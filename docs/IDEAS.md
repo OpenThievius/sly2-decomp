@@ -103,7 +103,13 @@ polynomial's meaning).
 - [x] **The five one-word opcode near misses (2026-11-15).** Two are not functions: func_0023C7B4 (`ld $s0; jr $ra; addiu $sp`) is the 12-byte tail of `__moddi3`
   (0x23C158, registered at 1628 bytes) and func_002488B8 the tail of `__ieee754_powf` (0x248038, registered at 2176: 0x248038 + 2176 is exactly 0x2488B8, so powf
   is really 2188 bytes). In both the previous chunk ends without a return and falls into the tail; `boundaries.py` only finds crossing branches, not fall-throughs
-  (a broad fall-through scan gave 762 candidates, mostly known fragments, so it needs a better test before it is worth running). The other three: func_00236FD8
+  (a broad fall-through scan gave 762 candidates, mostly known fragments, so it needs a better test before it is worth running). Landed as hand merges
+  (4be8a043, `config/matching/merges.tsv`, image still proves): both, plus seven more tails found by re-judging the 8 `stale` near misses of score 1 (all 2 to 3
+  instruction `jr $ra` stubs whose previous chunk ends in an `ld` or `lwc1` restore without a return): snd_SendIOPCommandNoWait, `__throw`, `__rethrow`,
+  func_0023F3D8, func_0024A0E8, `__ieee754_log` (1264 bytes, not 1252: its draft moved only 351 to 350, the size was not its problem), func_002542B8; the
+  eighth, func_0023B21C, follows a function that ends in `jr $ra` and stays a stub. The four other `stale` rows (UpdateJtLootSave 13, SolveDzg 47,
+  StoreAudioModeInSave 11, UpdateAmb 32) score exactly their manifest values: nothing was hiding. The other registry/manifest size gaps are padding: memmove 252 against
+  440 is memmove plus the next function memset in one source, CploFindSwObjectsByClass and GetXfLocalRateMatrix are followed by 8 and 16 byte `fragment` rows. The other three: func_00236FD8
   (SDK, `bnel` in retail, `bnez` in ours) and GetJtCpdefi (`bc1f` in retail, `bc1fl` in ours) took 12 and 10 compiles each from workers without moving off score 1;
   `__ieee754_fmodf` (`bnez` against `bgtz`) is the libm item above. What was learned about the likely-branch choice in gcc 2.9: a store written before the branch
   fills the slot as a plain branch; the same store written only in the nonzero arm is not moved into a `bnel` slot, the compiler copies the value into `$v1` and the
