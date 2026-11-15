@@ -45,11 +45,16 @@ polynomial's meaning).
   local, a plain name and a real type; `check_source.py` only flags the names scratch, junk, dummy, unused and spill. No other leaf frame in retail has an
   unused top; the two left are libgcc (`__udivdi3`, `__umoddi3`).
 - [ ] **Frames 0x10 short.** `frame_diff.py` on the open game functions with an unused 16-byte block shows three whose frame is exactly 0x10 smaller than
-  retail's: UpdateSoRoot (0x50 against 0x60), WarpJtToSafePoint (0x90 against 0xA0), Swarm_Update (0xB0 against 0xC0). `VECTOR local;` first in UpdateSoRoot
-  makes the frame identical (distance 0) and the score 105 to 90; in WarpJtToSafePoint the size matches but the score rises to 72 (try other declaration
-  orders: `frame_diff.py --search`); Swarm_Update is a `.c` draft with no `VECTOR`, so it needs the C++ rewrite first. SolveDzg and SolveDzgPrefilled have
-  frames far larger than retail's (0x480 against 0x70): a different cause. Unused blocks are common in matched functions with calls (244 matched, 28 open:
-  outgoing argument space), so only a frame-size difference counts, not the block alone.
+  retail's: UpdateSoRoot (0x50 against 0x60), WarpJtToSafePoint (0x90 against 0xA0), Swarm_Update (0xB0 against 0xC0). **Result (2026-11-15):** the cause is
+  not always a missing local. UpdateSoRoot: yes, `VECTOR local;` makes the frame identical, and it matched (landed 1e9e8ef7) once `plo = pso` moved right after
+  the `cgeom` check and `LO::Slot13` took `(int, SO*)` in lo.h (retail calls slot 13 with two arguments). WarpJtToSafePoint: no, retail saves six s-registers
+  where ours saved five, and the frame follows from that; a worker took it from 48 to 6 (write `pjt + 0x2C0` at each use, no shared local, which keeps the
+  pointer in two registers; declare `B_003DD490` as a struct with `s32 fade` at 0x3E60). What is left is the vtable pointer going to `$v1` and the first
+  callee to `$v0` in retail, `$v0` for both in ours; slot 30 (0xF0/0xF4) in lo.h has no argument although the call passes `pjt+0x1B0`, so widening it
+  and re-proving its users is the next try (best source in `work/scratch/e2b_sonnet/frames_wave/WarpJtToSafePoint/v2.cpp`). Swarm_Update is a `.c` draft with
+  no `VECTOR`: needs the C++ rewrite first. SolveDzg and SolveDzgPrefilled have frames far larger than retail's (0x480 against 0x70): a different cause.
+  Unused blocks are common in matched functions with calls (244 matched, 28 open: outgoing argument space), so only a frame-size difference counts.
+  Check the saved-register count before adding a local.
 - [ ] **func_00259AC8 (hand-written? no).** Not in `handwritten_asm.txt` and not a blocker: the unset `$v1` it stores is an uninitialised local, and a
   `volatile` 32-bit field written three times gives retail's three stores. With a `unsigned long` local and return the tail (`ld`, `dsrl32 28`, `andi 1`)
   matches and the score is 11. Still different: retail copies `$v1` to `$v0` first, puts a `nop` after every instruction and does the stores before the
