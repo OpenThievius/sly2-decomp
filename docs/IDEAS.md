@@ -78,6 +78,20 @@ polynomial's meaning).
   `source:provisional` (d6cb6f7b): 30 of the 36 functions that use them scored 1 or 2 lower, none reached 0. 17 more disagree (the name's address is not the
   binary's, e.g. `D_FLT_002BF438` against 0x2bf434): a wrong global in the source, not a missing entry; `.rodata` ones are function-local. Read the LINK
   lines of any near miss before reading its register hunks.
+- [x] **The six "wrong global" functions (2026-11-15, three Sonnet and three Opus workers, none reached 0).** The hint was wrong for most: the link check
+  prints a strange "binary" address (0xf3f0, 0x1f3f3cc, 0x202d43b0, 0x2df440) whenever scheduling pairs the wrong `lui` with a `lwc1`; the retail pairs give
+  the plain address (`lui 0x2C` plus a negative lo half). Read the retail pair, never the LINK value. Results: bevy_player_input_from_pad_cm 294 to 12
+  (one case left: the six instructions from `mfc1` to the second `sqc2` in jts 20, VU0 registers swapped; the `uFull = 1.0f` local was a literal local the
+  cleanup rules flag, inlining it kept 12), LoadMovieCharacter 206 to 17 (761 of 761 instructions), sceCdRead 91 to 58 (one extra callee-saved register),
+  SetJtJtcs 566 to 163 (545 instructions against 523: gcse PRE keeps `%hi(g_2dded0)` in `$s5` across the tail; no legal C form stops it; needs `lo.h` slot 38
+  `SetPosMatFromLo(LO *)`, `jt.h` `psm` at 0x1028 and about 15 `sly.h` fields before the draft compiles with the real headers),
+  UpdateDysh 146 to 47 (needs a shared quad-to-quad `pextlw` helper measured on a second function: the worker's own `InterleaveQuads` asm cannot land),
+  FJtAllowsGadget unchanged at 85 (retail 185 instructions, ours 176: `bne` forward with an inline `b epilogue`, both `lui` hoisted before the branch).
+  What worked on LoadMovieCharacter and is worth reusing: block-scope locals (GCC 2.95 shares slots between blocks); an empty `CStackFrame` class with
+  a real constructor and destructor (retail's reads no field, so it is 1 byte and cannot reuse a freed slot); a union for a vtable-call output buffer
+  so it shares a slot (`VU_SCALE`); `case 0: case 1:` labels for a jump table that starts at 0; an empty `case -1:` for retail's branch tree; VU1 entry
+  points are relocated `%hi`/`%lo` pairs, so they stay `extern char VU1_ENTRY_xxx[]` with an address in `symbol_addrs.txt`. 23 provisional symbols went in
+  (d81c5684); three drafts were adopted (72e4729f).
 - [ ] **func_00259AC8 (hand-written? no).** Not in `handwritten_asm.txt` and not a blocker: the unset `$v1` it stores is an uninitialised local, and a
   `volatile` 32-bit field written three times gives retail's three stores. With a `unsigned long` local and return the tail (`ld`, `dsrl32 28`, `andi 1`)
   matches and the score is 11. Still different: retail copies `$v1` to `$v0` first, puts a `nop` after every instruction and does the stores before the
