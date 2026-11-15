@@ -40,13 +40,12 @@ void PostStepLoadRun__FP4STEPP5BLRUNPP6ASEGBL(BLRUNX *prun)
     BIND bind;
     if (prun->aent[0].paseg == 0)
         return;
-    ASEGBLX **ppasegbl = &prun->pasegbl;
     void *pvFill = prun->aent;
     FillBlAmrsg__FiiPviiP3OID(0x40, 2, pvFill, 0x20, 2, D_002C3DC0);
-    BLENTRY *pentFirst = prun->aent;
     FillBlAmrsg__FiiPviiP3OID(0x40, 2, pvFill, 0x30, 2, D_002C3DC8);
-    BLENTRY *pentLoop = pentFirst;
     u32 iEntry = 0;
+    ASEGBLX **ppasegbl = &prun->pasegbl;
+    BLENTRY *pentLoop = prun->aent;
     do {
         ASEG *paseg = pentLoop->paseg;
         if (paseg != 0) {
@@ -60,7 +59,7 @@ void PostStepLoadRun__FP4STEPP5BLRUNPP6ASEGBL(BLRUNX *prun)
         iEntry++;
         pentLoop++;
     } while (iEntry < 2);
-    EnsureAsegBlendDynamic(prun->powner, 0x40, 2, pentFirst, 2, D_002C3DD8, D_002C3DD0, ppasegbl);
+    EnsureAsegBlendDynamic(prun->powner, 0x40, 2, prun->aent, 2, D_002C3DD8, D_002C3DD0, ppasegbl);
     for (int iable = 0; iable < prun->pasegbl->cable; iable++) {
         ABLE *pable = &prun->pasegbl->pable[iable];
         TARGET *ptargetA;

@@ -70,7 +70,34 @@ extern "C" void Crfodb_OnGrab(Guard *guard, JT *jt)
     func_00184130(guard, jt);
 }
 
-INCLUDE_ASM(0X13D1A8);
+struct SAVEPATH { int csym; short *asym; };
+
+extern "C" int IdCurrentLevel(void);
+
+extern "C" short SymidFindSymtab(void *, const char *);
+
+extern "C" void *func_002109B8(int);
+
+extern "C" SAVEPATH *PpathConcatStack(void *, SAVEPATH *);
+
+extern "C" char B_003E0EA8[];
+
+static inline void *SymtabOfSave(char *save) { return save + 8; }
+
+extern "C" void *PpathCrfodbLoot(void *guard)
+{
+    short asym[3];
+    SAVEPATH path;
+    int idLevel = IdCurrentLevel();
+    if (idLevel == -1)
+        idLevel = 0;
+    asym[0] = SymidFindSymtab(SymtabOfSave(B_003E0EA8), "booty");
+    asym[1] = SymidFindSymtab(SymtabOfSave(B_003E0EA8), "aoidAssembly");
+    asym[2] = *(unsigned short *)((char *)guard + 0x180);
+    path.csym = 3;
+    path.asym = asym;
+    return PpathConcatStack(func_002109B8(idLevel), &path);
+}
 
 struct CRef { int tagk; int n; int p2; int p3; };
 

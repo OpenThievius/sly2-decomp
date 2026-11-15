@@ -21,6 +21,15 @@ struct ZoneScript {
     float timeStamp;
 };
 
+static inline float GClamp(float g, float lo, float hi)
+{
+    if (g < lo)
+        return lo;
+    if (hi < g)
+        return hi;
+    return g;
+}
+
 extern "C" {
 void func_001EEF98();
 int func_001EF0A8(ZoneScript *);
@@ -62,13 +71,7 @@ void UpdateZoneScriptBeh(ZoneScript *self)
         float distance = LaneX(SqrtX(SquaredLengthXy(VectorSub(origin, other))));
         float *coefficients = owner->curve;
         float value = owner->curve[0] + distance * (coefficients[1] + distance * coefficients[2]);
-        float result;
-        if (value < owner->lowLimit)
-            result = owner->lowLimit;
-        else if (owner->highLimit < value)
-            result = owner->highLimit;
-        else
-            result = value;
+        float result = GClamp(value, owner->lowLimit, owner->highLimit);
         char *first = func_00205458(self->owner, 0xA7);
         char *second = func_00205458(self->owner, 0xB8);
         if (first != 0)

@@ -76,7 +76,24 @@ void AddPlosToSink(PLOSINK *psink, int cplo, LO_13FA30 **aplo)
     }
 }
 
-INCLUDE_ASM(0X13FAD0);
+extern "C" int IdCurrentLevel();
+
+extern "C" int func_0013FAD0(int count, short *ids)
+{
+    int id = IdCurrentLevel();
+    if (id == -1)
+        return 1;
+    short *pid = ids;
+    int index = 0;
+    goto test;
+    do {
+        index++;
+    test:
+        if (index >= count)
+            return 0;
+    } while (*pid++ != id);
+    return 1;
+}
 
 INCLUDE_ASM(0X13FB40);
 
