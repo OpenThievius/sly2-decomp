@@ -591,6 +591,7 @@ address	name	size	file	score
 0X229468	UGetWaterSubmerged	536	water-sw/UGetWaterSubmerged.c	113
 0X22A908	func_0022A908	1504	so-wr/fun_0022a908.c	434
 0X22C8C0	BuildXfLocalMatrix	344	wr-vec/BuildXfLocalMatrix.c	77
+0X22CA18	GetXfDofValue	184	wr-vec/GetXfDofValue.cpp	8
 0X22CAD0	ConvertDeulToW__FP6VECTORN20	192	vec_22cad0/ConvertDeulToW__FP6VECTORN20.c	45
 0X22CB90	BuildXfAngularRateMatrix	112	vec-alo/BuildXfAngularRateMatrix.cpp	2
 0X22CCD0	BuildXfSpinRateMatrix	240	vec-alo/BuildXfSpinRateMatrix.c	57
