@@ -154,6 +154,7 @@ Findings:
   helpers GCC schedules a load between them (AdjustSlyNewXp scores 7 split, 0 with the pair). The ground for a pair is the same as for a
   chain: retail always has the instructions together, and splitting them is what moves the bytes. A new pair needs the same evidence
   (adjacent in every retail user, measured on more than one function).
+- **Ruling (Theo, 2026-11-15): `VectorFromFloats3`, a five-instruction block, is allowed as one helper.** `mfc1` x3, `pextlw`, `pcpyld` build lanes x, y, z of a quadword from three floats. Retail writes the result into the low operand's register and keeps the block adjacent in about 40 functions (SetVectorCylind, SetVectorSphere, GetXfDofValue, GetPerpendicularVector, DecomposeRotateMatrixEuler, ...); split into `InterleaveLowWords` plus `JoinLowDoublewords` the scheduler puts an epilogue `lwc1` between them (SetVectorCylind 2, SetVectorSphere 11 split; 0 with the block). Measured on three drafts; the three matched ps2inline.h users still score 0. Same ground as `SquaredLengthXy`.
 - Not added, one user each so far: `VectorDivideX` (`vdiv Q, vf0w, s.x`; `vwaitq`; `vmulq`), `ScaleAddScaleX` (`vmulax` + `vmaddx`),
   `vmax`/`vmini` clamps. `vcallms` + `vmove` (RenderGlobsetTree) is not a helper candidate: the microprogram reads fixed VU registers
   (vf10-vf17), which needs register pins.

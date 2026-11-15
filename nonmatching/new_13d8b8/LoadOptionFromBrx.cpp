@@ -259,7 +259,7 @@ void LoadOptionFromBrx(BASIC *pbasic, EOPID *peopid, unsigned int grfopt, CBinar
             float y = pbis->F32Read();
             float z = pbis->F32Read();
             VECTOR vec;
-            QW qw = JoinLowDoublewords(z, InterleaveLowWords(y, x));
+            QW qw = VectorFromFloats3(x, y, z);
             *(QW *)&vec = qw;
             (pbasicSet->*(PMFVECTOR)pmf)(qw);
             break;

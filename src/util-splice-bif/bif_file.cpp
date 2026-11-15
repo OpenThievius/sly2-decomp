@@ -9,7 +9,16 @@
 
 INCLUDE_ASM(0X11E198);
 
-INCLUDE_ASM(0X11E1A0);
+void CalculateSinCos__FfPfT1(float rad, float *pgSin, float *pgCos);
+
+extern "C" QW SetVectorCylind__FP6VECTORfff(void *pvec, float rad, float sXY, float sZ)
+{
+    struct { QW vec; float gSin; float gCos; } l;
+    CalculateSinCos__FfPfT1(rad, &l.gSin, &l.gCos);
+    float cosScaled = l.gCos * sXY;
+    l.vec = VectorFromFloats3(cosScaled, l.gSin * sXY, sZ);
+    return l.vec;
+}
 
 INCLUDE_ASM(0X11E208);
 

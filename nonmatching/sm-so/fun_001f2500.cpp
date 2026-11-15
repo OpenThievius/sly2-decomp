@@ -13,6 +13,13 @@ struct Slot1F2500 {
     float maxB;
     float radius;
 };
+union PACKED1F2500 {
+    s64 whole;
+    struct {
+        int word0;
+        int word1;
+    } bits;
+};
 struct Node1F2500 {
     char pad0[0x10];
     Node1F2500 *parent;
@@ -27,7 +34,7 @@ struct Node1F2500 {
     char pad5[0x13C - 0x138];
     float radiusValue;
     char pad6[0x148 - 0x140];
-    s64 packed;
+    PACKED1F2500 packed;
 };
 
 extern char B_003E12D4;
@@ -44,11 +51,12 @@ extern "C" void func_001F2500(Node1F2500 *self)
         if (slot == 0) {
 loop:
             Node1F2500 *parent = walker->parent;
-            s64 word = 0;
+            PACKED1F2500 word;
+            word.whole = 0;
             if (parent != 0) {
-                word = walker->packed;
+                word.whole = walker->packed.whole;
             }
-            if (parent == 0 || (((s32)((word << 32) >> 32) << 8) >> 28) == 1) {
+            if (parent == 0 || ((word.bits.word0 << 8) >> 28) == 1) {
                 Slot1F2500 *fresh = (Slot1F2500 *)PvAllocSlotheapImpl(&B_003E12D4);
                 walker->slot = fresh;
                 self->slot = fresh;

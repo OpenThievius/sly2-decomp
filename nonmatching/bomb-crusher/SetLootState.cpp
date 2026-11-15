@@ -110,6 +110,16 @@ static inline float SDistance(QW pos, QW posOther)
     return LaneX(SqrtX(SquaredLength(VectorSub(pos, posOther))));
 }
 
+static inline void PostLootMsg(SO *pso, s32 kind)
+{
+    LOOTMSG msg;
+    msg.kind = kind;
+    msg.pso = pso;
+    struct VT { u8 unknown_0x0[0x198]; s16 delta; s16 index; void (*pfn)(void *, LOOTMSG *); };
+    VT *pvt = *(VT **)((char *)pso + 0xC);
+    pvt->pfn((char *)pso + pvt->delta, &msg);
+}
+
 extern "C" void SetLootState(LOOT *ploot, int state)
 {
     if (ploot->state == state)
@@ -124,9 +134,6 @@ extern "C" void SetLootState(LOOT *ploot, int state)
             LockLeaseOfPlo(B_003DD490.ppool, ploot);
         }
     }
-    VECTOR vel;
-    VECTOR dw;
-    VECTOR scale;
     int stateOld = ploot->state;
     JT *pjt = ploot->pjt;
     switch (stateOld) {
@@ -173,12 +180,7 @@ extern "C" void SetLootState(LOOT *ploot, int state)
     }
     case 5: {
         if (ploot->psoClaim) {
-            LOOTMSG msg;
-            msg.kind = 1;
-            msg.pso = ploot->psoClaim;
-            struct VT { u8 unknown_0x0[0x198]; s16 delta; s16 index; void (*pfn)(void *, LOOTMSG *); };
-            VT *pvt = *(VT **)((char *)ploot->psoClaim + 0xC);
-            pvt->pfn((char *)ploot->psoClaim + pvt->delta, &msg);
+            PostLootMsg(ploot->psoClaim, 1);
         }
         SetSoCnstrForce(ploot, 1);
         SetSoCnstrTorque(ploot, 1);
@@ -267,6 +269,10 @@ extern "C" void SetLootState(LOOT *ploot, int state)
             func_001F6B48(ploot, ploot->plootdef->istg);
         break;
     case 5: {
+        VECTOR vel;
+        VECTOR dw;
+        VECTOR scale;
+        VECTOR posUnused;
         func_001A58D0(ploot, 0, 3);
         SetSoCnstrForce(ploot, 0);
         SetSoCnstrTorque(ploot, 0);

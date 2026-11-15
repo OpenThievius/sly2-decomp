@@ -1,6 +1,7 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
 struct Owner_14AE38;
-struct Vt_14AE38 { char pad0[0x40]; short d40; short i40; void (*f44)(void *); char pad1[0x118 - 0x48]; short d118; short i118; void (*f11C)(void *, QW, Owner_14AE38 *); short d120; short i120; void (*f124)(void *, QW, Owner_14AE38 *); };
+struct Vt_14AE38 { char pad0[0x40]; short d40; short i40; void (*f44)(void *); char pad1[0x118 - 0x48]; short d118; short i118; void (*f11C)(void *, QW); short d120; short i120; void (*f124)(void *, QW); };
 struct Ent_14AE38 { char pad0[0xC]; Vt_14AE38 *vt; char pad1[0x30 - 0x10]; int f30; char pad2[0x38 - 0x34]; int f38; int f3C; int f40; char pad3[0x50 - 0x44]; QW f50; char pad4[0x64 - 0x60]; float f64; int f68; char pad5[0xC0 - 0x6C]; int fC0; char pad6[4]; int fC8; };
 struct Crv_14AE38 { char pad0[0xE8]; int fE8; char pad1[0xF4 - 0xEC]; QW *fF4; };
 struct Owner_14AE38 { char pad0[0xC]; Vt_14AE38 *vt; char pad1[0xF04 - 0x10]; float fF04; };
@@ -50,9 +51,9 @@ void func_0014AE38(Goal_14AE38 *self, int newState) {
             ent->vt->f44((char *)ent + ent->vt->d40);
             {
                 Owner_14AE38 *owner = self->owner;
-                owner->vt->f11C((char *)owner + owner->vt->d118, g_2a2dd0, owner);
+                owner->vt->f11C((char *)owner + owner->vt->d118, g_2a2dd0);
                 owner = self->owner;
-                owner->vt->f124((char *)owner + owner->vt->d120, g_2a2dd0, owner);
+                owner->vt->f124((char *)owner + owner->vt->d120, g_2a2dd0);
                 int *zero = (int *)((char *)self->owner + 0x190);
                 zero[2] = 0;
                 zero[1] = 0;

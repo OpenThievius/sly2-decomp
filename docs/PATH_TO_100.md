@@ -41,13 +41,17 @@ Why first: no draft means nothing to improve, so each is either a quick win or a
   `0x119BC0`, `0x14C1E0`, `0x243ED8`, `0x241970`). Left: the VU0 and asm-draft group, `__throw`, and the four large ones.
 - Exit: every one of the 49 has a match or a draft. Re-run `classify_diffs.py` on the new drafts and record the wall classes.
 
-### Stage 2: near misses (Not Started)
+### Stage 2: near misses (In Progress)
+
+- Status 2026-11-15: wave S2 (102 drafts scoring 1 to 16) ran with 12 Opus workers; 33 reached 0 (matched code 70.76% to 71.92%, 5548 to 5583 functions). Recurring walls: early `%hi` kept across a call (8 drafts), volatile store in a delay slot (5), pextlw reload (3), VU0 register order (4).
 
 - 102 drafts within 16 words of retail go to Opus, one function per worker, with the earlier attempt and its diff.
 - Six integer near misses have no known lever: 0x1733C8, 0x120548, 0x218748, 0x1A5D98, 0x13FAD0 (0x1C9058 now has a flag row). Check the RTL dump first.
 - SDK near misses: `powf` and the 5 libm drafts.
 
-### Stage 3: levers before waves (Not Started)
+### Stage 3: levers before waves (In Progress)
+
+- Status 2026-11-15: `VectorFromFloats3` (one helper for the mfc1/pextlw/pcpyld block) landed, 3 matches (`SetVectorCylind`, `SetVectorSphere`, `GetXfDofValue`). Closed with no rule-clean lever: the early `%hi` across a save call (cse-and-pre.md section 4), the VU0 register order of `ScaleByReciprocalX` and `DotProduct`. Volatile store in a branch or jal delay slot (5 drafts): toolchain limit, no assembler fills it. Next: the 4-lane pextlw variant, register-allocation classes, a new wave only where a lever landed.
 
 Waves yield about 20 bytes per claimed function. What moved the number: loop5, `-fmove-all-movables`, `function_flags.tsv`, shared helpers.
 

@@ -48,7 +48,33 @@ void func_001B1E38(char *arg0)
     func_0012E460(arg0 + 0x268);
 }
 
-INCLUDE_ASM(0X1B1E88);
+struct BOMB {
+    char pad0[0x5C];
+    int xf;
+    char pad1[0x210 - 0x60];
+    int target;
+    char pad2[0xC];
+    VECTOR posTarget;
+    void *paseg;
+    char handle[0x30];
+    int fActbank;
+    int actbank;
+    float gain;
+};
+
+extern "C" void ApplyAsegToHandle(void *paseg, BOMB *palo, int grfapl, char *handle, float tLocal, float svtLocal);
+
+extern "C" int CreateXfActbank(BOMB *, int, float, float, int, int);
+
+void FireMissile(BOMB *pbomb, int target, VECTOR *pposTarget)
+{
+    VECTOR posTarget = *pposTarget;
+    pbomb->target = target;
+    pbomb->posTarget = posTarget;
+    ApplyAsegToHandle(pbomb->paseg, pbomb, 8, pbomb->handle, 0.0f, 1.0f);
+    if (pbomb->fActbank != 0)
+        pbomb->actbank = CreateXfActbank(pbomb, pbomb->xf, pbomb->gain, 0.0f, 0, 5);
+}
 
 s32 func_0012E460(s32);                         /* extern */
 
@@ -58,7 +84,6 @@ void StickTrigBomb(s32 arg0) {
     func_0013B250();
     func_0012E460(arg0 + 0x268);
 }
-
 
 struct TRIG { char pad[0x238]; int coid; int aoid[4]; int ccid; int acid[4]; };
 

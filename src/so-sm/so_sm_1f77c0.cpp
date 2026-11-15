@@ -7,9 +7,30 @@
 #include "types.h"
 #include "alloc.h"
 #include "xf.h"
-#include "include_asm.h"
+#include "dl.h"
+#include "sw.h"
 
-INCLUDE_ASM(0X1F77C0);
+struct WKR_1F77C0 { char pad[0x4C]; float t; };
+
+extern float g_2dded0;
+
+extern "C" void FreeSlotheapPv(void *, void *);
+
+extern "C" void RemoveDlEntry(DL *, void *);
+
+void ExpireSwWkrs(SW *psw)
+{
+    DLI dli;
+    PushDli(&dli, &psw->dlWkr);
+    for (WKR_1F77C0 *pwkr = (WKR_1F77C0 *)PvStep(&dli); pwkr != 0; pwkr = (WKR_1F77C0 *)PvStep(&dli)) {
+        if (g_2dded0 < pwkr->t + 0.25f) {
+        } else {
+            RemoveDlEntry(&psw->dlWkr, pwkr);
+            FreeSlotheapPv(&psw->slotheapWkr, pwkr);
+        }
+    }
+    PopDli(&dli);
+}
 
 extern "C" int func_001F78A0(unsigned mask)
 {
@@ -704,8 +725,6 @@ struct Sm {
 extern "C" void Basic_FreeSubscribers(Sm *);
 
 extern "C" void CFramePtr_Assign(Sm *, s32);
-
-extern "C" void FreeSlotheapPv(s32 *, Sm *);
 
 extern "C" void SidebagPtr_Assign(char *, s32);
 

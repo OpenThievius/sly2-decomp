@@ -177,10 +177,9 @@ LActive:
             cExisting = pv ? CPvDl__FP2DL(pv + 0x15C) : 0;
         }
         int cMissing = cWanted - cExisting;
-        if (cMissing > 0)
+        cParticles = 0;
+        if (cParticles < cMissing)
             cParticles = cMissing;
-        else
-            cParticles = 0;
         break;
     }
     }

@@ -244,7 +244,27 @@ extern "C" CRef *func_001D8A38(CRef *result, const char *first, ...)
     return result;
 }
 
-INCLUDE_ASM(0X1D8B20);
+extern "C" void BuildSavePath(const char *first, char *args, SAVEPATH *path);
+
+extern "C" CRef RefSetSaveValue(void *, SAVEPATH *, CRef *, SAVEDATA *);
+
+static inline CRef SetSaveValue(SAVEPATH *path, CRef *pvalue, SAVEDATA *data)
+{
+    return RefSetSaveValue(B_003E0EA8, path, pvalue, data);
+}
+
+extern "C" CRef *func_001D8B20(CRef *result, CRef *pvalue, const char *first, ...)
+{
+    CRef ref;
+    char frame[16];
+    SAVEPATH path;
+    CStackFrame_Construct(frame);
+    BuildSavePath(first, (char *)__builtin_next_arg(first) - 40, &path);
+    ref = SetSaveValue(&path, pvalue, &B_003D4A60);
+    CRef_CopyConstruct(result, &ref);
+    CStackFrame_Destructor(frame, 2);
+    return result;
+}
 
 struct CRef_1D8C10 { int tagk; int n; };
 

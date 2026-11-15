@@ -86,6 +86,17 @@ static inline QW JoinLowDoublewords(float high, QW low)
     return joined;
 }
 
+/* Lanes x, y, z of a quadword from three floats: mfc1 x3, pextlw, pcpyld in one block. Retail always writes the pextlw and pcpyld result into the
+   register of the low operand and keeps the five instructions adjacent (about 40 functions); split across two helpers the scheduler puts an
+   epilogue load between them. Ruling (Theo, 2026-11-15): one helper, like SquaredLengthXy (docs/build/inline-asm-helpers.md) */
+static inline QW VectorFromFloats3(float x, float y, float z)
+{
+    QW packed;
+    u32 word;
+    asm("mfc1 %0, %2\n\tmfc1 %1, %3\n\tpextlw %0, %1, %0\n\tmfc1 %1, %4\n\tpcpyld %0, %1, %0" : "=&r"(packed), "=&r"(word) : "f"(x), "f"(y), "f"(z));
+    return packed;
+}
+
 /* pand: the 128-bit AND of two quadwords in general registers (a plain C `&` on QW fails: "unsupported wide integer operation"). Retail ANDs two
    axis bitsets of sixteen bytes each in one instruction (CobstacleFindPathzoneBox); the same instruction appears in three SDK-range functions that
    stay assembly (0x233470, 0x233638, 0x2401D8) */

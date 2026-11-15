@@ -7,6 +7,6 @@ extern "C" QW SetVectorSphere(float radPan, float radTilt, float sRadius)
     struct { QW vec; float gSinPan; float gCosPan; float gSinTilt; float gCosTilt; } l;
     CalculateSinCos(radPan, &l.gSinPan, &l.gCosPan);
     CalculateSinCos(radTilt, &l.gSinTilt, &l.gCosTilt);
-    l.vec = JoinLowDoublewords(l.gSinTilt * sRadius, InterleaveLowWords(l.gCosTilt * l.gCosPan * sRadius, l.gCosTilt * l.gSinPan * sRadius));
+    l.vec = VectorFromFloats3(l.gCosTilt * l.gCosPan * sRadius, l.gCosTilt * l.gSinPan * sRadius, l.gSinTilt * sRadius);
     return l.vec;
 }
