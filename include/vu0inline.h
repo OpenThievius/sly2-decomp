@@ -199,4 +199,22 @@ static inline u32 VectorWordX(QW v)
     return word;
 }
 
+/* qmtc2.ni from a 128-bit value already in a general register (retail copies the argument with por and moves the quad from there): a QW
+   operand is "r" like VectorFromWord's word, but GCC keeps the whole quadword in the general register (AddSphereToRenderTree, UpdateCmMat4) */
+static inline QW VectorFromQuad(QW quad)
+{
+    QW vector;
+    asm("qmtc2.ni %1, %0" : "=j"(vector) : "r"(quad));
+    return vector;
+}
+
+/* qmfc2.ni of a full quadword into a general register, for an sq or a por (retail: qmfc2.ni then sq); VectorWordX is the 32-bit form
+   (UpdateCmMat4) */
+static inline QW GeneralFromVector(QW vector)
+{
+    QW general;
+    asm("qmfc2.ni %0, %1" : "=r"(general) : "j"(vector));
+    return general;
+}
+
 #endif

@@ -129,6 +129,7 @@ address	name	size	file	score
 0X14D240	TickReadCount	64	new_14d1d0/TickReadCount.c	10
 0X14D478	UpdateCmLast	472	cm_14d478/UpdateCmLast.cpp	36
 0X14DA08	BuildFrustrum	360	cm_14d478/BuildFrustrum.c	88
+0X14DC58	UpdateCmMat4	936	cm_14d478/UpdateCmMat4.cpp	184
 0X14E1A8	SetCmLookAt	200	font-cm/SetCmLookAt.cpp	6
 0X14E328	SetCmPolicy__FP2CM3CPPP5CPLCYP2SOPv	416	cm_14e270/SetCmPolicy__FP2CM3CPPP5CPLCYP2SOPv.cpp	9
 0X14E4C8	RevokeCmPolicy__FP2CMi3CPPP5CPLCYP2SOPv	464	cm_14e270/RevokeCmPolicy__FP2CMi3CPPP5CPLCYP2SOPv.c	109
@@ -443,6 +444,7 @@ address	name	size	file	score
 0X1D19A8	UpdateVehicle	1960	rip-rumble/UpdateVehicle.c	531
 0X1D2490	func_001D2490	384	rip-rumble/fun_001d2490.c	86
 0X1D54B8	StoreAudioModeInSave	256	new_1d54b8/StoreAudioModeInSave.cpp	11
+0X1D6508	AddSphereToRenderTree	488	new_1d54b8/AddSphereToRenderTree.cpp	54
 0X1D6848	FCalculateMuzzleVelocity__FP6VECTORT0fT0P2SO	424	vec_1d6848/FCalculateMuzzleVelocity__FP6VECTORT0fT0P2SO.c	96
 0X1D69F0	VelBallistic	160	vec-coin/VelBallistic.c	38
 0X1D6B00	LaunchSoAtTarget	1504	vec-coin/LaunchSoAtTarget.c	322
