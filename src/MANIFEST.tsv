@@ -5158,6 +5158,8 @@ address	name	size	file	whole_file	symbol
 0X23A8E8	func_0023A8E8	36	sdk/fun_0023a8e8.c		
 0X23A9C8	func_0023A9C8	12	sdk/fun_0023a9c8.cpp		
 0X23AA40	func_0023AA40	36	sdk/fun_0023aa40.cpp		
+0X23AA98	func_0023AA98	28	unsorted/fun_0023aa98.c		
+0X23AAB8	func_0023AAB8	12	unsorted/fun_0023aab8.c		
 0X23AAC8	func_0023AAC8	24	sdk/fun_0023aac8.cpp		
 0X23AD70	func_0023AD70	52	sdk/fun_0023ad70.cpp		
 0X23AE20	func_0023AE20	76	sdk/fun_0023ae20.c		
@@ -5215,6 +5217,7 @@ address	name	size	file	whole_file	symbol
 0X23FE78	func_0023FE78	472	sdk/fun_0023fe78.cpp		
 0X2401C8	func_002401C8	12	sdk/fun_002401c8.cpp		
 0X240328	func_00240328	16	sdk/fun_00240328.cpp		
+0X2405F0	func_002405F0	12	sdk/fun_002405f0.c		
 0X240600	sceGsPutDispEnv	188	sdk/sceGsPutDispEnv.cpp		
 0X2406C0	sceGsPutDrawEnv	232	sdk/sceGsPutDrawEnv.cpp		
 0X240A40	sceGsSwapDBuff	92	sdk/sceGsSwapDBuff.cpp		

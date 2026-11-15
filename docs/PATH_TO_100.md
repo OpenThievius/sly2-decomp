@@ -27,7 +27,7 @@ all code. Track B is a gate, not work.
 
 Stages run in order. Status: Not Started | In Progress | Complete.
 
-### Stage 1: the 49 functions with no draft (Not Started)
+### Stage 1: the 49 functions with no draft (In Progress)
 
 Why first: no draft means nothing to improve, so each is either a quick win or a measured wall, and the answer feeds every later stage.
 
@@ -35,6 +35,10 @@ Why first: no draft means nothing to improve, so each is either a quick win or a
 - By size: Haiku up to 400 bytes, Sonnet 401 to 1,000, Opus above. Contiguous functions go to one worker. About ten compiles per function, then hand the best attempt up a tier.
 - Most are SDK range (`config/us/sony_gcc29.txt`, Sony gcc 2.9). Use `compile_unit.py` with the sony29 runner; libm needs 991111-01.
 - Output per function: a match, or a draft in `nonmatching/` with `MANIFEST.tsv` score, or `SKIP wall <semantics>`.
+- Status 2026-11-15: since the list was drawn, these are matched or published (matched: `func_0023E618`,
+  `__eh_rtime_match`, `func_002405F0`, `func_0023AA98`, `func_0023AAB8`; drafts: `GetXfDofValue`, `InsertTargetCandidate`,
+  `EvaluateAcsb`, `DtSolveJumpLaunch`, `GetJoyXYDeflection`); six more have a blocker note (`0x100000`, `exit_thunk`,
+  `0x119BC0`, `0x14C1E0`, `0x243ED8`, `0x241970`). Left: the VU0 and asm-draft group, `__throw`, and the four large ones.
 - Exit: every one of the 49 has a match or a draft. Re-run `classify_diffs.py` on the new drafts and record the wall classes.
 
 ### Stage 2: near misses (Not Started)

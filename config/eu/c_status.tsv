@@ -5158,6 +5158,8 @@ us_address	name	other_address	pair	score	addresses
 0x23A8E8	func_0023A8E8	0X23BA30	same	0	ok
 0x23A9C8	func_0023A9C8	0X23BB10	gap	0	ok
 0x23AA40	func_0023AA40	0X23BB88	same	0	ok
+0x23AA98	func_0023AA98		none		
+0x23AAB8	func_0023AAB8		none		
 0x23AAC8	func_0023AAC8		none		
 0x23AD70	func_0023AD70		none		
 0x23AE20	func_0023AE20		none		
@@ -5215,6 +5217,7 @@ us_address	name	other_address	pair	score	addresses
 0x23FE78	func_0023FE78	0X240838	same	0	ok
 0x2401C8	func_002401C8	0X240B88	gap	0	ok
 0x240328	func_00240328	0X240CE8	gap	0	ok
+0x2405F0	func_002405F0	0X240FB0	gap	0	ok
 0x240600	sceGsPutDispEnv	0X240FC0	same	0	ok
 0x2406C0	sceGsPutDrawEnv	0X241080	same	0	ok
 0x240A40	sceGsSwapDBuff	0X241400	same	0	ok

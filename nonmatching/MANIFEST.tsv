@@ -257,6 +257,7 @@ address	name	size	file	score
 0X186820	RefreshAloIkLimbLengths	272	binoc-joy/RefreshAloIkLimbLengths.c	66
 0X186930	InitIkLimb	288	binoc-joy/InitIkLimb.c	52
 0X186A50	SolveIkLimb	1160	binoc-joy/SolveIkLimb.c	274
+0X187768	GetJoyXYDeflection__FP3JOYUcUcPfN23PUcT6PiP2LM	560	joy_187030/GetJoyXYDeflection__FP3JOYUcUcPfN23PUcT6PiP2LM.cpp	36
 0X188960	PresetSlyAccel	872	joy-jt/PresetSlyAccel.cpp	188
 0X188E78	AdjustSlyXpVelocity	168	joy-jt/AdjustSlyXpVelocity.c	28
 0X189618	UpdateJtBalance	1576	joy-jt/UpdateJtBalance.c	322
@@ -289,6 +290,7 @@ address	name	size	file	score
 0X195368	EmitTargetSparkles	672	new_1942f0/EmitTargetSparkles.cpp	60
 0X195A00	SetJmpState	1464	new_1942f0/SetJmpState.c	289
 0X195FB8	SetJmpBodyState	2416	new_1942f0/SetJmpBodyState.c	356
+0X196928	DtSolveJumpLaunch	384	new_1942f0/DtSolveJumpLaunch.cpp	12
 0X196AA8	LimitJmpAccelByContacts	848	new_1942f0/LimitJmpAccelByContacts.c	219
 0X197500	UpdateJmpBodyState	2712	new_1942f0/UpdateJmpBodyState.c	561
 0X1991A0	func_001991A0	248	new_1942f0/fun_001991a0.c	54
@@ -658,7 +660,6 @@ address	name	size	file	score
 0X23A668	func_0023A668	96	sdk/fun_0023a668.cpp	2
 0X23A920	func_0023A920	168	sdk/fun_0023a920.cpp	42
 0X23A9D8	func_0023A9D8	104	sdk/fun_0023a9d8.cpp	24
-0X23AA68	func_0023AA68	80	sdk/fun_0023aa68.cpp	22
 0X23AAE0	func_0023AAE0	16	sdk/fun_0023aae0.cpp	3
 0X23AAF0	func_0023AAF0	640	sdk/fun_0023aaf0.c	61
 0X23ADA8	func_0023ADA8	120	sdk/fun_0023ada8.cpp	11
@@ -682,7 +683,7 @@ address	name	size	file	score
 0X23F850	func_0023F850	232	sdk/fun_0023f850.c	23
 0X23FA40	func_0023FA40	920	sdk/fun_0023fa40.cpp	82
 0X240050	func_00240050	376	sdk/fun_00240050.c	103
-0X240460	sceGsResetGraph	400	sdk/sceGsResetGraph.cpp	76
+0X240460	sceGsResetGraph	400	sdk/sceGsResetGraph.cpp	73
 0X2407A8	sceGsSetDefDBuff	664	sdk/sceGsSetDefDBuff.c	89
 0X240AE0	sceGsSetHalfOffset	136	sdk/sceGsSetHalfOffset.c	14
 0X240C38	sceGsSetDefDispEnv	888	sdk/sceGsSetDefDispEnv.cpp	128

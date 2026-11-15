@@ -724,6 +724,7 @@ address	name	size	kind
 0X23A910	func_0023A910	16	remnant
 0X23A920	func_0023A920	168	gp
 0X23A9D8	func_0023A9D8	104	remnant
+0X23AA68	func_0023AA68	48	remnant
 0X23AAE0	func_0023AAE0	16	remnant
 0X23ADA8	func_0023ADA8	120	gp
 0X23B028	func_0023B028	328	system
