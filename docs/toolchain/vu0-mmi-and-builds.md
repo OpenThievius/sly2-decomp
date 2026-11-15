@@ -41,6 +41,7 @@ Where our rules stand, plainly:
 Rulings to ask for (none assumed):
 
 1. Register-variable `"j"` inputs for a hardware microprogram interface (fixed VU registers a `vcallms` reads), stated as a hardware ABI, not steering; evidence required per function.
+   **Granted 2026-11-15 for `RenderGlobsetTree` (`0x1D5808`) only**, as sly1-decomp granted `func_0013A498`: marker `// vcallms-abi-ok: 0x1D5808 <reason>`, see AGENTS.md and exceptions.md. Not a general rule.
 2. A multi-instruction non-volatile helper with outputs when retail has the instructions adjacent in at least two functions (the `SquaredLengthXy` ground generalised beyond ACC/Q).
 3. A `mfc0` helper: a non-volatile asm with no inputs is CSE'd and hoisted, so Sly 1's `ReadCop0Status`/`ReadCop0Count` are volatile; AGENTS.md allows volatile only on barriers.
 

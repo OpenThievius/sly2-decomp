@@ -43,6 +43,10 @@ HARDWARE_ADDRESS = re.compile(r'0x1[0-9A-Fa-f]{7}\b')
 # data shared with an interrupt handler or another thread where retail reads and writes it as volatile. The reason names the register block or
 # the handler (and its address), so every use can be audited; a bare marker with no reason does not count.
 VOLATILE_OK = re.compile(r'volatile-ok:\s*\S')
+# `// vcallms-abi-ok: 0x1D5808 <reason>` on the line of a register variable: the one named exception to "no register pins" (Theo, 2026-11-15,
+# after sly1-decomp's func_0013A498 ruling of 2026-11-12): RenderGlobsetTree's culling microprogram (vcallms 0x1C0) reads fixed $vf10 to $vf17.
+# The address is part of the pattern, so no other function can use the marker (docs/contributing/exceptions.md).
+VCALLMS_ABI_OK = re.compile(r'vcallms-abi-ok:\s*0x1D5808\b', re.IGNORECASE)
 BANNED = [
     ('volatile', re.compile(r'(?<!asm )(?<!asm\t)\bvolatile\b')),  # not the `asm volatile` of a statement: the inline asm check covers those
     ('register pin', re.compile(r'\bregister\b[^;]*\basm\b|\basm\s*\(\s*"\$')),
@@ -61,6 +65,8 @@ def scan(text):
         code, _, comment = line.partition('//')
         for what, pattern in BANNED:
             if what == 'volatile' and (HARDWARE_ADDRESS.search(code) or VOLATILE_OK.search(comment)):
+                continue
+            if what == 'register pin' and VCALLMS_ABI_OK.search(comment):
                 continue
             if pattern.search(code):
                 found.append((number, what, line.strip()[:100]))
