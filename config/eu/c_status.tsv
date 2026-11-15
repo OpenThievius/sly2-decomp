@@ -4346,6 +4346,7 @@ us_address	name	other_address	pair	score	addresses
 0x200CA8	RefAddOption__FP5BASICiP4CRef	0X201468	identical	0	ok
 0x200D10	RefEnsureOption__FP5BASICiP4CRef	0X2014D0	identical	0	ok
 0x200DA0	RefSetArgListFromPvs	0X201560	same	0	ok
+0x200F58	func_00200F58	0X201718	same	0	ok
 0x201110	RefSetPvsFromSplice__FiP4CRefP4OTYPPPv	0X2018D0	same	0	ok
 0x201360	RefSetArgsFromSplice__FiP4CRefP4OTYPe	0X201B20	same	0	ok
 0x2013D8	func_002013D8	0X201B98	same	0	ok
