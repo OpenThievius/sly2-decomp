@@ -78,7 +78,7 @@ struct LO : BASIC {
     virtual void Slot35(QW vec);        /* 35: MatchSoOtherObject passes slot 33's result */
     virtual void Slot36(QW vec);        /* 36: MatchSoOtherObject passes slot 34's result */
     virtual void Slot37(void *pmat);    /* 37: func_001A6450, func_001F4010 (SO); InstantiateClone passes the clone's matrix */
-    virtual void SetPosMatFromLo();     /* 38: SetLoPosMatFromLo */
+    virtual void SetPosMatFromLo(struct LO *plo);     /* 38: SetLoPosMatFromLo */
     virtual void SetPosMatFromXf();     /* 39: SetLoPosMatFromXf */
     virtual void CloneVirtual();        /* 40: CloneLoVirtual */
     virtual void Slot41();

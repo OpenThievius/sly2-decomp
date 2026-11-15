@@ -15,6 +15,7 @@
 
 struct GUARD;
 struct LOOT;
+struct SM;
 
 /* One of the player's three gadget slots: LoadJtGadgetSlots fills gadget from the level data, three 0xC-byte entries. */
 struct GADGETSLOT {
@@ -79,7 +80,9 @@ struct JT : STEP {
     /* 0x1000 */ s32 field_0x1000; /* InitMurray sets 4, InitBentley 2 */
     u8 unknown_0x1004[0x1C];
     /* 0x1020 */ f32 field_0x1020; /* InitJt sets 100 */
-    u8 unknown_0x1024[0xC];
+    u8 unknown_0x1024[0x4];
+    /* 0x1028 */ struct SM *psm; /* SetJtJtcs: IsmsFindSmOptional */
+    u8 unknown_0x102C[0x4];
     /* 0x1030 */ void *field_0x1030; /* JT_StartPose (which calls slot 88, so holds a JT) */
     /* 0x1034 */ void *field_0x1034; /* JT_StartPose, UpdateJtStand */
     u8 unknown_0x1038[0x4];
