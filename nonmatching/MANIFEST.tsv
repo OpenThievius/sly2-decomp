@@ -74,7 +74,6 @@ address	name	size	file	score
 0X134040	RecalcSwXpAll	720	bbmark-blend/RecalcSwXpAll.cpp	105
 0X134DA8	UpdateBentley	1184	bbmark-blend/UpdateBentley.c	242
 0X135940	PresetBentleyAccel	264	bbmark-blend/PresetBentleyAccel.cpp	10
-0X135D08	GetBentleyMode	120	bbmark-blend/GetBentleyMode.cpp	18
 0X136118	UpdateBentleyGadget	384	bbmark-blend/UpdateBentleyGadget.cpp	49
 0X136530	func_00136530	680	bbmark-blend/fun_00136530.c	74
 0X136870	FBentleyCanUseGadget	440	bbmark-blend/FBentleyCanUseGadget.cpp	32
@@ -266,7 +265,6 @@ address	name	size	file	score
 0X18B348	func_0018B348	280	jt-alo/fun_0018b348.c	70
 0X18B7E8	bevy_player_input_from_pad_cm	1272	jt-alo/bevy_player_input_from_pad_cm.c	295
 0X18BCE0	bevy_player_p5_states_18bce0	896	jt-alo/bevy_player_p5_states_18bce0.c	189
-0X18D620	func_0018D620	120	jt-alo/fun_0018d620.cpp	18
 0X18D760	FJtAllowsGadget	744	jt-alo/FJtAllowsGadget.cpp	87
 0X18DF60	UpdateJtRide	640	jt-alo/UpdateJtRide.c	155
 0X18E1E0	func_0018E1E0	336	jt-alo/fun_0018e1e0.c	73
@@ -367,7 +365,6 @@ address	name	size	file	score
 0X1B72B0	func_001B72B0	1104	mpeg-memcard/fun_001b72b0.cpp	161
 0X1B7970	ThrowMurrayObject	264	mpeg-memcard/ThrowMurrayObject.c	55
 0X1B7A78	StartMurrayThrow	112	mpeg-memcard/StartMurrayThrow.c	23
-0X1B7F90	GetMurrayMode	120	mpeg-memcard/GetMurrayMode.cpp	18
 0X1B8100	GetMurrayExposeMode	128	mpeg-memcard/GetMurrayExposeMode.cpp	13
 0X1B8508	StartMurrayAttackA	200	mpeg-memcard/StartMurrayAttackA.cpp	7
 0X1B86B0	SetMurrayAttackState	648	mpeg-memcard/SetMurrayAttackState.c	125
@@ -403,7 +400,6 @@ address	name	size	file	score
 0X1C3500	GetJtPipeGoalMat__FP2JTP4PIPEfP7MATRIX3	1112	steppipe_1c3500/GetJtPipeGoalMat__FP2JTP4PIPEfP7MATRIX3.c	233
 0X1C3A08	func_001C3A08	128	new_1c3958/fun_001c3a08.c	25
 0X1C3A88	func_001C3A88	296	new_1c3958/fun_001c3a88.c	57
-0X1C4228	func_001C4228	88	new_1c3df8/fun_001c4228.cpp	11
 0X1C4330	UpdateVjoyStick	312	new_1c3df8/UpdateVjoyStick.c	86
 0X1C4768	bevy_player_p14_1c4768	216	new_1c3df8/bevy_player_p14_1c4768.c	53
 0X1C4AF8	func_001C4AF8	224	new_1c3df8/fun_001c4af8.c	47

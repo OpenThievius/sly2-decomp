@@ -1438,6 +1438,7 @@ address	name	size	file	whole_file	symbol
 0X135A48	AdjustBentleyNewXp	144	bbmark-blend/AdjustBentleyNewXp.cpp		
 0X135AD8	HandleBentleyMessage	324	bbmark-blend/HandleBentleyMessage.cpp		
 0X135C20	SetBentleyMode	232	bbmark-blend/SetBentleyMode.cpp		
+0X135D08	GetBentleyMode	120	bbmark-blend/GetBentleyMode.cpp		
 0X135D80	func_00135D80	172	bbmark-blend/fun_00135d80.cpp		
 0X135E30	func_00135E30	8	bbmark-blend/fun_00135e30.c		
 0X135E38	func_00135E38	8	bbmark-blend/fun_00135e38.c		
@@ -2692,6 +2693,7 @@ address	name	size	file	whole_file	symbol
 0X18D500	func_0018D500	68	jt-alo/fun_0018d500.cpp		
 0X18D548	ClearJtJtcs	28	jt-alo/ClearJtJtcs.cpp		
 0X18D568	func_0018D568	184	jt-alo/fun_0018d568.cpp		
+0X18D620	func_0018D620	120	jt-alo/fun_0018d620.cpp		
 0X18D698	func_0018D698	96	jt-alo/fun_0018d698.c		
 0X18D6F8	func_0018D6F8	104	jt-alo/fun_0018d6f8.cpp		
 0X18DA48	UseSlyGadget	812	jt-alo/UseSlyGadget.cpp		
@@ -3164,6 +3166,7 @@ address	name	size	file	whole_file	symbol
 0X1B7BA8	ReleaseMurrayObject	376	mpeg-memcard/ReleaseMurrayObject.cpp		
 0X1B7D20	DetachMurrayObject	284	mpeg-memcard/DetachMurrayObject.cpp		
 0X1B7E40	SetMurrayMode	336	mpeg-memcard/SetMurrayMode.cpp		
+0X1B7F90	GetMurrayMode	120	mpeg-memcard/GetMurrayMode.cpp		
 0X1B8008	SetMurrayAnimBase	228	mpeg-memcard/SetMurrayAnimBase.cpp		
 0X1B80F0	NopMurray	8	mpeg-memcard/NopMurray.c		
 0X1B80F8	FReturnFalseMurray	8	mpeg-memcard/FReturnFalseMurray.c		
@@ -3341,6 +3344,7 @@ address	name	size	file	whole_file	symbol
 0X1C40F8	FIsPoSwFocus	52	new_1c3df8/FIsPoSwFocus.c		
 0X1C4130	func_001C4130	136	new_1c3df8/fun_001c4130.cpp		
 0X1C41B8	func_001C41B8	112	new_1c3df8/fun_001c41b8.cpp		
+0X1C4228	func_001C4228	84	new_1c3df8/fun_001c4228.cpp		
 0X1C4280	VJOY_constructor	100	new_1c3df8/VJOY_constructor.cpp		
 0X1C42E8	ResetVjoy	72	new_1c3df8/ResetVjoy.cpp		
 0X1C4468	UpdateVjoy	320	new_1c3df8/UpdateVjoy.cpp		

@@ -1438,6 +1438,7 @@ us_address	name	other_address	pair	score	addresses
 0x135A48	AdjustBentleyNewXp	0X135A48	same	0	ok
 0x135AD8	HandleBentleyMessage	0X135AD8	same	0	ok
 0x135C20	SetBentleyMode	0X135C20	same	0	ok
+0x135D08	GetBentleyMode	0X135D08	same	0	ok
 0x135D80	func_00135D80	0X135D80	same	0	ok
 0x135E30	func_00135E30	0X135E30	gap	0	ok
 0x135E38	func_00135E38	0X135E38	gap	0	ok
@@ -2692,6 +2693,7 @@ us_address	name	other_address	pair	score	addresses
 0x18D500	func_0018D500	0X18D488	same	0	ok
 0x18D548	ClearJtJtcs	0X18D4D0	same	0	ok
 0x18D568	func_0018D568	0X18D4F0	same	0	ok
+0x18D620	func_0018D620	0X18D5A8	same	0	ok
 0x18D698	func_0018D698	0X18D620	identical	0	ok
 0x18D6F8	func_0018D6F8	0X18D680	identical	0	ok
 0x18DA48	UseSlyGadget	0X18D9D0	same	0	ok
@@ -3164,6 +3166,7 @@ us_address	name	other_address	pair	score	addresses
 0x1B7BA8	ReleaseMurrayObject	0X1B7E10	same	0	ok
 0x1B7D20	DetachMurrayObject	0X1B7F88	same	0	ok
 0x1B7E40	SetMurrayMode	0X1B80A8	same	0	ok
+0x1B7F90	GetMurrayMode	0X1B81F8	same	0	ok
 0x1B8008	SetMurrayAnimBase	0X1B8270	same	0	ok
 0x1B80F0	NopMurray	0X1B8358	gap	0	ok
 0x1B80F8	FReturnFalseMurray	0X1B8360	gap	0	ok
@@ -3341,6 +3344,7 @@ us_address	name	other_address	pair	score	addresses
 0x1C40F8	FIsPoSwFocus	0X1C4360	same	0	ok
 0x1C4130	func_001C4130	0X1C4398	same	0	ok
 0x1C41B8	func_001C41B8	0X1C4420	identical	0	ok
+0x1C4228	func_001C4228	0X1C4490	identical	0	ok
 0x1C4280	VJOY_constructor	0X1C44E8	same	0	ok
 0x1C42E8	ResetVjoy	0X1C4550	same	0	ok
 0x1C4468	UpdateVjoy	0X1C46D0	same	0	ok
