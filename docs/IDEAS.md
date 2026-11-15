@@ -28,6 +28,33 @@ polynomial's meaning).
 - [ ] **Open libm and fmodf.** `__ieee754_fmodf` is at 1 word (`bnez` against `bgtz` in the loop test; `while (n--)` and `n-- != 0` give a top-tested
   loop, `n-- > 0` the right shape): read the loop dump (`-dL`) for why the first two convert; `__ieee754_powf` (0x248038, 2,176 bytes) has no draft.
   Both are listed in `config/us/sony_gcc29_01.txt`. Re-test the five libm sources that landed after any toolchain change.
+- [x] **Registry sizes of split-cut functions.** A function whose switch bodies sit behind a second `jr $ra` is registered at the first piece's size, so
+  `try.py` compares only that piece and the score stays high for a source that is right. **Result (2026-11-15):** `boundaries.py find` listed exactly three
+  groups not yet in `config/matching/merges.tsv` (GetBentleyMode, func_0018D620, GetMurrayMode, 120 bytes each, 0x48 before the next symbol); after
+  `find --write` and `apply` their existing `nonmatching/` sources scored 0 and landed. Every function the tool lists is in the merges file now.
+  The other registry/manifest size gaps over 8 bytes (memmove, `__ieee754_log`, CploFindSwObjectsByClass, GetXfLocalRateMatrix) cross no branch: not this wall.
+  Run `boundaries.py find` after any re-split, before judging a near miss with a high score on a switch.
+- [x] **Local-model drafts (2026-11-14, 342 near misses of 400 bytes or less, 124 judged).** A candidate scored with `try.py` after splicing it into its
+  `nonmatching/` source beat our score on 21; 16 of those passed `check_source.py`, and 8 of the 16 were permanent blockers (7 VU0, 1 gp) whose body the model
+  had dropped. The three jump-table ones were the size wall above (the model's score was against 12 of 30 words). One Sonnet worker per remaining
+  function found one real match (func_001C4228: the addresses of two by-value parameters go into a pointer array, no padded locals struct). Judge any
+  candidate by splicing and `try.py`, never by the tool's similarity; filter `config/us/blockers.tsv` before sending workers.
+- [x] **Empty frame, the unused `VECTOR local`.** **Result (2026-11-15):** retail has 9 leaf functions whose whole frame is `addiu $sp,-0x10` in the first
+  delay slot and `+0x10` at the return, with no stack access; 5 were matched with an unused `VECTOR local;` (PasegaFindAseg, PsmaFindSm, PcmdFindScriptLabel;
+  PshdframesFromOid and PsaaFromOid get it another way). The four open ones (FBlotObscured, PasegaFindAlo, PsmaFindAlo, PseqnodeFind) matched with the same
+  local, a plain name and a real type; `check_source.py` only flags the names scratch, junk, dummy, unused and spill. No other leaf frame in retail has an
+  unused top; the two left are libgcc (`__udivdi3`, `__umoddi3`).
+- [ ] **Frames 0x10 short.** `frame_diff.py` on the open game functions with an unused 16-byte block shows three whose frame is exactly 0x10 smaller than
+  retail's: UpdateSoRoot (0x50 against 0x60), WarpJtToSafePoint (0x90 against 0xA0), Swarm_Update (0xB0 against 0xC0). `VECTOR local;` first in UpdateSoRoot
+  makes the frame identical (distance 0) and the score 105 to 90; in WarpJtToSafePoint the size matches but the score rises to 72 (try other declaration
+  orders: `frame_diff.py --search`); Swarm_Update is a `.c` draft with no `VECTOR`, so it needs the C++ rewrite first. SolveDzg and SolveDzgPrefilled have
+  frames far larger than retail's (0x480 against 0x70): a different cause. Unused blocks are common in matched functions with calls (244 matched, 28 open:
+  outgoing argument space), so only a frame-size difference counts, not the block alone.
+- [ ] **func_00259AC8 (hand-written? no).** Not in `handwritten_asm.txt` and not a blocker: the unset `$v1` it stores is an uninitialised local, and a
+  `volatile` 32-bit field written three times gives retail's three stores. With a `unsigned long` local and return the tail (`ld`, `dsrl32 28`, `andi 1`)
+  matches and the score is 11. Still different: retail copies `$v1` to `$v0` first, puts a `nop` after every instruction and does the stores before the
+  load. The `nop`s appear in no other function (scan: store, nop, store to one address). The `volatile` needs `// volatile-ok:` naming the register block, which
+  is unknown. Draft in `work/scratch/e2b_sonnet/func_00259AC8/w2.cpp`; stop at about ten compiles (used 3).
 
 ## 1. Scheduling
 
@@ -129,7 +156,7 @@ No Sly 2 function is named: none was checked against MANIFEST.tsv. Pick candidat
 - [ ] **Reload-rotation check via `Spilling reg`**: for near misses where one reload uses the wrong GPR (e.g. `a0` for `v0`) and later reloads are all shifted, keep the dumps with `regalloc.py ... --keep DIR` and `grep 'Spilling reg' DIR/*.greg | sort | uniq -c`. A register spilled exactly once is the culprit; find that insn's pseudo in `.lreg` and change its use (a copy through a local, an `"=&r"` helper operand). Expected: one fewer distinct spill register and a rotation that matches retail.
 - [ ] **jump.c clamp form**: where retail has `li K; slt t,K,c; movz/movn` write `s32 v = K+1; if (c < K+1) v = c;`; where retail has `slti`, write the GE form. Fits: diffs that differ only in `slti` vs `li`+`slt` and movz/movn polarity. Measure: try.py on each of the four forms (see doc section 6). Expected: whole clamp matches or the branch (`beqzl`) form is excluded.
 - [ ] **Flag as a value**: replace `if (a && b && c) flag = 1;` with `s32 flag = a && b && c;` where flag and a neighbouring register swap v0/v1. Measure: try.py, regalloc.py allocator column. Expected: swap disappears (sly1 case func_001BC978).
-- [ ] **Frame hole accounting**: for a frame shifted by exactly 16 after some offset, run `scripts/matching/frame_diff.py` and simulate which earlier block's local was bigger (inline frame, by-value result slot). Try the struct type retail implies. Expected: all later offsets align at once.
+- [x] **Frame hole accounting** (2026-11-15, results in section 0: the empty `VECTOR local` frames matched, three open functions 0x10 short): for a frame shifted by exactly 16 after some offset, run `scripts/matching/frame_diff.py` and simulate which earlier block's local was bigger (inline frame, by-value result slot). Try the struct type retail implies. Expected: all later offsets align at once.
 - [ ] **Move a variable's refs to flip a ranking**: for two swapped saved registers with identical code, use regalloc.py's priority text; add or remove one use, or split a variable. Expected: swap resolved; if not, record NEAR.
 - [ ] **Loop counter of its own**: where an earlier loop's counter shares the outer variable's register, declare a separate counter for the earlier loop. Measure: try.py. Expected: saved-register assignment changes.
 - [ ] **Member vs offset access for reload presence**: if retail reloads a field after a store and ours keeps it in a register (or reverse), switch between `m->flags` and `*(s32*)((u8*)m + N)`. Expected: reload appears or disappears; check against lessons.md section 2 first.
