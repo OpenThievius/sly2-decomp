@@ -61,6 +61,31 @@ def fragment_reason(name):
     return None
 
 
+def chunk_size(name):
+    """Bytes of the split's chunk of this name (its `nonmatching NAME, 0xN` header), else None."""
+    path = os.path.join(SPLIT, f'{name}.s')
+    if not os.path.exists(path):
+        return None
+    found = re.search(r'^nonmatching \S+, (0x[0-9A-Fa-f]+)', open(path, encoding='utf-8').read(), re.M)
+    return int(found.group(1), 16) if found else None
+
+
+def report_sizes():
+    """Function sizes of work/report.json (`make report`), which count the tails the split cut off; {} without the report."""
+    path = os.path.join(LAB, 'work', 'report.json')
+    if not os.path.exists(path):
+        return {}
+    with open(path, encoding='utf-8') as handle:
+        return {int(entry['address'], 16): int(entry['size']) for entry in json.load(handle)['functions']}
+
+
+def merged_tail(name, registered_size):
+    """True when the registry holds this function larger than the split's chunk by more than padding (4 bytes): the rest is a tail
+    chunk the split cut off and `config/matching/merges.tsv` or the registry put back, so the chunk alone looks like a fragment."""
+    size = chunk_size(name)
+    return size is not None and registered_size > size + 4
+
+
 def state_path(wave):
     return os.path.join(WAVES, wave, 'wave.json')
 
@@ -160,7 +185,8 @@ def init(arguments):
     sys.path.insert(0, os.path.join(LAB, 'scripts'))
     import classify_blockers
     blocker_names = classify_blockers.names()
-    fragments = {a: fragment_reason(names[a]) for a in queue}
+    reported = report_sizes()
+    fragments = {a: None if merged_tail(names[a], max(size.get(a, 0), reported.get(a, 0))) else fragment_reason(names[a]) for a in queue}
     for address, reason in sorted(fragments.items()):
         if reason:
             print(f'skipped 0x{address:06X} {names[address]}: {reason}')
@@ -182,6 +208,8 @@ def packet(wave, worker, address, budget):
     os.makedirs(scratch, exist_ok=True)
     lines = [f'## 0x{address:06X} {row["name"]} ({row["size"]} bytes)',
              f'- asm: `work/matching/split/asm/functions/SCUS_973/{row["name"]}.s`',
+             *([f'- merged tail: the registry holds {row["size"]} bytes, this chunk {chunk_size(row["name"])}: the rest is in the next chunk(s) '
+                f'(`func_{address + chunk_size(row["name"]):08X}.s`, same folder), a tail the split cut off'] if merged_tail(row['name'], int(row['size'])) else []),
              f'- scratch folder (write every attempt here, never in src/ or nonmatching/): `{os.path.relpath(scratch, LAB)}`',
              f'- run: `TRY_ARM={wave}-{worker} TRY_BUDGET={budget} python3 scripts/matching/try.py 0x{address:X} <file>`']
     entry = manifest().get(address)

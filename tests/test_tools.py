@@ -971,6 +971,17 @@ class ClaimTests(unittest.TestCase):
         with open(os.path.join(claim.WAVES, 'T', 'wave.json')) as handle:
             self.assertEqual(json.load(handle)['queue'], [0x100000])
 
+    def test_a_function_registered_larger_than_its_chunk_is_a_merged_tail_not_a_fragment(self):
+        self.write('work/matching/split/asm/functions/SCUS_973/tail.s', 'nonmatching tail, 0x534\n')
+        saved = claim.SPLIT
+        claim.SPLIT = os.path.join(self.directory, 'work/matching/split/asm/functions/SCUS_973')
+        try:
+            self.assertTrue(claim.merged_tail('tail', 1344))
+            self.assertFalse(claim.merged_tail('tail', 1336))
+            self.assertFalse(claim.merged_tail('missing', 1344))
+        finally:
+            claim.SPLIT = saved
+
 
     def wave(self, queue, claims):
         os.makedirs(os.path.join(claim.WAVES, 'T'), exist_ok=True)
