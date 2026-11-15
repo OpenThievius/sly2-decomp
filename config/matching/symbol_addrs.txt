@@ -7399,3 +7399,7 @@ D_FLT_002BF438 = 0x002BF438; // source:provisional
 D_FLT_002BF440 = 0x002BF440; // source:provisional
 VU1_ENTRY_650 = 0x00000650; // source:provisional
 VU1_ENTRY_140 = 0x00000140; // source:provisional
+copysignf = 0x0024A780; // source:provisional alias-of:func_0024A780 (the call scalbnf makes)
+RO_FLT_002ABC10 = 0x002ABC10; // source:provisional (powf bp table)
+RO_FLT_002ABC18 = 0x002ABC18; // source:provisional (powf dp_h table)
+RO_FLT_002ABC20 = 0x002ABC20; // source:provisional (powf dp_l table)

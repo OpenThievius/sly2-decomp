@@ -5061,6 +5061,7 @@ us_address	name	other_address	pair	score	addresses
 0x232520	func_00232520	0X232D68	same	0	ok
 0x232568	snd_AutoVol	0X232DB0	same	0	ok
 0x2325E0	func_002325E0	0X232E28	same	0	ok
+0x232838	snd_SendIOPCommandNoWait__FiiPcPFiUl_vUl	0X233080	same	0	ok
 0x232BB8	snd_PostMessage__Fv	0X233400	same	0	ok
 0x232D80	snd_StreamSafeCheckCDIdle	0X2335C8	same	0	ok
 0x232DA8	snd_StreamSafeCdSync	0X2335F0	same	0	ok
@@ -5281,6 +5282,7 @@ us_address	name	other_address	pair	score	addresses
 0x247330	__ieee754_acosf	0X247D78	same	0	ok
 0x247760	__ieee754_asinf	0X2481A8	same	0	ok
 0x247B00	__ieee754_atan2f	0X248548	same	0	ok
+0x248038	__ieee754_powf	0X248A80	same	0	ok
 0x2488C8	__ieee754_rem_pio2f	0X249310	same	0	ok
 0x248CA8	__ieee754_sqrtf	0X2496F0	identical	0	ok
 0x248DE0	__kernel_cosf	0X249828	identical	0	ok
@@ -5294,6 +5296,7 @@ us_address	name	other_address	pair	score	addresses
 0x249EE0	func_00249EE0	0X24A928	same	0	ok
 0x24A098	func_0024A098	0X24AAE0	identical	0	ok
 0x24A0C0	func_0024A0C0	0X24AB08	identical	0	ok
+0x24A0E8	func_0024A0E8	0X24AB30	same	0	ok
 0x24A738	func_0024A738	0X24B180	identical	0	ok
 0x24A780	func_0024A780	0X24B1C8	identical	0	ok
 0x24A7B0	func_0024A7B0	0X24B1F8	same	0	ok

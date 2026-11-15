@@ -1,13 +1,13 @@
 {
  "measures": {
-  "fuzzy_match_percent": 68.053928,
+  "fuzzy_match_percent": 68.349064,
   "total_code": "1164212",
-  "matched_code": "792292",
-  "matched_code_percent": 68.053928,
+  "matched_code": "795728",
+  "matched_code_percent": 68.349064,
   "total_data": "1038916",
   "total_functions": 6061,
-  "matched_functions": 5443,
-  "matched_functions_percent": 89.803663,
+  "matched_functions": 5446,
+  "matched_functions_percent": 89.85316,
   "complete_code": "141792",
   "complete_code_percent": 12.179225,
   "total_units": 434,
@@ -40650,7 +40650,7 @@
     {
      "name": ".text",
      "size": "142288",
-     "fuzzy_match_percent": 51.585517,
+     "fuzzy_match_percent": 54.000337,
      "metadata": {}
     }
    ],
@@ -40828,11 +40828,11 @@
     {
      "name": "snd_SendIOPCommandNoWait__FiiPcPFiUl_vUl",
      "size": "896",
+     "fuzzy_match_percent": 100.0,
      "metadata": {
       "demangled_name": "snd_SendIOPCommandNoWait(int, int, char*, void (*)(int, unsigned long), unsigned long)"
      },
-     "address": "3664",
-     "fuzzy_match_percent": 0.0
+     "address": "3664"
     },
     {
      "name": "snd_PostMessage__Fv",
@@ -42999,9 +42999,9 @@
     {
      "name": "__ieee754_powf",
      "size": "2188",
+     "fuzzy_match_percent": 100.0,
      "metadata": {},
-     "address": "91728",
-     "fuzzy_match_percent": 0.0
+     "address": "91728"
     },
     {
      "name": "__ieee754_rem_pio2f",
@@ -43104,9 +43104,9 @@
     {
      "name": "func_0024A0E8",
      "size": "352",
+     "fuzzy_match_percent": 100.0,
      "metadata": {},
-     "address": "100096",
-     "fuzzy_match_percent": 0.0
+     "address": "100096"
     },
     {
      "name": "__ieee754_log",
@@ -44278,14 +44278,14 @@
     ]
    },
    "measures": {
-    "fuzzy_match_percent": 51.585517,
+    "fuzzy_match_percent": 54.000337,
     "total_code": "142288",
-    "matched_code": "73400",
-    "matched_code_percent": 51.585517,
+    "matched_code": "76836",
+    "matched_code_percent": 54.000337,
     "matched_data_percent": 100.0,
     "total_functions": 515,
-    "matched_functions": 365,
-    "matched_functions_percent": 70.873786,
+    "matched_functions": 368,
+    "matched_functions_percent": 71.456311,
     "complete_code": "0",
     "complete_code_percent": 0.0,
     "complete_data_percent": 100.0,
@@ -59074,14 +59074,14 @@
    "id": "sdk",
    "name": "Sony SDK",
    "measures": {
-    "fuzzy_match_percent": 51.585517,
+    "fuzzy_match_percent": 54.000337,
     "total_code": "142288",
-    "matched_code": "73400",
-    "matched_code_percent": 51.585517,
+    "matched_code": "76836",
+    "matched_code_percent": 54.000337,
     "matched_data_percent": 100.0,
     "total_functions": 515,
-    "matched_functions": 365,
-    "matched_functions_percent": 70.873786,
+    "matched_functions": 368,
+    "matched_functions_percent": 71.456311,
     "complete_code": "0",
     "complete_code_percent": 0.0,
     "complete_data_percent": 100.0,

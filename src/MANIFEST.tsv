@@ -5061,6 +5061,7 @@ address	name	size	file	whole_file	symbol
 0X232520	func_00232520	72	sdk/fun_00232520.cpp		
 0X232568	snd_AutoVol	60	sdk/snd_AutoVol.cpp		
 0X2325E0	func_002325E0	600	sdk/fun_002325e0.cpp		
+0X232838	snd_SendIOPCommandNoWait__FiiPcPFiUl_vUl	896	sdk/snd_SendIOPCommandNoWait__FiiPcPFiUl_vUl.cpp		
 0X232BB8	snd_PostMessage__Fv	64	sdk/snd_PostMessage__Fv.cpp		
 0X232D80	snd_StreamSafeCheckCDIdle	40	sdk/snd_StreamSafeCheckCDIdle.cpp		
 0X232DA8	snd_StreamSafeCdSync	192	sdk/snd_StreamSafeCdSync.cpp		
@@ -5281,6 +5282,7 @@ address	name	size	file	whole_file	symbol
 0X247330	__ieee754_acosf	1072	sdk/__ieee754_acosf.cpp		
 0X247760	__ieee754_asinf	924	sdk/__ieee754_asinf.cpp		
 0X247B00	__ieee754_atan2f	744	sdk/__ieee754_atan2f.cpp		
+0X248038	__ieee754_powf	2188	sdk/__ieee754_powf.c		
 0X2488C8	__ieee754_rem_pio2f	992	sdk/__ieee754_rem_pio2f.cpp		
 0X248CA8	__ieee754_sqrtf	308	sdk/__ieee754_sqrtf.cpp		
 0X248DE0	__kernel_cosf	344	sdk/__kernel_cosf.cpp		
@@ -5294,6 +5296,7 @@ address	name	size	file	whole_file	symbol
 0X249EE0	func_00249EE0	436	sdk/fun_00249ee0.cpp		
 0X24A098	func_0024A098	36	sdk/fun_0024a098.c		
 0X24A0C0	func_0024A0C0	36	sdk/fun_0024a0c0.c		
+0X24A0E8	func_0024A0E8	352	sdk/fun_0024a0e8.c		
 0X24A738	func_0024A738	68	sdk/fun_0024a738.cpp		
 0X24A780	func_0024A780	48	sdk/fun_0024a780.cpp		
 0X24A7B0	func_0024A7B0	112	sdk/fun_0024a7b0.cpp		
