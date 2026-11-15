@@ -283,6 +283,7 @@ address	name	size	file	score
 0X193DE8	func_00193DE8	712	stephide/fun_00193de8.c	152
 0X194170	PresetJtAccelHide__FP2JT	384	stephide/PresetJtAccelHide__FP2JT.c	84
 0X1944C8	PasegAttachBase	144	new_1942f0/PasegAttachBase.cpp	22
+0X194688	InsertTargetCandidate	952	new_1942f0/InsertTargetCandidate.cpp	147
 0X194F70	UpdateSwTargetList	1016	new_1942f0/UpdateSwTargetList.cpp	82
 0X195368	EmitTargetSparkles	672	new_1942f0/EmitTargetSparkles.cpp	60
 0X195A00	SetJmpState	1464	new_1942f0/SetJmpState.c	289
@@ -609,6 +610,7 @@ address	name	size	file	score
 0X229468	UGetWaterSubmerged	536	water-sw/UGetWaterSubmerged.c	113
 0X22A908	func_0022A908	1504	so-wr/fun_0022a908.c	434
 0X22C8C0	BuildXfLocalMatrix	344	wr-vec/BuildXfLocalMatrix.c	77
+0X22CA18	GetXfDofValue	184	wr-vec/GetXfDofValue.cpp	8
 0X22CAD0	ConvertDeulToW__FP6VECTORN20	192	vec_22cad0/ConvertDeulToW__FP6VECTORN20.c	45
 0X22CB90	BuildXfAngularRateMatrix	112	vec-alo/BuildXfAngularRateMatrix.cpp	2
 0X22CCD0	BuildXfSpinRateMatrix	240	vec-alo/BuildXfSpinRateMatrix.c	57
