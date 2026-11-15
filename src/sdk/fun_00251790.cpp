@@ -1,61 +1,25 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-#include "types.h"
+#include "mpeg.h"
 extern "C" {
-struct MpegFrameBuffer {
-    u8 pad0[0x4];
-    void *coefficients;
-    u8 pad8[0x13C - 0x8];
-    int noCoefficients;
-};
-struct MpegDecoder {
-    u8 pad0[0x12C];
-    int fault;
-    u8 pad130[0x160 - 0x130];
-    int pictureCodingType;
-    int fullPelForward;
-    int forwardCode;
-    int fullPelBackward;
-    int backwardCode;
-    int motionCode[2][2];
-    int pictureStructure;
-    u8 pad188[0x18C - 0x188];
-    int framePredFrameDct;
-    int concealmentVectors;
-    u8 pad194[0x1C0 - 0x194];
-    int resetDcPredictor;
-    int quantizerScaleCode;
-    u8 pad1C8[0x5A0 - 0x1C8];
-    MpegFrameBuffer buffers[2];
-    u8 pad820[0x820 - 0x820];
-    int bufferIndex;
-    u8 pad824[0x828 - 0x824];
-    int commandPending;
-    unsigned commandState;
-    u8 pad830[0x848 - 0x830];
-    int topBits;
-    int bitsAvailable;
-    u8 pad850[0x858 - 0x850];
-    int mpeg2;
-};
 extern const char RO_STR_002AC620[];
-void func_00252358(MpegDecoder *decoder);
-long func_00251FC8(MpegDecoder *decoder);
-int func_00252148(MpegDecoder *decoder, int bitCount);
-void func_00252390(MpegDecoder *decoder, int bitCount);
-void func_0024FA38(MpegDecoder *decoder, const char *message);
+void func_00252358(MPEGDEC *decoder);
+long func_00251FC8(MPEGDEC *decoder);
+int func_00252148(MPEGDEC *decoder, int bitCount);
+void func_00252390(MPEGDEC *decoder, int bitCount);
+void func_0024FA38(MPEGDEC *decoder, const char *message);
 void func_00253478(void *buffer, int size);
-void func_002511C8(MpegDecoder *decoder, int *prediction, int *dualPrime, int horizontalRange, int verticalRange,
+void func_002511C8(MPEGDEC *decoder, int *prediction, int *dualPrime, int horizontalRange, int verticalRange,
                    int dualPrimeFlag, int scaleVertical, int fullPel);
-void func_002515F0(MpegDecoder *decoder, int prediction[2][2][2], int *dualPrime, int fieldSelect[2][2], int direction,
+void func_002515F0(MPEGDEC *decoder, int prediction[2][2][2], int *dualPrime, int fieldSelect[2][2], int direction,
                    int vectorCount, int vectorFormat, int horizontalRange, int verticalRange, int dualPrimeFlag,
                    int scaleVertical);
 
-static inline void SendVlcCommand(MpegDecoder *decoder) {
+static inline void SendVlcCommand(MPEGDEC *decoder) {
     decoder->commandPending = 0;
     decoder->commandState = 0x30000000;
 }
 
-static inline short ReadVlcResult(MpegDecoder *decoder) {
+static inline short ReadVlcResult(MPEGDEC *decoder) {
     long result;
     u32 bitPosition;
     long top;
@@ -68,18 +32,18 @@ static inline short ReadVlcResult(MpegDecoder *decoder) {
     } else {
         decoder->bitsAvailable = 32;
     }
-    decoder->fault = (int)result == 0;
+    decoder->field_0x12C = (int)result == 0;
     return (short)(u16)result;
 }
 
-static inline short GetMacroblockType(MpegDecoder *decoder) {
+static inline short GetMacroblockType(MPEGDEC *decoder) {
     func_00252358(decoder);
     *(volatile u32 *)0x10002000 = 0x34000000;
     SendVlcCommand(decoder);
     return ReadVlcResult(decoder);
 }
 
-static inline void IssueCommand(MpegDecoder *decoder, u32 command) {
+static inline void IssueCommand(MPEGDEC *decoder, u32 command) {
     unsigned state;
     *(volatile u32 *)0x10002000 = command;
     state = command & 0xF0000000;
@@ -91,12 +55,12 @@ static inline void IssueCommand(MpegDecoder *decoder, u32 command) {
     }
 }
 
-static inline void IssueBlockDecode(MpegDecoder *decoder, u32 flags) {
+static inline void IssueBlockDecode(MPEGDEC *decoder, u32 flags) {
     u32 command = 0x20000000 | (decoder->quantizerScaleCode << 16);
     IssueCommand(decoder, flags | command);
 }
 
-int func_00251790(MpegDecoder *decoder, int *macroblockType, int *motionType, int *dctType, int prediction[2][2][2],
+int func_00251790(MPEGDEC *decoder, int *macroblockType, int *motionType, int *dctType, int prediction[2][2][2],
                   int fieldSelect[2][2], int *dualPrime) {
     int vectorCount;
     int vectorFormat;
@@ -107,7 +71,7 @@ int func_00251790(MpegDecoder *decoder, int *macroblockType, int *motionType, in
     *macroblockType = GetMacroblockType(decoder);
     if (*macroblockType == 0) {
         func_0024FA38(decoder, RO_STR_002AC620);
-        decoder->fault = 1;
+        decoder->field_0x12C = 1;
         return 0;
     }
 
@@ -140,7 +104,7 @@ int func_00251790(MpegDecoder *decoder, int *macroblockType, int *motionType, in
     }
 
     if ((*macroblockType & 8) || ((*macroblockType & 1) && decoder->concealmentVectors)) {
-        if (decoder->mpeg2) {
+        if (decoder->field_0x858) {
             func_002515F0(decoder, prediction, dualPrime, fieldSelect, 0, vectorCount, vectorFormat,
                           decoder->motionCode[0][0] - 1, decoder->motionCode[0][1] - 1, dualPrimeFlag, scaleVertical);
         } else {
@@ -148,12 +112,12 @@ int func_00251790(MpegDecoder *decoder, int *macroblockType, int *motionType, in
                           decoder->fullPelForward);
         }
     }
-    if (decoder->fault) {
+    if (decoder->field_0x12C) {
         return 0;
     }
 
     if (*macroblockType & 4) {
-        if (decoder->mpeg2) {
+        if (decoder->field_0x858) {
             func_002515F0(decoder, prediction, dualPrime, fieldSelect, 1, vectorCount, vectorFormat,
                           decoder->motionCode[1][0] - 1, decoder->motionCode[1][1] - 1, 0, scaleVertical);
         } else {
@@ -161,7 +125,7 @@ int func_00251790(MpegDecoder *decoder, int *macroblockType, int *motionType, in
                           0, decoder->fullPelBackward);
         }
     }
-    if (decoder->fault) {
+    if (decoder->field_0x12C) {
         return 0;
     }
 
@@ -178,7 +142,7 @@ int func_00251790(MpegDecoder *decoder, int *macroblockType, int *motionType, in
     }
 
     decoder->resetDcPredictor = 0;
-    if (decoder->fault) {
+    if (decoder->field_0x12C) {
         return 0;
     }
 

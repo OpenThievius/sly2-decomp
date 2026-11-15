@@ -1,26 +1,16 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-#include "types.h"
+#include "mpeg.h"
 extern "C" {
-struct MpegDecoder {
-    u8 pad0[0x12C];
-    int lastCodeZero;
-    u8 pad130[0x828 - 0x130];
-    int commandPending;
-    unsigned commandState;
-    u8 pad830[0x848 - 0x830];
-    int topBits;
-    int bitsAvailable;
-};
-void func_00252358(MpegDecoder *decoder);
-long func_00251FC8(MpegDecoder *decoder);
-int func_00252148(MpegDecoder *decoder, int bitCount);
+void func_00252358(MPEGDEC *decoder);
+long func_00251FC8(MPEGDEC *decoder);
+int func_00252148(MPEGDEC *decoder, int bitCount);
 
-static inline void SendVlcCommand(MpegDecoder *decoder) {
+static inline void SendVlcCommand(MPEGDEC *decoder) {
     decoder->commandPending = 0;
     decoder->commandState = 0x30000000;
 }
 
-static inline short ReadVlcResult(MpegDecoder *decoder) {
+static inline short ReadVlcResult(MPEGDEC *decoder) {
     long result;
     u32 bitPosition;
     long top;
@@ -33,18 +23,18 @@ static inline short ReadVlcResult(MpegDecoder *decoder) {
     } else {
         decoder->bitsAvailable = 32;
     }
-    decoder->lastCodeZero = (int)result == 0;
+    decoder->field_0x12C = (int)result == 0;
     return (short)(u16)result;
 }
 
-static inline short GetMotionCode(MpegDecoder *decoder) {
+static inline short GetMotionCode(MPEGDEC *decoder) {
     func_00252358(decoder);
     *(volatile u32 *)0x10002000 = 0x38000000;
     SendVlcCommand(decoder);
     return ReadVlcResult(decoder);
 }
 
-static inline short GetDualPrime(MpegDecoder *decoder) {
+static inline short GetDualPrime(MPEGDEC *decoder) {
     func_00252358(decoder);
     *(volatile u32 *)0x10002000 = 0x3C000000;
     SendVlcCommand(decoder);
@@ -68,7 +58,7 @@ static inline void DecodeMotionVector(int *prediction, int rangeSize, int motion
     *prediction = fullPel ? (vector << 1) : vector;
 }
 
-void func_002511C8(MpegDecoder *decoder, int *prediction, int *dualPrime, int horizontalRange, int verticalRange,
+void func_002511C8(MPEGDEC *decoder, int *prediction, int *dualPrime, int horizontalRange, int verticalRange,
                    int dualPrimeFlag, int scaleVertical, int fullPel) {
     int motionCode;
     int residual;

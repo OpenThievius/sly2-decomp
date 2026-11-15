@@ -51,12 +51,30 @@ typedef struct MPEGDEC {
     unsigned int imageBuffer;                     /* 0x0EC */
     u8 unknown_0xF0[0x12C - 0xF0];
     int field_0x12C;                              /* a fault flag in one reader, "last code zero" in another */
-    u8 unknown_0x130[0x184 - 0x130];
-    int mode;                                     /* 0x184 */
-    u8 unknown_0x188[0x5A0 - 0x188];
+    u8 unknown_0x130[0x13C - 0x130];
+    int width;                                    /* 0x13C, in macroblocks */
+    int height;                                   /* 0x140 */
+    u8 unknown_0x144[0x154 - 0x144];
+    int field_0x154;                              /* 0x154, an 8-bit value from the sequence header */
+    int field_0x158;                              /* 0x158, 14 bits */
+    int field_0x15C;                              /* 0x15C, 14 bits */
+    int pictureCodingType;                        /* 0x160 */
+    int fullPelForward;                           /* 0x164 */
+    int forwardCode;                              /* 0x168 */
+    int fullPelBackward;                          /* 0x16C */
+    int backwardCode;                             /* 0x170 */
+    int motionCode[2][2];                         /* 0x174, [direction][horizontal, vertical] */
+    int pictureStructure;                         /* 0x184, 3 is a frame picture */
+    u8 unknown_0x188[0x18C - 0x188];
+    int framePredFrameDct;                        /* 0x18C */
+    int concealmentVectors;                       /* 0x190 */
+    u8 unknown_0x194[0x1C0 - 0x194];
+    int resetDcPredictor;                         /* 0x1C0 */
+    int quantizerScaleCode;                       /* 0x1C4 */
+    u8 unknown_0x1C8[0x5A0 - 0x1C8];
     MPEGBUFFER buffers[2];                        /* 0x5A0 */
     int bufferIndex;                              /* 0x820 */
-    u8 unknown_0x824[0x828 - 0x824];
+    int field_0x824;                              /* 0x824, cleared with the buffer index by one reader */
     int commandPending;                           /* 0x828 */
     unsigned int commandState;                    /* 0x82C */
     void *output;                                 /* 0x830, the destination or scratch picture */
@@ -70,6 +88,7 @@ typedef struct MPEGDEC {
     int field_0x868;                              /* 0x868 */
     u8 unknown_0x86C[0x878 - 0x86C];
     int field_0x878;                              /* "aborted" in one reader */
+    int sameFrame;                                /* 0x87C */
 } MPEGDEC;
 
 /* What the decoder's entry points are given: the decoder sits at 0x40 (one reader so far: func_0024ACD8) */
@@ -89,6 +108,9 @@ typedef char check_MPEGDEC_output[((unsigned int)&((MPEGDEC *)0)->output == 0x83
 typedef char check_MPEGDEC_topBits[((unsigned int)&((MPEGDEC *)0)->topBits == 0x848) ? 1 : -1];
 typedef char check_MPEGDEC_stop[((unsigned int)&((MPEGDEC *)0)->stop == 0x834) ? 1 : -1];
 typedef char check_MPEGDEC_imageBuffer[((unsigned int)&((MPEGDEC *)0)->imageBuffer == 0xEC) ? 1 : -1];
+typedef char check_MPEGDEC_pictureStructure[((unsigned int)&((MPEGDEC *)0)->pictureStructure == 0x184) ? 1 : -1];
+typedef char check_MPEGDEC_quantizerScaleCode[((unsigned int)&((MPEGDEC *)0)->quantizerScaleCode == 0x1C4) ? 1 : -1];
+typedef char check_MPEGDEC_sameFrame[((unsigned int)&((MPEGDEC *)0)->sameFrame == 0x87C) ? 1 : -1];
 typedef char check_MPEGDEC_field_0x878[((unsigned int)&((MPEGDEC *)0)->field_0x878 == 0x878) ? 1 : -1];
 
 #endif

@@ -37,7 +37,7 @@ int func_0024ACD8(MPEGHANDLE *handle)
                 if (kind == 0) {
                     break;
                 }
-                if (state->mode == state->targetE8) {
+                if (state->pictureStructure == state->targetE8) {
                     break;
                 }
             } while (state->field_0x858);
