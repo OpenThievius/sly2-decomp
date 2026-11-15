@@ -39,42 +39,42 @@ typedef struct MPEGBUFFER {
 
 typedef struct MPEGDEC {
     int done;                                     /* 0x000 */
-    u8 pad4[0xA8 - 0x4];
+    u8 unknown_0x4[0xA8 - 0x4];
     int countA8;                                  /* 0x0A8, the three counts and three indices are read by one function */
     int countAC;                                  /* 0x0AC */
     int countB0;                                  /* 0x0B0 */
     int indexB4;                                  /* 0x0B4 */
     int indexB8;                                  /* 0x0B8 */
     int indexBC;                                  /* 0x0BC */
-    u8 padC0[0xE8 - 0xC0];
+    u8 unknown_0xC0[0xE8 - 0xC0];
     int targetE8;                                 /* 0x0E8 */
     unsigned int imageBuffer;                     /* 0x0EC */
-    u8 padF0[0x12C - 0xF0];
+    u8 unknown_0xF0[0x12C - 0xF0];
     int field_0x12C;                              /* a fault flag in one reader, "last code zero" in another */
-    u8 pad130[0x184 - 0x130];
+    u8 unknown_0x130[0x184 - 0x130];
     int mode;                                     /* 0x184 */
-    u8 pad188[0x5A0 - 0x188];
+    u8 unknown_0x188[0x5A0 - 0x188];
     MPEGBUFFER buffers[2];                        /* 0x5A0 */
     int bufferIndex;                              /* 0x820 */
-    u8 pad824[0x828 - 0x824];
+    u8 unknown_0x824[0x828 - 0x824];
     int commandPending;                           /* 0x828 */
     unsigned int commandState;                    /* 0x82C */
     void *output;                                 /* 0x830, the destination or scratch picture */
     int stop;                                     /* 0x834 */
-    u8 pad838[0x848 - 0x838];
+    u8 unknown_0x838[0x848 - 0x838];
     int topBits;                                  /* 0x848 */
     int bitsAvailable;                            /* 0x84C */
-    u8 pad850[0x858 - 0x850];
+    u8 unknown_0x850[0x858 - 0x850];
     int field_0x858;                              /* "mpeg2" in one reader, "keep going" in another */
-    u8 pad85C[0x868 - 0x85C];
+    u8 unknown_0x85C[0x868 - 0x85C];
     int field_0x868;                              /* 0x868 */
-    u8 pad86C[0x878 - 0x86C];
+    u8 unknown_0x86C[0x878 - 0x86C];
     int field_0x878;                              /* "aborted" in one reader */
 } MPEGDEC;
 
 /* What the decoder's entry points are given: the decoder sits at 0x40 (one reader so far: func_0024ACD8) */
 typedef struct MPEGHANDLE {
-    u8 pad0[0x40];
+    u8 unknown_0x0[0x40];
     MPEGDEC *state;                               /* 0x40 */
 } MPEGHANDLE;
 
