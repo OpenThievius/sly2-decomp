@@ -35,12 +35,12 @@ s8 *PobstacleGroupAlloc(void) {
             temp_s0_2 = temp_v0 + 0x60;
             M2C_FIELD(temp_v0, s32 *, 0xE0) = 0;
             M2C_FIELD(temp_v0, s32 *, 0xE4) = 1;
-            M2C_FIELD(temp_v0, s32 *, 0x1C0) = 1;
-            memset(temp_s0_2, 0, 0x40);
-            M2C_FIELD(temp_s0_2, f32 *, 0x14) = 1.0f;
-            M2C_FIELD(temp_s0_2, f32 *, 0x3C) = 1.0f;
             M2C_FIELD(temp_s0_2, f32 *, 0x28) = 1.0f;
+            memset(temp_s0_2, 0, 0x40);
+            M2C_FIELD(temp_s0_2, f32 *, 0x3C) = 1.0f;
+            M2C_FIELD(temp_s0_2, f32 *, 0x14) = 1.0f;
             M2C_FIELD(temp_v0, f32 *, 0x60) = 1.0f;
+            M2C_FIELD(temp_v0, s32 *, 0x1C0) = 1;
             M2C_FIELD(temp_v0, s32 *, 0xEC) = PvAllocSwImpl__Fi(sp, 0x80, 0x10);
             var_a0 = 0;
 loop_3:

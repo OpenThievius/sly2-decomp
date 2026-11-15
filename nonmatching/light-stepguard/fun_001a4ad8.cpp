@@ -56,11 +56,11 @@ loop_3:
             temp_v1_2 = M2C_FIELD(var_s0, s32 *, 4);
             temp_a0 = M2C_FIELD(var_s0, s32 *, 8);
             var_a1 = M2C_FIELD(var_s0, s32 *, 0xC);
-            M2C_FIELD(var_a2, s32 *, 0) = M2C_FIELD(var_s0, s32 *, 0);
-            var_s0 += 0x10;
-            M2C_FIELD(var_a2, s32 *, 4) = temp_v1_2;
             M2C_FIELD(var_a2, s32 *, 8) = temp_a0;
+            var_s0 += 0x10;
+            M2C_FIELD(var_a2, s32 *, 0) = M2C_FIELD(var_s0, s32 *, 0);
             M2C_FIELD(var_a2, s32 *, 0xC) = var_a1;
+            M2C_FIELD(var_a2, s32 *, 4) = temp_v1_2;
             var_a2 += 0x10;
             if ((s32) var_a3 >= 0) {
                 goto loop_3;

@@ -50,12 +50,12 @@ void PxpAdd(char *psw, void *pobjA, void *pobjB, QW pos, QW vel, int arg5, int a
         ixpd++;
         pxpd->posConv = ConvertXfPos(0, pxpd->unk4, pxpd->pos);
     } while (ixpd < 2);
-    pxp->nA0 = arg6;
-    pxp->nA4 = arg7;
     pxp->gA = gScale;
     pxp->n9C = arg5;
     pxp->gB = D_FLT_002BFD30;
     pxp->gC = D_FLT_002BFD34;
+    pxp->nA0 = arg6;
+    pxp->nA4 = arg7;
     ixpd = 0;
     do {
         pxpd = &pxp->xpd[ixpd];

@@ -88,8 +88,8 @@ extern "C" void UpdateSwTargetList(SW *self, CAM *cam, int count, TGT *src)
                     continue;
                 cur->f8 = found->f8;
                 if (cur->pind == 0) {
-                    cur->vel = 0.0f;
                     cur->pos = found->pos;
+                    cur->vel = 0.0f;
                 } else {
                     hold = found->pobj->range(range);
                     if (hold != 0) {

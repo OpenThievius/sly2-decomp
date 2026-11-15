@@ -70,8 +70,8 @@ int func_0023F3D8(SortObject *object, unsigned expected) {
             do {
                 count--;
                 SortEntry *temporary = entries[0];
-                entries[0] = *last;
                 *last = temporary;
+                entries[0] = *last;
                 SiftDown(entries, 0, count);
                 last--;
             } while (count > 1);

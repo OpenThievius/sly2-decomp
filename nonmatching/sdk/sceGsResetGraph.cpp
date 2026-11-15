@@ -36,8 +36,8 @@ void sceGsResetGraph(s16 arg0, s16 arg1, s16 arg2, s16 arg3) {
         if (M2C_FIELD(temp_s0, s32 *, 8) != 0) {
             func_00235110(2);
             RemoveIntcHandler(2, M2C_FIELD(temp_s0, s32 *, 0xC));
-            M2C_FIELD(temp_s0, s32 *, 0xC) = 0;
             M2C_FIELD(temp_s0, s32 *, 8) = 0;
+            M2C_FIELD(temp_s0, s32 *, 0xC) = 0;
         }
         SetGsCrt(arg1 & 1, arg2 & 0xFF, arg3 & 1);
         return;
@@ -46,10 +46,10 @@ void sceGsResetGraph(s16 arg0, s16 arg1, s16 arg2, s16 arg3) {
         return;
     case 5:
         temp_v0 = func_002405F0(arg0, temp_a1, temp_a2, temp_a3);
-        M2C_FIELD(temp_v0, s16 *, 4) = (s16) (arg3 != 0);
-        M2C_FIELD(temp_v0, s16 *, 0) = arg1;
-        M2C_FIELD(temp_v0, s16 *, 2) = arg2;
         M2C_FIELD(temp_v0, s16 *, 6) = (s16) (((u64) *(u64 *)0x12001000 >> 0x10) & 0xFF & 0xFFFF);
+        M2C_FIELD(temp_v0, s16 *, 0) = arg1;
+        M2C_FIELD(temp_v0, s16 *, 4) = (s16) (arg3 != 0);
+        M2C_FIELD(temp_v0, s16 *, 2) = arg2;
         SetGsCrt(arg1 & 1, arg2 & 0xFF, arg3 & 1);
         return;
     }

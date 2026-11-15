@@ -1,8 +1,5 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later */
-typedef int s32;
-typedef unsigned int u32;
-typedef long s64;
-typedef unsigned long u64;
+#include "ps2inline.h"
 
 typedef union {
     u64 whole;
@@ -12,8 +9,8 @@ typedef union {
     } half;
 } Word64;
 
-/* 0x2AB018 (this object's copy): bit length of every byte value (0 for 0, 8 for 0x80 and up). */
-extern const unsigned char RO_002AB018[256];
+/* 0x2AB118 (this object's copy): bit length of every byte value (0 for 0, 8 for 0x80 and up). */
+extern const unsigned char RO_002AB118[256];
 
 #define HALF_BASE 0x10000UL
 
@@ -31,7 +28,7 @@ extern const unsigned char RO_002AB018[256];
                 if (((shiftedValue >> byteShift) & 0xFF) != 0) \
                     break; \
         } \
-        (count) = WORD_BITS - (RO_002AB018[shiftedValue >> byteShift] + byteShift); \
+        (count) = WORD_BITS - (RO_002AB118[shiftedValue >> byteShift] + byteShift); \
     } while (0)
 
 /* Divides the two-word numerator by a normalized one-word divisor, sixteen bits of quotient at a time. */
@@ -163,8 +160,7 @@ static inline u64 DivideWithRemainder(u64 numerator, u64 denominator, u64 *remai
                 numeratorHigh = (numeratorHigh << leadingZeros) | (numeratorLow >> complement);
                 numeratorLow = numeratorLow << leadingZeros;
                 DIVIDE_TWO_WORDS(quotientLow, numeratorHigh, numeratorTop, numeratorHigh, denominatorHigh);
-                productHigh = ((u64)quotientLow * denominatorLow) >> 32;
-                productLow = quotientLow * denominatorLow;
+                MultiplyUnsignedWide(quotientLow, denominatorLow, &productHigh, &productLow);
                 if (productHigh > numeratorHigh || (productHigh == numeratorHigh && productLow > numeratorLow)) {
                     quotientLow--;
                     SUBTRACT_TWO_WORDS(productHigh, productLow, productHigh, productLow, denominatorHigh, denominatorLow);

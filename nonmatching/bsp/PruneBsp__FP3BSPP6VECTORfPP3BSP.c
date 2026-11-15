@@ -70,9 +70,9 @@ block_5:
         if ((var_s0 != var_a2) || (var_v0 = var_a2, (var_a2 == 2))) {
             if (*arg3 > 0) {
                 temp_a1 = *temp_s4;
-                *temp_s4 = temp_a1 + 0xC;
                 *arg3 -= 1;
                 M2C_FIELD(temp_a1, s32 *, 8) = (s32) M2C_FIELD(var_s1, s32 *, 8);
+                *temp_s4 = temp_a1 + 0xC;
                 switch (var_s0) {                   /* irregular */
                 case 0:
                     M2C_FIELD(temp_a1, u32 *, 0) = 0U;

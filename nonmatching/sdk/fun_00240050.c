@@ -31,10 +31,10 @@ outer:
     cursor = link;
 emit:
     outCount = out->count;
-    out->values[outCount] = items[cursor];
-    nextLink = nextIndex[cursor];
-    out->count = outCount + 1;
     items[cursor] = 0;
+    nextLink = nextIndex[cursor];
+    out->values[outCount] = items[cursor];
+    out->count = outCount + 1;
     if (nextLink == -1) {
         goto tailInsert;
     }

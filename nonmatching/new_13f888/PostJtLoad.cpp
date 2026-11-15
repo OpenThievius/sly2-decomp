@@ -78,10 +78,10 @@ void PostJtLoad(Jt *self)
         saved[2] = *(QW *)(matrix + 0x20);
         char *body = self->body;
         memset(body, 0, 0x40);
-        *(float *)(body + 0x0) = 1.0f;
         *(float *)(body + 0x3C) = 1.0f;
         *(float *)(body + 0x28) = 1.0f;
         *(float *)(body + 0x14) = 1.0f;
+        *(float *)(body + 0x0) = 1.0f;
         int serial = B_003DD490.serial + 1;
         B_003DD490.serial = serial;
         *(int *)(self->body + 0xA4) = serial;

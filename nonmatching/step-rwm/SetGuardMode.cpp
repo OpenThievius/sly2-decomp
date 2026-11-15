@@ -116,8 +116,8 @@ block_16:
                     }
                     temp_v0_7 = arg0 + 0x190;
                     M2C_FIELD(temp_v0_7, s32 *, 4) = 0;
-                    M2C_FIELD(temp_v0_7, s32 *, 8) = 0;
                     M2C_FIELD(arg0, s32 *, 0x190) = 0;
+                    M2C_FIELD(temp_v0_7, s32 *, 8) = 0;
                     break;
                 case 13:                            /* switch 2 */
                     temp_v0_8 = func_00205458(arg0, 0x9C);

@@ -35,8 +35,8 @@ extern "C" void AddLightToSw(SWL *sw, LIGHT *light)
             unsigned lowest = bits & (0u - bits);
             int ilight = IbitLowest(lowest, iword * 32);
             free[iword] &= ~lowest;
-            *(void **)((char *)sw + ilight * 4 + 0x4154) = light;
             light->index = ilight;
+            *(void **)((char *)sw + ilight * 4 + 0x4154) = light;
             break;
         }
     }

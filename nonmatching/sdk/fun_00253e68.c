@@ -35,8 +35,8 @@ void func_00253E68(char *mpeg)
     fieldB = *(unsigned *)(mpeg + 0x138) & 0xFFF;
     fieldC = *(unsigned *)(mpeg + 0x144);
     fieldG = *(unsigned *)(mpeg + 0x148);
-    *(unsigned *)(mpeg + 0x148) = fieldG + (value << 10);
     *(unsigned *)(mpeg + 0x134) = (fieldF << 12) | fieldA;
     *(unsigned *)(mpeg + 0x138) = (fieldE << 12) | fieldB;
     *(unsigned *)(mpeg + 0x144) = fieldC + (countHigh << 18);
+    *(unsigned *)(mpeg + 0x148) = fieldG + (value << 10);
 }

@@ -79,8 +79,8 @@ int sceIoctl(int handle, int command, void *argument) {
         int result;
         SemaParam param;
         int reply;
-        packet->command = command;
         packet->field0C = slot->field0;
+        packet->command = command;
         if (argument == 0) {
             packet->dataSize = 0;
             argument = &reply;

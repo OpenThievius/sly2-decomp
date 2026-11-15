@@ -40,8 +40,8 @@ void ShopMenu_UpdateBlot(SHOPMENU *menu)
     if (menu->pblot->nBlots != 2) return;
     float vec[8] __attribute__((aligned(16)));
     memset(vec, 0, 0x20);
-    vec[0] = 1.0f;
     vec[3] = 1.0f;
+    vec[0] = 1.0f;
     int irowEnd = ShopMenu_IrowEnd(menu);
     if (menu->itop > 0) {
         int label = menu->page == 0 ? 0x4DA : 0x4A1;
@@ -88,8 +88,8 @@ void ShopMenu_UpdateBlot(SHOPMENU *menu)
         func_00213B00(menu->pblot, 0x437);
         memset(vec, 0, 0x20);
         vec[5] = RO_002C35B0 * (float)(menu->isel - menu->itop);
-        vec[0] = 1.0f;
         vec[3] = 1.0f;
+        vec[0] = 1.0f;
         func_00213CD8(menu->pblot, 0x437, vec);
     } else {
         func_00213928(menu->pblot, 0x437);

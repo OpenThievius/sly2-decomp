@@ -38,14 +38,14 @@ int func_002355E0(int threadId, int priority)
     for (zeroIndex = 0; zeroIndex < 0x28; zeroIndex++)
         ((QW *)block)[zeroIndex] = 0;
     *(long long *)(block + 0x40) = priority;
-    *(long long *)(block + 0x1C0) = *(int *)(block + 0x1C0);
-    *(long long *)(block + 0x1C8) = 0;
-    *(long long *)(block + 0x1D0) = *(int *)(block + 0x1D0);
-    *(long long *)(block + 0x1D8) = 0;
     *(long long *)(block + 0x1E0) = *(int *)(block + 0x1E0);
-    *(long long *)(block + 0x1E8) = 0;
-    *(long long *)(block + 0x1F0) = *(int *)(block + 0x1F0);
     *(long long *)(block + 0x1F8) = 0;
+    *(long long *)(block + 0x1F0) = *(int *)(block + 0x1F0);
+    *(long long *)(block + 0x1C8) = 0;
+    *(long long *)(block + 0x1E8) = 0;
+    *(long long *)(block + 0x1C0) = *(int *)(block + 0x1C0);
+    *(long long *)(block + 0x1D8) = 0;
+    *(long long *)(block + 0x1D0) = *(int *)(block + 0x1D0);
     func_002394A0();
     return StartThread(threadId, priority);
 }

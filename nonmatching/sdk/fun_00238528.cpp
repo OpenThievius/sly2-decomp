@@ -48,17 +48,17 @@ int func_00238528(int arg0, int source, int size) {
         func_00237B80();
         return -9;
     }
-    request->handle = entry->handle;
+    request->mode = 4;
     request->index = entry - B_0044BB80;
     param.maxCount = 1;
     param.option = (int)"SceStdioWriteSema";
-    request->size = size;
+    request->handle = entry->handle;
     asyncFlag = flags & 0x8000;
-    request->source = source;
+    request->size = size;
     param.initCount = 0;
     semaphore = CreateSema(&param);
-    request->mode = 4;
     request->result = &result;
+    request->source = source;
     B_0044A680.semaphoreId = semaphore;
     if (asyncFlag != 0) {
         WaitSema(D_002C4A8C);

@@ -119,8 +119,8 @@ block_8:
         M2C_FIELD(arg0, s32 *, 8) = var_s4;
         M2C_FIELD(arg0, s32 *, 0x1C) = 0;
     }
+    M2C_FIELD(arg0, s32 *, 0x14) = var_s1;
     M2C_FIELD(arg0, s32 *, 0x18) = var_s6;
     M2C_FIELD(arg0, u8 **, 0x10) = var_s2;
-    M2C_FIELD(arg0, s32 *, 0x14) = var_s1;
 }
 }

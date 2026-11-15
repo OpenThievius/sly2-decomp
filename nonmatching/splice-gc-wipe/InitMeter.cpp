@@ -42,12 +42,12 @@ void InitMeter(s8 *arg0) {
     temp_a0 = M2C_FIELD(arg0, s8 **, 0x34);
     if (temp_a0 != NULL) {
         temp_f0 = (f32) *M2C_FIELD(temp_a0, s32 **, 0xE00) / (f32) M2C_FIELD(temp_a0, s32 *, 0xDFC);
-        M2C_FIELD(arg0, f32 *, 0x20) = temp_f0;
         M2C_FIELD(arg0, f32 *, 0x24) = temp_f0;
+        M2C_FIELD(arg0, f32 *, 0x20) = temp_f0;
         temp_a0_2 = M2C_FIELD(arg0, s8 **, 0x34);
         temp_f0_2 = (f32) GetJtPower(temp_a0) / (f32) M2C_FIELD(temp_a0_2, s32 *, 0x1300);
-        M2C_FIELD(arg0, f32 *, 0x28) = temp_f0_2;
         M2C_FIELD(arg0, f32 *, 0x2C) = temp_f0_2;
+        M2C_FIELD(arg0, f32 *, 0x28) = temp_f0_2;
         var_v0 = 0x347;
         if (FIsBasicDerivedFrom(temp_a0_2, 0x37) != 0) {
             var_v1 = 0x348;

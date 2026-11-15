@@ -65,7 +65,7 @@ void CBinaryInputStream_ReadGeom(s32 arg0, s8 *arg1) {
     temp_v1 = temp_v0_2 << 5;
     sp4 = 0x10;
     sp0 = temp_v1;
-    M2C_FIELD(arg1, s32 *, 8) = temp_v0_2;
+    M2C_FIELD(arg1, s8 **, 0x14) = temp_v0_4;
     M2C_FIELD(arg1, s8 **, 0xC) = (s8 *)(PvAllocSwClearImpl__Fi(sp));
     temp_v0_3 = U16Read__18CBinaryInputStream(arg0);
     sp4 = 0x10;
@@ -73,7 +73,7 @@ void CBinaryInputStream_ReadGeom(s32 arg0, s8 *arg1) {
     sp0 = temp_v0_3 * 0x10;
     temp_v0_4 = (s8 *)(PvAllocSwClearImpl__Fi(sp));
     var_s7 = temp_v0_4;
-    M2C_FIELD(arg1, s8 **, 0x14) = temp_v0_4;
+    M2C_FIELD(arg1, s32 *, 8) = temp_v0_2;
     if (M2C_FIELD(arg1, s32 *, 8) > 0) {
 loop_4:
         temp_s5 = M2C_FIELD(arg1, s8 **, 0xC) + (var_s6 << 5);

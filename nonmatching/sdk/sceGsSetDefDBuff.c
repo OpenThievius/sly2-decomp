@@ -51,14 +51,14 @@ void sceGsSetDefDBuff(DBuff *db, short psm, short width, short height, short zte
         sceGsSetDefClear(&db->clear0, ztest, x, y, width, height, 0, 0, 0, 0, 0);
         sceGsSetDefClear(&db->clear1, ztest, x, y, width, height, 0, 0, 0, 0, 0);
     }
-    *(QW *)&db->giftag0 = 0;
     *(QW *)&db->giftag1 = 0;
+    *(QW *)&db->giftag0 = 0;
     db->giftag0.NLOOP = clear ? 0xE : 8;
+    db->giftag1.NLOOP = clear ? 0xE : 8;
+    db->giftag1.EOP = 1;
     db->giftag0.EOP = 1;
     db->giftag0.NREG = 1;
     db->giftag0.REGS0 = 0xE;
-    db->giftag1.NLOOP = clear ? 0xE : 8;
-    db->giftag1.EOP = 1;
     db->giftag1.NREG = 1;
     db->giftag1.REGS0 = 0xE;
     zaddr = sceGszbufaddr(psm, width, height);

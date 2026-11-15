@@ -33,14 +33,14 @@ void DrawMovieShapeCharacter(SELF *self, PAIR *pair, TAIL *tail, int fade)
     memset(&loc, 0, 0x40);
     float k0 = 0.8f;
     float k1 = 0.45454547f;
-    loc.v[0] = pair->v[0] * k0;
-    loc.v[1] = pair->v[1] * k1;
     loc.v[4] = pair->v[2] * k0;
+    loc.v[1] = pair->v[1] * k1;
+    loc.v[0] = pair->v[0] * k0;
     loc.v[5] = pair->v[3] * k1;
     loc.v[8] = pair->v[4] * k0 + self->owner->cam->x + 786432.0f;
-    loc.v[0xF] = 1.0f;
     loc.v[9] = pair->v[5] * k1 + self->owner->cam->y + 786432.0f;
     loc.v[10] = 1.0f;
+    loc.v[0xF] = 1.0f;
     if (self->count >= 2U)
         tail->kind = 1;
     else

@@ -111,8 +111,8 @@ extern "C" void DrawMovieBitmapCharacter(DMC *pdmc, IN *pin, OUT *pout)
         g_2dea28.pb += 4;
         PKT *p = OnGameLoad__FP4GAME();
         p->a = 0x15;
-        p->c = (unsigned)tag & 0x0FFFFFFF;
         p->b = pout->f8 + (float)(pdmc->obj8->shift << 18);
+        p->c = (unsigned)tag & 0x0FFFFFFF;
         p->d = pdmc->mode == 6 ? pdmc->i1C : pdmc->i18;
     }
 }

@@ -26,8 +26,8 @@ s32 func_00251CE8(s8 *arg0) {
     var_s2 = 0;
 loop_1:
     func_00252358(arg0);
-    *(s32 *)0x10002000 = 0x30000000;
     M2C_FIELD(arg0, s32 *, 0x82C) = 0x30000000;
+    *(s32 *)0x10002000 = 0x30000000;
     M2C_FIELD(arg0, s32 *, 0x828) = 0;
     temp_a2 = func_00251FC8(arg0);
     temp_a0 = *(s64 *)0x10002030;

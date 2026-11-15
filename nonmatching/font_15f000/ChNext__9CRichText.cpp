@@ -68,15 +68,15 @@ extern "C" int ChNext__9CRichText(CRichText *self)
                 CFont *pfont = PfontFromCh(pch[1]);
                 if (pfont != 0) {
                     self->font = *pfont;
-                    self->cur += 2;
                     self->base = &self->font;
+                    self->cur += 2;
                     float ratio = ((float)self->baseFont->height * self->baseFont->sy) / ((float)self->font.height * self->font.sy);
-                    self->font.sy *= ratio;
                     self->font.sx *= ratio;
+                    self->flag = 1;
                     Word saved = self->rgbaSaved;
+                    self->font.sy *= ratio;
                     saved.b[3] = self->rgbaCur.b[3];
                     self->rgbaCur = saved;
-                    self->flag = 1;
                 } else {
                     self->base = self->baseFont;
                     self->rgbaCur = self->rgbaBase;

@@ -14,10 +14,10 @@ void func_00167E58(char *data)
         do {
             unsigned short *dstA = colA;
             unsigned short *dstB = colB;
-            *dstA = ((rowA[4] >> 3) << 5) | (rowA[0] >> 3) | ((rowA[8] >> 3) << 10) | ((rowA[0xC] >> 7) << 15);
+            *dstB = ((rowB[4] >> 3) << 5) | (rowB[0] >> 3) | ((rowB[8] >> 3) << 10) | ((rowA[0xC] >> 7) << 15);
             colA++;
             colB++;
-            *dstB = ((rowB[4] >> 3) << 5) | (rowB[0] >> 3) | ((rowB[8] >> 3) << 10) | ((rowA[0xC] >> 7) << 15);
+            *dstA = ((rowA[4] >> 3) << 5) | (rowA[0] >> 3) | ((rowA[8] >> 3) << 10) | ((rowA[0xC] >> 7) << 15);
             *alphaB = rowB[0xC];
             alphaB++;
             if (*(int *)(p + 0x20) != 0) {

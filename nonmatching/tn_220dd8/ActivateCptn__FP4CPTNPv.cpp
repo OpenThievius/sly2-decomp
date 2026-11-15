@@ -103,17 +103,17 @@ extern "C" void ActivateCptn__FP4CPTNPv(CPTN *pcptn, void *pso, TN *ptn)
     DecomposeSphere(VectorSub(pcm->pos90, sum[0]), &pcptn->yaw, &pcptn->pitch, &pcptn->dist);
     pcptn->dist = pcptn->dist - pcm->f4C;
     pcptn->posSphere = VectorAdd(sum[0], SetVectorSphere__FP6VECTORfff(pcptn->yaw, pcptn->pitch, pcptn->dist));
-    pcptn->f34 = 0;
     pcptn->f24 = *(float *)((char *)pcptn->ptnfn + 0x5C);
+    pcptn->f34 = 0;
     if (pcptn->ptn) {
         if (pcptn->ptn->unused184)
             SetResetFlag__FP2CM(pcm);
     }
-    pcptn->f80 = g_2dded0;
-    TN *ptnLast = pcptn->ptn;
-    pcptn->f60 = g_2dded0;
-    pcptn->f3C = 0;
     *(float *)((char *)pcptn + 0x48) = g_2dded0 - D_FLT_002C41DC;
+    TN *ptnLast = pcptn->ptn;
+    pcptn->f80 = g_2dded0;
+    pcptn->f3C = 0;
+    pcptn->f60 = g_2dded0;
     if (ptnLast) {
         float f188 = ptnLast->f188;
         if (f188 != 0.0f)

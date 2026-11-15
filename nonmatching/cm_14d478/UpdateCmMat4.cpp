@@ -55,9 +55,9 @@ void UpdateCmMat4(Cm *pcm)
         QW move;
         move = GeneralFromVector(VectorScaleX(D_002BD870, qShake));
         __as__6VECTORG9VU_VECTOR((M4 *)&matShake.row[3], move);
-        matShake.row[0] = matRoll.row[0];
         matShake.row[1] = matRoll.row[1];
         matShake.row[2] = matRoll.row[2];
+        matShake.row[0] = matRoll.row[0];
         float *pw = (float *)&matShake;
         pw[3] = 0; pw[7] = 0; pw[11] = 0;
         pw[15] = 1.0f;
@@ -82,9 +82,9 @@ void UpdateCmMat4(Cm *pcm)
         float *n0 = frustum, *n1 = (float *)(base + 0x1D0), *n2 = (float *)(base + 0x1E0), *n3 = (float *)(base + 0x1F0);
         for (int i = 2; i >= 0; i--) {
             dst[0] = *n0++;
-            dst[1] = *n1++;
-            dst[2] = *n2++;
             dst[3] = *n3++;
+            dst[2] = *n2++;
+            dst[1] = *n1++;
             dst += 4;
         }
     }
@@ -94,9 +94,9 @@ void UpdateCmMat4(Cm *pcm)
         float *n0 = wide0, *n1 = wide1, *n2 = wide2, *n3 = wide3;
         for (int i = 2; i >= 0; i--) {
             dst[0] = *n0++;
-            dst[1] = *n1++;
-            dst[2] = *n2++;
             dst[3] = *n3++;
+            dst[2] = *n2++;
+            dst[1] = *n1++;
             dst += 4;
         }
     }

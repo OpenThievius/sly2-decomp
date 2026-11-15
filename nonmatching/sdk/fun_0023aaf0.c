@@ -81,10 +81,10 @@ void func_0023AAF0(void)
         slot--;
     } while (index >= 0);
     index = 0x20;
-    B_0044EE00[0].function = func_0023AA68 + 0x50;
     B_0044EE00[1].function = func_0023AA68 + 0x30;
-    B_0044EE00[1].argument = &B_0044EDD8;
+    B_0044EE00[0].function = func_0023AA68 + 0x50;
     B_0044EE00[0].argument = &B_0044EDD8;
+    B_0044EE00[1].argument = &B_0044EDD8;
     func_002394A0(B_0044EE00, receiveAddress, sendAddress, words);
     FlushCache(0);
     if (*(volatile u32 *)0x1000E010 & 0x20)

@@ -1,8 +1,5 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later */
-typedef int s32;
-typedef unsigned int u32;
-typedef long s64;
-typedef unsigned long u64;
+#include "ps2inline.h"
 
 typedef union {
     u64 whole;
@@ -12,8 +9,8 @@ typedef union {
     } half;
 } Word64;
 
-/* 0x2AAE18 (this object's copy): bit length of every byte value (0 for 0, 8 for 0x80 and up). */
-extern const unsigned char RO_002AAE18[256];
+/* 0x2AB018 (this object's copy): bit length of every byte value (0 for 0, 8 for 0x80 and up). */
+extern const unsigned char RO_002AB018[256];
 
 #define HALF_BASE 0x10000UL
 
@@ -31,7 +28,7 @@ extern const unsigned char RO_002AAE18[256];
                 if (((shiftedValue >> byteShift) & 0xFF) != 0) \
                     break; \
         } \
-        (count) = WORD_BITS - (RO_002AAE18[shiftedValue >> byteShift] + byteShift); \
+        (count) = WORD_BITS - (RO_002AB018[shiftedValue >> byteShift] + byteShift); \
     } while (0)
 
 /* Divides the two-word numerator by a normalized one-word divisor, sixteen bits of quotient at a time. */
@@ -87,7 +84,7 @@ static inline u64 DivideWithRemainder(u64 numerator, u64 denominator, u64 *remai
     Word64 result;
     u32 denominatorLow, denominatorHigh;
     u32 numeratorLow, numeratorHigh, numeratorTop;
-    u32 quotientLow, quotientHigh;
+    u32 quotientHigh, quotientLow;
     u32 leadingZeros, complement;
 
     numeratorWord.whole = numerator;
@@ -163,8 +160,7 @@ static inline u64 DivideWithRemainder(u64 numerator, u64 denominator, u64 *remai
                 numeratorHigh = (numeratorHigh << leadingZeros) | (numeratorLow >> complement);
                 numeratorLow = numeratorLow << leadingZeros;
                 DIVIDE_TWO_WORDS(quotientLow, numeratorHigh, numeratorTop, numeratorHigh, denominatorHigh);
-                productHigh = ((u64)quotientLow * denominatorLow) >> 32;
-                productLow = quotientLow * denominatorLow;
+                MultiplyUnsignedWide(quotientLow, denominatorLow, &productHigh, &productLow);
                 if (productHigh > numeratorHigh || (productHigh == numeratorHigh && productLow > numeratorLow)) {
                     quotientLow--;
                     SUBTRACT_TWO_WORDS(productHigh, productLow, productHigh, productLow, denominatorHigh, denominatorLow);
@@ -185,35 +181,6 @@ static inline u64 DivideWithRemainder(u64 numerator, u64 denominator, u64 *remai
     return result.whole;
 }
 
-/* Two's complement of a doubleword, one word at a time. */
-static inline s64 NegateDoubleword(s64 value) {
-    Word64 valueWord;
-    Word64 result;
-    valueWord.whole = value;
-    result.half.low = -valueWord.half.low;
-    result.half.high = -valueWord.half.high - ((u32)result.half.low > 0);
-    return result.whole;
-}
-
-s64 __divdi3(s64 numerator, s64 denominator) {
-    s64 negative = 0;
-    Word64 numeratorWord;
-    Word64 denominatorWord;
-    s64 quotient;
-
-    numeratorWord.whole = numerator;
-    denominatorWord.whole = denominator;
-    if (numeratorWord.half.high < 0) {
-        negative = ~negative;
-        numeratorWord.whole = NegateDoubleword(numeratorWord.whole);
-    }
-    if (denominatorWord.half.high < 0) {
-        negative = ~negative;
-        denominatorWord.whole = NegateDoubleword(denominatorWord.whole);
-    }
-    quotient = DivideWithRemainder(numeratorWord.whole, denominatorWord.whole, (u64 *)0);
-    if (negative) {
-        quotient = NegateDoubleword(quotient);
-    }
-    return quotient;
+u64 __udivdi3(u64 numerator, u64 denominator) {
+    return DivideWithRemainder(numerator, denominator, (u64 *)0);
 }

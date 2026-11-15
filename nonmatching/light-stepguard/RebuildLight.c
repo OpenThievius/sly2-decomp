@@ -40,17 +40,17 @@ void RebuildLight(void *arg0) {
     switch (temp_v1) {                              /* irregular */
     case 0:
         temp_v0 = arg0 + 0x100;
-        M2C_FIELD(temp_v0, f32 *, 4) = 0.0f;
         M2C_FIELD(temp_v0, f32 *, 8) = 0.0f;
+        M2C_FIELD(temp_v0, f32 *, 4) = 0.0f;
         M2C_FIELD(arg0, f32 *, 0x110) = 1.0f;
         temp_v1_2 = M2C_FIELD(arg0, void **, 0xC);
-        M2C_FIELD(arg0, f32 *, 0x114) = 0.0f;
+        M2C_FIELD(arg0, s32 *, 0x148) = (s32) M2C_FIELD(M2C_FIELD(temp_v1_2, void *(**)(void *), 0xFC)(arg0 + M2C_FIELD(temp_v1_2, s16 *, 0xF8)), s32 *, 8);
         M2C_FIELD(arg0, s128 *, 0x100) = 0.0f;
         M2C_ERROR(/* unknown instruction: ldl $v1, 0x7($v0) */);
         M2C_ERROR(/* unknown instruction: ldr $v1, ($v0) */);
         M2C_ERROR(/* unknown instruction: sdl $v1, 0x147($s0) */);
         M2C_ERROR(/* unknown instruction: sdr $v1, 0x140($s0) */);
-        M2C_FIELD(arg0, s32 *, 0x148) = (s32) M2C_FIELD(M2C_FIELD(temp_v1_2, void *(**)(void *), 0xFC)(arg0 + M2C_FIELD(temp_v1_2, s16 *, 0xF8)), s32 *, 8);
+        M2C_FIELD(arg0, f32 *, 0x114) = 0.0f;
         break;
     case 1:
         M2C_FIELD(arg0, s128 *, 0x100) = PosLoWorld(arg0);

@@ -40,8 +40,8 @@ int sceCdRead(int lsn, int sectors, void *buffer, unsigned char *mode)
         command->buffer = buffer;
         command->mode[0] = mode[0];
         command->mode[1] = mode[1];
-        command->result = D_002C7840;
         command->mode[2] = mode[2];
+        command->result = D_002C7840;
         command->status = &D_002C7900;
         switch (mode[2]) {
         case 1:

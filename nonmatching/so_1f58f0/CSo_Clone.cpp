@@ -250,8 +250,8 @@ extern "C" void CSo_Clone(SO_1F6068 *pso, SO_1F6068 *psoBase)
             BSPS_1F6068 *pbsps = (BSPS_1F6068 *)PvAllocSwCopyImpl__FiPv(preq, pgeom->pbsps);
             pgeom->pbsps = pbsps;
             req.cb = pgeom->cvtx << 4;
-            preq->cbAlign = 0x10;
             pgeom->pbsps->pv0 = PvAllocSwCopyImpl__FiPv(preq, pbsps->pv0);
+            preq->cbAlign = 0x10;
             preq->cbAlign = 0x10;
             req.cb = pgeom->cvtx << 4;
             pgeom->pbsps->pv4 = PvAllocSwCopyImpl__FiPv(preq, pgeom->pbsps->pv4);

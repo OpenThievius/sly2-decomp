@@ -39,9 +39,9 @@ extern "C" int CMovieText_ClineWrap(CMOVIETEXT *ptext)
                     unsigned char bNext = (unsigned char)pchSearch[1];
                     if ((pbTable[bNext] & 0x10) == 0) {
                         cline++;
-                        ptext->pchCur = pchSearch + 1;
-                        dxLine = 0.0f;
                         *pchSearch = '\n';
+                        dxLine = 0.0f;
+                        ptext->pchCur = pchSearch + 1;
                         break;
                     }
                 }

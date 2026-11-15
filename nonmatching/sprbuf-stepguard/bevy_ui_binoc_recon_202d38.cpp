@@ -104,10 +104,10 @@ void bevy_ui_binoc_recon_202d38(RECON *precon)
         float fCenter = 1.0f - (dCenter - 128.0f) * 0.0078125f;
         float fSize = LaneX(SqrtX(SquaredLengthXy(VectorSub(scale.q, top)))) * 0.008333334f;
         scale.q = top;
-        precon->fSmall = 1;
+        precon->fCenter = 0.0f > fCenter ? 0.0f : fCenter;
         fCenter = fCenter < 1.0f ? fCenter : 1.0f;
         precon->fSize = fSize;
-        precon->fCenter = 0.0f > fCenter ? 0.0f : fCenter;
+        precon->fSmall = 1;
         if (1.0f < fSize) {
             precon->fSmall = 0;
             precon->fSize = 2.0f - fSize;

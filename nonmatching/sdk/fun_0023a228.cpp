@@ -18,12 +18,12 @@ s32 func_0023A228(void) {
     }
     temp_a1 = temp_a2 * 0x10;
     M2C_FIELD(temp_a2, s32 *, 0x28) = 0;
-    M2C_FIELD(&D_002C5A30, s32 *, 0x10) = (s32) (M2C_FIELD(&D_002C5A30, s32 *, 0x10) + 1);
-    M2C_FIELD(temp_a2, s32 *, 0xC) = 0;
     M2C_FIELD(&D_002C5A30, s32 *, 0x14) = (s32) M2C_FIELD(temp_a2, s32 *, 0);
-    M2C_FIELD(temp_a2, s64 *, 0x18) = 0;
+    M2C_FIELD(&D_002C5A30, s32 *, 0x10) = (s32) (M2C_FIELD(&D_002C5A30, s32 *, 0x10) + 1);
     M2C_FIELD(&D_002C5A30, s32 *, 0xC) = (s32) (M2C_FIELD(&D_002C5A30, s32 *, 0xC) + 1);
+    M2C_FIELD(temp_a2, s64 *, 0x18) = 0;
     M2C_FIELD(temp_a2, s32 *, 8) = (s32) (((M2C_FIELD(&D_002C5A30, s32 *, 0xC) * 2) & 0x3FE) | 1);
+    M2C_FIELD(temp_a2, s32 *, 0xC) = 0;
     temp_a1 | M2C_FIELD(temp_a2, s32 *, 8);
 }
 }

@@ -37,12 +37,12 @@ void snd_StartSoundSystem(s32 arg0) {
     s8 sp[0xB0] __attribute__((aligned(16)));
     s32 var_v0;
     s32 var_v0_2;
-    M2C_FIELD(&D_002C4660, s32 **, 0) = &B_00443B80;
     M2C_FIELD(&D_002C4660, s32 **, 4) = &B_00444B80;
-    M2C_FIELD(&D_002C4678, M2C_UNK **, 0) = &B_00447B80;
-    M2C_FIELD(&D_002C4678, M2C_UNK **, 4) = &B_00447FC0;
     M2C_FIELD(&D_002C4670, M2C_UNK **, 0) = &B_00445B80;
+    M2C_FIELD(&D_002C4678, M2C_UNK **, 4) = &B_00447FC0;
     M2C_FIELD(&D_002C4670, M2C_UNK **, 4) = &B_00446B80;
+    M2C_FIELD(&D_002C4678, M2C_UNK **, 0) = &B_00447B80;
+    M2C_FIELD(&D_002C4660, s32 **, 0) = &B_00443B80;
     if (arg0 & 2) {
         D_002C46B8 = 1;
     } else {
@@ -75,12 +75,12 @@ loop_13:
             var_v0_2 -= 1;
         } while (var_v0_2 != -1);
         if (M2C_FIELD(&B_00448440, s32 *, 0x24) != 0) {
+            M2C_FIELD(&B_00448400, s32 *, 0x10) = 0;
             M2C_FIELD(&B_00448400, s32 *, 0) = 0;
-            M2C_FIELD(&D_002C4668, s32 *, 4) = 0xFFC;
             M2C_FIELD(&D_002C4668, s32 *, 0) = 0xFFC;
             B_00443B80 = 0;
             B_00444B80 = 0;
-            M2C_FIELD(&B_00448400, s32 *, 0x10) = 0;
+            M2C_FIELD(&D_002C4668, s32 *, 4) = 0xFFC;
             func_002325E0(0, 8, sp, &B_00448400, &B_00448400, arg0);
             return;
         }
