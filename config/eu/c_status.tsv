@@ -2794,6 +2794,7 @@ us_address	name	other_address	pair	score	addresses
 0x19F3E8	func_0019F3E8	0X19F370	gap	0	ok
 0x19F3F0	func_0019F3F0	0X19F378	gap	0	ok
 0x19F540	WarpJtToPoint	0X19F4C8	same	0	ok
+0x19F590	WarpJtToSafePoint	0X19F518	same	0	ok
 0x19FAF8	FindBestSafePoint	0X19FA80	same	0	ok
 0x19FD30	AddSafePointOnMember	0X19FCB8	same	0	ok
 0x1A0048	RemoveSafePoints	0X19FFD0	identical	0	ok

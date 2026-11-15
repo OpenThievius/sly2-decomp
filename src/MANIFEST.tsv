@@ -2794,6 +2794,7 @@ address	name	size	file	whole_file	symbol
 0X19F3E8	func_0019F3E8	8	new_19e110/fun_0019f3e8.c		
 0X19F3F0	func_0019F3F0	8	new_19e110/fun_0019f3f0.c		
 0X19F540	WarpJtToPoint	76	transition/WarpJtToPoint.cpp		
+0X19F590	WarpJtToSafePoint	572	transition-jp/WarpJtToSafePoint.cpp		
 0X19FAF8	FindBestSafePoint	308	jp-stepzap/FindBestSafePoint.cpp		
 0X19FD30	AddSafePointOnMember	380	jp-stepzap/AddSafePointOnMember_file.cpp	jp-stepzap/AddSafePointOnMember_file.cpp	AddSafePointOnMember
 0X1A0048	RemoveSafePoints	136	jp-stepzap/AddSafePointOnMember_file.cpp	jp-stepzap/AddSafePointOnMember_file.cpp	RemoveSafePoints

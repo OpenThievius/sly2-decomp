@@ -70,7 +70,7 @@ struct LO : BASIC {
     virtual void Slot27(void *pv);      /* 27: func_001CB5C8, func_001CB5D0 (SO); func_001CB5D0 calls it on each child */
     virtual void CReturnZero();         /* 28: CReturnZeroLo */
     virtual void TranslateToPos(QW pos); /* 29: TranslateSoToPos (SO); func_001B0D90 passes a quadword */
-    virtual void Slot30();
+    virtual void Slot30(void *pv);
     virtual struct MATRIX4 *PmatWorld(); /* 31: LO_PmatWorld, PmatWorldSo; Carry_Attach copies four quadwords from it */
     virtual void *Slot32(void *pmat);   /* 32: func_001A6B30, func_001F3FB0; func_001CD308 passes a matrix buffer, keeps the result as an XF */
     virtual QW GetVelocityVec();        /* 33: GetSoVelocityVec (SO); MatchSoOtherObject, func_001F7950 keep the quadword */

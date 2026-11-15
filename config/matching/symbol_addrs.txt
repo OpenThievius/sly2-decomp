@@ -6661,6 +6661,7 @@ RO_002A4D50 = 0x002A4D50; // source:provisional
 RO_002A4D58 = 0x002A4D58; // source:provisional
 VisitTaskInOrder_self = 0x00164100; // source:provisional alias-of:VisitTaskInOrder
 D_FLT_002BE5DC = 0x002BE5DC; // source:provisional
+D_FLT_002BF940 = 0x002BF940; // source:provisional
 g_cCrfodb_3e1acc = 0x003E1ACC; // source:provisional
 func_00116D20 = 0x00116D20; // source:provisional
 func_00117CF8 = 0x00117CF8; // source:provisional
