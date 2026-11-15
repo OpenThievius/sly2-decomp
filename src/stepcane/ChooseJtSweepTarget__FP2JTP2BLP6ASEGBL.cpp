@@ -1,6 +1,5 @@
 #include "sly2.h"
 #include "sly.h"
-struct BL { float w0; char pad[8]; float w3; };
 extern "C" void ReblendAsegbl(void *);
 extern "C" void SetStepRadTargetDir(void *, QW);
 extern "C" void FixStepAngularVelocity__FP4STEP(void *);
@@ -24,8 +23,8 @@ extern "C" void ChooseJtSweepTarget__FP2JTP2BLP6ASEGBL(SLY *pjt, BL *pbl, void *
         blend = GClamp((*((float *)&l.vecDir + 2) - -50.0f) * 0.009090909f, 0.0f, 1.0f);
     else
         blend = 1.0f;
-    pbl->w3 = blend;
-    pbl->w0 = 1.0f - blend;
+    pbl->aw[3] = blend;
+    pbl->aw[0] = 1.0f - blend;
     ReblendAsegbl(pasegbl);
     pjt->ptarget = l.ptarget;
     if (l.ptarget != 0 && pjt->jts == 0) {
