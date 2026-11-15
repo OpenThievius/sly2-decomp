@@ -1,13 +1,13 @@
 {
  "measures": {
-  "fuzzy_match_percent": 68.420185,
+  "fuzzy_match_percent": 68.444235,
   "total_code": "1164212",
-  "matched_code": "796556",
-  "matched_code_percent": 68.420185,
+  "matched_code": "796836",
+  "matched_code_percent": 68.444235,
   "total_data": "1038916",
-  "total_functions": 6062,
-  "matched_functions": 5450,
-  "matched_functions_percent": 89.904322,
+  "total_functions": 6063,
+  "matched_functions": 5451,
+  "matched_functions_percent": 89.905987,
   "complete_code": "141792",
   "complete_code_percent": 12.179225,
   "total_units": 434,
@@ -73,9 +73,9 @@
     {
      "name": "EvaluateAcpbl",
      "size": "556",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "0"
+     "address": "0",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "func_00138BA0",
@@ -1337,9 +1337,9 @@
     {
      "name": "PredictAsegEffect",
      "size": "976",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "3696"
+     "address": "3696",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "PasegaApplyAseg",
@@ -2048,9 +2048,9 @@
     {
      "name": "RecalcSwXpAll",
      "size": "716",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "0"
+     "address": "0",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "IMax",
@@ -2160,9 +2160,9 @@
     {
      "name": "PresetBentleyAccel",
      "size": "264",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "6400"
+     "address": "6400",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "AdjustBentleyNewXp",
@@ -2279,9 +2279,9 @@
     {
      "name": "func_00136530",
      "size": "676",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "9456"
+     "address": "9456",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "func_001367D8",
@@ -2828,9 +2828,9 @@
     {
      "name": "CBinaryInputStream_ReadGeom",
      "size": "580",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "1608"
+     "address": "1608",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "CBinaryInputStream_ReadBspc",
@@ -3498,11 +3498,11 @@
     {
      "name": "SetBlipgEmitb__FP5BLIPGP5EMITB",
      "size": "1044",
-     "fuzzy_match_percent": 0.0,
      "metadata": {
       "demangled_name": "SetBlipgEmitb(BLIPG*, EMITB*)"
      },
-     "address": "1472"
+     "address": "1472",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "func_001398E0",
@@ -3523,11 +3523,11 @@
     {
      "name": "ProjectBlipgTransformAccel__FP5BLIPGf",
      "size": "772",
-     "fuzzy_match_percent": 0.0,
      "metadata": {
       "demangled_name": "ProjectBlipgTransformAccel(BLIPG*, float)"
      },
-     "address": "2992"
+     "address": "2992",
+     "fuzzy_match_percent": 0.0
     }
    ],
    "metadata": {
@@ -3568,9 +3568,9 @@
     {
      "name": "DrawBlipg",
      "size": "1184",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "0"
+     "address": "0",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "func_0013A688",
@@ -3662,9 +3662,9 @@
     {
      "name": "UpdateBombCustomXps",
      "size": "464",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "304"
+     "address": "304",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "AddBombCustomXps",
@@ -3917,9 +3917,9 @@
     {
      "name": "SetLootState",
      "size": "2392",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "3960"
+     "address": "3960",
+     "fuzzy_match_percent": 0.0
     }
    ],
    "metadata": {
@@ -4526,11 +4526,11 @@
     {
      "name": "PruneBsp__FP3BSPP6VECTORfPP3BSP",
      "size": "636",
-     "fuzzy_match_percent": 0.0,
      "metadata": {
       "demangled_name": "PruneBsp(BSP*, VECTOR*, float, BSP**)"
      },
-     "address": "0"
+     "address": "0",
+     "fuzzy_match_percent": 0.0
     }
    ],
    "metadata": {
@@ -4768,9 +4768,9 @@
     {
      "name": "UpdateVolbtn",
      "size": "728",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "0"
+     "address": "0",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "SetVolbtnButtons",
@@ -6327,9 +6327,9 @@
     {
      "name": "UpdateCmMat4",
      "size": "936",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "2016"
+     "address": "2016",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "func_0014E000",
@@ -6395,11 +6395,11 @@
     {
      "name": "RevokeCmPolicy__FP2CMi3CPPP5CPLCYP2SOPv",
      "size": "464",
-     "fuzzy_match_percent": 0.0,
      "metadata": {
       "demangled_name": "RevokeCmPolicy(CM*, int, CPP, CPLCY*, SO*, void*)"
      },
-     "address": "600"
+     "address": "600",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "CalcCmAdjust__FP2CMP2SOP6CPDEFIP6VECTOR",
@@ -6431,11 +6431,11 @@
     {
      "name": "GetCmCpdefi__FP2CMP2SOfP6CPDEFI",
      "size": "160",
-     "fuzzy_match_percent": 0.0,
      "metadata": {
       "demangled_name": "GetCmCpdefi(CM*, SO*, float, CPDEFI*)"
      },
-     "address": "1784"
+     "address": "1784",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "FFindCmClearInterval",
@@ -6468,9 +6468,9 @@
     {
      "name": "bevy_camera_cm_14f478",
      "size": "100",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "4616"
+     "address": "4616",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "func_0014F4E0",
@@ -8318,9 +8318,9 @@
     {
      "name": "SolveDzgPrefilled",
      "size": "308",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "0"
+     "address": "0",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "SolveInequalities",
@@ -8417,9 +8417,9 @@
     {
      "name": "FillDzgDz",
      "size": "556",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "192"
+     "address": "192",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "func_00158958",
@@ -8431,11 +8431,11 @@
     {
      "name": "SolveDzg__FP3DZGiiPP2XPPiPPP2SO",
      "size": "408",
-     "fuzzy_match_percent": 0.0,
      "metadata": {
       "demangled_name": "SolveDzg(DZG*, int, int, XP**, int*, SO***)"
      },
-     "address": "800"
+     "address": "800",
+     "fuzzy_match_percent": 0.0
     }
    ],
    "metadata": {
@@ -9095,11 +9095,11 @@
     {
      "name": "UpdateEmitter__FP7EMITTERf",
      "size": "1204",
-     "fuzzy_match_percent": 0.0,
      "metadata": {
       "demangled_name": "UpdateEmitter(EMITTER*, float)"
      },
-     "address": "2768"
+     "address": "2768",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "PauseEmitter__FP7EMITTERf",
@@ -9165,11 +9165,11 @@
     {
      "name": "WakeSoWater__FP2SOP5WATERfP6VECTORT3ff",
      "size": "1348",
-     "fuzzy_match_percent": 0.0,
      "metadata": {
       "demangled_name": "WakeSoWater(SO *, WATER *, float, VECTOR *, VECTOR *, float, float)"
      },
-     "address": "4368"
+     "address": "4368",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "ConvertEmitoPosVec__FP5EMITOP6VECTORT1",
@@ -9192,11 +9192,11 @@
     {
      "name": "ChooseEmitVelocity__FP6EMITVXffP2LMP6VECTORiT4",
      "size": "444",
-     "fuzzy_match_percent": 0.0,
      "metadata": {
       "demangled_name": "ChooseEmitVelocity(EMITVX *, float, float, LM *, VECTOR *, int, VECTOR *)"
      },
-     "address": "7512"
+     "address": "7512",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "EmitRips__FP5EMITBP5EMITGiP6VECTORT3PfT5",
@@ -9210,11 +9210,11 @@
     {
      "name": "EmitBlips__FP5EMITBP5EMITGiP6VECTORT3PfT5T3T3",
      "size": "960",
-     "fuzzy_match_percent": 0.0,
      "metadata": {
       "demangled_name": "EmitBlips(EMITB *, EMITG *, int, VECTOR *, VECTOR *, float *, float *, VECTOR *, VECTOR *)"
      },
-     "address": "8824"
+     "address": "8824",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "EmitParticles__FiP5EMITBP5EMITG",
@@ -9237,9 +9237,9 @@
     {
      "name": "CalculateEmitdvMatrix",
      "size": "376",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "11816"
+     "address": "11816",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "ExplodeExpl",
@@ -9854,9 +9854,9 @@
     {
      "name": "InitDynamicTextStatics",
      "size": "4360",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "19336"
+     "address": "19336",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "InitDynamicTextStatics_thunk",
@@ -9904,9 +9904,9 @@
     {
      "name": "SetCmLookAt",
      "size": "196",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "0"
+     "address": "0",
+     "fuzzy_match_percent": 0.0
     }
    ],
    "metadata": {
@@ -11021,9 +11021,9 @@
     {
      "name": "BuildLaserBeams",
      "size": "2004",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "15248"
+     "address": "15248",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "func_001DEDB0",
@@ -12277,9 +12277,9 @@
     {
      "name": "GoalIdle_Activate",
      "size": "188",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "3008"
+     "address": "3008",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "GoalIdle_Deactivate",
@@ -12445,9 +12445,9 @@
     {
      "name": "GoalAnimLeap_Update",
      "size": "668",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "7600"
+     "address": "7600",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "GoalAnimLeap_FHandleMessage",
@@ -12466,9 +12466,9 @@
     {
      "name": "GoalAnimLeap_SetState",
      "size": "972",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "8904"
+     "address": "8904",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "func_0017B578",
@@ -12585,16 +12585,16 @@
     {
      "name": "func_0017BFF8",
      "size": "1008",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "12568"
+     "address": "12568",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "func_0017C3E8",
      "size": "360",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "13576"
+     "address": "13576",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "func_0017C550",
@@ -13383,9 +13383,9 @@
     {
      "name": "ScoreSafePoint",
      "size": "808",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "0"
+     "address": "0",
+     "fuzzy_match_percent": 0.0
     }
    ],
    "metadata": {
@@ -13433,9 +13433,9 @@
     {
      "name": "UpdateJtSafePoints",
      "size": "256",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "312"
+     "address": "312",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "AddSafePointOnMember",
@@ -13447,9 +13447,9 @@
     {
      "name": "AddSafePointOnGeom",
      "size": "404",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "952"
+     "address": "952",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "RemoveSafePoints",
@@ -13482,9 +13482,9 @@
     {
      "name": "BuildPlainBlend",
      "size": "332",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "2056"
+     "address": "2056",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "StaticInitSlotheaps_1a09c0",
@@ -13510,9 +13510,9 @@
     {
      "name": "SetJtZapState",
      "size": "1368",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "4168"
+     "address": "4168",
+     "fuzzy_match_percent": 0.0
     }
    ],
    "metadata": {
@@ -14079,16 +14079,16 @@
     {
      "name": "GetAttachCpdefi",
      "size": "992",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "688"
+     "address": "688",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "UpdateJtStateTransitions",
      "size": "2552",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "1680"
+     "address": "1680",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "UpdateJtBinocInput",
@@ -14100,16 +14100,16 @@
     {
      "name": "bevy_player_input_from_pad_cm",
      "size": "1268",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "5552"
+     "address": "5552",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "bevy_player_p5_states_18bce0",
      "size": "892",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "6824"
+     "address": "6824",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "BindJtStepAseg",
@@ -14268,9 +14268,9 @@
     {
      "name": "SetJtJtcs",
      "size": "2092",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "17160"
+     "address": "17160",
+     "fuzzy_match_percent": 0.0
     }
    ],
    "metadata": {
@@ -14797,9 +14797,9 @@
     {
      "name": "RebuildLight",
      "size": "460",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "0"
+     "address": "0",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "func_001A3B38",
@@ -15322,9 +15322,9 @@
     {
      "name": "GetXfmAngularVelocity",
      "size": "128",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "800"
+     "address": "800",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "func_00231550",
@@ -15775,9 +15775,9 @@
     {
      "name": "PxpMarkSwContactsRoot",
      "size": "1608",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "1712"
+     "address": "1712",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "StaticInitMark",
@@ -15846,11 +15846,11 @@
     {
      "name": "LoadRotateMatrixEuler__FP6VECTORP7MATRIX3",
      "size": "244",
-     "fuzzy_match_percent": 0.0,
      "metadata": {
       "demangled_name": "LoadRotateMatrixEuler(VECTOR*, MATRIX3*)"
      },
-     "address": "600"
+     "address": "600",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "LoadLookAtMatrix",
@@ -15880,9 +15880,9 @@
     {
      "name": "DecomposeRotateMatrixEuler",
      "size": "308",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "3104"
+     "address": "3104",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "TransposeMatrix4",
@@ -16612,9 +16612,9 @@
     {
      "name": "func_001ADA20",
      "size": "404",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "4224"
+     "address": "4224",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "func_001ADBB8",
@@ -16626,9 +16626,9 @@
     {
      "name": "func_001ADC40",
      "size": "428",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "4768"
+     "address": "4768",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "BusyMenu_Construct",
@@ -17965,9 +17965,9 @@
     {
      "name": "func_001B44D8",
      "size": "248",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "776"
+     "address": "776",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "StaticInitMurray",
@@ -18021,16 +18021,16 @@
     {
      "name": "UpdateMurray",
      "size": "716",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "3808"
+     "address": "3808",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "UpdateMurrayCarry",
      "size": "728",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "4528"
+     "address": "4528",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "SetMurrayCarryState",
@@ -18049,9 +18049,9 @@
     {
      "name": "func_001B5990",
      "size": "928",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "6080"
+     "address": "6080",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "func_001B5D30",
@@ -18063,9 +18063,9 @@
     {
      "name": "SetMurrayState",
      "size": "1712",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "7848"
+     "address": "7848",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "GetMurrayCpdefi",
@@ -18098,9 +18098,9 @@
     {
      "name": "func_001B6DA8",
      "size": "596",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "11224"
+     "address": "11224",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "StartMurrayLift",
@@ -18238,9 +18238,9 @@
     {
      "name": "StartMurrayAttackA",
      "size": "196",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "17208"
+     "address": "17208",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "StartMurrayAttackB",
@@ -18441,9 +18441,9 @@
     {
      "name": "UpdateZoneScriptBeh",
      "size": "544",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "25656"
+     "address": "25656",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "SetZoneScriptState",
@@ -18532,16 +18532,16 @@
     {
      "name": "RunStgSwitch",
      "size": "584",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "29232"
+     "address": "29232",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "RunStgSwitchStage",
      "size": "716",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "29816"
+     "address": "29816",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "AddStgSwitchClass",
@@ -18764,9 +18764,9 @@
     {
      "name": "func_00100008",
      "size": "528",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "8"
+     "address": "8",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "exit_thunk",
@@ -25332,9 +25332,9 @@
     {
      "name": "func_0012C768",
      "size": "768",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "6464"
+     "address": "6464",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "func_0012CA68",
@@ -26059,9 +26059,9 @@
     {
      "name": "func_00140750",
      "size": "616",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "3784"
+     "address": "3784",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "func_001409B8",
@@ -26136,9 +26136,9 @@
     {
      "name": "HandleJtMessage",
      "size": "1528",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "5896"
+     "address": "5896",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "func_00141588",
@@ -26150,9 +26150,9 @@
     {
      "name": "GetJtCpdefi",
      "size": "744",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "7608"
+     "address": "7608",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "func_00141928",
@@ -26907,9 +26907,9 @@
     {
      "name": "func_001467A0",
      "size": "884",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "7240"
+     "address": "7240",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "func_00146E18",
@@ -26998,9 +26998,9 @@
     {
      "name": "UpdateWipe",
      "size": "1096",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "11392"
+     "address": "11392",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "StartWipe",
@@ -27083,9 +27083,9 @@
     {
      "name": "func_00148300",
      "size": "452",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "960"
+     "address": "960",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "StaticInitSwSlotheaps_3",
@@ -27657,9 +27657,9 @@
     {
      "name": "OnDifficultyEvent",
      "size": "508",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "16"
+     "address": "16",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "GetSuck",
@@ -28405,9 +28405,9 @@
     {
      "name": "BindGlobset",
      "size": "568",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "2120"
+     "address": "2120",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "func_00167E58",
@@ -28433,16 +28433,16 @@
     {
      "name": "func_001681F8",
      "size": "728",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "3800"
+     "address": "3800",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "func_00169198",
      "size": "2032",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "7800"
+     "address": "7800",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "func_00169988",
@@ -28834,9 +28834,9 @@
     {
      "name": "UpdateSearchBeh",
      "size": "772",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "2600"
+     "address": "2600",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "SetSearchState",
@@ -28876,9 +28876,9 @@
     {
      "name": "FAddSearchCand",
      "size": "236",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "4520"
+     "address": "4520",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "FCompareSearchCand",
@@ -28967,9 +28967,9 @@
     {
      "name": "FInScreenBox",
      "size": "136",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "8088"
+     "address": "8088",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "func_00173928",
@@ -28988,16 +28988,16 @@
     {
      "name": "func_00173A68",
      "size": "688",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "9336"
+     "address": "9336",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "func_00173D18",
      "size": "352",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "10024"
+     "address": "10024",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "func_00173E78",
@@ -29247,9 +29247,9 @@
     {
      "name": "PsenseFindNotice",
      "size": "1116",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "17072"
+     "address": "17072",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "func_00175D00",
@@ -29275,9 +29275,9 @@
     {
      "name": "GoalNotice_Update",
      "size": "960",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "19112"
+     "address": "19112",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "GoalNotice_SetState",
@@ -29486,9 +29486,9 @@
     {
      "name": "func_0017CF10",
      "size": "328",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "528"
+     "address": "528",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "func_0017D058",
@@ -29598,9 +29598,9 @@
     {
      "name": "GoalGoto_Replan",
      "size": "656",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "3368"
+     "address": "3368",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "GoalGoto_FArrived",
@@ -29683,9 +29683,9 @@
     {
      "name": "func_0017DE50",
      "size": "656",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "224"
+     "address": "224",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "func_0017E278",
@@ -29753,9 +29753,9 @@
     {
      "name": "func_0017E6B0",
      "size": "472",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "2368"
+     "address": "2368",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "func_0017E888",
@@ -29984,9 +29984,9 @@
     {
      "name": "Mount_Update",
      "size": "540",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "7104"
+     "address": "7104",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "Mount_AccelToward",
@@ -30403,9 +30403,9 @@
     {
      "name": "UpdateAttachInput",
      "size": "2152",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "1360"
+     "address": "1360",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "StartAttach",
@@ -30424,9 +30424,9 @@
     {
      "name": "SetAttachSubstate",
      "size": "3300",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "8064"
+     "address": "8064",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "FAttachGroundTarget",
@@ -30530,9 +30530,9 @@
     {
      "name": "EmitTargetSparkles",
      "size": "672",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "4216"
+     "address": "4216",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "func_00195608",
@@ -30586,9 +30586,9 @@
     {
      "name": "SetJmpState",
      "size": "1460",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "5904"
+     "address": "5904",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "SetJmpBodyState",
@@ -30621,9 +30621,9 @@
     {
      "name": "UpdateJmpBodyState",
      "size": "2708",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "12816"
+     "address": "12816",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "func_00199298",
@@ -30792,9 +30792,9 @@
     {
      "name": "UpdateJtActivePipe",
      "size": "1904",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "208"
+     "address": "208",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "func_0019E950",
@@ -30989,9 +30989,9 @@
     {
      "name": "ZapTakeDamage",
      "size": "1480",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "2136"
+     "address": "2136",
+     "fuzzy_match_percent": 0.0
     }
    ],
    "metadata": {
@@ -31060,9 +31060,9 @@
     {
      "name": "GetLoEulerDegrees",
      "size": "108",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "176"
+     "address": "176",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "func_001A63B0",
@@ -31301,16 +31301,16 @@
     {
      "name": "CmpPosXy",
      "size": "112",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "112"
+     "address": "112",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "OrientXy",
      "size": "124",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "224"
+     "address": "224",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "Obstacle_IposWrap",
@@ -31969,9 +31969,9 @@
     {
      "name": "UpdateVjoyStick",
      "size": "308",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "1336"
+     "address": "1336",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "UpdateVjoy",
@@ -32467,9 +32467,9 @@
     {
      "name": "func_001C84D8",
      "size": "596",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "3592"
+     "address": "3592",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "func_001C8730",
@@ -32979,9 +32979,9 @@
     {
      "name": "func_001CC5E8",
      "size": "956",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "13592"
+     "address": "13592",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "func_001CC9A8",
@@ -33014,9 +33014,9 @@
     {
      "name": "func_001CCC88",
      "size": "1040",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "15288"
+     "address": "15288",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "Carry_Attach",
@@ -33092,9 +33092,9 @@
     {
      "name": "bevy_camera_cm_screen_px_ps2",
      "size": "536",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "0"
+     "address": "0",
+     "fuzzy_match_percent": 0.0
     }
    ],
    "metadata": {
@@ -33283,9 +33283,9 @@
     {
      "name": "AddSphereToRenderTree",
      "size": "488",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "4176"
+     "address": "4176",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "StaticInitSlotheaps_1d66f0",
@@ -34934,9 +34934,9 @@
     {
      "name": "CloneStepHullGeom",
      "size": "456",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "864"
+     "address": "864",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "func_00203CB8",
@@ -35175,9 +35175,9 @@
     {
      "name": "ExecuteSwLoadRequest",
      "size": "1836",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "2128"
+     "address": "2128",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "SetHandsOff",
@@ -35338,9 +35338,9 @@
     {
      "name": "CarryThrow_SetState",
      "size": "1308",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "5440"
+     "address": "5440",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "func_00220BE8",
@@ -35423,9 +35423,9 @@
     {
      "name": "HandleGadgetObjXps",
      "size": "392",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "424"
+     "address": "424",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "FGadgetObjAcceptsStick",
@@ -35522,9 +35522,9 @@
     {
      "name": "UpdateDysh",
      "size": "708",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "0"
+     "address": "0",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "StaticInitSlotheaps_225880",
@@ -35607,9 +35607,9 @@
     {
      "name": "UpdateTankAim",
      "size": "756",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "248"
+     "address": "248",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "UpdateTankFire",
@@ -35628,9 +35628,9 @@
     {
      "name": "func_00226370",
      "size": "132",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "2248"
+     "address": "2248",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "StaticInitSlotheaps_2263f8",
@@ -37693,11 +37693,11 @@
     {
      "name": "PresetPuffcAccel__FP5PUFFCf",
      "size": "380",
-     "fuzzy_match_percent": 0.0,
      "metadata": {
       "demangled_name": "PresetPuffcAccel(PUFFC*, float)"
      },
-     "address": "0"
+     "address": "0",
+     "fuzzy_match_percent": 0.0
     }
    ],
    "metadata": {
@@ -37949,9 +37949,9 @@
     {
      "name": "Swarm_Update",
      "size": "604",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "3840"
+     "address": "3840",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "Swarm_AdjustNewXp",
@@ -38724,9 +38724,9 @@
     {
      "name": "UpdateVehicle",
      "size": "1960",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "1936"
+     "address": "1936",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "func_001D2150",
@@ -39504,9 +39504,9 @@
     {
      "name": "func_001BE6F0",
      "size": "672",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "1200"
+     "address": "1200",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "func_001BE990",
@@ -40650,7 +40650,7 @@
     {
      "name": ".text",
      "size": "142288",
-     "fuzzy_match_percent": 54.582256,
+     "fuzzy_match_percent": 54.77904,
      "metadata": {}
     }
    ],
@@ -42109,10 +42109,17 @@
     },
     {
      "name": "func_0023E618",
-     "size": "352",
+     "size": "280",
+     "fuzzy_match_percent": 100.0,
      "metadata": {},
-     "address": "52272",
-     "fuzzy_match_percent": 0.0
+     "address": "52272"
+    },
+    {
+     "name": "func_0023E730",
+     "size": "72",
+     "fuzzy_match_percent": 0.0,
+     "metadata": {},
+     "address": "52552"
     },
     {
      "name": "__get_eh_table_version",
@@ -44285,14 +44292,14 @@
     ]
    },
    "measures": {
-    "fuzzy_match_percent": 54.582256,
+    "fuzzy_match_percent": 54.77904,
     "total_code": "142288",
-    "matched_code": "77664",
-    "matched_code_percent": 54.582256,
+    "matched_code": "77944",
+    "matched_code_percent": 54.77904,
     "matched_data_percent": 100.0,
-    "total_functions": 516,
-    "matched_functions": 372,
-    "matched_functions_percent": 72.093023,
+    "total_functions": 517,
+    "matched_functions": 373,
+    "matched_functions_percent": 72.147002,
     "complete_code": "0",
     "complete_code_percent": 0.0,
     "complete_data_percent": 100.0,
@@ -46244,9 +46251,9 @@
     {
      "name": "func_001F2500",
      "size": "388",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "7632"
+     "address": "7632",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "func_001F2688",
@@ -46356,9 +46363,9 @@
     {
      "name": "RemoveSoLoHierarchy",
      "size": "304",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "9752"
+     "address": "9752",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "UpdateSoRoot",
@@ -47978,9 +47985,9 @@
     {
      "name": "EnsureSogeomLvo",
      "size": "748",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "4888"
+     "address": "4888",
+     "fuzzy_match_percent": 0.0
     }
    ],
    "metadata": {
@@ -48610,9 +48617,9 @@
     {
      "name": "func_001242B8",
      "size": "560",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "768"
+     "address": "768",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "RefOpFindNearestObject",
@@ -50101,9 +50108,9 @@
     {
      "name": "SetMeterState",
      "size": "660",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "752"
+     "address": "752",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "UpdateMeter",
@@ -51176,9 +51183,9 @@
     {
      "name": "StartSeqnodeCameraMove",
      "size": "756",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "19648"
+     "address": "19648",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "StopSeqnodeCameraMove",
@@ -52131,9 +52138,9 @@
     {
      "name": "bevy_ui_binoc_recon_202d38",
      "size": "2096",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "4032"
+     "address": "4032",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "func_00203568",
@@ -52188,11 +52195,11 @@
     {
      "name": "UpdateStepPhys__FP4STEP",
      "size": "404",
-     "fuzzy_match_percent": 0.0,
      "metadata": {
       "demangled_name": "UpdateStepPhys(STEP*)"
      },
-     "address": "0"
+     "address": "0",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "func_00203FA0",
@@ -52513,9 +52520,9 @@
     {
      "name": "RenderStepguardSelf",
      "size": "780",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "10328"
+     "address": "10328",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "RemoveStepguardHierarchy",
@@ -52695,9 +52702,9 @@
     {
      "name": "func_002082D0",
      "size": "616",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "13464"
+     "address": "13464",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "func_00208538",
@@ -53837,9 +53844,9 @@
     {
      "name": "PxpAdd",
      "size": "504",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "3368"
+     "address": "3368",
+     "fuzzy_match_percent": 0.0
     }
    ],
    "metadata": {
@@ -54300,9 +54307,9 @@
     {
      "name": "GetJmpLaunchVelocity",
      "size": "776",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "688"
+     "address": "688",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "GMeasureJumpRail__FP3MJRf",
@@ -54358,9 +54365,9 @@
     {
      "name": "JtbsChooseJtLanding",
      "size": "4588",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "3184"
+     "address": "3184",
+     "fuzzy_match_percent": 0.0
     }
    ],
    "metadata": {
@@ -54401,11 +54408,11 @@
     {
      "name": "PresetJtAccelPipe__FP2JT",
      "size": "416",
-     "fuzzy_match_percent": 0.0,
      "metadata": {
       "demangled_name": "PresetJtAccelPipe(JT*)"
      },
-     "address": "0"
+     "address": "0",
+     "fuzzy_match_percent": 0.0
     }
    ],
    "metadata": {
@@ -54481,11 +54488,11 @@
     {
      "name": "PostStepLoadRun__FP4STEPP5BLRUNPP6ASEGBL",
      "size": "620",
-     "fuzzy_match_percent": 0.0,
      "metadata": {
       "demangled_name": "PostStepLoadRun(STEP*, BLRUN*, ASEGBL**)"
      },
-     "address": "0"
+     "address": "0",
+     "fuzzy_match_percent": 0.0
     }
    ],
    "metadata": {
@@ -54554,9 +54561,9 @@
     {
      "name": "LoadJumpAnim",
      "size": "500",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "688"
+     "address": "688",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "StartJumpAnim",
@@ -54617,9 +54624,9 @@
     {
      "name": "SetJumperState",
      "size": "1020",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "2080"
+     "address": "2080",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "SetJumperTarget",
@@ -55555,16 +55562,16 @@
     {
      "name": "Vec4_GetY",
      "size": "20",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "3256"
+     "address": "3256",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "Vec4_GetZ",
      "size": "20",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "3280"
+     "address": "3280",
+     "fuzzy_match_percent": 0.0
     }
    ],
    "metadata": {
@@ -57011,11 +57018,11 @@
     {
      "name": "ActivateCptn__FP4CPTNPv",
      "size": "676",
-     "fuzzy_match_percent": 0.0,
      "metadata": {
       "demangled_name": "ActivateCptn(CPTN*, void*)"
      },
-     "address": "3136"
+     "address": "3136",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "DeactivateCptn",
@@ -57406,9 +57413,9 @@
     {
      "name": "func_001A3260",
      "size": "256",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "4792"
+     "address": "4792",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "InitLight",
@@ -57688,16 +57695,16 @@
     {
      "name": "RefOpAdd",
      "size": "652",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "680"
+     "address": "680",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "RefOpSub",
      "size": "652",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "1336"
+     "address": "1336",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "RefOpMult",
@@ -58146,9 +58153,9 @@
     {
      "name": "func_0022D148",
      "size": "508",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "1464"
+     "address": "1464",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "func_0022D670",
@@ -58302,11 +58309,11 @@
     {
      "name": "ConvertDeulToW__FP6VECTORN20",
      "size": "192",
-     "fuzzy_match_percent": 0.0,
      "metadata": {
       "demangled_name": "ConvertDeulToW(VECTOR *, VECTOR *, VECTOR *)"
      },
-     "address": "0"
+     "address": "0",
+     "fuzzy_match_percent": 0.0
     }
    ],
    "metadata": {
@@ -58577,9 +58584,9 @@
     {
      "name": "UpdateWater",
      "size": "1160",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "0"
+     "address": "0",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "AddWaterExternalAccelerations",
@@ -58605,9 +58612,9 @@
     {
      "name": "UGetWaterSubmerged",
      "size": "536",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "1560"
+     "address": "1560",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "UpdateSoBounds_thunk",
@@ -58891,9 +58898,9 @@
     {
      "name": "BuildXfLocalMatrix",
      "size": "340",
-     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "720"
+     "address": "720",
+     "fuzzy_match_percent": 0.0
     },
     {
      "name": "GetXfDofValue",
@@ -59081,14 +59088,14 @@
    "id": "sdk",
    "name": "Sony SDK",
    "measures": {
-    "fuzzy_match_percent": 54.582256,
+    "fuzzy_match_percent": 54.77904,
     "total_code": "142288",
-    "matched_code": "77664",
-    "matched_code_percent": 54.582256,
+    "matched_code": "77944",
+    "matched_code_percent": 54.77904,
     "matched_data_percent": 100.0,
-    "total_functions": 516,
-    "matched_functions": 372,
-    "matched_functions_percent": 72.093023,
+    "total_functions": 517,
+    "matched_functions": 373,
+    "matched_functions_percent": 72.147002,
     "complete_code": "0",
     "complete_code_percent": 0.0,
     "complete_data_percent": 100.0,
