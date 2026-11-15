@@ -7054,6 +7054,7 @@ UseGuardAnimSetEK = 0x00208078; // source:provisional alias-of:func_00208078
 UseGuardAnimSetEL = 0x00208078; // source:provisional alias-of:func_00208078
 UseGuardAnimSetEM = 0x00208078; // source:provisional alias-of:func_00208078
 RO_STR_002AC468 = 0x002AC468; // source:provisional
+RO_STR_002AC598 = 0x002AC598; // source:provisional
 RO_STR_002AC5F0 = 0x002AC5F0; // source:provisional
 UseGuardAnimSetFN = 0x00208078; // source:provisional alias-of:func_00208078
 UseGuardAnimSetFO = 0x00208078; // source:provisional alias-of:func_00208078

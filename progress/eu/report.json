@@ -1,13 +1,13 @@
 {
  "measures": {
-  "fuzzy_match_percent": 67.997925,
+  "fuzzy_match_percent": 68.053928,
   "total_code": "1164212",
-  "matched_code": "791640",
-  "matched_code_percent": 67.997925,
+  "matched_code": "792292",
+  "matched_code_percent": 68.053928,
   "total_data": "1038916",
   "total_functions": 6061,
-  "matched_functions": 5441,
-  "matched_functions_percent": 89.770665,
+  "matched_functions": 5443,
+  "matched_functions_percent": 89.803663,
   "complete_code": "141792",
   "complete_code_percent": 12.179225,
   "total_units": 434,
@@ -40650,7 +40650,7 @@
     {
      "name": ".text",
      "size": "142288",
-     "fuzzy_match_percent": 51.127291,
+     "fuzzy_match_percent": 51.585517,
      "metadata": {}
     }
    ],
@@ -42397,9 +42397,9 @@
     {
      "name": "func_00241368",
      "size": "112",
+     "fuzzy_match_percent": 100.0,
      "metadata": {},
-     "address": "63872",
-     "fuzzy_match_percent": 0.0
+     "address": "63872"
     },
     {
      "name": "func_002413E0",
@@ -43475,9 +43475,9 @@
     {
      "name": "func_00250A38",
      "size": "540",
+     "fuzzy_match_percent": 100.0,
      "metadata": {},
-     "address": "127056",
-     "fuzzy_match_percent": 0.0
+     "address": "127056"
     },
     {
      "name": "func_00250C58",
@@ -44278,14 +44278,14 @@
     ]
    },
    "measures": {
-    "fuzzy_match_percent": 51.127291,
+    "fuzzy_match_percent": 51.585517,
     "total_code": "142288",
-    "matched_code": "72748",
-    "matched_code_percent": 51.127291,
+    "matched_code": "73400",
+    "matched_code_percent": 51.585517,
     "matched_data_percent": 100.0,
     "total_functions": 515,
-    "matched_functions": 363,
-    "matched_functions_percent": 70.485437,
+    "matched_functions": 365,
+    "matched_functions_percent": 70.873786,
     "complete_code": "0",
     "complete_code_percent": 0.0,
     "complete_data_percent": 100.0,
@@ -59074,14 +59074,14 @@
    "id": "sdk",
    "name": "Sony SDK",
    "measures": {
-    "fuzzy_match_percent": 51.127291,
+    "fuzzy_match_percent": 51.585517,
     "total_code": "142288",
-    "matched_code": "72748",
-    "matched_code_percent": 51.127291,
+    "matched_code": "73400",
+    "matched_code_percent": 51.585517,
     "matched_data_percent": 100.0,
     "total_functions": 515,
-    "matched_functions": 363,
-    "matched_functions_percent": 70.485437,
+    "matched_functions": 365,
+    "matched_functions_percent": 70.873786,
     "complete_code": "0",
     "complete_code_percent": 0.0,
     "complete_data_percent": 100.0,

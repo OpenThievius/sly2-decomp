@@ -694,7 +694,7 @@ address	name	size	file	score
 0X247028	__ieee754_sqrt	776	sdk/__ieee754_sqrt.cpp	226
 0X247DE8	__ieee754_fmodf	592	sdk/__ieee754_fmodf.cpp	1
 0X249CE0	rint	512	sdk/rint.cpp	31
-0X24A248	__ieee754_log	1264	sdk/__ieee754_log.cpp	351
+0X24A248	__ieee754_log	1264	sdk/__ieee754_log.cpp	350
 0X24AE90	func_0024AE90	696	sdk/fun_0024ae90.cpp	134
 0X24B480	sceMpegInit	176	sdk/sceMpegInit.c	2
 0X24B628	sceMpegAddCallback	56	sdk/sceMpegAddCallback.cpp	8

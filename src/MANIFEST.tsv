@@ -5217,6 +5217,7 @@ address	name	size	file	whole_file	symbol
 0X240B88	checkModelVersion	160	sdk/checkModelVersion.cpp		
 0X240FB0	sceGszbufaddr	200	sdk/sceGszbufaddr.c		
 0X241078	sceGsSetDefDrawEnv	484	sdk/sceGsSetDefDrawEnv.c		
+0X241368	func_00241368	112	sdk/fun_00241368.c		
 0X2413E0	func_002413E0	40	sdk/fun_002413e0.cpp		
 0X241408	memclr	52	sdk/memclr.cpp		
 0X241440	sceDmaGetChan	40	sdk/sceDmaGetChan.cpp		
@@ -5323,6 +5324,7 @@ address	name	size	file	whole_file	symbol
 0X24FA38	func_0024FA38	84	sdk/fun_0024fa38.cpp		
 0X24FA90	func_0024FA90	64	sdk/fun_0024fa90.cpp		
 0X2505B0	func_002505B0	1160	sdk/fun_002505b0.cpp		
+0X250A38	func_00250A38	540	sdk/fun_00250a38.c		
 0X250C58	func_00250C58	576	sdk/fun_00250c58.cpp		
 0X250E98	func_00250E98	812	sdk/fun_00250e98.cpp		
 0X2511C8	func_002511C8	1064	sdk/fun_002511c8.cpp		

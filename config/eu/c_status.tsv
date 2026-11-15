@@ -5217,6 +5217,7 @@ us_address	name	other_address	pair	score	addresses
 0x240B88	checkModelVersion	0X241548	same	0	ok
 0x240FB0	sceGszbufaddr	0X241970	same	0	ok
 0x241078	sceGsSetDefDrawEnv	0X241A38	same	0	ok
+0x241368	func_00241368	0X241D28	same	0	ok
 0x2413E0	func_002413E0	0X241DA0	identical	0	ok
 0x241408	memclr	0X241DC8	identical	0	ok
 0x241440	sceDmaGetChan	0X241E00	same	0	ok
@@ -5323,6 +5324,7 @@ us_address	name	other_address	pair	score	addresses
 0x24FA38	func_0024FA38	0X250480	same	0	ok
 0x24FA90	func_0024FA90	0X2504D8	same	0	ok
 0x2505B0	func_002505B0	0X251000	same	0	ok
+0x250A38	func_00250A38	0X251488	same	0	ok
 0x250C58	func_00250C58	0X2516A8	same	0	ok
 0x250E98	func_00250E98	0X2518E8	same	0	ok
 0x2511C8	func_002511C8	0X251C18	same	0	ok
