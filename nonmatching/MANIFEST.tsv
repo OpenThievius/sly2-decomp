@@ -80,6 +80,7 @@ address	name	size	file	score
 0X137248	PresetJtOrbitAccel	664	bbmark-blend/PresetJtOrbitAccel.c	193
 0X1375D0	bevy_player_p25_1375d0	432	bbmark-blend/bevy_player_p25_1375d0.c	103
 0X137A30	EnsureAsegBlendDynamic	1416	bbmark-blend/EnsureAsegBlendDynamic.cpp	73
+0X138660	EvaluateAcsb__FP4ACSBP3ALOfiP7MATRIX3	784	ac_138660/EvaluateAcsb__FP4ACSBP3ALOfiP7MATRIX3.cpp	62
 0X138970	EvaluateAcpbl	560	ac-blip/EvaluateAcpbl.cpp	41
 0X138BA0	func_00138BA0	528	ac-blip/fun_00138ba0.cpp	59
 0X139250	OnBlipgRemove__FP5BLIPG	200	blip/OnBlipgRemove__FP5BLIPG.cpp	12

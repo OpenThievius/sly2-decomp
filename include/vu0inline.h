@@ -109,6 +109,15 @@ static inline QW TransformPoint(QW v, QW row0, QW row1, QW row2, QW row3)
     return point;
 }
 
+/* vsub.xyzw of vf0 from itself: the zero vector in a VU0 register, where plain C gives por or a constant-pool load. Retail starts
+   an accumulator pair with it (EvaluateAcsb, PostVehicleLoad, UpdateGuardSensor) */
+static inline QW VectorZero(void)
+{
+    QW zero;
+    asm("vsub.xyzw %0, $vf0, $vf0" : "=j"(zero));
+    return zero;
+}
+
 /* a + b * s.x in every lane: vadda.xyzw puts vf0 + a in ACC, vmaddx.xyzw adds b * s.x. As vf0 is (0, 0, 0, 1), lane w also gains 1.
    The vadda operands are written a, vf0: ps2eeas encodes that text as retail's vadda ACC, vf0, a (StartNextSeqnodeRecord,
    GoalBrain_FHandleMessage, SetJtState) */
