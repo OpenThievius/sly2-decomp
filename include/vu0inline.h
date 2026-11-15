@@ -128,6 +128,15 @@ static inline QW ScaleAddX(QW a, QW b, QW s)
     return sum;
 }
 
+/* a + b * sb.x + c * sc.x in every lane: vadda.xyzw puts vf0 + a in ACC, vmaddax.xyzw adds b * sb.x, vmaddx.xyzw adds c * sc.x (w gains 1 from
+   vf0). PxpFindJtBestEdge, UpdateVehicle: both give retail's three instructions and vf numbers; sb and sc go through one VU_SCALE slot, sb first */
+static inline QW ScaleAddTwoX(QW a, QW b, QW sb, QW c, QW sc)
+{
+    QW sum;
+    asm("vadda.xyzw $ACC, %1, $vf0\n\tvmaddax.xyzw $ACC, %2, %3x\n\tvmaddx.xyzw %0, %4, %5x" : "=j"(sum) : "j"(a), "j"(b), "j"(sb), "j"(c), "j"(sc));
+    return sum;
+}
+
 /* qmtc2.ni: a float's bits into lane x of a VU0 register; GCC moves the float to a general register itself (mfc1) first
    (RefOpDiv, UpdateWipe) */
 static inline QW VectorFromFloat(float value)

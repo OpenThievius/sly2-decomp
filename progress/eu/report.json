@@ -14415,11 +14415,11 @@
     {
      "name": "PxpFindJtBestEdge__FP2JTPiP6VECTOR",
      "size": "844",
+     "fuzzy_match_percent": 0.0,
      "metadata": {
       "demangled_name": "PxpFindJtBestEdge(JT*, int*, VECTOR*)"
      },
-     "address": "2368",
-     "fuzzy_match_percent": 0.0
+     "address": "2368"
     }
    ],
    "metadata": {
