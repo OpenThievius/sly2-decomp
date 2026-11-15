@@ -254,6 +254,9 @@ def compare(arguments):
                 actual = ((target_words[hi_target] & 0xFFFF) << 16) + sign16(target_words[target_index] & 0xFFFF)
                 addend = ((object_words[hi_object] & 0xFFFF) << 16) + sign16(object_words[object_index] & 0xFFFF)
                 expected = None if wanted is None else wanted + addend
+                if wanted is None and name == ".text" and arguments.address + addend - object_start == actual & 0xFFFFFFFF:
+                    # the address of a label inside the function itself (`&&label`): the assembler resolved it against .text, no symbol
+                    continue
                 if wanted is None and name == ".rodata" and rodata_matches(arguments.object, object_start, addend, actual & 0xFFFFFFFF, arguments.address, size, arguments.elf):
                     continue
                 if expected != actual & 0xFFFFFFFF:

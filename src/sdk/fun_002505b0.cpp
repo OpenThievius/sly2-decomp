@@ -1,53 +1,20 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-#include "types.h"
+#include "mpeg.h"
 extern "C" {
-struct MpegBlockEntry {
-    u32 address;
-    int offset;
-    int firstCount;
-    int secondCount;
-    int stride;
-    u8 *firstSource;
-    u8 *secondSource;
-};
-struct MpegFrameBuffer {
-    u8 *base;
-    void *coefficients;
-    u8 *upper[4];
-    u8 *lower[4];
-    void *lumaRoutine[4];
-    void *chromaRoutine[4];
-    MpegBlockEntry luma[4];
-    MpegBlockEntry chroma[4];
-    u8 pad128[0x12C - 0x128];
-    int count;
-    u8 pad130[0x13C - 0x130];
-    int noCoefficients;
-};
 struct MpegReference {
     u8 *base;
     u8 pad4[0x10 - 0x4];
     int width;
 };
-struct MpegDecoder {
-    u8 pad0[0x5A0];
-    MpegFrameBuffer buffers[2];
-    u8 pad820[0x820 - 0x820];
-    int bufferIndex;
-    u8 pad824[0x830 - 0x824];
-    u32 output;
-    u8 pad834[0x87C - 0x834];
-    int sameFrame;
-};
-extern void *D_002C8478[];
-extern void *D_002C8498[];
+extern void (*D_002C8478[])(MPEGBLOCK *);
+extern void (*D_002C8498[])(MPEGBLOCK *);
 
-void func_002505B0(MpegDecoder *decoder, MpegReference *reference, int fieldOffset, int destinationRow, int row,
+void func_002505B0(MPEGDEC *decoder, MpegReference *reference, int fieldOffset, int destinationRow, int row,
                    int height, int column, int rowOffset, int vectorX, int vectorY, int fieldPrediction, int average) {
-    u32 output = decoder->output;
-    int index = decoder->buffers[decoder->bufferIndex].count;
-    MpegBlockEntry *luma = &decoder->buffers[decoder->bufferIndex].luma[index];
-    MpegBlockEntry *chroma = &decoder->buffers[decoder->bufferIndex].chroma[index];
+    u32 output = (u32)decoder->output;
+    int index = decoder->buffers[decoder->bufferIndex].blockCount;
+    MPEGBLOCK *luma = &decoder->buffers[decoder->bufferIndex].blocks[index];
+    MPEGBLOCK *chroma = &decoder->buffers[decoder->bufferIndex].blocks[4 + index];
     int x;
     int y;
     int lumaX;
@@ -165,9 +132,9 @@ void func_002505B0(MpegDecoder *decoder, MpegReference *reference, int fieldOffs
         chroma->secondSource = lower + offset + (fraction * 8 + 0x100);
     }
     chroma->stride = 8 << fieldPrediction;
-    decoder->buffers[decoder->bufferIndex].lumaRoutine[index] = D_002C8478[routine];
-    decoder->buffers[decoder->bufferIndex].chromaRoutine[index] =
+    decoder->buffers[decoder->bufferIndex].inverseQuantize[index] = D_002C8478[routine];
+    decoder->buffers[decoder->bufferIndex].inverseTransform[index] =
         D_002C8498[(average << 2) | (xHalf << 1) | yHalf];
-    decoder->buffers[decoder->bufferIndex].count++;
+    decoder->buffers[decoder->bufferIndex].blockCount++;
 }
 }

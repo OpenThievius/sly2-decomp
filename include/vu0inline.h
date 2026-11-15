@@ -109,6 +109,15 @@ static inline QW TransformPoint(QW v, QW row0, QW row1, QW row2, QW row3)
     return point;
 }
 
+/* vsub.xyzw of vf0 from itself: the zero vector in a VU0 register, where plain C gives por or a constant-pool load. Retail starts
+   an accumulator pair with it (EvaluateAcsb, PostVehicleLoad, UpdateGuardSensor) */
+static inline QW VectorZero(void)
+{
+    QW zero;
+    asm("vsub.xyzw %0, $vf0, $vf0" : "=j"(zero));
+    return zero;
+}
+
 /* a + b * s.x in every lane: vadda.xyzw puts vf0 + a in ACC, vmaddx.xyzw adds b * s.x. As vf0 is (0, 0, 0, 1), lane w also gains 1.
    The vadda operands are written a, vf0: ps2eeas encodes that text as retail's vadda ACC, vf0, a (StartNextSeqnodeRecord,
    GoalBrain_FHandleMessage, SetJtState) */
@@ -197,6 +206,24 @@ static inline u32 VectorWordX(QW v)
     u32 word;
     asm("qmfc2.ni %0, %1" : "=r"(word) : "j"(v));
     return word;
+}
+
+/* qmtc2.ni from a 128-bit value already in a general register (retail copies the argument with por and moves the quad from there): a QW
+   operand is "r" like VectorFromWord's word, but GCC keeps the whole quadword in the general register (AddSphereToRenderTree, UpdateCmMat4) */
+static inline QW VectorFromQuad(QW quad)
+{
+    QW vector;
+    asm("qmtc2.ni %1, %0" : "=j"(vector) : "r"(quad));
+    return vector;
+}
+
+/* qmfc2.ni of a full quadword into a general register, for an sq or a por (retail: qmfc2.ni then sq); VectorWordX is the 32-bit form
+   (UpdateCmMat4) */
+static inline QW GeneralFromVector(QW vector)
+{
+    QW general;
+    asm("qmfc2.ni %0, %1" : "=r"(general) : "j"(vector));
+    return general;
 }
 
 #endif

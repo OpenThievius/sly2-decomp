@@ -5061,6 +5061,7 @@ address	name	size	file	whole_file	symbol
 0X232520	func_00232520	72	sdk/fun_00232520.cpp		
 0X232568	snd_AutoVol	60	sdk/snd_AutoVol.cpp		
 0X2325E0	func_002325E0	600	sdk/fun_002325e0.cpp		
+0X232838	snd_SendIOPCommandNoWait__FiiPcPFiUl_vUl	896	sdk/snd_SendIOPCommandNoWait__FiiPcPFiUl_vUl.cpp		
 0X232BB8	snd_PostMessage__Fv	64	sdk/snd_PostMessage__Fv.cpp		
 0X232D80	snd_StreamSafeCheckCDIdle	40	sdk/snd_StreamSafeCheckCDIdle.cpp		
 0X232DA8	snd_StreamSafeCdSync	192	sdk/snd_StreamSafeCdSync.cpp		
@@ -5157,6 +5158,8 @@ address	name	size	file	whole_file	symbol
 0X23A8E8	func_0023A8E8	36	sdk/fun_0023a8e8.c		
 0X23A9C8	func_0023A9C8	12	sdk/fun_0023a9c8.cpp		
 0X23AA40	func_0023AA40	36	sdk/fun_0023aa40.cpp		
+0X23AA98	func_0023AA98	28	unsorted/fun_0023aa98.c		
+0X23AAB8	func_0023AAB8	12	unsorted/fun_0023aab8.c		
 0X23AAC8	func_0023AAC8	24	sdk/fun_0023aac8.cpp		
 0X23AD70	func_0023AD70	52	sdk/fun_0023ad70.cpp		
 0X23AE20	func_0023AE20	76	sdk/fun_0023ae20.c		
@@ -5194,6 +5197,11 @@ address	name	size	file	whole_file	symbol
 0X23E3E8	eh_context_initialize	40	sdk/eh_context_initialize.cpp		
 0X23E410	eh_context_static	104	sdk/eh_context_static.cpp		
 0X23E478	__get_dynamic_handler_chain	40	sdk/__get_dynamic_handler_chain.cpp		
+0X23E4A0	__sjthrow	376	sdk/__sjthrow.cpp		
+0X23E618	func_0023E618	280	unsorted/fun_0023e618.cpp		
+0X23E730	__eh_rtime_match	72	unsorted/__eh_rtime_match.cpp		
+0X23E778	__get_eh_table_version	8	unsorted/__get_eh_table_version.c		
+0X23E780	__get_eh_table_language	8	unsorted/__get_eh_table_language.c		
 0X23E9A8	get_reg_addr	136	sdk/get_reg_addr.c		
 0X23EA30	copy_reg	124	sdk/copy_reg.cpp		
 0X23EAB0	next_stack_level	140	sdk/next_stack_level.cpp		
@@ -5209,6 +5217,7 @@ address	name	size	file	whole_file	symbol
 0X23FE78	func_0023FE78	472	sdk/fun_0023fe78.cpp		
 0X2401C8	func_002401C8	12	sdk/fun_002401c8.cpp		
 0X240328	func_00240328	16	sdk/fun_00240328.cpp		
+0X2405F0	func_002405F0	12	sdk/fun_002405f0.c		
 0X240600	sceGsPutDispEnv	188	sdk/sceGsPutDispEnv.cpp		
 0X2406C0	sceGsPutDrawEnv	232	sdk/sceGsPutDrawEnv.cpp		
 0X240A40	sceGsSwapDBuff	92	sdk/sceGsSwapDBuff.cpp		
@@ -5217,6 +5226,7 @@ address	name	size	file	whole_file	symbol
 0X240B88	checkModelVersion	160	sdk/checkModelVersion.cpp		
 0X240FB0	sceGszbufaddr	200	sdk/sceGszbufaddr.c		
 0X241078	sceGsSetDefDrawEnv	484	sdk/sceGsSetDefDrawEnv.c		
+0X241368	func_00241368	112	sdk/fun_00241368.c		
 0X2413E0	func_002413E0	40	sdk/fun_002413e0.cpp		
 0X241408	memclr	52	sdk/memclr.cpp		
 0X241440	sceDmaGetChan	40	sdk/sceDmaGetChan.cpp		
@@ -5280,6 +5290,7 @@ address	name	size	file	whole_file	symbol
 0X247330	__ieee754_acosf	1072	sdk/__ieee754_acosf.cpp		
 0X247760	__ieee754_asinf	924	sdk/__ieee754_asinf.cpp		
 0X247B00	__ieee754_atan2f	744	sdk/__ieee754_atan2f.cpp		
+0X248038	__ieee754_powf	2188	sdk/__ieee754_powf.c		
 0X2488C8	__ieee754_rem_pio2f	992	sdk/__ieee754_rem_pio2f.cpp		
 0X248CA8	__ieee754_sqrtf	308	sdk/__ieee754_sqrtf.cpp		
 0X248DE0	__kernel_cosf	344	sdk/__kernel_cosf.cpp		
@@ -5293,6 +5304,7 @@ address	name	size	file	whole_file	symbol
 0X249EE0	func_00249EE0	436	sdk/fun_00249ee0.cpp		
 0X24A098	func_0024A098	36	sdk/fun_0024a098.c		
 0X24A0C0	func_0024A0C0	36	sdk/fun_0024a0c0.c		
+0X24A0E8	func_0024A0E8	352	sdk/fun_0024a0e8.c		
 0X24A738	func_0024A738	68	sdk/fun_0024a738.cpp		
 0X24A780	func_0024A780	48	sdk/fun_0024a780.cpp		
 0X24A7B0	func_0024A7B0	112	sdk/fun_0024a7b0.cpp		
@@ -5301,6 +5313,7 @@ address	name	size	file	whole_file	symbol
 0X24A908	func_0024A908	204	sdk/fun_0024a908.c		
 0X24A9D8	sceMpegCreate	568	sdk/sceMpegCreate.cpp		
 0X24AC10	func_0024AC10	200	sdk/fun_0024ac10.c		
+0X24ACD8	func_0024ACD8	436	sdk/fun_0024acd8.c		
 0X24B530	func_0024B530	8	sdk/fun_0024b530.cpp		
 0X24B540	sceMpegGetPicture	72	sdk/sceMpegGetPicture.cpp		
 0X24B590	func_0024B590	124	sdk/fun_0024b590.cpp		
@@ -5323,6 +5336,7 @@ address	name	size	file	whole_file	symbol
 0X24FA38	func_0024FA38	84	sdk/fun_0024fa38.cpp		
 0X24FA90	func_0024FA90	64	sdk/fun_0024fa90.cpp		
 0X2505B0	func_002505B0	1160	sdk/fun_002505b0.cpp		
+0X250A38	func_00250A38	540	sdk/fun_00250a38.c		
 0X250C58	func_00250C58	576	sdk/fun_00250c58.cpp		
 0X250E98	func_00250E98	812	sdk/fun_00250e98.cpp		
 0X2511C8	func_002511C8	1064	sdk/fun_002511c8.cpp		

@@ -1,15 +1,15 @@
 {
  "measures": {
-  "fuzzy_match_percent": 67.997925,
-  "total_code": "1164212",
-  "matched_code": "791640",
-  "matched_code_percent": 67.997925,
+  "fuzzy_match_percent": 68.447057,
+  "total_code": "1164164",
+  "matched_code": "796836",
+  "matched_code_percent": 68.447057,
   "total_data": "1038916",
-  "total_functions": 6061,
-  "matched_functions": 5441,
-  "matched_functions_percent": 89.770665,
+  "total_functions": 6063,
+  "matched_functions": 5451,
+  "matched_functions_percent": 89.905987,
   "complete_code": "141792",
-  "complete_code_percent": 12.179225,
+  "complete_code_percent": 12.179727,
   "total_units": 434,
   "complete_units": 262
  },
@@ -73,9 +73,9 @@
     {
      "name": "EvaluateAcpbl",
      "size": "556",
+     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "0",
-     "fuzzy_match_percent": 0.0
+     "address": "0"
     },
     {
      "name": "func_00138BA0",
@@ -313,11 +313,11 @@
     {
      "name": "EvaluateAcsb__FP4ACSBP3ALOfiP7MATRIX3",
      "size": "780",
+     "fuzzy_match_percent": 0.0,
      "metadata": {
       "demangled_name": "EvaluateAcsb(ACSB*, ALO*, float, int, MATRIX3*)"
      },
-     "address": "0",
-     "fuzzy_match_percent": 0.0
+     "address": "0"
     }
    ],
    "metadata": {
@@ -6327,9 +6327,9 @@
     {
      "name": "UpdateCmMat4",
      "size": "936",
+     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "2016",
-     "fuzzy_match_percent": 0.0
+     "address": "2016"
     },
     {
      "name": "func_0014E000",
@@ -11021,9 +11021,9 @@
     {
      "name": "BuildLaserBeams",
      "size": "2004",
+     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "15248",
-     "fuzzy_match_percent": 0.0
+     "address": "15248"
     },
     {
      "name": "func_001DEDB0",
@@ -13510,9 +13510,9 @@
     {
      "name": "SetJtZapState",
      "size": "1368",
+     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "4168",
-     "fuzzy_match_percent": 0.0
+     "address": "4168"
     }
    ],
    "metadata": {
@@ -30424,9 +30424,9 @@
     {
      "name": "SetAttachSubstate",
      "size": "3300",
+     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "8064",
-     "fuzzy_match_percent": 0.0
+     "address": "8064"
     },
     {
      "name": "FAttachGroundTarget",
@@ -30502,9 +30502,9 @@
     {
      "name": "InsertTargetCandidate",
      "size": "952",
+     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "920",
-     "fuzzy_match_percent": 0.0
+     "address": "920"
     },
     {
      "name": "BuildJtTargetList",
@@ -33283,9 +33283,9 @@
     {
      "name": "AddSphereToRenderTree",
      "size": "488",
+     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "4176",
-     "fuzzy_match_percent": 0.0
+     "address": "4176"
     },
     {
      "name": "StaticInitSlotheaps_1d66f0",
@@ -40649,8 +40649,8 @@
    "sections": [
     {
      "name": ".text",
-     "size": "142288",
-     "fuzzy_match_percent": 51.127291,
+     "size": "142240",
+     "fuzzy_match_percent": 54.797525,
      "metadata": {}
     }
    ],
@@ -40828,11 +40828,11 @@
     {
      "name": "snd_SendIOPCommandNoWait__FiiPcPFiUl_vUl",
      "size": "896",
+     "fuzzy_match_percent": 100.0,
      "metadata": {
       "demangled_name": "snd_SendIOPCommandNoWait(int, int, char*, void (*)(int, unsigned long), unsigned long)"
      },
-     "address": "3664",
-     "fuzzy_match_percent": 0.0
+     "address": "3664"
     },
     {
      "name": "snd_PostMessage__Fv",
@@ -41728,18 +41728,18 @@
      "address": "36952"
     },
     {
-     "name": "func_0023AA68",
-     "size": "76",
+     "name": "func_0023AA98",
+     "size": "28",
      "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "36992"
+     "address": "37040"
     },
     {
      "name": "func_0023AAB8",
      "size": "12",
+     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "37072",
-     "fuzzy_match_percent": 0.0
+     "address": "37072"
     },
     {
      "name": "func_0023AAC8",
@@ -41865,9 +41865,9 @@
     {
      "name": "__moddi3",
      "size": "1640",
+     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "42864",
-     "fuzzy_match_percent": 0.0
+     "address": "42864"
     },
     {
      "name": "__muldi3",
@@ -41893,9 +41893,9 @@
     {
      "name": "__umoddi3",
      "size": "1344",
+     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "46096",
-     "fuzzy_match_percent": 0.0
+     "address": "46096"
     },
     {
      "name": "func_0023D338",
@@ -42102,24 +42102,38 @@
     },
     {
      "name": "__sjthrow",
-     "size": "728",
+     "size": "376",
+     "fuzzy_match_percent": 100.0,
      "metadata": {},
-     "address": "51896",
-     "fuzzy_match_percent": 0.0
+     "address": "51896"
+    },
+    {
+     "name": "func_0023E618",
+     "size": "280",
+     "fuzzy_match_percent": 100.0,
+     "metadata": {},
+     "address": "52272"
+    },
+    {
+     "name": "func_0023E730",
+     "size": "72",
+     "fuzzy_match_percent": 0.0,
+     "metadata": {},
+     "address": "52552"
     },
     {
      "name": "__get_eh_table_version",
      "size": "8",
+     "fuzzy_match_percent": 100.0,
      "metadata": {},
-     "address": "52624",
-     "fuzzy_match_percent": 0.0
+     "address": "52624"
     },
     {
      "name": "__get_eh_table_language",
      "size": "8",
+     "fuzzy_match_percent": 100.0,
      "metadata": {},
-     "address": "52632",
-     "fuzzy_match_percent": 0.0
+     "address": "52632"
     },
     {
      "name": "old_find_exception_handler",
@@ -42208,9 +42222,9 @@
     {
      "name": "func_0023F3D8",
      "size": "612",
+     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "55792",
-     "fuzzy_match_percent": 0.0
+     "address": "55792"
     },
     {
      "name": "func_0023F640",
@@ -42313,9 +42327,9 @@
     {
      "name": "sceGsGetGParam",
      "size": "12",
+     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "60424",
-     "fuzzy_match_percent": 0.0
+     "address": "60424"
     },
     {
      "name": "sceGsPutDispEnv",
@@ -42397,9 +42411,9 @@
     {
      "name": "func_00241368",
      "size": "112",
+     "fuzzy_match_percent": 100.0,
      "metadata": {},
-     "address": "63872",
-     "fuzzy_match_percent": 0.0
+     "address": "63872"
     },
     {
      "name": "func_002413E0",
@@ -42999,9 +43013,9 @@
     {
      "name": "__ieee754_powf",
      "size": "2188",
+     "fuzzy_match_percent": 100.0,
      "metadata": {},
-     "address": "91728",
-     "fuzzy_match_percent": 0.0
+     "address": "91728"
     },
     {
      "name": "__ieee754_rem_pio2f",
@@ -43104,9 +43118,9 @@
     {
      "name": "func_0024A0E8",
      "size": "352",
+     "fuzzy_match_percent": 100.0,
      "metadata": {},
-     "address": "100096",
-     "fuzzy_match_percent": 0.0
+     "address": "100096"
     },
     {
      "name": "__ieee754_log",
@@ -43174,9 +43188,9 @@
     {
      "name": "func_0024ACD8",
      "size": "436",
+     "fuzzy_match_percent": 100.0,
      "metadata": {},
-     "address": "103152",
-     "fuzzy_match_percent": 0.0
+     "address": "103152"
     },
     {
      "name": "func_0024AE90",
@@ -43475,9 +43489,9 @@
     {
      "name": "func_00250A38",
      "size": "540",
+     "fuzzy_match_percent": 100.0,
      "metadata": {},
-     "address": "127056",
-     "fuzzy_match_percent": 0.0
+     "address": "127056"
     },
     {
      "name": "func_00250C58",
@@ -43804,9 +43818,9 @@
     {
      "name": "func_002542B8",
      "size": "460",
+     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "141520",
-     "fuzzy_match_percent": 0.0
+     "address": "141520"
     },
     {
      "name": "func_00254488",
@@ -44278,14 +44292,14 @@
     ]
    },
    "measures": {
-    "fuzzy_match_percent": 51.127291,
-    "total_code": "142288",
-    "matched_code": "72748",
-    "matched_code_percent": 51.127291,
+    "fuzzy_match_percent": 54.797525,
+    "total_code": "142240",
+    "matched_code": "77944",
+    "matched_code_percent": 54.797525,
     "matched_data_percent": 100.0,
-    "total_functions": 515,
-    "matched_functions": 363,
-    "matched_functions_percent": 70.485437,
+    "total_functions": 517,
+    "matched_functions": 373,
+    "matched_functions_percent": 72.147002,
     "complete_code": "0",
     "complete_code_percent": 0.0,
     "complete_data_percent": 100.0,
@@ -52124,9 +52138,9 @@
     {
      "name": "bevy_ui_binoc_recon_202d38",
      "size": "2096",
+     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "4032",
-     "fuzzy_match_percent": 0.0
+     "address": "4032"
     },
     {
      "name": "func_00203568",
@@ -54610,9 +54624,9 @@
     {
      "name": "SetJumperState",
      "size": "1020",
+     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "2080",
-     "fuzzy_match_percent": 0.0
+     "address": "2080"
     },
     {
      "name": "SetJumperTarget",
@@ -58891,9 +58905,9 @@
     {
      "name": "GetXfDofValue",
      "size": "180",
+     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "1064",
-     "fuzzy_match_percent": 0.0
+     "address": "1064"
     }
    ],
    "metadata": {
@@ -59074,14 +59088,14 @@
    "id": "sdk",
    "name": "Sony SDK",
    "measures": {
-    "fuzzy_match_percent": 51.127291,
-    "total_code": "142288",
-    "matched_code": "72748",
-    "matched_code_percent": 51.127291,
+    "fuzzy_match_percent": 54.797525,
+    "total_code": "142240",
+    "matched_code": "77944",
+    "matched_code_percent": 54.797525,
     "matched_data_percent": 100.0,
-    "total_functions": 515,
-    "matched_functions": 363,
-    "matched_functions_percent": 70.485437,
+    "total_functions": 517,
+    "matched_functions": 373,
+    "matched_functions_percent": 72.147002,
     "complete_code": "0",
     "complete_code_percent": 0.0,
     "complete_data_percent": 100.0,

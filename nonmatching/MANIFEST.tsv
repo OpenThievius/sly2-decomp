@@ -80,6 +80,8 @@ address	name	size	file	score
 0X137248	PresetJtOrbitAccel	664	bbmark-blend/PresetJtOrbitAccel.c	193
 0X1375D0	bevy_player_p25_1375d0	432	bbmark-blend/bevy_player_p25_1375d0.c	103
 0X137A30	EnsureAsegBlendDynamic	1416	bbmark-blend/EnsureAsegBlendDynamic.cpp	73
+0X138660	EvaluateAcsb__FP4ACSBP3ALOfiP7MATRIX3	784	ac_138660/EvaluateAcsb__FP4ACSBP3ALOfiP7MATRIX3.cpp	62
+0X138970	EvaluateAcpbl	560	ac-blip/EvaluateAcpbl.cpp	41
 0X138BA0	func_00138BA0	528	ac-blip/fun_00138ba0.cpp	59
 0X139250	OnBlipgRemove__FP5BLIPG	200	blip/OnBlipgRemove__FP5BLIPG.cpp	12
 0X1394C8	SetBlipgEmitb__FP5BLIPGP5EMITB	1048	blip/SetBlipgEmitb__FP5BLIPGP5EMITB.c	248
@@ -128,6 +130,7 @@ address	name	size	file	score
 0X14D240	TickReadCount	64	new_14d1d0/TickReadCount.c	10
 0X14D478	UpdateCmLast	472	cm_14d478/UpdateCmLast.cpp	36
 0X14DA08	BuildFrustrum	360	cm_14d478/BuildFrustrum.c	88
+0X14DC58	UpdateCmMat4	936	cm_14d478/UpdateCmMat4.cpp	184
 0X14E1A8	SetCmLookAt	200	font-cm/SetCmLookAt.cpp	6
 0X14E328	SetCmPolicy__FP2CM3CPPP5CPLCYP2SOPv	416	cm_14e270/SetCmPolicy__FP2CM3CPPP5CPLCYP2SOPv.cpp	9
 0X14E4C8	RevokeCmPolicy__FP2CMi3CPPP5CPLCYP2SOPv	464	cm_14e270/RevokeCmPolicy__FP2CMi3CPPP5CPLCYP2SOPv.c	109
@@ -254,6 +257,7 @@ address	name	size	file	score
 0X186820	RefreshAloIkLimbLengths	272	binoc-joy/RefreshAloIkLimbLengths.c	66
 0X186930	InitIkLimb	288	binoc-joy/InitIkLimb.c	52
 0X186A50	SolveIkLimb	1160	binoc-joy/SolveIkLimb.c	274
+0X187768	GetJoyXYDeflection__FP3JOYUcUcPfN23PUcT6PiP2LM	560	joy_187030/GetJoyXYDeflection__FP3JOYUcUcPfN23PUcT6PiP2LM.cpp	36
 0X188960	PresetSlyAccel	872	joy-jt/PresetSlyAccel.cpp	188
 0X188E78	AdjustSlyXpVelocity	168	joy-jt/AdjustSlyXpVelocity.c	28
 0X189618	UpdateJtBalance	1576	joy-jt/UpdateJtBalance.c	322
@@ -275,15 +279,18 @@ address	name	size	file	score
 0X190D10	func_00190D10	264	new_190c58/fun_00190d10.c	75
 0X190E18	UpdateJtHangPose	288	new_190c58/UpdateJtHangPose.c	55
 0X1911A8	UpdateAttachInput	2152	new_190c58/UpdateAttachInput.c	576
+0X192BD8	SetAttachSubstate	3304	new_190c58/SetAttachSubstate.cpp	385
 0X1938C0	FAttachGroundTarget	424	new_190c58/FAttachGroundTarget.cpp	40
 0X193A68	GetAttachRopeSlide	560	new_190c58/GetAttachRopeSlide.c	137
 0X193DE8	func_00193DE8	712	stephide/fun_00193de8.c	152
 0X194170	PresetJtAccelHide__FP2JT	384	stephide/PresetJtAccelHide__FP2JT.c	84
 0X1944C8	PasegAttachBase	144	new_1942f0/PasegAttachBase.cpp	22
+0X194688	InsertTargetCandidate	952	new_1942f0/InsertTargetCandidate.cpp	147
 0X194F70	UpdateSwTargetList	1016	new_1942f0/UpdateSwTargetList.cpp	82
 0X195368	EmitTargetSparkles	672	new_1942f0/EmitTargetSparkles.cpp	60
 0X195A00	SetJmpState	1464	new_1942f0/SetJmpState.c	289
 0X195FB8	SetJmpBodyState	2416	new_1942f0/SetJmpBodyState.c	356
+0X196928	DtSolveJumpLaunch	384	new_1942f0/DtSolveJumpLaunch.cpp	12
 0X196AA8	LimitJmpAccelByContacts	848	new_1942f0/LimitJmpAccelByContacts.c	219
 0X197500	UpdateJmpBodyState	2712	new_1942f0/UpdateJmpBodyState.c	561
 0X1991A0	func_001991A0	248	new_1942f0/fun_001991a0.c	54
@@ -308,6 +315,7 @@ address	name	size	file	score
 0X1A0300	BuildPlainBlend	336	jp-stepzap/BuildPlainBlend.cpp	6
 0X1A0450	SolvePlainBlendWeights	720	jp-stepzap/SolvePlainBlendWeights.c	163
 0X1A0720	SetJtGoalVelocityFromStick	672	jp-stepzap/SetJtGoalVelocityFromStick.c	166
+0X1A0B40	SetJtZapState	1368	jp-stepzap/SetJtZapState.cpp	11
 0X1A16C8	ZapKnockback	728	new_1a1148/ZapKnockback.c	177
 0X1A19A0	ZapTakeDamage	1480	new_1a1148/ZapTakeDamage.c	368
 0X1A2230	ZapFInvulnerable	296	ub-light/ZapFInvulnerable.cpp	6
@@ -440,6 +448,7 @@ address	name	size	file	score
 0X1D19A8	UpdateVehicle	1960	rip-rumble/UpdateVehicle.c	531
 0X1D2490	func_001D2490	384	rip-rumble/fun_001d2490.c	86
 0X1D54B8	StoreAudioModeInSave	256	new_1d54b8/StoreAudioModeInSave.cpp	11
+0X1D6508	AddSphereToRenderTree	488	new_1d54b8/AddSphereToRenderTree.cpp	54
 0X1D6848	FCalculateMuzzleVelocity__FP6VECTORT0fT0P2SO	424	vec_1d6848/FCalculateMuzzleVelocity__FP6VECTORT0fT0P2SO.c	96
 0X1D69F0	VelBallistic	160	vec-coin/VelBallistic.c	38
 0X1D6B00	LaunchSoAtTarget	1504	vec-coin/LaunchSoAtTarget.c	322
@@ -456,6 +465,7 @@ address	name	size	file	score
 0X1DCED8	JobMenu_BuildList	800	game-stepguard/JobMenu_BuildList.cpp	93
 0X1DD300	JobMenu_SetPage	600	game-stepguard/JobMenu_SetPage.cpp	26
 0X1DDB08	StartNewGame	200	game-stepguard/StartNewGame.cpp	8
+0X1DE5D8	BuildLaserBeams	2008	game-stepguard/BuildLaserBeams.cpp	143
 0X1DF0A0	AddLaserCustomXps	448	game-stepguard/AddLaserCustomXps.c	102
 0X1DF3D0	AdvanceLaserBeams	480	game-stepguard/AdvanceLaserBeams.cpp	71
 0X1DF908	AddLaserBeam	120	game-stepguard/AddLaserBeam.cpp	15
@@ -522,6 +532,7 @@ address	name	size	file	score
 0X2019F0	sprbuf__static_initialization_and_destruction_0	872	sprbuf/sprbuf__static_initialization_and_destruction_0.cpp	35
 0X202378	ProbeReconTargetVisibility	456	sprbuf-stepguard/ProbeReconTargetVisibility.c	92
 0X202540	PickReconTarget	440	sprbuf-stepguard/PickReconTarget.c	98
+0X202D38	bevy_ui_binoc_recon_202d38	2096	sprbuf-stepguard/bevy_ui_binoc_recon_202d38.cpp	155
 0X203AF0	CloneStepHullGeom	456	new_203790/CloneStepHullGeom.cpp	38
 0X203D00	func_00203D00	264	new_203790/fun_00203d00.c	54
 0X203E08	UpdateStepPhys__FP4STEP	408	step/UpdateStepPhys__FP4STEP.cpp	31
@@ -550,6 +561,7 @@ address	name	size	file	score
 0X20BAD8	CalculateBlrunV	112	steprun-stream/CalculateBlrunV.c	26
 0X20BB58	SetRunBlendU	176	steprun-stream/SetRunBlendU.c	39
 0X20BD88	LoadJumpAnim	504	steprun-stream/LoadJumpAnim.c	93
+0X20C2F8	SetJumperState	1024	steprun-stream/SetJumperState.cpp	71
 0X20C7E0	LoadDirAnimSet	360	steprun-stream/LoadDirAnimSet.c	71
 0X20E3C0	CreateSwSavePaths	896	new_20e040/CreateSwSavePaths.cpp	47
 0X20E890	ExecuteSwLoadRequest	1840	new_20e040/ExecuteSwLoadRequest.c	327
@@ -601,6 +613,7 @@ address	name	size	file	score
 0X229468	UGetWaterSubmerged	536	water-sw/UGetWaterSubmerged.c	113
 0X22A908	func_0022A908	1504	so-wr/fun_0022a908.c	434
 0X22C8C0	BuildXfLocalMatrix	344	wr-vec/BuildXfLocalMatrix.c	77
+0X22CA18	GetXfDofValue	184	wr-vec/GetXfDofValue.cpp	8
 0X22CAD0	ConvertDeulToW__FP6VECTORN20	192	vec_22cad0/ConvertDeulToW__FP6VECTORN20.c	45
 0X22CB90	BuildXfAngularRateMatrix	112	vec-alo/BuildXfAngularRateMatrix.cpp	2
 0X22CCD0	BuildXfSpinRateMatrix	240	vec-alo/BuildXfSpinRateMatrix.c	57
@@ -647,15 +660,16 @@ address	name	size	file	score
 0X23A668	func_0023A668	96	sdk/fun_0023a668.cpp	2
 0X23A920	func_0023A920	168	sdk/fun_0023a920.cpp	42
 0X23A9D8	func_0023A9D8	104	sdk/fun_0023a9d8.cpp	24
-0X23AA68	func_0023AA68	80	sdk/fun_0023aa68.cpp	22
 0X23AAE0	func_0023AAE0	16	sdk/fun_0023aae0.cpp	3
 0X23AAF0	func_0023AAF0	640	sdk/fun_0023aaf0.c	61
 0X23ADA8	func_0023ADA8	120	sdk/fun_0023ada8.cpp	11
 0X23AE70	func_0023AE70	312	sdk/fun_0023ae70.cpp	53
 0X23B7F8	__divdi3	1776	sdk/__divdi3.c	19
 0X23BEE8	__fixunsdfdi	240	sdk/__fixunsdfdi.cpp	26
+0X23C158	__moddi3	1640	sdk/__moddi3.c	9
 0X23C7C0	__muldi3	96	sdk/__muldi3.c	17
 0X23C828	__udivdi3	1488	sdk/__udivdi3.c	32
+0X23CDF8	__umoddi3	1344	sdk/__umoddi3.c	20
 0X23D338	func_0023D338	304	sdk/fun_0023d338.cpp	83
 0X23D508	func_0023D508	576	sdk/fun_0023d508.cpp	27
 0X23D808	__muldf3	680	sdk/__muldf3.cpp	4
@@ -665,10 +679,11 @@ address	name	size	file	score
 0X23E860	find_exception_handler	328	sdk/find_exception_handler.c	70
 0X23EB48	throw_helper	816	sdk/throw_helper.cpp	102
 0X23F2D8	func_0023F2D8	256	sdk/fun_0023f2d8.cpp	42
+0X23F3D8	func_0023F3D8	616	sdk/fun_0023f3d8.cpp	154
 0X23F850	func_0023F850	232	sdk/fun_0023f850.c	23
 0X23FA40	func_0023FA40	920	sdk/fun_0023fa40.cpp	82
 0X240050	func_00240050	376	sdk/fun_00240050.c	103
-0X240460	sceGsResetGraph	400	sdk/sceGsResetGraph.cpp	76
+0X240460	sceGsResetGraph	400	sdk/sceGsResetGraph.cpp	73
 0X2407A8	sceGsSetDefDBuff	664	sdk/sceGsSetDefDBuff.c	89
 0X240AE0	sceGsSetHalfOffset	136	sdk/sceGsSetHalfOffset.c	14
 0X240C38	sceGsSetDefDispEnv	888	sdk/sceGsSetDefDispEnv.cpp	128
@@ -694,7 +709,7 @@ address	name	size	file	score
 0X247028	__ieee754_sqrt	776	sdk/__ieee754_sqrt.cpp	226
 0X247DE8	__ieee754_fmodf	592	sdk/__ieee754_fmodf.cpp	1
 0X249CE0	rint	512	sdk/rint.cpp	31
-0X24A248	__ieee754_log	1264	sdk/__ieee754_log.cpp	351
+0X24A248	__ieee754_log	1264	sdk/__ieee754_log.cpp	350
 0X24AE90	func_0024AE90	696	sdk/fun_0024ae90.cpp	134
 0X24B480	sceMpegInit	176	sdk/sceMpegInit.c	2
 0X24B628	sceMpegAddCallback	56	sdk/sceMpegAddCallback.cpp	8
@@ -719,6 +734,7 @@ address	name	size	file	score
 0X2539D0	func_002539D0	688	sdk/fun_002539d0.c	37
 0X253E68	func_00253E68	320	sdk/fun_00253e68.c	19
 0X2540B0	func_002540B0	488	sdk/fun_002540b0.c	13
+0X2542B8	func_002542B8	464	sdk/fun_002542b8.c	1
 0X254CA0	InitIpu	568	sdk/InitIpu.c	30
 0X254EF0	func_00254EF0	16	sdk/fun_00254ef0.cpp	6
 0X256AF0	func_00256AF0	88	sdk/fun_00256af0.cpp	7
