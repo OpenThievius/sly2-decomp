@@ -43,6 +43,10 @@ polynomial's meaning).
   draft that dropped code: func_00259AC8's model draft is 5 instructions against 12 (score 9; the faithful 9-instruction draft with a `volatile` register field
   scores 11), func_0023AA68's is 8 of 23, FilterColorRgba5551's 31 of 52, func_00236918's 12 of 18. Compare the "target N instr, ours M instr" of `try.py`
   before adopting; `adopt.py` only compares scores. The one real gain was func_0013FAD0 (the worker's 5, 25 of 27 instructions).
+  Final (run finished, 282 results, about 6 hours of model time): 128 blockers, 118 scored, 28 did not compile once spliced, 16 below our draft, none at 0; of the
+  16 only func_0013FAD0 was complete and rule-clean (the other 15 had 35 to 90 percent of retail's instructions, or kept M2C macros: UpdateVjoyStick 86 to 69
+  has 87 of 77 instructions but is rejected by the cleanup rules). Verdict: the model finds no matches on near misses of 400 bytes or less that the repo's own
+  searches missed; the useful products of the trial were the size wall, the stack-frame pattern and the missing-symbol scan, found while reading its results.
 - [x] **Empty frame, the unused `VECTOR local`.** **Result (2026-11-15):** retail has 9 leaf functions whose whole frame is `addiu $sp,-0x10` in the first
   delay slot and `+0x10` at the return, with no stack access; 5 were matched with an unused `VECTOR local;` (PasegaFindAseg, PsmaFindSm, PcmdFindScriptLabel;
   PshdframesFromOid and PsaaFromOid get it another way). The four open ones (FBlotObscured, PasegaFindAlo, PsmaFindAlo, PseqnodeFind) matched with the same
