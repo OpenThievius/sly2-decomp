@@ -87,8 +87,8 @@ polynomial's meaning).
   the plain address (`lui 0x2C` plus a negative lo half). Read the retail pair, never the LINK value. Results: bevy_player_input_from_pad_cm 294 to 12
   (one case left: the six instructions from `mfc1` to the second `sqc2` in jts 20, VU0 registers swapped; the `uFull = 1.0f` local was a literal local the
   cleanup rules flag, inlining it kept 12), LoadMovieCharacter 206 to 17 (761 of 761 instructions), sceCdRead 91 to 58 (one extra callee-saved register),
-  SetJtJtcs 566 to 163 (545 instructions against 523: gcse PRE keeps `%hi(g_2dded0)` in `$s5` across the tail; no legal C form stops it; needs `lo.h` slot 38
-  `SetPosMatFromLo(LO *)`, `jt.h` `psm` at 0x1028 and about 15 `sly.h` fields before the draft compiles with the real headers),
+  SetJtJtcs 566 to 163 (545 instructions against 523: gcse PRE keeps `%hi(g_2dded0)` in `$s5` across the tail; no legal C form stops it; its headers went in
+  (2bfffbb4: `lo.h` slot 38 `SetPosMatFromLo(LO *)`, `jt.h` `psm` at 0x1028, 16 `sly.h` fields; full image still proves) and the draft is the registered 163),
   UpdateDysh 146 to 47 (needs a shared quad-to-quad `pextlw` helper measured on a second function: the worker's own `InterleaveQuads` asm cannot land),
   FJtAllowsGadget unchanged at 85 (retail 185 instructions, ours 176: `bne` forward with an inline `b epilogue`, both `lui` hoisted before the branch).
   What worked on LoadMovieCharacter and is worth reusing: block-scope locals (GCC 2.95 shares slots between blocks); an empty `CStackFrame` class with
