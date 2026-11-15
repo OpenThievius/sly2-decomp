@@ -3,7 +3,7 @@
 extern "C" {
 extern const char RO_STR_002AC620[];
 void func_00252358(MPEGDEC *decoder);
-long func_00251FC8(MPEGDEC *decoder);
+s64 func_00251FC8(MPEGDEC *decoder);
 int func_00252148(MPEGDEC *decoder, int bitCount);
 void func_00252390(MPEGDEC *decoder, int bitCount);
 void func_0024FA38(MPEGDEC *decoder, const char *message);
@@ -20,12 +20,12 @@ static inline void SendVlcCommand(MPEGDEC *decoder) {
 }
 
 static inline short ReadVlcResult(MPEGDEC *decoder) {
-    long result;
+    s64 result;
     u32 bitPosition;
-    long top;
+    s64 top;
     result = func_00251FC8(decoder);
     bitPosition = *(volatile u32 *)0x10002020;
-    top = *(volatile long *)0x10002030;
+    top = *(volatile s64 *)0x10002030;
     decoder->topBits = (int)top;
     if (top < 0) {
         decoder->bitsAvailable = (32 - (bitPosition & 0x1F)) & 0x1F;
