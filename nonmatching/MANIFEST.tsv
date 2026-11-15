@@ -24,8 +24,7 @@ address	name	size	file	score
 0X11C500	FInvertMatrix__FiPfT1	1000	mat/FInvertMatrix__FiPfT1.cpp	111
 0X11CAB0	GMaxAxisScale	160	util-alo/GMaxAxisScale.c	38
 0X11D508	CSolveQuadratic__FfffPf	168	util_11cf60/CSolveQuadratic__FfffPf.cpp	18
-0X11E1A0	SetVectorCylind__FP6VECTORfff	104	vec/SetVectorCylind__FP6VECTORfff.cpp	4
-0X11E208	SetVectorSphere__FP6VECTORfff	136	vec/SetVectorSphere__FP6VECTORfff.cpp	14
+0X11E208	SetVectorSphere__FP6VECTORfff	136	vec/SetVectorSphere__FP6VECTORfff.cpp	0
 0X11E290	SProjectVector__FP6VECTORT0	72	vec/SProjectVector__FP6VECTORT0.c	14
 0X11E390	GetPerpendicularVector	288	vec/GetPerpendicularVector.c	69
 0X11E4B0	RadBetweenVectors__FP6VECTORN20	384	vec/RadBetweenVectors__FP6VECTORN20.c	90
@@ -592,7 +591,6 @@ address	name	size	file	score
 0X229468	UGetWaterSubmerged	536	water-sw/UGetWaterSubmerged.c	113
 0X22A908	func_0022A908	1504	so-wr/fun_0022a908.c	434
 0X22C8C0	BuildXfLocalMatrix	344	wr-vec/BuildXfLocalMatrix.c	77
-0X22CA18	GetXfDofValue	184	wr-vec/GetXfDofValue.cpp	8
 0X22CAD0	ConvertDeulToW__FP6VECTORN20	192	vec_22cad0/ConvertDeulToW__FP6VECTORN20.c	45
 0X22CB90	BuildXfAngularRateMatrix	112	vec-alo/BuildXfAngularRateMatrix.cpp	2
 0X22CCD0	BuildXfSpinRateMatrix	240	vec-alo/BuildXfSpinRateMatrix.c	57

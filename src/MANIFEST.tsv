@@ -974,6 +974,7 @@ address	name	size	file	whole_file	symbol
 0X11DFA0	ConvertUserHsvToUserRgb__FP6VECTORT0	128	util/RadNormalize_file.cpp	util/RadNormalize_file.cpp	ConvertUserHsvToUserRgb__FP6VECTORT0
 0X11E040	StaticInitSlotheaps_11e040	308	util/RadNormalize_file.cpp	util/RadNormalize_file.cpp	StaticInitSlotheaps_11e040
 0X11E178	func_0011E178	32	util/RadNormalize_file.cpp	util/RadNormalize_file.cpp	func_0011E178
+0X11E1A0	SetVectorCylind__FP6VECTORfff	100	util-splice-bif/bif_file.cpp	util-splice-bif/bif_file.cpp	SetVectorCylind__FP6VECTORfff
 0X11E958	CalculateVectorPanTilt__FP6VECTORPfT1	156	util-splice-bif/bif_file.cpp	util-splice-bif/bif_file.cpp	CalculateVectorPanTilt__FP6VECTORPfT1
 0X11F2E8	bif__static_initialization_and_destruction_0	308	util-splice-bif/bif_file.cpp	util-splice-bif/bif_file.cpp	bif__static_initialization_and_destruction_0
 0X11F420	bif__GLOBAL__I_slotheaps	32	util-splice-bif/bif_file.cpp	util-splice-bif/bif_file.cpp	bif__GLOBAL__I_slotheaps
@@ -5020,6 +5021,7 @@ address	name	size	file	whole_file	symbol
 0X22C7F8	func_0022C7F8	32	so-wr/so_wr_22b720.cpp	so-wr/so_wr_22b720.cpp	func_0022C7F8
 0X22C818	func_0022C818	36	wr-vec/fun_0022c818.cpp		
 0X22C840	InvalidateXfSegment	124	wr-vec/InvalidateXfSegment.cpp		
+0X22CA18	GetXfDofValue	180	wr-vec/GetXfDofValue.cpp		
 0X22D670	func_0022D670	40	vec-alo/fun_0022d670.cpp		
 0X22D698	func_0022D698	20	vec-alo/fun_0022d698.c		
 0X22D6B0	PxfFromRef	156	vec-alo/PxfFromRef.cpp		

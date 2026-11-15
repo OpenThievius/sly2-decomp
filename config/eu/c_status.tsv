@@ -974,6 +974,7 @@ us_address	name	other_address	pair	score	addresses
 0x11DFA0	ConvertUserHsvToUserRgb__FP6VECTORT0	0X11DFA0	identical	0	ok
 0x11E040	StaticInitSlotheaps_11e040	0X11E040	same	0	ok
 0x11E178	func_0011E178	0X11E178	identical	0	ok
+0x11E1A0	SetVectorCylind__FP6VECTORfff	0X11E1A0	identical	0	ok
 0x11E958	CalculateVectorPanTilt__FP6VECTORPfT1	0X11E958	same	0	ok
 0x11F2E8	bif__static_initialization_and_destruction_0	0X11F2E8	same	0	ok
 0x11F420	bif__GLOBAL__I_slotheaps	0X11F420	identical	0	ok
@@ -5020,6 +5021,7 @@ us_address	name	other_address	pair	score	addresses
 0x22C7F8	func_0022C7F8	0X22D018	same	0	ok
 0x22C818	func_0022C818	0X22D038	identical	0	ok
 0x22C840	InvalidateXfSegment	0X22D060	same	0	ok
+0x22CA18	GetXfDofValue	0X22D238	same	0	ok
 0x22D670	func_0022D670	0X22DE90	same	0	ok
 0x22D698	func_0022D698	0X22DEB8	gap	0	ok
 0x22D6B0	PxfFromRef	0X22DED0	same	0	ok

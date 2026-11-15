@@ -49,7 +49,9 @@ Why first: no draft means nothing to improve, so each is either a quick win or a
 - Six integer near misses have no known lever: 0x1733C8, 0x120548, 0x218748, 0x1A5D98, 0x13FAD0 (0x1C9058 now has a flag row). Check the RTL dump first.
 - SDK near misses: `powf` and the 5 libm drafts.
 
-### Stage 3: levers before waves (Not Started)
+### Stage 3: levers before waves (In Progress)
+
+- Status 2026-11-15: `VectorFromFloats3` (one helper for the mfc1/pextlw/pcpyld block) landed, 3 matches (`SetVectorCylind`, `SetVectorSphere`, `GetXfDofValue`). Closed with no rule-clean lever: the early `%hi` across a save call (cse-and-pre.md section 4), the VU0 register order of `ScaleByReciprocalX` and `DotProduct`. Volatile store in a branch or jal delay slot (5 drafts): toolchain limit, no assembler fills it. Next: the 4-lane pextlw variant, register-allocation classes, a new wave only where a lever landed.
 
 Waves yield about 20 bytes per claimed function. What moved the number: loop5, `-fmove-all-movables`, `function_flags.tsv`, shared helpers.
 
