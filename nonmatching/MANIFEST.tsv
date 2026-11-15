@@ -89,7 +89,7 @@ address	name	size	file	score
 0X13C560	SetLootState	2392	bomb-crusher/SetLootState.cpp	5
 0X13D328	Crfodb_SetLootId	216	new_13cf38/Crfodb_SetLootId.cpp	20
 0X13DA18	LoadSwFromBrx	1384	new_13d8b8/LoadSwFromBrx.cpp	7
-0X13E818	LoadOptionFromBrx	4088	new_13d8b8/LoadOptionFromBrx.cpp	152
+0X13E818	LoadOptionFromBrx	4088	new_13d8b8/LoadOptionFromBrx.cpp	144
 0X13FB40	LoadSwObjectsFromBrx	728	new_13f888/LoadSwObjectsFromBrx.cpp	26
 0X1400B8	PostJtLoad	640	new_13f888/PostJtLoad.cpp	28
 0X140750	func_00140750	616	new_13f888/fun_00140750.c	102
