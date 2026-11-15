@@ -5305,6 +5305,7 @@ address	name	size	file	whole_file	symbol
 0X24A908	func_0024A908	204	sdk/fun_0024a908.c		
 0X24A9D8	sceMpegCreate	568	sdk/sceMpegCreate.cpp		
 0X24AC10	func_0024AC10	200	sdk/fun_0024ac10.c		
+0X24ACD8	func_0024ACD8	436	sdk/fun_0024acd8.c		
 0X24B530	func_0024B530	8	sdk/fun_0024b530.cpp		
 0X24B540	sceMpegGetPicture	72	sdk/sceMpegGetPicture.cpp		
 0X24B590	func_0024B590	124	sdk/fun_0024b590.cpp		

@@ -24,3 +24,4 @@ lead	end	members	evidence
 0x24A0E8	0x24A248	0x24A0E8,0x24A240	0x24a23c falls into 0x24a240 (the chunk before ends in lwc1, no return)
 0x24A248	0x24A738	0x24A248,0x24A72C	0x24a728 falls into 0x24a72c (the chunk before ends in ld, no return)
 0x2542B8	0x254488	0x2542B8,0x25447C	0x254478 falls into 0x25447c (the chunk before ends in ld, no return)
+0x24ACD8	0x24AE8C	0x24ACD8,0x24AE04	0x24adfc branches to 0x24ae48 inside the next chunk (func_0024ACD8 ends in b with its delay slot, no return)

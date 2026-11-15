@@ -5305,6 +5305,7 @@ us_address	name	other_address	pair	score	addresses
 0x24A908	func_0024A908	0X24B350	same	0	ok
 0x24A9D8	sceMpegCreate	0X24B420	same	0	ok
 0x24AC10	func_0024AC10	0X24B658	same	0	ok
+0x24ACD8	func_0024ACD8	0X24B720	same	0	ok
 0x24B530	func_0024B530	0X24BF78	gap	0	ok
 0x24B540	sceMpegGetPicture	0X24BF88	same	0	ok
 0x24B590	func_0024B590	0X24BFD8	same	0	ok
