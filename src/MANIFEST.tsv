@@ -5195,6 +5195,9 @@ address	name	size	file	whole_file	symbol
 0X23E3E8	eh_context_initialize	40	sdk/eh_context_initialize.cpp		
 0X23E410	eh_context_static	104	sdk/eh_context_static.cpp		
 0X23E478	__get_dynamic_handler_chain	40	sdk/__get_dynamic_handler_chain.cpp		
+0X23E4A0	__sjthrow	376	sdk/__sjthrow.cpp		
+0X23E778	__get_eh_table_version	8	unsorted/__get_eh_table_version.c		
+0X23E780	__get_eh_table_language	8	unsorted/__get_eh_table_language.c		
 0X23E9A8	get_reg_addr	136	sdk/get_reg_addr.c		
 0X23EA30	copy_reg	124	sdk/copy_reg.cpp		
 0X23EAB0	next_stack_level	140	sdk/next_stack_level.cpp		

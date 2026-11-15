@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "mpeg.h"
 
+extern const char RO_STR_002AC320[];
+extern const char RO_STR_002AC360[];
+extern const char RO_STR_002AC3A0[];
+
 void func_0024FA90(MPEGDEC *state, const char *format, unsigned int value);
 int func_00236960(const char *format, ...);
 int func_002544C8(MPEGDEC *state);
@@ -15,11 +19,11 @@ int func_0024ACD8(MPEGHANDLE *handle)
 
     state->done = 0;
     if (state->imageBuffer & 0x3F) {
-        func_0024FA90(state, "image buffer needs to be aligned to 64byte boundary(0x%08x)", state->imageBuffer);
+        func_0024FA90(state, RO_STR_002AC320, state->imageBuffer);
         return -1;
     }
     if (state->field_0x878) {
-        func_00236960("Need to re-setup libipu since sceMpegGetPicture was field_0x878\n");
+        func_00236960(RO_STR_002AC360);
         return -1;
     }
     state->stop = 0;
@@ -61,7 +65,7 @@ int func_0024ACD8(MPEGHANDLE *handle)
             break;
         }
         if (state->field_0x878) {
-            func_00236960("sceMpegGetPicture is field_0x878\n");
+            func_00236960(RO_STR_002AC3A0);
             return -1;
         }
         if (state->stop) {

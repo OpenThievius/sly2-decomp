@@ -5195,6 +5195,9 @@ us_address	name	other_address	pair	score	addresses
 0x23E3E8	eh_context_initialize	0X23EDA8	same	0	ok
 0x23E410	eh_context_static	0X23EDD0	same	0	ok
 0x23E478	__get_dynamic_handler_chain	0X23EE38	same	0	ok
+0x23E4A0	__sjthrow	0X23EE60	same	0	ok
+0x23E778	__get_eh_table_version	0X23F138	gap	0	ok
+0x23E780	__get_eh_table_language	0X23F140	gap	0	ok
 0x23E9A8	get_reg_addr	0X23F368	same	0	ok
 0x23EA30	copy_reg	0X23F3F0	same	0	ok
 0x23EAB0	next_stack_level	0X23F470	same	0	ok

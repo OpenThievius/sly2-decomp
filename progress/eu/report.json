@@ -1,13 +1,13 @@
 {
  "measures": {
-  "fuzzy_match_percent": 68.386514,
+  "fuzzy_match_percent": 68.420185,
   "total_code": "1164212",
-  "matched_code": "796164",
-  "matched_code_percent": 68.386514,
+  "matched_code": "796556",
+  "matched_code_percent": 68.420185,
   "total_data": "1038916",
-  "total_functions": 6061,
-  "matched_functions": 5447,
-  "matched_functions_percent": 89.869658,
+  "total_functions": 6062,
+  "matched_functions": 5450,
+  "matched_functions_percent": 89.904322,
   "complete_code": "141792",
   "complete_code_percent": 12.179225,
   "total_units": 434,
@@ -73,9 +73,9 @@
     {
      "name": "EvaluateAcpbl",
      "size": "556",
+     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "0",
-     "fuzzy_match_percent": 0.0
+     "address": "0"
     },
     {
      "name": "func_00138BA0",
@@ -6327,9 +6327,9 @@
     {
      "name": "UpdateCmMat4",
      "size": "936",
+     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "2016",
-     "fuzzy_match_percent": 0.0
+     "address": "2016"
     },
     {
      "name": "func_0014E000",
@@ -11021,9 +11021,9 @@
     {
      "name": "BuildLaserBeams",
      "size": "2004",
+     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "15248",
-     "fuzzy_match_percent": 0.0
+     "address": "15248"
     },
     {
      "name": "func_001DEDB0",
@@ -13510,9 +13510,9 @@
     {
      "name": "SetJtZapState",
      "size": "1368",
+     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "4168",
-     "fuzzy_match_percent": 0.0
+     "address": "4168"
     }
    ],
    "metadata": {
@@ -30424,9 +30424,9 @@
     {
      "name": "SetAttachSubstate",
      "size": "3300",
+     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "8064",
-     "fuzzy_match_percent": 0.0
+     "address": "8064"
     },
     {
      "name": "FAttachGroundTarget",
@@ -33283,9 +33283,9 @@
     {
      "name": "AddSphereToRenderTree",
      "size": "488",
+     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "4176",
-     "fuzzy_match_percent": 0.0
+     "address": "4176"
     },
     {
      "name": "StaticInitSlotheaps_1d66f0",
@@ -40650,7 +40650,7 @@
     {
      "name": ".text",
      "size": "142288",
-     "fuzzy_match_percent": 54.306758,
+     "fuzzy_match_percent": 54.582256,
      "metadata": {}
     }
    ],
@@ -41865,9 +41865,9 @@
     {
      "name": "__moddi3",
      "size": "1640",
+     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "42864",
-     "fuzzy_match_percent": 0.0
+     "address": "42864"
     },
     {
      "name": "__muldi3",
@@ -41893,9 +41893,9 @@
     {
      "name": "__umoddi3",
      "size": "1344",
+     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "46096",
-     "fuzzy_match_percent": 0.0
+     "address": "46096"
     },
     {
      "name": "func_0023D338",
@@ -42102,24 +42102,31 @@
     },
     {
      "name": "__sjthrow",
-     "size": "728",
+     "size": "376",
+     "fuzzy_match_percent": 100.0,
      "metadata": {},
-     "address": "51896",
+     "address": "51896"
+    },
+    {
+     "name": "func_0023E618",
+     "size": "352",
+     "metadata": {},
+     "address": "52272",
      "fuzzy_match_percent": 0.0
     },
     {
      "name": "__get_eh_table_version",
      "size": "8",
+     "fuzzy_match_percent": 100.0,
      "metadata": {},
-     "address": "52624",
-     "fuzzy_match_percent": 0.0
+     "address": "52624"
     },
     {
      "name": "__get_eh_table_language",
      "size": "8",
+     "fuzzy_match_percent": 100.0,
      "metadata": {},
-     "address": "52632",
-     "fuzzy_match_percent": 0.0
+     "address": "52632"
     },
     {
      "name": "old_find_exception_handler",
@@ -42208,9 +42215,9 @@
     {
      "name": "func_0023F3D8",
      "size": "612",
+     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "55792",
-     "fuzzy_match_percent": 0.0
+     "address": "55792"
     },
     {
      "name": "func_0023F640",
@@ -43804,9 +43811,9 @@
     {
      "name": "func_002542B8",
      "size": "460",
+     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "141520",
-     "fuzzy_match_percent": 0.0
+     "address": "141520"
     },
     {
      "name": "func_00254488",
@@ -44278,14 +44285,14 @@
     ]
    },
    "measures": {
-    "fuzzy_match_percent": 54.306758,
+    "fuzzy_match_percent": 54.582256,
     "total_code": "142288",
-    "matched_code": "77272",
-    "matched_code_percent": 54.306758,
+    "matched_code": "77664",
+    "matched_code_percent": 54.582256,
     "matched_data_percent": 100.0,
-    "total_functions": 515,
-    "matched_functions": 369,
-    "matched_functions_percent": 71.650485,
+    "total_functions": 516,
+    "matched_functions": 372,
+    "matched_functions_percent": 72.093023,
     "complete_code": "0",
     "complete_code_percent": 0.0,
     "complete_data_percent": 100.0,
@@ -52124,9 +52131,9 @@
     {
      "name": "bevy_ui_binoc_recon_202d38",
      "size": "2096",
+     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "4032",
-     "fuzzy_match_percent": 0.0
+     "address": "4032"
     },
     {
      "name": "func_00203568",
@@ -54610,9 +54617,9 @@
     {
      "name": "SetJumperState",
      "size": "1020",
+     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "2080",
-     "fuzzy_match_percent": 0.0
+     "address": "2080"
     },
     {
      "name": "SetJumperTarget",
@@ -59074,14 +59081,14 @@
    "id": "sdk",
    "name": "Sony SDK",
    "measures": {
-    "fuzzy_match_percent": 54.306758,
+    "fuzzy_match_percent": 54.582256,
     "total_code": "142288",
-    "matched_code": "77272",
-    "matched_code_percent": 54.306758,
+    "matched_code": "77664",
+    "matched_code_percent": 54.582256,
     "matched_data_percent": 100.0,
-    "total_functions": 515,
-    "matched_functions": 369,
-    "matched_functions_percent": 71.650485,
+    "total_functions": 516,
+    "matched_functions": 372,
+    "matched_functions_percent": 72.093023,
     "complete_code": "0",
     "complete_code_percent": 0.0,
     "complete_data_percent": 100.0,
