@@ -95,7 +95,7 @@ address	name	size	file	score
 0X13D328	Crfodb_SetLootId	216	new_13cf38/Crfodb_SetLootId.cpp	20
 0X13DA18	LoadSwFromBrx	1384	new_13d8b8/LoadSwFromBrx.cpp	7
 0X13E818	LoadOptionFromBrx	4088	new_13d8b8/LoadOptionFromBrx.cpp	152
-0X13FAD0	func_0013FAD0	112	new_13f888/fun_0013fad0.cpp	9
+0X13FAD0	func_0013FAD0	112	new_13f888/fun_0013fad0.cpp	5
 0X13FB40	LoadSwObjectsFromBrx	728	new_13f888/LoadSwObjectsFromBrx.cpp	26
 0X1400B8	PostJtLoad	640	new_13f888/PostJtLoad.cpp	28
 0X140750	func_00140750	616	new_13f888/fun_00140750.c	102
@@ -267,7 +267,7 @@ address	name	size	file	score
 0X18D760	FJtAllowsGadget	744	jt-alo/FJtAllowsGadget.cpp	85
 0X18DF60	UpdateJtRide	640	jt-alo/UpdateJtRide.c	155
 0X18E1E0	func_0018E1E0	336	jt-alo/fun_0018e1e0.c	73
-0X18E540	SetJtJtcs	2096	jt-alo/SetJtJtcs.c	566
+0X18E540	SetJtJtcs	2096	jt-alo/SetJtJtcs.cpp	163
 0X18F0A8	UpdateJtCaneInput	520	new_18ed98/UpdateJtCaneInput.cpp	115
 0X1903B8	PresetJtAccelHang__FP2JT	296	stephang/PresetJtAccelHang__FP2JT.c	73
 0X190520	UpdateJtActiveHang__FP2JTP3JOY	1728	stephang/UpdateJtActiveHang__FP2JTP3JOY.c	398
@@ -729,6 +729,6 @@ address	name	size	file	score
 0X257AB0	SweepSidebags	360	bis-memcard/SweepSidebags.cpp	63
 0X257C18	func_00257C18	360	bis-memcard/fun_00257c18.cpp	32
 0X258008	func_00258008	56	bis-memcard/fun_00258008.c	10
-0X259AC8	func_00259AC8	48	suv-end/fun_00259ac8.c	12
+0X259AC8	func_00259AC8	48	suv-end/fun_00259ac8.cpp	11
 0X259DA8	Vec4_GetY	24	suv-end/Vec4_GetY.c	4
 0X259DC0	Vec4_GetZ	24	suv-end/Vec4_GetZ.c	4

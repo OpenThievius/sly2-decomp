@@ -60,7 +60,6 @@ float RadNormalize(float);
 static inline float GMax(float a, float b) { return a >? b; }
 float GLimitAbs(float, float);
 
-#define FIELD(type, offset) (*(type *)((char *)psly + (offset)))
 
 extern "C" void bevy_player_input_from_pad_cm(SLY *psly)
 {
@@ -103,7 +102,7 @@ extern "C" void bevy_player_input_from_pad_cm(SLY *psly)
         bevy_player_p25_137218((char *)psly + 0x1FF0);
         break;
     case 10:
-        SetJtGoalVelocityFromStick(psly, (char *)psly + 0x1AC0, FIELD(void *, 0x1BC0), psly->pjoy->radStick, psly->pjoy->uStick);
+        SetJtGoalVelocityFromStick(psly, (char *)psly + 0x1AC0, psly->field_0x1BC0, psly->pjoy->radStick, psly->pjoy->uStick);
         break;
     case 11:
         func_0018B460(psly);
@@ -113,13 +112,13 @@ extern "C" void bevy_player_input_from_pad_cm(SLY *psly)
         SetStepRadTarget(psly, psly->pjoy->radStick);
         break;
     case 5:
-        switch (FIELD(int, 0x18D0)) {
+        switch (psly->field_0x18D0) {
         case 4:
-            if (FIELD(int, 0x10DC))
-                func_002046F0(psly, FIELD(int, 0x10DC));
+            if (psly->field_0x10DC)
+                func_002046F0(psly, psly->field_0x10DC);
             break;
         case 5:
-            SetJtGoalVelocityFromStick(psly, (char *)psly + 0x13D0, FIELD(void *, 0x14D0), psly->pjoy->radStick, psly->pjoy->uStick);
+            SetJtGoalVelocityFromStick(psly, (char *)psly + 0x13D0, psly->field_0x14D0, psly->pjoy->radStick, psly->pjoy->uStick);
             break;
         case 8:
         case 9: {
@@ -133,8 +132,8 @@ extern "C" void bevy_player_input_from_pad_cm(SLY *psly)
     case 16:
         if (FGadgetAcquired(0x1C)) {
             func_0018E1E0(psly);
-        } else if (FIELD(int, 0x1D2C)) {
-            CHN *pchn = PchnFindAseg(FIELD(void *, 0x1D1C), psly, 1, 1);
+        } else if (psly->field_0x1D2C) {
+            CHN *pchn = PchnFindAseg(psly->field_0x1D1C, psly, 1, 1);
             if (pchn) {
                 VU_SCALE vel;
                 CURVE *pcurve = pchn->curve;
@@ -176,7 +175,7 @@ extern "C" void bevy_player_input_from_pad_cm(SLY *psly)
     }
     case 24: {
         DrainJtPower(psly, D_002BF3C4);
-        if (FIELD(int, 0x18D0) == 12) {
+        if (psly->field_0x18D0 == 12) {
             float dRad = RadNormalize(RadYawSo(psly) - psly->radHeading);
             if (__builtin_fabsf(dRad) < D_FLT_002BF3C8)
                 SetJtState(psly, 0x18, 0xD);
@@ -184,19 +183,19 @@ extern "C" void bevy_player_input_from_pad_cm(SLY *psly)
             SetStepRadTarget(psly, psly->pjoy->radStick);
         }
         QW vel = psly->Slot34();
-        float u = GLimitAbs(LaneZInGeneralRegister(vel) / (FIELD(float, 0x1F4) * D_002BF35C), 1.0f);
+        float u = GLimitAbs(LaneZInGeneralRegister(vel) / (psly->field_0x1F4 * D_002BF35C), 1.0f);
         float g = D_002BF3CC * u;
-        FIELD(float, 0x2014) = GMax(0.0f, g);
-        FIELD(float, 0x202C) = GMax(0.0f, -g);
-        FIELD(float, 0x2020) = 1.0f - __builtin_fabsf(g);
-        ReblendAsegbl(FIELD(void *, 0x2038));
+        psly->field_0x2014 = GMax(0.0f, g);
+        psly->field_0x202C = GMax(0.0f, -g);
+        psly->field_0x2020 = 1.0f - __builtin_fabsf(g);
+        ReblendAsegbl(psly->field_0x2038);
         break;
     }
     }
     UpdateZapPost((char *)psly + 0xDF0);
     UpdateJtSafePoints(psly);
-    if (FIELD(int, 0x1310) && FAsegaGone(FIELD(int, 0x1310))) {
+    if (psly->field_0x1310 && FAsegaGone(psly->field_0x1310)) {
         ReleaseAsegaHandle((char *)psly + 0x1310);
-        FIELD(int, 0x1314) = -1;
+        psly->field_0x1314 = -1;
     }
 }
