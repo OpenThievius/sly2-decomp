@@ -23,7 +23,8 @@ struct SWEEP {
 };
 
 struct SLY : JT {
-    u8 unknown_0x1320[0x1B4];
+    u8 unknown_0x1320[0x1B0];
+    /* 0x14D0 */ void *field_0x14D0; /* bevy_player_input_from_pad_cm */
     /* 0x14D4 */ struct ASEG *apasegHide[2]; /* SetJtJtcs (states 10, 11) */
     u8 unknown_0x14DC[0x244];
     /* 0x1720 */ void *apasegJts[0x2C]; /* BindJtStepAseg (slot 90) binds the entry jts indexes, entry 0 when it is empty; the count is the room
@@ -37,7 +38,9 @@ struct SLY : JT {
     /* 0x18C0 */ struct TARGET *ptarget; /* the cane's target: FFaceSlyAimTarget (slot 92) faces it, ChooseJtSweepTarget sets it */
     /* 0x18C4 */ struct JTCSINFO *pjtcsinfo; /* SetJtJtcs: its 0x130 is the leaving sound */
     /* 0x18C8 */ s32 jts; /* the state: NSlyActionCategory (85), FAllowBinocSly (94), BindJtStepAseg (90), JT_FInvulnerable (76), func_0018A428 (50) */
-    u8 unknown_0x18CC[0xC];
+    u8 unknown_0x18CC[0x4];
+    /* 0x18D0 */ s32 field_0x18D0; /* bevy_player_input_from_pad_cm */
+    u8 unknown_0x18D4[0x4];
     /* 0x18D8 */ s32 jtcs; /* SetJtJtcs */
     /* 0x18DC */ f32 tJtcs; /* SetJtJtcs */
     /* 0x18E0 */ struct ASEGA *pasegaJtcs; /* SetJtJtcs: ApplyAsegToHandle's handle */
@@ -58,12 +61,25 @@ struct SLY : JT {
     /* 0x1A88 */ void *field_0x1A88; /* SetJtJtcs: func_001F2AD0 */
     u8 unknown_0x1A8C[0x18];
     /* 0x1AA4 */ f32 field_0x1AA4; /* func_0018A428 (50) */
-    u8 unknown_0x1AA8[0x238];
+    u8 unknown_0x1AA8[0x118];
+    /* 0x1BC0 */ void *field_0x1BC0; /* bevy_player_input_from_pad_cm */
+    u8 unknown_0x1BC4[0x11C];
     /* 0x1CE0 */ struct ASEG *apasegJtcs[15]; /* SetJtJtcs (states 12 to 21 from 0, 22 and 23 at 13 and 14) */
-    u8 unknown_0x1D1C[0x2C4];
+    /* 0x1D1C */ void *field_0x1D1C; /* bevy_player_input_from_pad_cm */
+    u8 unknown_0x1D20[0xC];
+    /* 0x1D2C */ s32 field_0x1D2C; /* bevy_player_input_from_pad_cm */
+    u8 unknown_0x1D30[0x2B0];
     /* 0x1FE0 */ s32 field_0x1FE0; /* UseSlyGadget (100) */
     /* 0x1FE4 */ s32 field_0x1FE4; /* UseSlyGadget (100) */
-    u8 unknown_0x1FE8[0x64];
+    u8 unknown_0x1FE8[0x2C];
+    /* 0x2014 */ f32 field_0x2014; /* bevy_player_input_from_pad_cm */
+    u8 unknown_0x2018[0x8];
+    /* 0x2020 */ f32 field_0x2020; /* bevy_player_input_from_pad_cm */
+    u8 unknown_0x2024[0x8];
+    /* 0x202C */ f32 field_0x202C; /* bevy_player_input_from_pad_cm */
+    u8 unknown_0x2030[0x8];
+    /* 0x2038 */ void *field_0x2038; /* bevy_player_input_from_pad_cm */
+    u8 unknown_0x203C[0x10];
     /* 0x204C */ s32 field_0x204C; /* UseSlyGadget (100) */
     u8 unknown_0x2050[0x10];
 };
@@ -81,5 +97,14 @@ SLY2_OFFSET_CHECK(SLY, field_0x1AA4, 0x1AA4);
 SLY2_OFFSET_CHECK(SLY, field_0x1FE0, 0x1FE0);
 SLY2_OFFSET_CHECK(SLY, field_0x1FE4, 0x1FE4);
 SLY2_OFFSET_CHECK(SLY, field_0x204C, 0x204C);
+SLY2_OFFSET_CHECK(SLY, field_0x14D0, 0x14D0);
+SLY2_OFFSET_CHECK(SLY, field_0x18D0, 0x18D0);
+SLY2_OFFSET_CHECK(SLY, field_0x1BC0, 0x1BC0);
+SLY2_OFFSET_CHECK(SLY, field_0x1D1C, 0x1D1C);
+SLY2_OFFSET_CHECK(SLY, field_0x1D2C, 0x1D2C);
+SLY2_OFFSET_CHECK(SLY, field_0x2014, 0x2014);
+SLY2_OFFSET_CHECK(SLY, field_0x2020, 0x2020);
+SLY2_OFFSET_CHECK(SLY, field_0x202C, 0x202C);
+SLY2_OFFSET_CHECK(SLY, field_0x2038, 0x2038);
 #endif
 #endif
