@@ -262,7 +262,7 @@ address	name	size	file	score
 0X18A4E8	GetAttachCpdefi	992	jt-alo/GetAttachCpdefi.cpp	67
 0X18A8C8	UpdateJtStateTransitions	2552	jt-alo/UpdateJtStateTransitions.c	458
 0X18B348	func_0018B348	280	jt-alo/fun_0018b348.c	70
-0X18B7E8	bevy_player_input_from_pad_cm	1272	jt-alo/bevy_player_input_from_pad_cm.c	294
+0X18B7E8	bevy_player_input_from_pad_cm	1272	jt-alo/bevy_player_input_from_pad_cm.cpp	12
 0X18BCE0	bevy_player_p5_states_18bce0	896	jt-alo/bevy_player_p5_states_18bce0.c	188
 0X18D760	FJtAllowsGadget	744	jt-alo/FJtAllowsGadget.cpp	85
 0X18DF60	UpdateJtRide	640	jt-alo/UpdateJtRide.c	155
@@ -557,7 +557,7 @@ address	name	size	file	score
 0X2124F0	PrepareBlotMovie	656	po-screen/PrepareBlotMovie.cpp	24
 0X213F70	FStartSpriteLabelInstance	400	screen-font/FStartSpriteLabelInstance.c	88
 0X214100	FStartSpriteDepthInstance	432	screen-font/FStartSpriteDepthInstance.cpp	4
-0X2149D8	LoadMovieCharacter	3048	screen-font/LoadMovieCharacter.cpp	206
+0X2149D8	LoadMovieCharacter	3048	screen-font/LoadMovieCharacter.cpp	17
 0X215F40	CMovieText_ClineWrap	408	font-break/CMovieText_ClineWrap.cpp	69
 0X2160D8	CMovieText_UpdateFont	240	font-break/CMovieText_UpdateFont.cpp	47
 0X216750	CMovieText_DrawGlyphs	1008	font-break/CMovieText_DrawGlyphs.cpp	2
@@ -682,7 +682,7 @@ address	name	size	file	score
 0X2420F0	sceCdInit	744	sdk/sceCdInit.cpp	172
 0X2423D8	sceCdDiskReady	536	sdk/sceCdDiskReady.c	64
 0X2425F0	func_002425F0	544	sdk/fun_002425f0.cpp	0
-0X242840	sceCdRead	480	sdk/sceCdRead.cpp	91
+0X242840	sceCdRead	480	sdk/sceCdRead.c	58
 0X242C30	sceCdMmode	208	sdk/sceCdMmode.cpp	15
 0X242F70	func_00242F70	280	sdk/fun_00242f70.cpp	42
 0X243088	scePadPortOpen	488	sdk/scePadPortOpen.cpp	39
