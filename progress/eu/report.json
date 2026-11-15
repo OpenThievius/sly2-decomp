@@ -14128,9 +14128,9 @@
     {
      "name": "SetJtState",
      "size": "4780",
+     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "8216",
-     "fuzzy_match_percent": 0.0
+     "address": "8216"
     },
     {
      "name": "func_0018D500",
@@ -29317,9 +29317,9 @@
     {
      "name": "GoalBrain_FHandleMessage",
      "size": "2604",
+     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "22008",
-     "fuzzy_match_percent": 0.0
+     "address": "22008"
     },
     {
      "name": "GoalBrain_Update",
@@ -32972,9 +32972,9 @@
     {
      "name": "func_001CC2E8",
      "size": "768",
+     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "12824",
-     "fuzzy_match_percent": 0.0
+     "address": "12824"
     },
     {
      "name": "func_001CC5E8",
@@ -52436,9 +52436,9 @@
     {
      "name": "UpdateGuardSensor",
      "size": "1092",
+     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "6856",
-     "fuzzy_match_percent": 0.0
+     "address": "6856"
     },
     {
      "name": "FIsGuardSpecialClass",
@@ -57041,11 +57041,11 @@
     {
      "name": "UpdateCptn__FP4CPTNP6CPDEFIP3JOYf",
      "size": "6416",
+     "fuzzy_match_percent": 0.0,
      "metadata": {
       "demangled_name": "UpdateCptn(CPTN*, CPDEFI*, JOY*, float)"
      },
-     "address": "4096",
-     "fuzzy_match_percent": 0.0
+     "address": "4096"
     }
    ],
    "metadata": {
@@ -57709,9 +57709,9 @@
     {
      "name": "RefOpMult",
      "size": "1380",
+     "fuzzy_match_percent": 0.0,
      "metadata": {},
-     "address": "1992",
-     "fuzzy_match_percent": 0.0
+     "address": "1992"
     },
     {
      "name": "RefOpDiv",
