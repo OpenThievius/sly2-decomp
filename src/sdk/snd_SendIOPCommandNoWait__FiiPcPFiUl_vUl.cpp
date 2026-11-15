@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-typedef void (*SoundCallback)(int, unsigned long);
+#include "types.h"
+typedef void (*SoundCallback)(int, u64);
 
 struct SoundCallbackEntry {
     SoundCallback callback;
     int pad4;
-    unsigned long value;
+    u64 value;
 };
 
 struct ExternalCommand {
@@ -37,7 +38,7 @@ extern char RO_002AA670[];
 
 void snd_PostMessage(void);
 
-void snd_SendIOPCommandNoWait(int command, int size, char *data, SoundCallback callback, unsigned long value)
+void snd_SendIOPCommandNoWait(int command, int size, char *data, SoundCallback callback, u64 value)
 {
     int paused = 0;
     int total;

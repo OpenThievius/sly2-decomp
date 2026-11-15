@@ -1,40 +1,15 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-typedef struct MpegState {
-    int done;
-    char pad4[0xA8 - 0x4];
-    int countA8;
-    int countAC;
-    int countB0;
-    int indexB4;
-    int indexB8;
-    int indexBC;
-    char padC0[0xE8 - 0xC0];
-    int targetE8;
-    unsigned int imageBuffer;
-    char padF0[0x184 - 0xF0];
-    int mode;
-    char pad188[0x834 - 0x188];
-    int stop;
-    char pad838[0x858 - 0x838];
-    int keepGoing;
-    char pad85C[0x878 - 0x85C];
-    int aborted;
-} MpegState;
+#include "mpeg.h"
 
-typedef struct MpegHandle {
-    char pad0[0x40];
-    MpegState *state;
-} MpegHandle;
-
-void func_0024FA90(MpegState *state, const char *format, unsigned int value);
+void func_0024FA90(MPEGDEC *state, const char *format, unsigned int value);
 int func_00236960(const char *format, ...);
-int func_002544C8(MpegState *state);
-int func_0024C360(MpegHandle *handle);
-int func_0024B760(MpegHandle *handle, int first, int second);
+int func_002544C8(MPEGDEC *state);
+int func_0024C360(MPEGHANDLE *handle);
+int func_0024B760(MPEGHANDLE *handle, int first, int second);
 
-int func_0024ACD8(MpegHandle *handle)
+int func_0024ACD8(MPEGHANDLE *handle)
 {
-    MpegState *state = handle->state;
+    MPEGDEC *state = handle->state;
     int result = 0;
     int kind = 1;
 
@@ -43,8 +18,8 @@ int func_0024ACD8(MpegHandle *handle)
         func_0024FA90(state, "image buffer needs to be aligned to 64byte boundary(0x%08x)", state->imageBuffer);
         return -1;
     }
-    if (state->aborted) {
-        func_00236960("Need to re-setup libipu since sceMpegGetPicture was aborted\n");
+    if (state->field_0x878) {
+        func_00236960("Need to re-setup libipu since sceMpegGetPicture was field_0x878\n");
         return -1;
     }
     state->stop = 0;
@@ -61,7 +36,7 @@ int func_0024ACD8(MpegHandle *handle)
                 if (state->mode == state->targetE8) {
                     break;
                 }
-            } while (state->keepGoing);
+            } while (state->field_0x858);
         }
         switch (kind) {
         case 0:
@@ -85,8 +60,8 @@ int func_0024ACD8(MpegHandle *handle)
             state->indexBC++;
             break;
         }
-        if (state->aborted) {
-            func_00236960("sceMpegGetPicture is aborted\n");
+        if (state->field_0x878) {
+            func_00236960("sceMpegGetPicture is field_0x878\n");
             return -1;
         }
         if (state->stop) {
