@@ -64,10 +64,13 @@ polynomial's meaning).
   --fresh`: 1 differ). `make_whole_files.py --land 0x155D90` landed func_00155D90 (1f7bca39). The other two whole-file landings fail on a callee declared two
   ways. GetSeqnodeObjectPosRad passed `VECTOR *` where AddJsgContext_file.cpp declared `FindCrvClosestPointAll(void *, QW, int, int, int, float *, float *)`:
   the callee's own code uses a3 and t0 as 128-bit store targets (`sq`, `sqc2`), t1 and t2 as float stores and a2 as a forwarded pointer, so the file now
-  declares `(void *, QW, void *, void *, void *, float *, float *)` and it landed (43420098). func_00200F58 is still open: its draft declares
-  `__as__4CRefRC4CRef(RefT *, RefT *)`, RefGetOption_file.cpp has its own `CRef_200DA0` with a real `operator=`, and GCC 2.95 reads the `__as__` name as that
-  operator in the merged file; per-declaration `extern "C"` did not help (4 compiles). Next try: write the draft's assignment as `*dst = element` on a
-  `CRef`-shaped struct and let the operator produce the call, or use `cref.h`'s `CRef`. Also open: the five unplaceable objects and snd_GotReturns.
+  declares `(void *, QW, void *, void *, void *, float *, float *)` and it landed (43420098). func_00200F58 landed too (bd7b32a8), in three steps. (1) Its draft
+  declared `__as__4CRefRC4CRef(RefT *, RefT *)`, which GCC 2.95 reads as an operator= in the merged file: a `CRef` with `operator=` and `*dst = element`
+  (as the sibling RefSetArgListFromPvs does) scores the same 0. (2) The merge drops a declaration only when it is textually identical to the file's, and
+  reports a conflict otherwise, so each callee both sides declare needs one shared declaration: `void *` for PairHandle_Init, PairHandle_Assign, CRef_Destruct,
+  CRef_ConstructPair, RefGetPeopid and FreeSlotheapPv, `char B_004520A8`, and the file's EOPID gained `ibGet` and `fieldC` (still 0x28 bytes).
+  (3) Reproduce a merge failure with `make_whole_files.insert_function(whole_text, address, source, False, "c++")`, write the text out and `try.py` it
+  with `--quiet`: the compiler then lists every conflict, where the dry run reports only the first. Also open: the five unplaceable objects and snd_GotReturns.
 - [x] **Link hunks and missing symbols (2026-11-15).** `classify_diffs.py` on the 462 unmatched functions: 95 have a `link` hunk and none has only link hunks, so no
   score of 1 was hiding there. But a link hunk can sit behind another one: WarpJtToSafePoint (link+register, 6) needed both a real virtual call on slot 30 and
   the missing float symbol `D_FLT_002BF940`, and matched (cc7f25b4). The kept diffs name 205 symbols as `unknown` (the link check's `LINK: X = unknown, binary
