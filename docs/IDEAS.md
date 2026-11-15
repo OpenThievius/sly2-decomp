@@ -38,7 +38,11 @@ polynomial's meaning).
   `nonmatching/` source beat our score on 21; 16 of those passed `check_source.py`, and 8 of the 16 were permanent blockers (7 VU0, 1 gp) whose body the model
   had dropped. The three jump-table ones were the size wall above (the model's score was against 12 of 30 words). One Sonnet worker per remaining
   function found one real match (func_001C4228: the addresses of two by-value parameters go into a pointer array, no padded locals struct). Judge any
-  candidate by splicing and `try.py`, never by the tool's similarity; filter `config/us/blockers.tsv` before sending workers.
+  candidate by splicing and `try.py`, never by the tool's similarity; filter `config/us/blockers.tsv` before sending workers (the first bulk run of 252
+  functions spent half its time on blockers). Second look at 252 results (2026-11-15): 95 scored, 8 below our draft, none at 0, and a lower score can be a
+  draft that dropped code: func_00259AC8's model draft is 5 instructions against 12 (score 9; the faithful 9-instruction draft with a `volatile` register field
+  scores 11), func_0023AA68's is 8 of 23, FilterColorRgba5551's 31 of 52, func_00236918's 12 of 18. Compare the "target N instr, ours M instr" of `try.py`
+  before adopting; `adopt.py` only compares scores. The one real gain was func_0013FAD0 (the worker's 5, 25 of 27 instructions).
 - [x] **Empty frame, the unused `VECTOR local`.** **Result (2026-11-15):** retail has 9 leaf functions whose whole frame is `addiu $sp,-0x10` in the first
   delay slot and `+0x10` at the return, with no stack access; 5 were matched with an unused `VECTOR local;` (PasegaFindAseg, PsmaFindSm, PcmdFindScriptLabel;
   PshdframesFromOid and PsaaFromOid get it another way). The four open ones (FBlotObscured, PasegaFindAlo, PsmaFindAlo, PseqnodeFind) matched with the same
