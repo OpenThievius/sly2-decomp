@@ -96,6 +96,16 @@ polynomial's meaning).
   so it shares a slot (`VU_SCALE`); `case 0: case 1:` labels for a jump table that starts at 0; an empty `case -1:` for retail's branch tree; VU1 entry
   points are relocated `%hi`/`%lo` pairs, so they stay `extern char VU1_ENTRY_xxx[]` with an address in `symbol_addrs.txt`. 23 provisional symbols went in
   (d81c5684); three drafts were adopted (72e4729f).
+- [x] **The five one-word opcode near misses (2026-11-15).** Two are not functions: func_0023C7B4 (`ld $s0; jr $ra; addiu $sp`) is the 12-byte tail of `__moddi3`
+  (0x23C158, registered at 1628 bytes) and func_002488B8 the tail of `__ieee754_powf` (0x248038, registered at 2176: 0x248038 + 2176 is exactly 0x2488B8, so powf
+  is really 2188 bytes). In both the previous chunk ends without a return and falls into the tail; `boundaries.py` only finds crossing branches, not fall-throughs
+  (a broad fall-through scan gave 762 candidates, mostly known fragments, so it needs a better test before it is worth running). The other three: func_00236FD8
+  (SDK, `bnel` in retail, `bnez` in ours) and GetJtCpdefi (`bc1f` in retail, `bc1fl` in ours) took 12 and 10 compiles each from workers without moving off score 1;
+  `__ieee754_fmodf` (`bnez` against `bgtz`) is the libm item above. What was learned about the likely-branch choice in gcc 2.9: a store written before the branch
+  fills the slot as a plain branch; the same store written only in the nonzero arm is not moved into a `bnel` slot, the compiler copies the value into `$v1` and the
+  code diverges at the branch (func_00236FD8); a float add written inside the `else if` fills the slot of `bc1fl`, while the same add as a named local before the
+  compare gives `bc1f` but swaps the `lo`/`hi` registers, about 16 words off (GetJtCpdefi). No plain-C form found for either: a wall of the delay-slot filler,
+  not a wording problem; try the permuter (`make search`) before more hand variants.
 - [ ] **func_00259AC8 (hand-written? no).** Not in `handwritten_asm.txt` and not a blocker: the unset `$v1` it stores is an uninitialised local, and a
   `volatile` 32-bit field written three times gives retail's three stores. With a `unsigned long` local and return the tail (`ld`, `dsrl32 28`, `andi 1`)
   matches and the score is 11. Still different: retail copies `$v1` to `$v0` first, puts a `nop` after every instruction and does the stores before the
