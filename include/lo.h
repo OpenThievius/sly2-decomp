@@ -52,7 +52,7 @@ struct LO : BASIC {
                                            Carry_Attach pass a pointer second */
     virtual void AddHierarchy();        /* 11: AddLoHierarchy, AddSoLoHierarchy */
     virtual void RemoveHierarchy();     /* 12: RemoveLoHierarchy */
-    virtual void Slot13();              /* 13: func_001A5B80 */
+    virtual void Slot13(int arg1, struct SO *arg2);              /* 13: func_001A5B80 */
     virtual void LoadFromBrx();         /* 14: LoadLoFromBrx, CSo_LoadFromBrx */
     virtual void PostLoad();            /* 15: PostLoLoad, PostSoLoad */
     virtual void Update();              /* 16: UpdateLo, UpdateSo */
@@ -70,7 +70,7 @@ struct LO : BASIC {
     virtual void Slot27(void *pv);      /* 27: func_001CB5C8, func_001CB5D0 (SO); func_001CB5D0 calls it on each child */
     virtual void CReturnZero();         /* 28: CReturnZeroLo */
     virtual void TranslateToPos(QW pos); /* 29: TranslateSoToPos (SO); func_001B0D90 passes a quadword */
-    virtual void Slot30();
+    virtual void Slot30(void *pv);
     virtual struct MATRIX4 *PmatWorld(); /* 31: LO_PmatWorld, PmatWorldSo; Carry_Attach copies four quadwords from it */
     virtual void *Slot32(void *pmat);   /* 32: func_001A6B30, func_001F3FB0; func_001CD308 passes a matrix buffer, keeps the result as an XF */
     virtual QW GetVelocityVec();        /* 33: GetSoVelocityVec (SO); MatchSoOtherObject, func_001F7950 keep the quadword */
@@ -78,7 +78,7 @@ struct LO : BASIC {
     virtual void Slot35(QW vec);        /* 35: MatchSoOtherObject passes slot 33's result */
     virtual void Slot36(QW vec);        /* 36: MatchSoOtherObject passes slot 34's result */
     virtual void Slot37(void *pmat);    /* 37: func_001A6450, func_001F4010 (SO); InstantiateClone passes the clone's matrix */
-    virtual void SetPosMatFromLo();     /* 38: SetLoPosMatFromLo */
+    virtual void SetPosMatFromLo(struct LO *plo);     /* 38: SetLoPosMatFromLo */
     virtual void SetPosMatFromXf();     /* 39: SetLoPosMatFromXf */
     virtual void CloneVirtual();        /* 40: CloneLoVirtual */
     virtual void Slot41();

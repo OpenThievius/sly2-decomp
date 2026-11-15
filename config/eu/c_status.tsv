@@ -1438,6 +1438,7 @@ us_address	name	other_address	pair	score	addresses
 0x135A48	AdjustBentleyNewXp	0X135A48	same	0	ok
 0x135AD8	HandleBentleyMessage	0X135AD8	same	0	ok
 0x135C20	SetBentleyMode	0X135C20	same	0	ok
+0x135D08	GetBentleyMode	0X135D08	same	0	ok
 0x135D80	func_00135D80	0X135D80	same	0	ok
 0x135E30	func_00135E30	0X135E30	gap	0	ok
 0x135E38	func_00135E38	0X135E38	gap	0	ok
@@ -1953,6 +1954,7 @@ us_address	name	other_address	pair	score	addresses
 0x155A38	func_00155A38	0X155A60	same	0	ok
 0x155A68	func_00155A68	0X155A90	same	0	ok
 0x155AE0	func_00155AE0	0X155B08	same	0	ok
+0x155D90	func_00155D90	0X155DB8	same	0	ok
 0x156390	guardposts__static_initialization_and_destruction_0	0X1563B8	same	0	ok
 0x1564C8	guardposts__static_initialization_and_destruction_0_thunk	0X1564F0	same	0	ok
 0x1564E8	func_001564E8	0X156510	same	0	ok
@@ -2692,6 +2694,7 @@ us_address	name	other_address	pair	score	addresses
 0x18D500	func_0018D500	0X18D488	same	0	ok
 0x18D548	ClearJtJtcs	0X18D4D0	same	0	ok
 0x18D568	func_0018D568	0X18D4F0	same	0	ok
+0x18D620	func_0018D620	0X18D5A8	same	0	ok
 0x18D698	func_0018D698	0X18D620	identical	0	ok
 0x18D6F8	func_0018D6F8	0X18D680	identical	0	ok
 0x18DA48	UseSlyGadget	0X18D9D0	same	0	ok
@@ -2791,6 +2794,7 @@ us_address	name	other_address	pair	score	addresses
 0x19F3E8	func_0019F3E8	0X19F370	gap	0	ok
 0x19F3F0	func_0019F3F0	0X19F378	gap	0	ok
 0x19F540	WarpJtToPoint	0X19F4C8	same	0	ok
+0x19F590	WarpJtToSafePoint	0X19F518	same	0	ok
 0x19FAF8	FindBestSafePoint	0X19FA80	same	0	ok
 0x19FD30	AddSafePointOnMember	0X19FCB8	same	0	ok
 0x1A0048	RemoveSafePoints	0X19FFD0	identical	0	ok
@@ -3164,6 +3168,7 @@ us_address	name	other_address	pair	score	addresses
 0x1B7BA8	ReleaseMurrayObject	0X1B7E10	same	0	ok
 0x1B7D20	DetachMurrayObject	0X1B7F88	same	0	ok
 0x1B7E40	SetMurrayMode	0X1B80A8	same	0	ok
+0x1B7F90	GetMurrayMode	0X1B81F8	same	0	ok
 0x1B8008	SetMurrayAnimBase	0X1B8270	same	0	ok
 0x1B80F0	NopMurray	0X1B8358	gap	0	ok
 0x1B80F8	FReturnFalseMurray	0X1B8360	gap	0	ok
@@ -3341,6 +3346,7 @@ us_address	name	other_address	pair	score	addresses
 0x1C40F8	FIsPoSwFocus	0X1C4360	same	0	ok
 0x1C4130	func_001C4130	0X1C4398	same	0	ok
 0x1C41B8	func_001C41B8	0X1C4420	identical	0	ok
+0x1C4228	func_001C4228	0X1C4490	identical	0	ok
 0x1C4280	VJOY_constructor	0X1C44E8	same	0	ok
 0x1C42E8	ResetVjoy	0X1C4550	same	0	ok
 0x1C4468	UpdateVjoy	0X1C46D0	same	0	ok
@@ -3739,6 +3745,7 @@ us_address	name	other_address	pair	score	addresses
 0x1E0120	func_001E0120	0X1E08E0	gap	0	ok
 0x1E0128	func_001E0128	0X1E08E8	identical	0	ok
 0x1E0158	func_001E0158	0X1E0918	identical	0	ok
+0x1E0180	PseqnodeFind	0X1E0940	identical	0	ok
 0x1E01C8	func_001E01C8	0X1E0988	identical	0	ok
 0x1E01F8	PjsgeAllocJsg	0X1E09B8	same	0	ok
 0x1E0290	AddJsgContext	0X1E0A50	same	0	ok
@@ -3843,6 +3850,7 @@ us_address	name	other_address	pair	score	addresses
 0x1E3890	FSeqnodeRecordDone	0X1E4050	same	0	ok
 0x1E4530	DtSeqnodeRecord	0X1E4CF0	same	0	ok
 0x1E46A0	UpdateSeqnodeVjoy	0X1E4E60	same	0	ok
+0x1E4D40	GetSeqnodeObjectPosRad	0X1E5500	same	0	ok
 0x1E4EB8	SetSeqnodeDrive	0X1E5678	same	0	ok
 0x1E4F20	func_001E4F20	0X1E56E0	same	0	ok
 0x1E5000	func_001E5000	0X1E57C0	same	0	ok
@@ -4075,6 +4083,7 @@ us_address	name	other_address	pair	score	addresses
 0x1F2B20	AddSoGeomsToOxa	0X1F32E0	same	0	ok
 0x1F2BA8	RemoveSoGeomsFromOxa	0X1F3368	same	0	ok
 0x1F2C30	AddSoLoHierarchy	0X1F33F0	gap	0	ok
+0x1F2E78	UpdateSoRoot	0X1F3638	same	0	ok
 0x1F2FE0	func_001F2FE0	0X1F37A0	identical	0	ok
 0x1F3078	func_001F3078	0X1F3838	identical	0	ok
 0x1F3118	func_001F3118	0X1F38D8	same	0	ok
@@ -4133,6 +4142,8 @@ us_address	name	other_address	pair	score	addresses
 0x1F5FF8	func_001F5FF8	0X1F67B8	identical	0	ok
 0x1F6030	PpartFindAlo	0X1F67F0	identical	0	ok
 0x1F66F0	CloneAloHierarchy	0X1F6EB0	same	0	ok
+0x1F6788	PasegaFindAlo	0X1F6F48	same	0	ok
+0x1F67E0	PsmaFindAlo	0X1F6FA0	same	0	ok
 0x1F6838	GetSoNoXpsAll	0X1F6FF8	identical	0	ok
 0x1F6860	SetSoNoXpsAll	0X1F7020	same	0	ok
 0x1F68A8	func_001F68A8	0X1F7068	identical	0	ok
@@ -4335,6 +4346,7 @@ us_address	name	other_address	pair	score	addresses
 0x200CA8	RefAddOption__FP5BASICiP4CRef	0X201468	identical	0	ok
 0x200D10	RefEnsureOption__FP5BASICiP4CRef	0X2014D0	identical	0	ok
 0x200DA0	RefSetArgListFromPvs	0X201560	same	0	ok
+0x200F58	func_00200F58	0X201718	same	0	ok
 0x201110	RefSetPvsFromSplice__FiP4CRefP4OTYPPPv	0X2018D0	same	0	ok
 0x201360	RefSetArgsFromSplice__FiP4CRefP4OTYPe	0X201B20	same	0	ok
 0x2013D8	func_002013D8	0X201B98	same	0	ok
@@ -4697,6 +4709,7 @@ us_address	name	other_address	pair	score	addresses
 0x2130C0	BuildBlotDmaHeader	0X213890	same	0	ok
 0x2132D0	FDrawBlotMovie	0X213AA0	same	0	ok
 0x213300	DrawBlotMovie	0X213AD0	same	0	ok
+0x2137F0	FBlotObscured	0X213FC0	same	0	ok
 0x213830	PlayBlotLabel	0X214000	same	0	ok
 0x213898	StopBlotLabel	0X214068	same	0	ok
 0x213928	func_00213928	0X2140F8	same	0	ok

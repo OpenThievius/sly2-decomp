@@ -150,6 +150,38 @@ another project and not measured here are marked *unverified*.
 - Land with `make land PROGRESS=0 ONLY="0x..."`, then commit `config/eu/`, `progress/` and the README table; stage by name. A function that no longer
   reproduces PAL is a finding for the commit body.
 
+### The round of 2026-11-15 (a local model, 26 Sonnet and Opus workers, 13 landings)
+
+- **Look for a wall before a wording.** A high score on a right-looking source is often the scorer, not the source: a function registered at the first
+  piece's size (switch bodies behind a second `jr $ra`: `boundaries.py find`, `merges.tsv`), a 12-byte tail the split cut off a library function (the chunk before
+  it ends in an `ld` or `lwc1` restore without a return: merged by hand), a symbol missing from `symbol_addrs.txt` (read the LINK lines before the register
+  hunks; a link hunk can hide behind a register hunk). Three jump-table functions scored 0 the moment the size was right.
+- **The link value is unreliable.** `LINK: X = unknown, binary 0x...` prints a strange address (0xf3f0, 0x1f3f3cc, 0x202d43b0) when scheduling pairs the wrong
+  `lui` with a `lwc1`: read the retail pair (`lui 0x2C` plus a negative lo half gives 0x2BF3F0), never the printed value. Three of six "wrong global" hints were wrong.
+- **An empty frame is a local.** A leaf whose whole frame is `addiu $sp,-0x10` and the restore, with no stack access, carries an unused `VECTOR local;`
+  (all four open cases matched; the matched siblings do it). Check the saved-register count first: a frame 0x10 short can also be a sixth saved register
+  (WarpJtToSafePoint). `check_source.py` only flags the names scratch, junk, dummy, unused and spill.
+- **What moved a large function** (LoadMovieCharacter 206 to 17, bevy_player_input_from_pad_cm 294 to 12): block-scope locals (GCC 2.95 shares stack slots
+  between blocks); an empty class with a real constructor and destructor for an object whose special members read no field (1 byte, cannot reuse a slot); a union for
+  a vtable-call output buffer so it shares a slot; `case 0: case 1:` labels for a table that starts at 0; an empty `case -1:` for retail's branch tree; real virtual
+  calls on a typed object where a hand-written vtable struct kept the vtable pointer in the wrong register; VU1 entry points stay `extern char VU1_ENTRY_x[]`
+  (a relocated `%hi/%lo` pair, not an immediate).
+- **Merging into a whole file.** The merge drops a declaration only when it is textually identical to the file's, and reports a conflict otherwise: settle one
+  shared declaration per callee (`void *` where the sides disagree on struct types) and read the callee's own code for which argument is a pointer (`sq`, `sqc2`,
+  `swc1` stores). `make_whole_files.insert_function` plus `try.py --quiet` on the written text lists every conflict; the dry run lists the first.
+- **A lower score can be a draft that dropped code.** `try.py` prints `target N instr, ours M instr`: read it before adopting (`adopt.py` compares scores only).
+  Of 16 model drafts below ours, one was complete and rule-clean. A draft that kept `M2C_` macros or a literal local (`float uFull = 1.0f`) fails the cleanup rules.
+- **Filter `config/us/blockers.tsv` before any bulk run or worker batch** (half of the first 252 model runs were blockers; seven of the first 16 worker functions).
+- **Gcc 2.9's likely-branch choice follows the delay slot.** A store written before the branch fills the slot as a plain branch; written only in one arm it is
+  not moved into a `bnel` slot (the value is copied to `$v1`, the code diverges); a float add inside the `else if` fills `bc1fl`, as a named local before the compare it
+  gives `bc1f` and swaps two registers. No plain-C form found for func_00236FD8 or GetJtCpdefi in 22 compiles: try the permuter before more hand variants.
+- **gcse PRE keeps `%hi(global)` live across a tail** where retail rebuilds it (SetJtJtcs, 545 instructions against 523): no legal C form found; `-fno-gcse`
+  gives the right count and worse scheduling.
+- **A shared-header change needs a clean rebuild, not a `PASS`.** After adding `struct BL` to `sly.h`, ChooseJtSweepTarget (its own local `BL`) stopped compiling
+  while `make elf` still printed `PASS: reconstructed image matches retail`: the failed unit fell back to a stale object or to the original assembly, and the
+  usual greps for "error" never matched 2.95's `redefinition of ...`. After touching `include/*.h`: `ninja -t clean`, `make elf`, and grep the log for `FAILED`;
+  before adding a type name to a header, `grep -rn "struct NAME" src include` for local definitions (use the shared one and its fields instead).
+
 ## 7. Domain facts
 
 - **VU1:** no debug info (no DWARF, `.mdebug`, line sections), names come from the code. `.DVP.overlay.*` are zero placeholders; microcode is in `.vutext`

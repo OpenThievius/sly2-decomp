@@ -15,6 +15,7 @@
 
 struct GUARD;
 struct LOOT;
+struct SM;
 
 /* One of the player's three gadget slots: LoadJtGadgetSlots fills gadget from the level data, three 0xC-byte entries. */
 struct GADGETSLOT {
@@ -79,7 +80,9 @@ struct JT : STEP {
     /* 0x1000 */ s32 field_0x1000; /* InitMurray sets 4, InitBentley 2 */
     u8 unknown_0x1004[0x1C];
     /* 0x1020 */ f32 field_0x1020; /* InitJt sets 100 */
-    u8 unknown_0x1024[0xC];
+    u8 unknown_0x1024[0x4];
+    /* 0x1028 */ struct SM *psm; /* SetJtJtcs: IsmsFindSmOptional */
+    u8 unknown_0x102C[0x4];
     /* 0x1030 */ void *field_0x1030; /* JT_StartPose (which calls slot 88, so holds a JT) */
     /* 0x1034 */ void *field_0x1034; /* JT_StartPose, UpdateJtStand */
     u8 unknown_0x1038[0x4];
@@ -105,7 +108,7 @@ struct JT : STEP {
     u8 unknown_0x10CC[0x8];
     /* 0x10D4 */ f32 field_0x10D4; /* InitJt sets 1 */
     /* 0x10D8 */ f32 field_0x10D8; /* InitJt sets 1 */
-    u8 unknown_0x10DC[0x4];
+    /* 0x10DC */ s32 field_0x10DC; /* bevy_player_input_from_pad_cm */
     /* 0x10E0 */ s32 fFocusBusy; /* UpdateJtFocus (which calls slot 95, so holds a JT) */
     /* 0x10E4 */ s32 focusKind; /* InitJt sets -1; UpdateBinocHud */
     u8 unknown_0x10E8[0x4];
@@ -130,7 +133,8 @@ struct JT : STEP {
     /* 0x1304 */ f32 field_0x1304; /* InitJt sets -60; SpendJtGadgetPower */
     u8 unknown_0x1308[0x4];
     /* 0x130C */ s32 field_0x130C; /* UseSlyGadget (Sly slot 100) */
-    u8 unknown_0x1310[0x8];
+    /* 0x1310 */ s32 field_0x1310; /* bevy_player_input_from_pad_cm */
+    /* 0x1314 */ s32 field_0x1314; /* bevy_player_input_from_pad_cm */
     /* 0x1318 */ s32 sidDefault; /* InitJt sets -1; func_00211420 */
     u8 unknown_0x131C[0x4];
 };
@@ -191,5 +195,8 @@ SLY2_OFFSET_CHECK(JT, nPowerMax, 0x1300);
 SLY2_OFFSET_CHECK(JT, field_0x1304, 0x1304);
 SLY2_OFFSET_CHECK(JT, field_0x130C, 0x130C);
 SLY2_OFFSET_CHECK(JT, sidDefault, 0x1318);
+SLY2_OFFSET_CHECK(JT, field_0x10DC, 0x10DC);
+SLY2_OFFSET_CHECK(JT, field_0x1310, 0x1310);
+SLY2_OFFSET_CHECK(JT, field_0x1314, 0x1314);
 #endif
 #endif

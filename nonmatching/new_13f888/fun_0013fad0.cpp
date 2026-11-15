@@ -2,17 +2,12 @@ extern "C" {
 int IdCurrentLevel();
 int func_0013FAD0(int count, short *ids) {
     int id = IdCurrentLevel();
+    if (id == -1) return 1;
     int index = 0;
-    if (id == -1) goto found;
-    goto test;
-next:
-    index++;
-test:
-    if (index < count) {
-        if (*ids++ != id) goto next;
-    } else
-        return 0;
-found:
+    do {
+        index++;
+        if (index >= count) return 0;
+    } while (*ids++ != id);
     return 1;
 }
 }

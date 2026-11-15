@@ -28,6 +28,99 @@ polynomial's meaning).
 - [ ] **Open libm and fmodf.** `__ieee754_fmodf` is at 1 word (`bnez` against `bgtz` in the loop test; `while (n--)` and `n-- != 0` give a top-tested
   loop, `n-- > 0` the right shape): read the loop dump (`-dL`) for why the first two convert; `__ieee754_powf` (0x248038, 2,176 bytes) has no draft.
   Both are listed in `config/us/sony_gcc29_01.txt`. Re-test the five libm sources that landed after any toolchain change.
+- [x] **Registry sizes of split-cut functions.** A function whose switch bodies sit behind a second `jr $ra` is registered at the first piece's size, so
+  `try.py` compares only that piece and the score stays high for a source that is right. **Result (2026-11-15):** `boundaries.py find` listed exactly three
+  groups not yet in `config/matching/merges.tsv` (GetBentleyMode, func_0018D620, GetMurrayMode, 120 bytes each, 0x48 before the next symbol); after
+  `find --write` and `apply` their existing `nonmatching/` sources scored 0 and landed. Every function the tool lists is in the merges file now.
+  The other registry/manifest size gaps over 8 bytes (memmove, `__ieee754_log`, CploFindSwObjectsByClass, GetXfLocalRateMatrix) cross no branch: not this wall.
+  Run `boundaries.py find` after any re-split, before judging a near miss with a high score on a switch.
+- [x] **Local-model drafts (2026-11-14, 342 near misses of 400 bytes or less, 124 judged).** A candidate scored with `try.py` after splicing it into its
+  `nonmatching/` source beat our score on 21; 16 of those passed `check_source.py`, and 8 of the 16 were permanent blockers (7 VU0, 1 gp) whose body the model
+  had dropped. The three jump-table ones were the size wall above (the model's score was against 12 of 30 words). One Sonnet worker per remaining
+  function found one real match (func_001C4228: the addresses of two by-value parameters go into a pointer array, no padded locals struct). Judge any
+  candidate by splicing and `try.py`, never by the tool's similarity; filter `config/us/blockers.tsv` before sending workers (the first bulk run of 252
+  functions spent half its time on blockers). Second look at 252 results (2026-11-15): 95 scored, 8 below our draft, none at 0, and a lower score can be a
+  draft that dropped code: func_00259AC8's model draft is 5 instructions against 12 (score 9; the faithful 9-instruction draft with a `volatile` register field
+  scores 11), func_0023AA68's is 8 of 23, FilterColorRgba5551's 31 of 52, func_00236918's 12 of 18. Compare the "target N instr, ours M instr" of `try.py`
+  before adopting; `adopt.py` only compares scores. The one real gain was func_0013FAD0 (the worker's 5, 25 of 27 instructions).
+  Final (run finished, 282 results, about 6 hours of model time): 128 blockers, 118 scored, 28 did not compile once spliced, 16 below our draft, none at 0; of the
+  16 only func_0013FAD0 was complete and rule-clean (the other 15 had 35 to 90 percent of retail's instructions, or kept M2C macros: UpdateVjoyStick 86 to 69
+  has 87 of 77 instructions but is rejected by the cleanup rules). Verdict: the model finds no matches on near misses of 400 bytes or less that the repo's own
+  searches missed; the useful products of the trial were the size wall, the stack-frame pattern and the missing-symbol scan, found while reading its results.
+- [x] **Empty frame, the unused `VECTOR local`.** **Result (2026-11-15):** retail has 9 leaf functions whose whole frame is `addiu $sp,-0x10` in the first
+  delay slot and `+0x10` at the return, with no stack access; 5 were matched with an unused `VECTOR local;` (PasegaFindAseg, PsmaFindSm, PcmdFindScriptLabel;
+  PshdframesFromOid and PsaaFromOid get it another way). The four open ones (FBlotObscured, PasegaFindAlo, PsmaFindAlo, PseqnodeFind) matched with the same
+  local, a plain name and a real type; `check_source.py` only flags the names scratch, junk, dummy, unused and spill. No other leaf frame in retail has an
+  unused top; the two left are libgcc (`__udivdi3`, `__umoddi3`).
+- [ ] **Frames 0x10 short.** `frame_diff.py` on the open game functions with an unused 16-byte block shows three whose frame is exactly 0x10 smaller than
+  retail's: UpdateSoRoot (0x50 against 0x60), WarpJtToSafePoint (0x90 against 0xA0), Swarm_Update (0xB0 against 0xC0). **Result (2026-11-15):** the cause is
+  not always a missing local. UpdateSoRoot: yes, `VECTOR local;` makes the frame identical, and it matched (landed 1e9e8ef7) once `plo = pso` moved right after
+  the `cgeom` check and `LO::Slot13` took `(int, SO*)` in lo.h (retail calls slot 13 with two arguments). WarpJtToSafePoint: no, retail saves six s-registers
+  where ours saved five, and the frame follows from that; a worker took it from 48 to 6 (write `pjt + 0x2C0` at each use, no shared local, which keeps the
+  pointer in two registers; declare `B_003DD490` as a struct with `s32 fade` at 0x3E60). The last 6 words were the vtable pointer going to `$v1` and the first
+  callee to `$v0` in retail: slot 30 (0xF0/0xF4) in lo.h had no argument although the call passes `pjt+0x1B0`; with `Slot30(void *)` and slots 29 and 30 as
+  real virtual calls on a `JT *`, the score went 6 to 1, and the missing `D_FLT_002BF940` symbol took it to 0 (landed cc7f25b4, every other Slot30 user re-proved). Swarm_Update is a `.c` draft with
+  no `VECTOR`: needs the C++ rewrite first. SolveDzg and SolveDzgPrefilled have frames far larger than retail's (0x480 against 0x70): a different cause.
+  Unused blocks are common in matched functions with calls (244 matched, 28 open: outgoing argument space), so only a frame-size difference counts.
+  Check the saved-register count before adding a local.
+- [x] **Score-0 rows in `nonmatching/MANIFEST.tsv` (2026-11-15).** 13 rows scored 0, but only 3 were unlanded sources (whole-file merges, found by
+  `make src`'s "not published" lines). The other 10 are already `matched` in `src/MANIFEST.tsv`; the image build just cannot use their C objects
+  (`gen_progress_report.py` calls a function `c` only when `config/us/swapped.tsv` has it, else `matched`). A debug copy of `link_image.py` that printed each
+  `continue` gave: GoalNotice_SetState, SetDprizeDprizes and func_002425F0 fail `retarget_rodata` (their rodata cannot be placed: the same family as the
+  StartNextSeqnodeRecord blocker); func_001110D8 and func_00112100 (96 bytes) have an object larger than their span or none; func_0021BBD0, func_0021C0D8,
+  func_0021C5F8 and InitFragile are whole-file members; snd_GotReturns is a candidate but is the one function that differs when linked (`link_image.py
+  --fresh`: 1 differ). `make_whole_files.py --land 0x155D90` landed func_00155D90 (1f7bca39). The other two whole-file landings fail on a callee declared two
+  ways. GetSeqnodeObjectPosRad passed `VECTOR *` where AddJsgContext_file.cpp declared `FindCrvClosestPointAll(void *, QW, int, int, int, float *, float *)`:
+  the callee's own code uses a3 and t0 as 128-bit store targets (`sq`, `sqc2`), t1 and t2 as float stores and a2 as a forwarded pointer, so the file now
+  declares `(void *, QW, void *, void *, void *, float *, float *)` and it landed (43420098). func_00200F58 landed too (bd7b32a8), in three steps. (1) Its draft
+  declared `__as__4CRefRC4CRef(RefT *, RefT *)`, which GCC 2.95 reads as an operator= in the merged file: a `CRef` with `operator=` and `*dst = element`
+  (as the sibling RefSetArgListFromPvs does) scores the same 0. (2) The merge drops a declaration only when it is textually identical to the file's, and
+  reports a conflict otherwise, so each callee both sides declare needs one shared declaration: `void *` for PairHandle_Init, PairHandle_Assign, CRef_Destruct,
+  CRef_ConstructPair, RefGetPeopid and FreeSlotheapPv, `char B_004520A8`, and the file's EOPID gained `ibGet` and `fieldC` (still 0x28 bytes).
+  (3) Reproduce a merge failure with `make_whole_files.insert_function(whole_text, address, source, False, "c++")`, write the text out and `try.py` it
+  with `--quiet`: the compiler then lists every conflict, where the dry run reports only the first. Also open: the five unplaceable objects and snd_GotReturns.
+- [x] **Link hunks and missing symbols (2026-11-15).** `classify_diffs.py` on the 462 unmatched functions: 95 have a `link` hunk and none has only link hunks, so no
+  score of 1 was hiding there. But a link hunk can sit behind another one: WarpJtToSafePoint (link+register, 6) needed both a real virtual call on slot 30 and
+  the missing float symbol `D_FLT_002BF940`, and matched (cc7f25b4). The kept diffs name 205 symbols as `unknown` (the link check's `LINK: X = unknown, binary
+  0x...`): 62 are address-named (`D_FLT`, `B_FLT`, `RO_FLT`, `RO_STR`) with the name's address equal to the binary's, and went into `symbol_addrs.txt` as
+  `source:provisional` (d6cb6f7b): 30 of the 36 functions that use them scored 1 or 2 lower, none reached 0. 17 more disagree (the name's address is not the
+  binary's, e.g. `D_FLT_002BF438` against 0x2bf434): a wrong global in the source, not a missing entry; `.rodata` ones are function-local. Read the LINK
+  lines of any near miss before reading its register hunks.
+- [x] **The six "wrong global" functions (2026-11-15, three Sonnet and three Opus workers, none reached 0).** The hint was wrong for most: the link check
+  prints a strange "binary" address (0xf3f0, 0x1f3f3cc, 0x202d43b0, 0x2df440) whenever scheduling pairs the wrong `lui` with a `lwc1`; the retail pairs give
+  the plain address (`lui 0x2C` plus a negative lo half). Read the retail pair, never the LINK value. Results: bevy_player_input_from_pad_cm 294 to 12
+  (one case left: the six instructions from `mfc1` to the second `sqc2` in jts 20, VU0 registers swapped; the `uFull = 1.0f` local was a literal local the
+  cleanup rules flag, inlining it kept 12), LoadMovieCharacter 206 to 17 (761 of 761 instructions), sceCdRead 91 to 58 (one extra callee-saved register),
+  SetJtJtcs 566 to 163 (545 instructions against 523: gcse PRE keeps `%hi(g_2dded0)` in `$s5` across the tail; no legal C form stops it; its headers went in
+  (2bfffbb4: `lo.h` slot 38 `SetPosMatFromLo(LO *)`, `jt.h` `psm` at 0x1028, 16 `sly.h` fields; full image still proves) and the draft is the registered 163),
+  UpdateDysh 146 to 47 (needs a shared quad-to-quad `pextlw` helper measured on a second function: the worker's own `InterleaveQuads` asm cannot land),
+  FJtAllowsGadget unchanged at 85 (retail 185 instructions, ours 176: `bne` forward with an inline `b epilogue`, both `lui` hoisted before the branch).
+  What worked on LoadMovieCharacter and is worth reusing: block-scope locals (GCC 2.95 shares slots between blocks); an empty `CStackFrame` class with
+  a real constructor and destructor (retail's reads no field, so it is 1 byte and cannot reuse a freed slot); a union for a vtable-call output buffer
+  so it shares a slot (`VU_SCALE`); `case 0: case 1:` labels for a jump table that starts at 0; an empty `case -1:` for retail's branch tree; VU1 entry
+  points are relocated `%hi`/`%lo` pairs, so they stay `extern char VU1_ENTRY_xxx[]` with an address in `symbol_addrs.txt`. 23 provisional symbols went in
+  (d81c5684); three drafts were adopted (72e4729f).
+- [x] **The five one-word opcode near misses (2026-11-15).** Two are not functions: func_0023C7B4 (`ld $s0; jr $ra; addiu $sp`) is the 12-byte tail of `__moddi3`
+  (0x23C158, registered at 1628 bytes) and func_002488B8 the tail of `__ieee754_powf` (0x248038, registered at 2176: 0x248038 + 2176 is exactly 0x2488B8, so powf
+  is really 2188 bytes). In both the previous chunk ends without a return and falls into the tail; `boundaries.py` only finds crossing branches, not fall-throughs
+  (a broad fall-through scan gave 762 candidates, mostly known fragments, so it needs a better test before it is worth running). Landed as hand merges
+  (4be8a043, `config/matching/merges.tsv`, image still proves): both, plus seven more tails found by re-judging the 8 `stale` near misses of score 1 (all 2 to 3
+  instruction `jr $ra` stubs whose previous chunk ends in an `ld` or `lwc1` restore without a return): snd_SendIOPCommandNoWait, `__throw`, `__rethrow`,
+  func_0023F3D8, func_0024A0E8, `__ieee754_log` (1264 bytes, not 1252: its draft moved only 351 to 350, the size was not its problem), func_002542B8; the
+  eighth, func_0023B21C, follows a function that ends in `jr $ra` and stays a stub. The four other `stale` rows (UpdateJtLootSave 13, SolveDzg 47,
+  StoreAudioModeInSave 11, UpdateAmb 32) score exactly their manifest values: nothing was hiding. The other registry/manifest size gaps are padding: memmove 252 against
+  440 is memmove plus the next function memset in one source, CploFindSwObjectsByClass and GetXfLocalRateMatrix are followed by 8 and 16 byte `fragment` rows. The other three: func_00236FD8
+  (SDK, `bnel` in retail, `bnez` in ours) and GetJtCpdefi (`bc1f` in retail, `bc1fl` in ours) took 12 and 10 compiles each from workers without moving off score 1;
+  `__ieee754_fmodf` (`bnez` against `bgtz`) is the libm item above. What was learned about the likely-branch choice in gcc 2.9: a store written before the branch
+  fills the slot as a plain branch; the same store written only in the nonzero arm is not moved into a `bnel` slot, the compiler copies the value into `$v1` and the
+  code diverges at the branch (func_00236FD8); a float add written inside the `else if` fills the slot of `bc1fl`, while the same add as a named local before the
+  compare gives `bc1f` but swaps the `lo`/`hi` registers, about 16 words off (GetJtCpdefi). No plain-C form found for either: a wall of the delay-slot filler,
+  not a wording problem; try the permuter (`make search`) before more hand variants.
+- [ ] **func_00259AC8 (hand-written? no).** Not in `handwritten_asm.txt` and not a blocker: the unset `$v1` it stores is an uninitialised local, and a
+  `volatile` 32-bit field written three times gives retail's three stores. With a `unsigned long` local and return the tail (`ld`, `dsrl32 28`, `andi 1`)
+  matches and the score is 11. Still different: retail copies `$v1` to `$v0` first, puts a `nop` after every instruction and does the stores before the
+  load. The `nop`s appear in no other function (scan: store, nop, store to one address). The `volatile` needs `// volatile-ok:` naming the register block, which
+  is unknown. Draft in `work/scratch/e2b_sonnet/func_00259AC8/w2.cpp`; stop at about ten compiles (used 3).
 
 ## 1. Scheduling
 
@@ -129,7 +222,7 @@ No Sly 2 function is named: none was checked against MANIFEST.tsv. Pick candidat
 - [ ] **Reload-rotation check via `Spilling reg`**: for near misses where one reload uses the wrong GPR (e.g. `a0` for `v0`) and later reloads are all shifted, keep the dumps with `regalloc.py ... --keep DIR` and `grep 'Spilling reg' DIR/*.greg | sort | uniq -c`. A register spilled exactly once is the culprit; find that insn's pseudo in `.lreg` and change its use (a copy through a local, an `"=&r"` helper operand). Expected: one fewer distinct spill register and a rotation that matches retail.
 - [ ] **jump.c clamp form**: where retail has `li K; slt t,K,c; movz/movn` write `s32 v = K+1; if (c < K+1) v = c;`; where retail has `slti`, write the GE form. Fits: diffs that differ only in `slti` vs `li`+`slt` and movz/movn polarity. Measure: try.py on each of the four forms (see doc section 6). Expected: whole clamp matches or the branch (`beqzl`) form is excluded.
 - [ ] **Flag as a value**: replace `if (a && b && c) flag = 1;` with `s32 flag = a && b && c;` where flag and a neighbouring register swap v0/v1. Measure: try.py, regalloc.py allocator column. Expected: swap disappears (sly1 case func_001BC978).
-- [ ] **Frame hole accounting**: for a frame shifted by exactly 16 after some offset, run `scripts/matching/frame_diff.py` and simulate which earlier block's local was bigger (inline frame, by-value result slot). Try the struct type retail implies. Expected: all later offsets align at once.
+- [x] **Frame hole accounting** (2026-11-15, results in section 0: the empty `VECTOR local` frames matched, three open functions 0x10 short): for a frame shifted by exactly 16 after some offset, run `scripts/matching/frame_diff.py` and simulate which earlier block's local was bigger (inline frame, by-value result slot). Try the struct type retail implies. Expected: all later offsets align at once.
 - [ ] **Move a variable's refs to flip a ranking**: for two swapped saved registers with identical code, use regalloc.py's priority text; add or remove one use, or split a variable. Expected: swap resolved; if not, record NEAR.
 - [ ] **Loop counter of its own**: where an earlier loop's counter shares the outer variable's register, declare a separate counter for the earlier loop. Measure: try.py. Expected: saved-register assignment changes.
 - [ ] **Member vs offset access for reload presence**: if retail reloads a field after a store and ours keeps it in a register (or reverse), switch between `m->flags` and `*(s32*)((u8*)m + N)`. Expected: reload appears or disappears; check against lessons.md section 2 first.

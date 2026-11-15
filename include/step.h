@@ -18,7 +18,9 @@ struct STEP : PO {
     /* 0x190 */ QW velGoal; /* SetMurrayCarryState, func_001B5D30 (two readers) */
     u8 unknown_0x1A0[0x8];
     /* 0x1A8 */ f32 radHeading; /* ChooseJtSweepTarget, UpdateBinocHud (two readers) */
-    u8 unknown_0x1AC[0x58];
+    u8 unknown_0x1AC[0x48];
+    /* 0x1F4 */ f32 field_0x1F4; /* bevy_player_input_from_pad_cm */
+    u8 unknown_0x1F8[0xC];
     /* 0x204 */ s32 field_0x204; /* func_00143C78 (JT slot 85) */
     /* 0x208 */ struct SO *psoSurface; /* what it stands on: func_00141588 (JT slot 97), UpdateJtStand */
     /* 0x20C */ f32 tJump; /* UpdateBentleyActive (from UpdateBentley, Bentley slot 16) */
@@ -50,5 +52,6 @@ SLY2_OFFSET_CHECK(STEP, field_0x248, 0x248);
 SLY2_OFFSET_CHECK(STEP, field_0x260, 0x260);
 SLY2_OFFSET_CHECK(STEP, pasegDefault, 0x268);
 SLY2_OFFSET_CHECK(STEP, field_0x270, 0x270);
+SLY2_OFFSET_CHECK(STEP, field_0x1F4, 0x1F4);
 #endif
 #endif
