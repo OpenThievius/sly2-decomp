@@ -3743,6 +3743,7 @@ address	name	size	file	whole_file	symbol
 0X1E0120	func_001E0120	8	stepguard-jsg/fun_001e0120.c		
 0X1E0128	func_001E0128	44	unsorted/fun_001e0128.cpp		
 0X1E0158	func_001E0158	36	unsorted/fun_001e0158.cpp		
+0X1E0180	PseqnodeFind	68	stepguard-jsg/PseqnodeFind.cpp		
 0X1E01C8	func_001E01C8	48	unsorted/fun_001e01c8.cpp		
 0X1E01F8	PjsgeAllocJsg	152	stepguard-jsg/PjsgeAllocJsg.cpp		
 0X1E0290	AddJsgContext	48	stepguard-jsg/AddJsgContext_file.cpp	stepguard-jsg/AddJsgContext_file.cpp	AddJsgContext
@@ -4137,6 +4138,8 @@ address	name	size	file	whole_file	symbol
 0X1F5FF8	func_001F5FF8	56	so/fun_001f5ff8.cpp		
 0X1F6030	PpartFindAlo	56	so/PpartFindAlo.cpp		
 0X1F66F0	CloneAloHierarchy	148	so/CloneAloHierarchy.cpp		
+0X1F6788	PasegaFindAlo	84	so/PasegaFindAlo.cpp		
+0X1F67E0	PsmaFindAlo	84	so/PsmaFindAlo.cpp		
 0X1F6838	GetSoNoXpsAll	40	so/GetSoNoXpsAll.cpp		
 0X1F6860	SetSoNoXpsAll	68	so/SetSoNoXpsAll.cpp		
 0X1F68A8	func_001F68A8	108	so/fun_001f68a8.cpp		
@@ -4701,6 +4704,7 @@ address	name	size	file	whole_file	symbol
 0X2130C0	BuildBlotDmaHeader	524	screen-font/BuildBlotDmaHeader.cpp		
 0X2132D0	FDrawBlotMovie	48	screen-font/FDrawBlotMovie.cpp		
 0X213300	DrawBlotMovie	1264	screen-font/DrawBlotMovie.cpp		
+0X2137F0	FBlotObscured	60	screen-font/FBlotObscured.cpp		
 0X213830	PlayBlotLabel	100	screen-font/PlayBlotLabel.cpp		
 0X213898	StopBlotLabel	140	screen-font/StopBlotLabel.cpp		
 0X213928	func_00213928	220	screen-font/fun_00213928.cpp		

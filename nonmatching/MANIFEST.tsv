@@ -461,7 +461,6 @@ address	name	size	file	score
 0X1DF0A0	AddLaserCustomXps	448	game-stepguard/AddLaserCustomXps.c	102
 0X1DF3D0	AdvanceLaserBeams	480	game-stepguard/AdvanceLaserBeams.cpp	71
 0X1DF908	AddLaserBeam	120	game-stepguard/AddLaserBeam.cpp	15
-0X1E0180	PseqnodeFind	72	stepguard-jsg/PseqnodeFind.c	13
 0X1E4D40	GetSeqnodeObjectPosRad	376	splice-ref-crv/GetSeqnodeObjectPosRad.cpp	0
 0X1E5280	DetachSeqnodeObject	240	splice-ref-crv/DetachSeqnodeObject.cpp	18
 0X1E57A0	StartSeqnodeCameraMove	760	splice-ref-crv/StartSeqnodeCameraMove.c	179
@@ -498,8 +497,6 @@ address	name	size	file	score
 0X1F59A0	AccelSoTowardMatSmooth__FP2SOfP7MATRIX3P3SMP	656	so_1f58f0/AccelSoTowardMatSmooth__FP2SOfP7MATRIX3P3SMP.c	145
 0X1F5C30	AccelSoTowardMatSpring__FP2SOP7MATRIX3P3CLQP6VECTORT2f	480	so_1f58f0/AccelSoTowardMatSpring__FP2SOP7MATRIX3P3CLQP6VECTORT2f.c	124
 0X1F6068	CSo_Clone	1672	so_1f58f0/CSo_Clone.cpp	135
-0X1F6788	PasegaFindAlo	88	so_1f58f0/PasegaFindAlo.c	16
-0X1F67E0	PsmaFindAlo	88	so_1f58f0/PsmaFindAlo.c	16
 0X1F6C08	EnsureSogeomLvo	752	so_1f58f0/EnsureSogeomLvo.cpp	41
 0X1F72F8	FPointInAloParts	280	so-sm/FPointInAloParts.c	77
 0X1F7598	PaloAbsorbWkr	552	so-sm/PaloAbsorbWkr.cpp	28
@@ -563,7 +560,6 @@ address	name	size	file	score
 0X20E890	ExecuteSwLoadRequest	1840	new_20e040/ExecuteSwLoadRequest.c	327
 0X20F7E0	UpdateSwHudBlots	360	sw-button/UpdateSwHudBlots.cpp	6
 0X2124F0	PrepareBlotMovie	656	po-screen/PrepareBlotMovie.cpp	24
-0X2137F0	FBlotObscured	64	screen-font/FBlotObscured.c	12
 0X213F70	FStartSpriteLabelInstance	400	screen-font/FStartSpriteLabelInstance.c	88
 0X214100	FStartSpriteDepthInstance	432	screen-font/FStartSpriteDepthInstance.cpp	4
 0X2149D8	LoadMovieCharacter	3048	screen-font/LoadMovieCharacter.cpp	206

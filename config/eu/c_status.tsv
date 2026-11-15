@@ -3743,6 +3743,7 @@ us_address	name	other_address	pair	score	addresses
 0x1E0120	func_001E0120	0X1E08E0	gap	0	ok
 0x1E0128	func_001E0128	0X1E08E8	identical	0	ok
 0x1E0158	func_001E0158	0X1E0918	identical	0	ok
+0x1E0180	PseqnodeFind	0X1E0940	identical	0	ok
 0x1E01C8	func_001E01C8	0X1E0988	identical	0	ok
 0x1E01F8	PjsgeAllocJsg	0X1E09B8	same	0	ok
 0x1E0290	AddJsgContext	0X1E0A50	same	0	ok
@@ -4137,6 +4138,8 @@ us_address	name	other_address	pair	score	addresses
 0x1F5FF8	func_001F5FF8	0X1F67B8	identical	0	ok
 0x1F6030	PpartFindAlo	0X1F67F0	identical	0	ok
 0x1F66F0	CloneAloHierarchy	0X1F6EB0	same	0	ok
+0x1F6788	PasegaFindAlo	0X1F6F48	same	0	ok
+0x1F67E0	PsmaFindAlo	0X1F6FA0	same	0	ok
 0x1F6838	GetSoNoXpsAll	0X1F6FF8	identical	0	ok
 0x1F6860	SetSoNoXpsAll	0X1F7020	same	0	ok
 0x1F68A8	func_001F68A8	0X1F7068	identical	0	ok
@@ -4701,6 +4704,7 @@ us_address	name	other_address	pair	score	addresses
 0x2130C0	BuildBlotDmaHeader	0X213890	same	0	ok
 0x2132D0	FDrawBlotMovie	0X213AA0	same	0	ok
 0x213300	DrawBlotMovie	0X213AD0	same	0	ok
+0x2137F0	FBlotObscured	0X213FC0	same	0	ok
 0x213830	PlayBlotLabel	0X214000	same	0	ok
 0x213898	StopBlotLabel	0X214068	same	0	ok
 0x213928	func_00213928	0X2140F8	same	0	ok
