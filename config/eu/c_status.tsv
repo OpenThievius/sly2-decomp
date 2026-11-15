@@ -1954,6 +1954,7 @@ us_address	name	other_address	pair	score	addresses
 0x155A38	func_00155A38	0X155A60	same	0	ok
 0x155A68	func_00155A68	0X155A90	same	0	ok
 0x155AE0	func_00155AE0	0X155B08	same	0	ok
+0x155D90	func_00155D90	0X155DB8	same	0	ok
 0x156390	guardposts__static_initialization_and_destruction_0	0X1563B8	same	0	ok
 0x1564C8	guardposts__static_initialization_and_destruction_0_thunk	0X1564F0	same	0	ok
 0x1564E8	func_001564E8	0X156510	same	0	ok

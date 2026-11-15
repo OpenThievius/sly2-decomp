@@ -1954,8 +1954,9 @@ address	name	size	file	whole_file	symbol
 0X155A38	func_00155A38	48	crv-lo/fun_00155a38.c		
 0X155A68	func_00155A68	116	crv-lo/fun_00155a68.cpp		
 0X155AE0	func_00155AE0	688	crv-lo/fun_00155ae0.cpp		
-0X156390	guardposts__static_initialization_and_destruction_0	308	crv-lo/guardposts_file.c	crv-lo/guardposts_file.c	guardposts__static_initialization_and_destruction_0
-0X1564C8	guardposts__static_initialization_and_destruction_0_thunk	32	crv-lo/guardposts_file.c	crv-lo/guardposts_file.c	guardposts__static_initialization_and_destruction_0_thunk
+0X155D90	func_00155D90	540	crv-lo/guardposts_file.cpp	crv-lo/guardposts_file.cpp	func_00155D90
+0X156390	guardposts__static_initialization_and_destruction_0	308	crv-lo/guardposts_file.cpp	crv-lo/guardposts_file.cpp	guardposts__static_initialization_and_destruction_0
+0X1564C8	guardposts__static_initialization_and_destruction_0_thunk	32	crv-lo/guardposts_file.cpp	crv-lo/guardposts_file.cpp	guardposts__static_initialization_and_destruction_0_thunk
 0X1564E8	func_001564E8	96	crv-lo/fun_001564e8.cpp		
 0X156548	PhitfxSpawn_156548	336	crv-lo/PhitfxSpawn_156548.cpp		
 0X156698	PhitfxSpawn	32	crv-lo/PhitfxSpawn.cpp		

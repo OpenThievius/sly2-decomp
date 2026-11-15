@@ -155,7 +155,6 @@ address	name	size	file	score
 0X153760	GMeanRhythmScore	160	rip-game/GMeanRhythmScore.cpp	16
 0X154A90	OnDifficultyEvent	512	new_154a80/OnDifficultyEvent.c	57
 0X155868	func_00155868	328	crv-lo/fun_00155868.c	73
-0X155D90	func_00155D90	544	crv-lo/fun_00155d90.cpp	0
 0X155FB0	PosAimAtPlayer	992	crv-lo/PosAimAtPlayer.c	215
 0X156918	FHitFxCoversPos	160	lo_156918/FHitFxCoversPos.c	33
 0X1569B8	InitSwHitFxParms	480	new_1569b8/InitSwHitFxParms.c	63
@@ -573,13 +572,9 @@ address	name	size	file	score
 0X219190	ApplySpriteKeySounds	440	font-break/ApplySpriteKeySounds.cpp	23
 0X219400	PlaceSpriteKeyCharacters	3040	font-break/PlaceSpriteKeyCharacters.cpp	265
 0X21AA60	InitDynamicTextStatics	4360	font-break/InitDynamicTextStatics.c	1379
-0X21BB88	InitFragile__FP7FRAGILE	72	break/InitFragile__FP7FRAGILE.c	0
-0X21BBD0	func_0021BBD0	56	break-text/fun_0021bbd0.cpp	0
 0X21BC08	func_0021BC08	272	break-text/fun_0021bc08.cpp	17
-0X21C0D8	func_0021C0D8	240	break-text/fun_0021c0d8.cpp	0
 0X21C1C8	func_0021C1C8	376	break-text/fun_0021c1c8.c	39
 0X21C340	func_0021C340	696	break-text/fun_0021c340.c	211
-0X21C5F8	func_0021C5F8	208	break-text/fun_0021c5f8.cpp	0
 0X21C888	func_0021C888	656	break-text/fun_0021c888.cpp	39
 0X21E1B0	CchAchFromDouble__FPciP3TFTd	776	text/CchAchFromDouble__FPciP3TFTd.cpp	87
 0X21F418	CarryThrow_Update	1792	new_21f188/CarryThrow_Update.c	522

@@ -72,7 +72,7 @@ start	end	file
 0x153B08	0x153D58	rip-game/rip_game_153b08.cpp
 0x154770	0x154A60	new_154180/StaticInitSensorSight_file.c
 0x154A60	0x1553F0	difficulty/OnDifficultyGameLoad_file.cpp
-0x155D90	0x1564E8	crv-lo/guardposts_file.c
+0x155D90	0x1564E8	crv-lo/guardposts_file.cpp
 0x156918	0x157200	new_1569b8/SpawnSwHitFx_file.cpp
 0x157200	0x1578F8	dmas/StartupDma_file.cpp
 0x1578F8	0x157A50	dmas-dzg/dmas_dzg_1578f8.c
