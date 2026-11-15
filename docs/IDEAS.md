@@ -49,9 +49,9 @@ polynomial's meaning).
   not always a missing local. UpdateSoRoot: yes, `VECTOR local;` makes the frame identical, and it matched (landed 1e9e8ef7) once `plo = pso` moved right after
   the `cgeom` check and `LO::Slot13` took `(int, SO*)` in lo.h (retail calls slot 13 with two arguments). WarpJtToSafePoint: no, retail saves six s-registers
   where ours saved five, and the frame follows from that; a worker took it from 48 to 6 (write `pjt + 0x2C0` at each use, no shared local, which keeps the
-  pointer in two registers; declare `B_003DD490` as a struct with `s32 fade` at 0x3E60). What is left is the vtable pointer going to `$v1` and the first
-  callee to `$v0` in retail, `$v0` for both in ours; slot 30 (0xF0/0xF4) in lo.h has no argument although the call passes `pjt+0x1B0`, so widening it
-  and re-proving its users is the next try (best source in `work/scratch/e2b_sonnet/frames_wave/WarpJtToSafePoint/v2.cpp`). Swarm_Update is a `.c` draft with
+  pointer in two registers; declare `B_003DD490` as a struct with `s32 fade` at 0x3E60). The last 6 words were the vtable pointer going to `$v1` and the first
+  callee to `$v0` in retail: slot 30 (0xF0/0xF4) in lo.h had no argument although the call passes `pjt+0x1B0`; with `Slot30(void *)` and slots 29 and 30 as
+  real virtual calls on a `JT *`, the score went 6 to 1, and the missing `D_FLT_002BF940` symbol took it to 0 (landed cc7f25b4, every other Slot30 user re-proved). Swarm_Update is a `.c` draft with
   no `VECTOR`: needs the C++ rewrite first. SolveDzg and SolveDzgPrefilled have frames far larger than retail's (0x480 against 0x70): a different cause.
   Unused blocks are common in matched functions with calls (244 matched, 28 open: outgoing argument space), so only a frame-size difference counts.
   Check the saved-register count before adding a local.
@@ -62,12 +62,19 @@ polynomial's meaning).
   StartNextSeqnodeRecord blocker); func_001110D8 and func_00112100 (96 bytes) have an object larger than their span or none; func_0021BBD0, func_0021C0D8,
   func_0021C5F8 and InitFragile are whole-file members; snd_GotReturns is a candidate but is the one function that differs when linked (`link_image.py
   --fresh`: 1 differ). `make_whole_files.py --land 0x155D90` landed func_00155D90 (1f7bca39). The other two whole-file landings fail on a callee declared two
-  ways: GetSeqnodeObjectPosRad passes `VECTOR *` where AddJsgContext_file.cpp declares `FindCrvClosestPointAll(void *, QW, int, int, int, float *, float *)`,
-  func_00200F58 needs `operator=(RefT *, RefT *)` that RefGetOption_file.cpp declares differently. Read the callee's own asm for which argument registers are
-  pointers, then fix the declaration in the whole file and re-prove it. Open: those two, the five unplaceable objects, snd_GotReturns.
-- [x] **Link-only near misses (2026-11-15).** `classify_diffs.py` on the 462 unmatched functions: 95 have a `link` hunk, none has only link hunks, and the lowest
-  score with one is 6 (WarpJtToSafePoint link+register; next bevy_player_p5_states_18bce0 7 and func_002082D0 7). So a missing `symbol_addrs.txt` entry is not
-  hiding a score of 1 anywhere; those three are callee-signature cases like slot 30.
+  ways. GetSeqnodeObjectPosRad passed `VECTOR *` where AddJsgContext_file.cpp declared `FindCrvClosestPointAll(void *, QW, int, int, int, float *, float *)`:
+  the callee's own code uses a3 and t0 as 128-bit store targets (`sq`, `sqc2`), t1 and t2 as float stores and a2 as a forwarded pointer, so the file now
+  declares `(void *, QW, void *, void *, void *, float *, float *)` and it landed (43420098). func_00200F58 is still open: its draft declares
+  `__as__4CRefRC4CRef(RefT *, RefT *)`, RefGetOption_file.cpp has its own `CRef_200DA0` with a real `operator=`, and GCC 2.95 reads the `__as__` name as that
+  operator in the merged file; per-declaration `extern "C"` did not help (4 compiles). Next try: write the draft's assignment as `*dst = element` on a
+  `CRef`-shaped struct and let the operator produce the call, or use `cref.h`'s `CRef`. Also open: the five unplaceable objects and snd_GotReturns.
+- [x] **Link hunks and missing symbols (2026-11-15).** `classify_diffs.py` on the 462 unmatched functions: 95 have a `link` hunk and none has only link hunks, so no
+  score of 1 was hiding there. But a link hunk can sit behind another one: WarpJtToSafePoint (link+register, 6) needed both a real virtual call on slot 30 and
+  the missing float symbol `D_FLT_002BF940`, and matched (cc7f25b4). The kept diffs name 205 symbols as `unknown` (the link check's `LINK: X = unknown, binary
+  0x...`): 62 are address-named (`D_FLT`, `B_FLT`, `RO_FLT`, `RO_STR`) with the name's address equal to the binary's, and went into `symbol_addrs.txt` as
+  `source:provisional` (d6cb6f7b): 30 of the 36 functions that use them scored 1 or 2 lower, none reached 0. 17 more disagree (the name's address is not the
+  binary's, e.g. `D_FLT_002BF438` against 0x2bf434): a wrong global in the source, not a missing entry; `.rodata` ones are function-local. Read the LINK
+  lines of any near miss before reading its register hunks.
 - [ ] **func_00259AC8 (hand-written? no).** Not in `handwritten_asm.txt` and not a blocker: the unset `$v1` it stores is an uninitialised local, and a
   `volatile` 32-bit field written three times gives retail's three stores. With a `unsigned long` local and return the tail (`ld`, `dsrl32 28`, `andi 1`)
   matches and the score is 11. Still different: retail copies `$v1` to `$v0` first, puts a `nop` after every instruction and does the stores before the
