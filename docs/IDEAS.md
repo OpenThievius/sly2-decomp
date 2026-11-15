@@ -55,6 +55,19 @@ polynomial's meaning).
   no `VECTOR`: needs the C++ rewrite first. SolveDzg and SolveDzgPrefilled have frames far larger than retail's (0x480 against 0x70): a different cause.
   Unused blocks are common in matched functions with calls (244 matched, 28 open: outgoing argument space), so only a frame-size difference counts.
   Check the saved-register count before adding a local.
+- [x] **Score-0 rows in `nonmatching/MANIFEST.tsv` (2026-11-15).** 13 rows scored 0, but only 3 were unlanded sources (whole-file merges, found by
+  `make src`'s "not published" lines). The other 10 are already `matched` in `src/MANIFEST.tsv`; the image build just cannot use their C objects
+  (`gen_progress_report.py` calls a function `c` only when `config/us/swapped.tsv` has it, else `matched`). A debug copy of `link_image.py` that printed each
+  `continue` gave: GoalNotice_SetState, SetDprizeDprizes and func_002425F0 fail `retarget_rodata` (their rodata cannot be placed: the same family as the
+  StartNextSeqnodeRecord blocker); func_001110D8 and func_00112100 (96 bytes) have an object larger than their span or none; func_0021BBD0, func_0021C0D8,
+  func_0021C5F8 and InitFragile are whole-file members; snd_GotReturns is a candidate but is the one function that differs when linked (`link_image.py
+  --fresh`: 1 differ). `make_whole_files.py --land 0x155D90` landed func_00155D90 (1f7bca39). The other two whole-file landings fail on a callee declared two
+  ways: GetSeqnodeObjectPosRad passes `VECTOR *` where AddJsgContext_file.cpp declares `FindCrvClosestPointAll(void *, QW, int, int, int, float *, float *)`,
+  func_00200F58 needs `operator=(RefT *, RefT *)` that RefGetOption_file.cpp declares differently. Read the callee's own asm for which argument registers are
+  pointers, then fix the declaration in the whole file and re-prove it. Open: those two, the five unplaceable objects, snd_GotReturns.
+- [x] **Link-only near misses (2026-11-15).** `classify_diffs.py` on the 462 unmatched functions: 95 have a `link` hunk, none has only link hunks, and the lowest
+  score with one is 6 (WarpJtToSafePoint link+register; next bevy_player_p5_states_18bce0 7 and func_002082D0 7). So a missing `symbol_addrs.txt` entry is not
+  hiding a score of 1 anywhere; those three are callee-signature cases like slot 30.
 - [ ] **func_00259AC8 (hand-written? no).** Not in `handwritten_asm.txt` and not a blocker: the unset `$v1` it stores is an uninitialised local, and a
   `volatile` 32-bit field written three times gives retail's three stores. With a `unsigned long` local and return the tail (`ld`, `dsrl32 28`, `andi 1`)
   matches and the score is 11. Still different: retail copies `$v1` to `$v0` first, puts a `nop` after every instruction and does the stores before the
