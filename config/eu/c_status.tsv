@@ -4080,6 +4080,7 @@ us_address	name	other_address	pair	score	addresses
 0x1F2B20	AddSoGeomsToOxa	0X1F32E0	same	0	ok
 0x1F2BA8	RemoveSoGeomsFromOxa	0X1F3368	same	0	ok
 0x1F2C30	AddSoLoHierarchy	0X1F33F0	gap	0	ok
+0x1F2E78	UpdateSoRoot	0X1F3638	same	0	ok
 0x1F2FE0	func_001F2FE0	0X1F37A0	identical	0	ok
 0x1F3078	func_001F3078	0X1F3838	identical	0	ok
 0x1F3118	func_001F3118	0X1F38D8	same	0	ok

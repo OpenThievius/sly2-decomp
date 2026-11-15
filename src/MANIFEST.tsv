@@ -4080,6 +4080,7 @@ address	name	size	file	whole_file	symbol
 0X1F2B20	AddSoGeomsToOxa	136	sm-so/AddSoGeomsToOxa.cpp		
 0X1F2BA8	RemoveSoGeomsFromOxa	136	sm-so/RemoveSoGeomsFromOxa.cpp		
 0X1F2C30	AddSoLoHierarchy	276	sm-so/AddSoLoHierarchy.cpp		
+0X1F2E78	UpdateSoRoot	356	sm-so/UpdateSoRoot.cpp		
 0X1F2FE0	func_001F2FE0	148	sm-so/fun_001f2fe0.cpp		
 0X1F3078	func_001F3078	156	sm-so/fun_001f3078.cpp		
 0X1F3118	func_001F3118	196	sm-so/fun_001f3118.cpp		

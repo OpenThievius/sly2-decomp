@@ -52,7 +52,7 @@ struct LO : BASIC {
                                            Carry_Attach pass a pointer second */
     virtual void AddHierarchy();        /* 11: AddLoHierarchy, AddSoLoHierarchy */
     virtual void RemoveHierarchy();     /* 12: RemoveLoHierarchy */
-    virtual void Slot13();              /* 13: func_001A5B80 */
+    virtual void Slot13(int arg1, struct SO *arg2);              /* 13: func_001A5B80 */
     virtual void LoadFromBrx();         /* 14: LoadLoFromBrx, CSo_LoadFromBrx */
     virtual void PostLoad();            /* 15: PostLoLoad, PostSoLoad */
     virtual void Update();              /* 16: UpdateLo, UpdateSo */
