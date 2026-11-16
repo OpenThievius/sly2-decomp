@@ -9,7 +9,7 @@ typedef union {
     } half;
 } Word64;
 
-/* 0x2AAE18 (this object's copy): bit length of every byte value (0 for 0, 8 for 0x80 and up). */
+/* 0x2AAF18 (this object's copy): bit length of every byte value (0 for 0, 8 for 0x80 and up). */
 extern const unsigned char RO_002AAF18[256];
 
 #define HALF_BASE 0x10000UL

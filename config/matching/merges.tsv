@@ -25,3 +25,4 @@ lead	end	members	evidence
 0x24A248	0x24A738	0x24A248,0x24A72C	0x24a728 falls into 0x24a72c (the chunk before ends in ld, no return)
 0x2542B8	0x254488	0x2542B8,0x25447C	0x254478 falls into 0x25447c (the chunk before ends in ld, no return)
 0x24ACD8	0x24AE8C	0x24ACD8,0x24AE04	0x24adfc branches to 0x24ae48 inside the next chunk (func_0024ACD8 ends in b with its delay slot, no return)
+0x23CDF8	0x23D338	0x23CDF8,0x23D32C	0x23d0cc, 0x23d0fc, 0x23d190 and 0x23d2f0 branch to 0x23d32c (a 3-instruction epilogue, ld; jr; addiu; the chunk before ends in no return)

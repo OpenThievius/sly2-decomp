@@ -23,8 +23,12 @@ def main():
     if not os.path.exists(swapped_path):
         sys.exit('run `make elf` first: config/us/swapped.tsv is written by the image link')
     swapped = {line.split('\t')[0].upper() for line in open(swapped_path)}
-    reasons = {line.split('\t')[0].upper(): line.rstrip('\n').split('\t')[2] for line in open(os.path.join(ROOT, 'build', 'image', 'fallbacks.tsv'))} \
-        if os.path.exists(os.path.join(ROOT, 'build', 'image', 'fallbacks.tsv')) else {}
+    # fallbacks.tsv: linked and differed; skipped.tsv: never became a link candidate (link_image.py), so there is nothing to compare
+    reasons = {}
+    for reason_file in ('skipped.tsv', 'fallbacks.tsv'):
+        reason_path = os.path.join(ROOT, 'build', 'image', reason_file)
+        if os.path.exists(reason_path):
+            reasons.update({line.split('\t')[0].upper(): line.rstrip('\n').split('\t')[2] for line in open(reason_path)})
     chosen = [entry for entry in rows(os.path.join(ROOT, 'src', 'MANIFEST.tsv'), 4) if matches(entry, selector)]
     whole = next((row for row in rows(os.path.join(ROOT, 'config', 'us', 'whole_files.tsv'))
                   if selector is not None and os.path.normpath(selector) in (row[2], os.path.join('src', row[2]))), None)

@@ -46,11 +46,12 @@ Why first: no draft means nothing to improve, so each is either a quick win or a
 - Status 2026-11-15: wave S2 (102 drafts scoring 1 to 16) ran with 12 Opus workers; 33 reached 0 (matched code 70.76% to 71.92%, 5548 to 5583 functions). Recurring walls: early `%hi` kept across a call (8 drafts), volatile store in a delay slot (5), pextlw reload (3), VU0 register order (4).
 
 - 102 drafts within 16 words of retail go to Opus, one function per worker, with the earlier attempt and its diff.
-- Six integer near misses have no known lever: 0x1733C8, 0x120548, 0x218748, 0x1A5D98, 0x13FAD0 (0x1C9058 now has a flag row). Check the RTL dump first.
+- Six integer near misses had no known lever: 0x1733C8, 0x120548, 0x218748, 0x1A5D98, 0x13FAD0 and 0x1C9058; five are matched by 2026-11-16 (see stage 3), 0x1C9058 is a noted wall.
 - SDK near misses: `powf` and the 5 libm drafts.
 
 ### Stage 3: levers before waves (In Progress)
 
+- Status 2026-11-16: four more levers landed as matches (matching.md, "What usually fixes a near miss"): scaled index first in an address sum, one `switch` arm per case, `return fixed >> 32` for a truncated `long`, and a table copied from its data global. They took `AddSpawnerOffset`, `bevy_splice_bif_ref_op_eqv` and `PauseSpriteInstance` (waves S6-<addr>) to 0; `StartLoadingLogo` stays at 9 (a high-part register tie, noted). Matched code 73.46%, 5,598 of 6,063 functions. Of the six integer near misses, five are matched; `StartLoadingLogo` is the one left.
 - Status 2026-11-15: `VectorFromFloats3` (one helper for the mfc1/pextlw/pcpyld block) landed, 3 matches (`SetVectorCylind`, `SetVectorSphere`, `GetXfDofValue`). Closed with no rule-clean lever: the early `%hi` across a save call (cse-and-pre.md section 4), the VU0 register order of `ScaleByReciprocalX` and `DotProduct`. Volatile store in a branch or jal delay slot (5 drafts): toolchain limit, no assembler fills it. Next: the 4-lane pextlw variant, register-allocation classes, a new wave only where a lever landed.
 
 Waves yield about 20 bytes per claimed function. What moved the number: loop5, `-fmove-all-movables`, `function_flags.tsv`, shared helpers.
@@ -62,15 +63,19 @@ Waves yield about 20 bytes per claimed function. What moved the number: loop5, `
 ### Stage 4: inline kind (In Progress)
 
 - Status 2026-11-15: only 12 of the 219 inline-kind functions were still in assembly (all VU0, 24,200 bytes), not 133. Waves S4 and S4a to S4h: 0 matches, 9 near misses and drafts rewritten onto shared helpers (`RefOpMult` 282 to 33, `func_001CC2E8` 105 to 4, `UpdateGuardSensor` 43 to 26 with a `-fno-strength-reduce` row, `UpdateVehicle` 531 to 43, `RenderGlobsetTree` 846 to 547). `ScaleAddTwoX` landed (two users). `RenderGlobsetTree` has a named exception for its microprogram's fixed registers (AGENTS.md, 2026-11-15). Worker lesson: `claim.py take` is arrival order, so one wave per target function.
-- Left: the vcallms/cfc2 asm statements of `RenderGlobsetTree` still need a ruling; 0x1CC2E8 (4) and 0x1B8D30 (7) differ only in vf numbering.
+- Status 2026-11-16 (waves S7-<addr>, one function each): `RenderGlobsetTree` 881 to 328 (the registry's 547 was an older rewrite), with the VIF/DMA stream written as inline member functions of `VIFS`, `matBone` assigned not initialised, the quad copy as four loads then four stores, and the kind adjust as a `switch`; it cannot land while its `vcallms` and `cfc2.i` statements are inline asm (`check_source.py`; the register-variable lines carry the marker). Recommendation, not a ruling: leave the asm ruling until the score is close, since 328 words are far from 0. `func_001B8D30`: the registry's 4 was a draft with its own inline asm and a pointer local; the rule-clean best is 9 (stack slots of the scale temporary, 7 words, plus a late `lwc1`). `func_001CC2E8` 4: matches only with a two-input-operand `DotProductXy` (`vmul.xy` + `vaddy.x`), two instructions and one measured user, so not added to `vu0inline.h` (noted in `blocker_notes.tsv`).
+- Left: the three above, `UpdateVehicle` (43), `UpdateGuardSensor` (26), `RefOpMult` (33).
 - 133 functions, about 11% of code, compiled C that needs the shared helpers (count from before the inline cutoff moved to 10%).
 - A new helper goes into `include/ps2inline.h` or `include/vu0inline.h`, measured on more than one function: one instruction each, no register pins, no `"memory"` clobber.
 
-### Stage 5: SDK range drafting (In Progress)
+### Stage 5: SDK range drafting (Complete, apart from four measured walls)
 
 - Status 2026-11-15: `MultiplyUnsignedWide` (libgcc's `umul_ppmm`, one `multu`) landed in `ps2inline.h`; it gives retail's `multu`, `mfhi`, `mflo` in all four 64-bit division functions. `__divdi3` and `__udivdi3` match (the second only with `sony29-01`, now in `config/us/sony_gcc29_01.txt`): matched code 71.95% to 72.23%, 5586 to 5588 functions. `__moddi3` (7) and `__umoddi3` (4) keep an unused 0x20 of frame that nothing accesses; `__umoddi3`'s tail is a split epilogue (`func_0023D32C`).
 - Eight SDK near misses ran as single waves: `func_002542B8` 1 (one rodata link word), `func_002358A0` 2, `sceMpegInit` 2, `func_00235780` 2 (with `sony29`), `func_002540B0` 6. Four of them end on an unfilled delay slot where retail filled it; the volatile-store-in-delay-slot wall of stage 2 is the likely common cause.
-- Left: the giants `func_0024D5E8` (7,592 bytes), `func_0024FC58`, `__ieee754_log`, `func_0024C670`. Drafting work, not toolchain.
+- Status 2026-11-16: seven more landed as single waves (`S5-<addr>`): `__ieee754_log`, `func_0024D5E8` (7,592 bytes, libmpeg PES header reader), `func_0024FC58`, `func_002358A0`, `func_002542B8`, `__moddi3`, `__umoddi3`. Matched code 72.23% to 73.31%, 5588 to 5594 functions. `__moddi3` and `__umoddi3` need `sony29-01` (the unused 0x20 frame goes away); `__umoddi3`'s split epilogue is a `merges.tsv` row; `func_0024D5E8` joins `sony_gcc29.txt`. `func_002358A0` was not the delay-slot wall: `return fixed >> 32` after merged `<< 32` tails lets gcc fill the `jr` slot (a single-instruction step); `(int)` of a long compiles to a two-instruction truncate and leaves the slot empty. `func_002542B8`'s one word was a second anonymous rodata table: copy the table from the existing `D_002AC838` global instead of a local initialiser. Also fixed: a statement swap from `make search` had broken `__udivdi3` (8); restored.
+- Walls (measured, `config/us/blocker_notes.tsv`): `func_002540B0` (6), `sceMpegInit` (2), `func_00235780` (2), `func_0024C670` (12, plus a v0/v1 swap). Retail puts a constant-address store in a delay slot; Sony's gcc reorg never puts a volatile store there, a plain one folds to the `$at` form, and neither assembler swaps it in. Same class: `0x24C4B0`, `0x2539D0`.
+- Resolved 2026-11-16: `make unit` had reported `__udivdi3` from assembly although `try.py` scored 0: `link_image.py` held it back from a stale `build/image/seed.json` (run it with `--fresh` after a repair). The same unit check also surfaced five more functions that never became link candidates (`build/image/skipped.tsv`); all 5,601 matched functions now link from C.
+- Left: nothing in the SDK range except the walls above and the libm drafts of stage 2.
 
 ### Stage 6: tail (Not Started)
 

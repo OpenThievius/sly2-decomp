@@ -988,6 +988,7 @@ us_address	name	other_address	pair	score	addresses
 0x1204B8	RefOpLE	0X1204B8	identical	0	ok
 0x1204E8	RefOpG__FiP4CRefP6CFrame	0X1204E8	identical	0	ok
 0x120518	RefOpGE__FiP4CRefP6CFrame	0X120518	identical	0	ok
+0x120548	bevy_splice_bif_ref_op_eqv	0X120548	same	0	ok
 0x1205B8	bevy_splice_bif_ref_equal	0X1205B8	same	0	ok
 0x1207F0	RefOpEqual__FiP4CRefP6CFrame	0X1207F0	identical	0	ok
 0x120820	func_00120820	0X120820	identical	0	ok
@@ -2344,6 +2345,7 @@ us_address	name	other_address	pair	score	addresses
 0x173318	func_00173318	0X1732A0	identical	0	ok
 0x173358	func_00173358	0X1732E0	identical	0	ok
 0x173398	func_00173398	0X173320	identical	0	ok
+0x1733C8	AddSpawnerOffset	0X173350	identical	0	ok
 0x1733F8	func_001733F8	0X173380	same	0	ok
 0x173928	func_00173928	0X1738B0	same	0	ok
 0x173A18	PosSpawnerFocus	0X1739A0	same	0	ok
@@ -4792,6 +4794,7 @@ us_address	name	other_address	pair	score	addresses
 0x218660	StopSpriteInstance	0X218E80	same	0	ok
 0x218710	func_00218710	0X218F30	identical	0	ok
 0x218738	func_00218738	0X218F58	gap	0	ok
+0x218748	PauseSpriteInstance	0X218F68	same	0	ok
 0x2188B0	RefreshSpriteInstance	0X2190D0	same	0	ok
 0x2190F8	func_002190F8	0X219918	same	0	ok
 0x219348	ClearSpriteKeySlots	0X219B68	same	0	ok
@@ -5113,6 +5116,7 @@ us_address	name	other_address	pair	score	addresses
 0x235388	func_00235388	0X235BC8	same	0	ok
 0x2357B8	func_002357B8	0X235FF8	same	0	ok
 0x235868	func_00235868	0X2360A8	same	0	ok
+0x2358A0	func_002358A0	0X2360E0	identical	0	ok
 0x235B08	func_00235B08	0X236348	same	0	ok
 0x236820	func_00236820	0X237060	identical	0	ok
 0x236878	func_00236878	0X2370B8	same	0	ok
@@ -5201,8 +5205,10 @@ us_address	name	other_address	pair	score	addresses
 0x23B7F8	__divdi3	0X23C1B8	same	0	ok
 0x23BFE0	__floatdidf	0X23C9A0	same	0	ok
 0x23C078	__floatdisf	0X23CA38	same	0	ok
+0x23C158	__moddi3	0X23CB18	same	0	ok
 0x23C820	func_0023C820	0X23D1E0	gap	0	ok
-0x23C828	__udivdi3	0X23D1E8	same	8	ok
+0x23C828	__udivdi3	0X23D1E8	same	0	ok
+0x23CDF8	__umoddi3	0X23D7B8	same	0	ok
 0x23D468	func_0023D468	0X23DE28	identical	0	ok
 0x23D748	__adddf3	0X23E108	same	0	ok
 0x23D7A0	__subdf3	0X23E160	same	0	ok
@@ -5343,6 +5349,7 @@ us_address	name	other_address	pair	score	addresses
 0x24A098	func_0024A098	0X24AAE0	identical	0	ok
 0x24A0C0	func_0024A0C0	0X24AB08	identical	0	ok
 0x24A0E8	func_0024A0E8	0X24AB30	same	0	ok
+0x24A248	__ieee754_log	0X24AC90	same	0	ok
 0x24A738	func_0024A738	0X24B180	identical	0	ok
 0x24A780	func_0024A780	0X24B1C8	identical	0	ok
 0x24A7B0	func_0024A7B0	0X24B1F8	same	0	ok
@@ -5370,11 +5377,13 @@ us_address	name	other_address	pair	score	addresses
 0x24C420	func_0024C420	0X24CE68	same	0	ok
 0x24CD70	func_0024CD70	0X24D7B8	identical	0	ok
 0x24CF40	func_0024CF40	0X24D988	same	0	ok
+0x24D5E8	func_0024D5E8	0X24E030	same	0	ok
 0x24F770	SceMpegDemuxPss	0X2501B8	same	0	ok
 0x24F8C0	func_0024F8C0	0X250308	gap	0	ok
 0x24F8D0	func_0024F8D0	0X250318	same	0	ok
 0x24FA38	func_0024FA38	0X250480	same	0	ok
 0x24FA90	func_0024FA90	0X2504D8	same	0	ok
+0x24FC58	func_0024FC58	0X2506A8	same	0	ok
 0x2505B0	func_002505B0	0X251000	same	0	ok
 0x250A38	func_00250A38	0X251488	same	0	ok
 0x250C58	func_00250C58	0X2516A8	same	0	ok
@@ -5398,6 +5407,7 @@ us_address	name	other_address	pair	score	addresses
 0x2540A0	func_002540A0	0X254AF0	gap	0	ok
 0x254298	func_00254298	0X254CE8	gap	0	ok
 0x2542A8	func_002542A8	0X254CF8	gap	0	ok
+0x2542B8	func_002542B8	0X254D08	same	0	ok
 0x254488	func_00254488	0X254ED8	same	0	ok
 0x2544C0	func_002544C0	0X254F10	gap	0	ok
 0x2544C8	func_002544C8	0X254F18	same	0	ok

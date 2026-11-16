@@ -1,3 +1,4 @@
+// The class declares Virtual0 itself (no inline body): it becomes the key function, so gcc leaves the vtable external instead of emitting its own copy.
 // new() factory of a class with two bases. The primary chain: a base with three words (the first two zeroed) and its
 // vptr at +0xC, then a class holding a CRef at +0x80 (its vptr, retail D_002D9978, is stored before the CRef
 // constructor runs). The second base sits at +0x164 with its vptr at +0x170. The derived class's inline constructor
@@ -15,6 +16,7 @@ struct CRefHolder112100 : CBase112100 {
     char pad[0x70];
     CRef ref;
     char pad2[0xD4];
+    virtual void Virtual0();
 };
 struct CSecondary112100 {
     int unk0x0[3];

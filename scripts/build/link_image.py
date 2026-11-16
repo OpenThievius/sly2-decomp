@@ -215,38 +215,72 @@ def derive_rodata_base(address, object_path):
         bases.add(retail_value - object_value)
     return next(iter(bases)) if len(bases) == 1 else None
 
+retarget_failures = {}  # address -> why retarget_rodata gave up (read for skipped.tsv)
+
+def retarget_failed(address, reason):
+    retarget_failures[address] = reason
+    return None
+
 def retarget_rodata(address, object_path):
-    """For an object whose rodata is string literals the retail keeps in another order (so no single base fits): a copy of the object
-    whose hi/lo immediates are the retail ones, with its own .rodata linked where nothing is loaded (address 0, NOLOAD). Every literal
-    is checked: the string the object holds at the offset must be the string the retail has at the address. None if it does not hold."""
+    """For an object whose rodata the retail keeps in another layout (strings in another order, a constant in the slot before a jump table:
+    no single base fits): a copy of the object whose hi/lo immediates are the retail ones, with its own .rodata linked where nothing is
+    loaded (address 0, NOLOAD). The image keeps retail's rodata bytes there, so what the code reads is checked here and nowhere else:
+    a string literal must equal the string retail has at the address, and any other item (a float, a jump table whose entries are
+    relocations against .text, resolved to this function's address plus the addend) must equal retail's bytes from that address for as far
+    as the object's item runs, up to the next item retail's code addresses. None if one does not hold."""
     with open(object_path, 'rb') as handle:
         elf = ELFFile(handle)
         text = elf.get_section_by_name('.text')
         rodata = elf.get_section_by_name('.rodata')
         symbol_table = elf.get_section_by_name('.symtab')
-        if elf.get_section_by_name('.rel.rodata') is not None:
-            return None
+        relocated_rodata = elf.get_section_by_name('.rel.rodata')
         entries = [(r['r_offset'], r['r_info_type'], symbol_table.get_symbol(r['r_info_sym'])) for r in elf.get_section_by_name('.rel.text').iter_relocations()]
         data, rodata_data, text_offset = text.data(), rodata.data(), text['sh_offset']
         rodata_index = elf.get_section_index('.rodata')
+        text_index = elf.get_section_index('.text')
+        table_entries = [(r['r_offset'], r['r_info_type'], symbol_table.get_symbol(r['r_info_sym'])['st_shndx']) for r in relocated_rodata.iter_relocations()] if relocated_rodata is not None else []
     base = FILE_OFFSET_OF_TEXT + address - TEXT_START
     signed = lambda value: value - 0x10000 if value & 0x8000 else value
     word = lambda offset, blob, origin: int.from_bytes(blob[origin + offset:origin + offset + 4], 'little')
+    resolved_rodata = bytearray(rodata_data)  # a jump table's entries are relocations: the object holds the addend, the image holds function address + addend
+    for entry_offset, entry_kind, entry_section in table_entries:
+        if entry_kind != 2 or entry_section != text_index or entry_offset + 4 > len(rodata_data):
+            return retarget_failed(address, f'the rodata relocation at rodata+{entry_offset:#x} is not a word that points into this function (type {entry_kind})')
+        resolved_rodata[entry_offset:entry_offset + 4] = ((word(entry_offset, rodata_data, 0) + address) & 0xFFFFFFFF).to_bytes(4, 'little')
+    resolved_rodata = bytes(resolved_rodata)
+    references = {}  # offset in the object's rodata -> the address retail's code loads it from
+    printable = lambda blob: len(blob) >= 2 and all(32 <= byte < 127 or byte in (9, 10, 13) for byte in blob)
     cstring = lambda blob, start: blob[start:blob.find(0, start)] if blob.find(0, start) >= 0 else None
+    # trim_rodata cut the section at its last non-zero byte, so the NUL that ends the last literal is gone: the end of the section ends the string
+    own_string = lambda start: rodata_data[start:rodata_data.find(0, start)] if rodata_data.find(0, start) >= 0 else rodata_data[start:]
     patched = bytearray(open(object_path, 'rb').read())
     for index, (offset, kind, symbol) in enumerate(entries):
         if kind != 5 or symbol['st_shndx'] != rodata_index:
             continue
         low = next(((o, k) for o, k, s in entries[index + 1:] if k == 6 and s['st_shndx'] == rodata_index), None)
         if low is None:
-            return None
+            return retarget_failed(address, f'a hi relocation at text+{offset:#x} has no matching lo')
         retail_value = ((word(offset, retail, base) & 0xFFFF) << 16) + signed(word(low[0], retail, base) & 0xFFFF)
         object_value = ((word(offset, data, 0) & 0xFFFF) << 16) + signed(word(low[0], data, 0) & 0xFFFF)
         retail_at = FILE_OFFSET_OF_TEXT + retail_value - TEXT_START
-        if not 0 <= object_value < len(rodata_data) or retail_at < 0 or cstring(rodata_data, object_value) is None or cstring(rodata_data, object_value) != cstring(retail, retail_at):
-            return None
+        if not 0 <= object_value < len(rodata_data) or retail_at < 0:
+            return retarget_failed(address, f'the load at text+{offset:#x} reaches rodata+{object_value:#x}, outside the object\'s {len(rodata_data):#x} bytes')
+        if references.setdefault(object_value, retail_value) != retail_value:
+            return retarget_failed(address, f'rodata+{object_value:#x} is loaded from both {references[object_value]:#x} and {retail_value:#x}')
+        if printable(own_string(object_value)) and own_string(object_value) != cstring(retail, retail_at):
+            return retarget_failed(address, f'the literal at rodata+{object_value:#x} ({rodata_data[object_value:object_value + 16]!r}) is not the string retail has at {retail_value:#x}')
         for at in (offset, low[0]):
             patched[text_offset + at:text_offset + at + 2] = retail[base + at:base + at + 2]
+    object_starts, retail_starts = sorted(references), sorted(references.values())
+    for object_value, retail_value in references.items():
+        if printable(own_string(object_value)):
+            continue  # a string: compared above by its text
+        object_end = next((start for start in object_starts if start > object_value), len(resolved_rodata))
+        retail_end = next((start for start in retail_starts if start > retail_value), None)
+        length = min(object_end - object_value, retail_end - retail_value) if retail_end is not None else object_end - object_value
+        retail_at = FILE_OFFSET_OF_TEXT + retail_value - TEXT_START
+        if length < 4 or resolved_rodata[object_value:object_value + length] != retail[retail_at:retail_at + length]:
+            return retarget_failed(address, f'the item at rodata+{object_value:#x} ({resolved_rodata[object_value:object_value + 8].hex()}) is not what retail has at {retail_value:#x} ({retail[retail_at:retail_at + 8].hex()}) over {length:#x} bytes')
     path = os.path.join(BUILD, 'retargeted', os.path.relpath(object_path, UNITS).replace(os.sep, '_'))
     os.makedirs(os.path.dirname(path), exist_ok=True)
     open(path, 'wb').write(patched)
@@ -287,6 +321,7 @@ def derive_addresses(address, object_path, names):
     return {name: next(iter(values)) for name, values in found.items() if len(values) == 1}
 
 candidates = {}
+skipped = {}  # address -> why a matched function never became a candidate (written to skipped.tsv, read by check_unit.py)
 manifest_addresses = set()
 retargeted = set()  # addresses whose object keeps its rodata out of the image (retarget_rodata)  # address -> (object path, undefined names)
 for line in list(open(os.path.join('src', 'MANIFEST.tsv')))[1:]:
@@ -296,7 +331,11 @@ for line in list(open(os.path.join('src', 'MANIFEST.tsv')))[1:]:
     if whole_file:  # its whole file is its only source: no object of its own
         continue
     object_path = os.path.join(UNITS, file + '.o')
-    if address not in by_address or not os.path.isfile(object_path):
+    if address not in by_address:
+        skipped[address] = (name, 'not in the function registry')
+        continue
+    if not os.path.isfile(object_path):
+        skipped[address] = (name, f'no object: {os.path.relpath(object_path)} did not compile')
         continue
     function = by_address[address]
     found = inspect(object_path)
@@ -306,6 +345,7 @@ for line in list(open(os.path.join('src', 'MANIFEST.tsv')))[1:]:
         object_path = trim_object(object_path, start, int(size), keep)
         found = inspect(object_path)
     if found is None or found[0] > function['end'] - address:
+        skipped[address] = (name, 'object unreadable' if found is None else f"object code {found[0]:#x} bytes is larger than the function's {function['end'] - address:#x}")
         continue
     rodata_base = None
     if found[2]:
@@ -315,10 +355,12 @@ for line in list(open(os.path.join('src', 'MANIFEST.tsv')))[1:]:
         if rodata_base is None:
             object_path = retarget_rodata(address, object_path)
             if object_path is None:
+                skipped[address] = (name, 'rodata: the hi/lo pairs disagree on a base and retarget_rodata gave up: ' + retarget_failures.get(address, 'no reason recorded'))
                 continue
             retargeted.add(address)
             found = (found[0], found[1], 0)
         elif not RODATA_START <= rodata_base < RODATA_END:
+            skipped[address] = (name, f'rodata base {rodata_base:#x} lies outside the rodata range')
             continue
     candidates[address] = (object_path, found[1], found[2], rodata_base)
 # two functions can share a string (the later one's literal is the tail of the earlier one's): their rodata holes overlap, so the later
@@ -331,6 +373,7 @@ for address in sorted(candidates, key=lambda a: candidates[a][3] or 0):
     if any(base < end and start < base + size for start, end in holes_taken):
         retargeted_path = retarget_rodata(address, object_path)
         if retargeted_path is None:
+            skipped[address] = (by_address[address]['name'], 'rodata overlaps another object and retarget_rodata gave up: ' + retarget_failures.get(address, 'no reason recorded'))
             del candidates[address]
             continue
         retargeted.add(address)
@@ -338,6 +381,8 @@ for address in sorted(candidates, key=lambda a: candidates[a][3] or 0):
     else:
         holes_taken.append((base, base + size))
 print(f'{len(candidates)} of {len(functions)} functions have a usable object', flush=True)
+with open(os.path.join(BUILD, 'skipped.tsv'), 'w') as handle:
+    handle.write(''.join(f'{address:#X}\t{name}\t{reason}\n' for address, (name, reason) in sorted(skipped.items())))
 
 # whole files (config/us/whole_files.tsv): one object per retail file, its unmatched functions included from Splat's assembly (INCLUDE_ASM).
 # It is linked at the file's start and takes the whole range: neither the per-function objects nor the assembly of its functions are linked.
