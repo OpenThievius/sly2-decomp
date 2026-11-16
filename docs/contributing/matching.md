@@ -109,7 +109,10 @@ Each one below was re-checked here on a small control compiled with `compile_uni
   zero-denominator branch scored 8 (first mismatch +0x3ec); the previous order scored 0. `make unit` did not flag it, because `link_image.py` held the function back from
   `build/image/seed.json` (see "Held-back functions" below).
 - **Held-back functions (2026-11-16).** `link_image.py` seeds from the last run and does not retest a function it held back for a difference; `make unit` then keeps
-  saying "from assembly" after the source is fixed. Run `.venv/bin/python scripts/build/link_image.py --fresh` after repairing one (it reads `build/image/seed.json`).
+  saying "from assembly" after the source is fixed. Run `.venv/bin/python scripts/build/link_image.py --fresh` after repairing one (it reads `build/image/seed.json`). `make elf` rebuilds the unit objects first; `link_image.py` alone does not.
+  A matched function that never became a link candidate (no object, a vtable or jump table of its own, rodata that cannot be placed) is in `build/image/skipped.tsv` with
+  the reason, and `make unit` prints it. A string literal the scorer masks can still be wrong: `snd_GotReturns__Fv` scored 0 with `"...from the \n"` where retail has
+  `"...from the IOP!\n"`, and only the rodata comparison of the link saw it.
 
 Not reproduced here (no change in the control): `__builtin_fabsf(x)` against `x < 0 ? -x : x` (both give `abs.s` with `-ffast-math`), and a store through
 `*(int *)((char *)o + 0x708)` against a member store (same code for three stores). They may matter in a larger function; don't start with them.
