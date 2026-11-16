@@ -942,7 +942,193 @@ s32 PsfxEnsureExpls(PSFX *psfx) {
 }
 }
 
-INCLUDE_ASM(0X15C690);
+struct LM_15C690 { float gMin; float gMax; };
+
+struct VU_FLOAT { QW m_q; VU_FLOAT(float g); };
+
+struct VU_VECTOR { QW m_q; VU_VECTOR(const VECTOR &vector); };
+
+VU_VECTOR operator*(VU_FLOAT vuf, VU_VECTOR vuv);
+
+float GLimitLm(LM_15C690 *plm, float g);
+
+extern "C" float GRandInRange(float gLow, float gHigh);
+
+extern "C" VECTOR *__as__6VECTORG9VU_VECTOR(VECTOR *pvector, VU_VECTOR vuv);
+
+extern "C" QW ConvertAloPos(void *paloFrom, void *paloTo, QW pos);
+
+/* a position and the 3x3 rotation after it: EXPLSO::pxfr, EMITB::pxfr */
+struct M3 { QW row[3]; };
+
+struct XFR { QW pos; M3 mat; };
+
+/* the object an emitter follows: its +0xF4 points at a position (case 2 of EMITB::emitk) */
+struct EMITOBJ { char pad[0xF4]; QW *ppos; };
+
+struct EMITO_15C690 { void *palo; EMITOBJ *pobj; int unknown8; int unknownC; int unknown10; };
+
+struct EMITB_15C690 {
+    int cref;
+    int pk;
+    EMITO_15C690 *pemito;
+    int unknownC;
+    int emitk;
+    int unknown14[2];
+    XFR *pxfr;
+    int unknown20[4];
+    union { QW pos; QW *apos; char *pb; };
+    QW vec;
+    LM_15C690 lmSpeed;
+    char unknown58[0xD8 - 0x58];
+    float gD8;
+    float gDC;
+    VECTOR vecE0;
+    QW unknownF0;
+};
+
+struct EMITG_15C690 { void **ppblipg; void **ppripg; void *plo; };
+
+struct AMB;
+
+struct AMBDESC { int sfx; LM_15C690 lmRange; float uVolume; float uPitch; };
+
+struct EXPLS {
+    char pad[0xE4];
+    EMITB_15C690 *pemitb;
+    char padE8[0xF0 - 0xE8];
+    AMBDESC *pambdesc;
+    LM_15C690 lmcParticle;
+    int fEmitg;
+    void *pripg;
+    void *pblipg;
+};
+
+struct EXPLSO {
+    unsigned int grf;
+    void *palo;
+    float g;
+    float uPercent;
+    QW vec;
+    QW pos;
+    int unknown30;
+    XFR *pxfr;
+    int cparticle;
+};
+
+extern LM_15C690 D_002BDEC0;
+
+extern "C" AMB *NewEmitter(int sfx);
+
+extern "C" void SetEmitterUnpositioned(AMB *pamb, void *palo);
+
+extern "C" void SetAmbPos(AMB *pamb, QW pos);
+
+extern "C" void SetAmbRange(AMB *pamb, float lmMin, float lmMax);
+
+extern "C" void SetAmbVolume(AMB *pamb, float uVolume);
+
+extern "C" void SetAmbPitch(AMB *pamb, float uPitch);
+
+void EmitParticles(int cparticle, EMITB_15C690 *pemitb, EMITG_15C690 *pemitg);
+
+static inline float GMax(float a, float b) { return a >? b; }
+
+void FireExplsExplso(EXPLS *pexpls, EXPLSO *pexplso)
+{
+    EMITO_15C690 emito = *pexpls->pemitb->pemito;
+    EMITB_15C690 emitb = *pexpls->pemitb;
+    EMITG_15C690 emitg;
+    EMITG_15C690 *pemitg;
+    VU_SCALE pos;
+    VU_SCALE half;
+    emitb.pemito = &emito;
+    int cparticle;
+    if (pexplso->grf & 0x80)
+        cparticle = pexplso->cparticle;
+    else
+        cparticle = (int)GRandInRange(pexpls->lmcParticle.gMin, pexpls->lmcParticle.gMax);
+    if (pexplso->grf & 1)
+        emito.palo = pexplso->palo;
+    if (pexplso->grf & 2)
+        emitb.vec = pexplso->vec;
+    if (pexplso->grf & 4) {
+        emitb.pos = pexplso->pos;
+        emitb.emitk = 0;
+    } else if (pexplso->grf & 0x40) {
+        emitb.pxfr = pexplso->pxfr;
+    }
+    if ((pexplso->grf & 8) && emitb.pk == 0) {
+        float g;
+        if (pexplso->g == 0.0f)
+            g = pexplso->uPercent * 0.01f;
+        else
+            g = pexplso->g;
+        if (g < 1.0f)
+            cparticle = (int)(cparticle * g);
+        else
+            cparticle = (int)(cparticle / g);
+        int cparticleMin = (int)pexpls->lmcParticle.gMax / 2;
+        if (cparticleMin >= cparticle)
+            cparticle = cparticleMin;
+        float gSpeed = GLimitLm(&D_002BDEC0, g);
+        emitb.lmSpeed.gMin = emitb.lmSpeed.gMin * gSpeed;
+        emitb.lmSpeed.gMax = emitb.lmSpeed.gMax * gSpeed;
+        g = GMax(0.5f, g);
+        __as__6VECTORG9VU_VECTOR(&emitb.vecE0, VU_FLOAT(g) * VU_VECTOR(emitb.vecE0));
+    }
+    if (emitb.pk == 1) {
+        if (pexplso->grf & 0x10)
+            emitb.gDC = emitb.gD8 = pexplso->g;
+        if (pexplso->grf & 0x20)
+            emitb.pemito->unknown10 = pexplso->unknown30;
+    }
+    if (pexpls->fEmitg) {
+        emitg.ppblipg = &pexpls->pblipg;
+        emitg.ppripg = &pexpls->pripg;
+        emitg.plo = pexpls;
+        pemitg = &emitg;
+    } else {
+        pemitg = 0;
+    }
+    if (emito.palo == 0 && emitb.emitk != 2 && !(pexplso->grf & 0x48))
+        emito.palo = pexpls;
+    EmitParticles(cparticle, &emitb, pemitg);
+    if (pexpls->pambdesc) {
+        switch (emitb.emitk) {
+        case 0:
+            pos.q = emitb.pos;
+            break;
+        case 1:
+            half.q = VectorFromFloat(0.5f);
+            {
+                QW *apos = emitb.apos;
+                QW posB = apos[1];
+                QW posA = apos[0];
+                pos.q = BlendX(half.q, posA, half.q, posB);
+            }
+            break;
+        case 2:
+            pos.q = *emitb.pemito->pobj->ppos;
+            break;
+        case 3:
+            pos.q = emitb.apos[2];
+            break;
+        }
+        XFR *pxfr = emitb.pxfr;
+        if (pxfr) {
+            M3 *pmat = &pxfr->mat;
+            pos.q = VectorAdd(TransformVector(pos.q, pmat->row[0], pmat->row[1], pmat->row[2]), pxfr->pos);
+        }
+        pos.q = ConvertAloPos(emito.palo, 0, pos.q);
+        AMB *pamb = NewEmitter(pexpls->pambdesc->sfx);
+        SetEmitterUnpositioned(pamb, 0);
+        SetAmbPos(pamb, pos.q);
+        SetAmbRange(pamb, pexpls->pambdesc->lmRange.gMin, pexpls->pambdesc->lmRange.gMax);
+        SetAmbVolume(pamb, pexpls->pambdesc->uVolume);
+        SetAmbPitch(pamb, pexpls->pambdesc->uPitch);
+    }
+}
 
 INCLUDE_ASM(0X15CAD8);
 

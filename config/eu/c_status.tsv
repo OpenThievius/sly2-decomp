@@ -2050,6 +2050,7 @@ us_address	name	other_address	pair	score	addresses
 0x15C5C8	HandleExplsMessage	0X15C5F0	identical	0	ok
 0x15C628	ExplodeExplsExplso	0X15C650	identical	0	ok
 0x15C650	PsfxEnsureExpls	0X15C678	same	0	ok
+0x15C690	FireExplsExplso__FP5EXPLSP6EXPLSO	0X15C6B8	same	0	ok
 0x15CD48	func_0015CD48	0X15CD70	same	0	ok
 0x15CD68	InitEpsel	0X15CD90	same	0	ok
 0x15CDA8	PostEpselLoad	0X15CDD0	same	0	ok

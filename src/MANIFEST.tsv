@@ -2050,6 +2050,7 @@ address	name	size	file	whole_file	symbol
 0X15C5C8	HandleExplsMessage	92	dzg-emitter/InitEmitb_file.cpp	dzg-emitter/InitEmitb_file.cpp	HandleExplsMessage
 0X15C628	ExplodeExplsExplso	40	dzg-emitter/InitEmitb_file.cpp	dzg-emitter/InitEmitb_file.cpp	ExplodeExplsExplso
 0X15C650	PsfxEnsureExpls	60	dzg-emitter/InitEmitb_file.cpp	dzg-emitter/InitEmitb_file.cpp	PsfxEnsureExpls
+0X15C690	FireExplsExplso__FP5EXPLSP6EXPLSO	1092	dzg-emitter/InitEmitb_file.cpp	dzg-emitter/InitEmitb_file.cpp	FireExplsExplso
 0X15CD48	func_0015CD48	32	dzg-emitter/InitEmitb_file.cpp	dzg-emitter/InitEmitb_file.cpp	func_0015CD48
 0X15CD68	InitEpsel	64	emitter-font/InitEpsel.cpp		
 0X15CDA8	PostEpselLoad	392	emitter-font/PostEpselLoad.cpp		
