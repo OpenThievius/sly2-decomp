@@ -1,7 +1,5 @@
 address	name	size	file	score
 0X100008	func_00100008	528	new_100008/fun_00100008.c	132
-0X1110D8	func_001110D8	96	new_100008/fun_001110d8.cpp	0
-0X112100	func_00112100	96	new_100008/fun_00112100.cpp	0
 0X116EA8	func_00116EA8	48	memory-bez/fun_00116ea8.cpp	11
 0X117120	EvaluateBezierPos__FfffP6VECTORN63	488	bez/EvaluateBezierPos__FfffP6VECTORN63.c	120
 0X1179F0	Decompress__18CBinaryInputStream	472	bis/Decompress__18CBinaryInputStream.cpp	67
@@ -112,7 +110,6 @@ address	name	size	file	score
 0X149C80	UpdateSwCallbacks	560	button-cd/UpdateSwCallbacks.cpp	28
 0X14A2A0	func_0014A2A0	472	button-cd/fun_0014a2a0.cpp	55
 0X14A4D0	func_0014A4D0	1376	button-cd/fun_0014a4d0.c	383
-0X14AE38	func_0014AE38	872	button-cd/fun_0014ae38.cpp	0
 0X14B7F8	CpchzTokenizePath__FPc	448	cd/CpchzTokenizePath__FPc.cpp	57
 0X14C748	ClsgClipEdgeToSphere__FP6VECTORfT0T0iP3LSG	688	clip/ClsgClipEdgeToSphere__FP6VECTORfT0T0iP3LSG.c	169
 0X14C9F8	ClsgMergeAlsg	600	clip/ClsgMergeAlsg.cpp	74
@@ -200,7 +197,6 @@ address	name	size	file	score
 0X173A68	func_00173A68	688	new_1715f0/fun_00173a68.c	163
 0X173D18	func_00173D18	352	new_1715f0/fun_00173d18.cpp	2
 0X1758A0	PsenseFindNotice	1120	new_1715f0/PsenseFindNotice.cpp	18
-0X176458	GoalNotice_SetState	640	new_1715f0/GoalNotice_SetState.cpp	0
 0X176BE8	GoalBrain_FHandleMessage	2608	new_1715f0/GoalBrain_FHandleMessage.cpp	94
 0X177F78	GoalFollowCrv_Steer	2688	new_1715f0/GoalFollowCrv_Steer.c	638
 0X178D00	GoalFollowCrv_FAtEnd	128	new_1715f0/GoalFollowCrv_FAtEnd.c	20
@@ -395,7 +391,6 @@ address	name	size	file	score
 0X1C4AF8	func_001C4AF8	224	new_1c3df8/fun_001c4af8.c	47
 0X1C5148	ProjectDprizeTransform	1064	new_1c3df8/ProjectDprizeTransform.c	246
 0X1C5B20	func_001C5B20	504	new_1c3df8/fun_001c5b20.c	120
-0X1C60B8	SetDprizeDprizes	592	new_1c3df8/SetDprizeDprizes.cpp	0
 0X1C6DE8	func_001C6DE8	496	new_1c3df8/fun_001c6de8.c	132
 0X1C6FD8	CpdprizeAttractSwDprizes	1648	new_1c3df8/CpdprizeAttractSwDprizes.c	449
 0X1C7C30	SetClueFound	208	new_1c76d0/SetClueFound.cpp	7
@@ -606,7 +601,6 @@ address	name	size	file	score
 0X231468	GetXfmVelocity	104	lo-sdk/GetXfmVelocity.c	20
 0X2314D0	GetXfmAngularVelocity	128	lo-sdk/GetXfmAngularVelocity.c	31
 0X2319E8	snd_StartSoundSystem	608	sdk/snd_StartSoundSystem.cpp	121
-0X231E90	snd_GotReturns__Fv	168	sdk/snd_GotReturns__Fv.cpp	0
 0X232380	func_00232380	40	sdk/fun_00232380.cpp	9
 0X2324C8	func_002324C8	56	sdk/fun_002324c8.cpp	13
 0X2325A8	func_002325A8	56	sdk/fun_002325a8.cpp	13
@@ -641,7 +635,6 @@ address	name	size	file	score
 0X23AE70	func_0023AE70	312	sdk/fun_0023ae70.cpp	42
 0X23BEE8	__fixunsdfdi	240	sdk/__fixunsdfdi.cpp	21
 0X23C7C0	__muldi3	96	sdk/__muldi3.c	17
-0X23C828	__udivdi3	1488	sdk/__udivdi3.c	0
 0X23D338	func_0023D338	304	sdk/fun_0023d338.cpp	73
 0X23D508	func_0023D508	576	sdk/fun_0023d508.cpp	27
 0X23DAB0	func_0023DAB0	360	sdk/fun_0023dab0.c	66
@@ -664,7 +657,6 @@ address	name	size	file	score
 0X241F98	func_00241F98	344	sdk/fun_00241f98.cpp	60
 0X2420F0	sceCdInit	744	sdk/sceCdInit.cpp	139
 0X2423D8	sceCdDiskReady	536	sdk/sceCdDiskReady.c	64
-0X2425F0	func_002425F0	544	sdk/fun_002425f0.cpp	0
 0X242840	sceCdRead	480	sdk/sceCdRead.c	44
 0X242F70	func_00242F70	280	sdk/fun_00242f70.cpp	42
 0X243088	scePadPortOpen	488	sdk/scePadPortOpen.cpp	31
