@@ -1,7 +1,10 @@
-int func_002358A0(unsigned long bits)
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Double bits to a rounded integer clamped to 9999; the low word is sign-extended through a 32.32 shift pair.
+long func_002358A0(unsigned long bits)
 {
     unsigned long mantissa;
     long exponent;
+    long fixed;
     mantissa = bits;
     exponent = (mantissa << 1) >> 53;
     exponent -= 0x433;
@@ -21,8 +24,10 @@ int func_002358A0(unsigned long bits)
         } else {
             mantissa >>= 2;
         }
+        fixed = mantissa << 32;
     } else {
         mantissa <<= (int)exponent;
+        fixed = mantissa << 32;
     }
-    return mantissa;
+    return fixed >> 32;
 }

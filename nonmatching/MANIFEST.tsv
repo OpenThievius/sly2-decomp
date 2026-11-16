@@ -619,7 +619,6 @@ address	name	size	file	score
 0X233828	func_00233828	152	sdk/fun_00233828.cpp	19
 0X2355E0	func_002355E0	376	sdk/fun_002355e0.c	71
 0X235780	func_00235780	56	sdk/fun_00235780.c	6
-0X2358A0	func_002358A0	144	sdk/fun_002358a0.c	2
 0X235930	func_00235930	472	sdk/fun_00235930.cpp	99
 0X236A60	sceSifInitRpc	416	sdk/sceSifInitRpc.c	26
 0X236D60	func_00236D60	208	sdk/fun_00236d60.cpp	32
@@ -644,10 +643,8 @@ address	name	size	file	score
 0X23ADA8	func_0023ADA8	120	sdk/fun_0023ada8.cpp	11
 0X23AE70	func_0023AE70	312	sdk/fun_0023ae70.cpp	42
 0X23BEE8	__fixunsdfdi	240	sdk/__fixunsdfdi.cpp	21
-0X23C158	__moddi3	1640	sdk/__moddi3.c	7
 0X23C7C0	__muldi3	96	sdk/__muldi3.c	17
 0X23C828	__udivdi3	1488	sdk/__udivdi3.c	8
-0X23CDF8	__umoddi3	1344	sdk/__umoddi3.c	4
 0X23D338	func_0023D338	304	sdk/fun_0023d338.cpp	73
 0X23D508	func_0023D508	576	sdk/fun_0023d508.cpp	27
 0X23DAB0	func_0023DAB0	360	sdk/fun_0023dab0.c	66
@@ -680,7 +677,6 @@ address	name	size	file	score
 0X246178	__ieee754_log10	392	sdk/__ieee754_log10.cpp	67
 0X247028	__ieee754_sqrt	776	sdk/__ieee754_sqrt.cpp	226
 0X249CE0	rint	512	sdk/rint.cpp	31
-0X24A248	__ieee754_log	1264	sdk/__ieee754_log.cpp	350
 0X24AE90	func_0024AE90	696	sdk/fun_0024ae90.cpp	95
 0X24B480	sceMpegInit	176	sdk/sceMpegInit.c	2
 0X24B628	sceMpegAddCallback	56	sdk/sceMpegAddCallback.cpp	8
@@ -691,10 +687,8 @@ address	name	size	file	score
 0X24BC80	func_0024BC80	704	sdk/fun_0024bc80.cpp	99
 0X24C4B0	func_0024C4B0	448	sdk/fun_0024c4b0.cpp	109
 0X24C670	func_0024C670	1240	sdk/fun_0024c670.cpp	12
-0X24D5E8	func_0024D5E8	7592	sdk/fun_0024d5e8.cpp	3469
 0X24F970	func_0024F970	200	sdk/fun_0024f970.cpp	13
 0X24FAD0	func_0024FAD0	392	sdk/fun_0024fad0.cpp	111
-0X24FC58	func_0024FC58	1800	sdk/fun_0024fc58.cpp	49
 0X250360	func_00250360	592	sdk/fun_00250360.cpp	139
 0X2515F0	func_002515F0	416	sdk/fun_002515f0.c	95
 0X251CE8	func_00251CE8	376	sdk/fun_00251ce8.cpp	61
@@ -703,7 +697,6 @@ address	name	size	file	score
 0X2539D0	func_002539D0	688	sdk/fun_002539d0.c	33
 0X253E68	func_00253E68	320	sdk/fun_00253e68.c	2
 0X2540B0	func_002540B0	488	sdk/fun_002540b0.cpp	6
-0X2542B8	func_002542B8	464	sdk/fun_002542b8.c	1
 0X254CA0	InitIpu	568	sdk/InitIpu.c	30
 0X254EF0	func_00254EF0	16	sdk/fun_00254ef0.cpp	6
 0X256AF0	func_00256AF0	88	sdk/fun_00256af0.cpp	7

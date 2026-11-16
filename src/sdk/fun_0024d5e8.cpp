@@ -1,9 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 /* libmpeg: reads one MPEG-2 program-stream PES packet header from the demuxer's bit reader */
+#include "types.h"
+
 extern "C" {
-typedef unsigned int u32;
-typedef unsigned long u64;
-typedef unsigned char u8;
 
 /* the demuxer's bit reader over a ring buffer */
 struct BitReader {
@@ -22,8 +21,8 @@ struct PacketHeader {
     /* 0x00 */ u64 streamId;     /* the stream id in the high word, a private stream's sub-id in the low word */
     /* 0x08 */ int length;
     /* 0x0C */ int scrambling;
-    /* 0x10 */ long pts;
-    /* 0x18 */ long dts;
+    /* 0x10 */ s64 pts;
+    /* 0x18 */ s64 dts;
     /* 0x20 */ int payloadPosition;
     /* 0x24 */ int payloadLength;
     /* 0x28 */ int headerPosition;
@@ -56,16 +55,16 @@ static inline void SkipBytes(BitReader *reader, int count)
     u64 position = count * 8 + reader->position;
     reader->buffer = 0;
     reader->bitCount = 0;
-    reader->next = reader->base + (int)(position >> 3);
     reader->position = position;
+    reader->next = reader->base + (int)(position >> 3);
     if (reader->next >= reader->ringEnd)
         reader->next -= reader->ringSize;
     FlushBits(reader, 0);
 }
 
-static inline long ReadTimestamp(BitReader *reader)
+static inline s64 ReadTimestamp(BitReader *reader)
 {
-    u32 high, middle, low;
+    u32 high, middle, low, bottom;
     FlushBits(reader, 4);
     high = GetBits(reader, 3);
     FlushBits(reader, 1);
@@ -73,7 +72,8 @@ static inline long ReadTimestamp(BitReader *reader)
     FlushBits(reader, 1);
     low = GetBits(reader, 15);
     FlushBits(reader, 1);
-    return ((u64)(high >> 2) << 32) | (u32)((high << 30) | (middle << 15) | low);
+    bottom = (high << 30) | (middle << 15) | low;
+    return ((u64)(high >> 2) << 32) | bottom;
 }
 
 int func_0024D5E8(void *context, BitReader *reader, PacketHeader *header)

@@ -5113,6 +5113,7 @@ address	name	size	file	whole_file	symbol
 0X235388	func_00235388	236	sdk/fun_00235388.cpp		
 0X2357B8	func_002357B8	176	sdk/fun_002357b8.c		
 0X235868	func_00235868	52	sdk/fun_00235868.c		
+0X2358A0	func_002358A0	144	sdk/fun_002358a0.c		
 0X235B08	func_00235B08	3348	sdk/fun_00235b08.c		
 0X236820	func_00236820	88	unsorted/fun_00236820.c		
 0X236878	func_00236878	40	sdk/fun_00236878.cpp		
@@ -5201,8 +5202,10 @@ address	name	size	file	whole_file	symbol
 0X23B7F8	__divdi3	1772	sdk/__divdi3.c		
 0X23BFE0	__floatdidf	152	sdk/__floatdidf.cpp		
 0X23C078	__floatdisf	224	sdk/__floatdisf.cpp		
+0X23C158	__moddi3	1640	sdk/__moddi3.c		
 0X23C820	func_0023C820	8	sdk/fun_0023c820.c		
 0X23C828	__udivdi3	1488	sdk/__udivdi3.c		
+0X23CDF8	__umoddi3	1344	sdk/__umoddi3.c		
 0X23D468	func_0023D468	156	sdk/fun_0023d468.c		
 0X23D748	__adddf3	88	sdk/__adddf3.cpp		
 0X23D7A0	__subdf3	100	sdk/__subdf3.cpp		
@@ -5343,6 +5346,7 @@ address	name	size	file	whole_file	symbol
 0X24A098	func_0024A098	36	sdk/fun_0024a098.c		
 0X24A0C0	func_0024A0C0	36	sdk/fun_0024a0c0.c		
 0X24A0E8	func_0024A0E8	352	sdk/fun_0024a0e8.c		
+0X24A248	__ieee754_log	1264	sdk/__ieee754_log.cpp		
 0X24A738	func_0024A738	68	sdk/fun_0024a738.cpp		
 0X24A780	func_0024A780	48	sdk/fun_0024a780.cpp		
 0X24A7B0	func_0024A7B0	112	sdk/fun_0024a7b0.cpp		
@@ -5370,11 +5374,13 @@ address	name	size	file	whole_file	symbol
 0X24C420	func_0024C420	144	sdk/fun_0024c420.cpp		
 0X24CD70	func_0024CD70	464	sdk/fun_0024cd70.c		
 0X24CF40	func_0024CF40	1704	sdk/fun_0024cf40.cpp		
+0X24D5E8	func_0024D5E8	7592	sdk/fun_0024d5e8.cpp		
 0X24F770	SceMpegDemuxPss	32	sdk/SceMpegDemuxPss.cpp		
 0X24F8C0	func_0024F8C0	16	sdk/fun_0024f8c0.c		
 0X24F8D0	func_0024F8D0	160	sdk/fun_0024f8d0.cpp		
 0X24FA38	func_0024FA38	84	sdk/fun_0024fa38.cpp		
 0X24FA90	func_0024FA90	64	sdk/fun_0024fa90.cpp		
+0X24FC58	func_0024FC58	1796	sdk/fun_0024fc58.cpp		
 0X2505B0	func_002505B0	1160	sdk/fun_002505b0.cpp		
 0X250A38	func_00250A38	540	sdk/fun_00250a38.c		
 0X250C58	func_00250C58	576	sdk/fun_00250c58.cpp		
@@ -5398,6 +5404,7 @@ address	name	size	file	whole_file	symbol
 0X2540A0	func_002540A0	12	unsorted/fun_002540a0.c		
 0X254298	func_00254298	12	unsorted/fun_00254298.c		
 0X2542A8	func_002542A8	12	unsorted/fun_002542a8.c		
+0X2542B8	func_002542B8	464	sdk/fun_002542b8.c		
 0X254488	func_00254488	52	sdk/fun_00254488.c		
 0X2544C0	func_002544C0	8	sdk/fun_002544c0.c		
 0X2544C8	func_002544C8	340	sdk/fun_002544c8.c		
