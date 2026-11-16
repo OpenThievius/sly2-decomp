@@ -988,6 +988,7 @@ us_address	name	other_address	pair	score	addresses
 0x1204B8	RefOpLE	0X1204B8	identical	0	ok
 0x1204E8	RefOpG__FiP4CRefP6CFrame	0X1204E8	identical	0	ok
 0x120518	RefOpGE__FiP4CRefP6CFrame	0X120518	identical	0	ok
+0x120548	bevy_splice_bif_ref_op_eqv	0X120548	same	0	ok
 0x1205B8	bevy_splice_bif_ref_equal	0X1205B8	same	0	ok
 0x1207F0	RefOpEqual__FiP4CRefP6CFrame	0X1207F0	identical	0	ok
 0x120820	func_00120820	0X120820	identical	0	ok
@@ -2344,6 +2345,7 @@ us_address	name	other_address	pair	score	addresses
 0x173318	func_00173318	0X1732A0	identical	0	ok
 0x173358	func_00173358	0X1732E0	identical	0	ok
 0x173398	func_00173398	0X173320	identical	0	ok
+0x1733C8	AddSpawnerOffset	0X173350	identical	0	ok
 0x1733F8	func_001733F8	0X173380	same	0	ok
 0x173928	func_00173928	0X1738B0	same	0	ok
 0x173A18	PosSpawnerFocus	0X1739A0	same	0	ok
@@ -4792,6 +4794,7 @@ us_address	name	other_address	pair	score	addresses
 0x218660	StopSpriteInstance	0X218E80	same	0	ok
 0x218710	func_00218710	0X218F30	identical	0	ok
 0x218738	func_00218738	0X218F58	gap	0	ok
+0x218748	PauseSpriteInstance	0X218F68	same	0	ok
 0x2188B0	RefreshSpriteInstance	0X2190D0	same	0	ok
 0x2190F8	func_002190F8	0X219918	same	0	ok
 0x219348	ClearSpriteKeySlots	0X219B68	same	0	ok
@@ -5204,7 +5207,7 @@ us_address	name	other_address	pair	score	addresses
 0x23C078	__floatdisf	0X23CA38	same	0	ok
 0x23C158	__moddi3	0X23CB18	same	0	ok
 0x23C820	func_0023C820	0X23D1E0	gap	0	ok
-0x23C828	__udivdi3	0X23D1E8	same	8	ok
+0x23C828	__udivdi3	0X23D1E8	same	0	ok
 0x23CDF8	__umoddi3	0X23D7B8	same	0	ok
 0x23D468	func_0023D468	0X23DE28	identical	0	ok
 0x23D748	__adddf3	0X23E108	same	0	ok

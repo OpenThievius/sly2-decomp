@@ -988,6 +988,7 @@ address	name	size	file	whole_file	symbol
 0X1204B8	RefOpLE	48	util-splice-bif/RefOpLE.cpp		
 0X1204E8	RefOpG__FiP4CRefP6CFrame	48	splice-bif/RefOpG__FiP4CRefP6CFrame.cpp		
 0X120518	RefOpGE__FiP4CRefP6CFrame	48	splice-bif/RefOpGE__FiP4CRefP6CFrame.cpp		
+0X120548	bevy_splice_bif_ref_op_eqv	108	splice-bif/bevy_splice_bif_ref_op_eqv.cpp		
 0X1205B8	bevy_splice_bif_ref_equal	564	splice-bif/bevy_splice_bif_ref_equal.cpp		
 0X1207F0	RefOpEqual__FiP4CRefP6CFrame	48	splice-bif/RefOpEqual__FiP4CRefP6CFrame.cpp		
 0X120820	func_00120820	32	unsorted/fun_00120820.cpp		
@@ -2344,6 +2345,7 @@ address	name	size	file	whole_file	symbol
 0X173318	func_00173318	64	unsorted/fun_00173318.c		
 0X173358	func_00173358	64	unsorted/fun_00173358.c		
 0X173398	func_00173398	48	unsorted/fun_00173398.cpp		
+0X1733C8	AddSpawnerOffset	48	new_1715f0/AddSpawnerOffset.cpp		
 0X1733F8	func_001733F8	396	new_1715f0/fun_001733f8.cpp		
 0X173928	func_00173928	240	new_1715f0/fun_00173928.cpp		
 0X173A18	PosSpawnerFocus	80	new_1715f0/PosSpawnerFocus.cpp		
@@ -4792,6 +4794,7 @@ address	name	size	file	whole_file	symbol
 0X218660	StopSpriteInstance	172	font-break/StopSpriteInstance.cpp		
 0X218710	func_00218710	40	font-break/fun_00218710.cpp		
 0X218738	func_00218738	12	font-break/fun_00218738.c		
+0X218748	PauseSpriteInstance	72	font-break/PauseSpriteInstance.cpp		
 0X2188B0	RefreshSpriteInstance	2120	font-break/RefreshSpriteInstance.cpp		
 0X2190F8	func_002190F8	152	font-break/fun_002190f8.cpp		
 0X219348	ClearSpriteKeySlots	184	font-break/ClearSpriteKeySlots.cpp		

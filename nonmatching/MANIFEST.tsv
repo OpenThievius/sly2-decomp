@@ -35,7 +35,6 @@ address	name	size	file	score
 0X11F440	RefOpAdd	656	util-splice-bif/RefOpAdd.c	160
 0X11F6D0	RefOpSub	656	util-splice-bif/RefOpSub.c	160
 0X11F960	RefOpMult	1384	util-splice-bif/RefOpMult.cpp	30
-0X120548	bevy_splice_bif_ref_op_eqv	112	splice-bif/bevy_splice_bif_ref_op_eqv.cpp	6
 0X120FB0	bevy_splice_bif_bif41_shuffle	840	splice-bif_120f80/bevy_splice_bif_bif41_shuffle.cpp	90
 0X121710	RefOpMap	552	splice-bif_120f80/RefOpMap.cpp	4
 0X121938	RefOpFilter	744	splice-bif_120f80/RefOpFilter.cpp	27
@@ -196,7 +195,6 @@ address	name	size	file	score
 0X172018	UpdateSearchBeh	776	new_1715f0/UpdateSearchBeh.cpp	18
 0X172658	func_00172658	264	new_1715f0/fun_00172658.c	52
 0X172798	FAddSearchCand	240	new_1715f0/FAddSearchCand.cpp	2
-0X1733C8	AddSpawnerOffset	48	new_1715f0/AddSpawnerOffset.cpp	6
 0X173588	FInScreenBox	136	new_1715f0/FInScreenBox.c	32
 0X173768	func_00173768	448	new_1715f0/fun_00173768.c	117
 0X173A68	func_00173A68	688	new_1715f0/fun_00173a68.c	163
@@ -558,7 +556,6 @@ address	name	size	file	score
 0X217058	EmitGlyphDma	576	font-break/EmitGlyphDma.cpp	49
 0X2174C8	DrawMovieShapeCharacter	792	font-break/DrawMovieShapeCharacter.cpp	52
 0X2177E0	DrawMovieBitmapCharacter	952	font-break/DrawMovieBitmapCharacter.cpp	97
-0X218748	PauseSpriteInstance	72	font-break/PauseSpriteInstance.cpp	7
 0X218790	CombineColorTransforms	288	font-break/CombineColorTransforms.cpp	17
 0X219190	ApplySpriteKeySounds	440	font-break/ApplySpriteKeySounds.cpp	23
 0X219400	PlaceSpriteKeyCharacters	3040	font-break/PlaceSpriteKeyCharacters.cpp	265
