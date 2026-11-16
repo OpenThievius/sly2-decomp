@@ -77,7 +77,9 @@ Waves yield about 20 bytes per claimed function. What moved the number: loop5, `
 - Resolved 2026-11-16: `make unit` had reported `__udivdi3` from assembly although `try.py` scored 0: `link_image.py` held it back from a stale `build/image/seed.json` (run it with `--fresh` after a repair). The same unit check also surfaced five more functions that never became link candidates (`build/image/skipped.tsv`); all 5,601 matched functions now link from C.
 - Left: nothing in the SDK range except the walls above and the libm drafts of stage 2.
 
-### Stage 6: tail (Not Started)
+### Stage 6: tail (In Progress)
+
+- Status 2026-11-16: `__throw` (0x23EE78) noted as the same unwind-and-jump wall as `__rethrow`. `func_0021BD18`: the draft's 32 uses raw asm; the helper rewrite (`DotProduct`, `ScaleAddX`, `VectorFromFloat`) scores 71 to 101 (extra saved registers, frame 0x8C0 against 0x8A0), noted. `FireExplsExplso` (0x15C690, 14 VU0 words of 273) still has no draft.
 
 - What is left after stages 1 to 5 is a permanent wall.
 - Each gets one line of semantics in `config/us/blocker_notes.tsv` (PS2 FPU behaviour where it matters).
