@@ -6,11 +6,11 @@ typedef struct SifEntry {
     int unused;
 } SifEntry;
 typedef struct SifState {
-    u32 sendUncached;
-    u32 receiveUncached;
-    int registerValue;
-    SifEntry *entries;
     int count;
+    u32 sendUncached;
+    int registerValue;
+    u32 receiveUncached;
+    SifEntry *entries;
     int field14;
     int field18;
     u32 *list;
@@ -63,10 +63,9 @@ void func_0023AAF0(void)
     B_0044EDD8.list = B_0044EF80;
     B_0044EDD8.receiveUncached = receiveAddress;
     B_0044EDD8.count = words;
-    B_0044EDD8.registerValue = 0;
     B_0044EDD8.entries = B_0044EE00;
     B_0044EDD8.field14 = 0;
-    B_0044EDD8.field18 = 0;
+    B_0044EDD8.registerValue = B_0044EDD8.field18 = 0;
     entry = B_0044EE00;
     do {
         entry->function = 0;

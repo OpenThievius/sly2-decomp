@@ -16,7 +16,7 @@ struct CARRY {
 };
 extern "C" CRV *PloNew(int, JT *, int, int);
 extern "C" void *PvAllocSwImpl__Fi(ALLOCREQ *);
-extern "C" void MeasureCrv(void *);
+extern "C" void MeasureCrv(void);
 extern "C" void PredictAsegEffect(float, float, ASEG *, JT *, XF *, XF *, MATRIX4 *, int);
 extern "C" void EnsureAsegBlendDynamic(JT *, int, int, void *, int, int, int, void *);
 MATRIX4 operator*(const MATRIX4 &, const MATRIX4 &);
@@ -53,8 +53,8 @@ void func_001CC5E8(CARRY *pcarry, JT *pjt, void *ppasega)
                     req.cbAlign = 16;
                     pcrv->pu = (float *)PvAllocSwImpl__Fi(&req);
                     req.cb = g_2c1ed0 << 2;
-                    req.cbAlign = 16;
                     pcrv->pv = (float *)PvAllocSwImpl__Fi(&req);
+                    req.cbAlign = 16;
                     req.cb = g_2c1ed0 << 4;
                     req.cbAlign = 16;
                     pcrv->ppos = (QW *)PvAllocSwImpl__Fi(&req);
@@ -76,11 +76,11 @@ void func_001CC5E8(CARRY *pcarry, JT *pjt, void *ppasega)
                         float u = (float)isample / (float)(g_2c1ed0 - 1);
                         PredictAsegEffect(u * paseg->dur, 0.0f, paseg, pcarry->pjt, pxfMeasure, pcarry->pjt->pxfRoot, (MATRIX4 *)&matBone, 0);
                         pcrv->pu[isample] = u;
-                        QW *pdest = &pcrv->ppos[isample];
+                        QW *pdest = (__typeof__(&(pcrv->ppos)[0]))((isample) * sizeof((pcrv->ppos)[0]) + (unsigned)(pcrv->ppos));
                         *pdest = TransformPoint(matAnchor.row[3], matBone.row[0], matBone.row[1], matBone.row[2], matBone.row[3]);
                     }
                     pcrv->vptr->fn((char *)pcrv + pcrv->vptr->delta);
-                    MeasureCrv(pcrv);
+                    MeasureCrv();
                     if (icurve == 0)
                         pcarry->item[iitem].pcrvStart = pcrv;
                     else

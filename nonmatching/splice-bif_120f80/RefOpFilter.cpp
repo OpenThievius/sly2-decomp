@@ -5,13 +5,13 @@ struct CFrame;
 struct SLOTHEAP;
 extern "C" {
 PairHandle *func_00121578(PairHandle *, CRef **, CRef **);
-CRef *RefEval(CRef *, CPair *, CFrame *);
+CRef *RefEval(void);
 void CRef_Destruct(CRef *);
 void CRef_CopyConstruct(CRef *, CRef *);
 void CRef_ConstructPair(CRef *, CPair *);
 void SetTag__4CRef4TAGK(CRef *, int);
 CPair *PpairNew(void);
-void PairHandle_Init(PairHandle *, CPair *);
+void PairHandle_Init(PairHandle *);
 void PairHandle_Assign(CPair **, CPair *);
 CRef *bevy_splice_value_list_ref(CRef *, CPair *);
 void CPairPtr_Destructor(CPair **, int);
@@ -39,9 +39,9 @@ extern "C" CRef *RefOpFilter(CRef *pref, int carg, CRef *aref, CFrame *pframe)
     if (element) {
         do {
             *prefArg = element->ref;
-            RefEval(&refCondition, call.p, pframe);
+            RefEval();
             if (refCondition.tagk == 0x17 && refCondition.n != 0) {
-                PairHandle_Init(&item, PpairNew());
+                PairHandle_Init(&item);
                 item.p->ref = element->ref;
                 if (result.p == 0) {
                     PairHandle_Assign(&result.p, PpairNew());
@@ -49,8 +49,8 @@ extern "C" CRef *RefOpFilter(CRef *pref, int carg, CRef *aref, CFrame *pframe)
                 } else {
                     PairHandle_Assign(&tail->next, item.p);
                 }
-                tail = item.p;
                 CPair *held = item.p;
+                tail = item.p;
                 if (held) {
                     if (--held->cref == 0) {
                         CPairPtr_Destructor(&held->next, 2);

@@ -1,6 +1,6 @@
 #include "m2c_macros.h"
 
-M2C_UNK ApplyAsegToHandle(s32, void *, M2C_UNK, void *, M2C_UNK, M2C_UNK); /* extern */
+M2C_UNK ApplyAsegToHandle(s32, void *, M2C_UNK, void *); /* extern */
 M2C_UNK CarryThrow_SetState(void *, M2C_UNK);       /* extern */
 M2C_UNK ConvertXfMatrix4(s128 *, s32, s32, void *); /* extern */
 M2C_UNK DecomposeRotateMatrixEuler(void *);         /* extern */
@@ -85,7 +85,7 @@ void func_00136530(void *arg0, s32 arg1) {
         default:                                    /* switch 2 */
 block_17:
             RetractSmaRef(arg0 + 0x1034);
-            ApplyAsegToHandle(temp_s3, arg0, 9, arg0 + 0x1030, 0, 0x3F800000);
+            ApplyAsegToHandle(temp_s3, arg0, 9, arg0 + 0x1030);
             temp_v0_2 = M2C_FIELD(arg0, void **, 0xC);
             M2C_FIELD(temp_v0_2, M2C_UNK (**)(void *), 0x2D4)(arg0 + M2C_FIELD(temp_v0_2, s16 *, 0x2D0));
             break;

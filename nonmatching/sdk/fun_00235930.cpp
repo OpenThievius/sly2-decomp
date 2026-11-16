@@ -42,14 +42,14 @@ s32 func_00235930(M2C_UNK (*arg0)(s32, s32 *, M2C_UNK), s32 arg1, s32 *arg2, s32
 loop_7:
         if (dpcmp(var_s0, RO_002AA830) < 0) {
             var_s2 -= 1;
-            var_s0 = __muldf3(var_s0, 0x8048 << 0x2F);
+            var_s0 = __muldf3(var_s0, 0x8048L << 0x2F);
             goto loop_7;
         }
     } else if (dpcmp(var_s0, 0xFFC0 << 0x2E) >= 0) {
 loop_13:
-        if (dpcmp(var_s0, 0xFFC0 << 0x2E) >= 0) {
+        if (dpcmp(var_s0, 0xFFC0L << 0x2E) >= 0) {
             var_s2 += 1;
-            var_s0 = func_0023DAB0(var_s0, 0x8048 << 0x2F);
+            var_s0 = func_0023DAB0(var_s0, 0x8048L << 0x2F);
             goto loop_13;
         }
     }

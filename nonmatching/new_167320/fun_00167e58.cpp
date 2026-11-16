@@ -3,13 +3,13 @@ void func_00167E58(char *data)
 {
     char *p = data + 0x3070;
     int base = *(int *)(data + 0x3010);
-    unsigned char *end = (unsigned char *)data + *(int *)(p + 0x10) * 16;
-    unsigned char *rowB = (unsigned char *)data + *(int *)(p + 0xC) * 16;
-    unsigned char *alphaB = (unsigned char *)(*(int *)(p + 0x24) + base);
     unsigned char *rowA = (unsigned char *)data + *(int *)(p + 8) * 16;
+    unsigned char *rowB = (unsigned char *)data + *(int *)(p + 0xC) * 16;
+    unsigned char *end = (unsigned char *)data + *(int *)(p + 0x10) * 16;
     unsigned short *colA = (unsigned short *)(*(int *)(p + 0x14) + base);
-    unsigned short *colB = (unsigned short *)(*(int *)(p + 0x18) + base);
+    unsigned char *alphaB = (unsigned char *)(*(int *)(p + 0x24) + base);
     unsigned char *alphaA = (unsigned char *)(*(int *)(p + 0x20) + base);
+    unsigned short *colB = (unsigned short *)(*(int *)(p + 0x18) + base);
     if (rowB < end) {
         do {
             unsigned short *dstA = colA;

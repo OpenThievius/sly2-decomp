@@ -65,7 +65,7 @@ void sceGsSetDefDispEnv(DispEnv_240C38 *env, short psm, short width, short heigh
         }
     } else if ((short)modeValue == 0x50) {
         long positionX = ((long)offset[0] + (0x2D0 - width) / 2 * 2 + dx * 2 + 0xE8) & 0xFFF;
-        long positionY = (dy + offset[1] + 0x23) & 0xFFF;
+        long positionY = (offset[1] + dy + 0x23) & 0xFFF;
         env->display = ((long)(height - 1) << 44) | ((long)(width * 2 - 1) << 32) | (positionX | 0x800000) | (positionY << 12);
     } else {
         func_00236960("sceGsDefDispEnv:Not support displaymode for 0x%x!!\n", (short)modeValue);

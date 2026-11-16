@@ -129,8 +129,8 @@ static inline u64 DivideWithRemainder(u64 numerator, u64 denominator, u64 *remai
         }
     } else {
         if (denominatorHigh > numeratorHigh) {
-            quotientLow = 0;
             quotientHigh = 0;
+            quotientLow = 0;
             if (remainderPointer != 0) {
                 remainderWord.half.low = numeratorLow;
                 remainderWord.half.high = numeratorHigh;

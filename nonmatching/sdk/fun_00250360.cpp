@@ -35,8 +35,10 @@ int func_00250360(Context *context, int index, int enable, u32 flags, int type) 
     int remainder = index % context->divisor;
     Table *table;
     if ((flags & 1) != 0) {
-        while ((*(volatile u32 *)0x1000D400 >> 8) & 1) {
-        }
+        goto test_37;
+loop_37:
+test_37:
+        if ((*(volatile u32 *)0x1000D400 >> 8) & 1) goto loop_37;
         context->slots[context->current].done = 0;
     } else {
         if ((u32)(type - 1) >= 3) {

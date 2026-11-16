@@ -70,8 +70,8 @@ extern "C" void ActivateCptn__FP4CPTNPv(CPTN *pcptn, void *pso, TN *ptn)
     QW nose[1];
     QW closest[1];
     QW sum[1];
-    ActivateCplcy(pcptn, pso);
     pcptn->ptn = ptn;
+    ActivateCplcy(pcptn, pso);
     if (ptn == 0) {
         pcptn->ptnfn = &D_002C4120;
     } else {

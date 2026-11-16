@@ -12,9 +12,9 @@ struct _m2c_stack_UpdateHub {
 };                                                  /* size = 0x90 */
 s32 FActiveCplcy(M2C_UNK *);                        /* extern */
 s32 FJoyButtonPressed(M2C_UNK *, s32);              /* extern */
-s32 GetSmaCur(s32);                                 /* extern */
+s32 GetSmaCur(void);                                 /* extern */
 s32 PloFindSwObject_thunk(M2C_UNK *, M2C_UNK, s32, s8 *); /* extern */
-M2C_UNK ShopMenu_SetPage(M2C_UNK *, M2C_UNK, s32);  /* extern */
+M2C_UNK ShopMenu_SetPage(s8 *, M2C_UNK *, M2C_UNK, s32);  /* extern */
 M2C_UNK StartJsg(s32, M2C_UNK);                     /* extern */
 M2C_UNK StepHubState(s8 *, s32);                  /* extern */
 s32 UpdateJoyNavX(M2C_UNK *);                       /* extern */
@@ -48,9 +48,9 @@ void UpdateHub(s8 *arg0) {
                 var_s0 = arg0 + 0x190;
 loop_11:
                 if (var_s2 < M2C_FIELD(arg0, s32 *, 0x18C)) {
-                    if ((M2C_FIELD(var_s0, s32 *, 0) == GetSmaCur(M2C_FIELD(arg0, s32 *, 0x188))) && (FJoyButtonPressed(var_s3, M2C_FIELD(var_s0, s32 *, 4)) != 0) && (temp_a2 = M2C_FIELD(var_s0, s32 *, 8), (temp_a2 != -1))) {
+                    if ((M2C_FIELD(var_s0, s32 *, 0) == GetSmaCur()) && (FJoyButtonPressed(var_s3, M2C_FIELD(var_s0, s32 *, 4)) != 0) && (temp_a2 = M2C_FIELD(var_s0, s32 *, 8), (temp_a2 != -1))) {
                         if (temp_a2 == 0x378) {
-                            ShopMenu_SetPage(&B_003DA150, 0, temp_a2);
+                            ShopMenu_SetPage(arg0, &B_003DA150, 0, temp_a2);
                         } else {
                             temp_v0_2 = PloFindSwObject_thunk(&B_003DD490, 4, temp_a2, arg0);
                             if (temp_v0_2 == 0) {

@@ -12,7 +12,7 @@ unsigned func_00252148(char *mpeg, unsigned count)
         *(unsigned *)(mpeg + 0x82C) = 0x40000000;
         *(int *)(mpeg + 0x848) = func_00251FC8(mpeg);
     }
-    *(int *)(mpeg + 0x84C) = 0x20;
+    *(unsigned long *)(mpeg + 0x84C) = 0x20;
     bits = *(unsigned *)(mpeg + 0x848);
     command = count | 0x40000000;
     *(volatile unsigned *)0x10002000 = command;

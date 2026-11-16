@@ -100,7 +100,7 @@ struct LOW {
 extern "C" {
 LOW *func_001A5BF0(int);
 int GrficFromAlo(LOW *, int);
-void *PvAllocSlotheapImpl(void *);
+void *PvAllocSlotheapImpl(void);
 void AppendDlEntry(DL *, void *);
 void ClearDle__FP3DLE(DLE *);
 extern DL B_003E15C0;
@@ -125,7 +125,7 @@ LOW *PaloAbsorbWkr(WKR *pwkr)
         LOW *ploTest = palo;
         if (ploTest->FAbsorbWkr(pwkr, ploTest) != 0) {
             pwkr->ploAbsorbed = palo;
-            WKR *pwkrCopy = (WKR *)PvAllocSlotheapImpl(B_003E15A8);
+            WKR *pwkrCopy = (WKR *)PvAllocSlotheapImpl();
             *pwkrCopy = *pwkr;
             pwkrCopy->field4C = g_2dded0;
             ClearDle__FP3DLE(&pwkrCopy->dle);

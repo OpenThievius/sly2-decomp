@@ -88,8 +88,8 @@ loop_4:
         BuildPlane(temp_s5, *(s32 *)((sp0 * 0x10) + temp_v1_2), *(s32 *)((sp4 * 0x10) + temp_v1_2), *temp_a4, temp_a4);
         M2C_FIELD(temp_s5, s32 *, 0x1C) = temp_v0_5;
         do {
-            var_s0_2 -= 1;
             F32Read__18CBinaryInputStream(arg0);
+            var_s0_2 -= 1;
         } while (var_s0_2 >= 0);
         var_s1 = 0;
         temp_v0_7 = U8Read__18CBinaryInputStream(arg0);

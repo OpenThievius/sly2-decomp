@@ -30,7 +30,7 @@ QW func_00172760(SEARCHBEH *);
 void func_00172560(SEARCHBEH *);
 void func_00172F10(SEARCHBEH *);
 void func_002562A8(GOAL *);
-void SetGoalTarget(void *, GOAL *);
+void SetGoalTarget(void);
 int GoalGoto_FArrived(void *);
 int GoalGoto_FBlocked(void *);
 void SetSearchState(SEARCHBEH *, int);
@@ -61,7 +61,7 @@ extern "C" void UpdateSearchBeh(SEARCHBEH *pbeh)
                     GOAL goal;
                     func_002562A8(&goal);
                     goal.pos = target;
-                    SetGoalTarget(pbeh->pgoal, &goal);
+                    SetGoalTarget();
                     pbeh->fRequest = 0;
                 }
             } else if (func_00172658(pbeh) || GoalGoto_FArrived(pbeh->pgoal) || GoalGoto_FBlocked(pbeh->pgoal)) {

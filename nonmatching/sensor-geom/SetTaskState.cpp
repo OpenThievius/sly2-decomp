@@ -40,7 +40,7 @@ extern char B_002E65E0[];
 extern char B_003D4A60[];
 extern char B_003DD490[];
 extern int B_003E0F8C;
-void CRef_CopyConstruct(CRefX *, CRefX *);
+void CRef_CopyConstruct(CRefX *);
 void CRef_Destruct(CRefX *);
 void CStackFrame_Construct(void *);
 void CStackFrame_Destructor(void *, int);
@@ -52,7 +52,7 @@ void NotifyJobTaskState(int, TASK *);
 void *PvAllocStackClearImpl__Fi(ALLOCREQ *);
 void RefSetGameSaveValue(CRefX *, int, CRefX *, void *);
 void SetTaskStateCascade(TASK *, int);
-void TryAutosave(void *, int);
+void TryAutosave(void *, f32);
 }
 extern "C" void SetTaskState(TASK *self, int state)
 {
@@ -101,12 +101,12 @@ extern "C" void SetTaskState(TASK *self, int state)
             tag.tagk = 0x15;
             tag.n = NPercentComplete(B_002DEB30);
             CRefX copy;
-            CRef_CopyConstruct(&copy, &tag);
+            CRef_CopyConstruct(&copy);
             CRefX result;
             RefSetGameSaveValue(&result, slot, &copy, B_003D4A60);
             CRef_Destruct(&result);
-            CRef_Destruct(&copy);
             CRef_Destruct(&tag);
+            CRef_Destruct(&copy);
         }
     }
     if (FTaskRunning(self) != 0 && old != -1 && old < 2 && self->state >= 2

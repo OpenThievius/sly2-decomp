@@ -93,8 +93,8 @@ block_6:
             M2C_FIELD(temp_s2, s32 *, 0x2C8) = temp_t0;
             M2C_FIELD(temp_s2, s32 *, 0x468) = (s32) (temp_a1_2 + temp_v0_2);
             M2C_FIELD(temp_s2, s32 *, 0x4D0) = (s32) (temp_v1_2 + temp_v0_2);
-            M2C_FIELD(temp_s2, s32 *, 0x538) = (s32) (temp_t0 + temp_v0_2);
             M2C_FIELD(temp_s2, s32 *, 0x400) = temp_t0;
+            M2C_FIELD(temp_s2, s32 *, 0x538) = (s32) (temp_t0 + temp_v0_2);
             goto block_13;
         }
         var_a2 = temp_s4 >> 4;

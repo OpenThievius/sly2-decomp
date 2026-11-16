@@ -11,12 +11,12 @@ struct _m2c_stack_func_0014A2A0 {
     /* 0x00 */ char pad0[0x30];
 };                                                  /* size = 0x30 */
 s32 FGoalAnimDone(s32);                             /* extern */
-s32 FGoalReactDone(s32);                            /* extern */
+s32 FGoalReactDone(void);                            /* extern */
 s32 GoalFollowCrv_FAtEnd(s32);                      /* extern */
 s32 PpoSwFocusBase(M2C_UNK *);                      /* extern */
 s32 PsenseFindNotice(s32, s32, M2C_UNK);            /* extern */
 s32 func_0014A478(s8 *);                          /* extern */
-M2C_UNK func_0014A4D0(s8 *);                      /* extern */
+M2C_UNK func_0014A4D0(void);                      /* extern */
 s32 func_0014AA30(s8 *);                          /* extern */
 M2C_UNK func_0014AD70(s8 *);                      /* extern */
 M2C_UNK func_0014AE38(s8 *, M2C_UNK);             /* extern */
@@ -30,7 +30,7 @@ void func_0014A2A0(s8 *arg0) {
     s32 var_v0;
     u32 temp_s1;
     func_001EEF98();
-    func_0014A4D0(arg0);
+    func_0014A4D0();
 loop_24:
     if (func_001EF0A8(arg0) == 0) {
         temp_s1 = M2C_FIELD(arg0, u32 *, 0x30);
@@ -88,7 +88,7 @@ block_19:
             if (func_00209098(M2C_FIELD(arg0, s32 *, 0x10)) != 0) {
                 goto block_17;
             }
-            var_v0 = FGoalReactDone(M2C_FIELD(arg0, s32 *, 0x18));
+            var_v0 = FGoalReactDone();
             goto block_19;
         case 4:
             if (func_00209098(M2C_FIELD(arg0, s32 *, 0x10)) == 0) {

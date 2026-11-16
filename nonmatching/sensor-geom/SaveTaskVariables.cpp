@@ -5,7 +5,7 @@ struct Task {
     char padF0[4]; int cause;
 };
 extern "C" int B_003D4A60;
-extern "C" void CRef_CopyConstruct(CRef *, CRef *);
+extern "C" int CRef_CopyConstruct(CRef *, CRef *);
 extern "C" void CRef_Destruct(CRef *);
 extern "C" void RefSetGameSaveValue(CRef *, void *, CRef *, int *);
 extern "C" int FTaskComplete(Task *);
@@ -44,8 +44,8 @@ extern "C" void SaveTaskVariables(Task *task)
     char *pathComplete = task->pathComplete;
     if (*(int *)pathComplete != 0) {
         CRef ref;
-        ref.tagk = 23;
         ref.n = FTaskComplete(task) ? 1 : 0;
+        ref.tagk = 23;
         SetSaveRef(pathComplete, &ref);
         CRef_Destruct(&ref);
     }
@@ -57,12 +57,11 @@ extern "C" void SaveTaskVariables(Task *task)
         SetSaveRef(pathState, &ref);
         CRef_Destruct(&ref);
     }
-    char *pathForced = task->pathForced;
-    if (*(int *)pathForced != 0) {
+    if (*(int *)task->pathForced != 0) {
         CRef ref;
         ref.tagk = 23;
         ref.n = 0;
-        SetSaveRef(pathForced, &ref);
+        SetSaveRef(task->pathForced, &ref);
         CRef_Destruct(&ref);
     }
     if (task->pjob != 0)

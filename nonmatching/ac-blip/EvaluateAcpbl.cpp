@@ -27,8 +27,8 @@ void EvaluateAcpbl(ACPBL *pacpbl, VECTOR *pvectorFirst, VECTOR *pvectorSecond, f
         pmrsg = &pacpbl->ptrack->amrsg[imrsg];
         gNorm = gDelta / pmrsg->w;
     }
-    vectorSecond = g_2a2dd0;
     vectorFirst = g_2a2dd0;
+    vectorSecond = g_2a2dd0;
     for (int i = 0; i < pacpbl->pdef->ccount; i++) {
         ACPBLCHILD *pchild = (ACPBLCHILD *)(pacpbl->pdef->abase + i * pacpbl->pdef->cstride);
         if (pchild->gScale != 0.0f) {

@@ -41,8 +41,8 @@ loop:
         if (ent->kind == 4) {
             i = next;
             if (ent->sym == symid) {
-                unsigned char *bits = save + ent->offset;
                 int count = ent->count;
+                unsigned char *bits = save + ent->offset;
                 if (count != 0) {
                     int j = 0;
                     if (count != 0) {
@@ -71,8 +71,8 @@ tail:
     if (total != 0) {
         result = 100;
         if (total != possible) {
-            int pct = total * 100 / possible;
             result = 1;
+            int pct = total * 100 / possible;
             if (pct > 0) result = pct <= 99 ? pct : 99;
         }
     }

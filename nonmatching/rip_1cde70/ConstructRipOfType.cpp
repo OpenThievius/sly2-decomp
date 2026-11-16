@@ -10,7 +10,7 @@ extern "C" {
 struct _m2c_stack_ConstructRipOfType {
     /* 0x00 */ char pad0[0x30];
 };                                                  /* size = 0x30 */
-M2C_UNK memset(u32 *, M2C_UNK, M2C_UNK);            /* extern */
+void memset(u32 *, M2C_UNK, M2C_UNK);            /* extern */
 extern M2C_UNK D_002D7468;
 extern M2C_UNK D_002D74B8;
 extern M2C_UNK D_002D7508;

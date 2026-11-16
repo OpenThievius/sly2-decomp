@@ -8,7 +8,7 @@ int FVjoyButtonHeld(int, int);
 int GrfbtnJtGadget(BENTLEY136118 *, int);
 void ReleaseBentleyGadget(BENTLEY136118 *);
 void SetBentleyGadgetAnim(BENTLEY136118 *, int);
-void SetJmpState(void *, int, int, int);
+void SetJmpState(void);
 void StickGadgetObj(GADGET136118 *, int);
 }
 #define FIELD136118(type, offset) (*(type *)((char *)pbentley + (offset)))
@@ -38,7 +38,7 @@ void UpdateBentleyGadget(BENTLEY136118 *pbentley)
                     }
                 }
                 ReleaseBentleyGadget(pbentley);
-                SetJmpState((char *)pbentley + 0x2C0, 0xB, 0, 0);
+                SetJmpState();
             }
         }
     } while (FIELD136118(int, 0x16B0) != state && FIELD136118(int, 0x13D0) == 6);

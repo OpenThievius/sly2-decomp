@@ -28,7 +28,7 @@ struct JTCSINFO {
 };
 struct AMB;
 
-extern "C" void ApplyAsegToHandle(ASEG *paseg, SLY *psly, int grf, ASEGA **ppasega, float tLocal, float svt);
+extern "C" void ApplyAsegToHandle(ASEG *paseg, SLY *psly, int grf, ASEGA **ppasega, float tLocal);
 extern "C" void Carry_SetState(void *pcarry, int carrys);
 extern "C" void ChooseJtSweepTarget__FP2JTP2BLP6ASEGBL(SLY *psly, BL *pbl, ASEGBL *pasegbl);
 extern "C" QW ConvertAloPos(LO *ploFrom, LO *ploTo, QW pos);
@@ -299,7 +299,7 @@ extern "C" void SetJtJtcs(SLY *psly, int jtcs)
     psly->jtcs = jtcs;
     psly->cbounds = 0;
     psly->tJtcs = g_2dded0;
-    ApplyAsegToHandle(paseg, psly, 1, &psly->pasegaJtcs, tLocal, svt);
+    ApplyAsegToHandle(paseg, psly, 1, &psly->pasegaJtcs, tLocal);
     if (dt != 0.0f)
         func_00131A90(psly->pasegaJtcs, g_2dded0 + dt);
     if (sfxNew != -1) {

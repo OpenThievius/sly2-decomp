@@ -41,8 +41,8 @@ void SetGuardMode(s8 *arg0, s32 arg1) {
     s8 *temp_v0_8;
     if (arg1 != M2C_FIELD(arg0, s32 *, 0xFBC)) {
         if (FCanSetGuardMode() != 0) {
-            temp_v0 = M2C_FIELD(arg0, s32 *, 0xFBC);
             M2C_FIELD(arg0, s32 *, 0xFBC) = arg1;
+            temp_v0 = M2C_FIELD(arg0, s32 *, 0xFBC);
             M2C_FIELD(arg0, f32 *, 0xFC0) = (f32) g_2dded0;
             switch (temp_v0) {                      /* switch 1 */
             case 8:                                 /* switch 1 */
@@ -115,9 +115,9 @@ block_16:
                         }
                     }
                     temp_v0_7 = arg0 + 0x190;
+                    M2C_FIELD(temp_v0_7, s32 *, 8) = 0;
                     M2C_FIELD(temp_v0_7, s32 *, 4) = 0;
                     M2C_FIELD(arg0, s32 *, 0x190) = 0;
-                    M2C_FIELD(temp_v0_7, s32 *, 8) = 0;
                     break;
                 case 13:                            /* switch 2 */
                     temp_v0_8 = func_00205458(arg0, 0x9C);

@@ -2,13 +2,13 @@
 extern "C" {
 int ChDigitFromG__Fdii(long, int, int);
 int ExpFirstFromG__Fd(long);
-long __adddf3(long, long);
+long __adddf3(char *, long);
 int __fixdfsi(long);
 long __floatsidf(int);
 long __muldf3(long, long);
 long pow(long, long);
 char *strcpy(char *, const char *);
-unsigned strlen(const char *);
+unsigned strlen(const char *, int);
 extern unsigned char D_002C40C8[];
 struct Tft_21E1B0 { char pad0[0x14]; int flag14; char pad18[4]; int precision; char pad20[0xC]; unsigned char kind; };
 int CchAchFromDouble__FPciP3TFTd(char *out, int unused, Tft_21E1B0 *tft, long bits) {
@@ -21,7 +21,7 @@ int CchAchFromDouble__FPciP3TFTd(char *out, int unused, Tft_21E1B0 *tft, long bi
             text = "(inf)";
         }
         strcpy(out, text);
-        return strlen(out);
+        return strlen(out, unused);
     }
     char *cursor = out;
     unsigned char kind = tft->kind;
@@ -33,7 +33,7 @@ int CchAchFromDouble__FPciP3TFTd(char *out, int unused, Tft_21E1B0 *tft, long bi
             tft->precision = tft->precision - 1;
         }
     }
-    long rounded = __adddf3(bits, __muldf3(pow(0x4024000000000000L, __floatsidf((scientific != 0 ? exponent : 0) - tft->precision)), 0x3FE0000000000000L));
+    long rounded = __adddf3(out, __muldf3(pow(0x4024000000000000L, __floatsidf((scientific != 0 ? exponent : 0) - tft->precision)), 0x3FE0000000000000L));
     int roundedExponent = ExpFirstFromG__Fd(rounded);
     int top = exponent < roundedExponent ? roundedExponent : exponent;
     int count;
@@ -99,8 +99,8 @@ int CchAchFromDouble__FPciP3TFTd(char *out, int unused, Tft_21E1B0 *tft, long bi
         do {
             digits -= 1;
             unsigned char digit = D_002C40C8[top / divisor];
-            top = (top % divisor) * 10;
             *cursor = digit;
+            top = (top % divisor) * 10;
             cursor += 1;
         } while (digits >= 0);
     }

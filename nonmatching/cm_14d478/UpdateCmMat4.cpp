@@ -30,11 +30,9 @@ void UpdateCmMat4(Cm *pcm)
 {
     char *base = (char *)pcm;
     float dt = g_2dded0 - pcm->tJolt;
-    M4 *pmatCam = (M4 *)(base + 0x60);
     M4 *pmatProj = (M4 *)(base + 0x100);
-    M4 *pmatWorldToClip = (M4 *)(base + 0x140);
     if (D_FLT_002BD850 < dt) {
-        CombineEyeLookAtProj(pmatCam, pmatProj, pmatWorldToClip);
+        CombineEyeLookAtProj(((M4 *)(base + 0x60)), pmatProj, ((M4 *)(base + 0x140)));
     } else {
         float u = dt / D_FLT_002BD850;
         float env = D_002BD860[0] + u * (D_002BD860[1] + u * D_002BD860[2]);
@@ -61,22 +59,21 @@ void UpdateCmMat4(Cm *pcm)
         float *pw = (float *)&matShake;
         pw[3] = 0; pw[7] = 0; pw[11] = 0;
         pw[15] = 1.0f;
-        MulMat(&fr.b, pmatCam, &matShake);
+        MulMat(&fr.b, ((M4 *)(base + 0x60)), &matShake);
         fr.a = fr.b;
         fr.b.row[0] = ScaleAddX(RO_002A2DE0, D_002BD890, fr.shake);
         fr.b.row[1] = VectorScaleX(D_002BD8A0, fr.shake);
-        float *ps = (float *)&fr.b.row[0];
         float *pc = (float *)&fr.b.row[1];
-        BuildSimpleProjectionMatrix__FffffffP7MATRIX4(ps[0] * 512.0f / (*(float *)(base + 0x40) * 4096.0f), ps[1] * 224.0f / (*(float *)(base + 0x44) * 4096.0f), pc[0], pc[1], *(float *)(base + 0x4C), *(float *)(base + 0x50), &fr.c);
-        CombineEyeLookAtProj(&fr.a, &fr.c, pmatWorldToClip);
+        BuildSimpleProjectionMatrix__FffffffP7MATRIX4(((float *)&fr.b.row[0])[0] * 512.0f / (*(float *)(base + 0x40) * 4096.0f), ((float *)&fr.b.row[0])[1] * 224.0f / (*(float *)(base + 0x44) * 4096.0f), pc[0], pc[1], *(float *)(base + 0x4C), *(float *)(base + 0x50), &fr.c);
+        CombineEyeLookAtProj(&fr.a, &fr.c, ((M4 *)(base + 0x140)));
     }
-    FInvertMatrix4__FP7MATRIX4T0(pmatWorldToClip, (M4 *)(base + 0x180));
+    FInvertMatrix4__FP7MATRIX4T0(((M4 *)(base + 0x140)), (M4 *)(base + 0x180));
     float *frustum = (float *)(base + 0x1C0);
     float *wide0 = (float *)(base + 0x200);
     float *wide1 = (float *)(base + 0x210);
     float *wide2 = (float *)(base + 0x220);
     float *wide3 = (float *)(base + 0x230);
-    BuildFrustrum(*(float *)(base + 0x40), *(float *)(base + 0x44), pmatCam, (M4 *)frustum);
+    BuildFrustrum(*(float *)(base + 0x40), *(float *)(base + 0x44), ((M4 *)(base + 0x60)), (M4 *)frustum);
     {
         float *dst = (float *)(base + 0xA0);
         float *n0 = frustum, *n1 = (float *)(base + 0x1D0), *n2 = (float *)(base + 0x1E0), *n3 = (float *)(base + 0x1F0);
@@ -88,7 +85,7 @@ void UpdateCmMat4(Cm *pcm)
             dst += 4;
         }
     }
-    BuildFrustrum(*(float *)(base + 0x40) * 7.93f, *(float *)(base + 0x44) * 18.1f, pmatCam, (M4 *)wide0);
+    BuildFrustrum(*(float *)(base + 0x40) * 7.93f, *(float *)(base + 0x44) * 18.1f, ((M4 *)(base + 0x60)), (M4 *)wide0);
     {
         float *dst = (float *)(base + 0xD0);
         float *n0 = wide0, *n1 = wide1, *n2 = wide2, *n3 = wide3;

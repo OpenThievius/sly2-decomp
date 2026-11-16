@@ -11,7 +11,7 @@ struct CMOVIETEXT {
 };
 extern "C" {
 extern const unsigned char RO_002AA6A1[];
-void CMovieText_Reset(CMOVIETEXT *, void *);
+void CMovieText_Reset(CMOVIETEXT *);
 int CMovieText_ChNext(CMOVIETEXT *);
 float DxFromFontCh(void *, unsigned char);
 }
@@ -21,7 +21,7 @@ extern "C" int CMovieText_ClineWrap(CMOVIETEXT *ptext)
     float dxLine = 0.0f;
     int cline = 1;
     const unsigned char *pbTable = RO_002AA6A1;
-    CMovieText_Reset(ptext, 0);
+    CMovieText_Reset(ptext);
     int ch;
     while ((ch = CMovieText_ChNext(ptext)) != 0) {
         if (ch == '\n') {

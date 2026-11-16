@@ -14,7 +14,7 @@ struct eh_context {
 };
 void __terminate(void);
 void __unwinding_cleanup(void);
-void copy_reg(int, frame_state *, frame_state *);
+void copy_reg(int, frame_state *);
 int find_exception_handler(int, int *, int, int, int *);
 long *get_reg_addr(unsigned short, frame_state *, frame_state *);
 frame_state *next_stack_level(int, frame_state *, frame_state *);
@@ -28,8 +28,8 @@ int throw_helper(eh_context *eh, int pc, frame_state *myUdata, frame_state **uda
     frame_state *subUdata = &ustruct;
     int savedPc = pc;
     int handler = 0;
-    int handlerPointer = 0;
     int pcPointer = 0;
+    int handlerPointer = 0;
     frame_state savedUstruct;
     int newEhModel;
     int cleanup = 0;
@@ -98,7 +98,7 @@ int throw_helper(eh_context *eh, int pc, frame_state *myUdata, frame_state **uda
             subUdata = previous;
             for (int index = 0; index < 0x4F; index++)
                 if (index != udata->retaddrColumn && udata->saved[index])
-                    copy_reg(index, udata, myUdata);
+                    copy_reg(index, udata);
             pc = getReturnAddress(udata, subUdata) - 1;
         } while (pc != handlerPc);
     }

@@ -26,7 +26,6 @@ void InitMeter(s8 *arg0) {
     s32 var_v0;
     s32 var_v1;
     s8 *temp_a0;
-    s8 *temp_a0_2;
     s8 *temp_a2;
     s8 *temp_v0;
     s8 *temp_v0_2;
@@ -44,12 +43,11 @@ void InitMeter(s8 *arg0) {
         temp_f0 = (f32) *M2C_FIELD(temp_a0, s32 **, 0xE00) / (f32) M2C_FIELD(temp_a0, s32 *, 0xDFC);
         M2C_FIELD(arg0, f32 *, 0x24) = temp_f0;
         M2C_FIELD(arg0, f32 *, 0x20) = temp_f0;
-        temp_a0_2 = M2C_FIELD(arg0, s8 **, 0x34);
-        temp_f0_2 = (f32) GetJtPower(temp_a0) / (f32) M2C_FIELD(temp_a0_2, s32 *, 0x1300);
+        temp_f0_2 = (f32) GetJtPower(temp_a0) / (f32) M2C_FIELD((M2C_FIELD(arg0, s8 **, 0x34)), s32 *, 0x1300);
         M2C_FIELD(arg0, f32 *, 0x2C) = temp_f0_2;
         M2C_FIELD(arg0, f32 *, 0x28) = temp_f0_2;
         var_v0 = 0x347;
-        if (FIsBasicDerivedFrom(temp_a0_2, 0x37) != 0) {
+        if (FIsBasicDerivedFrom((M2C_FIELD(arg0, s8 **, 0x34)), 0x37) != 0) {
             var_v1 = 0x348;
             var_a0 = 0x349;
             var_a1 = 0x34A;
@@ -77,7 +75,7 @@ void InitMeter(s8 *arg0) {
         temp_a2 = M2C_FIELD(arg0, s8 **, 0x38);
         if (temp_a2 != NULL) {
             temp_v0_3 = M2C_FIELD(temp_a2, s8 **, 0xC);
-            M2C_FIELD(temp_v0_3, M2C_UNK (**)(s8 *, s32, s8 *), 0x18C)(temp_a2 + M2C_FIELD(temp_v0_3, s16 *, 0x188), M2C_FIELD(arg0, s32 *, 0x3C), temp_a2);
+            M2C_FIELD(temp_v0_3, M2C_UNK (**)(s8 *, s32), 0x18C)(temp_a2 + M2C_FIELD(temp_v0_3, s16 *, 0x188), M2C_FIELD(arg0, s32 *, 0x3C));
             func_00213B00(M2C_FIELD(arg0, s8 **, 0x38), 0x34F);
             func_00213B00(M2C_FIELD(arg0, s8 **, 0x38), 0x350);
             SeekBlotLabel(M2C_FIELD(arg0, s8 **, 0x38), 0x34F, 1.0f - M2C_FIELD(arg0, f32 *, 0x20));

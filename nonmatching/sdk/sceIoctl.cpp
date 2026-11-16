@@ -21,7 +21,7 @@ int CreateSema(SemaParam *);
 int DeleteSema(int);
 int WaitSema(int);
 int SignalSema(int);
-void func_0023B170(void *, int);
+void func_0023B170(void *);
 unsigned int func_002375E0(void *, int, int, void *, int, void *, int, int, int, int);
 void *memcpy(void *, const void *, unsigned);
 extern IoctlPacket B_0044A680;
@@ -36,6 +36,7 @@ extern char B_0044BD80[];
 extern const char RO_002AAB28[];
 
 int sceIoctl(int handle, int command, void *argument) {
+    int result;
     IoctlPacket *packet = &B_0044A680;
     Slot *slot = func_002376D0(handle);
     func_00237B50(5);
@@ -45,7 +46,7 @@ int sceIoctl(int handle, int command, void *argument) {
     }
     if (slot == 0 || slot->state == 0) {
         func_00237B80();
-        return -9;
+        { result = -9; goto done; }
     }
     packet->field414 = 0;
     packet->field418 = 0;
@@ -53,7 +54,7 @@ int sceIoctl(int handle, int command, void *argument) {
     case 2:
         *(int *)argument = *(int *)((unsigned int)&B_0044B310[D_002C4A78] | 0x20000000);
         func_00237B80();
-        return 0;
+        { result = 0; goto done; }
     case 1: {
         int index;
         WaitSema(D_002C4A8C);
@@ -67,12 +68,12 @@ int sceIoctl(int handle, int command, void *argument) {
         }
         SignalSema(D_002C4A8C);
         func_00237B80();
-        return 0;
+        { result = 0; goto done; }
     }
     case 3:
-        *(long *)argument = *(long *)((unsigned int)&B_0044B310[D_002C4A78] | 0x20000000);
+        *(unsigned *)argument = *(long *)((unsigned int)&B_0044B310[D_002C4A78] | 0x20000000);
         func_00237B80();
-        return 0;
+        { result = 0; goto done; }
     }
     {
         int semaphore;
@@ -95,7 +96,7 @@ int sceIoctl(int handle, int command, void *argument) {
         packet->result = argument;
         packet->resultSize = 4;
         packet->semaphore = semaphore;
-        func_0023B170(packet, 0x420);
+        func_0023B170(packet);
         if ((int)func_002375E0(B_0044BD80, 5, 0, packet, 0x420, B_0044B2C0, 4, 0, 0, 0) < 0) {
             DeleteSema(semaphore);
             func_00237B80();
@@ -111,5 +112,7 @@ int sceIoctl(int handle, int command, void *argument) {
         DeleteSema(semaphore);
         return reply;
     }
+done:
+    return result;
 }
 }

@@ -31,7 +31,7 @@ extern float g_2dded4;
 extern char B_003DD040;
 void func_001A5ED8(void *);
 float MarkClockTickRealOnly__FP5CLOCK(void *);
-void func_00215AC0(float, Text *, const char *);
+s32 func_00215AC0(float, Text *, const char *);
 float CMovieText_Dx(Text *);
 void CMovieText_Draw(Text *, void *, int);
 void CTextBox_SetPos(void *, float, float);
@@ -124,8 +124,8 @@ void DrawRhythmHud(char *prhythm)
                         EvaluateBezierPos__FfffP6VECTORN63(tDuration, g_2dded4, 1.0f, *(QW *)(prhythm + 0x1A0), *(QW *)(prhythm + 0x1B0), *(QW *)&pbeatCursor->x, D_002BDBD0, (QW *)(prhythm + 0x1A0), (QW *)(prhythm + 0x1B0), 0);
                     }
                 }
-                f.boxX = *(float *)(prhythm + 0x1A0) - dxCursor * 0.5f;
                 f.boxY = ((*(float *)(prhythm + 0x1A4) - dyDim * 3.0f) - f.dyCursor) - 7.0f;
+                f.boxX = *(float *)(prhythm + 0x1A0) - dxCursor * 0.5f;
                 CMovieText_Draw(&f.cursor, &f.boxX, 0xC);
             }
         }

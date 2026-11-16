@@ -276,8 +276,8 @@ extern "C" void BuildLaserBeams(LASER *plaser)
         plaser->pso = pso;
         pso->xf = plaser->xf;
         pso->plaser = plaser;
-        pso->geomLocal.cpos = 2;
         pso->field0C = plaser->field18;
+        pso->geomLocal.cpos = 2;
         pso->grf |= 0x8000L << 33;
         allocreq.cbAlign = 0x10;
         allocreq.cb = 0x20;

@@ -21,7 +21,7 @@ extern "C" {
 int Goal_FHandleMessage(void *, int, void *);
 void func_001B9DB8(void *, QW);
 void func_001B9D28(void *, QW);
-void PhitfxSpawn(void *, QW, void *);
+s32 PhitfxSpawn(void *, QW, void *);
 void SetGuardMode(void *, int);
 void GoalBrain_SetCommand(void *, void *);
 void func_001F7A68(void *, int);
@@ -88,9 +88,8 @@ int GoalBrain_FHandleMessage(char *pgoal, int nMsg, HIT *phit)
     if (*(int *)(*(char **)(pgoal + 0x10) + 0x29C))
         phit->cDamage = 0;
     CMDK kindNow = *(CMDK *)(pgoal + 0x30);
-    char *pguard2 = *(char **)(pgoal + 0x10);
-    if (*(int *)(pguard2 + 0x4A4) && kindNow != 0xB && kindNow != 5 && (phit->grftak == 0x4000 || phit->grftak == 0x2000)) {
-        func_001F7A68(pguard2, 0);
+    if (*(int *)((*(char **)(pgoal + 0x10)) + 0x4A4) && kindNow != 0xB && kindNow != 5 && (phit->grftak == 0x4000 || phit->grftak == 0x2000)) {
+        func_001F7A68((*(char **)(pgoal + 0x10)), 0);
         memset(&fr.cmd, 0, 0x70);
         fr.cmd.kind = 0x13;
         GoalBrain_SetCommand(pgoal, &fr.cmd);
@@ -98,21 +97,21 @@ int GoalBrain_FHandleMessage(char *pgoal, int nMsg, HIT *phit)
     }
     switch (kindNow) {
     case 9:
-        if (!(GrficFromAlo(pguard2, phit->grftak) & 0x40)) {
+        if (!(GrficFromAlo((*(char **)(pgoal + 0x10)), phit->grftak) & 0x40)) {
             int hitA = *(int *)(*(char **)(pgoal + 0x10) + 0x350);
             if (!(hitA & phit->grftak))
                 return 1;
-            if (!(hitA & *(int *)(*(char **)(pgoal + 0x18) + 0x5C)))
+            if (!(hitA & *(unsigned long *)(*(char **)(pgoal + 0x18) + 0x5C)))
                 break;
             return 1;
         }
         break;
     case 0xA:
-        if (!(phit->grftak & *(int *)(pguard2 + 0x354)))
+        if (!(phit->grftak & *(int *)((*(char **)(pgoal + 0x10)) + 0x354)))
             return 1;
         break;
     case 0xB: {
-        int knock = *(int *)(pguard2 + 0x358);
+        int knock = *(int *)((*(char **)(pgoal + 0x10)) + 0x358);
         if (!(phit->grftak & knock))
             return 1;
         if (*(int *)(*(char **)(pgoal + 0x18) + 0x5C) & knock)

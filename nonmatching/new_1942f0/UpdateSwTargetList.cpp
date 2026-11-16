@@ -51,9 +51,9 @@ extern float RO_002BF714;
 extern float g_2dded0[];
 int func_00194F48(const void *, const void *);
 void FadeAloOut(IND *, float);
-float GSmooth__FfffP3SMPPf(char *, float *, float, float, float);
+float GSmooth__FfffP3SMPPf(char *, float *, float, TGT *, float);
 IND *PloSpawnTargetIndicator(SW *, int, TGT *);
-void bevy_camera_follow_activity(char *, int, int, int);
+void bevy_camera_follow_activity(char *, int, int);
 void *memmove(void *, const void *, unsigned);
 void qsort(void *, int, int, int (*)(const void *, const void *));
 }
@@ -114,9 +114,9 @@ store:
                         float pos = cur->pos;
                         float accel = vel + dt * ((found->pos - pos) * RO_002BF710 + (found->vel - vel) * RO_002BF714);
                         cur->vel = accel;
-                        cur->pos = pos + dt * ((vel + accel) * 0.5f);
+                        cur->pos = dt + pos * ((vel + accel) * 0.5f);
                     } else {
-                        cur->pos = GSmooth__FfffP3SMPPf(&D_002BF718, &cur->vel, cur->pos, found->pos, g_2dded0[1]);
+                        cur->pos = GSmooth__FfffP3SMPPf(&D_002BF718, &cur->vel, cur->pos, src, g_2dded0[1]);
                     }
                     if (hold != 0) {
                         float pos = cur->pos;
@@ -156,7 +156,7 @@ update:
         self->count = slot + 1;
         int oid = psrc->oid;
         psrc += 1;
-        bevy_camera_follow_activity(&B_002DEB30, 0x3D, oid, slot + 1);
+        bevy_camera_follow_activity(&B_002DEB30, 0x3D, oid);
     }
     qsort(list, self->count, 0x30, func_00194F48);
 }

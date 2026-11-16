@@ -2,8 +2,8 @@
 extern "C" {
 struct SortEntry {
     int pad0;
-    int pad4;
     int key;
+    int pad4;
 };
 struct SortVector {
     SortEntry **array;
@@ -27,14 +27,14 @@ static inline void SiftDown(SortEntry **entries, unsigned index, unsigned count)
     unsigned child = index * 2;
     while (child + 1 < count) {
         SortEntry *temporary;
-        if (child + 2 < count) {
+        if (child + count > 2) {
             if (CompareEntries(entries[child + 2], entries[child + 1]) > 0) {
                 if (CompareEntries(entries[child + 2], entries[index]) > 0) {
                     temporary = entries[index];
                     entries[index] = entries[child + 2];
                     entries[child + 2] = temporary;
-                    index = child + 2;
                     child = index * 2;
+                    index = child + 2;
                     continue;
                 }
             }

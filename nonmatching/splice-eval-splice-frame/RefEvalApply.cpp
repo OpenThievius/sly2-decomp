@@ -63,7 +63,7 @@ struct PROC { int pad0; int pad4; CFrame *frame; int count; int rest; CPair *par
 extern "C" {
 CRef RefEval(CPair *, CFrame *);
 CRef RefEvalProcBody(PROC *, CFrame *);
-CRef CFrame_RefAddBinding(CFrame *, int, CRef *);
+CRef CFrame_RefAddBinding(void);
 extern ENTRY D_002BBB90[];
 }
 
@@ -135,7 +135,8 @@ extern "C" CRef RefEvalApply(CPair *expr, CFrame *env)
         for (int bound = 0; bound < total; bound++) {
             if (cursor->ref.tagk == 0x14)
                 cursor = cursor->next;
-            CRef binding = CFrame_RefAddBinding(frame.p, cursor->ref.n, &args[bound]);
+            CRef  binding;
+            binding = CFrame_RefAddBinding();
             cursor = cursor->next;
         }
         result = RefEvalProcBody(proc, frame.p);

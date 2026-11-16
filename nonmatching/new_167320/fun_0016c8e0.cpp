@@ -11,11 +11,11 @@ struct _m2c_stack_func_0016C8E0 {
     /* 0x00 */ char pad0[0xB0];
 };                                                  /* size = 0xB0 */
 M2C_UNK FilterColorRgba5551_1ed1a8(s8 *);         /* extern */
-s8 *PvAllocStackClearImpl__Fi(s8 *, s32, s32);  /* extern */
+s8 *PvAllocStackClearImpl__Fi(s32, s32, s32);  /* extern */
 s32 S16Read__18CBinaryInputStream(s32);             /* extern */
 s32 U16Read__18CBinaryInputStream(s32);             /* extern */
 s8 U8Read__18CBinaryInputStream(s32);               /* extern */
-s8 *func_0016C8E0(s32 arg1) {
+s8 *func_0016C8E0(s32 unused_arg0, s32 arg1) {
     s8 sp[0x20] __attribute__((aligned(16)));
     s32 temp_a0;
     s32 temp_v0;
@@ -32,14 +32,14 @@ s8 *func_0016C8E0(s32 arg1) {
     temp_v0 = U16Read__18CBinaryInputStream(arg1);
     if (temp_v0 != 0) {
         var_s1 = 0;
-        var_s6 = PvAllocStackClearImpl__Fi(sp, 0xC, 0x10);
+        var_s6 = PvAllocStackClearImpl__Fi(arg1, 0xC, 0x10);
         M2C_FIELD(var_s6, s32 *, 0) = temp_v0;
-        M2C_FIELD(var_s6, s8 **, 4) = PvAllocStackClearImpl__Fi(sp, temp_v0 * 8, 0x10);
+        M2C_FIELD(var_s6, s8 **, 4) = PvAllocStackClearImpl__Fi(arg1, temp_v0 * 8, 0x10);
         if (M2C_FIELD(var_s6, s32 *, 0) > 0) {
             do {
                 temp_s5 = M2C_FIELD(var_s6, s8 **, 4) + (var_s1 * 8);
                 temp_v0_2 = U16Read__18CBinaryInputStream(arg1);
-                M2C_FIELD(temp_s5, s8 **, 4) = PvAllocStackClearImpl__Fi(sp, temp_v0_2 * 6, 0x10);
+                M2C_FIELD(temp_s5, s8 **, 4) = PvAllocStackClearImpl__Fi(arg1, temp_v0_2 * 6, 0x10);
                 if (temp_v0_2 > 0) {
                     var_s2 = temp_v0_2;
                     var_s3 = 0;
@@ -61,12 +61,13 @@ loop_5:
         }
         var_s0 = 0;
         temp_v0_3 = U16Read__18CBinaryInputStream(arg1);
-        M2C_FIELD(var_s6, s8 **, 8) = PvAllocStackClearImpl__Fi(sp, temp_v0_3 * 4, 0x10);
+        s8 * hoisted_3 = M2C_FIELD(var_s6, s8 **, 8);
+        hoisted_3 = PvAllocStackClearImpl__Fi(arg1, temp_v0_3 * 4, 0x10);
         if (temp_v0_3 > 0) {
             do {
                 temp_a0 = var_s0 * 4;
                 var_s0 += 1;
-                *(temp_a0 + M2C_FIELD(var_s6, s8 **, 8)) = S16Read__18CBinaryInputStream(arg1);
+                *(temp_a0 + hoisted_3) = S16Read__18CBinaryInputStream(arg1);
             } while (var_s0 < temp_v0_3);
         }
     }

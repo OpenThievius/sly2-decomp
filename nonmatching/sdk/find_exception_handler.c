@@ -6,9 +6,9 @@ typedef struct ExceptionEntry {
 } ExceptionEntry;
 
 typedef struct ExceptionTable {
+    ExceptionEntry entries[1];
     int header00;
     int header04;
-    ExceptionEntry entries[1];
 } ExceptionTable;
 
 typedef struct ExceptionHandler {
@@ -23,10 +23,9 @@ int find_exception_handler(unsigned int argument, ExceptionTable *table, Excepti
     ExceptionEntry *entry;
 
     *pFound = 1;
-    result = 0;
     if (table == 0)
         return result;
-    index = 0;
+    result = index = 0;
     if (isEntry == 0) {
         key = argument - 1;
     } else {

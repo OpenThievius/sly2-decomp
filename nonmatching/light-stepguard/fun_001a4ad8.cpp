@@ -74,8 +74,8 @@ loop_3:
             var_a3_2 = &D_002BFC60;
             *M2C_FIELD(&g_2dea28, s32 **, 0xC) = ((var_s1 * 3) + 0x15) | 0x6C03C000;
             temp_v1_3 = M2C_FIELD(&g_2dea28, s32 **, 0xC) + 4;
-            var_a2_2 = temp_v1_3;
             M2C_FIELD(&g_2dea28, s32 **, 0xC) = temp_v1_3;
+            var_a2_2 = temp_v1_3;
             var_t0 = 8;
 loop_8:
             var_t0 -= 4;

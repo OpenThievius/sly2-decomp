@@ -1,8 +1,8 @@
 #include "sly2.h"
 
 struct REGBLOCK {
+    int long status;
     char pad0[0x28];
-    unsigned long status;
     char pad1[0x10];
     volatile unsigned int command; // volatile-ok: command register of a block retail writes three times with a nop between each store (unverified which block)
 };

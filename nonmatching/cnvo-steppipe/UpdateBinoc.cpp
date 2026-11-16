@@ -1,6 +1,6 @@
 typedef int QW __attribute__((mode(TI)));
 
-extern "C" int FAsegaGone(int);
+extern "C" int FAsegaGone(void);
 extern "C" void SetBinocState(char *, int);
 extern "C" void SetStepRadTarget(char *, float);
 extern "C" void UpdateBinocHud(char *);
@@ -25,24 +25,24 @@ void UpdateBinoc(char *arg0)
                 SetStepRadTarget(*(char **)arg0, *(float *)(pTable + 0x460));
                 var_f0 = *(float *)(pTable + 0x470);
                 *(float *)(arg0 + 0x3C) = var_f0;
-                UpdateBinocHud(arg0 + 0x24);
+                UpdateBinocHud(arg0);
             } else if (*(int *)(arg0 + 0x20) == temp_s1) {
                 SetStepRadTarget(*(char **)arg0, *(float *)(pTable + 0x5C4));
                 var_f0 = *(float *)(pTable + 0x5CC);
                 *(float *)(arg0 + 0x3C) = var_f0;
-                UpdateBinocHud(arg0 + 0x24);
+                UpdateBinocHud(arg0);
             }
         } else if (temp_s1 < 2) {
             if (temp_s1 == 0) {
                 *(QW *)(*(char **)arg0 + 0x190) = *pIdentity;
                 temp_a0 = *(int *)(arg0 + 0x14);
-                if (temp_a0 == 0 || FAsegaGone(temp_a0) != 0)
+                if (temp_a0 == 0 || FAsegaGone() != 0)
                     SetBinocState(arg0, 1);
             }
         } else if (temp_s1 == constTwo) {
             *(QW *)(*(char **)arg0 + 0x190) = *pIdentity;
             temp_a0 = *(int *)(arg0 + 0x14);
-            if (temp_a0 == 0 || FAsegaGone(temp_a0) != 0)
+            if (temp_a0 == 0 || FAsegaGone() != 0)
                 SetBinocState(arg0, -1);
         }
     } while (temp_s1 != *(int *)(arg0 + 4));

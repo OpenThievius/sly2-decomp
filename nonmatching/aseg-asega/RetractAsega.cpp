@@ -63,14 +63,15 @@ loop_6:
             RemoveDlEntry((M2C_UNK *)(M2C_FIELD(arg0, s8 **, 0x14) + 0x50), arg0);
             var_s1 = M2C_FIELD(arg0, s8 **, 0x34);
             if (var_s1 != NULL) {
-                var_a0 = M2C_FIELD(var_s1, s32 *, 4);
+                s32 hoisted_5 = M2C_FIELD(var_s1, s32 *, 4);
+                var_a0 = hoisted_5;
 loop_11:
                 temp_s0 = M2C_FIELD(var_s1, s8 **, 0x28);
                 RemoveXfAct(var_a0, M2C_FIELD(var_s1, s32 *, 8), var_s1);
                 FreeAct(var_s1);
                 var_s1 = temp_s0;
                 if (var_s1 != NULL) {
-                    var_a0 = M2C_FIELD(var_s1, s32 *, 4);
+                    var_a0 = hoisted_5;
                     goto loop_11;
                 }
             }

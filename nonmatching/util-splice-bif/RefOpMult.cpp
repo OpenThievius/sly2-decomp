@@ -14,7 +14,7 @@ MATRIX4 operator*(const MATRIX4 &matrixLeft, const MATRIX4 &matrixRight);
 extern "C" {
 CRef *CRef_SetF32(CRef *pref, float g);
 CRef *CRef_SetVector(CRef *pref, QW vector);
-CRef *CRef_SetMatrixPtr(CRef *pref, MATRIX4 *pmatrix);
+CRef *CRef_SetMatrixPtr(CRef *pref);
 CRef *CRef_RefClone(CRef *pref, CRef *ref, CFrame *pframe, unsigned long ulArg);
 VECTOR *__as__6VECTORG9VU_VECTOR(VECTOR *pvector, VU_VECTOR vuv);
 }
@@ -102,7 +102,7 @@ CRef RefOpMult(int cref, CRef *aref)
                 float *pgDst = &matrix.mat[0][0];
                 for (int i = 0; i < 16; i++)
                     pgDst[i] = gScale * pgSrc[i];
-                CRef_SetMatrixPtr(&ref, &matrix);
+                CRef_SetMatrixPtr(&ref);
                 break;
             }
             case TAGK_Clq: {

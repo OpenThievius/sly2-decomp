@@ -49,8 +49,8 @@ loop_14:
         var_s1 -= 1;
         if (!(var_s6 & 0x100)) {
             if (var_s1 < 0) {
-                temp_v0 = M2C_FIELD(arg0, s8 **, 0x30);
                 M2C_FIELD(temp_v0, M2C_UNK (**)(s8 *), 0xC)(arg0 + M2C_FIELD(temp_v0, s16 *, 8));
+                temp_v0 = M2C_FIELD(arg0, s8 **, 0x30);
                 temp_v0_2 = M2C_FIELD(arg0, s32 *, 0x14);
                 if (temp_v0_2 > 0) {
                     var_s2 = M2C_FIELD(arg0, u8 **, 0x10);

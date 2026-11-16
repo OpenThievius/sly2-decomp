@@ -42,8 +42,8 @@ void UpdateStepPhys__FP4STEP(STEPHOLDER *step)
         if (remaining >= 0) {
             float *pposition = position.lane;
             do {
-                QW vector = *pvec;
                 QW *pvecNext = pvec + 1;
+                QW vector = *pvec;
                 QW *pbaseNext = pbase + 1;
                 QW point = TransformPoint(vector, local.row[0], local.row[1], local.row[2], local.row[3]);
                 float *pwrite = prow;

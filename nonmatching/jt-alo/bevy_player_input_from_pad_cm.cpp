@@ -46,7 +46,7 @@ int FGadgetAcquired(int);
 void func_0018E1E0(SLY *);
 CHN *PchnFindAseg(void *, void *, int, int);
 QW func_00204E38(float, SLY *, ASEGA *);
-void SetAsegaSpeed(ASEGA *, float);
+void SetAsegaSpeed(SLY *, float);
 void DrainJtPower(SLY *, float);
 void SetJtState(SLY *, int, int);
 void ReblendAsegbl(void *);
@@ -159,7 +159,7 @@ extern "C" void bevy_player_input_from_pad_cm(SLY *psly)
         VU_SCALE scale;
         scale.q = VectorFromFloat(-1.0f);
         psly->velGoal = VectorScaleX(vel, scale.q);
-        SetAsegaSpeed((ASEGA *)psly->field_0x1030, psly->pjoy->uStick);
+        SetAsegaSpeed(psly, psly->pjoy->uStick);
         SetStepRadTarget(psly, psly->pjoy->radStick);
         break;
     }

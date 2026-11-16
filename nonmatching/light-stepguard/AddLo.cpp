@@ -3,7 +3,7 @@ extern "C" void RemoveDlEntry(void *, void *);
 extern "C" void InsertDlEntryBefore(void *, void *, void *);
 extern "C" void ReinsertSwRoot(void *, void *);
 extern "C" int FIsLoInWorld(void *);
-extern "C" void func_00148300(void *, void *);
+extern "C" void func_00148300(void);
 extern "C" char B_003DD490[];
 
 void AddLo(char *arg0)
@@ -33,7 +33,7 @@ void AddLo(char *arg0)
             InsertDlEntryBefore(sp0, *sp4, arg0);
         }
         temp_v0 = *(char **)(arg0 + 0x10);
-        if (temp_v0 == 0 || (((*(unsigned long *)(temp_v0 + 0x28)) >> 0x3C) & 1)) {
+        if (temp_v0 == 0 || (((*(unsigned *)(temp_v0 + 0x28)) >> 0x3C) & 1)) {
             temp_v0_2 = *(char **)(arg0 + 0xC);
             ((void (*)(void *))(*(void **)(temp_v0_2 + 0x5C)))(arg0 + *(short *)(temp_v0_2 + 0x58));
         }
@@ -48,13 +48,13 @@ void AddLo(char *arg0)
                 temp_a2 = ((void **)sp8)[var_s0];
                 var_s0 += 1;
                 temp_v1_3 = *(char **)((char *)temp_a2 + 0xC);
-                temp_a1 = (void (*)(void *, void *, void *))(*(void **)(temp_v1_3 + 0x44));
                 temp_a1((char *)temp_a2 + *(short *)(temp_v1_3 + 0x40), temp_a1, temp_a2);
+                temp_a1 = (void (*)(void *, void *, void *))(*(void **)(temp_v1_3 + 0x44));
             } while (var_s0 < temp_v0_3);
         }
         if (FIsLoInWorld(arg0) == 0) {
             if (*(void **)(arg0 + 0x10) == 0)
-                func_00148300(B_003DD490, arg0);
+                func_00148300();
         } else {
             temp_v0_5 = *(char **)(arg0 + 0xC);
             ((void (*)(void *))(*(void **)(temp_v0_5 + 0xBC)))(arg0 + *(short *)(temp_v0_5 + 0xB8));

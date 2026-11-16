@@ -6,7 +6,7 @@ void sceSifInitRpc(int mode);
 int sceSifBindRpc(SifClient *client, u32 serverId, int mode);
 int sceSifCallRpc(SifClient *client, int rpcNumber, int mode, void *sendBuffer, int sendSize, void *receiveBuffer, int receiveSize, void *endFunction, void *endArgument);
 int func_00236960(const char *format, ...);
-void func_0023B170(void *address, int size);
+void func_0023B170(int, int size);
 void func_00241B18();
 void func_00241A30();
 void func_00241C10();
@@ -29,9 +29,8 @@ extern int B_00450540;
 extern SifClient B_004504E8;
 int sceCdInit(int mode) {
     int status;
-    int result;
+    unsigned int result;
     int delay;
-    int first;
     int second;
     int third;
     if (func_00241F28(1) != 0) {
@@ -66,17 +65,16 @@ int sceCdInit(int mode) {
     }
     B_00450540 = mode;
     D_002C6798 = 0;
-    func_0023B170(&B_00450540, 4);
+    func_0023B170(mode, 4);
     if (sceSifCallRpc(&B_004504E8, 0, 0, &B_00450540, 4, D_002C7940, 0x10, 0, 0) < 0) {
         D_002C6764 = 0;
         return 0;
     }
-    first = *(int *)((u32)&D_002C7940[3] | 0x20000000);
     second = *(int *)((u32)&D_002C7940[1] | 0x20000000);
     third = *(int *)((u32)&D_002C7940[2] | 0x20000000);
     status = 1;
-    if (first != 0xFF) {
-        if (first == 0xFE) {
+    if ((*(int *)((u32)&D_002C7940[3] | 0x20000000)) != 0xFF) {
+        if ((*(int *)((u32)&D_002C7940[3] | 0x20000000)) == 0xFE) {
             D_002C6750 = status;
         } else if (second / 256 < 2) {
             status = 2;

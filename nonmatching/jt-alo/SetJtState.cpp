@@ -372,8 +372,8 @@ extern "C" void SetJtState(JT *pjt, int jtsNew, int jtbsNew)
         case 3: {
             int kind;
             FIELD(int, 0x18F8) = -1;
-            FIELD(float, 0x1998) = 1.0f;
             FIELD(float, 0x199C) = 1.0f;
+            FIELD(float, 0x1998) = 1.0f;
             FIELD(float, 0x18F4) = g_2dded0;
             svt = 0.0f;
             paseg = FIELD(ASEG *, 0x1994);

@@ -17,7 +17,7 @@ void *PvAllocSwClearImpl__Fi(ALLOCREQ *);
 void *PvAllocStackImpl__Fi(ALLOCREQ *);
 void UnpackHelper__4VIFS3UPKiiPiPPUi(void *, int, int, int, int, void *);
 void AddVifStcycl__4VIFSii(void *, int, int);
-void AddVifStrow__4VIFSP2QW(void *, void *);
+void AddVifStrow__4VIFSP2QW(void *);
 void AddVifStmask__4VIFSUi(void *, int);
 void AddVifMscal__4VIFSPv(void *, void *);
 void EndDmaCnt__4DMAS(void *);
@@ -28,7 +28,7 @@ int func_001EC688(SHD *, int, int, void *);
 float func_002599D8(VECTOR *);
 float func_002599E0(VECTOR *);
 float func_002599E8(VECTOR *);
-void func_001699E8(void *, GLOB *, GLOBI *, int, int, int, int, int, CBinaryInputStream *);
+void func_001699E8(void *, GLOB *, GLOBI *, int, int, int, CBinaryInputStream *, int, CBinaryInputStream *);
 extern char B_002DEB60[];
 extern int D_002BE540[];
 extern int D_002BE558[];
@@ -99,7 +99,6 @@ extern "C" void LoadGlobIndexedFromBrx(void *pv, GLOB *pglob, GLOBI *pglobi, GLO
                 punpack->w[0] = 2;
                 break;
             }
-            int next = index + 1;
             punpack->w[1] = base;
             SHD *pshd = PshdFromIndex(pbis->U16Read());
             int cvtx = pbis->U8Read();
@@ -136,7 +135,7 @@ extern "C" void LoadGlobIndexedFromBrx(void *pv, GLOB *pglob, GLOBI *pglobi, GLO
             if (pglob->cweight != 0) {
                 int fShort = cweight < 4;
                 if (fShort) {
-                    AddVifStrow__4VIFSP2QW(vifs, B_002DEB60);
+                    AddVifStrow__4VIFSP2QW(vifs);
                     AddVifStmask__4VIFSUi(vifs, D_002BE540[cweight]);
                 }
                 UnpackHelper__4VIFS3UPKiiPiPPUi(vifs, D_002BE558[cweight], cvtx, punpack->w[8], 0, &pweights);
@@ -169,7 +168,7 @@ extern "C" void LoadGlobIndexedFromBrx(void *pv, GLOB *pglob, GLOBI *pglobi, GLO
                     CopyAb(pweights + ivtx * cweight, aweight + aipos[ivtx] * cweight, cweight);
             }
             AddVifMscal__4VIFSPv(vifs, VU1_START_0);
-            index = next;
+            index = (index + 1);
             AddVifMscal__4VIFSPv(vifs, D_00001910);
             AddVifMscal__4VIFSPv(vifs, D_00001A68);
             CStackFrame_Destructor(&frame1, 2);
@@ -178,6 +177,6 @@ extern "C" void LoadGlobIndexedFromBrx(void *pv, GLOB *pglob, GLOBI *pglobi, GLO
     EndDmaCnt__4DMAS(vifs);
     AddDmaRet__4DMAS(vifs);
     DMAS_DetachCopyPermanent(vifs, &pglob->dma, &dmaOut, &pglobi->dma);
-    func_001699E8(pv, pglob, pglobi, arg4, arg5, 0, 0, 0, pbis);
+    func_001699E8(pv, pglob, pglobi, arg4, arg5, 0, pbis, 0, pbis);
     CStackFrame_Destructor(frame0, 2);
 }

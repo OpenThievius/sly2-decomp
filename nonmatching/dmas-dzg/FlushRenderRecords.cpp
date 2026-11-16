@@ -10,14 +10,14 @@ struct Pass_157FA0 { void (*begin)(Vifs_157FA0 *, int, int); void (*end)(Vifs_15
 extern "C" {
 int SortRenderRecords(int, QW *, Rec_157FA0 **, int *, int *);
 void AddDmaCall__4DMASP2QW(void *, void *);
-int AddDmaCnt__4DMAS(void *);
+void AddDmaCnt__4DMAS(void *);
 void EndDmaCnt__4DMAS(void *);
 void AddVifDirect__4VIFSiP2QWi(void *, int, void *, int);
 int AddVifFlush__4VIFS(void *);
 void AddVifBaseOffset__4VIFSii(void *, int, int);
 void AddVifUnpack__4VIFS3UPKiPvi(void *, int, int, void *, int);
 void *bevy_camera_cm_14f768(void *, int, int, void *, void *);
-void func_001574A0(void *);
+s32 func_001574A0(void *);
 void func_001EA9F0(void *, int);
 extern Vifs_157FA0 g_2dea28;
 extern Dmas_157FA0 *g_2dea4c;
@@ -121,7 +121,7 @@ void FlushRenderRecords(char *psw)
     B_003D4A50 = 0;
     func_001574A0(B_002DEA00);
     func_001574A0(&g_2dea28);
-    if (*(int *)(psw + 0x3EA8) != 0) {
+    if (*(short *)(psw + 0x3EA8) != 0) {
         *(int *)(psw + 0x3EA8) = 0;
         func_001EA9F0(psw, 0);
     }

@@ -11,12 +11,12 @@ extern Cm B_002DDF40;
 extern const B8 D_002BD950, D_002BD958, D_002BD968, D_002BD970;
 extern char D_002BD960[];
 extern float B_FLT_003E1BE0;
-extern float g_2dded0;
-void ActivateCplcy(Plook *, void *);
+extern float g_2dded0[];
+void ActivateCplcy(Plook *);
 void *NewEmitter(int);
 void SetEmitterUnpositioned(void *, void *);
 void VirtualRefPtr_Assign(void *, void *);
-void PauseAmb(void *);
+void PauseAmb(void *, void *, void *);
 void DecomposeRotateMatrixPanTilt__FP7MATRIX3PfT1(void *, float *, float *);
 int FIsBasicDerivedFrom(void *, int);
 void *PmatLoWorld(void *);
@@ -25,14 +25,14 @@ void SetCmNearClip(void *, float);
 }
 extern "C" void ActivateCplook(Plook *pcplook, void *psoFocus, void *pv)
 {
-    ActivateCplcy(pcplook, psoFocus);
+    ActivateCplcy(pcplook);
     void *emitter = NewEmitter(0x26);
     SetEmitterUnpositioned(emitter, 0);
     VirtualRefPtr_Assign(&pcplook->pambZoom, emitter);
     emitter = NewEmitter(0x25);
     SetEmitterUnpositioned(emitter, 0);
     VirtualRefPtr_Assign(&pcplook->pambBinoc, emitter);
-    PauseAmb(pcplook->pambZoom);
+    PauseAmb(pcplook->pambZoom, psoFocus, pv);
     Cm *pcm = &B_002DDF40;
     DecomposeRotateMatrixPanTilt__FP7MATRIX3PfT1(pcm->mat, &pcplook->radPan, &pcplook->radTilt);
     if (FIsBasicDerivedFrom(pcplook->psoFocus, 0x34)) {
@@ -63,5 +63,5 @@ extern "C" void ActivateCplook(Plook *pcplook, void *psoFocus, void *pv)
     pcplook->radFovMax = pcm->fov;
     SetCmNearClip(pcm, 49.0f);
     pcplook->cActivate = pcplook->cActivate + 1;
-    B_FLT_003E1BE0 = g_2dded0;
+    B_FLT_003E1BE0 = g_2dded0[0];
 }

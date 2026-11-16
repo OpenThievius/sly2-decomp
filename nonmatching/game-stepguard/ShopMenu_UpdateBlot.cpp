@@ -54,8 +54,8 @@ void ShopMenu_UpdateBlot(SHOPMENU *menu)
         SwitchBlotLabel(menu->pblot, -1, &menu->labelA);
     }
     int irow = menu->itop;
-    int *plabelB = &menu->labelB;
     int *plabelC = &menu->labelC;
+    int *plabelB = &menu->labelB;
     if (irow < irowEnd) {
         ROW *prow = &menu->arow[irow];
         do {

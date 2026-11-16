@@ -4,7 +4,7 @@
 #include "types.h"
 struct SW;
 struct XP;
-struct XPSOVT { char pad[0x1B8]; short delta; short index; void (*fn)(void *, XP *, int, void *); };
+struct XPSOVT { char pad[0x1B8]; short delta; short index; void (*fn)(void *, XP *, int); };
 struct XPSO { char pad[0xC]; XPSOVT *vt; };
 struct XPSEC { char pad[0x60]; int unk60; };
 struct XPOWN { char pad[0xEC]; XPSEC *psec; };
@@ -61,7 +61,7 @@ void PxpAdd(char *psw, void *pobjA, void *pobjB, QW pos, QW vel, int arg5, int a
         pxpd = &pxp->xpd[ixpd];
         XPSO *pso = pxpd->pso;
         if (pso)
-            pso->vt->fn((char *)pso + pso->vt->delta, pxp, ixpd, pso);
+            pso->vt->fn((char *)pso + pso->vt->delta, pxp, ixpd);
         ixpd++;
     } while (ixpd < 2);
     RecalcSwXpMovement((SW *)psw, 1, &pxp);

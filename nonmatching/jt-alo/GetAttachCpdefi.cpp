@@ -53,7 +53,7 @@ void GetAttachCpdefi(ATTACH *pattach, CPDEFI *pcpdefi)
     if (pattach->pso->pvCam != pattach->pcam)
         return;
     pcpdefi->unk34 = 0;
-    int dir = pattach->dir;
+    unsigned int dir = pattach->dir;
     if (dir < 3) {
         if (dir > 0) {
             if (FIsBasicDerivedFrom(pattach->pcrv, 0xC)) {
@@ -109,7 +109,7 @@ void GetAttachCpdefi(ATTACH *pattach, CPDEFI *pcpdefi)
         if (s < sRamp + sEdge) {
             float t = GClamp01((sRamp + sEdge - s) / sRamp);
             gTarget = -t * t * 150.0f;
-        } else if (sMax - sRamp < s) {
+        } else if (sMax - s > sRamp) {
             float t = GClamp01((s - (sMax - sRamp)) / sRamp);
             gTarget = t * t * 150.0f;
         } else {

@@ -4,12 +4,11 @@ struct Out_240050 { struct Item_240050 **values; int count; };
 
 void func_00240050(struct List_240050 *list, struct Out_240050 *out)
 {
-    int count = list->count;
+    unsigned int count = list->count;
     int nextIndex[count];
     int head = -1;
     int index = 0;
     int link;
-    int ahead;
     int cursor;
     int nextLink;
     int outCount;
@@ -27,7 +26,6 @@ outer:
     if (items[index]->key - items[link]->key >= 0) {
         goto headInsert;
     }
-    ahead = index + 1;
     cursor = link;
 emit:
     outCount = out->count;
@@ -39,12 +37,12 @@ emit:
         goto tailInsert;
     }
     cursor = nextLink;
-    if (items[index]->key - items[cursor]->key < 0) {
+    if (items[index]->key - 0 > items[cursor]->key) {
         goto emit;
     }
     head = index;
     nextIndex[index] = cursor;
-    index = ahead;
+    index = (index + 1);
     goto check;
 headInsert:
     head = index;

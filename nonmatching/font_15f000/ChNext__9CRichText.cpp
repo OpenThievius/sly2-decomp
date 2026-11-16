@@ -14,20 +14,19 @@ extern "C" int ChNext__9CRichText(CRichText *self)
 {
     int done = 0;
     do {
-        unsigned char *pch = self->cur;
-        switch (*pch) {
+        switch (*self->cur) {
         case '~':
-            if (pch[1] == *pch) {
-                self->cur = pch + 1;
+            if (self->cur[1] == *self->cur) {
+                self->cur = self->cur + 1;
                 done = 1;
-            } else if (pch[1] == '.') {
+            } else if (self->cur[1] == '.') {
                 self->rgbaMarkup = self->rgbaBase;
                 self->rgbaCur = self->rgbaMarkup;
                 self->cur += 2;
             } else {
-                unsigned char *pdigit = pch + 1;
+                unsigned char *pdigit = self->cur + 1;
                 unsigned int value = 0;
-                if (pch[1] != 0 && pdigit - pch < 7) {
+                if (self->cur[1] != 0 && pdigit - self->cur < 7) {
                     do {
                         unsigned int digit;
                         if ((unsigned int)(*pdigit - '0') < 10)
@@ -40,7 +39,7 @@ extern "C" int ChNext__9CRichText(CRichText *self)
                             break;
                         pdigit++;
                         value = value * 16 + digit;
-                    } while (*pdigit != 0 && pdigit - pch < 7);
+                    } while (*pdigit != 0 && pdigit - self->cur < 7);
                 }
                 if (pdigit - self->cur >= 7) {
                     self->rgbaMarkup.b[0] = (((value >> 16) & 0xFF) + 1) >> 1;
@@ -56,16 +55,16 @@ extern "C" int ChNext__9CRichText(CRichText *self)
             }
             break;
         case '&':
-            if (pch[1] == *pch) {
-                self->cur = pch + 1;
+            if (self->cur[1] == *self->cur) {
+                self->cur = self->cur + 1;
                 done = 1;
-            } else if (pch[1] == '.') {
+            } else if (self->cur[1] == '.') {
                 self->base = self->baseFont;
                 self->rgbaCur = self->rgbaMarkup;
                 self->flag = 1;
                 self->cur += 2;
             } else {
-                CFont *pfont = PfontFromCh(pch[1]);
+                CFont *pfont = PfontFromCh(self->cur[1]);
                 if (pfont != 0) {
                     self->font = *pfont;
                     self->base = &self->font;
@@ -80,20 +79,20 @@ extern "C" int ChNext__9CRichText(CRichText *self)
                 } else {
                     self->base = self->baseFont;
                     self->rgbaCur = self->rgbaBase;
-                    self->flag = 1;
                     done = 1;
+                    self->flag = 1;
                 }
             }
             break;
         case '^':
-            if (pch[1] == *pch) {
-                self->cur = pch + 1;
+            if (self->cur[1] == *self->cur) {
+                self->cur = self->cur + 1;
                 done = 1;
-            } else if (pch[1] == '.') {
+            } else if (self->cur[1] == '.') {
                 PopScaling__5CFont(self->base);
                 self->cur += 2;
             } else {
-                float scale = (float)(pch[1] - '0') + (float)(pch[2] - '0') * 0.1f;
+                float scale = (float)(self->cur[1] - '0') + (float)(self->cur[2] - '0') * 0.1f;
                 PushScaling__5CFontff(self->base, scale * self->base->sx, scale * self->base->sy);
                 self->cur += 3;
             }
@@ -103,7 +102,6 @@ extern "C" int ChNext__9CRichText(CRichText *self)
             break;
         }
     } while (!done);
-    unsigned char *pend = self->cur;
-    self->cur = pend + 1;
-    return *pend;
+    self->cur = self->cur + 1;
+    return *self->cur;
 }

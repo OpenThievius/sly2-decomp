@@ -184,8 +184,8 @@ void bevy_ui_binoc_recon_202d38(RECON *precon)
             }
         } else if (ptarget != 0 && ptarget->kind != 1) {
             precon->label = precon->pblot->alabel[0];
-            bevy_ui_binoc_recon_202768(precon, 3);
             fSet = 1;
+            bevy_ui_binoc_recon_202768(precon, 3);
         } else if (1.0f <= precon->fCenter && precon->fSmall != 0) {
             precon->label = precon->pblot->alabel[1];
             bevy_ui_binoc_recon_202768(precon, 5);

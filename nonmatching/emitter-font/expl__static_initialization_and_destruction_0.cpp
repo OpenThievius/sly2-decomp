@@ -18,10 +18,10 @@ extern "C" void expl__static_initialization_and_destruction_0(int fInit, int pri
         SA *pa = &g_2de5b0;
         SA a;
         memset(&a, 0, 0x40);
-        *(int *)(a.b + 0x10) = -1;
+        *(unsigned *)(a.b + 0x10) = -1;
         *(QW *)(a.b + 0x20) = *(QW *)g_2a2dd0;
-        *(QW *)(a.b + 0x30) = *(QW *)g_2a2da0;
         *pa = a;
+        *(QW *)(a.b + 0x30) = *(QW *)g_2a2da0;
         SB *pb = &B_002DE5F0;
         SB b;
         memset(&b, 0, 0x70);

@@ -11,7 +11,7 @@ struct _m2c_stack_func_001C8730 {
     /* 0x00 */ char pad0[0x30];
 };                                                  /* size = 0x30 */
 M2C_UNK DecrementSwBinocCount(M2C_UNK *);           /* extern */
-M2C_UNK DecrementSwShowCount(M2C_UNK *);            /* extern */
+M2C_UNK DecrementSwShowCount(void);            /* extern */
 M2C_UNK IncrementSwBinocCount(M2C_UNK *);           /* extern */
 M2C_UNK IncrementSwShowCount(M2C_UNK *);            /* extern */
 M2C_UNK SetGadgetAcquired(s32, M2C_UNK);            /* extern */
@@ -19,7 +19,7 @@ M2C_UNK StartJsg(s32, s8 *);                      /* extern */
 s32 StartStream(M2C_UNK *, s32, M2C_UNK);           /* extern */
 M2C_UNK StopJsg(s32);                               /* extern */
 M2C_UNK StopStream(M2C_UNK *);                      /* extern */
-M2C_UNK func_001C8918(s8 *, M2C_UNK);             /* extern */
+M2C_UNK func_001C8918(void);             /* extern */
 extern M2C_UNK B_003DD040;
 extern M2C_UNK B_003DD490;
 extern f32 g_2dded0;
@@ -60,8 +60,8 @@ void func_001C8730(s8 *arg0, s32 arg1) {
             }
             break;
         case 2:                                     /* switch 1 */
-            func_001C8918(arg0, -1);
-            DecrementSwShowCount(&B_003DD490);
+            func_001C8918();
+            DecrementSwShowCount();
             break;
         }
         M2C_FIELD(arg0, s32 *, 0x180) = arg1;
@@ -69,7 +69,7 @@ void func_001C8730(s8 *arg0, s32 arg1) {
         switch (arg1) {                             /* switch 2 */
         case 2:                                     /* switch 2 */
             M2C_FIELD(arg0, s32 *, 0x194) = 5;
-            func_001C8918(arg0, 1);
+            func_001C8918();
             IncrementSwShowCount(&B_003DD490);
             temp_a1_2 = M2C_FIELD(arg0, s32 *, 0x1F4);
             if (temp_a1_2 != 0) {
@@ -92,7 +92,7 @@ block_29:
             temp_a2 = M2C_FIELD(arg0, s8 **, 0x190);
             if (temp_a2 != NULL) {
                 temp_v0_2 = M2C_FIELD(temp_a2, s8 **, 0xC);
-                M2C_FIELD(temp_v0_2, M2C_UNK (**)(s8 *, M2C_UNK, s8 *), 0x27C)(temp_a2 + M2C_FIELD(temp_v0_2, s16 *, 0x278), 1, temp_a2);
+                M2C_FIELD(temp_v0_2, M2C_UNK (**)(s8 *, M2C_UNK), 0x27C)(temp_a2 + M2C_FIELD(temp_v0_2, s16 *, 0x278), 1);
                 M2C_FIELD(arg0, s8 **, 0x190) = NULL;
                 DecrementSwBinocCount(&B_003DD490);
             }

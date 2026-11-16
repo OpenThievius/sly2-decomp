@@ -14,14 +14,14 @@ static inline void Pad(VIFS *pv) { while ((int)pv->p & 0xF) { *(int *)pv->p = 0;
 static inline void Skip(VIFS *pv, int n) { pv->p = pv->p + n; }
 static inline void Tail(VIFS *pv, char *tail)
 {
-    *(int *)pv->p = 0x6C03C004;
     int *to = (int *)(pv->p += 4);
+    *(int *)pv->p = 0x6C03C004;
     int *from = (int *)tail;
     int n = 8;
     do {
         n -= 4;
         int w0 = from[0]; int w1 = from[1]; int w2 = from[2]; int w3 = from[3];
-        from += 4;
+        from += 1;
         to[0] = w0; to[1] = w1; to[2] = w2; to[3] = w3;
         to += 4;
     } while (n >= 0);
@@ -80,8 +80,8 @@ void DrawMovieShapeCharacter(SELF *self, PAIR *pair, TAIL *tail, int fade)
     g_2dea28.p += 0x10;
     SLOT *slot = OnGameLoad__FP4GAME();
     slot->a = 0x15;
-    slot->c = (int)tag & 0x0FFFFFFF;
     slot->f = tail->base + (float)(self->owner->scale << 0x12);
+    slot->c = (int)tag & 0x0FFFFFFF;
     slot->d = self->word;
 }
 }

@@ -1,7 +1,7 @@
 #include "sly2.h"
 #include "vu0inline.h"
 #include "ps2inline.h"
-struct VT { char pad0[0x108]; short delta108; short u108; QW (*fn10C)(char *, char *); char pad1[0x118 - 0x110]; short delta118; short u118; void (*fn11C)(char *, QW, char *); };
+struct VT { char pad0[0x108]; short delta108; short u108; QW (*fn10C)(char *); char pad1[0x118 - 0x110]; short delta118; short u118; void (*fn11C)(char *, QW); };
 struct OBJ1C { char pad[0x1C]; float value; };
 struct HOLDER { char pad[0x90]; OBJ1C *obj; };
 struct PLAYER { char pad0[0xC]; VT *vt; char pad1[0x58 - 0x10]; HOLDER *holder58; char pad2[0x208 - 0x5C]; int f208; };
@@ -21,7 +21,7 @@ struct GOAL_17AC90 : GOAL {
 static inline QW VelocityOf(PLAYER *player)
 {
     VT *vt = player->vt;
-    return vt->fn10C((char *)player + vt->delta108, (char *)player);
+    return vt->fn10C((char *)player + vt->delta108);
 }
 union LQ { QW q; float g[4]; };
 struct LEAP { QW matrix[4]; LQ pos; LQ vel; LQ target; LQ result; LQ scale; };
@@ -30,7 +30,7 @@ void GoalAnimLeap_SetState(GOAL_17AC90 *, int);
 void GoalAnim_Update();
 QW PosLoWorld(void *);
 void PredictXfTransform(int, int, float, void *, void *);
-void func_0017ABC8(GOAL_17AC90 *, int);
+void func_0017ABC8(GOAL_17AC90 *);
 extern float D_FLT_002BE6C8;
 extern float D_FLT_002BE6CC;
 extern float g_2dded0;
@@ -56,7 +56,7 @@ void GoalAnimLeap_Update(GOAL_17AC90 *self) {
                     if (LaneZInGeneralRegister(vel) < 0.0f && self->state == 0)
                         GoalAnimLeap_SetState(self, 1);
                     else
-                        func_0017ABC8(self, self->state);
+                        func_0017ABC8(self);
                 }
             } else {
                 GoalAnimLeap_SetState(self, 3);
@@ -91,7 +91,7 @@ void GoalAnimLeap_Update(GOAL_17AC90 *self) {
             }
             {
                 PLAYER *player = (PLAYER *)self->pstep;
-                player->vt->fn11C((char *)player + player->vt->delta118, leap.result.q, (char *)player);
+                player->vt->fn11C((char *)player + player->vt->delta118, leap.result.q);
             }
             break;
         }

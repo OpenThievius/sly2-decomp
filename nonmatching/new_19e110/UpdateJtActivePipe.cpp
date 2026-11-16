@@ -134,11 +134,11 @@ turn:
         return;
     }
     {
-    QW screen = bevy_player_p14_1c4768(pjoy, VectorSub(l.pos0, l.pos1));
-    float joyx = *(float *)((char *)pjoy + 0x10);
-    float joyy = *(float *)((char *)pjoy + 0x14);
-    QW stick = JoinLowDoublewords(0.0f, InterleaveLowWords(joyy, joyx));
     float sStick = *(float *)((char *)pjoy + 0x1C);
+    QW screen = bevy_player_p14_1c4768(pjoy, VectorSub(l.pos0, l.pos1));
+    float joyy = *(float *)((char *)pjoy + 0x14);
+    float joyx = *(float *)((char *)pjoy + 0x10);
+    QW stick = JoinLowDoublewords(0.0f, InterleaveLowWords(joyy, joyx));
     float zero = 0.0f;
     l.stick = stick;
     float gAlong = LaneX(DotProduct(screen, stick));

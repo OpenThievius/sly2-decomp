@@ -7,7 +7,7 @@ extern "C" {
 int FCheckJtEdgeGrab__FP2JTP2SOP6VECTOR3XPKPvT2(char *, char *, QW, int, void *, QW *);
 int PcgtPointInCbspQuick__FP4CBSPP6VECTOR(int, int, QW);
 void RecalcSwXpMovement(void *, int, char **);
-int bevy_player_p4_144068(char *);
+int bevy_player_p4_144068(void);
 extern char B_003DD490[];
 extern int D_002BF8A8;
 extern float D_FLT_002BF8A4;
@@ -30,7 +30,7 @@ char *PxpFindJtBestEdge__FP2JTPiP6VECTOR(char *jt, int *outFlag, QW *outEdge) {
     char *best;
     char **list;
     locals.flagOut = outFlag;
-    if (bevy_player_p4_144068(*(char **)jt) != 0) {
+    if (bevy_player_p4_144068() != 0) {
         return 0;
     }
     int kind = *(int *)(jt + 0x1C);

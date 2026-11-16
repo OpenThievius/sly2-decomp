@@ -36,6 +36,6 @@ int func_0023AE70(int argument0, int argument1, unsigned char *argument2, int ar
     if (argument1 & 1) {
         return isceSifSetDma(dma, entryCount);
     }
-    return sceSifSetDma(dma);
+    sceSifSetDma(dma);
 }
 }

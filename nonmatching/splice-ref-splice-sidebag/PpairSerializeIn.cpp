@@ -64,8 +64,8 @@ extern "C" PairHandle PpairSerializeIn(CBinaryInputStream *pbis)
         S16Read__18CBinaryInputStream(pbis);
     }
     CPair *ppairNew = h.p;
-    int tagk = code & 0x7F;
     unsigned char fNext = code >> 7;
+    int tagk = code & 0x7F;
     CRef *pref = &ppairNew->ref;
     int i;
     switch (tagk) {

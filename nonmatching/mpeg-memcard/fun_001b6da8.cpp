@@ -28,13 +28,13 @@ void FreeSwMqList__FP2SWP2MQ(void *, PAIR *);
 int PaloFindWkrAbsorber(void *, int);
 void PaloAbsorbWkr(ABS_1B6DA8 *);
 float *PeaFindAsegLabel(void *, int);
-void RetractAsega(void *, int);
+void RetractAsega(void *);
 void SeekAsega(void *, int, float, float);
 }
 extern char B_003DD490;
 extern int D_002C09A8;
 extern QW g_2a2dc0;
-extern float g_2dded0;
+extern float g_2dded0[];
 
 static inline void SetScalar(VU_SCALE *pscale, u32 word)
 {
@@ -54,7 +54,7 @@ extern "C" void func_001B6DA8(OBJ *self, int state)
         self->a190 = 0;
     }
     self->state = state;
-    self->tState = g_2dded0;
+    self->tState = g_2dded0[0];
     switch (state) {
     case 0:
         break;
@@ -72,7 +72,7 @@ extern "C" void func_001B6DA8(OBJ *self, int state)
         scale.q = VectorFromWord(D_002C09A8);
         QW target = ScaleAddX(rest, axis, scale.q);
         pvt->f11C((char *)self + pvt->d118, target);
-        self->t131C = g_2dded0;
+        self->t131C = g_2dded0[0];
         break;
     }
     case 2: {
@@ -103,7 +103,7 @@ extern "C" void func_001B6DA8(OBJ *self, int state)
         if (pg)
             SeekAsega(self->pasega, 0, *pg, 1.0f);
         else
-            RetractAsega(self->pasega, 0);
+            RetractAsega(self->pasega);
         break;
     }
     }

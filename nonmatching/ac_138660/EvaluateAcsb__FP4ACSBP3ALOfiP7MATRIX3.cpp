@@ -16,7 +16,7 @@ struct FRAME {
     QW pos; float v10, v14, v18; int pad1C;
     char blk[0x100];
 };
-extern "C" void EvaluateBezierPos__FfffP6VECTORN63(QW, QW, QW, QW, float, float, float, void *, void *, int);
+extern "C" void EvaluateBezierPos__FfffP6VECTORN63(QW, OUT *, QW, QW, float, float, float, void *, void *, f32);
 extern "C" int ImrsgLookUp__FffiP4MRSGPf(float, float, int, void *, float *);
 extern "C" void EvaluateAcsb__FP4ACSBP3ALOfiP7MATRIX3(ACSB *pacsb, OUT *pout)
 {
@@ -70,8 +70,8 @@ extern "C" void EvaluateAcsb__FP4ACSBP3ALOfiP7MATRIX3(ACSB *pacsb, OUT *pout)
                 SOBJ *pobj = pacsb->apobj[cbez];
                 float len;
                 if (pobj == 0) {
-                    *(float *)(sp + 0x10) = 0.0f;
                     *(float *)(sp + 0x18) = 0.0f;
+                    *(float *)(sp + 0x10) = 0.0f;
                     *(float *)(sp + 0x14) = 0.0f;
                     *(QW *)sp = pacsb->vec;
                 } else {
@@ -97,8 +97,7 @@ extern "C" void EvaluateAcsb__FP4ACSBP3ALOfiP7MATRIX3(ACSB *pacsb, OUT *pout)
                     VT *vt = pobj->vt;
                     vt->fn((char *)pobj + vt->delta, sp + 0x20);
                     float base = *(float *)(sp + 0xA0);
-                    EvaluateBezierPos__FfffP6VECTORN63(*(QW *)(sp + 0xE0), *(QW *)(sp + 0xF0), *(QW *)(sp + 0x100), *(QW *)(sp + 0x110),
-                        *(float *)(sp + 0xA4) - base, *(float *)(sp + 0x134) - base, len, sp, sp + 0x10, 0);
+                    EvaluateBezierPos__FfffP6VECTORN63(*(QW *)(sp + 0xE0), pout, *(QW *)(sp + 0x100), *(QW *)(sp + 0x110), *(float *)(sp + 0xA4) - base, *(float *)(sp + 0x134) - base, len, sp, sp + 0x10, 0);
                 }
                 QW weight = VectorFromWord(*(u32 *)pelt);
                 *(QW *)(sp + 0x120) = weight;

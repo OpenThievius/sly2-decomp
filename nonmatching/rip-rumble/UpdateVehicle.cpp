@@ -153,10 +153,10 @@ extern "C" void UpdateVehicle(VEHICLE *pvehicle)
                 posGun = pgun->pxf->matWorld.row[3];
             int fOnTarget = 0;
             float tHalf = t * -0.5f;
-            float gDrop = pgun->gGravity * tHalf;
-            float rcp = 1.0f / t;
             QW delta = VectorSub(posTarget, posGun);
             QW up = g_2a2dc0;
+            float gDrop = pgun->gGravity * tHalf;
+            float rcp = 1.0f / t;
             QW velFlat = VectorSub(velTarget, VectorScaleX(up, DotProduct(velTarget, up)));
             scale.q = VectorFromFloat(rcp);
             QW scaleRcp = scale.q;

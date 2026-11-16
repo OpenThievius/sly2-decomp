@@ -27,10 +27,10 @@ struct OWNER_1681F8 {
     int result;
 };
 extern "C" {
-void CopyAb__FPvT0Ui(void *, void *, unsigned);
-float GMaxAxisScale(MATRIX4 *);
+void CopyAb__FPvT0Ui(OWNER_1681F8 *, void *, unsigned);
+float GMaxAxisScale(OWNER_1681F8 *);
 void *__ml__FRC7MATRIX4T0(MATRIX4 *, MATRIX4 *, MATRIX4 *);
-void *memcpy(void *, void *, unsigned);
+void *memcpy(void *);
 SLOT_1681F8 *OnGameLoad__FP4GAME(void);
 extern DMAS_1681F8 g_2dea28;
 extern char B_003DD490[];
@@ -45,13 +45,13 @@ extern "C" void func_001681F8(OWNER_1681F8 *self)
         if (entryA->value != 0) {
             frame.packet.word = entryB->word;
             if (entryB->flags & 0x1000) {
-                CopyAb__FPvT0Ui(&frame.packet.matrix, entryB->shared + 0x14, 0x40);
+                CopyAb__FPvT0Ui(self, entryB->shared + 0x14, 0x40);
             } else {
                 MATRIX4 *parent = entryB->parent;
-                memcpy(&frame.local, entryB->source + 0x40, 0x40);
+                memcpy(&frame.local);
                 if (parent != 0) {
                     __ml__FRC7MATRIX4T0(&frame.product, &frame.local, parent);
-                    memcpy(&frame.local, &frame.product, 0x40);
+                    memcpy(&frame.local);
                 }
                 frame.packet.matrix = frame.local;
             }
@@ -60,10 +60,10 @@ extern "C" void func_001681F8(OWNER_1681F8 *self)
                 frame.packet.scale = ((float *)entryB->fixed)[3];
             } else {
                 char *point = self->points + index * 0x18;
-                CopyAb__FPvT0Ui(&frame.local, point, 0xC);
+                CopyAb__FPvT0Ui(self, point, 0xC);
                 QW position = TransformPoint(*(QW *)&frame.local, frame.packet.matrix.row[0], frame.packet.matrix.row[1], frame.packet.matrix.row[2], frame.packet.matrix.row[3]);
                 *(QW *)&frame.packet.pos = position;
-                frame.packet.scale = GMaxAxisScale(&frame.packet.matrix) * *(float *)(point + 0xC);
+                frame.packet.scale = GMaxAxisScale(self) * *(float *)(point + 0xC);
             }
             int *tag = g_2dea28.cursor;
             *(long *)tag = 0x10000000;

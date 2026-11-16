@@ -44,8 +44,8 @@ void RenderStepguardSelf(GUARD *pguard)
     memset(&matScale, 0, 0x40);
     ((float *)&matScale)[0] = 1.0f;
     ((float *)&matScale)[15] = 1.0f;
-    ((float *)&matScale)[10] = 1.0f;
     ((float *)&matScale)[5] = 1.0f;
+    ((float *)&matScale)[10] = 1.0f;
     QW posGuard = PosLoWorld(pguard);
     const float *pc = B_FLT_003E1A60;
     float g0 = B_FLT_003E1A60[0];
@@ -58,12 +58,11 @@ void RenderStepguardSelf(GUARD *pguard)
     else if (pc[5] < scale)
         scale = pc[5];
     float scaleXy = scale;
-    float scaleZ = scale;
     float dt = g_2dded0 - pguard->tStamp;
+    float scaleZ = scale;
     if (dt < 0.85f) {
         float uSine = (sinf(dt * D_FLT_002C3D4C) + 1.0f) * 0.5f;
-        float u = dt * 1.1764705f;
-        float env = D_FLT_002C3D50[0] + u * (D_FLT_002C3D50[1] + u * D_FLT_002C3D50[2]);
+        float env = D_FLT_002C3D50[0] + (dt * 1.1764705f) * (D_FLT_002C3D50[1] + (dt * 1.1764705f) * D_FLT_002C3D50[2]);
         if (env < g_2bbb60[0])
             env = g_2bbb60[0];
         else if (g_2bbb60[1] < env)

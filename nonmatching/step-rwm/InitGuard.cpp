@@ -62,7 +62,7 @@ void InitGuard(void *p)
     I(0xE68) = -1;
     I(0xE78) = 0;
     I(0x350) = 0x20F800;
-    unsigned long grf = *(unsigned long *)((char *)p + 0x148);
+    unsigned long grf = *(unsigned short *)((char *)p + 0x148);
     int cell = D_002C3CF0;
     float lowest = RO_FLT_002A8604;
     grf = (grf & 0xFFFFFFFFFFF0FFFFUL) | 0x20000UL;
@@ -75,9 +75,9 @@ void InitGuard(void *p)
     I(0xFBC) = -1;
     F(0xFF4) = lowest;
     I(0x1000) = cell;
-    I(0x3D8) = -1;
     I(0xF80) = -1;
     I(0x3FC) = -1;
+    I(0x3D8) = -1;
     ResetGuardAnimrefArrays(p);
     func_00209768((char *)p + 0xFD0, p);
 }

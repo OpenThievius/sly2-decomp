@@ -129,8 +129,8 @@ block_19:
     }
     goto block_31;
 block_21:
-    var_t0 = 0;
     var_a3 = 0;
+    var_t0 = 0;
     if (sp4 <= 0) {
         goto block_31;
     }

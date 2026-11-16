@@ -14,7 +14,7 @@ struct Request {
     int index;
 };
 struct SifClient { char pad0[0x24]; int serverReady; };
-Entry *func_002376D0(int arg0);
+Entry *func_002376D0(void);
 void func_00237B50(int arg);
 void func_00237B80();
 int CreateSema(SemaParam *param);
@@ -42,7 +42,7 @@ int func_00238528(int arg0, int source, int size) {
     int index;
     int length;
     int word;
-    entry = func_002376D0(arg0);
+    entry = func_002376D0();
     func_00237B50(3);
     if (D_002C4A7C == 0 || entry == 0 || (flags = entry->flags) == 0) {
         func_00237B80();
@@ -74,10 +74,10 @@ int func_00238528(int arg0, int source, int size) {
     } else {
         pending = 0;
     }
-    if ((source & 0xF) == 0) {
+    if ((request->source & 0xF) == 0) {
         length = 0;
     } else {
-        int previous = source - 0x10;
+        int previous = request->source - 0x10;
         length = (((u32)source >> 4) << 4) - previous;
     }
     if (size < length) {

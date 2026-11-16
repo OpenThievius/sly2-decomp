@@ -24,8 +24,8 @@ void OnDifficultyEvent(void *arg0, s32 arg1, void *arg2) {
 
     switch (arg1) {
     case 3:
-        temp_s0 = "suck_history";
         M2C_FIELD(arg0, M2C_UNK **, 0x14) = &D_002BDC00;
+        temp_s0 = "suck_history";
         M2C_FIELD(arg0, s32 *, 8) = PsavepathNew(temp_s0, "mission_0", 0);
         M2C_FIELD(arg0, s32 *, 0xC) = PsavepathNew(temp_s0, "mission_1", 0);
         M2C_FIELD(arg0, s32 *, 0x10) = PsavepathNew(temp_s0, "mission_2", 0);
@@ -46,8 +46,8 @@ void OnDifficultyEvent(void *arg0, s32 arg1, void *arg2) {
         CRef_CopyConstruct(&sp40, &sp30);
         RefSetGameSaveValue(&sp50, temp_s1, &sp40, &B_003D4A60);
         CRef_Destruct(&sp50);
-        CRef_Destruct(&sp40);
         CRef_Destruct(&sp30);
+        CRef_Destruct(&sp40);
         break;
     case 37:
         if (B_003E0F9C == M2C_FIELD(arg2, s32 *, 0x7C)) {

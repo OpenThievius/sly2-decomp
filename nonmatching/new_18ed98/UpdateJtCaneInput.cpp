@@ -12,9 +12,9 @@ struct _m2c_stack_UpdateJtCaneInput {
 };                                                  /* size = 0x40 */
 s32 ChooseJtCaneAlternateSwing(s8 *);             /* extern */
 s32 ChooseJtCaneSwing(s8 *);                      /* extern */
-s32 FButtonPressedWithin(s8 *, M2C_UNK, M2C_UNK); /* extern */
+s32 FButtonPressedWithin(s8 *, M2C_UNK, f32); /* extern */
 M2C_UNK SetJmpState(s8 *, M2C_UNK, M2C_UNK, M2C_UNK); /* extern */
-M2C_UNK SetJtJtcs(s8 *, s32);                     /* extern */
+M2C_UNK SetJtJtcs(void);                     /* extern */
 M2C_UNK SetJtState(s8 *, M2C_UNK, M2C_UNK);       /* extern */
 void UpdateJtCaneInput(s8 *arg0) {
     s32 temp_v1;
@@ -24,8 +24,10 @@ void UpdateJtCaneInput(s8 *arg0) {
     s32 var_s1;
     u32 temp_v1_2;
     temp_v1 = M2C_FIELD(arg0, s32 *, 0x18D8);
-    if ((temp_v1 < 0x16) && (temp_v1 >= 0xC) && !(M2C_FIELD(M2C_FIELD(arg0, s8 **, 0x150), s32 *, 0x30) & 0x80)) {
+    if ((temp_v1 < 0x16)) {
+        if ((temp_v1 >= 0xC) && !(M2C_FIELD(M2C_FIELD(arg0, s8 **, 0x150), s32 *, 0x30) & 0x80)) {
         M2C_FIELD(arg0, s32 *, 0x18EC) = 0;
+    }
     }
     temp_v1_2 = M2C_FIELD(arg0, u32 *, 0x18C8);
     var_s1 = 0;
@@ -40,13 +42,13 @@ void UpdateJtCaneInput(s8 *arg0) {
 block_21:
         if ((var_s1 != 0) && ((temp_v1_3 = M2C_FIELD(arg0, s32 *, 0x18D8), (temp_v1_3 == -1)) || ((temp_v1_3 >= -1) && (temp_v1_3 < 0x18) && (temp_v1_3 >= 0xC) && (M2C_FIELD(arg0, s32 *, 0x18E4) != 0)))) {
             if (FButtonPressedWithin(M2C_FIELD(arg0, s8 **, 0x150), 0x10, 0x3EB33333) != 0) {
-                SetJtJtcs(arg0, -1);
-                SetJtJtcs(arg0, ChooseJtCaneAlternateSwing(arg0));
+                SetJtJtcs();
+                SetJtJtcs();
                 return;
             }
             if (FButtonPressedWithin(M2C_FIELD(arg0, s8 **, 0x150), 0x80, 0x3EB33333) != 0) {
-                SetJtJtcs(arg0, -1);
-                SetJtJtcs(arg0, ChooseJtCaneSwing(arg0));
+                SetJtJtcs();
+                SetJtJtcs();
             }
         } else {
             return;

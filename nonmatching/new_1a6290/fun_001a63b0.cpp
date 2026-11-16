@@ -11,9 +11,10 @@ extern "C" void LoadRotateMatrixEuler__FP6VECTORP7MATRIX3(M3 *, QW);
 void func_001A63B0(OBJ *pobj, QW vec)
 {
     struct L { M3 copy; QW junk; M3 mat; } l;
-    float k = 0.017453294f;
-    float z = LaneZInGeneralRegister(vec) * k;
+    float  k;
     float y = LaneX(RotateWords3(vec)) * k;
+    k = 0.017453294f;
+    float z = LaneZInGeneralRegister(vec) * k;
     float x = LaneX(vec) * k;
     QW low = InterleaveLowWords(y, x);
     QW euler = JoinLowDoublewords(z, low);

@@ -8,7 +8,7 @@ typedef struct Unpacked {
 } Unpacked;
 extern Unpacked B_00450230;
 void func_0023D468(u64 *source, Unpacked *out);
-void func_0023D338(Unpacked *result, Unpacked *operand);
+void func_0023D338(Unpacked *result);
 
 void func_0023DAB0(u64 a, u64 b) {
     Unpacked A, B;
@@ -63,5 +63,5 @@ void func_0023DAB0(u64 a, u64 b) {
             A.fraction = quotient;
         }
     }
-    func_0023D338(pResult, &A);
+    func_0023D338(pResult);
 }

@@ -42,11 +42,11 @@ extern "C" void func_001B72B0(Obj *obj, XF *xfEnd, M4 *mat, QW *outEuler, QW *ou
     int count = 0;
     int idxA = -1;
     int idxB = -1;
-    M4 *paZ = &l.mZ;
-    QW *pbPos = &l.mW.row[3];
     M4 *pcE = &l.mE;
-    M4 *pdQ = &l.mQ;
     M4 *pmA = &l.mA;
+    QW *pbPos = &l.mW.row[3];
+    M4 *pdQ = &l.mQ;
+    M4 *paZ = &l.mZ;
     M4 *pmW = &l.mW;
     M4 *pmR = &l.mR;
     M4 *pmI = &l.mI;
@@ -77,8 +77,8 @@ extern "C" void func_001B72B0(Obj *obj, XF *xfEnd, M4 *mat, QW *outEuler, QW *ou
     l.mW.row[0] = l.mR.row[0];
     l.mW.row[1] = l.mR.row[1];
     l.mW.row[2] = l.mR.row[2];
-    ((float *)&l.mW)[3] = 0;
     ((float *)&l.mW)[7] = 0;
+    ((float *)&l.mW)[3] = 0;
     ((float *)&l.mW)[11] = 0;
     ((float *)&l.mW)[15] = 1.0f;
     l.mR = l.mI = RO_002A2D30;

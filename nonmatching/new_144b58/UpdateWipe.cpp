@@ -10,11 +10,11 @@ void AddDmaRefs__4DMASiP2QW(GIFS *, int, QW *);
 void AddDmaCnt__4DMAS(GIFS *);
 void AddPrimPack__4GIFSiiUl(GIFS *, int, int, unsigned long);
 void PackAD__4GIFSll(GIFS *, long, long);
-void PackSTQ__4GIFSfff(GIFS *, float, float, float);
+void PackSTQ__4GIFSfff(float, GIFS *, float, float);
 void PackRGBA__4GIFSUi(GIFS *, unsigned);
 void PackXYZ__4GIFSiii(GIFS *, int, int, int);
 M4 ConvertXfMatrix4(void *, void *, void *);
-QW __ml__FRC7MATRIX4G10VU_VECTOR4(const M4 *, QW);
+QW __ml__FRC7MATRIX4G10VU_VECTOR4(const M4 *);
 void Force__FPv(void *);
 extern char g_2dea4c[], g_2dea34[];
 extern GIFS B_002DEA00;
@@ -90,8 +90,8 @@ void UpdateWipe(char *wipe)
         float *offsets1 = D_002BD39C + which * 2;
         for (unsigned corner = 0; corner < 4; corner++) {
             unsigned off = corner * sizeof(QW);
-            QW posLocal = __ml__FRC7MATRIX4G10VU_VECTOR4(&matrices[which], *(QW *)((char *)D_002BD3B0 + off));
-            QW clipValue = __ml__FRC7MATRIX4G10VU_VECTOR4(&D_002BD410, posLocal);
+            QW posLocal = __ml__FRC7MATRIX4G10VU_VECTOR4(&matrices[which]);
+            QW clipValue = __ml__FRC7MATRIX4G10VU_VECTOR4(&D_002BD410);
             union { QW q; float f[4]; } clip;
             clip.q = clipValue;
             Force__FPv(&clip);
@@ -104,7 +104,7 @@ void UpdateWipe(char *wipe)
             clip.f[0] = ScreenCoordinate(clip.f[0], 512.0f);
             clip.f[1] = ScreenCoordinate(clip.f[1], 224.0f);
             Force__FPv(&clip);
-            PackSTQ__4GIFSfff(&B_002DEA00, invW * (D_002BD3F0[corner * 2] + *offsets0), invW * (D_002BD3F0[corner * 2 + 1] + *offsets1), invW);
+            PackSTQ__4GIFSfff(invW * (D_002BD3F0[corner * 2] + *offsets0), &B_002DEA00, invW * (D_002BD3F0[corner * 2 + 1] + *offsets1), invW);
             PackRGBA__4GIFSUi(&B_002DEA00, 0x80808080);
             PackXYZ__4GIFSiii(&B_002DEA00, ((int)clip.f[0] + 0x700) << 4, ((int)clip.f[1] + 0x790) << 4, 0);
         }

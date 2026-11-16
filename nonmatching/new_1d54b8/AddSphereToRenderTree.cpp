@@ -20,7 +20,7 @@ struct RTE_1D6508 {
 struct RTB_1D6508 { RTE_1D6508 aentry[3]; float x, y, z, radius; unsigned long bits; RTB_1D6508 *child; RTB_1D6508 *next; };
 struct TREE_1D6508 { char pad[0x3E5C]; RTB_1D6508 *root; };
 extern "C" {
-RTB_1D6508 *AllocRenderTreeNode();
+RTB_1D6508 *AllocRenderTreeNode(TREE_1D6508 *);
 extern float g_2a7870;
 }
 
@@ -29,6 +29,7 @@ static inline float GMin(float a, float b) { return a < b ? a : b; }
 
 extern "C" RTE_1D6508 *AddSphereToRenderTree(TREE_1D6508 *tree, QW pos, int grf, float radius, float sRadius)
 {
+    RTE_1D6508 * result;
     RTB_1D6508 *pblock = tree->root;
     RTE_1D6508 *pfree;
     RTB_1D6508 *pb;
@@ -43,8 +44,7 @@ extern "C" RTE_1D6508 *AddSphereToRenderTree(TREE_1D6508 *tree, QW pos, int grf,
             RTB_1D6508 *chain = pb->next;
             RTE_1D6508 *pe = (RTE_1D6508 *)pb;
             for (unsigned int i = 0; i < 4; i++, pe++) {
-                long kind = pe->bits.kind;
-                switch (kind) {
+                switch (pe->bits.kind) {
                 case -1:
                     if (pfree == 0)
                         pfree = pe;
@@ -74,7 +74,7 @@ extern "C" RTE_1D6508 *AddSphereToRenderTree(TREE_1D6508 *tree, QW pos, int grf,
         }
         if (pnext == 0) {
             if (pfree == 0) {
-                RTB_1D6508 *pnew = AllocRenderTreeNode();
+                RTB_1D6508 *pnew = AllocRenderTreeNode(tree);
                 pb->next = pnew;
                 pfree = (RTE_1D6508 *)pnew;
             }
@@ -82,9 +82,11 @@ extern "C" RTE_1D6508 *AddSphereToRenderTree(TREE_1D6508 *tree, QW pos, int grf,
             *(QW *)pfree = pos;
             pfree->radius = radius;
             pfree->bits.grf = grf;
-                return pfree;
+                { result = pfree; goto done; }
         }
         pblock = pnext;
     }
-    return 0;
+    { result = 0; goto done; }
+done:
+    return result;
 }

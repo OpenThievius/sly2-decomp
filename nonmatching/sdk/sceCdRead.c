@@ -18,7 +18,7 @@ extern char D_002C7840[];
 extern int D_002C7900;
 extern char D_002C7910[];
 
-int func_00241DF0(void);
+int func_00241DF0(int, int, void *);
 int func_00241C98(int);
 void func_0023B170(void *, int);
 void func_00236960(const char *, ...);
@@ -31,7 +31,7 @@ int sceCdRead(int lsn, int sectors, void *buffer, unsigned char *mode)
     struct CdReadCommand *command = &D_002C6840;
     int size;
 
-    if ((D_002C6778 & 1) || func_00241DF0() != 6) {
+    if ((D_002C6778 & 1) || func_00241DF0(lsn, sectors, buffer) != 6) {
         if (func_00241C98(4) == 0) {
             return 0;
         }
@@ -68,8 +68,8 @@ int sceCdRead(int lsn, int sectors, void *buffer, unsigned char *mode)
         D_002C6774 = 1;
         if (sceSifCallRpc(D_002C7910, 1, 1, command, 0x18, 0, 0, func_00241978, D_002C7840) < 0) {
             D_002C67A0 = 0;
-            D_002C6774 = 0;
             SignalSema(D_002C6768);
+            D_002C6774 = 0;
             return 0;
         }
         if (D_002C6750 > 0) {
