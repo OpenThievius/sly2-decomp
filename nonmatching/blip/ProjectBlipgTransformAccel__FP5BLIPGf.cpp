@@ -22,7 +22,7 @@ extern "C" void FlushCache(int);
 extern "C" void LoadSprBuf__Fie(int, ...);
 extern "C" void SaveSprBuf__FPve(void *, ...);
 extern "C" void func_00201998(void);
-extern "C" void func_002417F0(int, int, int);
+extern "C" int func_002417F0(int, int, int);
 extern int g_2de59c;
 extern "C" void RemoveBlip__FP4BLIP(void *);
 extern "C" int CblipeProjectBlipTransformAccel__FP7MATRIX4G8VU_FLOATP5BLIPPP5BLIPVP5BLIPXi6BLIPOKP6VECTORT7(MATRIX4 *, QW, void *, void *, void *, int, int, VU4 *, VU4 *);

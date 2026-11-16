@@ -12,7 +12,7 @@ struct _m2c_stack___ieee754_log10 {
 };                                                  /* size = 0x40 */
 s64 __adddf3(s64, s64);                             /* extern */
 s64 __floatsidf(s32);                               /* extern */
-s64 __ieee754_log(s32);                             /* extern */
+s64 __ieee754_log(void);                             /* extern */
 s64 __muldf3(s64, s64);                             /* extern */
 s32 __subdf3(s64, s64);                             /* extern */
 s64 func_0023DAB0(s32, M2C_UNK);                    /* extern */
@@ -33,8 +33,8 @@ s64 __ieee754_log10(s64 arg0) {
     s64 var_s1;
     u32 temp_a0;
     u32 temp_s2;
-    var_s1 = arg0;
     var_s0 = var_s1 >> 0x20;
+    var_s1 = arg0;
     var_s2 = 0;
     if (var_s0 <= 0xFFFFF) {
         if (((var_s0 & 0x7FFFFFFF) | ((s64) (var_s1 << 0x20) >> 0x20)) == 0) {
@@ -51,13 +51,13 @@ s64 __ieee754_log10(s64 arg0) {
     }
 block_7:
     if (var_s0 > 0x7FEFFFFF) {
-        var_a0 = var_s1;
         var_a1 = var_a0;
+        var_a0 = var_s1;
     } else {
         temp_s2 = var_s2 - 0x3FF + (var_s0 >> 0x14);
         temp_a0 = temp_s2 >> 0x1F;
         temp_s2_2 = __floatsidf(temp_s2 + temp_a0);
-        temp_s1 = __ieee754_log((var_s1 & (0xFFFF0000U >> 0x20)) | (((var_s0 & 0xFFFFF) | ((0x3FF - temp_a0) << 0x14)) << 0x20));
+        temp_s1 = __ieee754_log();
         temp_s0 = __muldf3(temp_s2_2, RO_002AB978);
         temp_s0_2 = __adddf3(temp_s0, __muldf3(temp_s1, RO_002AB980));
         var_a0 = temp_s0_2;

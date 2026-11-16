@@ -62,6 +62,11 @@ counts as matched.
   carries `// volatile-ok: <reason>` on its line, naming the register block or the handler that writes it (scripts/matching/record.py).
   `do { } while (0)` is one too: in game code it is allowed only as the form C macros take (`#define NAME(...) do { ... } while (0)`)
   that the original plausibly had and retail's code needs. Never a wrapper written only to move instructions.
+- **One named exception to "no register pins".** `RenderGlobsetTree` (`0x1D5808`) may hold the fixed registers its culling microprogram reads
+  (`vcallms 0x1C0` reads `$vf10` to `$vf17`) as register variables named as `"j"` inputs of that `vcallms`, in the form its programmer
+  plausibly wrote (the maintainer allowed it on 2026-11-15, after sly1-decomp's `func_0013A498` ruling of 2026-11-12). Each such line carries
+  `// vcallms-abi-ok: 0x1D5808 <reason>`; `record.py` accepts that marker for that address only. No other function may do it
+  (docs/contributing/exceptions.md).
 - **Permanent blockers.** A function with a VU0, MMI or COP0 instruction, hand-written assembly, or a remnant (a chunk nothing reaches that never
   transfers control, so not a function) (`config/us/blockers.tsv`, from `make blockers`), stays
   original assembly: it is left out of the work queues, counts as finished in the reports apart from the exact C, and is never matched with asm

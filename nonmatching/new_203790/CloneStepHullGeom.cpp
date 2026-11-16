@@ -72,8 +72,8 @@ extern "C" void CloneStepHullGeom(HULLSTEP *pstep, HULLGEOM *pgeomSource)
     pstep->gMin = gMin;
     int cvec = pstep->pgeom->cvec;
     int offset = cvec * 0x10;
-    pstep->pgeom->cvec = cvec + 2;
     *(QW *)((char *)pstep->pgeom->avec + offset) = pstep->qPos;
+    pstep->pgeom->cvec = cvec + 2;
     *(QW *)((char *)pstep->pgeom->avec + offset + 0x10) = AddScaled(pstep->qPos, g_2a2dc0, *(u32 *)&pstep->gValue);
     if (fExtra)
         *(QW *)((char *)pstep->pgeom->avec + offset + 0x20) = g_2a2dd0;

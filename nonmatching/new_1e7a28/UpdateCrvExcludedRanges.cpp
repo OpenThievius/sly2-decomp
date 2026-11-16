@@ -119,8 +119,8 @@ loop_9:
                     temp_v0_2 = PobstacleFindAtPos(sp0);
                     if (temp_v0_2 != 0) {
                         temp_v0_3 = M2C_FIELD(arg0, s8 **, 0);
-                        temp_s2 = M2C_FIELD(temp_v0_3, s32 *, 0xE4);
                         M2C_FIELD(temp_v0_3, s32 *, 0xE4) = 0;
+                        temp_s2 = M2C_FIELD(temp_v0_3, s32 *, 0xE4);
                         if (func_001BD560(temp_v0_2, M2C_FIELD(arg0, s8 **, 0), 0, 0, &spC10, var_f20) == 3) {
                             spC10 = temp_f0;
                         }

@@ -3,7 +3,7 @@
 extern "C" {
 s32 dpcmp(f64, f64);
 f64 __muldf3(f64, f64);
-f64 __subdf3(f64, f64);
+f64 __subdf3(f64);
 f64 __adddf3(f64, f64);
 f64 __floatdidf(s64);
 u32 func_0023DED0(f64);
@@ -24,9 +24,9 @@ extern "C" s64 __fixunsdfdi(f64 value) {
         floored = __floatdidf((result >> 1) | (result & 1));
         floored = __adddf3(floored, floored);
     }
-    rest = __subdf3(value, floored);
+    rest = __subdf3(value);
     if (dpcmp(rest, 0.0) < 0) {
-        result -= (u32)func_0023DED0(__subdf3(0.0, rest));
+        result -= (u32)func_0023DED0(__subdf3(0.0));
     } else {
         result += (u32)func_0023DED0(rest);
     }

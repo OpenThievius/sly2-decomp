@@ -341,11 +341,11 @@ void LoadOptionFromBrx(BASIC *pbasic, EOPID *peopid, unsigned int grfopt, CBinar
                 if (grfopt & 0x100) {
                     int oid = pbis->S32Read();
                     OPTCALL *poptcall = (OPTCALL *)func_00210120(B_003DD490);
-                    poptcall->oid = oid;
                     poptcall->pmf = peopid->pmfSetAlt;
+                    poptcall->oid = oid;
                     PDCB *pdcb = func_001A5D58(pbasic);
-                    pdcb->pv = poptcall;
                     pdcb->pfn = DcbCallOptionPlo;
+                    pdcb->pv = poptcall;
                 } else {
                     OPTCALL optcall;
                     optcall.oid = pbis->S32Read();

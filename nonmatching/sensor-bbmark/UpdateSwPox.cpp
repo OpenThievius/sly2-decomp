@@ -79,8 +79,8 @@ block_17:
         if (var_s1 == NULL) {
             temp_s0 = AllocSwOx(arg0, arg1, arg2);
             temp_v0 = AllocSwOx(arg0, arg2, arg1);
-            var_s1 = temp_s0;
             M2C_FIELD(temp_s0, s8 **, 8) = temp_v0;
+            var_s1 = temp_s0;
             M2C_FIELD(temp_v0, s8 **, 8) = temp_s0;
             goto block_30;
         }

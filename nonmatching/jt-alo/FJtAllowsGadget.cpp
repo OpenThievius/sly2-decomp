@@ -1,5 +1,5 @@
 extern "C" {
-int FActiveCplcy(void *);
+int FActiveCplcy(void *, int);
 int FAttachAllowsGadget(char *, int);
 int FCanLease(int);
 int FGadgetObjActive(int);
@@ -14,6 +14,7 @@ extern const float D_FLT_002BF3EC;
 extern const float D_FLT_002BF3F0;
 extern int g_2dfbc0;
 int FJtAllowsGadget(char *jt, int gadget) {
+    int result;
     int allowed;
     if (bevy_player_p15_binoc_active() != 0) {
         return 0;
@@ -69,7 +70,7 @@ int FJtAllowsGadget(char *jt, int gadget) {
                 return 0;
             }
             if (*(int *)(*(char **)(jt + 0x11C0) + 0x15C) != gadget) {
-                return 0;
+                { result = 0; goto done; }
             }
             return 1;
         }
@@ -119,7 +120,7 @@ dispatch:
             if ((g_2dfbc0 & 2) == 0) {
                 return 0;
             }
-            result = FActiveCplcy(B_002DE2E0) == 0;
+            result = FActiveCplcy(B_002DE2E0, gadget) == 0;
         }
         return result;
     }
@@ -142,7 +143,7 @@ dispatch:
                 if (state >= 0) {
                     return 1;
                 }
-                return 0;
+                { result = 0; goto done; }
             }
             return 0;
         }
@@ -164,5 +165,7 @@ dispatch:
     default:
         return 0;
     }
+done:
+    return result;
 }
 }

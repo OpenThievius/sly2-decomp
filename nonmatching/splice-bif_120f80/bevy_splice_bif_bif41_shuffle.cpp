@@ -11,7 +11,7 @@ void CPairPtr_Destructor(CPair **, int);
 void UnlinkPairNode(CPair *);
 void FreeSlotheapPv(SLOTHEAP *, void *);
 void SetTag__4CRef4TAGK(CRef *, int);
-void CRef_ConstructPair(CRef *, CPair *);
+void CRef_ConstructPair(CRef *, CPair *, CRef *);
 int NRandInRange(int, int);
 extern SLOTHEAP B_004520A8;
 }
@@ -52,8 +52,8 @@ extern "C" CRef *bevy_splice_bif_bif41_shuffle(CRef *pret, int carg, CRef *aref)
         for (int round = 0; round < count; round++) {
             int pick = NRandInRange(0, count - 1);
             CRef *held = items[pick];
-            items[pick] = items[round];
             items[round] = held;
+            items[pick] = items[round];
         }
         zeroIndex = count;
         if (items[0] == first) {
@@ -83,14 +83,14 @@ extern "C" CRef *bevy_splice_bif_bif41_shuffle(CRef *pret, int carg, CRef *aref)
         if (head.p != target) {
             PairHandle_Init(&second, PpairNew());
             SetTag__4CRef4TAGK(&refTag, 0);
-            second.p->ref = refTag;
             CRef_Destruct(&refTag);
+            second.p->ref = refTag;
             PairHandle_Assign(&second.p->next, target->next);
             PairHandle_Assign(&target->next, second.p);
             ReleasePair(second.p);
         }
     }
-    CRef_ConstructPair(pret, head.p);
+    CRef_ConstructPair(pret, head.p, aref);
     ReleasePair(head.p);
     return pret;
 }

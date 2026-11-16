@@ -19,7 +19,7 @@ void AddPrimPack__4GIFSiiUl(s8 *, M2C_UNK, M2C_UNK, M2C_UNK);
 void AllocStatic__4DMASiP2QW(s8 *, M2C_UNK, M2C_UNK *);
 void EndDmaCnt__4DMAS(s8 *);
 void PackAD__4GIFSll(...);
-void PackUV__4GIFSii(s8 *, s32, s32);
+void PackUV__4GIFSii(s8 *);
 void PackXYZF__4GIFSiiii(s8 *, s32, M2C_UNK, M2C_UNK, M2C_UNK);
 void SendDmaSyncGsFinish__FP10sceDmaChanP2QW(s32, M2C_UNK *);
 void __4GIFS(s8 *);
@@ -60,16 +60,16 @@ void BlendPrevFrame__Fv(void) {
             PackAD__4GIFSll(sp, 8, 5);
             PackAD__4GIFSll(sp, 0x47, 0x33001);
             PackAD__4GIFSll(sp, 0x42, (0xC000 << 0x16) | 0x64);
-            PackAD__4GIFSll(sp, 1, (((0xFE00 << 0x1E) | 0x8080) << 0x10) | 0x8080);
-            PackAD__4GIFSll(sp, 0x40, ((((0xDE00 << 0x17) | 0x80FF) << 0x10) | 0x8000) * 2);
+            PackAD__4GIFSll(sp, 1, (((0xFE00L << 0x1E) | 0x8080) << 0x10) | 0x8080);
+            PackAD__4GIFSll(sp, 0x40, ((((0xDE00L << 0x17) | 0x80FF) << 0x10) | 0x8000) * 2);
             AddPrimPack__4GIFSiiUl(sp, 0x156, 2, 0x43);
             temp_s2 = (g_2dedb8 & 1) ? 0 : 0x10;
             var_a1 = 0 * 0x10;
 loop_6:
-            PackUV__4GIFSii(sp, var_a1 | 8, temp_s2);
+            PackUV__4GIFSii(sp);
             temp_s0 = var_s1 + 0x20;
             PackXYZF__4GIFSiiii(sp, (var_s1 + 0x700) * 0x10, 0x7900, 0, 0);
-            PackUV__4GIFSii(sp, (temp_s0 * 0x10) | 8, temp_s2 + 0xE00);
+            PackUV__4GIFSii(sp);
             PackXYZF__4GIFSiiii(sp, (var_s1 + 0x720) * 0x10, 0x8700, 0, 0);
             var_s1 = temp_s0;
             if (var_s1 < 0x200) {

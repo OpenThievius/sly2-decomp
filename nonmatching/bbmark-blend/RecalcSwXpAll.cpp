@@ -19,7 +19,7 @@ M2C_UNK FreeSwMqList__FP2SWP2MQ(s8 *, s32);       /* extern */
 s32 PxpMarkSwContactsRoot(s8 *, s8 *, s8 *);  /* extern */
 M2C_UNK RemoveDlEntry(s8 *, s8 *);              /* extern */
 M2C_UNK UpdateSwAaox__FP2SW(s8 *);                /* extern */
-M2C_UNK func_00133E30();                            /* extern */
+M2C_UNK func_00133E30(s8 *);                            /* extern */
 M2C_UNK func_001F5078(s8 *);                      /* extern */
 void RecalcSwXpAll(s8 *arg0) {
     s8 sp[0xCA0] __attribute__((aligned(16)));
@@ -53,7 +53,7 @@ void RecalcSwXpAll(s8 *arg0) {
     s8 *var_s1_2;
     s8 *var_s3;
     var_s6 = 0;
-    func_00133E30();
+    func_00133E30(arg0);
     UpdateSwAaox__FP2SW(arg0);
     CStackFrame_Construct(sp);
     var_s1 = M2C_FIELD(arg0, s8 **, 0x3D34);

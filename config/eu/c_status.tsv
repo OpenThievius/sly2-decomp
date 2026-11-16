@@ -2385,6 +2385,7 @@ us_address	name	other_address	pair	score	addresses
 0x175D00	func_00175D00	0X175C88	same	0	ok
 0x175FF0	func_00175FF0	0X175F78	same	0	ok
 0x176060	func_00176060	0X175FE8	same	0	ok
+0x176098	GoalNotice_Update	0X176020	same	0	ok
 0x176458	GoalNotice_SetState	0X1763E0	same	0	ok
 0x1766D8	GoalBrain_Init	0X176660	same	0	ok
 0x176708	GoalBrain_Activate	0X176690	same	0	ok
@@ -2951,6 +2952,7 @@ us_address	name	other_address	pair	score	addresses
 0x1A7970	StartupAll	0X1A7980	same	1	ok
 0x1A7AC0	StaticInitSlotheaps_1a7ac0	0X1A7BB8	same	0	ok
 0x1A7BF8	GlobalCtorSlotheaps_1a7bf8	0X1A7CF0	same	0	ok
+0x1A7C18	PxpAdd	0X1A7D10	same	0	ok
 0x1A7E10	FreeSwMqList__FP2SWP2MQ	0X1A7F08	identical	0	ok
 0x1A7FC0	RecalcSwXpMovement	0X1A80B8	same	0	ok
 0x1A80D8	ClsgClipSoAllEdges	0X1A81D0	identical	0	ok
@@ -5196,9 +5198,11 @@ us_address	name	other_address	pair	score	addresses
 0x23B290	func_0023B290	0X23BC50	same	0	ok
 0x23B368	func_0023B368	0X23BD28	same	0	ok
 0x23B7D8	__main__Fv	0X23C198	same	0	ok
+0x23B7F8	__divdi3	0X23C1B8	same	0	ok
 0x23BFE0	__floatdidf	0X23C9A0	same	0	ok
 0x23C078	__floatdisf	0X23CA38	same	0	ok
 0x23C820	func_0023C820	0X23D1E0	gap	0	ok
+0x23C828	__udivdi3	0X23D1E8	same	8	ok
 0x23D468	func_0023D468	0X23DE28	identical	0	ok
 0x23D748	__adddf3	0X23E108	same	0	ok
 0x23D7A0	__subdf3	0X23E160	same	0	ok

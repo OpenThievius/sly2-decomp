@@ -94,8 +94,8 @@ extern "C" LEASE *PleaseAcquire(CLONEOWNER *self, int grade, int flag) {
             object->Add();
             object->Slot26(self);
             objectRef = &object;
-            self->HandleSpliceEvent(0xE, 0, 1, (int)&objectRef, 0);
             objectRef = (LO **)&selfSlot;
+            self->HandleSpliceEvent(0xE, 0, 1, (int)&objectRef, 0);
             object->HandleSpliceEvent(0xE, 0, 1, (int)&objectRef, 0);
         } while (index < self->pool->count);
     }

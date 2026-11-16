@@ -144,8 +144,8 @@ extern "C" SENSE *PsenseFindNotice(GUARD *pguard, PO *ptarget, void *pknowledge)
             parg = psense->field_0x18;
             CRef *pref = &ref;
             pref->m_tagk = TAGK_Bool;
-            pref->m_tag.m_bool = 1;
             pguard->HandleSpliceEvent(0x18, 0, 1, (int)&parg, (int)&ref);
+            pref->m_tag.m_bool = 1;
             if (ref.m_tagk != TAGK_Bool || ref.m_tag.m_bool == 0) {
                 continue;
             }

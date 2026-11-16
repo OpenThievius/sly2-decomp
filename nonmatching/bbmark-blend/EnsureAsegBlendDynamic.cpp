@@ -202,8 +202,8 @@ extern "C" void EnsureAsegBlendDynamic(ALO *paloRoot, int cb, int cbl, BL_137A30
     }
     paseg->aent = (ENT_137A30 *)PvAllocSwCopy(paseg->cent * sizeof(ENT_137A30), paseg->aent);
     paseg->n6C = pasegFirst->n6C;
-    paseg->nD4 = -1;
     paseg->g78 = pasegFirst->g78;
+    paseg->nD4 = -1;
     if (pasegFrame)
         CFramePtr_Assign(paseg, pasegFrame->pframe);
     for (i = 0; i < cbl; i++) {

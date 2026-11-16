@@ -386,7 +386,7 @@ LCarryDone:
         l.u.pipe.mjp.pobj = pobj;
         MinimizeRange(GMeasureJumpPipe, &l.u.pipe.mjp, sPipe, 100.0f, 50.0f, SMaxCrv(pobj) - 50.0f, &l.sPipeBest, &l.gPipe);
         if (pobj != ploForce) {
-            if (l.gPipe >= D_002BF8E0)
+            if (D_002BF8E0 <= l.gPipe)
                 continue;
             l.gPipe = GAdjustJtLandingScore(pjmp, pobj, l.gPipe, D_002BF8F0);
             if (gBest <= l.gPipe)

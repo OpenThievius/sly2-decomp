@@ -8,7 +8,7 @@ struct SaveWorld_143410 { char pad[0x3A18]; char save[4]; char *nodes; };
 extern "C" {
 void CRef_Destruct(CRef_143410 *);
 void CopyAb__FPvT0Ui(void *, void *, unsigned);
-int FFindSaveVar(void *, SAVEPATH_143410 *, FINDRES_143410 **);
+int FFindSaveVar(void *);
 SAVEPATH_143410 *PvAllocStackImpl__Fi(AllocArg_143410 *);
 void RefGetSaveValue(CRef_143410 *, void *, SAVEPATH_143410 *, void *);
 short SymidFindSymtab(void *, const char *);
@@ -27,8 +27,8 @@ SAVEPATH_143410 *PpathFindBootyOid(int oid) {
     FindSlot_143410 pnodeEpisode;
     FindSlot_143410 pnodeLevel;
     CRef_143410 current;
-    CRef_143410 value;
     AllocArg_143410 alloc;
+    CRef_143410 value;
     Symtab_143410 *world = &B_003E0EA8;
     path.csym = 0;
     path.asym = asym;
@@ -37,19 +37,19 @@ SAVEPATH_143410 *PpathFindBootyOid(int oid) {
     asym[4] = SymidFindSymtab(world->symtab, RO_002A4D98);
     asym[5] = SymidFindSymtab(world->symtab, RO_002A4DA0);
     path.csym = 1;
-    FFindSaveVar(world->save, &path, &pnodeEpisode.p);
+    FFindSaveVar(world->save);
     unsigned inodeLevel = pnodeEpisode.p->inodeFirstChild;
     while (inodeLevel != 0) {
         SaveNode_143410 *nodeLevel = (SaveNode_143410 *)(B_003DD490.nodes + inodeLevel * 10);
         path.csym = 3;
         asym[1] = nodeLevel->sym;
-        if (FFindSaveVar(B_003DD490.save, &path, &pnodeLevel.p) != 0) {
+        if (FFindSaveVar(B_003DD490.save) != 0) {
             unsigned inodeBooty = pnodeLevel.p->inodeFirstChild;
             while (inodeBooty != 0) {
                 SaveNode_143410 *nodeBooty = (SaveNode_143410 *)(B_003DD490.nodes + inodeBooty * 10);
                 int index = 0;
-                current.type = -1;
                 asym[3] = nodeBooty->sym;
+                current.type = -1;
                 do {
                     asym[6] = index;
                     path.csym = 7;

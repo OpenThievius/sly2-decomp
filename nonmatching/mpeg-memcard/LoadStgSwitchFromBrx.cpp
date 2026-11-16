@@ -3,7 +3,7 @@
 struct SWITCHENTRY { int kind; void *pv; };
 struct SWITCHGROUP { char pad[8]; int count; SWITCHENTRY *entries; };
 struct STGSWITCH { char pad0[0x150]; int cEntry; void *table; int field_0x158; int field_0x15C; int cGroup; SWITCHGROUP *groups; };
-extern "C" void *CStackFrame_Construct(void *);
+extern "C" void *CStackFrame_Construct(void *, void *);
 extern "C" void *PvAllocStackImpl__Fi(ALLOCREQ *);
 extern "C" void *PvAllocStackClearImpl__Fi(ALLOCREQ *);
 extern "C" void *PvAllocSwCopyImpl__FiPv(ALLOCREQ *, void *);
@@ -12,7 +12,7 @@ extern "C" void CStackFrame_Destructor(void *, int);
 void LoadStgSwitchFromBrx(STGSWITCH *pstgsw, void *pbis)
 {
     char frame[0x10];
-    CStackFrame_Construct(frame);
+    CStackFrame_Construct(frame, pbis);
     ALLOCREQ req;
     ALLOCREQ *preq = &req;
     req.cb = 0x40;

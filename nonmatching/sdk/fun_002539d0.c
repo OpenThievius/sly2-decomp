@@ -33,7 +33,7 @@ extern char D_002C8500[];
 void func_002539D0(Decoder *decoder)
 {
     int mode;
-    int header;
+    unsigned int header;
     u32 flag;
     int interrupts;
     u32 source;

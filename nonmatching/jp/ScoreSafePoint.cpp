@@ -5,7 +5,7 @@ M2C_UNK CStackFrame_Construct(void *);              /* extern */
 M2C_UNK CStackFrame_Destructor(void *, M2C_UNK);    /* extern */
 M2C_UNK IntersectSwBoundingSphere(M2C_UNK *, s128, M2C_UNK *, s32, f32); /* extern */
 s32 PsoHitTestLineObjects__FiP6VECTORT1iPP2SOP3LSG(M2C_UNK, s128, s128, s32); /* extern */
-s128 func_0019F3F8(void *, M2C_UNK);                /* extern */
+s128 func_0019F3F8(void *, f32);                /* extern */
 extern M2C_UNK B_003DD490;
 extern M2C_UNK FFilterOxa;
 extern f32 g_2bf944;
@@ -95,7 +95,7 @@ loop_10:
                 var_f20 = M2C_ERROR(/* unknown instruction: max.s $f20, $f0, $f20 */);
             }
             var_a2 -= 1;
-            var_a3 += 4;
+            var_a3 += 1;
         } while (var_a2 != 0);
     }
     return var_f20;

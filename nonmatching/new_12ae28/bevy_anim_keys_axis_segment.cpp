@@ -65,8 +65,8 @@ extern "C" void bevy_anim_keys_axis_segment(KEYS_12C140 *keys, STATE_12C140 *sta
     } while (step < 3U);
     QW first = *(QW *)state->vecA;
     QW second = *(QW *)state->vecC;
-    int nearStart = 0;
     int nearEnd = 0;
+    int nearStart = 0;
     if (Near(LaneX(first), LaneX(second))) {
         if (Near(LaneYInGeneralRegister(first), LaneYInGeneralRegister(second))) {
             nearStart = Near(LaneZInGeneralRegister(first), LaneZInGeneralRegister(second)) != 0;

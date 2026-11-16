@@ -21,9 +21,9 @@ struct _m2c_stack_BindGlobset {
 #define sp30 (*(s128 *)(sp + 0x030))
 M2C_UNK InvertMatrix4Affine(M2C_UNK *, s32);        /* extern */
 s8 *PloFindSwObject_thunk(M2C_UNK *, M2C_UNK, s32, s32); /* extern */
-M2C_UNK __ml__FRC7MATRIX4T0(M2C_UNK *, M2C_UNK *, s8 *); /* extern */
+M2C_UNK __ml__FRC7MATRIX4T0(s8 *, M2C_UNK *, s8 *); /* extern */
 M2C_UNK func_0022B7A0(s8 *, s8 *);              /* extern */
-M2C_UNK memset(s8 *, M2C_UNK, M2C_UNK);           /* extern */
+M2C_UNK memset(s8 *);           /* extern */
 extern M2C_UNK B_003DD490;
 extern s32 B_003E11EC;
 void BindGlobset(s8 *arg0) {
@@ -73,7 +73,7 @@ void BindGlobset(s8 *arg0) {
                             M2C_FIELD(temp_s1, s128 *, 0x30) = (s128) M2C_FIELD(temp_a0, s128 *, 0x60);
                             M2C_FIELD(temp_s1, s128 *, 0x40) = (s128) M2C_FIELD(temp_a0, s128 *, 0x70);
                         } else {
-                            memset(temp_s0, 0, 0x40);
+                            memset(temp_s0);
                             M2C_FIELD(temp_s0, f32 *, 0x14) = 1.0f;
                             M2C_FIELD(temp_s0, f32 *, 0x3C) = 1.0f;
                             M2C_FIELD(temp_s0, f32 *, 0x28) = 1.0f;
@@ -83,7 +83,7 @@ void BindGlobset(s8 *arg0) {
                         temp_a1_2 = temp_a1 + 0x40;
                         if (M2C_FIELD(temp_s3, s8 **, 4) != NULL) {
                             InvertMatrix4Affine(&sp40, temp_a1_2);
-                            __ml__FRC7MATRIX4T0((M2C_UNK *)(sp), &sp40, M2C_FIELD(temp_s3, s8 **, 4) + 0x40);
+                            __ml__FRC7MATRIX4T0(arg0, &sp40, M2C_FIELD(temp_s3, s8 **, 4) + 0x40);
                         } else {
                             InvertMatrix4Affine((M2C_UNK *)(sp), temp_a1_2);
                         }

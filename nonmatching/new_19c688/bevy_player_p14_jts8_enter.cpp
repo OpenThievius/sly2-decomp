@@ -13,7 +13,7 @@ struct _m2c_stack_bevy_player_p14_jts8_enter {
 M2C_UNK SetBentleyState(s32, M2C_UNK, s8 *);      /* extern */
 M2C_UNK SetJmpBodyState(s8 *, M2C_UNK, M2C_UNK);  /* extern */
 M2C_UNK SetJtState(s8 *, M2C_UNK, M2C_UNK);       /* extern */
-M2C_UNK StartAttach(s32, s32, s8 *, s8 *);      /* extern */
+M2C_UNK StartAttach(s32, s32, s8 *);      /* extern */
 extern s32 g_2dd5bc;
 void bevy_player_p14_jts8_enter(s8 *arg0) {
     s32 temp_v0;
@@ -37,7 +37,7 @@ void bevy_player_p14_jts8_enter(s8 *arg0) {
         var_a2 = temp_a3;
         var_a3 = temp_a3 + 0x150;
 block_9:
-        StartAttach((int)(M2C_FIELD(arg0, s8 **, 0) + 0x4C0), var_a1, var_a2, (var_a2 == NULL) ? NULL : var_a3);
+        StartAttach((int)(M2C_FIELD(arg0, s8 **, 0) + 0x4C0), var_a1, var_a2);
         return;
     case 11:
         var_a1 = 0;
@@ -67,8 +67,8 @@ block_8:
         var_a1 = 3;
         goto block_8;
     case 14:
-        temp_v0_3 = M2C_FIELD(arg0, s8 **, 0xC);
         temp_a2 = M2C_FIELD(arg0, s8 **, 0);
+        temp_v0_3 = M2C_FIELD(arg0, s8 **, 0xC);
         M2C_FIELD(temp_a2, s8 **, 0x18C4) = temp_v0_3;
         if (M2C_FIELD(temp_v0_3, s32 *, 0x124) == 3) {
             SetJtState(temp_a2, 0x16, -1);
@@ -81,7 +81,7 @@ block_8:
         M2C_FIELD(M2C_FIELD(arg0, s8 **, 0), f32 *, 0xF60) = (f32) M2C_FIELD(arg0, f32 *, 0x14);
         temp_a2_2 = M2C_FIELD(arg0, s8 **, 0);
         temp_v0_4 = M2C_FIELD(temp_a2_2, s8 **, 0xC);
-        M2C_FIELD(temp_v0_4, M2C_UNK (**)(s8 *, M2C_UNK, s8 *), 0x2C4)(temp_a2_2 + M2C_FIELD(temp_v0_4, s16 *, 0x2C0), 8, temp_a2_2);
+        M2C_FIELD(temp_v0_4, M2C_UNK (**)(s8 *, M2C_UNK), 0x2C4)(temp_a2_2 + M2C_FIELD(temp_v0_4, s16 *, 0x2C0), 8);
         return;
     case 16:
         temp_a0 = M2C_FIELD(arg0, s8 **, 0);

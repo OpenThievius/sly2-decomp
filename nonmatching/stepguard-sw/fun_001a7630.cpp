@@ -63,9 +63,9 @@ void func_001A7630(void) {
     char *staging = func_00238C58(largest);
     IOPMODULE *module = D_004E5D80;
     while (module < D_004E5E38) {
-        IOPMODULE *next = module + 1;
         int remaining = module->size;
         int offset = 0;
+        IOPMODULE *next = module + 1;
         if (remaining != 0) {
             do {
                 int chunk = 0xFFFC0;

@@ -13,8 +13,8 @@ GOAL *GoalStack_Push(GOALSTACK *pgoalstack, int cid)
         pparent = 0;
     else
         pparent = pgoalstack->apgoal[pgoalstack->cgoal - 1];
-    GOAL *pbuffer = pgoalstack->apgoal[pgoalstack->cgoal];
     pgoalstack->cgoal++;
+    GOAL *pbuffer = pgoalstack->apgoal[pgoalstack->cgoal];
     memset(pbuffer, 0, CbGoalMax());
     GOAL *pgoal = PgoalConstruct(cid, pbuffer);
     pgoal->pparent = pparent;

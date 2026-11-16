@@ -3,7 +3,7 @@
 M2C_UNK DecomposeRotateMatrixRad__FP7MATRIX3PfP6VECTOR(); /* extern */
 M2C_UNK EvaluateBezierMat(); /* extern */
 M2C_UNK GetJtPipeGoalMat__FP2JTP4PIPEfP7MATRIX3(); /* extern */
-M2C_UNK MatMulMatTransMat();     /* extern */
+void MatMulMatTransMat();     /* extern */
 s32 PmatLoWorld();                 /* extern */
 extern s128 g_2a2dd0;
 extern M2C_UNK g_2dded0;

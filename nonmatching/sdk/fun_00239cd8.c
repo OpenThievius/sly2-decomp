@@ -20,8 +20,8 @@ typedef struct AlarmState {
 
 extern AlarmState D_002C5A30;
 
-void func_00239AC0(s32);
-void func_00239AD0(s32);
+void func_00239AC0(void);
+void func_00239AD0(s64, s32);
 
 void func_00239CD8(s64 arg0)
 {
@@ -38,8 +38,8 @@ void func_00239CD8(s64 arg0)
     cursor = state->head;
     control = *(volatile s32 *)0x10001010;
     if (cursor == 0) {
-        func_00239AD0(0);
-        func_00239AC0(control & 0xFFFFF7FF);
+        func_00239AD0(arg0, 0);
+        func_00239AC0();
         return;
     }
     bound = cursor->field20 + cursor->field10 - cursor->field18;
@@ -63,10 +63,10 @@ void func_00239CD8(s64 arg0)
     }
     slot = control & 3;
     if (bound - arg0 < 0x7333) {
-        func_00239AD0(*(volatile s32 *)0x10001000 + (s32)(0x7333 >> (slot << 2)));
-        func_00239AC0(control & 0xFFFFF7FF);
+        func_00239AD0(arg0, *(volatile s32 *)0x10001000 + (s32)(0x7333 >> (slot << 2)));
+        func_00239AC0();
         return;
     }
-    func_00239AC0(control & 0xFFFFF7FF);
-    func_00239AD0((s32)(bound >> (slot << 2)));
+    func_00239AC0();
+    func_00239AD0(arg0, (s32)(bound >> (slot << 2)));
 }

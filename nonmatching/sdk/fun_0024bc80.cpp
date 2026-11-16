@@ -10,8 +10,8 @@ extern "C" {
 struct _m2c_stack_func_0024BC80 {
     /* 0x000 */ char pad0[0x190];
 };                                                  /* size = 0x190 */
-s64 __muldi3(s64, s64);                             /* extern */
-M2C_UNK func_00236918(s8 *, M2C_UNK, M2C_UNK *, s32, s32); /* extern */
+s64 __muldi3(s8 *, s64, s64);                             /* extern */
+M2C_UNK func_00236918(s8 *, M2C_UNK); /* extern */
 M2C_UNK func_0024B9F0(s8 *, s8 *);              /* extern */
 M2C_UNK func_0024C670(s8 *, s8 *);              /* extern */
 M2C_UNK func_0024FA38(s8 *, s8 *);              /* extern */
@@ -41,7 +41,7 @@ void func_0024BC80(s8 *arg0, s8 *arg1) {
             temp_a0 = M2C_FIELD(arg0, s64 *, 0x90);
             temp_s1 = temp_a1 & 1;
             temp_s0 = (s64) ((temp_s1 & (M2C_FIELD(arg0, s32 *, 0x9C) & 1) & (temp_a0 & 1)) << 0x20) >> 0x20;
-            M2C_FIELD(var_s4, s64 *, 0x10) = (s64) (M2C_FIELD(arg0, s32 *, 0x98) + (((s64) (__muldi3(temp_a0, temp_a1) << 0x1F) >> 0x20) + temp_s0));
+            M2C_FIELD(var_s4, s64 *, 0x10) = (s64) (M2C_FIELD(arg0, s32 *, 0x98) + (((s64) (__muldi3(arg0, temp_a0, temp_a1) << 0x1F) >> 0x20) + temp_s0));
             var_s4 = M2C_FIELD(arg0, s8 **, 0x868);
             if (temp_s1 & M2C_FIELD(arg0, s64 *, 0x90)) {
                 M2C_FIELD(arg0, s32 *, 0x9C) = (s32) (M2C_FIELD(arg0, s32 *, 0x9C) + 1);
@@ -85,7 +85,7 @@ block_6:
 block_14:
         var_s0 = var_v0 ^ 1;
     }
-    if (((var_s0 != 0) || (func_00236918(sp, 0x100, &RO_002AC438, M2C_FIELD(arg1, s32 *, 4), M2C_FIELD(arg1, s32 *, 8)), func_0024FA38(arg0, sp), (var_s0 != 0))) && (M2C_FIELD(arg1, s32 *, 0x28) == 1)) {
+    if (((var_s0 != 0) || (func_00236918(sp, 0x100), func_0024FA38(arg0, sp), (var_s0 != 0))) && (M2C_FIELD(arg1, s32 *, 0x28) == 1)) {
         if (M2C_FIELD(arg0, s32 *, 0xC4) != 0) {
             func_0024C670(arg0, arg1);
         } else {

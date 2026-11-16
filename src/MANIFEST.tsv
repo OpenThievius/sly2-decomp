@@ -2385,6 +2385,7 @@ address	name	size	file	whole_file	symbol
 0X175D00	func_00175D00	752	new_1715f0/fun_00175d00.cpp		
 0X175FF0	func_00175FF0	112	new_1715f0/fun_00175ff0.c		
 0X176060	func_00176060	56	new_1715f0/fun_00176060.cpp		
+0X176098	GoalNotice_Update	960	new_1715f0/GoalNotice_Update.cpp		
 0X176458	GoalNotice_SetState	636	new_1715f0/GoalNotice_SetState.cpp		
 0X1766D8	GoalBrain_Init	44	new_1715f0/GoalBrain_Init.cpp		
 0X176708	GoalBrain_Activate	68	new_1715f0/GoalBrain_Activate.cpp		
@@ -2951,6 +2952,7 @@ address	name	size	file	whole_file	symbol
 0X1A7970	StartupAll	336	stepguard-sw/stepguard_sw_1a7890.cpp	stepguard-sw/stepguard_sw_1a7890.cpp	StartupAll
 0X1A7AC0	StaticInitSlotheaps_1a7ac0	308	stepguard-sw/stepguard_sw_1a7890.cpp	stepguard-sw/stepguard_sw_1a7890.cpp	StaticInitSlotheaps_1a7ac0
 0X1A7BF8	GlobalCtorSlotheaps_1a7bf8	32	stepguard-sw/stepguard_sw_1a7890.cpp	stepguard-sw/stepguard_sw_1a7890.cpp	GlobalCtorSlotheaps_1a7bf8
+0X1A7C18	PxpAdd	504	stepguard-sw/PxpAdd.cpp		
 0X1A7E10	FreeSwMqList__FP2SWP2MQ	76	sw/FreeSwMqList_file.cpp	sw/FreeSwMqList_file.cpp	FreeSwMqList__FP2SWP2MQ
 0X1A7FC0	RecalcSwXpMovement	276	sw/FreeSwMqList_file.cpp	sw/FreeSwMqList_file.cpp	RecalcSwXpMovement
 0X1A80D8	ClsgClipSoAllEdges	284	sw/FreeSwMqList_file.cpp	sw/FreeSwMqList_file.cpp	ClsgClipSoAllEdges
@@ -5196,9 +5198,11 @@ address	name	size	file	whole_file	symbol
 0X23B290	func_0023B290	196	sdk/fun_0023b290.cpp		
 0X23B368	func_0023B368	64	sdk/fun_0023b368.cpp		
 0X23B7D8	__main__Fv	32	sdk/__main__Fv.c		
+0X23B7F8	__divdi3	1772	sdk/__divdi3.c		
 0X23BFE0	__floatdidf	152	sdk/__floatdidf.cpp		
 0X23C078	__floatdisf	224	sdk/__floatdisf.cpp		
 0X23C820	func_0023C820	8	sdk/fun_0023c820.c		
+0X23C828	__udivdi3	1488	sdk/__udivdi3.c		
 0X23D468	func_0023D468	156	sdk/fun_0023d468.c		
 0X23D748	__adddf3	88	sdk/__adddf3.cpp		
 0X23D7A0	__subdf3	100	sdk/__subdf3.cpp		

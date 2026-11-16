@@ -10,12 +10,12 @@ extern "C" {
 struct _m2c_stack_func_00241C98 {
     /* 0x00 */ char pad0[0x40];
 };                                                  /* size = 0x40 */
-s32 PollSema(s32);                                  /* extern */
-M2C_UNK SignalSema(s32);                            /* extern */
+s32 PollSema(void);                                  /* extern */
+M2C_UNK SignalSema(void);                            /* extern */
 M2C_UNK func_00236960(...);         /* extern */
 M2C_UNK func_00241A30();                            /* extern */
 s32 sceCdSync(M2C_UNK);                             /* extern */
-s32 sceSifBindRpc(M2C_UNK *, M2C_UNK, M2C_UNK);     /* extern */
+s32 sceSifBindRpc(M2C_UNK *);     /* extern */
 M2C_UNK sceSifInitRpc(M2C_UNK);                     /* extern */
 extern s32 D_002C6750;
 extern s32 D_002C675C;
@@ -26,7 +26,7 @@ s32 func_00241C98(s32 arg0) {
     s32 var_v0;
     s32 var_v0_2;
     func_00241A30();
-    if (D_002C6768 != PollSema(D_002C6768)) {
+    if (D_002C6768 != PollSema()) {
         if (D_002C6750 > 0) {
             func_00236960((M2C_UNK *)("Ncmd fail sema cur_cmd:%d keep_cmd:%d\n"), arg0, D_002C675C);
             return 0;
@@ -35,14 +35,14 @@ s32 func_00241C98(s32 arg0) {
     }
     D_002C675C = arg0;
     if (sceCdSync(1) != 0) {
-        SignalSema(D_002C6768);
+        SignalSema();
 block_5:
         return 0;
     }
     sceSifInitRpc(0);
     if (D_002C677C < 0) {
 loop_10:
-        if (sceSifBindRpc(&D_002C7910, 0x80000595, 0) < 0) {
+        if (sceSifBindRpc(&D_002C7910) < 0) {
             var_v0 = 0x100000;
             if (D_002C6750 > 0) {
                 func_00236960((M2C_UNK *)("Libcdvd bind err N CMD\n"));

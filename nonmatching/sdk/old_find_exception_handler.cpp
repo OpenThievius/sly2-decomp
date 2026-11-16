@@ -6,21 +6,20 @@ struct ExceptionEntry {
 };
 
 unsigned int old_find_exception_handler(unsigned int pc, struct ExceptionEntry *table) {
-    int bestIndex = -1;
+    unsigned int result;
     int entryIndex = 0;
+    int bestIndex = -1;
     struct ExceptionEntry *entry;
     unsigned int entryStart;
-    unsigned int entryEnd;
 
     if (table != 0) {
       if (table->start != 0xFFFFFFFF) {
         entry = table;
         do {
             entryStart = entry->start;
-            entryEnd = entry->end;
-            if (pc >= entryStart && pc < entryEnd) {
+            if (pc >= entryStart && pc < entry->end) {
                 if (bestIndex == -1 ||
-                    (table[bestIndex].end >= entryEnd && entryStart >= table[bestIndex].start)) {
+                    (table[bestIndex].end >= entry->end && entryStart >= table[bestIndex].start)) {
                     bestIndex = entryIndex;
                 }
             } else if (bestIndex != -1 && pc < entryStart) {
@@ -32,8 +31,10 @@ unsigned int old_find_exception_handler(unsigned int pc, struct ExceptionEntry *
       }
     }
     if (bestIndex != -1) {
-        return table[bestIndex].handler;
+        { result = table[bestIndex].handler; goto done; }
     }
-    return 0;
+    { result = 0; goto done; }
+done:
+    return result;
 }
 }

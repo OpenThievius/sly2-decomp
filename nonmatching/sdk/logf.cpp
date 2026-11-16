@@ -17,7 +17,7 @@ s64 __ieee754_log10();                              /* extern */
 s64 __subdf3(M2C_UNK, s64);                         /* extern */
 s32 dpcmp(s64, M2C_UNK);                            /* extern */
 s32 *func_002401C8();                               /* extern */
-s32 func_00249C80(s64);                             /* extern */
+s32 func_00249C80(void);                             /* extern */
 s32 matherr(s8 *);                                /* extern */
 extern s64 RO_002AB8C8;
 extern s64 RO_002AC130;
@@ -37,7 +37,7 @@ s64 logf(s64 arg0) {
     var_v0 = temp_v0;
     if (temp_s2 != -1) {
         var_v0 = temp_v0;
-        if (func_00249C80(arg0) == 0) {
+        if (func_00249C80() == 0) {
             var_v0 = temp_v0;
             if (dpcmp(arg0, 0) <= 0) {
                 sp20 = 0;

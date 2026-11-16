@@ -86,8 +86,8 @@ block_14:
     } else {
         var_v0_10 = arg4 >> 1;
     }
-    temp_a2 = var_v0_10 + M2C_FIELD(arg2, s32 *, 4);
     M2C_FIELD(arg1, s32 *, 4) = temp_a2;
+    temp_a2 = var_v0_10 + M2C_FIELD(arg2, s32 *, 4);
     temp_v0 = temp_a2 + 1;
     if (M2C_FIELD(arg0, s32 *, 0x184) == 1) {
         temp_v0_2 = temp_a2 - 1;

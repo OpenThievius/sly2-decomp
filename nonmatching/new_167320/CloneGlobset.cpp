@@ -103,11 +103,11 @@ extern "C" void CloneGlobset(GS *self, VOBJ *parent, int arg)
     }
     for (int index = 0; index < self->cdst; index++) {
         DST *pdst = &self->pdst[index];
-        SRC *psrc = (SRC *)((char *)self->psrc + index * 0x14);
+        SRC *psrc = (SRC *)((unsigned int *)self->psrc + index * 0x14);
         parent->emit(arg, &pdst->f4);
         req.cb = psrc->count * 0x50;
-        req.cbAlign = 0x10;
         pdst->p18 = PvAllocSwCopyImpl__FiPv(&req, pdst->p18);
+        req.cbAlign = 0x10;
         for (int ient = 0; ient < psrc->count; ient++)
             parent->emit(arg, (char *)pdst->p18 + ient * 0x50 + 0xC);
         OBJ *pobj = pdst->pobj;

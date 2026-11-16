@@ -1,6 +1,6 @@
 extern "C" {
 int func_00239450(void);
-void func_002394A0(unsigned int, unsigned int);
+void func_002394A0(void);
 struct Transfer {
     char pad0[0xEC];
     unsigned int baseAddress;
@@ -41,8 +41,8 @@ void func_0024B9F0(Transfer *transfer, Stream *stream) {
     }
     {
         int selector = state.transfer->strideSelect;
-        blockBytes = stream->sizeSelect * 0x180;
         quadwordCount = blockBytes >> 4;
+        blockBytes = stream->sizeSelect * 0x180;
         if (selector != 0)
             destinationStep = (selector >> 4) * 0x180;
         else
@@ -63,7 +63,7 @@ run:
                     *(volatile unsigned int *)0x1000D420 = quadwordCount;
                     *(volatile unsigned int *)0x1000D400 = 0x101;
                     if (busy != 0)
-                        func_002394A0(0x1000D420, 0x1000D400);
+                        func_002394A0();
                     index++;
                     while (*(volatile unsigned int *)0x1000D400 & 0x100) {
                     }
@@ -73,13 +73,13 @@ run:
                     *(volatile unsigned int *)0x1000D020 = quadwordCount;
                     *(volatile unsigned int *)0x1000D000 = 0x100;
                     if (busy != 0)
-                        func_002394A0(0x1000D020, 0x1000D000);
+                        func_002394A0();
                     while (*(volatile unsigned int *)0x1000D000 & 0x100) {
                     }
                     while (*(volatile unsigned int *)0x1000D020 != 0) {
                     }
-                    destination += destinationStep;
                     sourceAddress += blockBytes;
+                    destination += destinationStep;
                 } while (index < stream->count);
             }
             pass++;

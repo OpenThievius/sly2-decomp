@@ -54,8 +54,8 @@ unsigned char *func_0023FA40(unsigned char *code, Machine_23FA40 *machine, Conte
         code += 2;
         goto add;
     case 4:
-        delta = ((UnalignedWord_23FA40 *)code)->value;
         code += 4;
+        delta = ((UnalignedWord_23FA40 *)code)->value;
     add:
         *accumulator = *accumulator + delta;
         break;

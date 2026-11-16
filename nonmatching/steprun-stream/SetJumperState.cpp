@@ -32,7 +32,7 @@ struct JMPR {
     int fFar;
     int iPredict;
 };
-extern float g_2dded0;
+extern float g_2dded0[];
 extern char D_3DD490[];
 extern "C" {
 int FIsBasicDerivedFrom(void *, int);
@@ -60,7 +60,7 @@ void SetJumperState(JMPR *pjmpr, int js)
     if (js == pjmpr->js)
         return;
     pjmpr->js = js;
-    pjmpr->tState = g_2dded0;
+    pjmpr->tState = g_2dded0[0];
     switch (js) {
     case 0:
         ApplyAsegToHandle(pjmpr->pjmpt->paseg, pjmpr->pso, pjmpr->pv3C, &pjmpr->pasega, 0.0f, 1.0f);
@@ -101,7 +101,7 @@ void SetJumperState(JMPR *pjmpr, int js)
         QW scaleB = VectorFromFloat(dt * -0.5f);
         velocity.q = BlendX(scaleA, dpos.q, scaleB, vGrav.q);
         pso->vptr->SetVelocity((char *)pso + pso->vptr->delta, velocity.q);
-        float tLand = g_2dded0 + dt;
+        float tLand = g_2dded0[0] + dt;
         pjmpr->tLand = tLand;
         pjmpr->tPeak = tLand - pjmpr->pjmpt->dtMin / speed;
         if (pjmpr->fGuided != 0) {

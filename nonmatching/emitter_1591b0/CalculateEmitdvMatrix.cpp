@@ -28,7 +28,8 @@ extern "C" MATRIX4 *CalculateEmitdvMatrix(MATRIX4 *result, EMITDV *emitdv)
         rotate.row[1] = curl.row[1];
         rotate.row[2] = curl.row[2];
     }
-    MATRIX4 scaled = __ml__FRC7MATRIX4G8VU_FLOAT(rotate * damp, MakeVUF(*(int *)&g_2dded0[1]));
+    MATRIX4  scaled;
+    scaled = __ml__FRC7MATRIX4G8VU_FLOAT(rotate * damp, MakeVUF(*(unsigned char *)&g_2dded0[1]));
     for (int i = 0; i < 4; i++) {
         result->row[i] = VectorAdd(rotate.row[i], scaled.row[i]);
     }

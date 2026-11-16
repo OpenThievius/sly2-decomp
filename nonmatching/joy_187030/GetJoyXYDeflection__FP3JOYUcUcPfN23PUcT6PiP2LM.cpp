@@ -58,8 +58,7 @@ extern "C" void GetJoyXYDeflection__FP3JOYUcUcPfN23PUcT6PiP2LM(JOY *pjoy, u8 x, 
             *pdx = clamped * fx / length;
             *pdy = clamped * fy / length;
         } else {
-            *pdy = 0.0f;
-            *pdx = 0.0f;
+            *pdx = *pdy = 0.0f;
         }
         *plastX = x;
         *plastY = y;

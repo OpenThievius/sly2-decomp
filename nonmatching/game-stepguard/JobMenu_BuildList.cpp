@@ -129,8 +129,8 @@ block_19:
     }
     goto block_31;
 block_21:
-    var_t0 = 0;
     var_a3 = 0;
+    var_t0 = 0;
     if (sp4 <= 0) {
         goto block_31;
     }
@@ -145,9 +145,9 @@ block_24:
     temp_v1_3 = M2C_FIELD(arg0, s32 *, 0x48);
     M2C_FIELD(arg0, s32 *, 0x48) = (s32) (temp_v1_3 + 1);
     temp_v0_2 = arg0 + ((temp_v1_3 * 0xC) + 0x4C);
+    M2C_FIELD(temp_v0_2, s32 *, 8) = -1;
     M2C_FIELD(temp_v0_2, s32 *, 4) = -1;
     M2C_FIELD(temp_v0_2, s8 **, 0) = var_a2;
-    M2C_FIELD(temp_v0_2, s32 *, 8) = -1;
     temp_v1_4 = M2C_FIELD(var_a2, s32 *, 0x54);
     var_a3 = ((temp_v1_4 ^ 1) == 0) ? 1 : var_a3;
     if (temp_v1_4 == 0) {

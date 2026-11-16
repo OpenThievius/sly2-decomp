@@ -6,10 +6,10 @@ int CreateSema(SemaParam_2382B8 *);
 void DeleteSema(int);
 void WaitSema(int);
 void SignalSema(int);
-Entry_2382B8 *func_002376D0(void);
+Entry_2382B8 *func_002376D0(int);
 void func_00237B50(int);
 void func_00237B80(void);
-void func_0023B170(void *, int);
+void func_0023B170(void *, void *);
 int func_002375E0(void *, int, int, void *, int, void *, int, int, int, int);
 extern Request_2382B8 B_0044A680;
 extern Entry_2382B8 B_0044BB80[];
@@ -22,8 +22,8 @@ int sceRead(int fd, void *buffer, int size) {
     SemaParam_2382B8 param;
     int result;
     Request_2382B8 *request = &B_0044A680;
-    Entry_2382B8 *entry = func_002376D0();
-    func_00237B50(2);
+    Entry_2382B8 *entry = func_002376D0(fd);
+    func_00237B50(fd);
     if (D_002C4A7C == 0 || entry == 0 || entry->flags == 0) {
         func_00237B80();
         return -9;
@@ -57,9 +57,9 @@ int sceRead(int fd, void *buffer, int size) {
         waited = 0;
     }
     if (!(flags & 0x20000000)) {
-        func_0023B170(buffer, size);
+        func_0023B170(buffer, buffer);
     }
-    func_0023B170(request, 0x20);
+    func_0023B170(request, buffer);
     if (func_002375E0(B_0044BD80, 2, 0, &B_0044A680, 0x20, B_0044B2C0, 4, 0, 0, waited) < 0) {
         DeleteSema(semaphore);
         func_00237B80();

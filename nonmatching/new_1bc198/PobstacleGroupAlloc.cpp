@@ -12,8 +12,8 @@ struct _m2c_stack_PobstacleGroupAlloc {
 };                                                  /* size = 0xC0 */
 s32 AppendDlEntry(s8 **, s8 *);
 s32 *PloNew(M2C_UNK, M2C_UNK, M2C_UNK, M2C_UNK);
-s32 PvAllocSwImpl__Fi(s8 *, s32, s32);
-void RemoveDlEntry(s8 **, s8 *);
+s32 PvAllocSwImpl__Fi(s8 *);
+void RemoveDlEntry(void);
 s32 memset(s8 *, M2C_UNK, M2C_UNK);
 extern s8 *B_003E1A40;
 s8 *PobstacleGroupAlloc(void) {
@@ -35,13 +35,13 @@ s8 *PobstacleGroupAlloc(void) {
             temp_s0_2 = temp_v0 + 0x60;
             M2C_FIELD(temp_v0, s32 *, 0xE0) = 0;
             M2C_FIELD(temp_v0, s32 *, 0xE4) = 1;
-            M2C_FIELD(temp_v0, s32 *, 0x1C0) = 1;
-            memset(temp_s0_2, 0, 0x40);
-            M2C_FIELD(temp_s0_2, f32 *, 0x14) = 1.0f;
-            M2C_FIELD(temp_s0_2, f32 *, 0x3C) = 1.0f;
             M2C_FIELD(temp_s0_2, f32 *, 0x28) = 1.0f;
+            memset(temp_s0_2, 0, 0x40);
+            M2C_FIELD(temp_s0_2, f32 *, 0x3C) = 1.0f;
+            M2C_FIELD(temp_s0_2, f32 *, 0x14) = 1.0f;
             M2C_FIELD(temp_v0, f32 *, 0x60) = 1.0f;
-            M2C_FIELD(temp_v0, s32 *, 0xEC) = PvAllocSwImpl__Fi(sp, 0x80, 0x10);
+            M2C_FIELD(temp_v0, s32 *, 0x1C0) = 1;
+            M2C_FIELD(temp_v0, s32 *, 0xEC) = PvAllocSwImpl__Fi(sp);
             var_a0 = 0;
 loop_3:
             temp_f0 = (f32) var_a0;
@@ -51,16 +51,16 @@ loop_3:
             if (var_a0 < 0x20) {
                 goto loop_3;
             }
+            M2C_FIELD(temp_v0, s32 *, 0xF0) = PvAllocSwImpl__Fi(sp);
             var_s0 += 1;
-            M2C_FIELD(temp_v0, s32 *, 0xF0) = PvAllocSwImpl__Fi(sp, 0x80, 0x10);
-            M2C_FIELD(temp_v0, s32 *, 0xF4) = PvAllocSwImpl__Fi(sp, 0x200, 0x10);
-            M2C_FIELD(temp_v0, s32 *, 0x1EC) = PvAllocSwImpl__Fi(sp, 0x1F0, 0x10);
+            M2C_FIELD(temp_v0, s32 *, 0xF4) = PvAllocSwImpl__Fi(sp);
+            M2C_FIELD(temp_v0, s32 *, 0x1EC) = PvAllocSwImpl__Fi(sp);
             temp_v0_3 = M2C_FIELD(temp_v0, s8 **, 0xC);
             M2C_FIELD(temp_v0_3, M2C_UNK (**)(s8 *), 0x4C)(temp_v0 + M2C_FIELD(temp_v0_3, s16 *, 0x48));
             AppendDlEntry(&B_003E1A40, temp_v0);
         } while (var_s0 < 0x10);
     }
-    RemoveDlEntry(&B_003E1A40, temp_s0);
+    RemoveDlEntry();
     temp_v1 = M2C_FIELD(temp_s0, s8 **, 0xC);
     M2C_FIELD(temp_s0, s32 *, 0x1E8) = -1;
     M2C_FIELD(temp_v1, M2C_UNK (**)(s8 *), 0x44)(temp_s0 + M2C_FIELD(temp_v1, s16 *, 0x40));

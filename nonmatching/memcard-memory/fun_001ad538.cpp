@@ -8,15 +8,15 @@ struct Result_1AD538 { s32 pad0; f32 value; s32 pad8; s32 padC; };
 extern "C" {
 void CRef_Destruct(void *);
 s32 RefGetGameSaveValue(void *, s32, void *);
-s32 func_001ACC38(void *, s32);
+void func_001ACC38(void *, s32);
 s32 func_001B0078(void *);
 extern char B_002E6550[];
 extern Cards_1AD538 B_002E65E0;
 extern Table_1AD538 B_003D9ED0;
 extern char B_003DD490[];
 void func_001AD538(void) {
-    f32 values[3];
     Result_1AD538 result;
+    f32 values[3];
     char *entry;
     Obj_1AD538 *save;
     s32 index;
@@ -32,8 +32,8 @@ void func_001AD538(void) {
             RefGetGameSaveValue(&result, *(s32 *)(B_003DD490 + 0x3B1C), save);
             save++;
             value = result.value;
-            CRef_Destruct(&result);
             values[index] = value;
+            CRef_Destruct(&result);
         }
         mode = func_001B0078(&B_003D9ED0);
         switch (mode) {

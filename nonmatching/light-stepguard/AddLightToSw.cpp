@@ -10,7 +10,7 @@ struct LIGHT {
     int f160; char pad3[4]; float radius;
 };
 extern "C" {
-QW PosLoWorld(void *);
+QW PosLoWorld(void);
 void AddLightToBspRegions(SWL *, void *, QW, int, float);
 }
 static inline int IbitLowest(unsigned bit, int base)
@@ -35,14 +35,14 @@ extern "C" void AddLightToSw(SWL *sw, LIGHT *light)
             unsigned lowest = bits & (0u - bits);
             int ilight = IbitLowest(lowest, iword * 32);
             free[iword] &= ~lowest;
-            *(void **)((char *)sw + ilight * 4 + 0x4154) = light;
             light->index = ilight;
+            *(void **)((char *)sw + ilight * 4 + 0x4154) = light;
             break;
         }
     }
     if (sw->dirty != 0 || light->skip != 0) return;
     if (light->e0 != 0 && light->f160 == 0 && sw->root != 0) {
-        AddLightToBspRegions(sw, sw->root, PosLoWorld(light), light->index, light->radius);
+        AddLightToBspRegions(sw, sw->root, PosLoWorld(), light->index, light->radius);
         return;
     }
     int ilight = light->index;

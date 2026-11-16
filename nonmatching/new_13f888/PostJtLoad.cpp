@@ -11,7 +11,7 @@ struct Jt {
     char pad58[0x1088 - 0x58]; int alert; int pad108c; ObjectEntry *objects; int objectCount;
 };
 extern "C" {
-void PostStepLoad();
+void PostStepLoad(Jt *);
 void SetSoProperties(void *, int, void *);
 void func_001959C0(void *);
 void LoadAttach(void *);
@@ -39,7 +39,7 @@ void PostJtLoad(Jt *self)
     void *found[16];
     AllocRequest request;
     QW saved[3];
-    PostStepLoad();
+    PostStepLoad(self);
     SetSoProperties(self, 0x35, D_002BC9F0);
     func_001959C0((char *)self + 0x2C0);
     LoadAttach((char *)self + 0x4C0);
@@ -78,14 +78,14 @@ void PostJtLoad(Jt *self)
         saved[2] = *(QW *)(matrix + 0x20);
         char *body = self->body;
         memset(body, 0, 0x40);
-        *(float *)(body + 0x0) = 1.0f;
         *(float *)(body + 0x3C) = 1.0f;
         *(float *)(body + 0x28) = 1.0f;
         *(float *)(body + 0x14) = 1.0f;
+        *(float *)(body + 0x0) = 1.0f;
         int serial = B_003DD490.serial + 1;
         B_003DD490.serial = serial;
-        *(int *)(self->body + 0xA4) = serial;
         char *vtable = self->vtable;
+        *(int *)(self->body + 0xA4) = serial;
         slot = (SlotEntry *)(vtable + 0x90);
         slot->function((char *)self + slot->adjust, vtable);
         slot = SLOT(self, 0xE8);

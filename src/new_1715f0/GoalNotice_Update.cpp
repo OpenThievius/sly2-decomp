@@ -31,7 +31,7 @@ struct GOALNOTICE : GOAL {
 };
 
 extern "C" {
-void func_001EEF98();
+void func_001EEF98(GOALNOTICE *);
 int func_001EF0A8(GOALNOTICE *);
 int func_00209098(NOTICESTEP *);
 int func_00176060(GOALNOTICE *);
@@ -40,7 +40,7 @@ int func_00175D00(GOALNOTICE *);
 void GoalNotice_SetState(GOALNOTICE *, int);
 QW PosLoWorld(void *);
 int PpathzoneFindPos(QW, int);
-void func_002562A8(TARGET *, int);
+void func_002562A8(TARGET *);
 void SetGoalTarget(GOAL *, TARGET *);
 int FGoalReactDone(GOAL *);
 int FGoalAnimDone(GOAL *);
@@ -71,7 +71,7 @@ static inline int FMoved(QW current, QW last)
 extern "C" void GoalNotice_Update(GOALNOTICE *pgoal)
 {
     TARGET target;
-    func_001EEF98();
+    func_001EEF98(pgoal);
     int state;
     do {
         state = pgoal->state;
@@ -104,7 +104,7 @@ extern "C" void GoalNotice_Update(GOALNOTICE *pgoal)
                             } else if (pgoal->pzoneLast != pzone || FMoved(pos, pgoal->posLast)) {
                                 pgoal->pzoneLast = pzone;
                                 pgoal->posLast = pos;
-                                func_002562A8(&target, pzone);
+                                func_002562A8(&target);
                                 target.pos = pos;
                                 SetGoalTarget(pgoal->pgoalChild, &target);
                             }

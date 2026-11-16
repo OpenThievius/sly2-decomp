@@ -1,8 +1,5 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later */
-typedef int s32;
-typedef unsigned int u32;
-typedef long s64;
-typedef unsigned long u64;
+#include "ps2inline.h"
 
 typedef union {
     u64 whole;
@@ -132,8 +129,8 @@ static inline u64 DivideWithRemainder(u64 numerator, u64 denominator, u64 *remai
         }
     } else {
         if (denominatorHigh > numeratorHigh) {
-            quotientLow = 0;
             quotientHigh = 0;
+            quotientLow = 0;
             if (remainderPointer != 0) {
                 remainderWord.half.low = numeratorLow;
                 remainderWord.half.high = numeratorHigh;
@@ -163,8 +160,7 @@ static inline u64 DivideWithRemainder(u64 numerator, u64 denominator, u64 *remai
                 numeratorHigh = (numeratorHigh << leadingZeros) | (numeratorLow >> complement);
                 numeratorLow = numeratorLow << leadingZeros;
                 DIVIDE_TWO_WORDS(quotientLow, numeratorHigh, numeratorTop, numeratorHigh, denominatorHigh);
-                productHigh = ((u64)quotientLow * denominatorLow) >> 32;
-                productLow = quotientLow * denominatorLow;
+                MultiplyUnsignedWide(quotientLow, denominatorLow, &productHigh, &productLow);
                 if (productHigh > numeratorHigh || (productHigh == numeratorHigh && productLow > numeratorLow)) {
                     quotientLow--;
                     SUBTRACT_TWO_WORDS(productHigh, productLow, productHigh, productLow, denominatorHigh, denominatorLow);

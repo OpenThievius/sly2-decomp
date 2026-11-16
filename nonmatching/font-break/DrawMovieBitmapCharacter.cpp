@@ -80,12 +80,12 @@ extern "C" void DrawMovieBitmapCharacter(DMC *pdmc, IN *pin, OUT *pout)
         loc.f14 = pin->fC * 0.45454547f;
         loc.f20 = pin->f10 * 0.8f + po->p->f9C + 786432.0f;
         loc.f24 = pin->f14 * 0.45454547f + po->p->fA0 + 786432.0f;
-        loc.f3C = 1.0f;
         loc.f28 = 1.0f;
+        loc.f3C = 1.0f;
         pout->iC = 0x7FFF;
         pout->i4 = 0;
         unsigned *tag = g_2dea28.pb;
-        *(long *)tag = 0x10000000;
+        *(unsigned char *)tag = 0x10000000;
         g_2dea28.pb += 4;
         *g_2dea28.pb = 0x6C04C000;
         g_2dea28.pb += 1;
@@ -111,8 +111,8 @@ extern "C" void DrawMovieBitmapCharacter(DMC *pdmc, IN *pin, OUT *pout)
         g_2dea28.pb += 4;
         PKT *p = OnGameLoad__FP4GAME();
         p->a = 0x15;
-        p->c = (unsigned)tag & 0x0FFFFFFF;
         p->b = pout->f8 + (float)(pdmc->obj8->shift << 18);
+        p->c = (unsigned)tag & 0x0FFFFFFF;
         p->d = pdmc->mode == 6 ? pdmc->i1C : pdmc->i18;
     }
 }

@@ -27,10 +27,9 @@ static inline int ChunkOf(int quotient) {
     return quotient > 0x8000 ? (quotient & -0x8000) : (quotient & -0x800);
 }
 void CBinaryInputStream::PumpCd() {
-    int quotient = total / count;
     pos += avail;
     avail = 0;
-    int chunk = ChunkOf(quotient);
+    int chunk = ChunkOf((total / count));
     if (filled > 0) {
         int nextCurrent = current + 1;
         int base0 = buffer;
@@ -60,7 +59,7 @@ void CBinaryInputStream::PumpCd() {
                     int slotOffset = next * chunk;
                     int sector = lsn;
                     base = offset;
-                    ReadCdDirect__FUiUiPv(sector + (offset / 0x800), ((request - offset) + 0x7FF & ~0x7FF) >> 11, (char *)buffer + slotOffset + offset, 0);
+                    ReadCdDirect__FUiUiPv(sector + (offset / 0x800), ((request - offset) + 0x7FF & ~0x7FF) >> 11, (char *)slotOffset + buffer + offset, 0);
                 }
             }
         }
@@ -69,8 +68,8 @@ void CBinaryInputStream::PumpCd() {
             if (left > 0) {
                 done = 0;
                 int length = left >= chunk ? chunk : left;
-                int nextSlot = (next + 1) % count;
                 request = length;
+                int nextSlot = (next + 1) % count;
                 filled++;
                 next = nextSlot;
                 ReadCdDirect__FUiUiPv(lsn, (length + 0x7FF & ~0x7FF) >> 11, (char *)buffer + nextSlot * chunk, 0);

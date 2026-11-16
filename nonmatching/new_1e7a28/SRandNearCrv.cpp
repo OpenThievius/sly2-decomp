@@ -2,7 +2,7 @@
 struct CRV { char pad0[0xE4]; int closed; };
 extern "C" {
 float SMaxCrv(CRV *);
-float SWrapCrv(CRV *, float);
+float SWrapCrv(float, CRV *);
 float GRandInRange(float, float);
 extern int g_2c3650;
 }
@@ -23,8 +23,8 @@ float SRandNearCrv(CRV *pcrv, float s, float ds)
         float sBottom = sCenter - ds;
         bounds[0] = (0.0f < sBottom) ? sBottom : 0.0f;
     } else {
-        bounds[1] = s + ds;
         bounds[0] = s - ds;
+        bounds[1] = s + ds;
     }
     float gRand = GRandInRange(-1.0f, 1.0f);
     if (g_2c3650 == 1) {
@@ -41,6 +41,6 @@ float SRandNearCrv(CRV *pcrv, float s, float ds)
     float unit = gRand * 0.5f + 0.5f;
     float result = (1.0f - unit) * bounds[0] + unit * bounds[1];
     if (pcrv->closed != 0)
-        return SWrapCrv(pcrv, result);
+        return SWrapCrv(result, pcrv);
     return result;
 }

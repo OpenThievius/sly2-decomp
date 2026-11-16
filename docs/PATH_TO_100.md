@@ -59,14 +59,18 @@ Waves yield about 20 bytes per claimed function. What moved the number: loop5, `
 - One measured lever per class, against a control. Land it, then `rejudge.py` the affected drafts.
 - Run a wave only on a class where a lever just landed.
 
-### Stage 4: inline kind (Not Started)
+### Stage 4: inline kind (In Progress)
 
-- 133 functions, about 11% of code, compiled C that needs the shared helpers.
+- Status 2026-11-15: only 12 of the 219 inline-kind functions were still in assembly (all VU0, 24,200 bytes), not 133. Waves S4 and S4a to S4h: 0 matches, 9 near misses and drafts rewritten onto shared helpers (`RefOpMult` 282 to 33, `func_001CC2E8` 105 to 4, `UpdateGuardSensor` 43 to 26 with a `-fno-strength-reduce` row, `UpdateVehicle` 531 to 43, `RenderGlobsetTree` 846 to 547). `ScaleAddTwoX` landed (two users). `RenderGlobsetTree` has a named exception for its microprogram's fixed registers (AGENTS.md, 2026-11-15). Worker lesson: `claim.py take` is arrival order, so one wave per target function.
+- Left: the vcallms/cfc2 asm statements of `RenderGlobsetTree` still need a ruling; 0x1CC2E8 (4) and 0x1B8D30 (7) differ only in vf numbering.
+- 133 functions, about 11% of code, compiled C that needs the shared helpers (count from before the inline cutoff moved to 10%).
 - A new helper goes into `include/ps2inline.h` or `include/vu0inline.h`, measured on more than one function: one instruction each, no register pins, no `"memory"` clobber.
 
-### Stage 5: SDK range drafting (Not Started)
+### Stage 5: SDK range drafting (In Progress)
 
-- Remaining libm and libc giants. Drafting work, not toolchain.
+- Status 2026-11-15: `MultiplyUnsignedWide` (libgcc's `umul_ppmm`, one `multu`) landed in `ps2inline.h`; it gives retail's `multu`, `mfhi`, `mflo` in all four 64-bit division functions. `__divdi3` and `__udivdi3` match (the second only with `sony29-01`, now in `config/us/sony_gcc29_01.txt`): matched code 71.95% to 72.23%, 5586 to 5588 functions. `__moddi3` (7) and `__umoddi3` (4) keep an unused 0x20 of frame that nothing accesses; `__umoddi3`'s tail is a split epilogue (`func_0023D32C`).
+- Eight SDK near misses ran as single waves: `func_002542B8` 1 (one rodata link word), `func_002358A0` 2, `sceMpegInit` 2, `func_00235780` 2 (with `sony29`), `func_002540B0` 6. Four of them end on an unfilled delay slot where retail filled it; the volatile-store-in-delay-slot wall of stage 2 is the likely common cause.
+- Left: the giants `func_0024D5E8` (7,592 bytes), `func_0024FC58`, `__ieee754_log`, `func_0024C670`. Drafting work, not toolchain.
 
 ### Stage 6: tail (Not Started)
 

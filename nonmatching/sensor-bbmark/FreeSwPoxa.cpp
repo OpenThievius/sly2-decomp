@@ -30,8 +30,8 @@ void FreeSwMqList__FP2SWP2MQ(SW_1337D0 *, void *);
 void *PoxExtractFromPoxa(SW_1337D0 *, int, POXA_1337D0 *);
 void RemoveDlEntry(void *, void *);
 void func_001F5078(OBJ_1337D0 *);
-void *memmove(void *, void *, int);
-void FreeSwPoxa(SW_1337D0 *sw, POXA_1337D0 *poxa) {
+void *memmove(void *, POXA_1337D0 *, int);
+void * FreeSwPoxa(SW_1337D0 *sw, POXA_1337D0 *poxa) {
     NODE_1337D0 *node;
     NODE_1337D0 *current;
     OBJ_1337D0 *object;
@@ -91,11 +91,12 @@ void FreeSwPoxa(SW_1337D0 *sw, POXA_1337D0 *poxa) {
             }
             break;
         }
-        memmove(first, first + 1, (entry - first) * 0xC - 0xC);
-        memmove(entry - 1, entry + 1, (sw->count - (entry - base)) * 0xC - 0xC);
+        memmove(first, poxa, (entry - first) * 0xC - 0xC);
+        memmove(entry - 1, poxa, (sw->count - (entry - base)) * 0xC - 0xC);
         table++;
     } while (table < 3);
     sw->count -= 2;
     FreeSlotheapPv(slotheap, poxa);
+    return extracted;
 }
 }

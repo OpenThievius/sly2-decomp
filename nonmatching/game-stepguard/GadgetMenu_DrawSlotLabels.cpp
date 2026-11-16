@@ -16,14 +16,14 @@ struct _m2c_stack_GadgetMenu_DrawSlotLabels {
 };                                                  /* size = 0x180 */
 M2C_UNK CMovieText_Draw(M2C_UNK *, s8 *, M2C_UNK, f32, f32, f32, f32); /* extern */
 M2C_UNK CTextBox_SetHorizontalJust(s8 *, M2C_UNK); /* extern */
-M2C_UNK CTextBox_SetPos(s8 *, s32, M2C_UNK, M2C_UNK); /* extern */
-M2C_UNK CTextBox_SetSize(s8 *, M2C_UNK, M2C_UNK); /* extern */
+M2C_UNK CTextBox_SetPos(s8 *, s32, M2C_UNK); /* extern */
+M2C_UNK CTextBox_SetSize(s8 *); /* extern */
 M2C_UNK CTextBox_SetTextColor(s8 *, s32 *);       /* extern */
 M2C_UNK CTextBox_SetVerticalJust(s8 *, M2C_UNK);  /* extern */
 s32 FDrawBlotMovie(s32);                            /* extern */
 s32 FIsBasicDerivedFrom(s32, M2C_UNK);              /* extern */
 s32 PpoSwFocusBase(M2C_UNK *);                      /* extern */
-M2C_UNK func_00215AC0(M2C_UNK *, s32, f32);         /* extern */
+M2C_UNK func_00215AC0(f32, M2C_UNK *, s32);         /* extern */
 extern M2C_UNK B_003DD490;
 extern s32 D_002C3268;
 extern f32 D_FLT_002C3264;
@@ -58,13 +58,13 @@ loop_7:
                             goto loop_7;
                         }
                     } else {
-                        CTextBox_SetPos(sp, var_a1, 0, 0);
-                        CTextBox_SetSize(sp, 0x44200000, 0x43F66667);
+                        CTextBox_SetPos(sp, var_a1, 0);
+                        CTextBox_SetSize(sp);
                         sp20 = 0xFF808080;
                         CTextBox_SetTextColor(sp, &sp20);
                         CTextBox_SetHorizontalJust(sp, 0);
                         CTextBox_SetVerticalJust(sp, 0);
-                        func_00215AC0(&sp30, *var_s0, D_FLT_002C3264);
+                        func_00215AC0(D_FLT_002C3264, &sp30, *var_s0);
                         CMovieText_Draw(&sp30, sp, 0x13, M2C_FIELD(temp_s1, f32 *, 0x14), M2C_FIELD(temp_s1, f32 *, 0x18), 32.0f, 32.0f);
                     }
                     var_a0 += 1;

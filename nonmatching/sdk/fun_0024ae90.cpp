@@ -123,8 +123,8 @@ block_18:
         }
     } else {
         if (arg1 == 0) {
-            temp_a0_2 = obj->f1CC;
             obj->f1CC = obj->f1C8;
+            temp_a0_2 = obj->f1CC;
             temp_v1 = obj->f1DC;
             obj->f1DC = obj->f1D8;
             temp_a2 = obj->f1E8;

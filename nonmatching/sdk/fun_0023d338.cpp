@@ -55,6 +55,6 @@ block_10:
         var_a3 = 0x7FF;
         var_a1 = 0;
     }
-    return (((((arg2 & (0xFFF0L << 0x30)) | (var_a1 & (-1U >> 0xC))) & ((((0x800FFFFF << 0x10) | 0xFFFF) << 0x10) | 0xFFFF)) | ((var_a3 & 0x7FF) << 0x34)) & (-1U >> 1)) | ((s64) M2C_FIELD(arg0, s32 *, 4) << 0x3F);
+    (((((arg2 & (0xFFF0L << 0x30)) | (var_a1 & (-1U >> 0xC))) & ((((0x800FFFFF << 0x10) | 0xFFFF) << 0x10) | 0xFFFF)) | ((var_a3 & 0x7FF) << 0x34)) & (-1U >> 1)) | ((s64) M2C_FIELD(arg0, s32 *, 4) << 0x3F);
 }
 }

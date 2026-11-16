@@ -17,11 +17,11 @@ extern float g_2dded0;
 extern "C" {
 void *CStackFrame_Construct(void *);
 void CStackFrame_Destructor(void *, int);
-int ClsgClipEdgeToObjectPruned(Item *, void *, QW, QW, int, Hit *);
+int ClsgClipEdgeToObjectPruned(Item *, void *, QW);
 int FIsBasicDerivedFrom(int, int);
 int FIsDlEmpty__FP2DL(DL *);
 int PruneBsp__FP3BSPP6VECTORfPP3BSP(void *, int, QW, int *, void **, float);
-void *PvAllocStackImpl__Fi(ALLOCREQ *);
+void *PvAllocStackImpl__Fi(void);
 }
 inline void PushDli(DLI *it, DL *list)
 {
@@ -43,7 +43,6 @@ extern "C" void BounceRipgRips__FP4RIPG(Ripg *ripg)
 {
     if (ripg->state != 1)
         return;
-    DL *rips = &ripg->rips;
     for (Node *node = ripg->world->head; node; node = node->next) {
         Obj *obj = node->so->obj;
         if (obj->flags & 4)
@@ -63,7 +62,7 @@ extern "C" void BounceRipgRips__FP4RIPG(Ripg *ripg)
                 ALLOCREQ req;
                 req.cb = count * 0xC;
                 req.cbAlign = 0x10;
-                pruned = PvAllocStackImpl__Fi(&req);
+                pruned = PvAllocStackImpl__Fi();
                 World *world = ripg->world;
                 if (PruneBsp__FP3BSPP6VECTORfPP3BSP(item->bsp, 0x7FFFFFFF, world->pos, &count, &pruned, world->radius) != 2) {
                     CStackFrame_Destructor(frame, 2);
@@ -72,12 +71,12 @@ extern "C" void BounceRipgRips__FP4RIPG(Ripg *ripg)
                 pruned = (char *)pruned - 0xC;
             }
             DLI inner;
-            PushDli(&inner, rips);
+            PushDli(&inner, (&ripg->rips));
             for (Rip *rip = (Rip *)PvStep(&inner); rip; rip = (Rip *)PvStep(&inner)) {
                 if (g_2dded0 <= rip->created)
                     continue;
                 Hit hits[4];
-                int hitCount = ClsgClipEdgeToObjectPruned(item, pruned, rip->edgeA, rip->edgeB, 4, hits);
+                int hitCount = ClsgClipEdgeToObjectPruned(item, pruned, rip->edgeA);
                 for (int index = 0; index < hitCount; index++) {
                     if (hits[index].weight != 0.0f && rip->vt->fn((char *)rip + rip->vt->delta, (char *)item, hits[index].point, hits[index].normal))
                         break;
@@ -88,6 +87,6 @@ extern "C" void BounceRipgRips__FP4RIPG(Ripg *ripg)
         }
         PopDli(&outer);
     }
-    if (FIsDlEmpty__FP2DL(rips))
+    if (FIsDlEmpty__FP2DL((&ripg->rips)))
         ripg->vt->fn((char *)ripg + ripg->vt->delta);
 }

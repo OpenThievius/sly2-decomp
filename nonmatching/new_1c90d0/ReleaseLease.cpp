@@ -10,7 +10,7 @@ struct CLONEOWNER : LO {
 };
 extern "C" void CFramePtr_Assign(int *, int);
 extern "C" void CFrame_RemoveParent(void *, int);
-extern "C" int FIsBasicDerivedFrom(void *, int);
+extern "C" int FIsBasicDerivedFrom(CLONEOWNER *, int);
 extern "C" int IcloneFromLease(CLONEOWNER *, LEASE *);
 extern "C" void InvertMatrix4Affine(QW *, void *);
 extern "C" void func_001A58D0(void *, int, int);
@@ -80,7 +80,7 @@ extern "C" void ReleaseLease(CLONEOWNER *self, LEASE *lease) {
         object->Remove();
         object->Slot37(scratch);
         func_001A58D0(object, 0, 0);
-        if (FIsBasicDerivedFrom(object, 0x30) != 0) {
+        if (FIsBasicDerivedFrom(self, 0x30) != 0) {
             SO *solid = (SO *)object;
             QW *matrix = self->pool->matrices + index * 4;
             if (solid->pxfLinear != 0) {

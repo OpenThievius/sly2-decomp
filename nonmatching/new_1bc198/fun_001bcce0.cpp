@@ -3,9 +3,10 @@ typedef float f32;
 extern "C" {
 s32 FFindCrvSInPathzone(s32, s32, f32 *, s32, f32, f32);
 f32 SMaxCrv(s32);
-s32 func_001BCAC0(s32, s32, s32, f32, f32);
+s32 func_001BCAC0(s32, s32, s32, s32);
 extern f32 g_2c0ab8;
 s32 func_001BCCE0(s32 arg0, s32 arg1, f32 *arg2, s32 arg3, f32 fparg0) {
+    s32 result;
     f32 sp[2];
     f32 var_f20;
     f32 var_f21;
@@ -32,8 +33,8 @@ s32 func_001BCCE0(s32 arg0, s32 arg1, f32 *arg2, s32 arg3, f32 fparg0) {
         if (!(var_f21 < (SMaxCrv(arg0) * var_f20 * 0.5f))) {
             var_s2 = 0;
         }
-        temp_s0 = func_001BCAC0(arg0, arg1, 1, sp[0], sp[1]);
-        temp_v0 = func_001BCAC0(arg0, arg1, 0, sp[0], sp[1]);
+        temp_s0 = func_001BCAC0(arg0, arg1, 1, arg3);
+        temp_v0 = func_001BCAC0(arg0, arg1, 0, arg3);
         var_v0 = 1;
         if (temp_v0 >= temp_s0) {
             var_v0 = 2;
@@ -41,11 +42,13 @@ s32 func_001BCCE0(s32 arg0, s32 arg1, f32 *arg2, s32 arg3, f32 fparg0) {
                 if (temp_s0 != 2) {
                     return (var_s2 != 0) ? 2 : 1;
                 }
-                return 4;
+                { result = 4; goto done; }
             }
         }
-        return var_v0;
+        { result = var_v0; goto done; }
     }
-    return 4;
+    { result = 4; goto done; }
+done:
+    return result;
 }
 }

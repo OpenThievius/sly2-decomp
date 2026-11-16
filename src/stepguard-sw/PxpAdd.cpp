@@ -4,7 +4,7 @@
 #include "types.h"
 struct SW;
 struct XP;
-struct XPSOVT { char pad[0x1B8]; short delta; short index; void (*fn)(void *, XP *, int, void *); };
+struct XPSOVT { char pad[0x1B8]; short delta; short index; void (*fn)(void *, XP *, int); };
 struct XPSO { char pad[0xC]; XPSOVT *vt; };
 struct XPSEC { char pad[0x60]; int unk60; };
 struct XPOWN { char pad[0xEC]; XPSEC *psec; };
@@ -50,18 +50,18 @@ void PxpAdd(char *psw, void *pobjA, void *pobjB, QW pos, QW vel, int arg5, int a
         ixpd++;
         pxpd->posConv = ConvertXfPos(0, pxpd->unk4, pxpd->pos);
     } while (ixpd < 2);
-    pxp->nA0 = arg6;
-    pxp->nA4 = arg7;
     pxp->gA = gScale;
     pxp->n9C = arg5;
     pxp->gB = D_FLT_002BFD30;
     pxp->gC = D_FLT_002BFD34;
+    pxp->nA0 = arg6;
+    pxp->nA4 = arg7;
     ixpd = 0;
     do {
         pxpd = &pxp->xpd[ixpd];
         XPSO *pso = pxpd->pso;
         if (pso)
-            pso->vt->fn((char *)pso + pso->vt->delta, pxp, ixpd, pso);
+            pso->vt->fn((char *)pso + pso->vt->delta, pxp, ixpd);
         ixpd++;
     } while (ixpd < 2);
     RecalcSwXpMovement((SW *)psw, 1, &pxp);

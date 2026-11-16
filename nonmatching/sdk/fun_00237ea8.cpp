@@ -58,15 +58,15 @@ int func_00237EA8(const unsigned char *path, int flags, ...)
         request->path[0x3FF] = 0;
     }
     index = ((int)slot - (int)B_0044BB80) >> 4;
-    request->flags = flags & 0x7FFFFFFF;
-    request->mode = mode;
+    request->sema = semaphore;
+    request->index = index;
     param.initCount = 1;
     param.maxCount = 0;
     param.name = "SceStdioOpenSema";
-    request->index = index;
+    request->flags = flags & 0x7FFFFFFF;
     semaphore = CreateSema(&param);
     request->result = &result;
-    request->sema = semaphore;
+    request->mode = mode;
     request->field8 = 4;
     if (func_002375E0(B_0044BD80, 0, 0, &B_0044A680, 0x418, B_0044B2C0, 4, 0, 0, 0) < 0) {
         DeleteSema(semaphore);

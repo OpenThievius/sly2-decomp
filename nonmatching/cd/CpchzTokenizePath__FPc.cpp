@@ -15,10 +15,10 @@ extern "C" int CpchzTokenizePath__FPc(char *pchzPath)
         cch = strlen(pchzPath);
     }
     unsigned char *pbEnd = (unsigned char *)pchzPath + cch;
-    unsigned char *pbRead = (unsigned char *)pchzPath;
     char *pchWrite = pchzPath;
-    int cComponent = 0;
     int cchComponent = 0;
+    unsigned char *pbRead = (unsigned char *)pchzPath;
+    int cComponent = 0;
     int cchMax = 8;
     while (pbRead < pbEnd) {
         unsigned char ch = *pbRead;
@@ -43,8 +43,8 @@ extern "C" int CpchzTokenizePath__FPc(char *pchzPath)
         }
         if (ch == ';' && cchComponent != 0 && pbRead == pbEnd - 2 && pbRead[1] == '1') {
             pchWrite[0] = (char)pbEnd[-2];
+            pchWrite += 1;
             pchWrite[1] = (char)pbEnd[-1];
-            pchWrite += 2;
             cchComponent += 2;
             pbRead = pbEnd;
             continue;

@@ -13,7 +13,7 @@ struct _m2c_stack_GoalIdle_Update {
 s32 FGuardScriptDone(s32);                          /* extern */
 M2C_UNK GoalIdle_SetState(s8 *, M2C_UNK);         /* extern */
 M2C_UNK func_001EEF98();                            /* extern */
-s32 func_001EF0A8(s8 *);                          /* extern */
+s32 func_001EF0A8(void);                          /* extern */
 s32 func_00209098(s32);                             /* extern */
 extern f32 g_2dded0;
 void GoalIdle_Update(s8 *arg0) {
@@ -22,7 +22,7 @@ void GoalIdle_Update(s8 *arg0) {
     func_001EEF98();
     temp_s2 = func_00209098(M2C_FIELD(arg0, s32 *, 0x10));
 loop_24:
-    if (func_001EF0A8(arg0) == 0) {
+    if (func_001EF0A8() == 0) {
         temp_s1 = M2C_FIELD(arg0, s32 *, 0x38);
         switch (temp_s1) {                          /* irregular */
         case 1:

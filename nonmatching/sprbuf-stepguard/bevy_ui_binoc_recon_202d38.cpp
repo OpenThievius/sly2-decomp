@@ -104,10 +104,10 @@ void bevy_ui_binoc_recon_202d38(RECON *precon)
         float fCenter = 1.0f - (dCenter - 128.0f) * 0.0078125f;
         float fSize = LaneX(SqrtX(SquaredLengthXy(VectorSub(scale.q, top)))) * 0.008333334f;
         scale.q = top;
-        precon->fSmall = 1;
+        precon->fCenter = 0.0f > fCenter ? 0.0f : fCenter;
         fCenter = fCenter < 1.0f ? fCenter : 1.0f;
         precon->fSize = fSize;
-        precon->fCenter = 0.0f > fCenter ? 0.0f : fCenter;
+        precon->fSmall = 1;
         if (1.0f < fSize) {
             precon->fSmall = 0;
             precon->fSize = 2.0f - fSize;
@@ -184,8 +184,8 @@ void bevy_ui_binoc_recon_202d38(RECON *precon)
             }
         } else if (ptarget != 0 && ptarget->kind != 1) {
             precon->label = precon->pblot->alabel[0];
-            bevy_ui_binoc_recon_202768(precon, 3);
             fSet = 1;
+            bevy_ui_binoc_recon_202768(precon, 3);
         } else if (1.0f <= precon->fCenter && precon->fSmall != 0) {
             precon->label = precon->pblot->alabel[1];
             bevy_ui_binoc_recon_202768(precon, 5);

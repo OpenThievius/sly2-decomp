@@ -17,7 +17,7 @@ extern s32 B_002DD2C8;
 extern M2C_UNK B_00452138;
 extern M2C_UNK B_00452148;
 extern s32 g_2dd598;
-void SweepSidebags(void) {
+u32 SweepSidebags(void) {
     s32 temp_a0_2;
     s32 temp_a0_3;
     s32 temp_v1;
@@ -49,7 +49,8 @@ void SweepSidebags(void) {
     if (var_s0 != NULL) {
         var_s1 = var_s0;
         do {
-            temp_v0_2 = M2C_FIELD(var_s1, u32 *, 4);
+            u32 hoisted_1 = M2C_FIELD(var_s1, u32 *, 4);
+            temp_v0_2 = hoisted_1;
             temp_a0_3 = (temp_v0_2 >> 0x10) & 0x1FFF;
             temp_v1_2 = (temp_v0_2 >> 0x1D) & 3;
             if (temp_a0_3 == 0) {
@@ -64,12 +65,13 @@ void SweepSidebags(void) {
 block_14:
                 var_s2 = (s8 *)(*(var_v0_2 + &B_00452138) + (temp_a0_3 * 0xC));
             }
-            if (((u32) M2C_FIELD(var_s1, u32 *, 4) >> 0x1F) != g_2dd598) {
+            if (((u32) hoisted_1 >> 0x1F) != g_2dd598) {
                 UnlinkSidebagNode(var_s1);
                 FreeSlotheapPv(&B_00452148, var_s1);
             }
             var_s1 = var_s2;
         } while (var_s2 != NULL);
     }
+    return temp_v0_2;
 }
 }

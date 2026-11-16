@@ -2,7 +2,7 @@ struct SB { char pad[0x14C]; float volB; float volA; };
 struct GSR { char pad0[0x18]; long r18; char pad1[0x20]; long r40; };
 extern "C" {
 float GLimitLm__FP2LMf(void *, float);
-void SetSndbankVolumeFactor(SB *, int, int, float);
+void SetSndbankVolumeFactor(SB *, int, float, int);
 void SeekBlotLabel(int, int, float);
 int UpdateJoyNavX(int);
 int UpdateJoyNavY(int);
@@ -43,7 +43,7 @@ void PauseMenu_AdjustOption(PAD *pad, PAUSE *menu, int *pkind)
         if (stick != 0.0f) {
             vol = GLimitLm__FP2LMf(g_2bbb60, D_003DD040.volA + stick * g_2ddf10 * 1.5f);
             bank = 1;
-            SetSndbankVolumeFactor(&D_003DD040, bank, 1, vol);
+            SetSndbankVolumeFactor(&D_003DD040, bank, vol, 1);
             SeekBlotLabel(menu->label, 0x315, vol);
         }
         break;
@@ -52,8 +52,8 @@ void PauseMenu_AdjustOption(PAD *pad, PAUSE *menu, int *pkind)
         float stick = (float)UpdateJoyNavX(pad->nav);
         if (stick != 0.0f) {
             vol = GLimitLm__FP2LMf(g_2bbb60, D_003DD040.volB + stick * g_2ddf10 * 1.5f);
-            SetSndbankVolumeFactor(&D_003DD040, 0, 1, vol);
-            SetSndbankVolumeFactor(&D_003DD040, 3, 1, vol);
+            SetSndbankVolumeFactor(&D_003DD040, 0, vol, 1);
+            SetSndbankVolumeFactor(&D_003DD040, 3, vol, 1);
             SeekBlotLabel(menu->label, 0x315, vol);
         }
         break;
@@ -71,8 +71,8 @@ void PauseMenu_AdjustOption(PAD *pad, PAUSE *menu, int *pkind)
             D_002DEB80.r40 = a;
             D_002DEB80.r18 = b;
             unsigned int hi = func_0023E1C8(y) & 0x7FE;
-            D_002DEB80.r40 = SetHighBits(a, hi);
             D_002DEB80.r18 = SetHighBits(b, hi);
+            D_002DEB80.r40 = SetHighBits(a, hi);
         }
         break;
     }

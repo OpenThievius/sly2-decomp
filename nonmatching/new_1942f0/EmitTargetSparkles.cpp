@@ -45,7 +45,7 @@ void EmitTargetSparkles(void *unused, JT *jt, int ctarget, Target *atarget)
         if (target->nPriority == -1)
             continue;
         float blips = emitter->rate * g_2dded0.dt;
-        int count = (int)blips;
+        unsigned int count = (int)blips;
         if (GRandInRange(0.0f, 1.0f) < blips - (float)count)
             count++;
         QW *pposOut = &apos[cblip];

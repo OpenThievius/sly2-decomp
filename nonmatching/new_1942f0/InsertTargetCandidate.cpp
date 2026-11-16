@@ -2,7 +2,7 @@
 #include "sly2.h"
 #include "ps2inline.h"
 #include "vu0inline.h"
-void *memmove(void *, const void *, unsigned int);
+void *memmove(void);
 struct Obj { char pad[0x18]; int group; };
 struct JT {
     char pad0[0x2CC]; Obj *jumpTarget; char pad1[0x37C - 0x2D0]; Obj *obj37c;
@@ -94,7 +94,7 @@ void InsertTargetCandidate(void *unused, JT *jt, QW posFrom, Lo *plo, Member *me
                 if (other->group == group) {
                     if (local.sDist < atarget[index].sDist) {
                         CopyAb__FPvT0Ui(&atarget[index], &atarget[index + 1], (ctarget - index - 1) * sizeof(Target));
-                        memset(&atarget[ctarget - 1], 0, sizeof(Target));
+                        memset((__typeof__(&(atarget)[0]))((ctarget - 1) * sizeof((atarget)[0]) + (unsigned)(atarget)), 0, sizeof(Target));
                         atarget[ctarget - 1].sDist = D_FLT_002BF664;
                         break;
                     }
@@ -119,7 +119,7 @@ void InsertTargetCandidate(void *unused, JT *jt, QW posFrom, Lo *plo, Member *me
     }
     if (index == ctarget)
         return;
-    memmove(&atarget[index + 1], &atarget[index], (ctarget - index) * sizeof(Target) - sizeof(Target));
+    memmove();
     local.plo = plo;
     local.pmember = member;
     local.tStart = g_2dded0;

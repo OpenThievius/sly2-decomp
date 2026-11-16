@@ -31,7 +31,7 @@ static inline float GClamp(float g, float lo, float hi)
 }
 
 extern "C" {
-void func_001EEF98();
+void func_001EEF98(ZoneScript *);
 int func_001EF0A8(ZoneScript *);
 int FIsGuardInSgs(ZoneOwner *, int);
 QW PosLoWorld(void *);
@@ -44,7 +44,7 @@ extern void *g_2e1e40;
 void UpdateZoneScriptBeh(ZoneScript *self)
 {
     QW origin;
-    func_001EEF98();
+    func_001EEF98(self);
     while (func_001EF0A8(self) == 0) {
         int previousState = self->state;
         switch (previousState) {

@@ -23,7 +23,7 @@ extern s32 B_003E0E70;
 
 extern "C" {
 void *PpoSwFocusBase();
-QW PosLoWorld(void *);
+QW PosLoWorld(void);
 int FFindDlEntry(DL *, void *);
 void AppendDlEntry(DL *, void *);
 void RemoveDlEntry(DL *, void *);
@@ -37,7 +37,7 @@ void func_00148300(ROOTSW *psw, ROOTOBJ *pobj)
     QW pos[2];
     pos[0] = B_002DDF40.pos;
     void *pvBase = PpoSwFocusBase();
-    pos[1] = pvBase ? PosLoWorld(pvBase) : pos[0];
+    pos[1] = pvBase ? PosLoWorld() : pos[0];
     void *pvDle = pobj->pvDle;
     int fActive;  // retail leaves it unset for types 4..15
     switch ((pobj->grfPacked << 8) >> 60) {
@@ -46,7 +46,7 @@ void func_00148300(ROOTSW *psw, ROOTOBJ *pobj)
             float radius = *(float *)((u8 *)pobj + 0x38);
             fActive = 1;
             radius = radius * radius;
-            QW here = PosLoWorld(pobj);
+            QW here = PosLoWorld();
             QW delta = VectorSub(here, pos[0]);
             if (LaneX(SquaredLength(delta)) < radius)
                 break;
@@ -61,7 +61,7 @@ void func_00148300(ROOTSW *psw, ROOTOBJ *pobj)
             float radius = *(float *)((u8 *)pobj + 0x38);
             fActive = 1;
             radius = radius * radius;
-            QW here = PosLoWorld(pobj);
+            QW here = PosLoWorld();
             QW delta = VectorSub(here, pos[1]);
             if (LaneX(SquaredLength(delta)) < radius)
                 break;

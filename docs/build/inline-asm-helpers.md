@@ -157,7 +157,7 @@ Findings:
 - **Ruling (Theo, 2026-11-15): `VectorFromFloats3`, a five-instruction block, is allowed as one helper.** `mfc1` x3, `pextlw`, `pcpyld` build lanes x, y, z of a quadword from three floats. Retail writes the result into the low operand's register and keeps the block adjacent in about 40 functions (SetVectorCylind, SetVectorSphere, GetXfDofValue, GetPerpendicularVector, DecomposeRotateMatrixEuler, ...); split into `InterleaveLowWords` plus `JoinLowDoublewords` the scheduler puts an epilogue `lwc1` between them (SetVectorCylind 2, SetVectorSphere 11 split; 0 with the block). Measured on three drafts; the three matched ps2inline.h users still score 0. Same ground as `SquaredLengthXy`.
 - Not added, one user each so far: `VectorDivideX` (`vdiv Q, vf0w, s.x`; `vwaitq`; `vmulq`), `ScaleAddScaleX` (`vmulax` + `vmaddx`),
   `vmax`/`vmini` clamps. `vcallms` + `vmove` (RenderGlobsetTree) is not a helper candidate: the microprogram reads fixed VU registers
-  (vf10-vf17), which needs register pins.
+  (vf10-vf17), which needs register pins. Ruled 2026-11-15: a named exception for this function only (AGENTS.md), not a helper.
 
 ## The VU0 flag follows the include (2026-11-13)
 
@@ -228,6 +228,10 @@ lead with `try.py`, `TRY_VU0=1`; about 12 compiles per function at most):
   `SquaredLength` instructions with two operands), `VectorMinXyz` and `VectorMaxXyz` (`vmini.xyz`, `vmax.xyz`), `CrossProduct`
   (`vopmula.xyz` + `vopmsub.xyz`, ACC in one asm), `BlendX` (`vmulax.xyzw` + `vmaddx.xyzw`, two users), `ScaleByReciprocalX`
   (`vdiv`, `vwaitq`, `vmulq.xyzw`, two users) and `TransformVector` (`vmulax.xyz`, `vmadday.xyz`, `vmaddz.xyz`).
+- `ScaleAddTwoX` (2026-11-15; `vadda ACC, vf0, a`, `vmaddax ACC, b, sb.x`, `vmaddx r, c, sc.x`: a + b * sb.x + c * sc.x), two users:
+  `PxpFindJtBestEdge` (0x199D48) and `UpdateVehicle` (0x1D19A8) give retail's three instructions and vf numbers (vf2/vf5/vf3/vf1/vf4 and
+  vf1/vf5/vf2/vf3/vf4); both write sb then sc through one `VU_SCALE` slot. Retail has 28 such sequences, 26 of them in permanent blockers.
+  Neither function matches yet (46 and 43 words).
 - Measured effect of the change (2026-11-12): inline functions 75 to 219 (180,184 bytes), final blockers 888 to 767 functions, 329,784 to
   239,036 bytes left out. Headline code 72.52% to 66.86% (NTSC-U), 69.16% to 63.77% (PAL): the 144 functions (97 KB) enter the
   denominator while the matched bytes stay the same, so the fall is about 5.7 points, more than the 2.5 first estimated from the 2026-11-08

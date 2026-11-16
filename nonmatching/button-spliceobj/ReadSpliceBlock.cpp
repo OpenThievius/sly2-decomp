@@ -7,7 +7,7 @@ void PpairSerializeIn(int **, int);
 int *PvAllocSwClearImpl__Fi(CRef *);
 int PvAllocSwImpl__Fi(CRef *);
 void RunSpliceBlockEntry(CRef *, char *, int *, int);
-int U32Read__18CBinaryInputStream(int);
+int U32Read__18CBinaryInputStream(void);
 void Unknown1__18CBinaryInputStream(int);
 int UnlinkPairNode(int *);
 void func_00128148(void *);
@@ -17,22 +17,22 @@ extern char g_2dd598;
 void ReadSpliceBlock(char *arg0, int arg1, int arg2) {
     CRef ref;
     CRef work;
-    int count = U32Read__18CBinaryInputStream(arg2);
+    int count = U32Read__18CBinaryInputStream();
     if (count != 0) {
         int index = 0;
         ref.tagk = 0x10;
         ref.n = 0x10;
         int *block = PvAllocSwClearImpl__Fi(&ref);
-        ref.tagk = -1;
         block[0] = arg1;
+        ref.tagk = -1;
         block[1] = count;
         work.tagk = count * 8;
         work.n = 0x10;
         block[2] = PvAllocSwImpl__Fi(&work);
         if (count > 0) {
             do {
-                int *slot = (int *)(block[2] + index * 8);
                 PpairSerializeIn((int **)&work, arg2);
+                int *slot = (int *)(block[2] + index * 8);
                 int *pair = *(int **)&work;
                 if (pair != 0) {
                     *pair = *pair + 1;

@@ -16,7 +16,7 @@ int UnlinkSidebagNode(int *);
 int UnlinkVarbNode(int *);
 void VarbPtr_Destructor(void *, int);
 void func_00128148(void *);
-void *func_0015E3C0(void *, int);
+void *func_0015E3C0(void);
 int func_00258178(int);
 int func_00259A88(int);
 extern char B_003DD490[];
@@ -90,7 +90,6 @@ void CLo_Clone(char *self, char *source) {
     }
     *(int *)(self + 0x34) = *(int *)(source + 0x34);
     char *destination;
-    char *sourceData = source + 0x50;
     if (*(int *)(B_003DD490 + 0x3F10) != -2) {
         destination = self + 0x50;
         *(int *)(self + 0x3C) = *(int *)(source + 0x3C);
@@ -107,7 +106,7 @@ void CLo_Clone(char *self, char *source) {
                 ClearSle(copy + 0x14);
                 ClearSl(copy + 0x18);
                 AppendSlEntry(*(char **)(copy + 4) + 0x18, copy);
-                AppendSlEntry(func_0015E3C0(B_003DD490, *(int *)(copy + 8)), copy);
+                AppendSlEntry(func_0015E3C0(), copy);
                 node = *(char **)(node + 4);
                 if (node == 0) {
                     break;
@@ -121,5 +120,5 @@ void CLo_Clone(char *self, char *source) {
     }
     char *vtable = *(char **)(self + 0xC);
     char *(*getInfo)(char *) = *(char *(**)(char *))(vtable + 0x34);
-    CopyAb__FPvT0Ui(destination, sourceData, *(int *)(getInfo(self + *(short *)(vtable + 0x30)) + 0xC) - 0x50);
+    CopyAb__FPvT0Ui(destination, (source + 0x50), *(int *)(getInfo(self + *(short *)(vtable + 0x30)) + 0xC) - 0x50);
 }

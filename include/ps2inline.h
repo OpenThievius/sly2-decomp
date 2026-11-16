@@ -129,4 +129,15 @@ static inline void EnableInterrupts(void)
     asm volatile("ei");
 }
 
+/* multu: unsigned 32 x 32 to 64 bits, high word and low word out of HI and LO (the "h" and "l" constraints name those registers, so GCC
+   schedules the mfhi and mflo itself). libgcc's umul_ppmm: __divdi3, __moddi3, __udivdi3 and __umoddi3 each give retail's multu, mfhi, mflo
+   with the same registers through it (2026-11-15) */
+static inline void MultiplyUnsignedWide(u32 left, u32 right, u32 *high, u32 *low)
+{
+    u32 highWord, lowWord;
+    asm("multu %2,%3" : "=l"(lowWord), "=h"(highWord) : "d"(left), "d"(right));
+    *high = highWord;
+    *low = lowWord;
+}
+
 #endif

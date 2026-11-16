@@ -102,8 +102,8 @@ block_9:
                     if (var_v0 == var_a1) {
                         var_v0 = M2C_FIELD(var_s0, s32 *, 8);
                     }
-                    var_a2_2 = var_v0;
                     M2C_FIELD(arg0, s32 *, 0x34) = var_v0;
+                    var_a2_2 = var_v0;
                     goto block_30;
                 }
                 if (var_s1 != 0) {

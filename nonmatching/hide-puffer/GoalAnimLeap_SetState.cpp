@@ -20,7 +20,7 @@ float *PeaFindAsegLabel(void *, int);
 void SeekAsega(void *, int, float, float);
 QW PosLoWorld(char *);
 QW ConvertXfPos(void *, void *, QW);
-QW ConvertXfVec(void *, void *, QW);
+QW ConvertXfVec(void *);
 }
 void SetSoMass(SO *, float);
 extern char B_003DD490[];
@@ -101,13 +101,12 @@ void GoalAnimLeap_SetState(char *goal, int state)
         OBJ2 *guard2 = *(OBJ2 **)(goal + 0x10);
         QW offset = VectorSub(l.s70, pos);
         QW aimed = VectorAdd(VectorScaleX(offset, l.s60), VectorScaleX(g_2a2dc0, VectorFromFloat(D_002BE704)));
-        guard2->vt->fn((char *)guard2 + guard2->vt->delta, aimed);
-        char *pxfLinear = *(char **)(*(char **)(goal + 0x10) + 0x58);
+        guard2->vt->fn((long *)guard2 + guard2->vt->delta, aimed);
         if (*(void **)(goal + 0x64) == 0) {
             float tEnd = g_2dded0 + g_2be700;
-            QW posLocal = ConvertXfPos(0, *(void **)(pxfLinear + 0xA0), l.posAim);
-            QW vecLocal = ConvertXfVec(0, *(void **)(pxfLinear + 0xA0), l.vecAim);
-            *(void **)(goal + 0x64) = func_0012DE58(*(void **)(goal + 0x10), pxfLinear, 0, posLocal, vecLocal, tEnd);
+            QW posLocal = ConvertXfPos(0, *(void **)((*(char **)(*(char **)(goal + 0x10) + 0x58)) + 0xA0), l.posAim);
+            QW vecLocal = ConvertXfVec(0);
+            *(void **)(goal + 0x64) = func_0012DE58(*(void **)(goal + 0x10), (*(char **)(*(char **)(goal + 0x10) + 0x58)), 0, posLocal, vecLocal, tEnd);
         }
         int held = 0;
         if (l.fFound)

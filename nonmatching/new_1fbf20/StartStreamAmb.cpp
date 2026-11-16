@@ -20,10 +20,10 @@ struct _m2c_stack_StartStreamAmb {
     /* 0x124 */ s32 sp124;                          /* inferred */
     /* 0x128 */ char pad128[0x58];
 };                                                  /* size = 0x180 */
-M2C_UNK Clear__13CFileLocation(s8 *);             /* extern */
+M2C_UNK Clear__13CFileLocation(void);             /* extern */
 M2C_UNK PauseAmb(s8 *, s32);                      /* extern */
 M2C_UNK SetAmbGrf(s8 *, M2C_UNK, M2C_UNK);        /* extern */
-s32 func_001FD080(M2C_UNK *, s8 *);               /* extern */
+s32 func_001FD080(s8 *, M2C_UNK *, s8 *);               /* extern */
 M2C_UNK func_00233130(M2C_UNK, M2C_UNK, M2C_UNK, s32 *, M2C_UNK *, s8 *); /* extern */
 extern M2C_UNK B_003DD040;
 extern M2C_UNK OnStreamAmbStarted;
@@ -48,9 +48,9 @@ void StartStreamAmb(s8 *arg0) {
     s8 *temp_v0_2;
     s8 *var_a1;
     sp8 = 2;
-    Clear__13CFileLocation(sp);
+    Clear__13CFileLocation();
     var_a1 = M2C_FIELD(arg0, s8 **, 0x60);
-    temp_s2 = func_001FD080(&B_003DD040, M2C_FIELD(arg0, s8 **, 0x60));
+    temp_s2 = func_001FD080(arg0, &B_003DD040, M2C_FIELD(arg0, s8 **, 0x60));
     if (var_a1 == NULL) {
         var_v0 = 0;
     } else {

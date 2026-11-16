@@ -82,7 +82,7 @@ void LoadSwObjectsFromBrx(LO_13FB40 *ploParent, CBinaryInputStream *pbis, CPloSi
             if (cid == 0x84 || cid == 0x85) {
                 LO_13FB40 *plo = PloNew(cid, ploParent, oid, -1);
                 plo->field_0x50 = 1;
-                plo->pvtlo->pfnLoadFromBrx((char *)plo + plo->pvtlo->delta, pbis);
+                plo->pvtlo->pfnLoadFromBrx((int *)plo + plo->pvtlo->delta, pbis);
                 if (psinkParent)
                     psinkParent->Append(1, &plo);
                 continue;

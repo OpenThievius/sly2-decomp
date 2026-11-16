@@ -884,6 +884,18 @@ class RecordScanTests(unittest.TestCase):
         found = record.scan('struct S { volatile int id; };  // volatile-ok:\n')
         self.assertEqual([what for _, what, _ in found], ['volatile'])
 
+    def test_a_register_variable_is_flagged(self):
+        found = record.scan('void f(void) { register QW row asm("vf10"); }\n')
+        self.assertEqual([what for _, what, _ in found], ['register pin'])
+
+    def test_a_register_variable_marked_for_render_globset_tree_is_allowed(self):
+        source = 'void f(void) { register QW row asm("vf10"); }  // vcallms-abi-ok: 0x1D5808 culling microprogram reads vf10\n'
+        self.assertEqual(record.scan(source), [])
+
+    def test_a_register_variable_marked_for_another_function_is_flagged(self):
+        source = 'void f(void) { register QW row asm("vf10"); }  // vcallms-abi-ok: 0x13A498 particle filter\n'
+        self.assertEqual([what for _, what, _ in record.scan(source)], ['register pin'])
+
     def test_a_volatile_pointer_to_a_hardware_register_is_allowed(self):
         self.assertEqual(record.scan('void f(void) { *(volatile unsigned *)0x1000E010 = 1; }\n'), [])
 

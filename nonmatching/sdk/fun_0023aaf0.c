@@ -6,11 +6,11 @@ typedef struct SifEntry {
     int unused;
 } SifEntry;
 typedef struct SifState {
-    u32 sendUncached;
-    u32 receiveUncached;
-    int registerValue;
-    SifEntry *entries;
     int count;
+    u32 sendUncached;
+    int registerValue;
+    u32 receiveUncached;
+    SifEntry *entries;
     int field14;
     int field18;
     u32 *list;
@@ -63,10 +63,9 @@ void func_0023AAF0(void)
     B_0044EDD8.list = B_0044EF80;
     B_0044EDD8.receiveUncached = receiveAddress;
     B_0044EDD8.count = words;
-    B_0044EDD8.registerValue = 0;
     B_0044EDD8.entries = B_0044EE00;
     B_0044EDD8.field14 = 0;
-    B_0044EDD8.field18 = 0;
+    B_0044EDD8.registerValue = B_0044EDD8.field18 = 0;
     entry = B_0044EE00;
     do {
         entry->function = 0;
@@ -81,10 +80,10 @@ void func_0023AAF0(void)
         slot--;
     } while (index >= 0);
     index = 0x20;
-    B_0044EE00[0].function = func_0023AA68 + 0x50;
     B_0044EE00[1].function = func_0023AA68 + 0x30;
-    B_0044EE00[1].argument = &B_0044EDD8;
+    B_0044EE00[0].function = func_0023AA68 + 0x50;
     B_0044EE00[0].argument = &B_0044EDD8;
+    B_0044EE00[1].argument = &B_0044EDD8;
     func_002394A0(B_0044EE00, receiveAddress, sendAddress, words);
     FlushCache(0);
     if (*(volatile u32 *)0x1000E010 & 0x20)

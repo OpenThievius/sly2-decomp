@@ -14,14 +14,14 @@ static inline void Pad(VIFS *pv) { while ((int)pv->p & 0xF) { *(int *)pv->p = 0;
 static inline void Skip(VIFS *pv, int n) { pv->p = pv->p + n; }
 static inline void Tail(VIFS *pv, char *tail)
 {
-    *(int *)pv->p = 0x6C03C004;
     int *to = (int *)(pv->p += 4);
+    *(int *)pv->p = 0x6C03C004;
     int *from = (int *)tail;
     int n = 8;
     do {
         n -= 4;
         int w0 = from[0]; int w1 = from[1]; int w2 = from[2]; int w3 = from[3];
-        from += 4;
+        from += 1;
         to[0] = w0; to[1] = w1; to[2] = w2; to[3] = w3;
         to += 4;
     } while (n >= 0);
@@ -33,14 +33,14 @@ void DrawMovieShapeCharacter(SELF *self, PAIR *pair, TAIL *tail, int fade)
     memset(&loc, 0, 0x40);
     float k0 = 0.8f;
     float k1 = 0.45454547f;
-    loc.v[0] = pair->v[0] * k0;
-    loc.v[1] = pair->v[1] * k1;
     loc.v[4] = pair->v[2] * k0;
+    loc.v[1] = pair->v[1] * k1;
+    loc.v[0] = pair->v[0] * k0;
     loc.v[5] = pair->v[3] * k1;
     loc.v[8] = pair->v[4] * k0 + self->owner->cam->x + 786432.0f;
-    loc.v[0xF] = 1.0f;
     loc.v[9] = pair->v[5] * k1 + self->owner->cam->y + 786432.0f;
     loc.v[10] = 1.0f;
+    loc.v[0xF] = 1.0f;
     if (self->count >= 2U)
         tail->kind = 1;
     else
@@ -80,8 +80,8 @@ void DrawMovieShapeCharacter(SELF *self, PAIR *pair, TAIL *tail, int fade)
     g_2dea28.p += 0x10;
     SLOT *slot = OnGameLoad__FP4GAME();
     slot->a = 0x15;
-    slot->c = (int)tag & 0x0FFFFFFF;
     slot->f = tail->base + (float)(self->owner->scale << 0x12);
+    slot->c = (int)tag & 0x0FFFFFFF;
     slot->d = self->word;
 }
 }

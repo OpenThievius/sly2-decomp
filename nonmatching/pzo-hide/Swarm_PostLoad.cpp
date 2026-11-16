@@ -10,8 +10,8 @@ extern "C" {
 struct _m2c_stack_Swarm_PostLoad {
     /* 0x00 */ char pad0[0xB0];
 };                                                  /* size = 0xB0 */
-void AddSoGeomsToOxa(s8 *, s32, M2C_UNK, s32);
-s32 AppendDlEntry(s8 *, s8 *);
+void AddSoGeomsToOxa(s8 *);
+void AppendDlEntry(s8 *, s8 *);
 void InitDl__FP2DLi(s8 *, M2C_UNK);
 s32 PloFindSwObject_thunk(M2C_UNK *, M2C_UNK, s32, s8 *);
 s32 *PvAllocSwClearImpl__Fi(s8 *, s32, s32);
@@ -25,7 +25,6 @@ void Swarm_PostLoad(s8 *arg0) {
     s32 temp_v0_3;
     s32 var_s1;
     s32 var_s4;
-    s8 *temp_a0;
     s8 *temp_a0_2;
     s8 *temp_v0_2;
     s8 *var_s0;
@@ -40,16 +39,15 @@ void Swarm_PostLoad(s8 *arg0) {
                 var_s4 -= 1;
                 M2C_FIELD(arg0, s32 *, 0x1C8) = (s32) (M2C_FIELD(arg0, s32 *, 0x1C8) - 1);
             } else {
-                temp_a0 = var_s0 + 0x10;
                 var_s1 = 0;
-                InitDl__FP2DLi(temp_a0, 0x60);
+                InitDl__FP2DLi((var_s0 + 0x10), 0x60);
                 if (M2C_FIELD(var_s0, s32 *, 4) > 0) {
                     do {
                         var_s1 += 1;
                         temp_v0_2 = (s8 *)(PvAllocSwClearImpl__Fi(sp, 0x70, 0x10));
                         M2C_FIELD(temp_v0_2, s8 **, 0x20) = var_s0;
                         M2C_FIELD(temp_v0_2, s32 *, 0x24) = -1;
-                        AppendDlEntry(temp_a0, temp_v0_2);
+                        AppendDlEntry((var_s0 + 0x10), temp_v0_2);
                     } while (var_s1 < M2C_FIELD(var_s0, s32 *, 4));
                 }
             }
@@ -68,7 +66,7 @@ void Swarm_PostLoad(s8 *arg0) {
     M2C_FIELD(temp_a0_2, s8 **, 4) = arg0;
     M2C_FIELD(temp_a0_2, s64 *, 0x10) = (s64) (M2C_FIELD(temp_a0_2, s64 *, 0x10) | (0x8000 << 0x21) | (0x8000 << 0x22));
     if ((int)((u64) M2C_FIELD(arg0, u64 *, 0x28) >> 0x3C) & 1) {
-        AddSoGeomsToOxa(arg0, temp_a1, -1, temp_a3);
+        AddSoGeomsToOxa(arg0);
     }
 }
 }

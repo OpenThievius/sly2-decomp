@@ -14,7 +14,7 @@ struct _m2c_stack_AdvanceLaserBeams {
 };                                                  /* size = 0xE0 */
 M2C_UNK AppendDlEntry(M2C_UNK *, s8 *);           /* extern */
 M2C_UNK GetLaserBeamPoints(s8 *, s8 *, s8 *, f32 *); /* extern */
-f32 fmodf(s32, f32, f32);                           /* extern */
+f32 fmodf(s8 *, f32, f32);                           /* extern */
 extern M2C_UNK B_003E11C4;
 extern M2C_UNK g_2dded0;
 void AdvanceLaserBeams(s8 *arg0) {
@@ -32,10 +32,9 @@ void AdvanceLaserBeams(s8 *arg0) {
     s8 *temp_s3;
     s8 *var_s0;
     s8 *var_v0;
-    var_a0 = 0;
     if (M2C_FIELD(arg0, s32 *, 0x198) > 0) {
         do {
-            var_a0_2 = 0;
+    var_a0 = var_a0_2 = 0;
             temp_s3 = (s8 *)(M2C_FIELD(arg0, s32 *, 0x19C) + (var_a0 * 0x150));
             var_s0 = temp_s3;
 loop_3:
@@ -45,7 +44,7 @@ loop_3:
                 temp_f12 = M2C_FIELD(var_v0, f32 *, 0x10) + (M2C_FIELD(arg0, f32 *, 0x1C0) * M2C_FIELD(&g_2dded0, f32 *, 4));
                 M2C_FIELD(var_v0, f32 *, 0x10) = temp_f12;
                 if (temp_f13 < temp_f12) {
-                    temp_f0 = fmodf(var_a0_2, temp_f12, temp_f13);
+                    temp_f0 = fmodf(arg0, temp_f12, temp_f13);
                     temp_hi = (s32) (M2C_FIELD(var_s0, s32 *, 0x94) + 1) % (s32) M2C_FIELD(var_s0, s32 *, 0x18);
                     M2C_FIELD(var_s0, s32 *, 0x94) = temp_hi;
                     var_v0 = var_s0 + ((temp_hi * 0x14) + 0x1C);

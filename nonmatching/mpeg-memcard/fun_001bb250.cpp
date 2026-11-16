@@ -12,7 +12,7 @@ struct _m2c_stack_func_001BB250 {
 };                                                  /* size = 0x60 */
 s32 FIsBasicDerivedFrom(s8 *, s32);
 s32 FStgSwitchDone(s8 *);
-void FreeSwMqList__FP2SWP2MQ(M2C_UNK *, s32);
+void FreeSwMqList__FP2SWP2MQ(M2C_UNK *);
 void SetStgSwitchHitter(s8 *, s8 *, M2C_UNK);
 void func_001F4F10();
 extern M2C_UNK B_003DD490;
@@ -67,8 +67,8 @@ loop_17:
                             M2C_FIELD(temp_v0_3, M2C_UNK (**)(s8 *, s8 *), 0x1B4)(arg0 + M2C_FIELD(temp_v0_3, s16 *, 0x1B0), M2C_FIELD(var_s2, s8 **, 0xC));
                             temp_a2 = M2C_FIELD(var_s2, s8 **, 0xC);
                             temp_v0_4 = M2C_FIELD(temp_a2, s8 **, 0xC);
-                            M2C_FIELD(temp_v0_4, M2C_UNK (**)(s8 *, s8 *, s8 *), 0x1B4)(temp_a2 + M2C_FIELD(temp_v0_4, s16 *, 0x1B0), arg0, temp_a2);
-                            FreeSwMqList__FP2SWP2MQ(&B_003DD490, M2C_FIELD(var_s2, s32 *, 0));
+                            FreeSwMqList__FP2SWP2MQ(&B_003DD490);
+                            M2C_FIELD(temp_v0_4, M2C_UNK (**)(s8 *, s8 *), 0x1B4)(temp_a2 + M2C_FIELD(temp_v0_4, s16 *, 0x1B0), arg0);
                             *M2C_FIELD(var_s2, s32 **, 8) = 0;
                             M2C_FIELD(var_s2, s32 *, 0) = 0;
                         }

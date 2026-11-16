@@ -12,7 +12,7 @@ struct _m2c_stack_UpdateMurrayAttack {
 };                                                  /* size = 0x70 */
 M2C_UNK EndMurrayAttack(s8 *);                    /* extern */
 s32 FAsegaGone(s32);                                /* extern */
-s32 FButtonPressedWithin(s8 *, M2C_UNK, M2C_UNK); /* extern */
+s32 FButtonPressedWithin(s8 *, M2C_UNK, f32); /* extern */
 s32 FMurrayAttackCanChain(s8 *);                  /* extern */
 s32 FMurrayTryGrabGuard(s8 *);                    /* extern */
 M2C_UNK SetMurrayAttackState(s8 *, s32);          /* extern */
