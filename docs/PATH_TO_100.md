@@ -46,11 +46,12 @@ Why first: no draft means nothing to improve, so each is either a quick win or a
 - Status 2026-11-15: wave S2 (102 drafts scoring 1 to 16) ran with 12 Opus workers; 33 reached 0 (matched code 70.76% to 71.92%, 5548 to 5583 functions). Recurring walls: early `%hi` kept across a call (8 drafts), volatile store in a delay slot (5), pextlw reload (3), VU0 register order (4).
 
 - 102 drafts within 16 words of retail go to Opus, one function per worker, with the earlier attempt and its diff.
-- Six integer near misses have no known lever: 0x1733C8, 0x120548, 0x218748, 0x1A5D98, 0x13FAD0 (0x1C9058 now has a flag row). Check the RTL dump first.
+- Six integer near misses had no known lever: 0x1733C8, 0x120548, 0x218748, 0x1A5D98, 0x13FAD0 and 0x1C9058; five are matched by 2026-11-16 (see stage 3), 0x1C9058 is a noted wall.
 - SDK near misses: `powf` and the 5 libm drafts.
 
 ### Stage 3: levers before waves (In Progress)
 
+- Status 2026-11-16: four more levers landed as matches (matching.md, "What usually fixes a near miss"): scaled index first in an address sum, one `switch` arm per case, `return fixed >> 32` for a truncated `long`, and a table copied from its data global. They took `AddSpawnerOffset`, `bevy_splice_bif_ref_op_eqv` and `PauseSpriteInstance` (waves S6-<addr>) to 0; `StartLoadingLogo` stays at 9 (a high-part register tie, noted). Matched code 73.46%, 5,598 of 6,063 functions. Of the six integer near misses, five are matched; `StartLoadingLogo` is the one left.
 - Status 2026-11-15: `VectorFromFloats3` (one helper for the mfc1/pextlw/pcpyld block) landed, 3 matches (`SetVectorCylind`, `SetVectorSphere`, `GetXfDofValue`). Closed with no rule-clean lever: the early `%hi` across a save call (cse-and-pre.md section 4), the VU0 register order of `ScaleByReciprocalX` and `DotProduct`. Volatile store in a branch or jal delay slot (5 drafts): toolchain limit, no assembler fills it. Next: the 4-lane pextlw variant, register-allocation classes, a new wave only where a lever landed.
 
 Waves yield about 20 bytes per claimed function. What moved the number: loop5, `-fmove-all-movables`, `function_flags.tsv`, shared helpers.
@@ -62,7 +63,8 @@ Waves yield about 20 bytes per claimed function. What moved the number: loop5, `
 ### Stage 4: inline kind (In Progress)
 
 - Status 2026-11-15: only 12 of the 219 inline-kind functions were still in assembly (all VU0, 24,200 bytes), not 133. Waves S4 and S4a to S4h: 0 matches, 9 near misses and drafts rewritten onto shared helpers (`RefOpMult` 282 to 33, `func_001CC2E8` 105 to 4, `UpdateGuardSensor` 43 to 26 with a `-fno-strength-reduce` row, `UpdateVehicle` 531 to 43, `RenderGlobsetTree` 846 to 547). `ScaleAddTwoX` landed (two users). `RenderGlobsetTree` has a named exception for its microprogram's fixed registers (AGENTS.md, 2026-11-15). Worker lesson: `claim.py take` is arrival order, so one wave per target function.
-- Left: the vcallms/cfc2 asm statements of `RenderGlobsetTree` still need a ruling; 0x1CC2E8 (4) and 0x1B8D30 (7) differ only in vf numbering.
+- Status 2026-11-16 (waves S7-<addr>, one function each): `RenderGlobsetTree` 881 to 328 (the registry's 547 was an older rewrite), with the VIF/DMA stream written as inline member functions of `VIFS`, `matBone` assigned not initialised, the quad copy as four loads then four stores, and the kind adjust as a `switch`; it cannot land while its `vcallms` and `cfc2.i` statements are inline asm (`check_source.py`; the register-variable lines carry the marker). Recommendation, not a ruling: leave the asm ruling until the score is close, since 328 words are far from 0. `func_001B8D30`: the registry's 4 was a draft with its own inline asm and a pointer local; the rule-clean best is 9 (stack slots of the scale temporary, 7 words, plus a late `lwc1`). `func_001CC2E8` 4: matches only with a two-input-operand `DotProductXy` (`vmul.xy` + `vaddy.x`), two instructions and one measured user, so not added to `vu0inline.h` (noted in `blocker_notes.tsv`).
+- Left: the three above, `UpdateVehicle` (43), `UpdateGuardSensor` (26), `RefOpMult` (33).
 - 133 functions, about 11% of code, compiled C that needs the shared helpers (count from before the inline cutoff moved to 10%).
 - A new helper goes into `include/ps2inline.h` or `include/vu0inline.h`, measured on more than one function: one instruction each, no register pins, no `"memory"` clobber.
 

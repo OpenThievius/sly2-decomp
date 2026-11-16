@@ -93,6 +93,23 @@ Each one below was re-checked here on a small control compiled with `compile_uni
   local folds them into one and gives a `beqzl`/`bnezl` loop. Try the local when retail has one load, the cast when it has two.
 - **`extern int T[][2]` read as `T[i][1]`** gives `lui`, `sll`, `addiu`, `addu`, `lw 4(v1)`; `U[i * 2 + 1]` gives `ori a0,a0,4` and a different add order. For a stride-8 table
   of pairs, try the 2-D declaration (or a pair struct) before the flat one.
+- **Scaled index first in an address sum (2026-11-16, `AddSpawnerOffset` 6 to 0).** `(QW *)(index * sizeof(QW) + (u32)offsets)` puts the `sll` result as the first operand
+  of the `addu`; every pointer form (`&items[n]`, `n + items`, `n[items]`, `slot += n`, char* casts) puts the array base first and swaps the registers. Take the counter
+  store into the `if` as `index + 1` so no variable crosses blocks. The `(u32)` cast only fixes the operand order: say so in the commit (same kind as `GMin`).
+- **One `switch` arm per case instead of a shared case group (2026-11-16, `bevy_splice_bif_ref_op_eqv` 6 to 0).** The arms compile to the same code and merge after
+  allocation, but before it a reference has more uses and a longer life, which moves the global-alloc order. Keep the GNU named-return form (`CRef f(...) return ref`) when
+  the draft has it: the pointer-return form schedules `sll` before `lui` in the jump-table dispatch.
+- **A `long` truncated to `int` at the return leaves the delay slot empty (2026-11-16, `func_002358A0` 2 to 0).** `return (int)x` is one RTL step that prints as
+  `dsll32` + `dsra32`, and the delay-slot filler takes single-instruction steps only. Compute `fixed = x << 32` in each branch and `return fixed >> 32`: gcc merges the
+  `<< 32` tails at the join and the `>> 32` fills the `jr` slot. With the shift in the return's own block the pair folds again. Not the volatile-store wall.
+- **A second rodata table in the object (2026-11-16, `func_002542B8` 1 to 0).** A local initialiser (`handlers[11] = {...}`) puts an anonymous `.rodata` table of relocated
+  words in our object, which the scorer can never resolve to retail's address (`rodata_matches` rejects a relocated constant). When the table already lands from data
+  (`src/rodata/`), copy it from that global (`struct { void (*handlers[11])(Ctx *); }` extern, then a local copy) instead of defining it again.
+- **Re-run `try.py` on every source a `make search` commit touched (2026-11-16, `__udivdi3`).** A committed swap of `quotientLow` and `quotientHigh` in the
+  zero-denominator branch scored 8 (first mismatch +0x3ec); the previous order scored 0. `make unit` did not flag it, because `link_image.py` held the function back from
+  `build/image/seed.json` (see "Held-back functions" below).
+- **Held-back functions (2026-11-16).** `link_image.py` seeds from the last run and does not retest a function it held back for a difference; `make unit` then keeps
+  saying "from assembly" after the source is fixed. Run `.venv/bin/python scripts/build/link_image.py --fresh` after repairing one (it reads `build/image/seed.json`).
 
 Not reproduced here (no change in the control): `__builtin_fabsf(x)` against `x < 0 ? -x : x` (both give `abs.s` with `-ffast-math`), and a store through
 `*(int *)((char *)o + 0x708)` against a member store (same code for three stores). They may matter in a larger function; don't start with them.
