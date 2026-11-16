@@ -66,11 +66,14 @@ Waves yield about 20 bytes per claimed function. What moved the number: loop5, `
 - 133 functions, about 11% of code, compiled C that needs the shared helpers (count from before the inline cutoff moved to 10%).
 - A new helper goes into `include/ps2inline.h` or `include/vu0inline.h`, measured on more than one function: one instruction each, no register pins, no `"memory"` clobber.
 
-### Stage 5: SDK range drafting (In Progress)
+### Stage 5: SDK range drafting (Complete, apart from four measured walls)
 
 - Status 2026-11-15: `MultiplyUnsignedWide` (libgcc's `umul_ppmm`, one `multu`) landed in `ps2inline.h`; it gives retail's `multu`, `mfhi`, `mflo` in all four 64-bit division functions. `__divdi3` and `__udivdi3` match (the second only with `sony29-01`, now in `config/us/sony_gcc29_01.txt`): matched code 71.95% to 72.23%, 5586 to 5588 functions. `__moddi3` (7) and `__umoddi3` (4) keep an unused 0x20 of frame that nothing accesses; `__umoddi3`'s tail is a split epilogue (`func_0023D32C`).
 - Eight SDK near misses ran as single waves: `func_002542B8` 1 (one rodata link word), `func_002358A0` 2, `sceMpegInit` 2, `func_00235780` 2 (with `sony29`), `func_002540B0` 6. Four of them end on an unfilled delay slot where retail filled it; the volatile-store-in-delay-slot wall of stage 2 is the likely common cause.
-- Left: the giants `func_0024D5E8` (7,592 bytes), `func_0024FC58`, `__ieee754_log`, `func_0024C670`. Drafting work, not toolchain.
+- Status 2026-11-16: seven more landed as single waves (`S5-<addr>`): `__ieee754_log`, `func_0024D5E8` (7,592 bytes, libmpeg PES header reader), `func_0024FC58`, `func_002358A0`, `func_002542B8`, `__moddi3`, `__umoddi3`. Matched code 72.23% to 73.31%, 5588 to 5594 functions. `__moddi3` and `__umoddi3` need `sony29-01` (the unused 0x20 frame goes away); `__umoddi3`'s split epilogue is a `merges.tsv` row; `func_0024D5E8` joins `sony_gcc29.txt`. `func_002358A0` was not the delay-slot wall: `return fixed >> 32` after merged `<< 32` tails lets gcc fill the `jr` slot (a single-instruction step); `(int)` of a long compiles to a two-instruction truncate and leaves the slot empty. `func_002542B8`'s one word was a second anonymous rodata table: copy the table from the existing `D_002AC838` global instead of a local initialiser. Also fixed: a statement swap from `make search` had broken `__udivdi3` (8); restored.
+- Walls (measured, `config/us/blocker_notes.tsv`): `func_002540B0` (6), `sceMpegInit` (2), `func_00235780` (2), `func_0024C670` (12, plus a v0/v1 swap). Retail puts a constant-address store in a delay slot; Sony's gcc reorg never puts a volatile store there, a plain one folds to the `$at` form, and neither assembler swaps it in. Same class: `0x24C4B0`, `0x2539D0`.
+- Open: `make unit UNIT=sdk` still reports `__udivdi3` from assembly (differs at +0x3ec) though `try.py` scores 0; it did so before this round.
+- Left: nothing in the SDK range except the walls above and the libm drafts of stage 2.
 
 ### Stage 6: tail (Not Started)
 
