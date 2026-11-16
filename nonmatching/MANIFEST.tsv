@@ -641,6 +641,7 @@ address	name	size	file	score
 0X23AE70	func_0023AE70	312	sdk/fun_0023ae70.cpp	42
 0X23BEE8	__fixunsdfdi	240	sdk/__fixunsdfdi.cpp	21
 0X23C7C0	__muldi3	96	sdk/__muldi3.c	17
+0X23C828	__udivdi3	1488	sdk/__udivdi3.c	0
 0X23D338	func_0023D338	304	sdk/fun_0023d338.cpp	73
 0X23D508	func_0023D508	576	sdk/fun_0023d508.cpp	27
 0X23DAB0	func_0023DAB0	360	sdk/fun_0023dab0.c	66

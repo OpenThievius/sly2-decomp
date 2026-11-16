@@ -24,6 +24,6 @@ int snd_GotReturns()
     }
     if (D_002C46B8 != 0)
         return 0;
-    printf("989snd.c: Sif says RPC isn't busy, but we still don't have returns from the \n");
+    printf("989snd.c: Sif says RPC isn't busy, but we still don't have returns from the IOP!\n");
     return 0;
 }
