@@ -222,22 +222,34 @@ def retarget_failed(address, reason):
     return None
 
 def retarget_rodata(address, object_path):
-    """For an object whose rodata is string literals the retail keeps in another order (so no single base fits): a copy of the object
-    whose hi/lo immediates are the retail ones, with its own .rodata linked where nothing is loaded (address 0, NOLOAD). Every literal
-    is checked: the string the object holds at the offset must be the string the retail has at the address. None if it does not hold."""
+    """For an object whose rodata the retail keeps in another layout (strings in another order, a constant in the slot before a jump table:
+    no single base fits): a copy of the object whose hi/lo immediates are the retail ones, with its own .rodata linked where nothing is
+    loaded (address 0, NOLOAD). The image keeps retail's rodata bytes there, so what the code reads is checked here and nowhere else:
+    a string literal must equal the string retail has at the address, and any other item (a float, a jump table whose entries are
+    relocations against .text, resolved to this function's address plus the addend) must equal retail's bytes from that address for as far
+    as the object's item runs, up to the next item retail's code addresses. None if one does not hold."""
     with open(object_path, 'rb') as handle:
         elf = ELFFile(handle)
         text = elf.get_section_by_name('.text')
         rodata = elf.get_section_by_name('.rodata')
         symbol_table = elf.get_section_by_name('.symtab')
-        if elf.get_section_by_name('.rel.rodata') is not None:
-            return retarget_failed(address, 'the rodata carries relocations (a jump table), not only string literals')
+        relocated_rodata = elf.get_section_by_name('.rel.rodata')
         entries = [(r['r_offset'], r['r_info_type'], symbol_table.get_symbol(r['r_info_sym'])) for r in elf.get_section_by_name('.rel.text').iter_relocations()]
         data, rodata_data, text_offset = text.data(), rodata.data(), text['sh_offset']
         rodata_index = elf.get_section_index('.rodata')
+        text_index = elf.get_section_index('.text')
+        table_entries = [(r['r_offset'], r['r_info_type'], symbol_table.get_symbol(r['r_info_sym'])['st_shndx']) for r in relocated_rodata.iter_relocations()] if relocated_rodata is not None else []
     base = FILE_OFFSET_OF_TEXT + address - TEXT_START
     signed = lambda value: value - 0x10000 if value & 0x8000 else value
     word = lambda offset, blob, origin: int.from_bytes(blob[origin + offset:origin + offset + 4], 'little')
+    resolved_rodata = bytearray(rodata_data)  # a jump table's entries are relocations: the object holds the addend, the image holds function address + addend
+    for entry_offset, entry_kind, entry_section in table_entries:
+        if entry_kind != 2 or entry_section != text_index or entry_offset + 4 > len(rodata_data):
+            return retarget_failed(address, f'the rodata relocation at rodata+{entry_offset:#x} is not a word that points into this function (type {entry_kind})')
+        resolved_rodata[entry_offset:entry_offset + 4] = ((word(entry_offset, rodata_data, 0) + address) & 0xFFFFFFFF).to_bytes(4, 'little')
+    resolved_rodata = bytes(resolved_rodata)
+    references = {}  # offset in the object's rodata -> the address retail's code loads it from
+    printable = lambda blob: len(blob) >= 2 and all(32 <= byte < 127 or byte in (9, 10, 13) for byte in blob)
     cstring = lambda blob, start: blob[start:blob.find(0, start)] if blob.find(0, start) >= 0 else None
     # trim_rodata cut the section at its last non-zero byte, so the NUL that ends the last literal is gone: the end of the section ends the string
     own_string = lambda start: rodata_data[start:rodata_data.find(0, start)] if rodata_data.find(0, start) >= 0 else rodata_data[start:]
@@ -251,10 +263,24 @@ def retarget_rodata(address, object_path):
         retail_value = ((word(offset, retail, base) & 0xFFFF) << 16) + signed(word(low[0], retail, base) & 0xFFFF)
         object_value = ((word(offset, data, 0) & 0xFFFF) << 16) + signed(word(low[0], data, 0) & 0xFFFF)
         retail_at = FILE_OFFSET_OF_TEXT + retail_value - TEXT_START
-        if not 0 <= object_value < len(rodata_data) or retail_at < 0 or own_string(object_value) != cstring(retail, retail_at):
+        if not 0 <= object_value < len(rodata_data) or retail_at < 0:
+            return retarget_failed(address, f'the load at text+{offset:#x} reaches rodata+{object_value:#x}, outside the object\'s {len(rodata_data):#x} bytes')
+        if references.setdefault(object_value, retail_value) != retail_value:
+            return retarget_failed(address, f'rodata+{object_value:#x} is loaded from both {references[object_value]:#x} and {retail_value:#x}')
+        if printable(own_string(object_value)) and own_string(object_value) != cstring(retail, retail_at):
             return retarget_failed(address, f'the literal at rodata+{object_value:#x} ({rodata_data[object_value:object_value + 16]!r}) is not the string retail has at {retail_value:#x}')
         for at in (offset, low[0]):
             patched[text_offset + at:text_offset + at + 2] = retail[base + at:base + at + 2]
+    object_starts, retail_starts = sorted(references), sorted(references.values())
+    for object_value, retail_value in references.items():
+        if printable(own_string(object_value)):
+            continue  # a string: compared above by its text
+        object_end = next((start for start in object_starts if start > object_value), len(resolved_rodata))
+        retail_end = next((start for start in retail_starts if start > retail_value), None)
+        length = min(object_end - object_value, retail_end - retail_value) if retail_end is not None else object_end - object_value
+        retail_at = FILE_OFFSET_OF_TEXT + retail_value - TEXT_START
+        if length < 4 or resolved_rodata[object_value:object_value + length] != retail[retail_at:retail_at + length]:
+            return retarget_failed(address, f'the item at rodata+{object_value:#x} ({resolved_rodata[object_value:object_value + 8].hex()}) is not what retail has at {retail_value:#x} ({retail[retail_at:retail_at + 8].hex()}) over {length:#x} bytes')
     path = os.path.join(BUILD, 'retargeted', os.path.relpath(object_path, UNITS).replace(os.sep, '_'))
     os.makedirs(os.path.dirname(path), exist_ok=True)
     open(path, 'wb').write(patched)
