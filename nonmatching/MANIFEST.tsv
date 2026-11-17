@@ -133,7 +133,7 @@ address	name	size	file	score
 0X14F898	FInsideCmMrd	152	cm_14e270/FInsideCmMrd.c	20
 0X14FE58	PosCplookAnchor	112	tn-rip/PosCplookAnchor.c	28
 0X14FEC8	PosCplookEye	112	tn-rip/PosCplookEye.c	18
-0X14FF38	ActivateCplook	552	tn-rip/ActivateCplook.cpp	28
+0X14FF38	ActivateCplook	552	tn-rip/ActivateCplook.cpp	10
 0X151340	bevy_camera_looks_update	720	tn-rip/bevy_camera_looks_update.c	179
 0X151700	bevy_camera_policy_update	456	tn-rip/bevy_camera_policy_update.c	140
 0X151950	UpdateCpattach	672	rip/UpdateCpattach.c	161
@@ -170,7 +170,7 @@ address	name	size	file	score
 0X163460	SaveJobVariables	320	new_161458/SaveJobVariables.cpp	23
 0X1643B0	SaveTaskVariables	544	sensor-geom/SaveTaskVariables.cpp	32
 0X164DF0	SetTaskState	808	sensor-geom/SetTaskState.cpp	77
-0X165B40	UpdateDependentTaskState	232	sensor-geom/UpdateDependentTaskState.cpp	22
+0X165B40	UpdateDependentTaskState	232	sensor-geom/UpdateDependentTaskState.cpp	15
 0X165E38	StartGameFromSave	464	sensor-geom/StartGameFromSave.cpp	38
 0X166428	TransformPoints	120	sensor-geom/TransformPoints.c	24
 0X167B68	BindGlobset	568	new_167320/BindGlobset.cpp	65
