@@ -121,6 +121,11 @@ with no stores, callee return type, and Sonnet on a near miss with the diff in h
 
 ## Walls
 
+`config/matching/walls.tsv` is the list: address, name, class (`blocker`, `fragment`, `helper`, `toolchain`, `tie`, `exhausted`), the reason, the evidence and the `unlock` condition.
+**Never attempt a walled function without an unlocking finding** (AGENTS.md); `claim.py init` skips them and `--unlock` overrides it
+with the finding named. Add a row whenever a function ends NEAR after its bound; `classify_walls.py --write` adds `exhausted` rows by run history (20 runs, 3 arms, no gain in 15). Wave S9 (2026-11-17) spent 14 workers on near misses
+that 5 of its own functions' wall rows already described and that earlier waves had run 10 to 50 times: 0 matched by lever, 1 by luck.
+
 Patterns the source cannot reach (record them in the file and move on):
 
 - Hand-written assembly: trapping `add`/`addi`, `$at` used as a general register, MMI and VU0 sequences in delay slots.

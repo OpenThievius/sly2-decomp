@@ -89,7 +89,7 @@ address	name	size	file	score
 0X13DA18	LoadSwFromBrx	1384	new_13d8b8/LoadSwFromBrx.cpp	7
 0X13E818	LoadOptionFromBrx	4088	new_13d8b8/LoadOptionFromBrx.cpp	139
 0X13FB40	LoadSwObjectsFromBrx	728	new_13f888/LoadSwObjectsFromBrx.cpp	24
-0X1400B8	PostJtLoad	640	new_13f888/PostJtLoad.cpp	11
+0X1400B8	PostJtLoad	640	new_13f888/PostJtLoad.cpp	8
 0X140750	func_00140750	616	new_13f888/fun_00140750.c	102
 0X140C30	func_00140C30	88	new_13f888/fun_00140c30.c	6
 0X140F90	HandleJtMessage	1528	new_13f888/HandleJtMessage.c	249
@@ -160,7 +160,7 @@ address	name	size	file	score
 0X15B428	EmitBlips__FP5EMITBP5EMITGiP6VECTORT3PfT5T3T3	960	emitter_1591b0/EmitBlips__FP5EMITBP5EMITGiP6VECTORT3PfT5T3T3.c	244
 0X15B7E8	OriginateParticles__FiP5EMITBP7EMITGEN	520	emitter_1591b0/OriginateParticles__FiP5EMITBP7EMITGEN.c	115
 0X15BF40	SetEmitdvEmitb__FP6EMITDVP5EMITB	152	emitter_1591b0/SetEmitdvEmitb__FP6EMITDVP5EMITB.c	30
-0X15BFD8	CalculateEmitdvMatrix	376	emitter_1591b0/CalculateEmitdvMatrix.cpp	41
+0X15BFD8	CalculateEmitdvMatrix	376	emitter_1591b0/CalculateEmitdvMatrix.cpp	6
 0X15CAD8	expl__static_initialization_and_destruction_0	624	emitter-font/expl__static_initialization_and_destruction_0.cpp	34
 0X15E9C8	CploFindSwObjectsByClass	944	emitter-font/CploFindSwObjectsByClass.cpp	36
 0X15F9D0	ChNext__9CRichText	904	font_15f000/ChNext__9CRichText.cpp	60
@@ -272,7 +272,7 @@ address	name	size	file	score
 0X1944C8	PasegAttachBase	144	new_1942f0/PasegAttachBase.cpp	22
 0X194688	InsertTargetCandidate	952	new_1942f0/InsertTargetCandidate.cpp	84
 0X194F70	UpdateSwTargetList	1016	new_1942f0/UpdateSwTargetList.cpp	54
-0X195368	EmitTargetSparkles	672	new_1942f0/EmitTargetSparkles.cpp	45
+0X195368	EmitTargetSparkles	672	new_1942f0/EmitTargetSparkles.cpp	43
 0X195A00	SetJmpState	1464	new_1942f0/SetJmpState.c	289
 0X195FB8	SetJmpBodyState	2416	new_1942f0/SetJmpBodyState.c	356
 0X196928	DtSolveJumpLaunch	384	new_1942f0/DtSolveJumpLaunch.cpp	12
@@ -318,7 +318,6 @@ address	name	size	file	score
 0X1A5478	AddLo	440	light-stepguard/AddLo.cpp	44
 0X1A5FB8	func_001A5FB8	344	stepguard-jt/fun_001a5fb8.c	85
 0X1A6340	GetLoEulerDegrees	112	new_1a6290/GetLoEulerDegrees.c	22
-0X1A63B0	func_001A63B0	160	new_1a6290/fun_001a63b0.cpp	15
 0X1A64E8	SetSoProperties	480	new_1a6290/SetSoProperties.cpp	50
 0X1A6730	CLo_Clone	928	new_1a6290/CLo_Clone.cpp	56
 0X1A7050	ConvertLoMat	352	stepguard-sw/ConvertLoMat.c	82

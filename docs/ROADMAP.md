@@ -316,7 +316,7 @@ matched bytes or what counts as matched ([PRESERVATION_AND_PORT.md](PRESERVATION
      is left among the open functions (no group over 12 by module, name or size); reorder-mode assembly for the SDK range
      (negative, 2026-11-09).
    - A worker that meets a permanent blocker reports
-     one line of what it computes (`SKIP wall <semantics>`); the lead records it in `config/us/blocker_notes.tsv`, with a note on
+     one line of what it computes (`SKIP wall <semantics>`); the lead records it in `config/matching/walls.tsv`, with a note on
      PS2 FPU behaviour (no denormals, infinities or NaNs) where the result depends on it.
 6. Done 2026-11-11 (maintainer ruling, PR #45 and the waves after it): framed blockers with at most 5% VU0, MMI and system
    instructions are inline functions (`config/us/inline_functions.tsv`, 75 found), counted as to-do and matched with the shared helpers of

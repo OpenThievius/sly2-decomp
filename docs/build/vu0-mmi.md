@@ -74,7 +74,7 @@ original assembly as finished apart from the exact C:
   more that touch `$gp` keep a final kind (`system`, `handwritten`). No matched function reads or writes `$gp`, and the only C form found
   is a register pin (`register void *g asm("$28")`, score 4 on 0x241BB8, and GCC then schedules the `$gp` load after the call), which
   AGENTS.md bans. They are left out of the work queues and counted as unmatched until a ruling on one shared form or on making the kind
-  final. Survey: one line of semantics each in `config/us/blocker_notes.tsv`.
+  final. Survey: one line of semantics each in `config/matching/walls.tsv`.
 - A function leaves the list only if its instructions change: the table is content-based, regenerated from the split.
 
 The other options (a narrow written asm exception like `Sqrt`, a compiler with VU0 builtins, plain-math rewrites for the port) are not
