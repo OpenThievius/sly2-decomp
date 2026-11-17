@@ -42,13 +42,10 @@ extern "C" RTE_1D6508 *AddSphereToRenderTree(TREE_1D6508 *tree, QW pos, int grf,
         pb = pblock;
         for (;;) {
             RTB_1D6508 *chain = pb->next;
+            unsigned int i = 0;
             RTE_1D6508 *pe = (RTE_1D6508 *)pb;
-            for (unsigned int i = 0; i < 4; i++, pe++) {
+            for (; i < 4; i++, pe++) {
                 switch (pe->bits.kind) {
-                case -1:
-                    if (pfree == 0)
-                        pfree = pe;
-                    break;
                 case 1: {
                     QW offset = VectorSub(VectorFromQuad(pos), *(QW *)pe);
                     float r = pe->radius;
@@ -66,6 +63,10 @@ extern "C" RTE_1D6508 *AddSphereToRenderTree(TREE_1D6508 *tree, QW pos, int grf,
                     }
                     break;
                 }
+                case -1:
+                    if (pfree == 0)
+                        pfree = pe;
+                    break;
                 }
             }
             if (chain == 0)

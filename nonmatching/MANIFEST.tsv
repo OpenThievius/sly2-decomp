@@ -426,7 +426,7 @@ address	name	size	file	score
 0X1D19A8	UpdateVehicle	1960	rip-rumble/UpdateVehicle.cpp	22
 0X1D2490	func_001D2490	384	rip-rumble/fun_001d2490.c	86
 0X1D54B8	StoreAudioModeInSave	256	new_1d54b8/StoreAudioModeInSave.cpp	11
-0X1D6508	AddSphereToRenderTree	488	new_1d54b8/AddSphereToRenderTree.cpp	15
+0X1D6508	AddSphereToRenderTree	488	new_1d54b8/AddSphereToRenderTree.cpp	2
 0X1D6848	FCalculateMuzzleVelocity__FP6VECTORT0fT0P2SO	424	vec_1d6848/FCalculateMuzzleVelocity__FP6VECTORT0fT0P2SO.c	96
 0X1D69F0	VelBallistic	160	vec-coin/VelBallistic.c	38
 0X1D6B00	LaunchSoAtTarget	1504	vec-coin/LaunchSoAtTarget.c	322
