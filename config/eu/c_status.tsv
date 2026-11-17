@@ -4807,6 +4807,7 @@ us_address	name	other_address	pair	score	addresses
 0x219348	ClearSpriteKeySlots	0X219B68	same	0	ok
 0x219FE0	AdvanceSpriteInstance	0X21A800	same	0	ok
 0x21A998	QueueSpriteInstanceSlots	0X21B1B8	same	0	ok
+0x21AA60	InitDynamicTextStatics	0X21B280	same	0	ok
 0x21BB68	InitDynamicTextStatics_thunk	0X21C388	same	0	ok
 0x21BB88	InitFragile__FP7FRAGILE	0X21C3A8	same	0	ok
 0x21BBD0	func_0021BBD0	0X21C3F0	same	0	ok

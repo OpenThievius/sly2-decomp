@@ -270,10 +270,10 @@ address	name	size	file	score
 0X194F70	UpdateSwTargetList	1016	new_1942f0/UpdateSwTargetList.cpp	54
 0X195368	EmitTargetSparkles	672	new_1942f0/EmitTargetSparkles.cpp	43
 0X195A00	SetJmpState	1464	new_1942f0/SetJmpState.c	289
-0X195FB8	SetJmpBodyState	2416	new_1942f0/SetJmpBodyState.c	356
+0X195FB8	SetJmpBodyState	2416	new_1942f0/SetJmpBodyState.cpp	60
 0X196928	DtSolveJumpLaunch	384	new_1942f0/DtSolveJumpLaunch.cpp	12
 0X196AA8	LimitJmpAccelByContacts	848	new_1942f0/LimitJmpAccelByContacts.c	219
-0X197500	UpdateJmpBodyState	2712	new_1942f0/UpdateJmpBodyState.c	561
+0X197500	UpdateJmpBodyState	2712	new_1942f0/UpdateJmpBodyState.cpp	0
 0X1991A0	func_001991A0	248	new_1942f0/fun_001991a0.c	54
 0X1995D8	BuildJmpEdgeProbes	512	jump/BuildJmpEdgeProbes.c	123
 0X1997D8	FCheckJtEdgeNormal__FP2JTP6VECTORT1	504	jump/FCheckJtEdgeNormal__FP2JTP6VECTORT1.cpp	39
@@ -548,7 +548,6 @@ address	name	size	file	score
 0X218790	CombineColorTransforms	288	font-break/CombineColorTransforms.cpp	10
 0X219190	ApplySpriteKeySounds	440	font-break/ApplySpriteKeySounds.cpp	23
 0X219400	PlaceSpriteKeyCharacters	3040	font-break/PlaceSpriteKeyCharacters.cpp	265
-0X21AA60	InitDynamicTextStatics	4360	font-break/InitDynamicTextStatics.c	1379
 0X21BC08	func_0021BC08	272	break-text/fun_0021bc08.cpp	17
 0X21C1C8	func_0021C1C8	376	break-text/fun_0021c1c8.c	39
 0X21C340	func_0021C340	696	break-text/fun_0021c340.c	211

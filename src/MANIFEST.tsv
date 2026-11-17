@@ -4807,6 +4807,7 @@ address	name	size	file	whole_file	symbol
 0X219348	ClearSpriteKeySlots	184	font-break/ClearSpriteKeySlots.cpp		
 0X219FE0	AdvanceSpriteInstance	2484	font-break/AdvanceSpriteInstance.cpp		
 0X21A998	QueueSpriteInstanceSlots	196	font-break/QueueSpriteInstanceSlots.cpp		
+0X21AA60	InitDynamicTextStatics	4360	font-break/InitDynamicTextStatics.cpp		
 0X21BB68	InitDynamicTextStatics_thunk	32	font-break/InitDynamicTextStatics_thunk.c		
 0X21BB88	InitFragile__FP7FRAGILE	72	break/InitFragile_file.cpp	break/InitFragile_file.cpp	InitFragile__FP7FRAGILE
 0X21BBD0	func_0021BBD0	56	break/InitFragile_file.cpp	break/InitFragile_file.cpp	func_0021BBD0
