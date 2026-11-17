@@ -394,7 +394,7 @@ address	name	size	file	score
 0X1C9058	StartLoadingLogo	56	prog-memcard/StartLoadingLogo.cpp	3
 0X1C9688	StaticInitLoadingLogo	664	new_1c90d0/StaticInitLoadingLogo.cpp	65
 0X1C9B08	func_001C9B08	1552	new_1c90d0/fun_001c9b08.cpp	24
-0X1CA118	LO_SetCloneId	496	new_1c90d0/LO_SetCloneId.cpp	21
+0X1CA118	LO_SetCloneId	496	new_1c90d0/LO_SetCloneId.cpp	19
 0X1CAA60	ReleaseLease	896	new_1c90d0/ReleaseLease.cpp	13
 0X1CAEC8	PleaseAcquire	904	new_1c90d0/PleaseAcquire.cpp	45
 0X1CBB58	func_001CBB58	80	new_1c90d0/fun_001cbb58.c	15
