@@ -22,7 +22,6 @@ address	name	size	file	score
 0X11C500	FInvertMatrix__FiPfT1	1000	mat/FInvertMatrix__FiPfT1.cpp	111
 0X11CAB0	GMaxAxisScale	160	util-alo/GMaxAxisScale.c	38
 0X11D508	CSolveQuadratic__FfffPf	168	util_11cf60/CSolveQuadratic__FfffPf.cpp	18
-0X11E208	SetVectorSphere__FP6VECTORfff	136	vec/SetVectorSphere__FP6VECTORfff.cpp	0
 0X11E290	SProjectVector__FP6VECTORT0	72	vec/SProjectVector__FP6VECTORT0.c	14
 0X11E390	GetPerpendicularVector	288	vec/GetPerpendicularVector.c	69
 0X11E4B0	RadBetweenVectors__FP6VECTORN20	384	vec/RadBetweenVectors__FP6VECTORN20.c	90
@@ -357,7 +356,6 @@ address	name	size	file	score
 0X1B8988	UpdateMurrayAttack	488	mpeg-memcard/UpdateMurrayAttack.cpp	98
 0X1B8B70	MoveMurrayAttack	448	mpeg-memcard/MoveMurrayAttack.c	101
 0X1B90B8	func_001B90B8	120	mpeg-memcard/fun_001b90b8.c	19
-0X1BA608	UpdateZoneScriptBeh	544	mpeg-memcard/UpdateZoneScriptBeh.cpp	0
 0X1BABA0	LoadStgSwitchFromBrx	480	mpeg-memcard/LoadStgSwitchFromBrx.cpp	37
 0X1BB250	func_001BB250	432	mpeg-memcard/fun_001bb250.cpp	46
 0X1BB400	RunStgSwitch	584	mpeg-memcard/RunStgSwitch.c	101

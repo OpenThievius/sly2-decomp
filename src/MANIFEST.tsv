@@ -975,6 +975,7 @@ address	name	size	file	whole_file	symbol
 0X11E040	StaticInitSlotheaps_11e040	308	util/RadNormalize_file.cpp	util/RadNormalize_file.cpp	StaticInitSlotheaps_11e040
 0X11E178	func_0011E178	32	util/RadNormalize_file.cpp	util/RadNormalize_file.cpp	func_0011E178
 0X11E1A0	SetVectorCylind__FP6VECTORfff	100	util-splice-bif/bif_file.cpp	util-splice-bif/bif_file.cpp	SetVectorCylind__FP6VECTORfff
+0X11E208	SetVectorSphere__FP6VECTORfff	136	util-splice-bif/bif_file.cpp	util-splice-bif/bif_file.cpp	SetVectorSphere__FP6VECTORfff
 0X11E958	CalculateVectorPanTilt__FP6VECTORPfT1	156	util-splice-bif/bif_file.cpp	util-splice-bif/bif_file.cpp	CalculateVectorPanTilt__FP6VECTORPfT1
 0X11F2E8	bif__static_initialization_and_destruction_0	308	util-splice-bif/bif_file.cpp	util-splice-bif/bif_file.cpp	bif__static_initialization_and_destruction_0
 0X11F420	bif__GLOBAL__I_slotheaps	32	util-splice-bif/bif_file.cpp	util-splice-bif/bif_file.cpp	bif__GLOBAL__I_slotheaps
@@ -3227,6 +3228,7 @@ address	name	size	file	whole_file	symbol
 0X1BA560	InitZoneScriptBeh	56	mpeg-memcard/mpeg_memcard_1ba0b8.cpp	mpeg-memcard/mpeg_memcard_1ba0b8.cpp	InitZoneScriptBeh
 0X1BA598	EnterZoneScriptBeh	48	mpeg-memcard/mpeg_memcard_1ba0b8.cpp	mpeg-memcard/mpeg_memcard_1ba0b8.cpp	EnterZoneScriptBeh
 0X1BA5C8	ExitZoneScriptBeh	60	mpeg-memcard/mpeg_memcard_1ba0b8.cpp	mpeg-memcard/mpeg_memcard_1ba0b8.cpp	ExitZoneScriptBeh
+0X1BA608	UpdateZoneScriptBeh	544	mpeg-memcard/mpeg_memcard_1ba0b8.cpp	mpeg-memcard/mpeg_memcard_1ba0b8.cpp	GClamp
 0X1BA828	SetZoneScriptState	340	mpeg-memcard/mpeg_memcard_1ba0b8.cpp	mpeg-memcard/mpeg_memcard_1ba0b8.cpp	SetZoneScriptState
 0X1BA980	func_001BA980	116	mpeg-memcard/mpeg_memcard_1ba0b8.cpp	mpeg-memcard/mpeg_memcard_1ba0b8.cpp	func_001BA980
 0X1BA9F8	StaticInitStgSwitch	308	mpeg-memcard/mpeg_memcard_1ba0b8.cpp	mpeg-memcard/mpeg_memcard_1ba0b8.cpp	StaticInitStgSwitch
