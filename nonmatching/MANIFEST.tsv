@@ -177,7 +177,6 @@ address	name	size	file	score
 0X167DA0	func_00167DA0	184	new_167320/fun_00167da0.c	40
 0X167E58	func_00167E58	288	new_167320/fun_00167e58.cpp	42
 0X167F78	Vif1InterruptHandler	72	new_167320/Vif1InterruptHandler.c	6
-0X167FC0	UploadRelightLights	496	new_167320/UploadRelightLights.cpp	17
 0X1681F8	func_001681F8	728	new_167320/fun_001681f8.cpp	81
 0X169198	func_00169198	2032	new_167320/fun_00169198.cpp	430
 0X16A000	LoadGlobFromBrx	10464	new_167320/LoadGlobFromBrx.cpp	695
@@ -267,7 +266,6 @@ address	name	size	file	score
 0X193A68	GetAttachRopeSlide	560	new_190c58/GetAttachRopeSlide.c	137
 0X193DE8	func_00193DE8	712	stephide/fun_00193de8.c	152
 0X194170	PresetJtAccelHide__FP2JT	384	stephide/PresetJtAccelHide__FP2JT.c	84
-0X1944C8	PasegAttachBase	144	new_1942f0/PasegAttachBase.cpp	22
 0X194688	InsertTargetCandidate	952	new_1942f0/InsertTargetCandidate.cpp	84
 0X194F70	UpdateSwTargetList	1016	new_1942f0/UpdateSwTargetList.cpp	54
 0X195368	EmitTargetSparkles	672	new_1942f0/EmitTargetSparkles.cpp	43
@@ -459,7 +457,7 @@ address	name	size	file	score
 0X1EA000	UpdateCrvExcludedRanges	944	new_1e7a28/UpdateCrvExcludedRanges.cpp	147
 0X1ED1A8	FilterColorRgba5551_1ed1a8	208	new_1ed1a8/FilterColorRgba5551_1ed1a8.cpp	42
 0X1ED2D8	GreyColor_1ed2d8	208	new_1ed1a8/GreyColor_1ed2d8.c	43
-0X1ED470	AddToIdTableA_1ed470	112	new_1ed1a8/AddToIdTableA_1ed470.cpp	17
+0X1ED470	AddToIdTableA_1ed470	112	new_1ed1a8/AddToIdTableA_1ed470.cpp	15
 0X1ED560	AddToIdTableB_1ed560	112	new_1ed1a8/AddToIdTableB_1ed560.c	12
 0X1EEE00	GoalStack_Push	208	shdanim-sm/GoalStack_Push.cpp	9
 0X1EFAC0	CSm_LoadFromBrx	1544	sm/CSm_LoadFromBrx.cpp	39
@@ -547,7 +545,7 @@ address	name	size	file	score
 0X217058	EmitGlyphDma	576	font-break/EmitGlyphDma.cpp	49
 0X2174C8	DrawMovieShapeCharacter	792	font-break/DrawMovieShapeCharacter.cpp	52
 0X2177E0	DrawMovieBitmapCharacter	952	font-break/DrawMovieBitmapCharacter.cpp	97
-0X218790	CombineColorTransforms	288	font-break/CombineColorTransforms.cpp	17
+0X218790	CombineColorTransforms	288	font-break/CombineColorTransforms.cpp	10
 0X219190	ApplySpriteKeySounds	440	font-break/ApplySpriteKeySounds.cpp	23
 0X219400	PlaceSpriteKeyCharacters	3040	font-break/PlaceSpriteKeyCharacters.cpp	265
 0X21AA60	InitDynamicTextStatics	4360	font-break/InitDynamicTextStatics.c	1379

@@ -127,6 +127,14 @@ constant, then `VectorFromFloats3`); `UpdateVehicle` 31 to 22 and `bevy_ui_binoc
 `RotateWords3`, try this first. An inline accessor for a global (`StepSeconds(&g_2dded0)`) helped `CalculateEmitdvMatrix` (33 to 6) and did not transfer
 to 0x173D18 or 0x216750.
 
+## Locals and arms that moved a near miss (wave S14, 2026-11-17)
+
+Measured on drafts, none yet a control that took a second function to 0: check the retail signature first (`ActivateCplook` takes one
+parameter; the wrong three-argument prototype hid a 28 draft that is now 10). Two locals for the two uses of one global's address (a pointer
+used for the first call, a second declared just before the later use) removed an early `%hi` hoist; two locals for two emitters in place of
+one reused local fixed an s1/s2 swap. An explicit empty `case 1: case 2: break;` arm gave `UpdateDependentTaskState` retail's switch tree (22 to 15).
+An old draft's score is no baseline when its callee prototype was wrong: fix the prototype and re-score before comparing.
+
 ## Walls
 
 `config/matching/walls.tsv` is the list: address, name, class (`blocker`, `fragment`, `helper`, `toolchain`, `tie`, `exhausted`), the reason, the evidence and the `unlock` condition.
