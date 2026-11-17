@@ -22,7 +22,6 @@ address	name	size	file	score
 0X11C500	FInvertMatrix__FiPfT1	1000	mat/FInvertMatrix__FiPfT1.cpp	111
 0X11CAB0	GMaxAxisScale	160	util-alo/GMaxAxisScale.c	38
 0X11D508	CSolveQuadratic__FfffPf	168	util_11cf60/CSolveQuadratic__FfffPf.cpp	18
-0X11E208	SetVectorSphere__FP6VECTORfff	136	vec/SetVectorSphere__FP6VECTORfff.cpp	0
 0X11E290	SProjectVector__FP6VECTORT0	72	vec/SProjectVector__FP6VECTORT0.c	14
 0X11E390	GetPerpendicularVector	288	vec/GetPerpendicularVector.c	69
 0X11E4B0	RadBetweenVectors__FP6VECTORN20	384	vec/RadBetweenVectors__FP6VECTORN20.c	90
@@ -89,7 +88,6 @@ address	name	size	file	score
 0X13DA18	LoadSwFromBrx	1384	new_13d8b8/LoadSwFromBrx.cpp	7
 0X13E818	LoadOptionFromBrx	4088	new_13d8b8/LoadOptionFromBrx.cpp	139
 0X13FB40	LoadSwObjectsFromBrx	728	new_13f888/LoadSwObjectsFromBrx.cpp	24
-0X1400B8	PostJtLoad	640	new_13f888/PostJtLoad.cpp	11
 0X140750	func_00140750	616	new_13f888/fun_00140750.c	102
 0X140C30	func_00140C30	88	new_13f888/fun_00140c30.c	6
 0X140F90	HandleJtMessage	1528	new_13f888/HandleJtMessage.c	249
@@ -135,7 +133,7 @@ address	name	size	file	score
 0X14F898	FInsideCmMrd	152	cm_14e270/FInsideCmMrd.c	20
 0X14FE58	PosCplookAnchor	112	tn-rip/PosCplookAnchor.c	28
 0X14FEC8	PosCplookEye	112	tn-rip/PosCplookEye.c	18
-0X14FF38	ActivateCplook	552	tn-rip/ActivateCplook.cpp	28
+0X14FF38	ActivateCplook	552	tn-rip/ActivateCplook.cpp	10
 0X151340	bevy_camera_looks_update	720	tn-rip/bevy_camera_looks_update.c	179
 0X151700	bevy_camera_policy_update	456	tn-rip/bevy_camera_policy_update.c	140
 0X151950	UpdateCpattach	672	rip/UpdateCpattach.c	161
@@ -160,7 +158,7 @@ address	name	size	file	score
 0X15B428	EmitBlips__FP5EMITBP5EMITGiP6VECTORT3PfT5T3T3	960	emitter_1591b0/EmitBlips__FP5EMITBP5EMITGiP6VECTORT3PfT5T3T3.c	244
 0X15B7E8	OriginateParticles__FiP5EMITBP7EMITGEN	520	emitter_1591b0/OriginateParticles__FiP5EMITBP7EMITGEN.c	115
 0X15BF40	SetEmitdvEmitb__FP6EMITDVP5EMITB	152	emitter_1591b0/SetEmitdvEmitb__FP6EMITDVP5EMITB.c	30
-0X15BFD8	CalculateEmitdvMatrix	376	emitter_1591b0/CalculateEmitdvMatrix.cpp	41
+0X15BFD8	CalculateEmitdvMatrix	376	emitter_1591b0/CalculateEmitdvMatrix.cpp	6
 0X15CAD8	expl__static_initialization_and_destruction_0	624	emitter-font/expl__static_initialization_and_destruction_0.cpp	34
 0X15E9C8	CploFindSwObjectsByClass	944	emitter-font/CploFindSwObjectsByClass.cpp	36
 0X15F9D0	ChNext__9CRichText	904	font_15f000/ChNext__9CRichText.cpp	60
@@ -172,14 +170,13 @@ address	name	size	file	score
 0X163460	SaveJobVariables	320	new_161458/SaveJobVariables.cpp	23
 0X1643B0	SaveTaskVariables	544	sensor-geom/SaveTaskVariables.cpp	32
 0X164DF0	SetTaskState	808	sensor-geom/SetTaskState.cpp	77
-0X165B40	UpdateDependentTaskState	232	sensor-geom/UpdateDependentTaskState.cpp	22
+0X165B40	UpdateDependentTaskState	232	sensor-geom/UpdateDependentTaskState.cpp	15
 0X165E38	StartGameFromSave	464	sensor-geom/StartGameFromSave.cpp	38
 0X166428	TransformPoints	120	sensor-geom/TransformPoints.c	24
 0X167B68	BindGlobset	568	new_167320/BindGlobset.cpp	65
 0X167DA0	func_00167DA0	184	new_167320/fun_00167da0.c	40
 0X167E58	func_00167E58	288	new_167320/fun_00167e58.cpp	42
 0X167F78	Vif1InterruptHandler	72	new_167320/Vif1InterruptHandler.c	6
-0X167FC0	UploadRelightLights	496	new_167320/UploadRelightLights.cpp	17
 0X1681F8	func_001681F8	728	new_167320/fun_001681f8.cpp	81
 0X169198	func_00169198	2032	new_167320/fun_00169198.cpp	430
 0X16A000	LoadGlobFromBrx	10464	new_167320/LoadGlobFromBrx.cpp	695
@@ -269,10 +266,9 @@ address	name	size	file	score
 0X193A68	GetAttachRopeSlide	560	new_190c58/GetAttachRopeSlide.c	137
 0X193DE8	func_00193DE8	712	stephide/fun_00193de8.c	152
 0X194170	PresetJtAccelHide__FP2JT	384	stephide/PresetJtAccelHide__FP2JT.c	84
-0X1944C8	PasegAttachBase	144	new_1942f0/PasegAttachBase.cpp	22
 0X194688	InsertTargetCandidate	952	new_1942f0/InsertTargetCandidate.cpp	84
 0X194F70	UpdateSwTargetList	1016	new_1942f0/UpdateSwTargetList.cpp	54
-0X195368	EmitTargetSparkles	672	new_1942f0/EmitTargetSparkles.cpp	45
+0X195368	EmitTargetSparkles	672	new_1942f0/EmitTargetSparkles.cpp	43
 0X195A00	SetJmpState	1464	new_1942f0/SetJmpState.c	289
 0X195FB8	SetJmpBodyState	2416	new_1942f0/SetJmpBodyState.c	356
 0X196928	DtSolveJumpLaunch	384	new_1942f0/DtSolveJumpLaunch.cpp	12
@@ -318,7 +314,6 @@ address	name	size	file	score
 0X1A5478	AddLo	440	light-stepguard/AddLo.cpp	44
 0X1A5FB8	func_001A5FB8	344	stepguard-jt/fun_001a5fb8.c	85
 0X1A6340	GetLoEulerDegrees	112	new_1a6290/GetLoEulerDegrees.c	22
-0X1A63B0	func_001A63B0	160	new_1a6290/fun_001a63b0.cpp	15
 0X1A64E8	SetSoProperties	480	new_1a6290/SetSoProperties.cpp	50
 0X1A6730	CLo_Clone	928	new_1a6290/CLo_Clone.cpp	56
 0X1A7050	ConvertLoMat	352	stepguard-sw/ConvertLoMat.c	82
@@ -359,7 +354,6 @@ address	name	size	file	score
 0X1B8988	UpdateMurrayAttack	488	mpeg-memcard/UpdateMurrayAttack.cpp	98
 0X1B8B70	MoveMurrayAttack	448	mpeg-memcard/MoveMurrayAttack.c	101
 0X1B90B8	func_001B90B8	120	mpeg-memcard/fun_001b90b8.c	19
-0X1BA608	UpdateZoneScriptBeh	544	mpeg-memcard/UpdateZoneScriptBeh.cpp	0
 0X1BABA0	LoadStgSwitchFromBrx	480	mpeg-memcard/LoadStgSwitchFromBrx.cpp	37
 0X1BB250	func_001BB250	432	mpeg-memcard/fun_001bb250.cpp	46
 0X1BB400	RunStgSwitch	584	mpeg-memcard/RunStgSwitch.c	101
@@ -400,7 +394,7 @@ address	name	size	file	score
 0X1C9058	StartLoadingLogo	56	prog-memcard/StartLoadingLogo.cpp	3
 0X1C9688	StaticInitLoadingLogo	664	new_1c90d0/StaticInitLoadingLogo.cpp	65
 0X1C9B08	func_001C9B08	1552	new_1c90d0/fun_001c9b08.cpp	24
-0X1CA118	LO_SetCloneId	496	new_1c90d0/LO_SetCloneId.cpp	21
+0X1CA118	LO_SetCloneId	496	new_1c90d0/LO_SetCloneId.cpp	19
 0X1CAA60	ReleaseLease	896	new_1c90d0/ReleaseLease.cpp	13
 0X1CAEC8	PleaseAcquire	904	new_1c90d0/PleaseAcquire.cpp	45
 0X1CBB58	func_001CBB58	80	new_1c90d0/fun_001cbb58.c	15
@@ -425,10 +419,10 @@ address	name	size	file	score
 0X1D09A0	ProjectLeafTransform__FP4LEAFf	600	rip_1cf0a0/ProjectLeafTransform__FP4LEAFf.c	146
 0X1D0E48	InitBublet__FP6BUBLETP6VECTORfP2SO	112	rip_1cf0a0/InitBublet__FP6BUBLETP6VECTORfP2SO.c	17
 0X1D0EB8	ProjectBubletTransform__FP6BUBLETf	560	rip_1cf0a0/ProjectBubletTransform__FP6BUBLETf.c	115
-0X1D19A8	UpdateVehicle	1960	rip-rumble/UpdateVehicle.cpp	31
+0X1D19A8	UpdateVehicle	1960	rip-rumble/UpdateVehicle.cpp	22
 0X1D2490	func_001D2490	384	rip-rumble/fun_001d2490.c	86
 0X1D54B8	StoreAudioModeInSave	256	new_1d54b8/StoreAudioModeInSave.cpp	11
-0X1D6508	AddSphereToRenderTree	488	new_1d54b8/AddSphereToRenderTree.cpp	15
+0X1D6508	AddSphereToRenderTree	488	new_1d54b8/AddSphereToRenderTree.cpp	2
 0X1D6848	FCalculateMuzzleVelocity__FP6VECTORT0fT0P2SO	424	vec_1d6848/FCalculateMuzzleVelocity__FP6VECTORT0fT0P2SO.c	96
 0X1D69F0	VelBallistic	160	vec-coin/VelBallistic.c	38
 0X1D6B00	LaunchSoAtTarget	1504	vec-coin/LaunchSoAtTarget.c	322
@@ -463,7 +457,7 @@ address	name	size	file	score
 0X1EA000	UpdateCrvExcludedRanges	944	new_1e7a28/UpdateCrvExcludedRanges.cpp	147
 0X1ED1A8	FilterColorRgba5551_1ed1a8	208	new_1ed1a8/FilterColorRgba5551_1ed1a8.cpp	42
 0X1ED2D8	GreyColor_1ed2d8	208	new_1ed1a8/GreyColor_1ed2d8.c	43
-0X1ED470	AddToIdTableA_1ed470	112	new_1ed1a8/AddToIdTableA_1ed470.cpp	17
+0X1ED470	AddToIdTableA_1ed470	112	new_1ed1a8/AddToIdTableA_1ed470.cpp	15
 0X1ED560	AddToIdTableB_1ed560	112	new_1ed1a8/AddToIdTableB_1ed560.c	12
 0X1EEE00	GoalStack_Push	208	shdanim-sm/GoalStack_Push.cpp	9
 0X1EFAC0	CSm_LoadFromBrx	1544	sm/CSm_LoadFromBrx.cpp	39
@@ -508,7 +502,7 @@ address	name	size	file	score
 0X2019F0	sprbuf__static_initialization_and_destruction_0	872	sprbuf/sprbuf__static_initialization_and_destruction_0.cpp	35
 0X202378	ProbeReconTargetVisibility	456	sprbuf-stepguard/ProbeReconTargetVisibility.c	92
 0X202540	PickReconTarget	440	sprbuf-stepguard/PickReconTarget.c	98
-0X202D38	bevy_ui_binoc_recon_202d38	2096	sprbuf-stepguard/bevy_ui_binoc_recon_202d38.cpp	136
+0X202D38	bevy_ui_binoc_recon_202d38	2096	sprbuf-stepguard/bevy_ui_binoc_recon_202d38.cpp	123
 0X203AF0	CloneStepHullGeom	456	new_203790/CloneStepHullGeom.cpp	36
 0X203D00	func_00203D00	264	new_203790/fun_00203d00.c	54
 0X203E08	UpdateStepPhys__FP4STEP	408	step/UpdateStepPhys__FP4STEP.cpp	29
@@ -551,7 +545,7 @@ address	name	size	file	score
 0X217058	EmitGlyphDma	576	font-break/EmitGlyphDma.cpp	49
 0X2174C8	DrawMovieShapeCharacter	792	font-break/DrawMovieShapeCharacter.cpp	52
 0X2177E0	DrawMovieBitmapCharacter	952	font-break/DrawMovieBitmapCharacter.cpp	97
-0X218790	CombineColorTransforms	288	font-break/CombineColorTransforms.cpp	17
+0X218790	CombineColorTransforms	288	font-break/CombineColorTransforms.cpp	10
 0X219190	ApplySpriteKeySounds	440	font-break/ApplySpriteKeySounds.cpp	23
 0X219400	PlaceSpriteKeyCharacters	3040	font-break/PlaceSpriteKeyCharacters.cpp	265
 0X21AA60	InitDynamicTextStatics	4360	font-break/InitDynamicTextStatics.c	1379
@@ -684,7 +678,6 @@ address	name	size	file	score
 0X252148	func_00252148	232	sdk/fun_00252148.c	11
 0X2536B8	func_002536B8	792	sdk/fun_002536b8.cpp	113
 0X2539D0	func_002539D0	688	sdk/fun_002539d0.c	33
-0X253E68	func_00253E68	320	sdk/fun_00253e68.c	2
 0X2540B0	func_002540B0	488	sdk/fun_002540b0.cpp	6
 0X254CA0	InitIpu	568	sdk/InitIpu.c	30
 0X254EF0	func_00254EF0	16	sdk/fun_00254ef0.cpp	6

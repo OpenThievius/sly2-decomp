@@ -119,7 +119,28 @@ Not reproduced here (no change in the control): `__builtin_fabsf(x)` against `x 
 Already covered above or in the rounds below: the `[a..z]` to `[b..z, a]` store rotation, `sp[N]` sizing from the frame, the hidden leading argument, the dead local for a frame
 with no stores, callee return type, and Sonnet on a near miss with the diff in hand (theirs: 40 of 92 matched, 43%, against 28 of 420 when Haiku retried).
 
+## Lane helpers (2026-11-17)
+
+Take a lane of a quadword with the one-instruction helpers of `include/ps2inline.h`, not `LaneX(RotateWords3(v))`: `LaneYInGeneralRegister(v)`
+(prot3w, mtc1 left to GCC) for y and `LaneZInGeneralRegister(v)` (pextuw) for z. `func_001A63B0` went 15 to 0 (x, y, z each times the same
+constant, then `VectorFromFloats3`); `UpdateVehicle` 31 to 22 and `bevy_ui_binoc_recon_202d38` 136 to 123. Where a draft still reads a lane through
+`RotateWords3`, try this first. An inline accessor for a global (`StepSeconds(&g_2dded0)`) helped `CalculateEmitdvMatrix` (33 to 6) and did not transfer
+to 0x173D18 or 0x216750.
+
+## Locals and arms that moved a near miss (wave S14, 2026-11-17)
+
+Measured on drafts, none yet a control that took a second function to 0: check the retail signature first (`ActivateCplook` takes one
+parameter; the wrong three-argument prototype hid a 28 draft that is now 10). Two locals for the two uses of one global's address (a pointer
+used for the first call, a second declared just before the later use) removed an early `%hi` hoist; two locals for two emitters in place of
+one reused local fixed an s1/s2 swap. An explicit empty `case 1: case 2: break;` arm gave `UpdateDependentTaskState` retail's switch tree (22 to 15).
+An old draft's score is no baseline when its callee prototype was wrong: fix the prototype and re-score before comparing.
+
 ## Walls
+
+`config/matching/walls.tsv` is the list: address, name, class (`blocker`, `fragment`, `helper`, `toolchain`, `tie`, `exhausted`), the reason, the evidence and the `unlock` condition.
+**Never attempt a walled function without an unlocking finding** (AGENTS.md); `claim.py init` skips them and `--unlock` overrides it
+with the finding named. Add a row whenever a function ends NEAR after its bound; `classify_walls.py --write` adds `exhausted` rows by run history (20 runs, 3 arms, no gain in 15). Wave S9 (2026-11-17) spent 14 workers on near misses
+that 5 of its own functions' wall rows already described and that earlier waves had run 10 to 50 times: 0 matched by lever, 1 by luck.
 
 Patterns the source cannot reach (record them in the file and move on):
 

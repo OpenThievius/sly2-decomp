@@ -5,9 +5,7 @@ extern const char RO_002AC708[];
 void func_00253E68(char *mpeg)
 {
     unsigned selector;
-    unsigned status;
     unsigned countHigh;
-    unsigned countLow;
     unsigned fieldA;
     unsigned fieldB;
     unsigned fieldC;
@@ -17,7 +15,8 @@ void func_00253E68(char *mpeg)
     unsigned fieldG;
     unsigned value;
     *(int *)(mpeg + 0x858) = 1;
-    *(volatile unsigned *)0x10002010 = *(volatile unsigned *)0x10002010 & 0xFF7FFFFF;
+    /* plain access: retail fills the call's delay slot with this store */
+    *(unsigned *)0x10002010 = *(unsigned *)0x10002010 & 0xFF7FFFFF;
     value = func_00252148(mpeg, 0x1C);
     countHigh = (value >> 1) & 0xFFF;
     fieldD = (value >> 17) & 0x3;

@@ -5,6 +5,8 @@
 #include "types.h"
 #include "m2c_macros.h"
 #include "include_asm.h"
+#include "vu0inline.h"
+#include "ps2inline.h"
 
 struct VT_1BA0B8 { char pad[0x48]; short delta; short pad2; void (*fn)(void *); };
 
@@ -142,7 +144,89 @@ extern "C" void ExitZoneScriptBeh(ZoneScriptBeh_1BA5C8 *beh) {
     RemoveGuardSgs(beh->field_0x10, 0x25);
 }
 
-INCLUDE_ASM(0X1BA608);
+struct ZoneSgs { char pad[0xE8]; int firstHandle; int secondHandle; };
+
+struct ZoneOwner {
+    char pad0[0xF64];
+    ZoneSgs *sgs;
+    char pad1[0x1070 - 0xF68];
+    float curve[3];
+    float pad2;
+    float lowLimit;
+    float highLimit;
+    float reach;
+};
+
+struct ZoneScript {
+    int pad0[4];
+    ZoneOwner *owner;
+    int pad1[7];
+    int state;
+    float timeStamp;
+};
+
+static inline float GClamp(float g, float lo, float hi)
+{
+    if (g < lo)
+        return lo;
+    if (hi < g)
+        return hi;
+    return g;
+}
+
+extern "C" void func_001EEF98(ZoneScript *);
+
+extern "C" int func_001EF0A8(ZoneScript *);
+
+extern "C" QW PosLoWorld(void *);
+
+extern "C" int func_00227C90(int, QW);
+
+extern "C" void SetZoneScriptState_1BA608(ZoneScript *, int);
+
+extern "C" Clock g_2dded0;
+
+extern "C" int g_2e1e40;
+
+extern "C" void UpdateZoneScriptBeh(ZoneScript *self)
+{
+    QW origin;
+    func_001EEF98(self);
+    while (func_001EF0A8(self) == 0) {
+        int previousState = self->state;
+        switch (previousState) {
+        case 0:
+            if (func_00227C90(self->owner->sgs->secondHandle, PosLoWorld((void *)g_2e1e40)) == 0)
+                SetZoneScriptState_1BA608(self, 1);
+            break;
+        case 1:
+            if (func_00227C90(self->owner->sgs->firstHandle, PosLoWorld((void *)g_2e1e40)) != 0)
+                SetZoneScriptState_1BA608(self, 0);
+            else if (self->owner->reach < g_2dded0.time - self->timeStamp)
+                SetZoneScriptState_1BA608(self, 2);
+            break;
+        case 2:
+            break;
+        }
+        if (previousState == self->state)
+            break;
+    }
+    if (self->state == 0 && FIsGuardInSgs(self->owner, 9) != 0) {
+        origin = PosLoWorld(self->owner);
+        QW other = PosLoWorld((void *)g_2e1e40);
+        ZoneOwner *owner = self->owner;
+        float distance = LaneX(SqrtX(SquaredLengthXy(VectorSub(origin, other))));
+        float *coefficients = owner->curve;
+        float value = owner->curve[0] + distance * (coefficients[1] + distance * coefficients[2]);
+        float result = GClamp(value, owner->lowLimit, owner->highLimit);
+        char *first = func_00205458(self->owner, 0xA7);
+        char *second = func_00205458(self->owner, 0xB8);
+        if (first != 0)
+            *(float *)(first + 0xC4) = result;
+        else if (second != 0)
+            *(float *)(second + 0x38) = result;
+    }
+}
 
 struct VT_1BA828 {
     char p0[0x40];

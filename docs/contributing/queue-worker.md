@@ -8,6 +8,8 @@ You are done when `claim.py done $WAVE $ID $N` prints `DONE`, and not before. It
 functions and the queue still has free ones. A hard near miss is a `NEAR` line after its compiles, not a reason to stop; a worker that
 ends early leaves free functions in the queue.
 
+0. A function in `config/matching/walls.tsv` is not yours to try: `claim.py` does not queue it. If one reaches you anyway, say
+   `SKIP wall <class>` and take the next. Never spend compiles on it without an unlocking finding (AGENTS.md "Never attempt a walled function").
 1. Claim: `python3 scripts/matching/claim.py take $WAVE $ID $COUNT --of $N`. It prints one packet per function: asm, best draft and its diff,
    nearest matched sources, your scratch folder, and the exact `try.py` command. Claim again until `done` says `DONE`. `QUEUE EMPTY` also
    counts as done. `take` claims: to look at the queue without claiming, use `claim.py status WAVE`.
@@ -15,7 +17,7 @@ ends early leaves free functions in the queue.
    `include/vu0inline.h` / `include/ps2inline.h` gives the instructions (inline asm of your own is never allowed, AGENTS.md). Then say
    `SKIP need-helper <instructions>`, one line of what it computes ("4x4 matrix times vector, w ignored"; add "FPU" when the result
    depends on PS2 FPU behaviour: no denormals, infinities or NaNs), and take the next function; the lead records it in
-   `config/us/blocker_notes.tsv`. Otherwise use the helpers and run `try.py` with `TRY_VU0=1`. Two VU0 tricks, measured
+   `config/matching/walls.tsv`. Otherwise use the helpers and run `try.py` with `TRY_VU0=1`. Two VU0 tricks, measured
    (docs/contributing/matching.md "VU0 near misses"): a scalar quad that retail stores to the stack is a `union VU_SCALE { QW q; VECTOR v; }`
    local, and a commutative helper's operand order decides register sharing (swap it first at score 2 to 4). A `nop` that no wording
    of the C gives is not a wall by itself: the build's assembler pads short loops like retail (docs/build/assembler.md), so look for

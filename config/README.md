@@ -9,7 +9,6 @@ Everything here describes the retail executable; no game bytes.
 | `us/image.ld` | The retail layout of the two loaded segments, the base of the linker script `link_image.py` writes |
 | `us/checksum.sha1` | SHA-1 of the USA executable; `setup.sh` and `scripts/verify_image.py` check your copy against it |
 | `us/blockers.tsv` | The permanent blockers (VU0, MMI, COP0, hand-written assembly, or `remnant`: a chunk that is not a function), written by `make blockers` (`scripts/classify_blockers.py`) |
-| `us/blocker_notes.tsv` | One line of what each blocker computes, and whether its result depends on PS2 FPU behaviour; the lead fills it from workers' `SKIP wall` lines ([docs/PRESERVATION_AND_PORT.md](../docs/PRESERVATION_AND_PORT.md)) |
 | `us/handwritten_asm.txt` | Functions retail wrote in assembly (`scripts/matching/handwritten.py`) |
 | `us/whole_files.tsv` | Whole source files proved from the constructor list: range and file under `src/` ([docs/ROADMAP.md](../docs/ROADMAP.md) "Next", item 2) |
 | `us/data_files.tsv` | Data defined in C, linked at retail's address: range and file under `src/` (item 3) |
@@ -38,7 +37,7 @@ Reference data, tracked (what the name recovery produced and the Sly 1 decompila
 | `names/resolutions.tsv` | How conflicting name proposals were resolved |
 | `matching/symbol_addrs.txt` | Names the compile-and-compare tools give to functions |
 | `matching/merges.tsv` | Split chunks that are one function (lead, end, members, branch evidence) |
-| `matching/walls.tsv` | Functions the search tools leave out, with the wall and its evidence |
+| `matching/walls.tsv` | Every function nobody should attempt without an unlocking finding (AGENTS.md): class (`blocker`, `fragment`, `helper`, `toolchain`, `tie`, `exhausted`), reason, evidence, `unlock` condition, and for blockers what the function computes and whether the result depends on PS2 FPU behaviour; the search tools and `claim.py init` skip it; `scripts/matching/classify_walls.py` maintains the `exhausted` rows |
 
 `data/` is git-ignored working space for the local tools (matching drafts and exports).
 

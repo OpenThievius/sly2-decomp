@@ -102,7 +102,76 @@ INCLUDE_ASM(0X167E58);
 
 INCLUDE_ASM(0X167F78);
 
-INCLUDE_ASM(0X167FC0);
+struct SW_16DD58 { char pad[0x3E38]; int flag; };
+
+extern "C" SW_16DD58 B_003DD490;
+
+extern "C" const char RO_0025E090[];
+
+extern "C" const char RO_0025E668[];
+
+extern "C" void EnsureVu1Code__FP4VIFSPvT1_167FC0(void *, const void *, const void *);
+
+extern "C" void AddDmaCnt__4DMAS_167FC0(void *);
+
+extern "C" void AddVifFlusha__4VIFS_167FC0(void *);
+
+extern "C" void AddVifBaseOffset__4VIFSii_167FC0(void *, int, int);
+
+extern "C" void UnpackHelper__4VIFS3UPKiiPiPPUi_167FC0(void *, int, int, int, int *, void *);
+
+extern "C" void EndDmaCnt__4DMAS_167FC0(void *);
+
+extern "C" void CopyAb__FPvT0Ui_167FC0(void *, const void *, unsigned);
+
+extern "C" int CploFindSwObjectsByClass(SW_16DD58 *, int, int, int, int, void **);
+
+extern "C" void UploadRelightLights(void *vifs)
+{
+    void *lights[0x180];
+    int *header;
+    int *dest;
+    int staticCount = 0;
+    char *light;
+    int index;
+    EnsureVu1Code__FP4VIFSPvT1_167FC0(vifs, RO_0025E090, RO_0025E668);
+    AddDmaCnt__4DMAS_167FC0(vifs);
+    AddVifFlusha__4VIFS_167FC0(vifs);
+    AddVifBaseOffset__4VIFSii_167FC0(vifs, 0x32, 0);
+    int count = CploFindSwObjectsByClass(&B_003DD490, 0x505, 4, 0, 0x180, lights);
+    for (index = 0; index < count; index++) {
+        light = (char *)lights[index];
+        if (*(int *)(light + 0x160) == 0)
+            staticCount++;
+    }
+    if (staticCount > 0x100)
+        staticCount = 0x100;
+    UnpackHelper__4VIFS3UPKiiPiPPUi_167FC0(vifs, 0xC, 1, 0, 0, &header);
+    header[0] = 1;
+    header[1] = staticCount * 3 + 1;
+    int written = 0;
+    int chunkEnd = 0;
+    dest = 0;
+    for (index = 0; index < count; index++) {
+        light = (char *)lights[index];
+        if (*(int *)(light + 0x160) != 0)
+            continue;
+        if (chunkEnd <= written) {
+            int rest = staticCount - written;
+            int chunk = 0x20;
+            if (!(0x1F < rest))
+                chunk = rest;
+            chunkEnd = written + chunk;
+            UnpackHelper__4VIFS3UPKiiPiPPUi_167FC0(vifs, 0xC, (chunkEnd - written) * 3, written * 3 + 1, 0, &dest);
+        }
+        written++;
+        CopyAb__FPvT0Ui_167FC0(dest, light + 0x120, 0x30);
+        dest += 12;
+        if (written > 0xff)
+            break;
+    }
+    EndDmaCnt__4DMAS_167FC0(vifs);
+}
 
 extern "C" {
 s32 AddDmaCnt__4DMAS_1681B0();                         /* extern */
@@ -768,8 +837,6 @@ extern "C" char B_002DEA50[];
 extern "C" char B_002DF940[];
 
 extern "C" char B_002DFA80[];
-
-struct SW_16DD58 { char pad[0x3E38]; int flag; };
 
 extern "C" SW_16DD58 B_003DD490;
 

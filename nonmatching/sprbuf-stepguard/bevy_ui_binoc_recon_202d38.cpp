@@ -93,11 +93,11 @@ void bevy_ui_binoc_recon_202d38(RECON *precon)
         QW scr = ConvertCmWorldToScreen(pcm, pos);
         QW scrTop = ConvertCmWorldToScreen(pcm, posTop);
         float x = LaneX(scr) * 320.0f + 320.0f;
-        float y = LaneX(RotateWords3(scr)) * -246.40001f + 246.40001f;
+        float y = LaneYInGeneralRegister(scr) * -246.40001f + 246.40001f;
         float z = FloatFromWord(LaneWordZ(scr));
         scale.q = JoinLowDoublewords(z, InterleaveLowWords(y, x));
         float xTop = LaneX(scrTop) * 320.0f + 320.0f;
-        float yTop = LaneX(RotateWords3(scrTop)) * -246.40001f + 246.40001f;
+        float yTop = LaneYInGeneralRegister(scrTop) * -246.40001f + 246.40001f;
         float zTop = FloatFromWord(LaneWordZ(scrTop));
         QW top = JoinLowDoublewords(zTop, InterleaveLowWords(yTop, xTop));
         float dCenter = LaneX(SqrtX(SquaredLengthXy(VectorSub(scale.q, precon->posCenter))));

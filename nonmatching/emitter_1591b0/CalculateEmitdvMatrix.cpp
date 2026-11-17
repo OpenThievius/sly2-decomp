@@ -3,11 +3,13 @@
 struct M3 { QW row[3]; };
 struct EMITDV { float acc[3]; float pad0; QW axis; float swCurl; float damp; };
 extern const MATRIX4 RO_002A2D30;
-extern float g_2dded0[2];
+struct CLOCK { float t; float dt; };
+extern CLOCK g_2dded0;
+static inline const float &StepSeconds(const CLOCK *clock) { return clock->dt; }
+struct VU_FLOAT { QW m_q; VU_FLOAT(const float &value) : m_q(*(const int *)&value) {} };
 extern "C" void LoadRotateMatrixRad(M3 *, QW, float);
 MATRIX4 operator*(const MATRIX4 &, const MATRIX4 &);
-extern "C" MATRIX4 __ml__FRC7MATRIX4G8VU_FLOAT(const MATRIX4 &, QW);
-static inline QW MakeVUF(int value) { QW result; result = value; return result; }
+MATRIX4 operator*(const MATRIX4 &, VU_FLOAT);
 
 extern "C" MATRIX4 *CalculateEmitdvMatrix(MATRIX4 *result, EMITDV *emitdv)
 {
@@ -21,17 +23,18 @@ extern "C" MATRIX4 *CalculateEmitdvMatrix(MATRIX4 *result, EMITDV *emitdv)
     damp.mat[3][1] = emitdv->acc[1];
     damp.mat[3][2] = emitdv->acc[2];
     MATRIX4 rotate = RO_002A2D30;
+    MATRIX4 *protate = &rotate;
     if (swCurl != 0.0f) {
         M3 curl;
-        LoadRotateMatrixRad(&curl, emitdv->axis, swCurl * g_2dded0[1]);
-        rotate.row[0] = curl.row[0];
-        rotate.row[1] = curl.row[1];
-        rotate.row[2] = curl.row[2];
+        LoadRotateMatrixRad(&curl, emitdv->axis, swCurl * StepSeconds(&g_2dded0));
+        protate->row[0] = curl.row[0];
+        protate->row[1] = curl.row[1];
+        protate->row[2] = curl.row[2];
     }
     MATRIX4  scaled;
-    scaled = __ml__FRC7MATRIX4G8VU_FLOAT(rotate * damp, MakeVUF(*(unsigned char *)&g_2dded0[1]));
+    scaled = (rotate * damp) * VU_FLOAT(StepSeconds(&g_2dded0));
     for (int i = 0; i < 4; i++) {
-        result->row[i] = VectorAdd(rotate.row[i], scaled.row[i]);
+        result->row[i] = VectorAdd(protate->row[i], scaled.row[i]);
     }
     return result;
 }

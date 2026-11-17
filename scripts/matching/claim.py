@@ -195,6 +195,13 @@ def init(arguments):
     for address in sorted(blocked):
         print(f'skipped 0x{address:06X} {names[address]}: permanent blocker (VU0, MMI, COP0 or hand-written: config/us/blockers.tsv)')
     queue = [a for a in queue if a not in blocked]
+    # walled functions (config/matching/walls.tsv) are not queued without a named finding that unlocks them (AGENTS.md "Never attempt a walled function")
+    walls_path = os.path.join(LAB, 'config/matching/walls.tsv')
+    walls = {int(row['address'], 16): row for row in csv.DictReader(open(walls_path, encoding='utf-8'), delimiter='\t')} if os.path.exists(walls_path) else {}
+    if not arguments.unlock:
+        for address in sorted(a for a in queue if a in walls):
+            print(f'skipped 0x{address:06X} {names[address]}: wall ({walls[address]["class"]}); unlock needs: {walls[address]["unlock"]}')
+        queue = [a for a in queue if a not in walls]
     os.makedirs(os.path.join(WAVES, arguments.wave), exist_ok=True)
     json.dump({'queue': queue, 'claims': {}, 'budget': arguments.budget}, open(state_path(arguments.wave), 'w'), indent=1)
     print(f'{arguments.wave}: {len(queue)} functions queued, budget {arguments.budget} runs each')
@@ -428,6 +435,7 @@ def main():
     sub.add_argument('--min-size', type=int, default=0)
     sub.add_argument('--max-size', type=int, default=1 << 30)
     sub.add_argument('--budget', type=int, default=12)
+    sub.add_argument('--unlock', help='queue walled functions (config/matching/walls.tsv) anyway: the finding that unlocks them, one line (cite a commit or doc)')
     sub = commands.add_parser('take')
     sub.add_argument('wave')
     sub.add_argument('worker')

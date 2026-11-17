@@ -7,6 +7,8 @@
 #include "m2c_macros.h"
 #include "so.h"
 #include "include_asm.h"
+#include "ps2inline.h"
+#include "vu0inline.h"
 
 extern "C" char B_003DD4BC;
 
@@ -642,7 +644,27 @@ void PmatLoWorld(struct LOOBJ_1A6318 *plo) {
 
 INCLUDE_ASM(0X1A6340);
 
-INCLUDE_ASM(0X1A63B0);
+struct M3 { QW row[3]; };
+
+struct VT_1A63B0 { char pad[0xF0]; short delta; short index; void (*fn)(void *, M3 *); };
+
+struct OBJ { char pad[0xC]; VT_1A63B0 *vptr; };
+
+extern "C" void LoadRotateMatrixEuler__FP6VECTORP7MATRIX3(M3 *, QW);
+
+void func_001A63B0(OBJ *pobj, QW vec)
+{
+    struct L { M3 copy; QW junk; M3 mat; } l;
+    float x = LaneX(vec) * 0.017453294f;
+    float y = LaneYInGeneralRegister(vec) * 0.017453294f;
+    float z = LaneZInGeneralRegister(vec) * 0.017453294f;
+    QW euler = VectorFromFloats3(x, y, z);
+    l.junk = euler;
+    LoadRotateMatrixEuler__FP6VECTORP7MATRIX3(&l.mat, euler);
+    l.copy = l.mat;
+    VT_1A63B0 *vtable = pobj->vptr;
+    vtable->fn((char *)pobj + vtable->delta, &l.copy);
+}
 
 struct LO_1A6450;
 

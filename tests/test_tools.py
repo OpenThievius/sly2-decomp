@@ -979,7 +979,21 @@ class ClaimTests(unittest.TestCase):
             self.write(f'data/matching/src/fn/{address}.cpp', 'int f();\n')
         self.write('blockers.tsv', 'address\tname\tsize\tkind\n0X100200\tblocked\t64\tvu\n')
         import argparse
-        claim.init(argparse.Namespace(wave='T', addresses=None, near=2, min_score=1, min_size=0, max_size=1 << 30, budget=10))
+        claim.init(argparse.Namespace(wave='T', addresses=None, near=2, min_score=1, min_size=0, max_size=1 << 30, budget=10, unlock=None))
+        with open(os.path.join(claim.WAVES, 'T', 'wave.json')) as handle:
+            self.assertEqual(json.load(handle)['queue'], [0x100000])
+
+    def test_a_walled_function_is_not_queued_unless_an_unlock_is_named(self):
+        header = 'address\tname\tsize\tstatus\tbest\ttries\tsource\tname_source\toption_name\n'
+        self.write('data/matching/functions.tsv', header + '0x100000\tnear_miss\t64\ttried\t2\t1\t\t\t\n')
+        self.write('data/matching/src/fn/100000.cpp', 'int f();\n')
+        self.write('config/matching/walls.tsv', 'address\tname\tclass\treason\tevidence\tunlock\n0x100000\tnear_miss\ttie\twhy\tproof\ta lever\n')
+        import argparse
+        base = dict(wave='T', addresses=None, near=2, min_score=1, min_size=0, max_size=1 << 30, budget=10)
+        claim.init(argparse.Namespace(unlock=None, **base))
+        with open(os.path.join(claim.WAVES, 'T', 'wave.json')) as handle:
+            self.assertEqual(json.load(handle)['queue'], [])
+        claim.init(argparse.Namespace(unlock='commit abc', **base))
         with open(os.path.join(claim.WAVES, 'T', 'wave.json')) as handle:
             self.assertEqual(json.load(handle)['queue'], [0x100000])
 
@@ -2114,7 +2128,7 @@ class SearchGuardTests(unittest.TestCase):
         import csv
         with open(search_guard.WALLS, encoding='utf-8') as handle:
             rows = list(csv.DictReader(handle, delimiter='\t'))
-        self.assertTrue(rows and all(row['reason'] and row['evidence'] and row['class'] in ('toolchain', 'tie') for row in rows))
+        self.assertTrue(rows and all(row['reason'] and row['evidence'] and row['unlock'] and row['class'] in ('blocker', 'fragment', 'helper', 'toolchain', 'tie', 'exhausted') for row in rows))
 
 
 class BoundarySuspectTests(unittest.TestCase):

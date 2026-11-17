@@ -20,7 +20,14 @@ extern "C" QW SetVectorCylind__FP6VECTORfff(void *pvec, float rad, float sXY, fl
     return l.vec;
 }
 
-INCLUDE_ASM(0X11E208);
+extern "C" QW SetVectorSphere__FP6VECTORfff(void *pvec, float radPan, float radTilt, float sRadius)
+{
+    struct { QW vec; float gSinPan; float gCosPan; float gSinTilt; float gCosTilt; } l;
+    CalculateSinCos__FfPfT1(radPan, &l.gSinPan, &l.gCosPan);
+    CalculateSinCos__FfPfT1(radTilt, &l.gSinTilt, &l.gCosTilt);
+    l.vec = VectorFromFloats3(l.gCosTilt * l.gCosPan * sRadius, l.gCosTilt * l.gSinPan * sRadius, l.gSinTilt * sRadius);
+    return l.vec;
+}
 
 INCLUDE_ASM(0X11E290);
 

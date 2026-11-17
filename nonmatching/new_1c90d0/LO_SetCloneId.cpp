@@ -29,7 +29,14 @@ extern "C" void LO_SetCloneId(Obj_1CA118 *self, int cloneId, int flag) {
         node = node->next;
     }
     node = newPath;
-    while (node->id != -1 && B_003DD490.sets[IsetFromCloneId(node->id)].kind == 1 && node->owner == 0) {
+    for (;;) {
+        if (node->id == -1)
+            break;
+        SetEntry_1CA118 *entry = &B_003DD490.sets[IsetFromCloneId(node->id)];
+        if (entry->kind != 1)
+            break;
+        if (node->owner != 0)
+            break;
         node->owner = self;
         node = node->next;
     }

@@ -116,7 +116,7 @@ extern "C" void UpdateVehicle(VEHICLE *pvehicle)
         AXLE *paxle = &pvehicle->aaxle[iaxle];
         QW vec = SetVectorCylind__FP6VECTORfff(pvehicle->radAim, 1.0f, 0.0f);
         QW dir = ConvertXfVec(0, paxle->pxf->pxfParent, vec);
-        float rad = GLimitLm__FP2LMf(&paxle->lm, atan2f(LaneX(RotateWords3(dir)), LaneX(dir)));
+        float rad = GLimitLm__FP2LMf(&paxle->lm, atan2f(LaneYInGeneralRegister(dir), LaneX(dir)));
         scale.q = VectorFromFloats3(0.0f, 0.0f, rad);
         func_0012D108(paxle->pact, scale.q);
     }

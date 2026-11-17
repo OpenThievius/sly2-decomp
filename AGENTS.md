@@ -26,7 +26,7 @@ counts as matched.
   (`*(int *)(base + 0x1404)`), a virtual call over a hand-written vtable call (`vt->fn(obj + vt->delta, ...)`), a shared type over a
   local one, a fixed-width typedef over a bare `long`. `make cleanup` warns on these in added code; a warning does not fail it.
 - **Blockers get one line of semantics.** A worker that meets a permanent blocker says what it computes (`SKIP wall <semantics>`); the
-  lead records it in `config/us/blocker_notes.tsv`, noting PS2 FPU behaviour (no denormals, infinities or NaNs) where results depend on it.
+  lead records it in `config/matching/walls.tsv`, noting PS2 FPU behaviour (no denormals, infinities or NaNs) where results depend on it.
 - **No "equivalent C".** C that behaves like a function but does not reproduce its bytes is not a match: never in `src/`, never in
   the reports. If anyone writes it for a port, it lives outside `src/` (the port's repository or `reference/`), labelled as such.
 
@@ -72,6 +72,13 @@ counts as matched.
   original assembly: it is left out of the work queues, counts as finished in the reports apart from the exact C, and is never matched with asm
   (docs/build/vu0-mmi.md). Not a blocker: a function with the compiler's frame whose VU0, MMI and system instructions are at most 10% of it
   (`config/us/inline_functions.tsv`, same command): compiled C that needs the shared helpers, in the work queues and counted as to-do.
+- **Never attempt a walled function without an unlocking finding.** `config/matching/walls.tsv` lists every function whose remaining
+  difference was traced to the toolchain or to a register or scheduling tie that earlier runs could not move, with the reason, the
+  evidence and what would unlock it. Check it, and the function's history in `work/matching/runs.log`, before queueing, claiming or
+  compiling anything. A walled function gets no wave, no worker and no compiles until a *finding* meets its `unlock` column: a lever
+  measured against a control that took another function of its class to 0, or a toolchain change measured on two functions. "Another
+  wording" and "a stronger model" are not findings. `claim.py init` skips walled functions; `--unlock '<finding, commit or doc>'` queues
+  them. A new wall is added to the file when a function ends NEAR after its bound (class, reason, evidence, unlock).
 - **An unused local only as a type the original plausibly declared.** GCC 2.95 gives an unused struct local a stack slot, so retail's
   frames show where the original declared one. A padding array (`s32 scratch[4];`), an invented type or a field that exists only to
   size the frame is not allowed.
