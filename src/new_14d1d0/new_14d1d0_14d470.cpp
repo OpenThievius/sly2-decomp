@@ -386,7 +386,51 @@ INCLUDE_ASM(0X14E320);
 
 INCLUDE_ASM(0X14E328);
 
-INCLUDE_ASM(0X14E4C8);
+struct CPLCY_14E4C8 {
+    int unk0; int unk4; int unk8;
+    virtual void v0();
+    virtual void v1(SO *, void *);
+    virtual void v2(SO *, void *);
+    virtual void v3();
+    virtual void v4(void *);
+};
+
+struct CPR_14E4C8 { CPP cpp; CPLCY_14E4C8 *pcplcy; SO *pso; void *pv; };
+
+struct CM_14E4C8 { char pad[0x30C]; int ccpr; CPR_14E4C8 acpr[1]; };
+
+extern float g_2dded0;
+
+void RevokeCmPolicy(CM_14E4C8 *pcm, int grf, CPP cpp, CPLCY_14E4C8 *pcplcy, SO *pso, void *pv)
+{
+    CPR_14E4C8 *pcprOut = pcm->acpr;
+    SO *psoFirst = 0;
+    CPLCY_14E4C8 *pcplcyFirst = 0;
+    void *pvFirst = 0;
+    int icpr = 0;
+    CPR_14E4C8 *pcpr = pcm->acpr;
+    for (; icpr < pcm->ccpr; icpr++, pcpr++) {
+        if ((!(grf & 1) || cpp == pcpr->cpp) && ((grf & 2) == 0 || pcplcy == pcpr->pcplcy) &&
+            ((grf & 4) == 0 || pso == pcpr->pso) && ((grf & 8) == 0 || pv == pcpr->pv)) {
+            if (icpr == 0) {
+                pcplcyFirst = pcpr->pcplcy;
+                psoFirst = pcpr->pso;
+                pvFirst = pcpr->pv;
+            }
+            pcpr->pcplcy->v4(pcpr->pv);
+        } else {
+            *pcprOut++ = *pcpr;
+        }
+    }
+    pcm->ccpr = pcprOut - pcm->acpr;
+    if (pcplcyFirst != 0) {
+        pcplcyFirst->v2(psoFirst, pvFirst);
+        if (pcm->ccpr > 0) {
+            *(float *)((char *)pcm + 0x390) = g_2dded0;
+            pcm->acpr[0].pcplcy->v1(pcm->acpr[0].pso, pcm->acpr[0].pv);
+        }
+    }
+}
 
 struct CPDEFI { char pad[0x30]; float radHome; float sAdjust; };
 

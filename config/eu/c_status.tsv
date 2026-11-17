@@ -1835,6 +1835,7 @@ us_address	name	other_address	pair	score	addresses
 0x14E148	bevy_camera_cm_14e148	0X14E170	identical	0	ok
 0x14E168	SetCmPosMat	0X14E190	same	0	ok
 0x14E270	BuildCmFgfn__FP2CMfP4FGFN	0X14E298	same	0	ok
+0x14E4C8	RevokeCmPolicy__FP2CMi3CPPP5CPLCYP2SOPv	0X14E4F0	same	0	ok
 0x14E698	CalcCmAdjust__FP2CMP2SOP6CPDEFIP6VECTOR	0X14E6C0	identical	0	ok
 0x14E768	AdjustCmCpdefi__FP2CMP2SOfP6CPDEFI	0X14E790	same	0	ok
 0x14E920	ResetCmAdjust__FP2CMP2SOP6CPDEFI	0X14E948	same	0	ok
@@ -3618,6 +3619,7 @@ us_address	name	other_address	pair	score	addresses
 0x1D57E0	PopRenderNode	0X1D5A58	identical	0	ok
 0x1D6310	RemoveAloFromRenderTree	0X1D6588	identical	0	ok
 0x1D6480	AllocRenderTreeNode	0X1D66F8	same	0	ok
+0x1D6508	AddSphereToRenderTree	0X1D6780	same	0	ok
 0x1D66F0	StaticInitSlotheaps_1d66f0	0X1D6968	same	0	ok
 0x1D6828	func_001D6828	0X1D6AA0	same	0	ok
 0x1D6A90	InitLaunch	0X1D6D08	same	0	ok

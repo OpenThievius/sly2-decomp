@@ -118,7 +118,6 @@ address	name	size	file	score
 0X14DC58	UpdateCmMat4	936	cm_14d478/UpdateCmMat4.cpp	96
 0X14E1A8	SetCmLookAt	200	font-cm/SetCmLookAt.cpp	6
 0X14E328	SetCmPolicy__FP2CM3CPPP5CPLCYP2SOPv	416	cm_14e270/SetCmPolicy__FP2CM3CPPP5CPLCYP2SOPv.cpp	9
-0X14E4C8	RevokeCmPolicy__FP2CMi3CPPP5CPLCYP2SOPv	464	cm_14e270/RevokeCmPolicy__FP2CMi3CPPP5CPLCYP2SOPv.c	109
 0X14E6D0	SpringCm__FfffP2CMP6VECTORP6VECTORP6VECTOR	152	cm_14e270/SpringCm__FfffP2CMP6VECTORP6VECTORP6VECTOR.c	38
 0X14E968	GetCmCpdefi__FP2CMP2SOfP6CPDEFI	160	cm_14e270/GetCmCpdefi__FP2CMP2SOfP6CPDEFI.c	26
 0X14EA08	FFindCmClearInterval	360	cm_14e270/FFindCmClearInterval.cpp	52
@@ -211,7 +210,7 @@ address	name	size	file	score
 0X17C6D0	func_0017C6D0	600	hide-puffer/fun_0017c6d0.cpp	124
 0X17CB80	PresetPuffcAccel__FP5PUFFCf	384	puffer_17cb80/PresetPuffcAccel__FP5PUFFCf.cpp	46
 0X17CF10	func_0017CF10	328	new_17cd00/fun_0017cf10.c	49
-0X17D6C8	GoalGoto_Update	480	new_17cd00/GoalGoto_Update.cpp	6
+0X17D6C8	GoalGoto_Update	480	new_17cd00/GoalGoto_Update.cpp	2
 0X17DA28	GoalGoto_Replan	656	new_17cd00/GoalGoto_Replan.c	156
 0X17DE50	func_0017DE50	656	new_17dd70/fun_0017de50.cpp	5
 0X17E0E0	func_0017E0E0	408	new_17dd70/fun_0017e0e0.c	94
@@ -422,7 +421,6 @@ address	name	size	file	score
 0X1D19A8	UpdateVehicle	1960	rip-rumble/UpdateVehicle.cpp	22
 0X1D2490	func_001D2490	384	rip-rumble/fun_001d2490.c	86
 0X1D54B8	StoreAudioModeInSave	256	new_1d54b8/StoreAudioModeInSave.cpp	11
-0X1D6508	AddSphereToRenderTree	488	new_1d54b8/AddSphereToRenderTree.cpp	2
 0X1D6848	FCalculateMuzzleVelocity__FP6VECTORT0fT0P2SO	424	vec_1d6848/FCalculateMuzzleVelocity__FP6VECTORT0fT0P2SO.c	96
 0X1D69F0	VelBallistic	160	vec-coin/VelBallistic.c	38
 0X1D6B00	LaunchSoAtTarget	1504	vec-coin/LaunchSoAtTarget.c	322
