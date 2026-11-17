@@ -683,7 +683,6 @@ address	name	size	file	score
 0X252148	func_00252148	232	sdk/fun_00252148.c	11
 0X2536B8	func_002536B8	792	sdk/fun_002536b8.cpp	113
 0X2539D0	func_002539D0	688	sdk/fun_002539d0.c	33
-0X253E68	func_00253E68	320	sdk/fun_00253e68.c	2
 0X2540B0	func_002540B0	488	sdk/fun_002540b0.cpp	6
 0X254CA0	InitIpu	568	sdk/InitIpu.c	30
 0X254EF0	func_00254EF0	16	sdk/fun_00254ef0.cpp	6

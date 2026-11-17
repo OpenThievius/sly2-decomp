@@ -5404,6 +5404,7 @@ address	name	size	file	whole_file	symbol
 0X253518	func_00253518	416	sdk/fun_00253518.c		
 0X253C80	func_00253C80	160	sdk/fun_00253c80.c		
 0X253D20	func_00253D20	324	sdk/fun_00253d20.c		
+0X253E68	func_00253E68	320	sdk/fun_00253e68.c		
 0X253FA8	func_00253FA8	232	sdk/fun_00253fa8.c		
 0X254090	func_00254090	12	unsorted/fun_00254090.c		
 0X2540A0	func_002540A0	12	unsorted/fun_002540a0.c		

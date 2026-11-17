@@ -5404,6 +5404,7 @@ us_address	name	other_address	pair	score	addresses
 0x253518	func_00253518	0X253F68	same	0	ok
 0x253C80	func_00253C80	0X2546D0	same	0	ok
 0x253D20	func_00253D20	0X254770	same	0	ok
+0x253E68	func_00253E68	0X2548B8	same	0	ok
 0x253FA8	func_00253FA8	0X2549F8	same	0	ok
 0x254090	func_00254090	0X254AE0	gap	0	ok
 0x2540A0	func_002540A0	0X254AF0	gap	0	ok
