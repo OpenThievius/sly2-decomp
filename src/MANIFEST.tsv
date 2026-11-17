@@ -1569,6 +1569,7 @@ address	name	size	file	whole_file	symbol
 0X13FE18	StaticInitJtPools	308	new_13f888/AppendPloarray_file.cpp	new_13f888/AppendPloarray_file.cpp	StaticInitJtPools
 0X13FF50	GlobalCtorJtPools	32	new_13f888/AppendPloarray_file.cpp	new_13f888/AppendPloarray_file.cpp	GlobalCtorJtPools
 0X13FF70	InitJt	324	new_13f888/InitJt.cpp		
+0X1400B8	PostJtLoad	640	new_13f888/PostJtLoad.cpp		
 0X140338	func_00140338	152	new_13f888/fun_00140338.cpp		
 0X1403D0	UpdateJt	392	new_13f888/UpdateJt.cpp		
 0X140558	UpdateJtFocus	288	new_13f888/UpdateJtFocus.cpp		

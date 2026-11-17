@@ -1569,6 +1569,7 @@ us_address	name	other_address	pair	score	addresses
 0x13FE18	StaticInitJtPools	0X13FE30	same	0	ok
 0x13FF50	GlobalCtorJtPools	0X13FF68	same	0	ok
 0x13FF70	InitJt	0X13FF88	same	0	ok
+0x1400B8	PostJtLoad	0X1400D0	gap	0	ok
 0x140338	func_00140338	0X140350	same	0	ok
 0x1403D0	UpdateJt	0X1403E8	same	0	ok
 0x140558	UpdateJtFocus	0X140570	same	0	ok

@@ -89,7 +89,6 @@ address	name	size	file	score
 0X13DA18	LoadSwFromBrx	1384	new_13d8b8/LoadSwFromBrx.cpp	7
 0X13E818	LoadOptionFromBrx	4088	new_13d8b8/LoadOptionFromBrx.cpp	139
 0X13FB40	LoadSwObjectsFromBrx	728	new_13f888/LoadSwObjectsFromBrx.cpp	24
-0X1400B8	PostJtLoad	640	new_13f888/PostJtLoad.cpp	8
 0X140750	func_00140750	616	new_13f888/fun_00140750.c	102
 0X140C30	func_00140C30	88	new_13f888/fun_00140c30.c	6
 0X140F90	HandleJtMessage	1528	new_13f888/HandleJtMessage.c	249
@@ -424,7 +423,7 @@ address	name	size	file	score
 0X1D09A0	ProjectLeafTransform__FP4LEAFf	600	rip_1cf0a0/ProjectLeafTransform__FP4LEAFf.c	146
 0X1D0E48	InitBublet__FP6BUBLETP6VECTORfP2SO	112	rip_1cf0a0/InitBublet__FP6BUBLETP6VECTORfP2SO.c	17
 0X1D0EB8	ProjectBubletTransform__FP6BUBLETf	560	rip_1cf0a0/ProjectBubletTransform__FP6BUBLETf.c	115
-0X1D19A8	UpdateVehicle	1960	rip-rumble/UpdateVehicle.cpp	31
+0X1D19A8	UpdateVehicle	1960	rip-rumble/UpdateVehicle.cpp	22
 0X1D2490	func_001D2490	384	rip-rumble/fun_001d2490.c	86
 0X1D54B8	StoreAudioModeInSave	256	new_1d54b8/StoreAudioModeInSave.cpp	11
 0X1D6508	AddSphereToRenderTree	488	new_1d54b8/AddSphereToRenderTree.cpp	15
@@ -507,7 +506,7 @@ address	name	size	file	score
 0X2019F0	sprbuf__static_initialization_and_destruction_0	872	sprbuf/sprbuf__static_initialization_and_destruction_0.cpp	35
 0X202378	ProbeReconTargetVisibility	456	sprbuf-stepguard/ProbeReconTargetVisibility.c	92
 0X202540	PickReconTarget	440	sprbuf-stepguard/PickReconTarget.c	98
-0X202D38	bevy_ui_binoc_recon_202d38	2096	sprbuf-stepguard/bevy_ui_binoc_recon_202d38.cpp	136
+0X202D38	bevy_ui_binoc_recon_202d38	2096	sprbuf-stepguard/bevy_ui_binoc_recon_202d38.cpp	123
 0X203AF0	CloneStepHullGeom	456	new_203790/CloneStepHullGeom.cpp	36
 0X203D00	func_00203D00	264	new_203790/fun_00203d00.c	54
 0X203E08	UpdateStepPhys__FP4STEP	408	step/UpdateStepPhys__FP4STEP.cpp	29

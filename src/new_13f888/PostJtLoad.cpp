@@ -53,10 +53,9 @@ extern "C" void PostJtLoad(JT *self)
         ObjectEntry *objects = (ObjectEntry *)PvAllocSwClearImpl__Fi(pointer);
         *(ObjectEntry **)(base + 0x1090) = objects;
         for (int index = 0; index < count; index++) {
-            objects = *(ObjectEntry **)(base + 0x1090);
-            objects[index].object = (LO *)found[index];
-            objects = *(ObjectEntry **)(base + 0x1090);
-            objects[index].object->Remove();
+            LO *object = (LO *)found[index];
+            (*(ObjectEntry **)(base + 0x1090))[index].object = object;
+            (*(ObjectEntry **)(base + 0x1090))[index].object->Remove();
         }
     }
     SlotEntry *slot = (SlotEntry *)(*(char **)(base + 0xC) + 0x278);

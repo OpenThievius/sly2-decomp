@@ -119,6 +119,14 @@ Not reproduced here (no change in the control): `__builtin_fabsf(x)` against `x 
 Already covered above or in the rounds below: the `[a..z]` to `[b..z, a]` store rotation, `sp[N]` sizing from the frame, the hidden leading argument, the dead local for a frame
 with no stores, callee return type, and Sonnet on a near miss with the diff in hand (theirs: 40 of 92 matched, 43%, against 28 of 420 when Haiku retried).
 
+## Lane helpers (2026-11-17)
+
+Take a lane of a quadword with the one-instruction helpers of `include/ps2inline.h`, not `LaneX(RotateWords3(v))`: `LaneYInGeneralRegister(v)`
+(prot3w, mtc1 left to GCC) for y and `LaneZInGeneralRegister(v)` (pextuw) for z. `func_001A63B0` went 15 to 0 (x, y, z each times the same
+constant, then `VectorFromFloats3`); `UpdateVehicle` 31 to 22 and `bevy_ui_binoc_recon_202d38` 136 to 123. Where a draft still reads a lane through
+`RotateWords3`, try this first. An inline accessor for a global (`StepSeconds(&g_2dded0)`) helped `CalculateEmitdvMatrix` (33 to 6) and did not transfer
+to 0x173D18 or 0x216750.
+
 ## Walls
 
 `config/matching/walls.tsv` is the list: address, name, class (`blocker`, `fragment`, `helper`, `toolchain`, `tie`, `exhausted`), the reason, the evidence and the `unlock` condition.
