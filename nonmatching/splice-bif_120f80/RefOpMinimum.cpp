@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 struct CRef { int tagk; union { int n; float g; void *pv; }; void operator=(const CRef &); };
 struct CPAIR { int pad[2]; CRef ref; CPAIR *next; };
 struct CFrame;
@@ -8,8 +9,12 @@ CRef *CRef_CopyConstruct(CRef *, CRef *);
 extern "C" CRef *RefOpMinimum(CRef *pret, int carg, CRef *aref, CFrame *pframe)
 {
     CRef best;
-    CPAIR *pair = aref[1].tagk == 0 ? 0 : (CPAIR *)aref[1].pv;
-    CRef_CopyConstruct(pret, &aref[0]);
+    CRef_CopyConstruct(&best, &aref[0]);
+    if (aref[1].tagk != 0)
+        aref = (CRef *)aref[1].pv;
+    else
+        aref = 0;
+    CPAIR *pair = (CPAIR *)aref;
     for (; pair != 0; pair = pair->next) {
         CRef *other = &pair->ref;
         if (best.tagk == 0x15) {
@@ -17,12 +22,12 @@ extern "C" CRef *RefOpMinimum(CRef *pret, int carg, CRef *aref, CFrame *pframe)
                 if (best.n > other->n)
                     best = *other;
             } else {
-                if (other->g < (float)best.n)
+                if ((float)best.n > other->g)
                     best = *other;
             }
         } else {
             if (other->tagk == 0x15) {
-                if ((float)best.g > other->n)
+                if ((float)other->n < best.g)
                     best = *other;
             } else {
                 if (best.g > other->g)

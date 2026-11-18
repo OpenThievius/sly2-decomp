@@ -407,7 +407,50 @@ void CopyGlobDmaChain(GLOB *pglob, GLOBI *pglobi, int cqw, char *source, int rel
 
 INCLUDE_ASM(0X16A000);
 
-INCLUDE_ASM(0X16C8E0);
+extern "C" int U16Read__18CBinaryInputStream_16C8E0(BIS_169AC8 *);
+extern "C" int S16Read__18CBinaryInputStream_16C8E0(BIS_169AC8 *);
+extern "C" int U8Read__18CBinaryInputStream_16C8E0(BIS_169AC8 *);
+extern "C" void *PvAllocStackClearImpl__Fi_16C8E0(ALLOCREQ *);
+extern "C" void FilterColorRgba5551_1ed1a8(void *);
+
+extern "C" MAP_169AC8 *func_0016C8E0(CTX_169AC8 *, BIS_169AC8 *pbis)
+{
+    MAP_169AC8 *table = 0;
+    int count = U16Read__18CBinaryInputStream_16C8E0(pbis);
+    if (count != 0) {
+        ALLOCREQ request;
+        request.cb = 0xC;
+        request.cbAlign = 0x10;
+        table = (MAP_169AC8 *)PvAllocStackClearImpl__Fi_16C8E0(&request);
+        table->unk0 = count;
+        request.cb = count * 8;
+        request.cbAlign = 0x10;
+        table->avtxl = (VTXL_169AC8 *)PvAllocStackClearImpl__Fi_16C8E0(&request);
+        for (int iset = 0; iset < table->unk0; iset++) {
+            VTXL_169AC8 *set = &table->avtxl[iset];
+            int itemCount = U16Read__18CBinaryInputStream_16C8E0(pbis);
+            request.cb = itemCount * 6;
+            request.cbAlign = 0x10;
+            set->avtx = (VTX_169AC8 *)PvAllocStackClearImpl__Fi_16C8E0(&request);
+            for (int iitem = 0; iitem < itemCount; iitem++) {
+                VTX_169AC8 *item = (VTX_169AC8 *)((char *)set->avtx + iitem * 6);
+                unsigned short *second = &item->b;
+                item->a = U16Read__18CBinaryInputStream_16C8E0(pbis);
+                *second = U16Read__18CBinaryInputStream_16C8E0(pbis);
+                item->c = U8Read__18CBinaryInputStream_16C8E0(pbis);
+                FilterColorRgba5551_1ed1a8(&item->a);
+                FilterColorRgba5551_1ed1a8(second);
+            }
+        }
+        int valueCount = U16Read__18CBinaryInputStream_16C8E0(pbis);
+        request.cb = valueCount * 4;
+        request.cbAlign = 0x10;
+        table->aivtxl = (int *)PvAllocStackClearImpl__Fi_16C8E0(&request);
+        for (int ivalue = 0; ivalue < valueCount; ivalue++)
+            table->aivtxl[ivalue] = S16Read__18CBinaryInputStream_16C8E0(pbis);
+    }
+    return table;
+}
 
 struct BIS;
 

@@ -66,8 +66,8 @@ extern "C" void CloneStepHullGeom(HULLSTEP *pstep, HULLGEOM *pgeomSource)
     HULLGEOM *pgeom = pstep->pgeom;
     float gMin = 3.4028235e38f;
     for (int ivec = 0; ivec < pgeom->cvec; ivec++) {
-        VECTOR *pvector = (VECTOR *)pgeom->avec + ivec;
-        gMin = gMin < pvector->z ? gMin : pvector->z;
+        float gZ = ((VECTOR *)pgeom->avec + ivec)->z;
+        gMin = gMin < gZ ? gMin : gZ;
     }
     pstep->gMin = gMin;
     int cvec = pstep->pgeom->cvec;
@@ -78,8 +78,8 @@ extern "C" void CloneStepHullGeom(HULLSTEP *pstep, HULLGEOM *pgeomSource)
     if (fExtra)
         *(QW *)((char *)pstep->pgeom->avec + offset + 0x20) = g_2a2dd0;
     TransformGeom(pstep->pgeom->pxf + 1, &pstep->pgeom->field78, &pstep->pgeom->field90);
-    pstep->pindexA = (int *)((char *)pstep->pgeom->pindex + offset);
-    pstep->pindexB = (int *)((char *)pstep->pgeom->pindex + offset + 0x10);
+    pstep->pindexA = pstep->pgeom->pindex + cvec * 4;
+    pstep->pindexB = pstep->pgeom->pindex + (cvec * 4 + 4);
     if ((int)(pstep->grfo >> 60) & 1)
         AddSoGeomsToOxa(pstep);
 }

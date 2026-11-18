@@ -1454,6 +1454,7 @@ address	name	size	file	whole_file	symbol
 0X135F78	FInvulnerableBentley	120	bbmark-blend/FInvulnerableBentley.cpp		
 0X135FF0	func_00135FF0	80	bbmark-blend/fun_00135ff0.cpp		
 0X136040	SetBentleyGadgetAnim	216	bbmark-blend/SetBentleyGadgetAnim.cpp		
+0X136118	UpdateBentleyGadget	384	bbmark-blend/UpdateBentleyGadget.cpp		
 0X136298	ReleaseBentleyGadget	92	bbmark-blend/ReleaseBentleyGadget.c		
 0X1362F8	SetBentleyAimState	60	bbmark-blend/SetBentleyAimState.c		
 0X136338	UpdateBentleyAim	500	bbmark-blend/UpdateBentleyAim.cpp		
@@ -1769,6 +1770,7 @@ address	name	size	file	whole_file	symbol
 0X14A1B0	func_0014A1B0	76	button-cd/fun_0014a1b0.cpp		
 0X14A200	func_0014A200	68	button-cd/fun_0014a200.cpp		
 0X14A248	func_0014A248	84	button-cd/fun_0014a248.c		
+0X14A2A0	func_0014A2A0	472	button-cd/fun_0014a2a0.cpp		
 0X14A478	func_0014A478	84	button-cd/fun_0014a478.cpp		
 0X14AA30	func_0014AA30	832	button-cd/fun_0014aa30.cpp		
 0X14AD70	func_0014AD70	164	button-cd/fun_0014ad70.cpp		
@@ -1787,6 +1789,7 @@ address	name	size	file	whole_file	symbol
 0X14B690	PchzFidName_14b690	12	unsorted/unsorted_14b660.cpp	unsorted/unsorted_14b660.cpp	PchzFidName_14b690
 0X14B6A0	StaticInitSlotheaps_14b6a0	308	unsorted/unsorted_14b660.cpp	unsorted/unsorted_14b660.cpp	StaticInitSlotheaps_14b6a0
 0X14B7D8	GlobalCtor_14b7d8	32	unsorted/unsorted_14b660.cpp	unsorted/unsorted_14b660.cpp	GlobalCtor_14b7d8
+0X14B7F8	CpchzTokenizePath__FPc	444	cd/CpchzTokenizePath__FPc.cpp		
 0X14B9C0	FValidCdMmode__Fv	60	cd/FValidCdMmode__Fv.c		
 0X14BA00	SetCdMmode__Fv	44	cd/SetCdMmode__Fv.c		
 0X14BA30	func_0014BA30	8	unsorted/unsorted_14ba30.cpp	unsorted/unsorted_14ba30.cpp	func_0014BA30
@@ -1981,6 +1984,7 @@ address	name	size	file	whole_file	symbol
 0X156780	HitFx_Remove	240	crv-lo/HitFx_Remove.cpp		
 0X156870	FHitFxGone	40	crv-lo/FHitFxGone.c		
 0X156898	HitFx_GIntensity	124	crv-lo/HitFx_GIntensity.cpp		
+0X1569B8	InitSwHitFxParms	476	new_1569b8/SpawnSwHitFx_file.cpp	new_1569b8/SpawnSwHitFx_file.cpp	InitSwHitFxParms
 0X156B98	SpawnSwHitFx	68	new_1569b8/SpawnSwHitFx_file.cpp	new_1569b8/SpawnSwHitFx_file.cpp	SpawnSwHitFx
 0X156BE0	ReplaceHitFx	160	new_1569b8/SpawnSwHitFx_file.cpp	new_1569b8/SpawnSwHitFx_file.cpp	ReplaceHitFx
 0X156C80	ReplaceSwHitFx	72	new_1569b8/SpawnSwHitFx_file.cpp	new_1569b8/SpawnSwHitFx_file.cpp	ReplaceSwHitFx
@@ -2022,6 +2026,7 @@ address	name	size	file	whole_file	symbol
 0X1585B8	func_001585B8	32	dmas-dzg/dmas_dzg_157fa0.c	dmas-dzg/dmas_dzg_157fa0.c	func_001585B8
 0X1585D8	InitDzg	144	dmas-dzg/InitDzg_file.cpp	dmas-dzg/InitDzg_file.cpp	InitDzg
 0X158958	func_00158958	44	dmas-dzg/InitDzg_file.cpp	dmas-dzg/InitDzg_file.cpp	func_00158958
+0X158988	SolveDzg__FP3DZGiiPP2XPPiPPP2SO	408	dmas-dzg/InitDzg_file.cpp	dmas-dzg/InitDzg_file.cpp	SolveDzg__FP3DZGiiPP2XPPiPPP2SO
 0X158FC0	dzg__static_initialization_and_destruction_0	308	dmas-dzg/InitDzg_file.cpp	dmas-dzg/InitDzg_file.cpp	dzg__static_initialization_and_destruction_0
 0X1590F8	func_001590F8	32	dmas-dzg/InitDzg_file.cpp	dmas-dzg/InitDzg_file.cpp	func_001590F8
 0X159118	InitEmitb	152	dzg-emitter/InitEmitb_file.cpp	dzg-emitter/InitEmitb_file.cpp	InitEmitb
@@ -2041,6 +2046,7 @@ address	name	size	file	whole_file	symbol
 0X15A2B0	func_0015A2B0	16	dzg-emitter/InitEmitb_file.cpp	dzg-emitter/InitEmitb_file.cpp	func_0015A2B0
 0X15AD48	ConvertEmitoPosVec__FP5EMITOP6VECTORT1	240	dzg-emitter/InitEmitb_file.cpp	dzg-emitter/InitEmitb_file.cpp	ConvertEmitoPosVec__FP5EMITOP6VECTORT1
 0X15AE38	CalculateEmitvx__FiP2LMiP6EMITVX	208	dzg-emitter/InitEmitb_file.cpp	dzg-emitter/InitEmitb_file.cpp	CalculateEmitvx
+0X15AF08	ChooseEmitVelocity__FP6EMITVXffP2LMP6VECTORiT4	444	dzg-emitter/InitEmitb_file.cpp	dzg-emitter/InitEmitb_file.cpp	ChooseEmitVelocity__FP6EMITVXffP2LMP6VECTORiT4
 0X15B1B0	EmitRips__FP5EMITBP5EMITGiP6VECTORT3PfT5	632	dzg-emitter/InitEmitb_file.cpp	dzg-emitter/InitEmitb_file.cpp	EmitRips
 0X15BD20	EmitParticles__FiP5EMITBP5EMITG	264	dzg-emitter/InitEmitb_file.cpp	dzg-emitter/InitEmitb_file.cpp	EmitParticles
 0X15BE28	EmitRipsSphere__FP6VECTORT0iP7EMITRIPP5EMITVPP4RIPGP2LO	272	dzg-emitter/InitEmitb_file.cpp	dzg-emitter/InitEmitb_file.cpp	EmitRipsSphere__FP6VECTORT0iP7EMITRIPP5EMITVPP4RIPGP2LO
@@ -2247,6 +2253,7 @@ address	name	size	file	whole_file	symbol
 0X1699E8	func_001699E8	220	new_167320/LoadGlobsetBndTreeFromBrx_file.cpp	new_167320/LoadGlobsetBndTreeFromBrx_file.cpp	func_001699E8
 0X169AC8	func_00169AC8	1004	new_167320/LoadGlobsetBndTreeFromBrx_file.cpp	new_167320/LoadGlobsetBndTreeFromBrx_file.cpp	func_00169AC8
 0X169EB8	CopyGlobDmaChain	324	new_167320/LoadGlobsetBndTreeFromBrx_file.cpp	new_167320/LoadGlobsetBndTreeFromBrx_file.cpp	CopyGlobDmaChain
+0X16C8E0	func_0016C8E0	448	new_167320/LoadGlobsetBndTreeFromBrx_file.cpp	new_167320/LoadGlobsetBndTreeFromBrx_file.cpp	func_0016C8E0
 0X16CAA0	LoadGlobStreamedFromBrx	1240	new_167320/LoadGlobsetBndTreeFromBrx_file.cpp	new_167320/LoadGlobsetBndTreeFromBrx_file.cpp	LoadGlobStreamedFromBrx
 0X16D698	func_0016D698	48	new_167320/LoadGlobsetBndTreeFromBrx_file.cpp	new_167320/LoadGlobsetBndTreeFromBrx_file.cpp	func_0016D698
 0X16D6C8	func_0016D6C8	896	new_167320/LoadGlobsetBndTreeFromBrx_file.cpp	new_167320/LoadGlobsetBndTreeFromBrx_file.cpp	func_0016D6C8
@@ -2465,6 +2472,7 @@ address	name	size	file	whole_file	symbol
 0X17BED0	func_0017BED0	56	hide-puffer/fun_0017bed0.cpp		
 0X17BF08	func_0017BF08	172	hide-puffer/fun_0017bf08.cpp		
 0X17BFB8	func_0017BFB8	60	hide-puffer/fun_0017bfb8.c		
+0X17C3E8	func_0017C3E8	360	hide-puffer/fun_0017c3e8.cpp		
 0X17C550	func_0017C550	228	hide-puffer/fun_0017c550.cpp		
 0X17C638	func_0017C638	56	hide-puffer/fun_0017c638.c		
 0X17C670	func_0017C670	48	hide-puffer/fun_0017c670.c		
@@ -2575,6 +2583,7 @@ address	name	size	file	whole_file	symbol
 0X181728	func_00181728	88	pzo-hide/fun_00181728.cpp		
 0X181780	func_00181780	100	pzo-hide/fun_00181780.cpp		
 0X1817E8	Swarm_Init	88	pzo-hide/Swarm_Init.cpp		
+0X181840	Swarm_PostLoad	412	pzo-hide/Swarm_PostLoad.cpp		
 0X1819E0	Swarm_Reset	176	pzo-hide/Swarm_Reset.cpp		
 0X181A90	SwarmGroup_PlaceRiders	208	pzo-hide/SwarmGroup_PlaceRiders.cpp		
 0X181CB0	SwarmGroup_UpdateTargets	352	pzo-hide/SwarmGroup_UpdateTargets.cpp		
@@ -2747,6 +2756,7 @@ address	name	size	file	whole_file	symbol
 0X1910F8	LoadAttach	176	new_190c58/LoadAttach.cpp		
 0X1928F8	StartAttach	304	new_190c58/StartAttach.cpp		
 0X192A28	ForgetJtGuards	428	new_190c58/ForgetJtGuards.cpp		
+0X1938C0	FAttachGroundTarget	420	new_190c58/FAttachGroundTarget.cpp		
 0X193C98	MatchJtXmgRail__FP2JTP3XMGP6ACTADJ	332	stephide/MatchJtXmgRail__FP2JTP3XMGP6ACTADJ.cpp		
 0X1940B0	SetJtHfdk__FP2JT4HFDK	104	stephide/SetJtHfdk__FP2JT4HFDK.cpp		
 0X194118	ResetJtDynamicTunnel__FP2JT	84	stephide/ResetJtDynamicTunnel__FP2JT.cpp		
@@ -2860,6 +2870,7 @@ address	name	size	file	whole_file	symbol
 0X1A30D0	func_001A30D0	52	ub-light/ub_light_1a3020.cpp	ub-light/ub_light_1a3020.cpp	func_001A30D0
 0X1A3108	func_001A3108	308	ub-light/ub_light_1a3020.cpp	ub-light/ub_light_1a3020.cpp	func_001A3108
 0X1A3240	func_001A3240	32	ub-light/ub_light_1a3020.cpp	ub-light/ub_light_1a3020.cpp	func_001A3240
+0X1A3260	func_001A3260	256	ub-light/fun_001a3260.cpp		
 0X1A3360	InitLight	156	ub-light/InitLight.cpp		
 0X1A3400	PostLightLoad	44	ub-light/PostLightLoad.c		
 0X1A3430	func_001A3430	44	ub-light/fun_001a3430.c		
@@ -2879,6 +2890,7 @@ address	name	size	file	whole_file	symbol
 0X1A3730	FitLinearFunction__FffffPfT4	160	light/FitLinearFunction__FffffPfT4.cpp		
 0X1A37D0	FitRecipFunction__FffffPfT4	216	light/FitRecipFunction__FffffPfT4.cpp		
 0X1A38A8	ConvertAngleStrength__FffffPfT4	188	light/ConvertAngleStrength__FffffPfT4.cpp		
+0X1A3968	RebuildLight	460	light-stepguard/RebuildLight.cpp		
 0X1A3B38	func_001A3B38	72	light-stepguard/fun_001a3b38.cpp		
 0X1A3E88	RemoveLightFromSw	92	light-stepguard/RemoveLightFromSw_file.cpp	light-stepguard/RemoveLightFromSw_file.cpp	RemoveLightFromSw
 0X1A3EE8	func_001A3EE8	140	light-stepguard/RemoveLightFromSw_file.cpp	light-stepguard/RemoveLightFromSw_file.cpp	func_001A3EE8
@@ -2897,6 +2909,7 @@ address	name	size	file	whole_file	symbol
 0X1A53A0	func_001A53A0	64	light-stepguard/fun_001a53a0.c		
 0X1A53E0	func_001A53E0	104	light-stepguard/light_stepguard_1a53e0.cpp	light-stepguard/light_stepguard_1a53e0.cpp	func_001A53E0
 0X1A5448	func_001A5448	48	light-stepguard/light_stepguard_1a53e0.cpp	light-stepguard/light_stepguard_1a53e0.cpp	func_001A5448
+0X1A5478	AddLo	436	light-stepguard/light_stepguard_1a53e0.cpp	light-stepguard/light_stepguard_1a53e0.cpp	AddLo
 0X1A5630	RemoveLo	376	light-stepguard/light_stepguard_1a53e0.cpp	light-stepguard/light_stepguard_1a53e0.cpp	RemoveLo
 0X1A57A8	func_001A57A8	84	light-stepguard/light_stepguard_1a53e0.cpp	light-stepguard/light_stepguard_1a53e0.cpp	func_001A57A8
 0X1A5800	AddLoHierarchy	68	light-stepguard/light_stepguard_1a53e0.cpp	light-stepguard/light_stepguard_1a53e0.cpp	AddLoHierarchy
@@ -3174,6 +3187,7 @@ address	name	size	file	whole_file	symbol
 0X1B4418	GlobalCtorMpeg	32	mpeg/Finish_file.cpp	mpeg/Finish_file.cpp	GlobalCtorMpeg
 0X1B4438	func_001B4438	64	mpeg-memcard/mpeg_memcard_1b4438.cpp	mpeg-memcard/mpeg_memcard_1b4438.cpp	func_001B4438
 0X1B4478	func_001B4478	96	mpeg-memcard/mpeg_memcard_1b4438.cpp	mpeg-memcard/mpeg_memcard_1b4438.cpp	func_001B4478
+0X1B44D8	func_001B44D8	248	mpeg-memcard/mpeg_memcard_1b4438.cpp	mpeg-memcard/mpeg_memcard_1b4438.cpp	func_001B44D8
 0X1B45D0	StaticInitMurray	308	mpeg-memcard/mpeg_memcard_1b4438.cpp	mpeg-memcard/mpeg_memcard_1b4438.cpp	StaticInitMurray
 0X1B4708	GlobalCtorMurray	32	mpeg-memcard/mpeg_memcard_1b4438.cpp	mpeg-memcard/mpeg_memcard_1b4438.cpp	GlobalCtorMurray
 0X1B4728	InitMurray	352	mpeg-memcard/InitMurray.cpp		
@@ -3380,6 +3394,7 @@ address	name	size	file	whole_file	symbol
 0X1C4228	func_001C4228	84	new_1c3df8/fun_001c4228.cpp		
 0X1C4280	VJOY_constructor	100	new_1c3df8/VJOY_constructor.cpp		
 0X1C42E8	ResetVjoy	72	new_1c3df8/ResetVjoy.cpp		
+0X1C4330	UpdateVjoyStick	308	new_1c3df8/UpdateVjoyStick.cpp		
 0X1C4468	UpdateVjoy	320	new_1c3df8/UpdateVjoy.cpp		
 0X1C45A8	UpdateVjoyPressTimes	148	new_1c3df8/UpdateVjoyPressTimes.cpp		
 0X1C4640	SetVjoyMode	28	new_1c3df8/SetVjoyMode.c		
@@ -3692,6 +3707,7 @@ address	name	size	file	whole_file	symbol
 0X1DAA48	GadgetMenu_Reset	44	game-stepguard/GadgetMenu_Reset.c		
 0X1DAA78	GadgetMenu_InitPage	24	game-stepguard/GadgetMenu_InitPage.c		
 0X1DAA90	GadgetMenu_Update	452	game-stepguard/GadgetMenu_Update.cpp		
+0X1DAC58	GadgetMenu_DrawSlotLabels	452	game-stepguard/GadgetMenu_DrawSlotLabels.cpp		
 0X1DAE20	GadgetMenu_PgmeFind	56	game-stepguard/GadgetMenu_PgmeFind.cpp		
 0X1DAE58	FGadgetOnSale	80	game-stepguard/FGadgetOnSale.cpp		
 0X1DAEA8	FGadgetAcquired	144	game-stepguard/FGadgetAcquired.cpp		
@@ -4116,6 +4132,7 @@ address	name	size	file	whole_file	symbol
 0X1F2B20	AddSoGeomsToOxa	136	sm-so/AddSoGeomsToOxa.cpp		
 0X1F2BA8	RemoveSoGeomsFromOxa	136	sm-so/RemoveSoGeomsFromOxa.cpp		
 0X1F2C30	AddSoLoHierarchy	276	sm-so/AddSoLoHierarchy.cpp		
+0X1F2D48	RemoveSoLoHierarchy	304	sm-so/RemoveSoLoHierarchy.cpp		
 0X1F2E78	UpdateSoRoot	356	sm-so/UpdateSoRoot.cpp		
 0X1F2FE0	func_001F2FE0	148	sm-so/fun_001f2fe0.cpp		
 0X1F3078	func_001F3078	156	sm-so/fun_001f3078.cpp		
@@ -4544,6 +4561,7 @@ address	name	size	file	whole_file	symbol
 0X209BC0	PguardanimCurrent	28	step-rwm/PguardanimCurrent.cpp		
 0X209BE0	PguardanimFind	56	step-rwm/PguardanimFind.cpp		
 0X209C18	PguardanimEnsure	112	step-rwm/PguardanimEnsure.cpp		
+0X209C88	func_00209C88	416	step-rwm/fun_00209c88.cpp		
 0X209E28	PostGuardStunCommand	92	step-rwm/PostGuardStunCommand.cpp		
 0X209E88	func_00209E88	84	step-rwm/fun_00209e88.cpp		
 0X209EE0	func_00209EE0	216	step-rwm/fun_00209ee0.cpp		
@@ -5506,7 +5524,10 @@ address	name	size	file	whole_file	symbol
 0X2574F8	func_002574F8	8	bis-memcard/fun_002574f8.c		
 0X257500	func_00257500	8	bis-memcard/fun_00257500.c		
 0X257508	func_00257508	8	bis-memcard/fun_00257508.c		
+0X257510	SweepFrames	356	bis-memcard/SweepFrames.cpp		
+0X257678	SweepVarbs	356	bis-memcard/SweepVarbs.cpp		
 0X2577E0	SweepPairs	356	bis-memcard/SweepPairs.cpp		
+0X257AB0	SweepSidebags	356	bis-memcard/SweepSidebags.cpp		
 0X257D80	PsidebagNew	228	bis-memcard/PsidebagNew.cpp		
 0X257E68	func_00257E68	28	bis-memcard/fun_00257e68.cpp		
 0X257E88	ResetPairHeap	64	bis-memcard/ResetPairHeap.cpp		

@@ -8,14 +8,14 @@ int FVjoyButtonHeld(int, int);
 int GrfbtnJtGadget(BENTLEY136118 *, int);
 void ReleaseBentleyGadget(BENTLEY136118 *);
 void SetBentleyGadgetAnim(BENTLEY136118 *, int);
-void SetJmpState(void);
+void SetJmpState(void *, int, int, int);
 void StickGadgetObj(GADGET136118 *, int);
 }
 #define FIELD136118(type, offset) (*(type *)((char *)pbentley + (offset)))
 void UpdateBentleyGadget(BENTLEY136118 *pbentley)
 {
     int state;
-    do {
+    for (;;) {
         state = FIELD136118(int, 0x16B0);
         if (state == 0) {
             if (FAsegaGone(FIELD136118(int, 0x1030)))
@@ -26,20 +26,21 @@ void UpdateBentleyGadget(BENTLEY136118 *pbentley)
                 int kind = pgadget->kind;
                 if (kind == 2) {
                     StickGadgetObj(pgadget, pgadget->stickArg);
+                    ReleaseBentleyGadget(pbentley);
+                    SetJmpState((char *)pbentley + 0x2C0, 0xB, 0, 0);
+                } else if (kind == 4 || !FVjoyButtonHeld(FIELD136118(int, 0x150), GrfbtnJtGadget(pbentley, *FIELD136118(int *, 0x16B4)) | 0x10)) {
+                    pgadget->vt->fn((char *)pgadget + pgadget->vt->delta, 1);
+                    ReleaseBentleyGadget(pbentley);
+                    SetJmpState((char *)pbentley + 0x2C0, 0xB, 0, 0);
                 } else {
-                    if (kind == 4 || !FVjoyButtonHeld(FIELD136118(int, 0x150), GrfbtnJtGadget(pbentley, **FIELD136118(int **, 0x16B4)) | 0x10)) {
-                        pgadget->vt->fn((char *)pgadget + pgadget->vt->delta, 1);
-                    } else {
-                        if (g_2dded0 - FIELD136118(float, 0x20C) > 0.1f)
-                            SetBentleyGadgetAnim(pbentley, 2);
-                        else
-                            SetBentleyGadgetAnim(pbentley, 1);
-                        continue;
-                    }
+                    if (g_2dded0 - FIELD136118(float, 0x20C) > 0.1f)
+                        SetBentleyGadgetAnim(pbentley, 2);
+                    else
+                        SetBentleyGadgetAnim(pbentley, 1);
                 }
-                ReleaseBentleyGadget(pbentley);
-                SetJmpState();
             }
         }
-    } while (FIELD136118(int, 0x16B0) != state && FIELD136118(int, 0x13D0) == 6);
+        if (FIELD136118(int, 0x16B0) == state || FIELD136118(int, 0x13D0) != 6)
+            break;
+    }
 }
