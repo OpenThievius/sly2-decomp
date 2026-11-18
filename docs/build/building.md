@@ -91,6 +91,24 @@ the judge. Of those, 8 still come from assembly (`build/image/fallbacks.tsv`, an
 - a function's own jump table or literals (`.rodata` of its object, cut at its content: the section is padded to its alignment, a 14-entry table becoming 64 bytes, and the padding would overwrite the retail bytes after it) are linked where the retail image has them: the
   retail rodata is split around that range and the object's section takes its place.
 
+### Whole files with several rodata bases (2026-11-18)
+
+A whole file's own jump tables and literals are linked where retail has them when every hi/lo pair against its `.rodata` agrees on one base
+(`derive_rodata_base`). Retail does not always lay them out that way: the assembly functions between two compiled ones own rodata of
+their own (UpdateJmpBodyState at 0x197500 reads 0x2A6410 and `bevy_player_19c828`'s neighbour reads 0x2A6600, with the assembly
+functions' tables between them), so the pairs give two bases. Such a file is handled as one function with a scrambled layout already is
+(`retarget_rodata`): the object's `.rodata` is linked where nothing is loaded (`.nl_<start>`, NOLOAD), the image keeps retail's rodata bytes,
+and what the code reads is checked instead: every hi/lo pair is given retail's immediates, a string literal must equal retail's string, and
+any other item (a float, a jump table whose relocated words resolve to the file's address plus the addend) must equal retail's bytes from
+that address for the item's own length, up to the next item the code reads. `make_whole_files.py` makes the same check before it writes
+a landed function (`retarget_cause`), so a whole file that lands is one `link_image.py` can link.
+
+The object's rodata is not an own range of the image, so `make objdiff` cannot read it from a linked hole. Instead `retarget_rodata`
+records each item it proved equal to retail (its retail address and length: a string with its NUL, any other item over its checked
+length) and `link_image.py` writes the active ones to `build/image/proved_rodata.json`. `make_objdiff.py` counts those ranges as
+C-owned rodata, like a hole: `matched_data` 343657 to 343857 bytes with UpdateJmpBodyState (its two proved ranges, 96 and 104 bytes;
+padding and items the code does not read stay uncredited).
+
 The ELF container is carried as raw pieces cut from your executable: the header and program headers, the padding, the
 section data outside the loaded segments (overlay tables, `.mdebug`) and the section header table. The code, the VU1
 microcode, the rodata, the data and the IOP modules are the rebuilt image, and the whole file matches the retail SHA-1.

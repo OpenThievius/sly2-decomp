@@ -20,8 +20,8 @@ A work-in-progress, byte-matching decompilation of *Sly 2: Band of Thieves* (Suc
 <!-- progress:begin (scripts/readme_progress.py) -->
 | Version | Code matched | Functions matched | Original assembly, outside the count | C with inline assembly to match |
 | :--- | ---: | ---: | ---: | ---: |
-| NTSC-U `SCUS_973.16` | 73.71% (858060 of 1164172 bytes) | 5604 of 6063 | 766 functions, 238320 bytes | 117 functions, 10.80% |
-| PAL `SCES_525.29` | 71.48% (832128 of 1164172 bytes) | 5509 of 6063 | 766 functions, 238320 bytes | 117 functions, 10.80% |
+| NTSC-U `SCUS_973.16` | 74.41% (866308 of 1164172 bytes) | 5609 of 6063 | 766 functions, 238320 bytes | 115 functions, 10.53% |
+| PAL `SCES_525.29` | 72.19% (840376 of 1164172 bytes) | 5514 of 6063 | 766 functions, 238320 bytes | 115 functions, 10.53% |
 
 A function counts when `make elf` links its C and the image still equals retail byte for byte; for PAL, when the same C also reproduces PAL's code. Permanent blockers that are final (a VU0 or COP0 instruction, hand-written assembly, or a remnant that is not a function: `config/us/blockers.tsv`, [docs/build/vu0-mmi.md](docs/build/vu0-mmi.md)) stay original assembly for good, so they are left out of the totals above: they are neither matched nor unmatched, and the column before the last counts them. Functions with MMI instructions stay in the totals as unmatched until the shared helpers rule on them, and so do the SDK functions that use `$gp` as an ordinary register (kind `gp`) until a ruling on them. Compiled C that needs a shared inline-assembly helper for an instruction GCC cannot emit (`config/us/inline_functions.tsv`, [docs/build/inline-asm-helpers.md](docs/build/inline-asm-helpers.md)) is work to do; the last column counts those not matched yet.
 <!-- progress:end -->

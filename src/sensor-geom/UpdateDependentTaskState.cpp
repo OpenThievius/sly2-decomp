@@ -7,14 +7,14 @@ extern "C" void UpdateDependentTaskState(TASK *ptask, int nStateParent)
 {
     if (ptask->nPending != -1)
         return;
-    int nState = GetState(ptask);
     int nStateOld = GetState(ptask);
-    if (-1 < nStateParent) {
+    int nState = nStateOld;
+    if (nStateParent >= 0) {
         if (nStateParent < 2) {
             nState = 0;
         } else if (nStateParent < 4) {
-            int fAllComplete = 1; int cPrereq = GetCount(ptask);
-            for (int itask = 0; itask < cPrereq; itask++) {
+            int fAllComplete = 1;
+            for (int itask = 0; itask < ptask->cPrereq; itask++) {
                 if (ptask->apPrereq[itask]->nState < 2) {
                     fAllComplete = 0;
                     break;

@@ -1835,6 +1835,7 @@ address	name	size	file	whole_file	symbol
 0X14E148	bevy_camera_cm_14e148	32	new_14d1d0/new_14d1d0_14d470.cpp	new_14d1d0/new_14d1d0_14d470.cpp	bevy_camera_cm_14e148
 0X14E168	SetCmPosMat	60	new_14d1d0/new_14d1d0_14d470.cpp	new_14d1d0/new_14d1d0_14d470.cpp	SetCmPosMat
 0X14E270	BuildCmFgfn__FP2CMfP4FGFN	176	new_14d1d0/new_14d1d0_14d470.cpp	new_14d1d0/new_14d1d0_14d470.cpp	BuildCmFgfn
+0X14E4C8	RevokeCmPolicy__FP2CMi3CPPP5CPLCYP2SOPv	464	new_14d1d0/new_14d1d0_14d470.cpp	new_14d1d0/new_14d1d0_14d470.cpp	RevokeCmPolicy
 0X14E698	CalcCmAdjust__FP2CMP2SOP6CPDEFIP6VECTOR	52	new_14d1d0/new_14d1d0_14d470.cpp	new_14d1d0/new_14d1d0_14d470.cpp	CalcCmAdjust__FP2CMP2SOP6CPDEFIP6VECTOR
 0X14E768	AdjustCmCpdefi__FP2CMP2SOfP6CPDEFI	440	new_14d1d0/new_14d1d0_14d470.cpp	new_14d1d0/new_14d1d0_14d470.cpp	AdjustCmCpdefi__FP2CMP2SOfP6CPDEFI
 0X14E920	ResetCmAdjust__FP2CMP2SOP6CPDEFI	72	new_14d1d0/new_14d1d0_14d470.cpp	new_14d1d0/new_14d1d0_14d470.cpp	ResetCmAdjust__FP2CMP2SOP6CPDEFI
@@ -2203,6 +2204,7 @@ address	name	size	file	whole_file	symbol
 0X1657A8	PostTaskJobEvent	40	sensor-geom/PostTaskJobEvent.c		
 0X1657D0	ApplyTaskState	656	sensor-geom/ApplyTaskState.cpp		
 0X165A60	SetTaskStateCascade	220	sensor-geom/SetTaskStateCascade.cpp		
+0X165B40	UpdateDependentTaskState	228	sensor-geom/UpdateDependentTaskState.cpp		
 0X165C28	func_00165C28	108	unsorted/fun_00165c28.cpp		
 0X165C98	OrderTasks	292	sensor-geom/OrderTasks.cpp		
 0X165DC0	SetSwCurrentJob	40	sensor-geom/SetSwCurrentJob.cpp		
@@ -2763,6 +2765,7 @@ address	name	size	file	whole_file	symbol
 0X1959C0	func_001959C0	60	new_1942f0/fun_001959c0.cpp		
 0X197370	StartJmpDirectionAseg	344	new_1942f0/StartJmpDirectionAseg_file.cpp	new_1942f0/StartJmpDirectionAseg_file.cpp	StartJmpDirectionAseg
 0X1974C8	PmqFirstOxaContact	52	new_1942f0/StartJmpDirectionAseg_file.cpp	new_1942f0/StartJmpDirectionAseg_file.cpp	PmqFirstOxaContact
+0X197500	UpdateJmpBodyState	2708	new_1942f0/StartJmpDirectionAseg_file.cpp	new_1942f0/StartJmpDirectionAseg_file.cpp	UpdateJmpBodyState
 0X199298	func_00199298	364	new_1942f0/StartJmpDirectionAseg_file.cpp	new_1942f0/StartJmpDirectionAseg_file.cpp	func_00199298
 0X19A400	FTimeJtJumpToTarget	160	new_1942f0/StartJmpDirectionAseg_file.cpp	new_1942f0/StartJmpDirectionAseg_file.cpp	FTimeJtJumpToTarget
 0X19AA58	GMeasureJumpRail__FP3MJRf	96	new_1942f0/StartJmpDirectionAseg_file.cpp	new_1942f0/StartJmpDirectionAseg_file.cpp	GMeasureJumpRail__FP3MJRf
@@ -3618,6 +3621,7 @@ address	name	size	file	whole_file	symbol
 0X1D57E0	PopRenderNode	40	new_1d54b8/InitRenderNodeStack_file.cpp	new_1d54b8/InitRenderNodeStack_file.cpp	PopRenderNode
 0X1D6310	RemoveAloFromRenderTree	100	new_1d54b8/InitRenderNodeStack_file.cpp	new_1d54b8/InitRenderNodeStack_file.cpp	RemoveAloFromRenderTree
 0X1D6480	AllocRenderTreeNode	132	new_1d54b8/InitRenderNodeStack_file.cpp	new_1d54b8/InitRenderNodeStack_file.cpp	AllocRenderTreeNode
+0X1D6508	AddSphereToRenderTree	488	new_1d54b8/InitRenderNodeStack_file.cpp	new_1d54b8/InitRenderNodeStack_file.cpp	AddSphereToRenderTree
 0X1D66F0	StaticInitSlotheaps_1d66f0	308	new_1d54b8/InitRenderNodeStack_file.cpp	new_1d54b8/InitRenderNodeStack_file.cpp	StaticInitSlotheaps_1d66f0
 0X1D6828	func_001D6828	32	new_1d54b8/InitRenderNodeStack_file.cpp	new_1d54b8/InitRenderNodeStack_file.cpp	func_001D6828
 0X1D6A90	InitLaunch	112	vec-coin/InitLaunch_file.cpp	vec-coin/InitLaunch_file.cpp	InitLaunch
@@ -4807,6 +4811,7 @@ address	name	size	file	whole_file	symbol
 0X219348	ClearSpriteKeySlots	184	font-break/ClearSpriteKeySlots.cpp		
 0X219FE0	AdvanceSpriteInstance	2484	font-break/AdvanceSpriteInstance.cpp		
 0X21A998	QueueSpriteInstanceSlots	196	font-break/QueueSpriteInstanceSlots.cpp		
+0X21AA60	InitDynamicTextStatics	4360	font-break/InitDynamicTextStatics.cpp		
 0X21BB68	InitDynamicTextStatics_thunk	32	font-break/InitDynamicTextStatics_thunk.c		
 0X21BB88	InitFragile__FP7FRAGILE	72	break/InitFragile_file.cpp	break/InitFragile_file.cpp	InitFragile__FP7FRAGILE
 0X21BBD0	func_0021BBD0	56	break/InitFragile_file.cpp	break/InitFragile_file.cpp	func_0021BBD0

@@ -118,7 +118,6 @@ address	name	size	file	score
 0X14DC58	UpdateCmMat4	936	cm_14d478/UpdateCmMat4.cpp	96
 0X14E1A8	SetCmLookAt	200	font-cm/SetCmLookAt.cpp	6
 0X14E328	SetCmPolicy__FP2CM3CPPP5CPLCYP2SOPv	416	cm_14e270/SetCmPolicy__FP2CM3CPPP5CPLCYP2SOPv.cpp	9
-0X14E4C8	RevokeCmPolicy__FP2CMi3CPPP5CPLCYP2SOPv	464	cm_14e270/RevokeCmPolicy__FP2CMi3CPPP5CPLCYP2SOPv.c	109
 0X14E6D0	SpringCm__FfffP2CMP6VECTORP6VECTORP6VECTOR	152	cm_14e270/SpringCm__FfffP2CMP6VECTORP6VECTORP6VECTOR.c	38
 0X14E968	GetCmCpdefi__FP2CMP2SOfP6CPDEFI	160	cm_14e270/GetCmCpdefi__FP2CMP2SOfP6CPDEFI.c	26
 0X14EA08	FFindCmClearInterval	360	cm_14e270/FFindCmClearInterval.cpp	52
@@ -133,7 +132,7 @@ address	name	size	file	score
 0X14F898	FInsideCmMrd	152	cm_14e270/FInsideCmMrd.c	20
 0X14FE58	PosCplookAnchor	112	tn-rip/PosCplookAnchor.c	28
 0X14FEC8	PosCplookEye	112	tn-rip/PosCplookEye.c	18
-0X14FF38	ActivateCplook	552	tn-rip/ActivateCplook.cpp	10
+0X14FF38	ActivateCplook	552	tn-rip/ActivateCplook.cpp	7
 0X151340	bevy_camera_looks_update	720	tn-rip/bevy_camera_looks_update.c	179
 0X151700	bevy_camera_policy_update	456	tn-rip/bevy_camera_policy_update.c	140
 0X151950	UpdateCpattach	672	rip/UpdateCpattach.c	161
@@ -170,7 +169,6 @@ address	name	size	file	score
 0X163460	SaveJobVariables	320	new_161458/SaveJobVariables.cpp	23
 0X1643B0	SaveTaskVariables	544	sensor-geom/SaveTaskVariables.cpp	32
 0X164DF0	SetTaskState	808	sensor-geom/SetTaskState.cpp	77
-0X165B40	UpdateDependentTaskState	232	sensor-geom/UpdateDependentTaskState.cpp	15
 0X165E38	StartGameFromSave	464	sensor-geom/StartGameFromSave.cpp	38
 0X166428	TransformPoints	120	sensor-geom/TransformPoints.c	24
 0X167B68	BindGlobset	568	new_167320/BindGlobset.cpp	65
@@ -211,7 +209,7 @@ address	name	size	file	score
 0X17C6D0	func_0017C6D0	600	hide-puffer/fun_0017c6d0.cpp	124
 0X17CB80	PresetPuffcAccel__FP5PUFFCf	384	puffer_17cb80/PresetPuffcAccel__FP5PUFFCf.cpp	46
 0X17CF10	func_0017CF10	328	new_17cd00/fun_0017cf10.c	49
-0X17D6C8	GoalGoto_Update	480	new_17cd00/GoalGoto_Update.cpp	6
+0X17D6C8	GoalGoto_Update	480	new_17cd00/GoalGoto_Update.cpp	2
 0X17DA28	GoalGoto_Replan	656	new_17cd00/GoalGoto_Replan.c	156
 0X17DE50	func_0017DE50	656	new_17dd70/fun_0017de50.cpp	5
 0X17E0E0	func_0017E0E0	408	new_17dd70/fun_0017e0e0.c	94
@@ -270,10 +268,9 @@ address	name	size	file	score
 0X194F70	UpdateSwTargetList	1016	new_1942f0/UpdateSwTargetList.cpp	54
 0X195368	EmitTargetSparkles	672	new_1942f0/EmitTargetSparkles.cpp	43
 0X195A00	SetJmpState	1464	new_1942f0/SetJmpState.c	289
-0X195FB8	SetJmpBodyState	2416	new_1942f0/SetJmpBodyState.c	356
+0X195FB8	SetJmpBodyState	2416	new_1942f0/SetJmpBodyState.cpp	60
 0X196928	DtSolveJumpLaunch	384	new_1942f0/DtSolveJumpLaunch.cpp	12
 0X196AA8	LimitJmpAccelByContacts	848	new_1942f0/LimitJmpAccelByContacts.c	219
-0X197500	UpdateJmpBodyState	2712	new_1942f0/UpdateJmpBodyState.c	561
 0X1991A0	func_001991A0	248	new_1942f0/fun_001991a0.c	54
 0X1995D8	BuildJmpEdgeProbes	512	jump/BuildJmpEdgeProbes.c	123
 0X1997D8	FCheckJtEdgeNormal__FP2JTP6VECTORT1	504	jump/FCheckJtEdgeNormal__FP2JTP6VECTORT1.cpp	39
@@ -421,8 +418,7 @@ address	name	size	file	score
 0X1D0EB8	ProjectBubletTransform__FP6BUBLETf	560	rip_1cf0a0/ProjectBubletTransform__FP6BUBLETf.c	115
 0X1D19A8	UpdateVehicle	1960	rip-rumble/UpdateVehicle.cpp	22
 0X1D2490	func_001D2490	384	rip-rumble/fun_001d2490.c	86
-0X1D54B8	StoreAudioModeInSave	256	new_1d54b8/StoreAudioModeInSave.cpp	11
-0X1D6508	AddSphereToRenderTree	488	new_1d54b8/AddSphereToRenderTree.cpp	2
+0X1D54B8	StoreAudioModeInSave	256	new_1d54b8/StoreAudioModeInSave.cpp	9
 0X1D6848	FCalculateMuzzleVelocity__FP6VECTORT0fT0P2SO	424	vec_1d6848/FCalculateMuzzleVelocity__FP6VECTORT0fT0P2SO.c	96
 0X1D69F0	VelBallistic	160	vec-coin/VelBallistic.c	38
 0X1D6B00	LaunchSoAtTarget	1504	vec-coin/LaunchSoAtTarget.c	322
@@ -548,7 +544,6 @@ address	name	size	file	score
 0X218790	CombineColorTransforms	288	font-break/CombineColorTransforms.cpp	10
 0X219190	ApplySpriteKeySounds	440	font-break/ApplySpriteKeySounds.cpp	23
 0X219400	PlaceSpriteKeyCharacters	3040	font-break/PlaceSpriteKeyCharacters.cpp	265
-0X21AA60	InitDynamicTextStatics	4360	font-break/InitDynamicTextStatics.c	1379
 0X21BC08	func_0021BC08	272	break-text/fun_0021bc08.cpp	17
 0X21C1C8	func_0021C1C8	376	break-text/fun_0021c1c8.c	39
 0X21C340	func_0021C340	696	break-text/fun_0021c340.c	211
@@ -645,7 +640,7 @@ address	name	size	file	score
 0X2407A8	sceGsSetDefDBuff	664	sdk/sceGsSetDefDBuff.c	70
 0X240C38	sceGsSetDefDispEnv	888	sdk/sceGsSetDefDispEnv.cpp	126
 0X2418C8	func_002418C8	168	sdk/fun_002418c8.cpp	77
-0X241B18	func_00241B18	160	sdk/fun_00241b18.cpp	9
+0X241B18	func_00241B18	160	sdk/fun_00241b18.c	6
 0X241BB8	func_00241BB8	88	sdk/fun_00241bb8.cpp	19
 0X241C98	func_00241C98	344	sdk/fun_00241c98.cpp	60
 0X241F98	func_00241F98	344	sdk/fun_00241f98.cpp	60

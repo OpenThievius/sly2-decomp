@@ -7,10 +7,11 @@ CRef *CRef_CopyConstruct(CRef *, CRef *);
 void CRef_Destruct(CRef *);
 }
 struct CRef {
-    int n;
     int tagk;
+    int n;
     int pad[2];
-    CRef(int tag, int value) { tagk = tag; n = value; }
+    CRef(int tag, int value) { n = value; tagk = tag; }
+    CRef(int value) { n = value; tagk = 0x17; }
     CRef(CRef &other) { CRef_CopyConstruct(this, &other); }
     ~CRef() { CRef_Destruct(this); }
 };
@@ -43,13 +44,13 @@ extern "C" void StoreAudioModeInSave(void)
     case 2: {
         SAVE *save = &B_003D4A60;
         int path = B_003E0FD8;
-        CRef mode(0x17, 0);
+        CRef mode(0);
         SetGameSaveValue(path, mode, save);
         break;
     }
     case 3: {
         int path = B_003E0FD8;
-        CRef mode(0x17, 1);
+        CRef mode(1);
         SetGameSaveValue(path, mode, &B_003D4A60);
         break;
     }
