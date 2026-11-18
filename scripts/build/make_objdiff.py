@@ -283,6 +283,14 @@ def owned_rodata(kind='rodata'):
         size = sizes.get(label)
         if size:
             found.append((address, image_bytes[address - 0x100000:address - 0x100000 + size]))
+    if kind == 'rodata':
+        # the items of a whole file with several rodata bases (link_image.py retarget_rodata): its object's rodata stays out of the image, but
+        # each item its code reads was proved equal to retail's bytes, so those ranges count as matched
+        proved_path = os.path.join('build', 'image', 'proved_rodata.json')
+        if os.path.isfile(proved_path):
+            with open(proved_path) as handle:
+                for address, length in json.load(handle):
+                    found.append((address, image_bytes[address - 0x100000:address - 0x100000 + length]))
     return sorted(found)
 
 def data_symbols(address, size, owned):

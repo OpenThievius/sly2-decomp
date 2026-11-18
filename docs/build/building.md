@@ -103,9 +103,11 @@ any other item (a float, a jump table whose relocated words resolve to the file'
 that address for the item's own length, up to the next item the code reads. `make_whole_files.py` makes the same check before it writes
 a landed function (`retarget_cause`), so a whole file that lands is one `link_image.py` can link.
 
-The cost is a report number: rodata of such a file is no longer an object's own range, so `make objdiff` counts it as assembly data again
-(`matched_data` 343761 to 343657 bytes with UpdateJmpBodyState). The bytes are checked, not credited. A later split of the object's rodata
-into one hole per base would give the credit back.
+The object's rodata is not an own range of the image, so `make objdiff` cannot read it from a linked hole. Instead `retarget_rodata`
+records each item it proved equal to retail (its retail address and length: a string with its NUL, any other item over its checked
+length) and `link_image.py` writes the active ones to `build/image/proved_rodata.json`. `make_objdiff.py` counts those ranges as
+C-owned rodata, like a hole: `matched_data` 343657 to 343857 bytes with UpdateJmpBodyState (its two proved ranges, 96 and 104 bytes;
+padding and items the code does not read stay uncredited).
 
 The ELF container is carried as raw pieces cut from your executable: the header and program headers, the padding, the
 section data outside the loaded segments (overlay tables, `.mdebug`) and the section header table. The code, the VU1
