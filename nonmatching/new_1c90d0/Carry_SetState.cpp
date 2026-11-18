@@ -10,9 +10,9 @@ struct CARRY {
     int nState; float tState;
 };
 extern "C" {
-void func_0012E460(void);
+void func_0012E460(void *);
 int FIsBasicDerivedFrom(void *, int);
-QW PosLoWorld(void *, int);
+QW PosLoWorld(void *);
 void FindCrvClosestPointAll(void *, QW, void *, void *, void *, void *, float *);
 LOB *func_001CCA40(JT *, LOB *);
 QW GetXfDofValue(void *, void *);
@@ -26,28 +26,23 @@ extern const UL g_2a77c8;
 
 void Carry_SetState(CARRY *carry, int state)
 {
-    if (state == carry->nState) return;
-    if (carry->nState == 1) {
-        func_0012E460();
-        func_0012E460();
+    int old = carry->nState;
+    if (state == old) return;
+    int next = state;
+    carry->nState = next;
+    if (old == 1) {
+        func_0012E460(&carry->pactGoalPos);
+        func_0012E460(&carry->pactGoalRot);
     }
     carry->tState = g_2dded0;
-    carry->nState = state;
-    switch (state) {
-    case -1:
-        carry->nKind = state;
-        func_0012E460();
-        carry->ploTarget = 0;
-        carry->ploTargetGiven = 0;
-        carry->sPath = 0.0f;
-        break;
+    switch (next) {
     case 0:
     case 1: {
         LOB *given = carry->ploTargetGiven;
         carry->nKind = 1;
         carry->ploTarget = given;
         if (FIsBasicDerivedFrom(given, 10)) {
-            QW pos = PosLoWorld(carry->pjt, state);
+            QW pos = PosLoWorld(carry->pjt);
             FindCrvClosestPointAll(carry->ploTargetGiven, pos, 0, 0, 0, 0, &carry->sPath);
             carry->nKind = 0;
         } else if (FIsBasicDerivedFrom(carry->ploTargetGiven, 0x14) && (carry->ploTargetGiven->flags & carry->pjt->grfTargetMask)) {
@@ -69,5 +64,12 @@ void Carry_SetState(CARRY *carry, int state)
         QueueSwCallbackOnce(B_003DD490, carry->pjt, g_2a77c8.v, carry);
         break;
     }
+    case -1:
+        carry->nKind = next;
+        func_0012E460(&carry->pactLook);
+        carry->ploTarget = 0;
+        carry->ploTargetGiven = 0;
+        carry->sPath = 0.0f;
+        break;
     }
 }

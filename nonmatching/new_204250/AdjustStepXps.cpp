@@ -1,100 +1,91 @@
-typedef signed char s8; typedef short s16; typedef int s32; typedef long s64;
-typedef unsigned char u8; typedef unsigned short u16; typedef unsigned int u32; typedef unsigned long u64;
-typedef float f32; typedef double f64; typedef int s128 __attribute__((mode(TI)));
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
-extern "C" {
-struct _m2c_stack_AdjustStepXps {
-    /* 0x00 */ char pad0[0x20];
-};                                                  /* size = 0x20 */
-M2C_UNK FreeSwMqList__FP2SWP2MQ(M2C_UNK *); /* extern */
-M2C_UNK func_001F4F10();                            /* extern */
-extern M2C_UNK B_003DD490;
-extern f32 g_2dded0;
-void AdjustStepXps(s8 *arg0) {
-    f32 temp_f0;
-    f32 var_f1;
-    s32 var_v0;
-    s32 var_v0_2;
-    s8 **var_a2;
-    s8 **var_a2_2;
-    s8 **var_a3;
-    s8 *var_a0;
-    s8 *var_a1;
-    s8 *var_t1;
-    s8 *var_v1;
-    func_001F4F10();
-    var_f1 = 3.4028235e38f;
-    var_t1 = NULL;
-    var_a2 = M2C_FIELD(M2C_FIELD(arg0, s8 **, 0xEC), s8 ***, 0x64);
-loop_1:
-    if (var_a2 == NULL) {
-        var_v1 = M2C_FIELD(M2C_FIELD(arg0, s8 **, 0xEC), s8 **, 0x68);
-    } else {
-        var_v1 = M2C_FIELD(var_a2, s8 **, 0);
-    }
-    if (var_v1 != NULL) {
-        s32 hoisted_2 = M2C_FIELD(var_v1, s32 *, 0x9C);
-        var_v0 = hoisted_2;
-loop_8:
-        if (var_v0 == 0xE) {
-            temp_f0 = M2C_FIELD(var_v1, f32 *, 0x90);
-            if (temp_f0 < var_f1) {
-                var_f1 = temp_f0;
-                var_t1 = var_v1;
+#include "sly2.h"
+struct AdjustStepXpsNode;
+struct AdjustStepXpsLink {
+    AdjustStepXpsNode *head;
+    AdjustStepXpsLink *next;
+    AdjustStepXpsNode **outHead;
+};
+struct AdjustStepXpsSet {
+    char pad0[0x64];
+    AdjustStepXpsLink *links;
+    AdjustStepXpsNode *firstNode;
+};
+struct AdjustStepXpsNode {
+    char pad0[0x8];
+    int owner;
+    void *ownerStep;
+    char pad1[0x40 - 0x10];
+    void *alternate;
+    char pad2[0x50 - 0x48];
+    QW quad;
+    char pad3[0x90 - 0x60];
+    float value;
+    char pad4[0x9C - 0x94];
+    int kind;
+    char pad5[0xAC - 0xA0];
+    AdjustStepXpsNode *next;
+};
+struct AdjustStep {
+    char pad0[0xEC];
+    AdjustStepXpsSet *set;
+    char pad1[0x208 - 0xF0];
+    AdjustStepXpsNode *chosen;
+    float chosenScale;
+    char pad2[0x230 - 0x210];
+    QW chosenQuad;
+};
+extern "C" void func_001F4F10(void *);
+extern "C" void FreeSwMqList__FP2SWP2MQ(void *);
+extern "C" float g_2dded0;
+extern "C" char B_003DD490[];
+
+extern "C" void AdjustStepXps(AdjustStep *step)
+{
+    func_001F4F10(step);
+    float bestValue = 3.4028235e38f;
+    AdjustStepXpsNode *best = 0;
+    AdjustStepXpsLink *link = step->set->links;
+    for (;;) {
+        AdjustStepXpsNode *node = link ? link->head : step->set->firstNode;
+        for (; node; node = node->next) {
+            if (node->kind == 0xE && node->value < bestValue) {
+                bestValue = node->value;
+                best = node;
             }
         }
-        var_v1 = M2C_FIELD(var_v1, s8 **, 0xAC);
-        if (var_v1 != NULL) {
-            var_v0 = hoisted_2;
-            goto loop_8;
+        if (!link)
+            break;
+        link = link->next;
+    }
+    step->chosen = best;
+    if (best) {
+        step->chosenScale = g_2dded0;
+        step->chosenQuad = best->quad;
+    }
+    AdjustStepXpsNode *removed = 0;
+    link = step->set->links;
+    for (;;) {
+        AdjustStepXpsNode **slot = link ? &link->head : &step->set->firstNode;
+        AdjustStepXpsNode *node = *slot;
+        while (node) {
+            AdjustStepXpsNode *endpoint = node->owner != (int)step ? (AdjustStepXpsNode *)node->alternate : node;
+            if (endpoint->ownerStep != step)
+                slot = &node->next;
+            else if (node->kind != 0xE)
+                slot = &node->next;
+            else if (node == best)
+                slot = &node->next;
+            else {
+                *slot = node->next;
+                node->next = removed;
+                removed = node;
+            }
+            node = *slot;
         }
+        if (!link)
+            break;
+        *link->outHead = link->head;
+        link = link->next;
     }
-    if (var_a2 != NULL) {
-        var_a2 = M2C_FIELD(var_a2, s8 ***, 4);
-        goto loop_1;
-    }
-    M2C_FIELD(arg0, s8 **, 0x208) = var_t1;
-    if (var_t1 != NULL) {
-        M2C_FIELD(arg0, f32 *, 0x20C) = (f32) g_2dded0;
-        M2C_FIELD(arg0, s128 *, 0x230) = (s128) M2C_FIELD(var_t1, s128 *, 0x50);
-    }
-    var_a1 = NULL;
-    var_a2_2 = M2C_FIELD(M2C_FIELD(arg0, s8 **, 0xEC), s8 ***, 0x64);
-loop_19:
-    var_a3 = var_a2_2;
-    if (var_a2_2 == NULL) {
-        var_a3 = (s8 **)(M2C_FIELD(arg0, s8 **, 0xEC) + 0x68);
-    }
-    var_a0 = *var_a3;
-    if (var_a0 != NULL) {
-        var_v0_2 = M2C_FIELD(var_a0, s32 *, 8);
-loop_23:
-        if (M2C_FIELD((var_a0 + (((s32) (s32)arg0 != var_v0_2) << 6)), s32 *, 0xC) != (s32)arg0) {
-            var_a3 = (s8 **)(var_a0 + 0xAC);
-        } else if (M2C_FIELD(var_a0, s32 *, 0x9C) != 0xE) {
-            var_a3 = (s8 **)(var_a0 + 0xAC);
-        } else if (var_a0 == var_t1) {
-            var_a3 = (s8 **)(var_a0 + 0xAC);
-        } else {
-            *var_a3 = M2C_FIELD(var_a0, s8 **, 0xAC);
-            M2C_FIELD(var_a0, s8 **, 0xAC) = var_a1;
-            var_a1 = var_a0;
-        }
-        var_a0 = *var_a3;
-        if (var_a0 != NULL) {
-            var_v0_2 = M2C_FIELD(var_a0, s32 *, 8);
-            goto loop_23;
-        }
-    }
-    if (var_a2_2 != NULL) {
-        *M2C_FIELD(var_a2_2, s32 **, 8) = (int)(M2C_FIELD(var_a2_2, s8 **, 0));
-        var_a2_2 = M2C_FIELD(var_a2_2, s8 ***, 4);
-        goto loop_19;
-    }
-    FreeSwMqList__FP2SWP2MQ(&B_003DD490);
-}
+    FreeSwMqList__FP2SWP2MQ(B_003DD490);
 }

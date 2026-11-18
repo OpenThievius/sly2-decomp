@@ -1,58 +1,60 @@
-typedef signed char s8; typedef short s16; typedef int s32; typedef long s64;
-typedef unsigned char u8; typedef unsigned short u16; typedef unsigned int u32; typedef unsigned long u64;
-typedef float f32; typedef double f64; typedef int s128 __attribute__((mode(TI)));
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
+// SPDX-License-Identifier: GPL-3.0-or-later
+struct PAD {
+    char unknown_0x0[0x1C];
+    float stick;
+};
+struct MURRAY_ATTACK {
+    char unknown_0x0[0x150];
+    PAD *ppad;
+    char unknown_0x154[0xEDC];
+    void *pasega;
+    char unknown_0x1034[0x7DC];
+    int state;
+    char unknown_0x1814[0x8];
+    int fAttacking;
+};
 extern "C" {
-struct _m2c_stack_UpdateMurrayAttack {
-    /* 0x00 */ char pad0[0x70];
-};                                                  /* size = 0x70 */
-M2C_UNK EndMurrayAttack(s8 *);                    /* extern */
-s32 FAsegaGone(s32);                                /* extern */
-s32 FButtonPressedWithin(s8 *, M2C_UNK, f32); /* extern */
-s32 FMurrayAttackCanChain(s8 *);                  /* extern */
-s32 FMurrayTryGrabGuard(s8 *);                    /* extern */
-M2C_UNK SetMurrayAttackState(s8 *, s32);          /* extern */
-M2C_UNK SetMurrayState(s8 *, M2C_UNK);            /* extern */
-void UpdateMurrayAttack(s8 *arg0) {
-    s32 temp_a0;
-    s32 temp_s1;
-    s32 temp_v0;
-    s32 temp_v1;
-loop_1:
-    temp_a0 = M2C_FIELD(arg0, s32 *, 0x1030);
-    temp_s1 = M2C_FIELD(arg0, s32 *, 0x1810);
-    if (temp_a0 != 0) {
-        if (FAsegaGone(temp_a0) == 0) {
-            temp_v1 = M2C_FIELD(arg0, s32 *, 0x1810);
-            if (temp_v1 >= 0) {
-                if (temp_v1 >= 2) {
-                    if (temp_v1 < 4) {
-                        if ((FMurrayAttackCanChain(arg0) != 0) && (FButtonPressedWithin(M2C_FIELD(arg0, s8 **, 0x150), 0x10, 0x3E800000) != 0)) {
-                            SetMurrayAttackState(arg0, ((M2C_FIELD(arg0, s32 *, 0x1810) ^ 2) != 0) ? 2 : 3);
-                        } else if (((FMurrayAttackCanChain(arg0) == 0) || (FMurrayTryGrabGuard(arg0) == 0)) && (M2C_FIELD(arg0, s32 *, 0x181C) != 0) && (M2C_FIELD(M2C_FIELD(arg0, s8 **, 0x150), f32 *, 0x1C) > 0.0f)) {
-                            EndMurrayAttack(arg0);
-                        }
-                    }
-                } else if ((FMurrayAttackCanChain(arg0) != 0) && (FButtonPressedWithin(M2C_FIELD(arg0, s8 **, 0x150), 0x80, 0x3E800000) != 0)) {
-                    SetMurrayAttackState(arg0, M2C_FIELD(arg0, s32 *, 0x1810) == 0);
-                } else if (((FMurrayAttackCanChain(arg0) == 0) || (FMurrayTryGrabGuard(arg0) == 0)) && (M2C_FIELD(arg0, s32 *, 0x181C) != 0) && (M2C_FIELD(M2C_FIELD(arg0, s8 **, 0x150), f32 *, 0x1C) > 0.0f)) {
-                    EndMurrayAttack(arg0);
-                }
-            }
+int FAsegaGone(void *);
+int FButtonPressedWithin(PAD *, int, float);
+int FMurrayAttackCanChain(MURRAY_ATTACK *);
+int FMurrayTryGrabGuard(MURRAY_ATTACK *);
+void SetMurrayAttackState(MURRAY_ATTACK *, int);
+void SetMurrayState(MURRAY_ATTACK *, int);
+void EndMurrayAttack(MURRAY_ATTACK *);
+
+void UpdateMurrayAttack(MURRAY_ATTACK *murray)
+{
+    int statePrevious;
+    for (;;) {
+        statePrevious = murray->state;
+        if (murray->pasega == 0 || FAsegaGone(murray->pasega) != 0) {
+            SetMurrayState(murray, 0);
         } else {
-            goto block_5;
+            switch (murray->state) {
+            case 0:
+            case 1: {
+                    if (FMurrayAttackCanChain(murray) && FButtonPressedWithin(murray->ppad, 0x80, 0.25f)) {
+                        SetMurrayAttackState(murray, murray->state == 0);
+                    } else if ((!FMurrayAttackCanChain(murray) || !FMurrayTryGrabGuard(murray)) && murray->fAttacking != 0
+                               && murray->ppad->stick > 0.0f) {
+                        EndMurrayAttack(murray);
+                    }
+                break;
+            }
+            case 2:
+            case 3: {
+                    if (FMurrayAttackCanChain(murray) && FButtonPressedWithin(murray->ppad, 0x10, 0.25f)) {
+                        SetMurrayAttackState(murray, murray->state == 2 ? 3 : 2);
+                    } else if ((!FMurrayAttackCanChain(murray) || !FMurrayTryGrabGuard(murray)) && murray->fAttacking != 0
+                               && murray->ppad->stick > 0.0f) {
+                        EndMurrayAttack(murray);
+                    }
+                break;
+            }
+            }
         }
-    } else {
-block_5:
-        SetMurrayState(arg0, 0);
-    }
-    temp_v0 = M2C_FIELD(arg0, s32 *, 0x1810);
-    if ((temp_v0 != temp_s1) && (temp_v0 != -1)) {
-        goto loop_1;
+        if (murray->state == statePrevious || murray->state == -1)
+            break;
     }
 }
 }

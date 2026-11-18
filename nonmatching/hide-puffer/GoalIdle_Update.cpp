@@ -1,71 +1,66 @@
-typedef signed char s8; typedef short s16; typedef int s32; typedef long s64;
-typedef unsigned char u8; typedef unsigned short u16; typedef unsigned int u32; typedef unsigned long u64;
-typedef float f32; typedef double f64; typedef int s128 __attribute__((mode(TI)));
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
+#include "sly2.h"
+struct GOAL_IDLE {
+    char pad0[0x10];
+    int guard;
+    char pad1[0x18 - 0x14];
+    int script;
+    char pad2[0x30 - 0x1C];
+    float timer30;
+    float value34;
+    int state;
+    char pad3[0x40 - 0x3C];
+    int pause40;
+};
 extern "C" {
-struct _m2c_stack_GoalIdle_Update {
-    /* 0x00 */ char pad0[0x80];
-};                                                  /* size = 0x80 */
-s32 FGuardScriptDone(s32);                          /* extern */
-M2C_UNK GoalIdle_SetState(s8 *, M2C_UNK);         /* extern */
-M2C_UNK func_001EEF98();                            /* extern */
-s32 func_001EF0A8(void);                          /* extern */
-s32 func_00209098(s32);                             /* extern */
-extern f32 g_2dded0;
-void GoalIdle_Update(s8 *arg0) {
-    s32 temp_s1;
-    s32 temp_s2;
+int FGuardScriptDone(int);
+void GoalIdle_SetState(GOAL_IDLE *, int);
+void func_001EEF98(void);
+int func_001EF0A8(void);
+int func_00209098(int);
+extern float g_2dded0;
+void GoalIdle_Update(GOAL_IDLE *self)
+{
     func_001EEF98();
-    temp_s2 = func_00209098(M2C_FIELD(arg0, s32 *, 0x10));
-loop_24:
-    if (func_001EF0A8() == 0) {
-        temp_s1 = M2C_FIELD(arg0, s32 *, 0x38);
-        switch (temp_s1) {                          /* irregular */
+    int canAlert = func_00209098(self->guard);
+    while (func_001EF0A8() == 0) {
+        int previousState = self->state;
+        switch (previousState) {
         case 1:
-            if (temp_s2 == 0) {
-                if (M2C_FIELD(arg0, f32 *, 0x34) < g_2dded0) {
-                    GoalIdle_SetState(arg0, 0);
-                }
+            if (canAlert == 0) {
+                if (g_2dded0 > self->value34)
+                    GoalIdle_SetState(self, 0);
             } else {
-block_15:
-                GoalIdle_SetState(arg0, 3);
+                GoalIdle_SetState(self, 3);
             }
             break;
         case 2:
-            if (temp_s2 != 0) {
-                goto block_15;
-            }
+            if (canAlert != 0)
+                GoalIdle_SetState(self, 3);
             break;
         case 0:
-            if (temp_s2 != 0) {
-                goto block_15;
-            }
-            if (!(M2C_FIELD(arg0, f32 *, 0x30) < g_2dded0)) {
-                if (FGuardScriptDone(M2C_FIELD(arg0, s32 *, 0x18)) != 0) {
-                    M2C_FIELD(arg0, s32 *, 0x40) = 0;
-                    GoalIdle_SetState(arg0, 2);
+            if (canAlert != 0) {
+                GoalIdle_SetState(self, 3);
+            } else if (!(g_2dded0 > self->timer30)) {
+                if (FGuardScriptDone(self->script) != 0) {
+                    self->pause40 = 0;
+                    GoalIdle_SetState(self, 2);
                 }
             } else {
-block_21:
-                GoalIdle_SetState(arg0, 1);
+                GoalIdle_SetState(self, 1);
             }
             break;
         case 3:
-            if (temp_s2 == 0) {
-                if (M2C_FIELD(arg0, s32 *, 0x40) != 0) {
-                    goto block_21;
+            if (canAlert == 0) {
+                if (self->pause40 != 0) {
+                    GoalIdle_SetState(self, 1);
+                } else {
+                    GoalIdle_SetState(self, 2);
                 }
-                GoalIdle_SetState(arg0, 2);
             }
             break;
         }
-        if (M2C_FIELD(arg0, s32 *, 0x38) != temp_s1) {
-            goto loop_24;
-        }
+        if (self->state == previousState)
+            break;
     }
 }
 }

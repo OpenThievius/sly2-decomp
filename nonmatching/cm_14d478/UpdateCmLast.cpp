@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 struct Policy;
 struct Pso;
 struct VTE { short delta; short index; void (*fn)(void *, void *, void *); };
@@ -32,37 +33,32 @@ extern float B_FLT_002DDEE0;
 
 extern "C" void UpdateCmLast(CM *pcm)
 {
-    if (pcm->ccpr > 0) {
+    Policy *pcplcyPrev = 0;
+    Pso *psoDone = 0;
+    while (pcm->ccpr > 0) {
         Policy *pcplcy = pcm->pcplcy;
-        Policy *pcplcyPrev = 0;
-        Pso *psoDone = 0;
-        if (pcplcy != 0) {
-            do {
-                Pso *pso = pcm->psoFocus;
-                void *pcpdefi;
-                if (pso != 0) {
-                    pcpdefi = pcm->cpdefi;
-                    if (pso != psoDone) {
-                        pso->vtable->fn((char *)pso + pso->vtable->delta, pcpdefi);
-                        if (pcplcyPrev != 0 || pso != pcm->psoCpdefi)
-                            ResetCmAdjust__FP2CMP2SOP6CPDEFI(pcm, pcpdefi);
-                        AdjustCmCpdefi__FP2CMP2SOfP6CPDEFI(pcm, pso, pcpdefi);
-                        pcm->psoCpdefi = pso;
-                        psoDone = pso;
-                    }
-                } else {
-                    pcm->psoCpdefi = 0;
-                    pcpdefi = 0;
-                    psoDone = 0;
-                }
-                VTE *entry = &pcplcy->vtable->entry;
-                void *pad = &B_002DFC00;
-                if (!(g_2dfbc0 & 1))
-                    pad = &B_002E0D00;
-                pcplcyPrev = pcplcy;
-                entry->fn((char *)pcplcy + entry->delta, pcpdefi, pad);
-            } while (pcm->ccpr > 0 && (pcplcy = pcm->pcplcy) != pcplcyPrev);
+        if (pcplcy == pcplcyPrev)
+            break;
+        Pso *pso = pcm->psoFocus;
+        void *pcpdefi;
+        if (pso != 0) {
+            pcpdefi = pcm->cpdefi;
+            if (pso != psoDone) {
+                pso->vtable->fn((char *)pso + pso->vtable->delta, pcpdefi);
+                if (pcplcyPrev != 0 || pso != pcm->psoCpdefi)
+                    ResetCmAdjust__FP2CMP2SOP6CPDEFI(pcm, pcpdefi);
+                AdjustCmCpdefi__FP2CMP2SOfP6CPDEFI(pcm, pso, pcpdefi);
+                pcm->psoCpdefi = pso;
+                psoDone = pso;
+            }
+        } else {
+            pcm->psoCpdefi = 0;
+            pcpdefi = 0;
+            psoDone = 0;
         }
+        VTE *entry = &pcplcy->vtable->entry;
+        pcplcyPrev = pcplcy;
+        entry->fn((char *)pcplcy + entry->delta, pcpdefi, (g_2dfbc0 & 1) ? (void *)&B_002DFC00 : (void *)&B_002E0D00);
     }
     if (pcm->fCut != 0) {
         SetCmFov(pcm, pcm->radFovTarget);

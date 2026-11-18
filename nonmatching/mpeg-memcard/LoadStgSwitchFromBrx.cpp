@@ -27,9 +27,9 @@ void LoadStgSwitchFromBrx(STGSWITCH *pstgsw, void *pbis)
     preq->cbAlign = 0x10;
     pstgsw->table = PvAllocSwCopyImpl__FiPv(preq, pstgsw->table);
     if (pstgsw->cGroup != 0) {
-        preq->cbAlign = 0x10;
+        req.cbAlign = 0x10;
         req.cb = pstgsw->cGroup * 0x10 + 0x10;
-        pstgsw->groups = (SWITCHGROUP *)((char *)PvAllocSwCopyImpl__FiPv(preq, (char *)pstgsw->groups - 0x10) + 0x10);
+        pstgsw->groups = (SWITCHGROUP *)((char *)PvAllocSwCopyImpl__FiPv(&req, (char *)pstgsw->groups - 0x10) + 0x10);
         for (int iGroup = -1; iGroup < pstgsw->cGroup; iGroup++) {
             SWITCHGROUP *pgroup = pstgsw->groups + iGroup;
             req.cb = pgroup->count * 8;

@@ -16,48 +16,56 @@ extern "C" int CpchzTokenizePath__FPc(char *pchzPath)
     }
     unsigned char *pbEnd = (unsigned char *)pchzPath + cch;
     char *pchWrite = pchzPath;
-    int cchComponent = 0;
     unsigned char *pbRead = (unsigned char *)pchzPath;
     int cComponent = 0;
+    int cchComponent = 0;
     int cchMax = 8;
     while (pbRead < pbEnd) {
         unsigned char ch = *pbRead;
-        if (ch == '/' || ch == '\\') {
+        switch (ch) {
+        case '/':
+        case '\\':
             if (cchComponent != 0) {
                 *pchWrite++ = 0;
                 cchComponent = 0;
                 cchMax = 8;
                 cComponent++;
             }
-            pbRead++;
-            continue;
-        }
-        if (ch == '.') {
+            break;
+        case '.':
             if (cchComponent != 0 && cchMax == 8) {
                 *pchWrite++ = '.';
                 cchComponent = 0;
                 cchMax = 3;
             }
+            break;
+        case ';':
+            if (cchComponent != 0 && pbRead == pbEnd - 2 && pbRead[1] == '1') {
+                *pchWrite++ = pbRead[0];
+                pbRead = pbEnd - 1;
+                *pchWrite++ = pbRead[0];
+                cchComponent += 2;
+                break;
+            }
+            goto copy;
+        default:
+        copy:
+            if (cchComponent < cchMax) {
+                if ((*pbRead >= 'A' && *pbRead <= 'Z') || (*pbRead >= '0' && *pbRead <= '9'))
+                    *pchWrite = *pbRead;
+                else
+                    *pchWrite = '_';
+                pchWrite++;
+                cchComponent++;
+            }
             pbRead++;
             continue;
         }
-        if (ch == ';' && cchComponent != 0 && pbRead == pbEnd - 2 && pbRead[1] == '1') {
-            pchWrite[0] = (char)pbEnd[-2];
-            pchWrite += 1;
-            pchWrite[1] = (char)pbEnd[-1];
-            cchComponent += 2;
-            pbRead = pbEnd;
-            continue;
-        }
-        if (cchComponent < cchMax) {
-            if ((ch >= 'A' && ch <= 'Z') || (ch >= '0' && ch <= '9'))
-                *pchWrite = (char)ch;
-            else
-                *pchWrite = '_';
-            pchWrite++;
-            cchComponent++;
-        }
         pbRead++;
+    }
+    if (cchComponent != 0) {
+        *pchWrite = 0;
+        cComponent++;
     }
     return cComponent;
 }

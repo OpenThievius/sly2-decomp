@@ -43,7 +43,63 @@ void func_001A5448(char *self, char **first, char **second)
     *second = &B_003DD4A0 + 0xC;
 }
 
-INCLUDE_ASM(0X1A5478);
+struct LO_1A5478 { char pad[0xC]; char *vt; LO_1A5478 *parent; void *root; char pad2[0x24 - 0x18]; LO_1A5478 *next; unsigned long grf; };
+
+struct VB8_1A5478 { char pad[0xB8]; short d; short i; void (*f)(void *); };
+
+struct VE0_1A5478 { char pad[0xE0]; short d; short i; int (*f)(void *, LO_1A5478 ***); };
+
+struct V40_1A5478 { char pad[0x40]; short d; short i; void (*f)(void *); };
+
+struct V58_1A5478 { char pad[0x58]; short d; short i; void (*f)(void *); };
+
+extern "C" int FIsLoInWorld_1A5478(LO_1A5478 *);
+
+extern "C" void RemoveDlEntry_1A5478(void *, void *);
+
+extern "C" void InsertDlEntryBefore_1A5478(void *, void *, void *);
+
+extern "C" void ReinsertSwRoot_1A5478(void *, void *);
+
+extern "C" void func_00148300_1A5478(void *, void *);
+
+extern char B_003DD490;
+
+void AddLo(LO_1A5478 *plo)
+{
+    if ((plo->grf & (1UL << 56)) == 0)
+        return;
+    plo->grf &= ~(1UL << 56);
+    char *pdl;
+    char **pfirst;
+    func_001A5448((char *)plo->parent, &pdl, (char **)&pfirst);
+    if (plo == (LO_1A5478 *)*pfirst) {
+        *pfirst = (char *)plo->next;
+    } else {
+        RemoveDlEntry_1A5478(pdl, plo);
+        InsertDlEntryBefore_1A5478(pdl, *pfirst, plo);
+    }
+    if (plo->parent == 0 || ((int)(plo->parent->grf >> 60) & 1) != 0) {
+        V58_1A5478 *vta = (V58_1A5478 *)plo->vt;
+        vta->f((char *)plo + vta->d);
+    }
+    if (plo->parent == 0 && (((long)plo->grf << 8) >> 60) != 2)
+        ReinsertSwRoot_1A5478(&B_003DD490, plo->root);
+    LO_1A5478 **achild;
+    VE0_1A5478 *vtc = (VE0_1A5478 *)plo->vt;
+    int cchild = vtc->f((char *)plo + vtc->d, &achild);
+    for (int ichild = 0; ichild < cchild; ichild++) {
+        LO_1A5478 *child = achild[ichild];
+        V40_1A5478 *vtk = (V40_1A5478 *)child->vt;
+        vtk->f((char *)child + vtk->d);
+    }
+    if (FIsLoInWorld_1A5478(plo) != 0) {
+        VB8_1A5478 *vtw = (VB8_1A5478 *)plo->vt;
+        vtw->f((char *)plo + vtw->d);
+    } else if (plo->parent == 0) {
+        func_00148300_1A5478(&B_003DD490, plo);
+    }
+}
 
 struct LO_1A5630 { char pad[0xC]; char *vt; LO_1A5630 *parent; void *root; char pad2[0x28 - 0x18]; unsigned long grf; };
 

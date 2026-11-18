@@ -1,99 +1,70 @@
-typedef signed char s8; typedef short s16; typedef int s32; typedef long s64;
-typedef unsigned char u8; typedef unsigned short u16; typedef unsigned int u32; typedef unsigned long u64;
-typedef float f32; typedef double f64; typedef int s128 __attribute__((mode(TI)));
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
+typedef int s32; typedef signed char s8; typedef short s16;
 extern "C" {
-struct _m2c_stack_bevy_player_p14_jts8_enter {
-    /* 0x00 */ char pad0[0x10];
-};                                                  /* size = 0x10 */
-M2C_UNK SetBentleyState(s32, M2C_UNK, s8 *);      /* extern */
-M2C_UNK SetJmpBodyState(s8 *, M2C_UNK, M2C_UNK);  /* extern */
-M2C_UNK SetJtState(s8 *, M2C_UNK, M2C_UNK);       /* extern */
-M2C_UNK StartAttach(s32, s32, s8 *);      /* extern */
+void StartAttach(void *, s32, void *, void *);
+void SetBentleyState(s32, s32, void *);
+void SetJmpBodyState(void *, s32, s32);
+void SetJtState(void *, s32, s32);
 extern s32 g_2dd5bc;
-void bevy_player_p14_jts8_enter(s8 *arg0) {
-    s32 temp_v0;
-    s32 var_a1;
-    s8 *temp_a0;
-    s8 *temp_a2;
-    s8 *temp_a2_2;
-    s8 *temp_a3;
-    s8 *temp_a3_2;
-    s8 *temp_a3_3;
-    s8 *temp_v0_2;
-    s8 *temp_v0_3;
-    s8 *temp_v0_4;
-    s8 *var_a2;
-    s8 *var_a3;
-    temp_v0 = M2C_FIELD(arg0, s32 *, 0x1C);
-    switch (temp_v0) {
+}
+static inline char *Adjust(char *base, int offset) { return base ? base + offset : 0; }
+static inline void Attach(char *self, s32 flag, int offset)
+{
+    char *target = *(char **)(self + 0xC);
+    StartAttach(*(char **)self + 0x4C0, flag, target, target ? target + offset : 0);
+}
+struct VT { char pad[8]; short delta; short index; void (*fn)(void *, int); };
+void bevy_player_p14_jts8_enter(char *self)
+{
+    char *owner;
+    char *target;
+    switch (*(s32 *)(self + 0x1C)) {
     case 6:
-        temp_a3 = M2C_FIELD(arg0, s8 **, 0xC);
-        var_a1 = 1;
-        var_a2 = temp_a3;
-        var_a3 = temp_a3 + 0x150;
-block_9:
-        StartAttach((int)(M2C_FIELD(arg0, s8 **, 0) + 0x4C0), var_a1, var_a2);
+        Attach(self, 1, 0x150);
         return;
     case 11:
-        var_a1 = 0;
-block_8:
-        var_a2 = M2C_FIELD(arg0, s8 **, 0xC);
-        var_a3 = M2C_FIELD(arg0, s8 **, 0xC) + 0x190;
-        goto block_9;
+        Attach(self, 0, 0x190);
+        return;
     case 12:
-        temp_a3_2 = M2C_FIELD(arg0, s8 **, 0xC);
-        var_a1 = 0;
-        var_a2 = temp_a3_2;
-        var_a3 = temp_a3_2 + 0xE0;
-        goto block_9;
+        Attach(self, 0, 0xE0);
+        return;
     case 13:
-        temp_v0_2 = M2C_FIELD(arg0, s8 **, 0xC);
-        var_a2 = temp_v0_2;
-        var_a3 = temp_v0_2 + 0xE0;
-        var_a1 = M2C_FIELD(temp_v0_2, s32 *, 0x10C);
-        goto block_9;
+        target = *(char **)(self + 0xC);
+        StartAttach(*(char **)self + 0x4C0, *(s32 *)(target + 0x10C), target, target ? target + 0xE0 : 0);
+        return;
     case 9:
-        temp_a3_3 = M2C_FIELD(arg0, s8 **, 0xC);
-        var_a1 = 4;
-        var_a2 = temp_a3_3;
-        var_a3 = temp_a3_3 + 0xE0;
-        goto block_9;
+        Attach(self, 4, 0xE0);
+        return;
     case 10:
-        var_a1 = 3;
-        goto block_8;
+        Attach(self, 3, 0x190);
+        return;
     case 14:
-        temp_a2 = M2C_FIELD(arg0, s8 **, 0);
-        temp_v0_3 = M2C_FIELD(arg0, s8 **, 0xC);
-        M2C_FIELD(temp_a2, s8 **, 0x18C4) = temp_v0_3;
-        if (M2C_FIELD(temp_v0_3, s32 *, 0x124) == 3) {
-            SetJtState(temp_a2, 0x16, -1);
+        target = *(char **)(self + 0xC);
+        self = *(char **)self;
+        *(char **)(self + 0x18C4) = target;
+        if (*(s32 *)(target + 0x124) == 3) {
+            SetJtState(self, 0x16, -1);
             return;
         }
-        SetJtState(temp_a2, 3, 1);
+        SetJtState(self, 3, 1);
         return;
-    case 15:
-        M2C_FIELD(M2C_FIELD(arg0, s8 **, 0), s8 **, 0xF5C) = (s8 *) M2C_FIELD(arg0, s8 **, 0xC);
-        M2C_FIELD(M2C_FIELD(arg0, s8 **, 0), f32 *, 0xF60) = (f32) M2C_FIELD(arg0, f32 *, 0x14);
-        temp_a2_2 = M2C_FIELD(arg0, s8 **, 0);
-        temp_v0_4 = M2C_FIELD(temp_a2_2, s8 **, 0xC);
-        M2C_FIELD(temp_v0_4, M2C_UNK (**)(s8 *, M2C_UNK), 0x2C4)(temp_a2_2 + M2C_FIELD(temp_v0_4, s16 *, 0x2C0), 8);
-        return;
-    case 16:
-        temp_a0 = M2C_FIELD(arg0, s8 **, 0);
-        M2C_FIELD(temp_a0, s8 **, 0x1F18) = (s8 *) M2C_FIELD(arg0, s8 **, 0xC);
-        SetJtState(temp_a0, 0x15, 0xA);
-        return;
-    case 18:
-        SetBentleyState(g_2dd5bc, 8, arg0);
-        return;
-    default:
-        SetJmpBodyState(arg0, 4, 0);
+    case 15: {
+        *(char **)(*(char **)self + 0xF5C) = *(char **)(self + 0xC);
+        *(float *)(*(char **)self + 0xF60) = *(float *)(self + 0x14);
+        self = *(char **)self;
+        char *obj = *(char **)(self + 0xC);
+        (*(void (**)(void *, int))(obj + 0x2C4))(self + *(s16 *)(obj + 0x2C0), 8);
         return;
     }
-}
+    case 16:
+        owner = *(char **)self;
+        *(char **)(owner + 0x1F18) = *(char **)(self + 0xC);
+        SetJtState(owner, 0x15, 10);
+        return;
+    case 18:
+        SetBentleyState(g_2dd5bc, 8, self);
+        return;
+    default:
+        SetJmpBodyState(self, 4, 0);
+        return;
+    }
 }

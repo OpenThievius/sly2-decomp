@@ -589,7 +589,43 @@ void CalculateEmitvx(int cParticlePerRing, LM *plm, int cParticle, EMITVX *pemit
     pemitvx->panMin = GRandInRange(0.0f, 6.2831855f);
 }
 
-INCLUDE_ASM(0X15AF08);
+struct EMITVX_15AF08 { int cpos; float gStepX; float gStepY; float gBaseX; float gBaseY; };
+
+struct LM_15AF08 { float gMin; float gMax; };
+
+extern "C" float RadNormalize__Ff_15AF08(float);
+
+extern "C" QW SetVectorSphere__FP6VECTORfff_15AF08(float, float, float);
+
+extern "C" void GetNormalVectors__FP6VECTORN30_15AF08(QW, QW, QW, QW *);
+
+extern QW g_2a2da0;
+
+extern QW g_2a2db0;
+
+void ChooseEmitVelocity__FP6EMITVXffP2LMP6VECTORiT4(EMITVX_15AF08 *pemitvx, float gSpread, float gSpeed, LM_15AF08 *plm, QW *pvecDirection, int ipos, QW *pvecOut)
+{
+    union VU_SCALE sphere;
+    QW basis[2];
+    QW direction[1];
+    float gY;
+    int iRow = ipos / pemitvx->cpos;
+    int iColumn = ipos % pemitvx->cpos;
+    float gX = pemitvx->gBaseX + (float)iRow * pemitvx->gStepX;
+    gY = pemitvx->gBaseY + (float)iColumn * pemitvx->gStepY;
+    if (gSpread != 0.0f) {
+        gX += gSpread * GRandInRange(-0.5f, 0.5f) * pemitvx->gStepX;
+        gY += gSpread * GRandInRange(-0.5f, 0.5f) * pemitvx->gStepY;
+    }
+    gX = RadNormalize__Ff_15AF08(gX + 1.5707964f);
+    gY = RadNormalize__Ff_15AF08(gY);
+    float gRadius = GRandInRange(plm->gMin, plm->gMax);
+    sphere.q = SetVectorSphere__FP6VECTORfff_15AF08(gY, gX, gRadius);
+    direction[0] = *pvecDirection;
+    sphere.v.z = sphere.v.z * gSpeed;
+    GetNormalVectors__FP6VECTORN30_15AF08(direction[0], g_2a2da0, g_2a2db0, basis);
+    *pvecOut = TransformVector(sphere.q, basis[0], basis[1], direction[0]);
+}
 
 INCLUDE_ASM(0X15B0C8);
 

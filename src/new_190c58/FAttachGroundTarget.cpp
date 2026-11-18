@@ -13,9 +13,8 @@ int FAttachGroundTarget(ATTACH *pattach)
 {
     int itarget = 0;
     int ctarget = B_003DD490.ctarget;
-    TARGET *pnext = B_003DD490.atarget;
-    for (; itarget < ctarget; itarget++, pnext++) {
-        TARGET *ptarget = pnext;
+    for (; itarget < ctarget; itarget++) {
+        TARGET *ptarget = &B_003DD490.atarget[itarget];
         if (ptarget->dist > D_FLT_002BF660)
             break;
         void *plo = ptarget->plo;

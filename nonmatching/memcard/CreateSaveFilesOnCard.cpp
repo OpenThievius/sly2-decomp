@@ -18,39 +18,35 @@ extern "C" int CreateSaveFilesOnCard(CARD *card)
 {
     int spaceFree;
     char path[0x50];
+    int need = 1;
     int result = McSync((char *)card + 0xFD5C, sceMcGetEntSpace(card->port, card->slot, "/"), 0x12, &spaceFree);
     if (result == 0) {
-        int need = 1;
         if (spaceFree == 0)
             need = 2;
         need += 5;
         need += (FUN_0018c1e8(RO_002A38E8) + 0x3FF) / 0x400;
         need += 0x42;
-        result = 1;
         if (card->freeBlocks >= need) {
             result = CreateSaveDirectory(card);
-            char *pslot = card->slots[0];
             if (result == 0) {
                 int index = 0;
                 do {
-                    result = InitAndWriteSaveSlot(card, pslot);
-                    index++;
+                    result = InitAndWriteSaveSlot(card, card->slots[index]);
                     if (result != 0)
                         break;
-                    pslot += 0x5464;
+                    index++;
                 } while (index < 3);
                 if (result == 0) {
                     if (card->fileCount < 5)
                         card->fileCount = 5;
-                    return result;
+                    goto done;
                 }
-                pslot = card->slots[0];
             }
+            char *pslot = card->slots[0];
             int count = 2;
             do {
-                char *pthis = pslot;
+                BuildSlotFilePath(card, pslot, path);
                 pslot += 0x5464;
-                BuildSlotFilePath(card, pthis, path);
                 DeleteMemcardFile(card, path);
                 count--;
             } while (count >= 0);
@@ -58,10 +54,12 @@ extern "C" int CreateSaveFilesOnCard(CARD *card)
             DeleteMemcardFile(card, "/BASCUS-97316YAOTWTD!/memcard_icon.ico");
             DeleteMemcardFile(card, RO_002A6BC8);
             DeleteMemcardFile(card, RO_002A6BB0);
+        } else {
+            result = 1;
         }
-        if (result == 0)
-            return 0;
     }
-    func_001ACC38(B_002E6550, 3);
+    if (result != 0)
+        func_001ACC38(B_002E6550, 3);
+done:
     return result;
 }

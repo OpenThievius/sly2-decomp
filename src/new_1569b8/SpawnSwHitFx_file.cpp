@@ -5,10 +5,70 @@
 #include "types.h"
 #include "m2c_macros.h"
 #include "include_asm.h"
+#include "lo.h"
 
 INCLUDE_ASM(0X156918);
 
-INCLUDE_ASM(0X1569B8);
+struct HITFXPLO : LO { int f50; float f54; u8 pad58[8]; float f60; int f64; };
+
+struct Parms_1569B8 { char pad[0x4020]; HITFXPLO *p20, *p24, *p28, *p2C, *p30, *p34, *p38; };
+
+extern "C" LO *PloNew(int, int, int, int);
+
+extern "C" float g_2bdd00;
+
+extern "C" float g_2bdd04;
+
+extern "C" float g_2bdd08;
+
+extern "C" float g_2bdd0c;
+
+extern "C" float g_2bdd10;
+
+extern "C" float g_2bdd14;
+
+extern "C" float g_2bdd18;
+
+extern "C" void InitSwHitFxParms(Parms_1569B8 *parms) {
+    HITFXPLO *obj;
+    obj = (HITFXPLO *)PloNew(0x75, 0, 0x2C2, -1);
+    obj->f50 = 0;
+    parms->p20 = obj;
+    obj->Remove();
+    obj = (HITFXPLO *)PloNew(0x75, 0, 0x2C3, -1);
+    obj->f50 = 1;
+    obj->f60 = g_2bdd00;
+    parms->p24 = obj;
+    obj->Remove();
+    obj = (HITFXPLO *)PloNew(0x75, 0, 0x2C4, -1);
+    obj->f50 = 0;
+    obj->f54 = g_2bdd04;
+    parms->p28 = obj;
+    obj->Remove();
+    obj = (HITFXPLO *)PloNew(0x75, 0, 0x2C5, -1);
+    obj->f54 = g_2bdd08;
+    obj->f60 = g_2bdd0c;
+    obj->f50 = 0;
+    parms->p2C = obj;
+    obj->Remove();
+    obj = (HITFXPLO *)PloNew(0x75, 0, 0x2C7, -1);
+    obj->f64 = 3;
+    obj->f60 = -1.0f;
+    obj->f50 = 0;
+    parms->p34 = obj;
+    obj->Remove();
+    obj = (HITFXPLO *)PloNew(0x75, 0, 0x2C6, -1);
+    obj->f54 = g_2bdd10;
+    obj->f60 = g_2bdd14;
+    obj->f50 = 0;
+    parms->p30 = obj;
+    obj->Remove();
+    obj = (HITFXPLO *)PloNew(0x75, 0, 0x2C8, -1);
+    obj->f50 = 0;
+    obj->f54 = g_2bdd18;
+    parms->p38 = obj;
+    obj->Remove();
+}
 
 struct SWHITFX156B98 { char pad[0x4020]; void *player0; void *player1; };
 

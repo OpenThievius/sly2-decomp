@@ -45,7 +45,7 @@ void func_00257C18(void)
         unsigned *next;
         unsigned *cur = node;
         do {
-            next = NextNode(cur);
+            next = NextNodeA(cur);
             node = next;
             if ((cur[1] >> 31) != g_2dd598) {
                 func_00256120(cur);
