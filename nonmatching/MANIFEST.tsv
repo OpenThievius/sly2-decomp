@@ -271,7 +271,6 @@ address	name	size	file	score
 0X195FB8	SetJmpBodyState	2416	new_1942f0/SetJmpBodyState.cpp	60
 0X196928	DtSolveJumpLaunch	384	new_1942f0/DtSolveJumpLaunch.cpp	12
 0X196AA8	LimitJmpAccelByContacts	848	new_1942f0/LimitJmpAccelByContacts.c	219
-0X197500	UpdateJmpBodyState	2712	new_1942f0/UpdateJmpBodyState.cpp	0
 0X1991A0	func_001991A0	248	new_1942f0/fun_001991a0.c	54
 0X1995D8	BuildJmpEdgeProbes	512	jump/BuildJmpEdgeProbes.c	123
 0X1997D8	FCheckJtEdgeNormal__FP2JTP6VECTORT1	504	jump/FCheckJtEdgeNormal__FP2JTP6VECTORT1.cpp	39
