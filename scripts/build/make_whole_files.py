@@ -593,7 +593,7 @@ def rodata_cause(elf, text_data, start):
         object_value = ((word(text_data, offset) & 0xFFFF) << 16) + signed(word(text_data, low) & 0xFFFF)
         bases.add(retail_value - object_value)
     if len(bases) != 1:
-        return f'rodata: {len(bases)} bases'
+        return retarget_cause(elf, text_data, start, entries, index, retail, signed, word)
     base = next(iter(bases))
     data = rodata.data()
     masked = {r['r_offset'] // 4 for r in (elf.get_section_by_name('.rel.rodata').iter_relocations() if elf.get_section_by_name('.rel.rodata') else [])}
@@ -606,6 +606,59 @@ def rodata_cause(elf, text_data, start):
             continue
         if word(data, word_index * 4) != target[word_index]:
             return f'rodata differs at {base + word_index * 4:#X}'
+    return None
+
+
+def retarget_cause(elf, text_data, start, entries, rodata_index, retail, signed, word):
+    """None when every item of the object's .rodata that its code reads is retail's bytes at the address its hi/lo pair gives: the check
+    scripts/build/link_image.py retarget_rodata makes for a file whose rodata has no single base (retail keeps the rodata of assembly
+    functions between its own); a string by its text, any other item (a float, a jump table: its relocated words resolved to the file's
+    address plus the addend) over its own length up to the next item the code reads. Else the cause."""
+    rodata = elf.get_section_by_name('.rodata')
+    relocated = elf.get_section_by_name('.rel.rodata')
+    text_index = elf.get_section_index('.text')
+    symbols = elf.get_section_by_name('.symtab')
+    # the section as trim_rodata cuts it: at its last non-zero byte (a relocated word counts)
+    data = rodata.data()
+    table = [(r['r_offset'], r['r_info_type'], symbols.get_symbol(r['r_info_sym'])['st_shndx']) for r in relocated.iter_relocations()] if relocated else []
+    end = len(data.rstrip(b'\0'))
+    end = max([end] + [offset + 4 for offset, _, _ in table])
+    data = data[:end]
+    resolved = bytearray(data)
+    for offset, kind, section in table:
+        if kind != 2 or section != text_index or offset + 4 > len(data):
+            return f'rodata: the relocation at rodata+{offset:#x} is not a word that points into this file (type {kind})'
+        resolved[offset:offset + 4] = ((word(data, offset) + start) & 0xFFFFFFFF).to_bytes(4, 'little')
+    resolved = bytes(resolved)
+    printable = lambda blob: len(blob) >= 2 and all(32 <= byte < 127 or byte in (9, 10, 13) for byte in blob)
+    own_string = lambda at: data[at:data.find(0, at)] if data.find(0, at) >= 0 else data[at:]
+    references = {}
+    for position, (offset, kind, symbol) in enumerate(entries):
+        if kind != 5 or symbol['st_shndx'] != rodata_index:
+            continue
+        low = next((o for o, k, s in entries[position + 1:] if k == 6 and s['st_shndx'] == rodata_index), None)
+        if low is None:
+            return 'rodata: a hi16 without a lo16'
+        retail_value = ((retail[offset // 4] & 0xFFFF) << 16) + signed(retail[low // 4] & 0xFFFF)
+        object_value = ((word(text_data, offset) & 0xFFFF) << 16) + signed(word(text_data, low) & 0xFFFF)
+        if not 0 <= object_value < len(data):
+            return f'rodata: the load at text+{offset:#x} reaches rodata+{object_value:#x}, outside the object\'s {len(data):#x} bytes'
+        if references.setdefault(object_value, retail_value) != retail_value:
+            return f'rodata: rodata+{object_value:#x} is loaded from both {references[object_value]:#x} and {retail_value:#x}'
+    object_starts, retail_starts = sorted(references), sorted(references.values())
+    for object_value, retail_value in references.items():
+        retail_blob = retail_words(retail_value, 4 * ((len(data) + 3) // 4))
+        retail_bytes = b''.join(item.to_bytes(4, 'little') for item in retail_blob)
+        if printable(own_string(object_value)):
+            text_here = own_string(object_value)
+            if retail_bytes[:len(text_here)] != text_here or retail_bytes[len(text_here):len(text_here) + 1] not in (b'\0',):
+                return f'rodata: the literal at rodata+{object_value:#x} is not the string retail has at {retail_value:#X}'
+            continue
+        object_end = next((value for value in object_starts if value > object_value), len(resolved))
+        retail_end = next((value for value in retail_starts if value > retail_value), None)
+        length = min(object_end - object_value, retail_end - retail_value) if retail_end is not None else object_end - object_value
+        if length < 4 or resolved[object_value:object_value + length] != retail_bytes[:length]:
+            return f'rodata differs at {retail_value:#X} (rodata+{object_value:#x}, {length:#x} bytes)'
     return None
 
 

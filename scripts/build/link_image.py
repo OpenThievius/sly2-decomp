@@ -389,6 +389,7 @@ with open(os.path.join(BUILD, 'skipped.tsv'), 'w') as handle:
 # A whole file whose object is missing, has another size or needs its own data is not linked: its functions come from assembly (their
 # only source is the whole file, src/MANIFEST.tsv `whole_file`).
 wholes = {}  # start -> (end, object path, undefined names)
+retargeted_wholes = set()  # starts of whole files whose rodata stays out of the image (retarget_rodata), as for a function in `retargeted`
 for start, end, file in whole_files():
     object_path = os.path.join(UNITS, file + '.o')
     by_name = set()
@@ -401,8 +402,16 @@ for start, end, file in whole_files():
         object_path, rodata_size = trim_rodata(object_path)
         rodata_base = derive_rodata_base(start, object_path)
         if rodata_base is None or not RODATA_START <= rodata_base < RODATA_END:
-            print(f'whole file {file}: not linked (no single base for its own rodata), its functions come from assembly', flush=True)
-            continue
+            # no single base: retail keeps assembly functions' rodata between the file's own (docs/build/building.md "Whole files with
+            # several rodata bases"). As for one function, the object's rodata stays out of the image and every item it reads is checked
+            # against retail's bytes (retarget_rodata); the image keeps retail's rodata.
+            retargeted_path = retarget_rodata(start, object_path)
+            if retargeted_path is None:
+                print(f'whole file {file}: not linked (no single base for its own rodata and retarget_rodata gave up: '
+                      f'{retarget_failures.get(start, "no reason recorded")}), its functions come from assembly', flush=True)
+                continue
+            object_path, rodata_size, rodata_base = retargeted_path, 0, None
+            retargeted_wholes.add(start)
     if by_name:
         object_path = link_whole_data(start, object_path, by_name)
     wholes[start] = (end, object_path, found[1], rodata_size, rodata_base, by_name)
@@ -568,6 +577,8 @@ def build(swapped, active, raw_pieces):
     statements = [(f'    .t_{address:06X} 0x{address:X} : SUBALIGN(1) {{ */{os.path.basename(path)}(.text) }}', path) for address, path in sorted(placed)]
     statements += [(f'    .nl_{address:06X} 0x0 (NOLOAD) : SUBALIGN(1) {{ */{os.path.basename(candidates[address][0])}(.rodata) }}', candidates[address][0])
                    for address in sorted(swapped & retargeted)]
+    statements += [(f'    .nl_{start:06X} 0x0 (NOLOAD) : SUBALIGN(1) {{ */{os.path.basename(wholes[start][1])}(.rodata) }}', wholes[start][1])
+                   for start in sorted(active & retargeted_wholes)]
     statements += [(f'    .nb_{start:06X} 0x0 (NOLOAD) : SUBALIGN(1) {{ */{os.path.basename(wholes[start][1])}(.bss .sbss) }}', wholes[start][1])
                    for start in sorted(active) if wholes[start][5]]
     # rodata and data are linked as pieces (config/us/pieces.tsv); a function's own rodata goes where the retail image
