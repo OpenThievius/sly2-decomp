@@ -2204,6 +2204,7 @@ address	name	size	file	whole_file	symbol
 0X1657A8	PostTaskJobEvent	40	sensor-geom/PostTaskJobEvent.c		
 0X1657D0	ApplyTaskState	656	sensor-geom/ApplyTaskState.cpp		
 0X165A60	SetTaskStateCascade	220	sensor-geom/SetTaskStateCascade.cpp		
+0X165B40	UpdateDependentTaskState	228	sensor-geom/UpdateDependentTaskState.cpp		
 0X165C28	func_00165C28	108	unsorted/fun_00165c28.cpp		
 0X165C98	OrderTasks	292	sensor-geom/OrderTasks.cpp		
 0X165DC0	SetSwCurrentJob	40	sensor-geom/SetSwCurrentJob.cpp		

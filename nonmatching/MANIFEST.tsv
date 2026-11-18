@@ -132,7 +132,7 @@ address	name	size	file	score
 0X14F898	FInsideCmMrd	152	cm_14e270/FInsideCmMrd.c	20
 0X14FE58	PosCplookAnchor	112	tn-rip/PosCplookAnchor.c	28
 0X14FEC8	PosCplookEye	112	tn-rip/PosCplookEye.c	18
-0X14FF38	ActivateCplook	552	tn-rip/ActivateCplook.cpp	10
+0X14FF38	ActivateCplook	552	tn-rip/ActivateCplook.cpp	7
 0X151340	bevy_camera_looks_update	720	tn-rip/bevy_camera_looks_update.c	179
 0X151700	bevy_camera_policy_update	456	tn-rip/bevy_camera_policy_update.c	140
 0X151950	UpdateCpattach	672	rip/UpdateCpattach.c	161
@@ -169,7 +169,6 @@ address	name	size	file	score
 0X163460	SaveJobVariables	320	new_161458/SaveJobVariables.cpp	23
 0X1643B0	SaveTaskVariables	544	sensor-geom/SaveTaskVariables.cpp	32
 0X164DF0	SetTaskState	808	sensor-geom/SetTaskState.cpp	77
-0X165B40	UpdateDependentTaskState	232	sensor-geom/UpdateDependentTaskState.cpp	15
 0X165E38	StartGameFromSave	464	sensor-geom/StartGameFromSave.cpp	38
 0X166428	TransformPoints	120	sensor-geom/TransformPoints.c	24
 0X167B68	BindGlobset	568	new_167320/BindGlobset.cpp	65
@@ -420,7 +419,7 @@ address	name	size	file	score
 0X1D0EB8	ProjectBubletTransform__FP6BUBLETf	560	rip_1cf0a0/ProjectBubletTransform__FP6BUBLETf.c	115
 0X1D19A8	UpdateVehicle	1960	rip-rumble/UpdateVehicle.cpp	22
 0X1D2490	func_001D2490	384	rip-rumble/fun_001d2490.c	86
-0X1D54B8	StoreAudioModeInSave	256	new_1d54b8/StoreAudioModeInSave.cpp	11
+0X1D54B8	StoreAudioModeInSave	256	new_1d54b8/StoreAudioModeInSave.cpp	9
 0X1D6848	FCalculateMuzzleVelocity__FP6VECTORT0fT0P2SO	424	vec_1d6848/FCalculateMuzzleVelocity__FP6VECTORT0fT0P2SO.c	96
 0X1D69F0	VelBallistic	160	vec-coin/VelBallistic.c	38
 0X1D6B00	LaunchSoAtTarget	1504	vec-coin/LaunchSoAtTarget.c	322
@@ -642,7 +641,7 @@ address	name	size	file	score
 0X2407A8	sceGsSetDefDBuff	664	sdk/sceGsSetDefDBuff.c	70
 0X240C38	sceGsSetDefDispEnv	888	sdk/sceGsSetDefDispEnv.cpp	126
 0X2418C8	func_002418C8	168	sdk/fun_002418c8.cpp	77
-0X241B18	func_00241B18	160	sdk/fun_00241b18.cpp	9
+0X241B18	func_00241B18	160	sdk/fun_00241b18.c	6
 0X241BB8	func_00241BB8	88	sdk/fun_00241bb8.cpp	19
 0X241C98	func_00241C98	344	sdk/fun_00241c98.cpp	60
 0X241F98	func_00241F98	344	sdk/fun_00241f98.cpp	60

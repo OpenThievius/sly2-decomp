@@ -2204,6 +2204,7 @@ us_address	name	other_address	pair	score	addresses
 0x1657A8	PostTaskJobEvent	0X165720	same	0	ok
 0x1657D0	ApplyTaskState	0X165748	same	0	ok
 0x165A60	SetTaskStateCascade	0X1659D8	same	0	ok
+0x165B40	UpdateDependentTaskState	0X165AB8	same	0	ok
 0x165C28	func_00165C28	0X165BA0	identical	0	ok
 0x165C98	OrderTasks	0X165C10	same	0	ok
 0x165DC0	SetSwCurrentJob	0X165D38	same	0	ok

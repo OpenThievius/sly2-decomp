@@ -38,7 +38,6 @@ extern "C" void ActivateCplook(Plook *pcplook)
     if (FIsBasicDerivedFrom(pcplook->psoFocus, 0x34)) {
         *(B8 *)&pcplook->lim[0] = D_002BD950;
         *(B8 *)&pcplook->lim[2] = D_002BD958;
-        pcplook->swPan = 0;
     } else {
         *(B8 *)&pcplook->lim[0] = D_002BD968;
         *(B8 *)&pcplook->lim[2] = D_002BD970;
@@ -54,9 +53,9 @@ extern "C" void ActivateCplook(Plook *pcplook)
         pcplook->lim[3] += radTilt;
         pcplook->lim[2] = GLimitLm__FP2LMf(D_002BD960, radTilt);
         pcplook->lim[3] = GLimitLm__FP2LMf(D_002BD960, pcplook->radTilt);
-        pcplook->swPan = 0;
     }
     Cm *pcm = &B_002DDF40;
+    pcplook->swPan = 0;
     pcplook->swTilt = 0;
     pcplook->uZoom = 0;
     pcplook->svuZoom = 0;
