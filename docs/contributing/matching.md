@@ -155,6 +155,13 @@ Patterns the source cannot reach (record them in the file and move on):
   question, not a C question.
 - A register-allocation difference that three different wordings leave unchanged.
 - A delay slot that retail leaves unfilled where ours fills it, with no visible trigger.
+- **`ScaleByReciprocalX` result register (2026-11-18, `BuildPlainBlend` 0x1A0300, 6).** Retail: divisor `$vf1`, start `$vf2`, end `$vf3`, `vmulq` result in `$vf2`
+  (the vector's register), the scalar `sqc2 $vf1` after the `vsub`. Ours: result in `$vf1`, the `sqc2` before the `vsub`. Measured in the helper
+  (`data/matching/include/vu0inline.h`; `include/` is the published copy, edit it only through `export_src.py`): inputs listed `(v, divisor)` gives
+  result = v but the divisor falls to `$vf3`, start and end shift down (score 10); `"0"(v)` tied with the divisor first, and `"+j"(v)`, both give the same 10 (the
+  tied quantity takes the lowest register). In the source: storing the scalar into the union after the call, or computing `VectorSub` first
+  into a local, stay at 6 (sched1 hoists the store above the `vsub` either way). No form separates "divisor lowest" from "result in v's
+  register"; the store position needs its own lever. Two more users (`AddLaserCustomXps`, `PresetTarmissAccel`) are far off for other reasons.
 - **A single-use address kept as hi only across a call (2026-11-18, wave T5).** Retail puts `lui $s0,%hi(B_003D4A60)` in the delay slot of
   the `CRef` copy-constructor `jal` and forms the argument later as `addiu $a3,$s0,%lo`; ours builds the whole address in `$s0` before the call
   and moves it (`daddu $a3,$s0,$zero`): one instruction more, three branch offsets one off. Four near misses show it: `SetClueFound` (0x1C7C30, 7),
