@@ -16,7 +16,181 @@ int func_00194F48(Item *left, Item *right)
     return 1;
 }
 
-INCLUDE_ASM(0X194F70);
+struct VT_1956D0 {
+    char p0[0x48];
+    short d48; short i48; void (*f48)(void *);
+    char p1[0x98];
+    short dE8; short iE8; void (*fE8)(void *, QW);
+    short dF0; short iF0; void (*fF0)(void *, const void *);
+    char p2[0x20];
+    short d118; short i118; void (*f118)(void *, QW);
+    short d120; short i120; void (*f120)(void *, QW);
+};
+
+struct LO { char pad[0xC]; VT_1956D0 *vt; };
+
+struct JT;
+
+/* the target interface a candidate points at: its label id at 0x14, its vtable at 0x20 */
+struct TGTDEF {
+    u8 unknown_0x0[0x14];
+    /* 0x14 */ s32 idLabel;
+    u8 unknown_0x18[0x8];
+    /* 0x20: the vtable pointer */
+    virtual int FGetWrapRange(float *prange);   /* 1: two floats, the low and the high end */
+    virtual void Slot2();
+    virtual void GetIndicatorPos(JT *pjt, QW *ppos, int grf, float s); /* 3 */
+};
+
+/* a candidate of the player's target list (0x30 bytes); the world keeps four (from 0x4680) */
+struct TGT {
+    /* 0x0 */ s32 oid;
+    /* 0x4 */ TGTDEF *ptgtdef;
+    /* 0x8 */ f32 sRank;
+    /* 0xC */ s32 iRank;
+    /* 0x10 */ LO *ploClone;
+    /* 0x14 */ f32 tShown;
+    /* 0x18 */ f32 s;
+    /* 0x1C */ f32 dsdt;
+    /* 0x20 */ QW pos;
+};
+
+struct SWTARGETS {
+    u8 unknown_0x0[0x4678];
+    /* 0x4678 */ s32 ctgt;
+    u8 unknown_0x467C[0x4];
+    /* 0x4680 */ TGT atgt[4];
+};
+
+struct JTTARGET {
+    u8 unknown_0x0[0x9C4];
+    /* 0x9C4 */ void *ptemplate;
+};
+
+extern "C" {
+void FadeAloOut(LO *, float);
+LO *PloSpawnTargetIndicator(void *, void *, TGT *);
+}
+
+struct SMP;
+
+extern "C" {
+extern char B_002DEB30;
+extern int B_002E1E50;
+extern SMP D_002BF718;
+extern float RO_002BF710;
+extern float RO_002BF714;
+extern float g_2dded0[];
+void bevy_camera_follow_activity(char *, int, int);
+void *memmove(void *, const void *, unsigned int);
+void qsort(void *, int, int, int (*)(const void *, const void *));
+}
+float GSmooth(float, float, float, SMP *, float *);
+
+extern "C" void UpdateSwTargetList(SWTARGETS *psw, JTTARGET *pjt, int ctgt, TGT *atgt)
+{
+    float range[2];
+    QW pos;
+    float width;
+    int fWrap;
+    TGT *ptgtNew;
+    int itgtNew;
+    LO *plo;
+    if (ctgt > 0) {
+        qsort(atgt, ctgt, sizeof(TGT), (int (*)(const void *, const void *))func_00194F48);
+        if (atgt->ptgtdef->idLabel != -1)
+            atgt->iRank = 1;
+    }
+    int itgt = psw->ctgt;
+    TGT *list = psw->atgt;
+    while (--itgt >= 0) {
+        itgtNew = ctgt;
+        TGT *ptgt = &psw->atgt[itgt];
+        for (;;) {
+            itgtNew -= 1;
+            if (itgtNew < 0) {
+                if (ptgt->ploClone != 0)
+                    FadeAloOut(ptgt->ploClone, 0.5f);
+                memmove(ptgt, ptgt + 1, (3 - itgt) * sizeof(TGT));
+                psw->ctgt -= 1;
+                break;
+            }
+            ptgtNew = &atgt[itgtNew];
+            if (ptgt->oid != ptgtNew->oid)
+                continue;
+            ptgt->sRank = ptgtNew->sRank;
+            if (ptgt->ploClone == 0) {
+                ptgt->s = ptgtNew->s;
+                ptgt->dsdt = 0.0f;
+            } else {
+                fWrap = ptgtNew->ptgtdef->FGetWrapRange(range);
+                if (fWrap != 0) {
+                    width = range[1] - range[0];
+                    float sNew = ptgtNew->s;
+                    float s = ptgt->s;
+                    float ds = sNew - s;
+                    if (width * 0.5f < ds) {
+                        ds -= width;
+                        goto store;
+                    }
+                    if (ds < width * -0.5f) {
+                        ds += width;
+store:
+                        ptgtNew->s = s + ds;
+                    } else {
+                        fWrap = 0;
+                    }
+                }
+                if (B_002E1E50 != 0) {
+                    float dt = g_2dded0[1];
+                    float dsdt = ptgt->dsdt;
+                    float dsdtNew = dsdt + dt * ((ptgtNew->s - ptgt->s) * RO_002BF710 + (ptgtNew->dsdt - dsdt) * RO_002BF714);
+                    ptgt->dsdt = dsdtNew;
+                    float dsdtAvg = (dsdt + dsdtNew) * 0.5f;
+                    ptgt->s += dt * dsdtAvg;
+                } else {
+                    ptgt->s = GSmooth(ptgt->s, ptgtNew->s, g_2dded0[1], &D_002BF718, &ptgt->dsdt);
+                }
+                if (fWrap != 0) {
+                    float s = ptgt->s;
+                    float sWrap;
+                    if (range[1] < s) {
+                        sWrap = s - width;
+                        goto wrap;
+                    }
+                    if (s < range[0]) {
+                        sWrap = s + width;
+wrap:
+                        ptgt->s = sWrap;
+                    }
+                }
+                ptgt->ptgtdef->GetIndicatorPos((JT *)pjt, &pos, 0, ptgt->s);
+                plo = ptgt->ploClone;
+                plo->vt->fE8((char *)plo + plo->vt->dE8, pos);
+            }
+            memmove(ptgtNew, ptgtNew + 1, (ctgt - itgtNew) * sizeof(TGT) - sizeof(TGT));
+            ctgt -= 1;
+            break;
+        }
+    }
+    for (itgtNew = 0; itgtNew < ctgt; itgtNew++) {
+        void *ptemplate = pjt->ptemplate;
+        if (ptemplate != 0) {
+            ptgtNew = &atgt[itgtNew];
+            if (ptgtNew->iRank == 1) {
+                plo = PloSpawnTargetIndicator(psw, ptemplate, ptgtNew);
+                if (plo == 0)
+                    break;
+                ptgtNew->ploClone = plo;
+            }
+        }
+        int ctgtCur = psw->ctgt;
+        psw->atgt[ctgtCur] = atgt[itgtNew];
+        psw->ctgt = ctgtCur + 1;
+        bevy_camera_follow_activity(&B_002DEB30, 0x3D, atgt[itgtNew].oid);
+    }
+    qsort(list, psw->ctgt, sizeof(TGT), (int (*)(const void *, const void *))func_00194F48);
+}
 
 INCLUDE_ASM(0X195368);
 
@@ -54,21 +228,6 @@ extern "C" void func_00195608(STATE *state, void *key)
     }
 }
 
-struct VT_1956D0 {
-    char p0[0x48];
-    short d48; short i48; void (*f48)(void *);
-    char p1[0x98];
-    short dE8; short iE8; void (*fE8)(void *, QW);
-    short dF0; short iF0; void (*fF0)(void *, const void *);
-    char p2[0x20];
-    short d118; short i118; void (*f118)(void *, QW);
-    short d120; short i120; void (*f120)(void *, QW);
-};
-
-struct LO { char pad[0xC]; VT_1956D0 *vt; };
-
-struct TARGET { char pad[0x20]; QW pos; };
-
 extern "C" {
 LO *PloLeaseCloneObject(void *, int);
 void func_001A58D0(LO *, int, int);
@@ -79,7 +238,7 @@ extern QW g_2a2dd0;
 
 extern char RO_002A2D00[];
 
-extern "C" LO *PloSpawnTargetIndicator(void *psw, void *ptemplate, TARGET *ptarget)
+extern "C" LO *PloSpawnTargetIndicator(void *psw, void *ptemplate, TGT *ptarget)
 {
     if (!ptemplate) return 0;
     LO *plo = PloLeaseCloneObject(ptemplate, 0);

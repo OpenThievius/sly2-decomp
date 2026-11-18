@@ -2022,6 +2022,7 @@ us_address	name	other_address	pair	score	addresses
 0x157A98	func_00157A98	0X157AC0	identical	0	ok
 0x157AE0	SortRenderRecords	0X157B08	same	0	ok
 0x157CF0	DrawPassSetupCamera	0X157D18	same	0	ok
+0x157FA0	FlushRenderRecords	0X157FC8	same	0	ok
 0x158480	StaticInitSlotheaps_158480	0X1584A8	same	0	ok
 0x1585B8	func_001585B8	0X1585E0	same	0	ok
 0x1585D8	InitDzg	0X158600	same	0	ok
@@ -2766,6 +2767,7 @@ us_address	name	other_address	pair	score	addresses
 0x194640	func_00194640	0X1945C8	identical	0	ok
 0x194A40	BuildJtTargetList	0X1949C8	same	1	ok
 0x194F48	func_00194F48	0X194ED0	identical	0	ok
+0x194F70	UpdateSwTargetList	0X194EF8	same	0	ok
 0x195608	func_00195608	0X195590	same	0	ok
 0x1956D0	PloSpawnTargetIndicator	0X195658	same	0	ok
 0x1957C0	FindTargetIndicatorTemplate	0X195748	same	0	ok

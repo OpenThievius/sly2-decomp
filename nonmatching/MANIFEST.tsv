@@ -142,7 +142,6 @@ address	name	size	file	score
 0X155FB0	PosAimAtPlayer	992	crv-lo/PosAimAtPlayer.c	215
 0X156918	FHitFxCoversPos	160	lo_156918/FHitFxCoversPos.c	33
 0X156FE8	FHitFxSensorReaches	192	new_1569b8/FHitFxSensorReaches.c	39
-0X157FA0	FlushRenderRecords	1248	dmas-dzg/FlushRenderRecords.cpp	45
 0X158728	FillDzgDz	560	dzg_158668/FillDzgDz.cpp	21
 0X158E20	ApplyDzg	416	dzg-emitter/ApplyDzg.c	100
 0X159240	LoadEmitmeshFromBrx__FP8EMITMESHP18CBinaryInputStream	664	emitter_1591b0/LoadEmitmeshFromBrx__FP8EMITMESHP18CBinaryInputStream.c	170
@@ -255,7 +254,6 @@ address	name	size	file	score
 0X193DE8	func_00193DE8	712	stephide/fun_00193de8.c	152
 0X194170	PresetJtAccelHide__FP2JT	384	stephide/PresetJtAccelHide__FP2JT.c	84
 0X194688	InsertTargetCandidate	952	new_1942f0/InsertTargetCandidate.cpp	84
-0X194F70	UpdateSwTargetList	1016	new_1942f0/UpdateSwTargetList.cpp	54
 0X195368	EmitTargetSparkles	672	new_1942f0/EmitTargetSparkles.cpp	43
 0X195A00	SetJmpState	1464	new_1942f0/SetJmpState.c	289
 0X195FB8	SetJmpBodyState	2416	new_1942f0/SetJmpBodyState.cpp	60

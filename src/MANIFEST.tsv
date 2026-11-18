@@ -2022,8 +2022,9 @@ address	name	size	file	whole_file	symbol
 0X157A98	func_00157A98	72	unsorted/fun_00157a98.cpp		
 0X157AE0	SortRenderRecords	524	dmas-dzg/SortRenderRecords.cpp		
 0X157CF0	DrawPassSetupCamera	688	dmas-dzg/DrawPassSetupCamera.cpp		
-0X158480	StaticInitSlotheaps_158480	308	dmas-dzg/dmas_dzg_157fa0.c	dmas-dzg/dmas_dzg_157fa0.c	StaticInitSlotheaps_158480
-0X1585B8	func_001585B8	32	dmas-dzg/dmas_dzg_157fa0.c	dmas-dzg/dmas_dzg_157fa0.c	func_001585B8
+0X157FA0	FlushRenderRecords	1248	dmas-dzg/dmas_dzg_157fa0.cpp	dmas-dzg/dmas_dzg_157fa0.cpp	FlushRenderRecords
+0X158480	StaticInitSlotheaps_158480	308	dmas-dzg/dmas_dzg_157fa0.cpp	dmas-dzg/dmas_dzg_157fa0.cpp	StaticInitSlotheaps_158480
+0X1585B8	func_001585B8	32	dmas-dzg/dmas_dzg_157fa0.cpp	dmas-dzg/dmas_dzg_157fa0.cpp	func_001585B8
 0X1585D8	InitDzg	144	dmas-dzg/InitDzg_file.cpp	dmas-dzg/InitDzg_file.cpp	InitDzg
 0X158958	func_00158958	44	dmas-dzg/InitDzg_file.cpp	dmas-dzg/InitDzg_file.cpp	func_00158958
 0X158988	SolveDzg__FP3DZGiiPP2XPPiPPP2SO	408	dmas-dzg/InitDzg_file.cpp	dmas-dzg/InitDzg_file.cpp	SolveDzg__FP3DZGiiPP2XPPiPPP2SO
@@ -2766,6 +2767,7 @@ address	name	size	file	whole_file	symbol
 0X194640	func_00194640	68	new_1942f0/fun_00194640.cpp		
 0X194A40	BuildJtTargetList	1284	new_1942f0/BuildJtTargetList.cpp		
 0X194F48	func_00194F48	36	unsorted/unsorted_194f48.cpp	unsorted/unsorted_194f48.cpp	func_00194F48
+0X194F70	UpdateSwTargetList	1012	unsorted/unsorted_194f48.cpp	unsorted/unsorted_194f48.cpp	UpdateSwTargetList
 0X195608	func_00195608	196	unsorted/unsorted_194f48.cpp	unsorted/unsorted_194f48.cpp	func_00195608
 0X1956D0	PloSpawnTargetIndicator	236	unsorted/unsorted_194f48.cpp	unsorted/unsorted_194f48.cpp	PloSpawnTargetIndicator
 0X1957C0	FindTargetIndicatorTemplate	52	unsorted/unsorted_194f48.cpp	unsorted/unsorted_194f48.cpp	FindTargetIndicatorTemplate
