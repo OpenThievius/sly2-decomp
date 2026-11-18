@@ -155,6 +155,14 @@ Patterns the source cannot reach (record them in the file and move on):
   question, not a C question.
 - A register-allocation difference that three different wordings leave unchanged.
 - A delay slot that retail leaves unfilled where ours fills it, with no visible trigger.
+- **A single-use address kept as hi only across a call (2026-11-18, wave T5).** Retail puts `lui $s0,%hi(B_003D4A60)` in the delay slot of
+  the `CRef` copy-constructor `jal` and forms the argument later as `addiu $a3,$s0,%lo`; ours builds the whole address in `$s0` before the call
+  and moves it (`daddu $a3,$s0,$zero`): one instruction more, three branch offsets one off. Four near misses show it: `SetClueFound` (0x1C7C30, 7),
+  `StoreAudioModeInSave` (0x1D54B8, 9), `SetGameCoins` (0x1617E0, 9), `UpdateJtLootSave` (0x143678, 18). Measured without effect: `int`, `char[]`,
+  struct and `SAVE` declarations of the global, a `psave` local or parameter, a by-value helper, `&B_003D4A60` at the call (51 instructions but no
+  hoist, scores 8 to 9). Matched `SetVaultOpen` and `FClueFound` use the same global and the same copy and match, but they use the address twice
+  (a get, then a set), so the hi is shared: a first lever to test is whether the retail function reads the global a second time. A lever
+  that takes one of the four to 0 against that control unlocks the rest.
 
 ## Teams of workers
 
