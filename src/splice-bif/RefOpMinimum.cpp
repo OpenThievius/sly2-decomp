@@ -16,22 +16,25 @@ extern "C" CRef *RefOpMinimum(CRef *pret, int carg, CRef *aref, CFrame *pframe)
         aref = 0;
     CPAIR *pair = (CPAIR *)aref;
     for (; pair != 0; pair = pair->next) {
-        CRef *other = &pair->ref;
         if (best.tagk == 0x15) {
-            if (other->tagk == 0x15) {
-                if (best.n > other->n)
-                    best = *other;
+            if (pair->ref.tagk == 0x15) {
+                CRef *pref = &pair->ref;
+                if (pref->n < best.n)
+                    best = *pref;
             } else {
-                if ((float)best.n > other->g)
-                    best = *other;
+                CRef *pref = &pair->ref;
+                if (pref->g < (float)best.n)
+                    best = *pref;
             }
         } else {
-            if (other->tagk == 0x15) {
-                if ((float)other->n < best.g)
-                    best = *other;
+            if (pair->ref.tagk == 0x15) {
+                CRef *pref = &pair->ref;
+                if ((float)pref->n < best.g)
+                    best = *pref;
             } else {
-                if (best.g > other->g)
-                    best = *other;
+                CRef *pref = &pair->ref;
+                if (pref->g < best.g)
+                    best = *pref;
             }
         }
     }

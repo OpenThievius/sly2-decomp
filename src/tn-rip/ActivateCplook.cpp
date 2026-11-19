@@ -11,7 +11,8 @@ extern Cm B_002DDF40;
 extern const B8 D_002BD950, D_002BD958, D_002BD968, D_002BD970;
 extern char D_002BD960[];
 extern float B_FLT_003E1BE0;
-extern float g_2dded0;
+struct CLOCK { float t; float dt; };
+extern CLOCK g_2dded0;
 void ActivateCplcy(Plook *);
 void *NewEmitter(int);
 void SetEmitterUnpositioned(void *, void *);
@@ -63,5 +64,5 @@ extern "C" void ActivateCplook(Plook *pcplook)
     pcplook->radFovMax = pcm->fov;
     SetCmNearClip(pcm, 49.0f);
     pcplook->cActivate = pcplook->cActivate + 1;
-    B_FLT_003E1BE0 = g_2dded0;
+    B_FLT_003E1BE0 = g_2dded0.t;
 }

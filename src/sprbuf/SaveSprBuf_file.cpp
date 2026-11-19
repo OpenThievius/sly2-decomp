@@ -69,12 +69,28 @@ extern "C" void func_00201998(void)
     B_003DD2C0_201998[index].mode = 2;
 }
 
-INCLUDE_ASM(0X2019F0);
-
+// 0x2019F0 and 0x201D58 are the static initializer g++ 2.95 generates for this file's globals and the constructor-list entry that calls it
+// (`__static_initialization_and_destruction_0` and `_GLOBAL_$I$g_asprbuf`), written as the globals' brace initialisers below.
+// The two scratchpad double buffers: an uncached DMA tag buffer and a scratchpad half each. The inline call makes each
+// record unsafe to build in place, so g++ clears a temporary, fills it and copies it (retail's memset and block move).
 extern "C" {
-s32 sprbuf__static_initialization_and_destruction_0(s32, s32); /* extern */
-
-void func_00201D58(void) {
-    sprbuf__static_initialization_and_destruction_0(1, 0xFFFF);
+extern int B_002DD2E0, B_002DD2E4, B_002DD2E8, B_002DD2EC, B_002DD2F0, B_002DD2F4;
+extern int B_004520A8, B_004520D0, B_004520F8, B_00452120, B_00452148, B_00452170;
+extern char B_003DD380[], B_003DD400[];
+int CreateSlotheapSwAlign(int *slotheap, int cb, int c, int align);
 }
-}
+// The uncached (0x20000000) mirror of a main-memory address.
+inline unsigned UncachedAddress(void *pv) { return (unsigned)pv | 0x20000000; }
+// data-ok: .bss in retail (zero), filled by this file's static initializer below
+extern "C" SPRBUF B_003DD2C0[2] = {
+    {UncachedAddress(B_003DD380), 0x70000000},
+    {UncachedAddress(B_003DD400), 0x70002000},
+};
+// The counted static objects of the slot heaps' header: the first file to run creates each heap.
+#define SLOTHEAP_INIT(cls, count, heap, cb, c) struct cls { cls() { if (++count == 1) CreateSlotheapSwAlign(&heap, cb, c, 0x10); } }; static cls s_##cls;
+SLOTHEAP_INIT(SH0, B_002DD2E0, B_004520A8, 0x14, 0x2000)
+SLOTHEAP_INIT(SH1, B_002DD2E4, B_004520D0, 0x18, 0x800)
+SLOTHEAP_INIT(SH2, B_002DD2E8, B_004520F8, 0x28, 0x200)
+SLOTHEAP_INIT(SH3, B_002DD2EC, B_00452120, 0x1C, 0x800)
+SLOTHEAP_INIT(SH4, B_002DD2F0, B_00452148, 0xC, 0xC8)
+SLOTHEAP_INIT(SH5, B_002DD2F4, B_00452170, 0x14, 0x100)

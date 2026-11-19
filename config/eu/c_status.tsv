@@ -1063,6 +1063,7 @@ us_address	name	other_address	pair	score	addresses
 0x1236D8	func_001236D8	0X1236D8	identical	0	ok
 0x1236F8	RefOpAbs	0X1236F8	identical	0	ok
 0x123788	RefOpMaximum	0X123788	identical	0	ok
+0x1238B0	RefOpMinimum	0X1238B0	identical	0	ok
 0x1239D8	func_001239D8	0X1239D8	identical	0	ok
 0x123A08	func_00123A08	0X123A08	same	0	ok
 0x123A28	RefOpIdCurrentLevel	0X123A28	same	0	ok
@@ -1179,6 +1180,7 @@ us_address	name	other_address	pair	score	addresses
 0x128148	func_00128148	0X128148	same	0	ok
 0x1281B0	bevy_splice_eval_reset	0X1281B0	same	0	ok
 0x1285D8	CGc_MarkRef	0X1285D8	same	0	ok
+0x1286E0	CGc_Collect	0X1286E0	same	0	ok
 0x128A00	gc__static_initialization_and_destruction_0	0X128A00	same	0	ok
 0x128B40	gc__static_initialization_and_destruction_0_thunk	0X128B40	identical	0	ok
 0x128B60	func_00128B60	0X128B60	same	0	ok
@@ -1254,6 +1256,7 @@ us_address	name	other_address	pair	score	addresses
 0x12BE68	func_0012BE68	0X12BE68	identical	0	ok
 0x12BF30	func_0012BF30	0X12BF30	same	0	ok
 0x12C0E0	func_0012C0E0	0X12C0E0	identical	0	ok
+0x12C140	bevy_anim_keys_axis_segment	0X12C140	same	0	ok
 0x12C440	func_0012C440	0X12C440	identical	0	ok
 0x12C570	func_0012C570	0X12C570	same	0	ok
 0x12C708	func_0012C708	0X12C708	identical	0	ok
@@ -1887,6 +1890,7 @@ us_address	name	other_address	pair	score	addresses
 0x14FDC0	UpdateCplcy_thunk	0X14FDE8	same	0	ok
 0x14FDE0	InitCplook	0X14FE08	same	0	ok
 0x14FE28	func_0014FE28	0X14FE50	same	0	ok
+0x14FF38	ActivateCplook	0X14FF60	same	0	ok
 0x150160	UpdateCplook	0X150188	same	0	ok
 0x1505D8	bevy_camera_looks_reset	0X150600	same	0	ok
 0x150610	DeactivateCplook	0X150638	same	0	ok
@@ -2048,6 +2052,7 @@ us_address	name	other_address	pair	score	addresses
 0x1599A8	HandleEmitterMessage	0X1599D0	identical	0	ok
 0x159A08	func_00159A08	0X159A30	gap	0	ok
 0x159A20	ModifyEmitterParticles__FP7EMITTER	0X159A48	same	0	ok
+0x159C80	UpdateEmitter__FP7EMITTERf	0X159CA8	same	0	ok
 0x15A138	PauseEmitter__FP7EMITTERf	0X15A160	gap	0	ok
 0x15A150	PauseEmitterIndefinite__FP7EMITTER	0X15A178	gap	0	ok
 0x15A160	UnpauseEmitter__FP7EMITTER	0X15A188	gap	0	ok
@@ -4245,6 +4250,7 @@ us_address	name	other_address	pair	score	addresses
 0x1F7410	func_001F7410	0X1F7BD0	same	0	ok
 0x1F7530	PaloFindWkrAbsorber	0X1F7CF0	same	0	ok
 0x1F7588	FAbsorbSoWkr	0X1F7D48	gap	0	ok
+0x1F7598	PaloAbsorbWkr	0X1F7D58	same	0	ok
 0x1F77C0	ExpireSwWkrs	0X1F7F80	same	0	ok
 0x1F78A0	func_001F78A0	0X1F8060	identical	0	ok
 0x1F78D8	GrficFromAlo	0X1F8098	identical	0	ok
@@ -4331,6 +4337,7 @@ us_address	name	other_address	pair	score	addresses
 0x1FB658	SetAmbGrf	0X1FBE18	same	0	ok
 0x1FB6A8	ActivateAmb	0X1FBE68	same	0	ok
 0x1FB710	DeactivateAmb	0X1FBED0	same	0	ok
+0x1FB8E0	UpdateAmb	0X1FC0A0	same	0	ok
 0x1FBAF8	OnAmbVoiceStarted	0X1FC2B8	identical	0	ok
 0x1FBB30	OnAmbVoicePolled	0X1FC2F0	same	0	ok
 0x1FBB90	NewEmitter	0X1FC350	same	0	ok
@@ -4790,6 +4797,7 @@ us_address	name	other_address	pair	score	addresses
 0x2121E8	FBlotLabelPlaying	0X2129B8	same	0	ok
 0x212298	LoadBlotFromBrx	0X212A68	same	0	ok
 0x2123C8	PostBlotLoad	0X212B98	same	2	ok
+0x2124F0	PrepareBlotMovie	0X212CC0	same	0	ok
 0x212780	ReleaseBlotMovie	0X212F50	identical	0	ok
 0x2127C8	func_002127C8	0X212F98	same	0	ok
 0x212828	SetBlotLabelListFromRef	0X212FF8	same	0	ok
@@ -4983,6 +4991,7 @@ us_address	name	other_address	pair	score	addresses
 0x225BA0	UpdateTankAim	0X2263C0	same	0	ok
 0x226250	UpdateTankFire	0X226A70	same	0	ok
 0x226310	FIgnoreTankIntersection	0X226B30	same	0	ok
+0x226370	func_00226370	0X226B90	identical	0	ok
 0x2263F8	StaticInitSlotheaps_2263f8	0X226C18	same	0	ok
 0x226530	func_00226530	0X226D50	same	0	ok
 0x226550	UpdateSw	0X226D70	same	0	ok
@@ -5101,6 +5110,7 @@ us_address	name	other_address	pair	score	addresses
 0x22C818	func_0022C818	0X22D038	identical	0	ok
 0x22C840	InvalidateXfSegment	0X22D060	same	0	ok
 0x22CA18	GetXfDofValue	0X22D238	same	0	ok
+0x22D148	func_0022D148	0X22D968	same	0	ok
 0x22D670	func_0022D670	0X22DE90	same	0	ok
 0x22D698	func_0022D698	0X22DEB8	gap	0	ok
 0x22D6B0	PxfFromRef	0X22DED0	same	0	ok
@@ -5574,7 +5584,9 @@ us_address	name	other_address	pair	score	addresses
 0x257510	SweepFrames	0X257F60	same	0	ok
 0x257678	SweepVarbs	0X2580C8	same	0	ok
 0x2577E0	SweepPairs	0X258230	same	0	ok
+0x257948	SweepProcs	0X258398	same	0	ok
 0x257AB0	SweepSidebags	0X258500	same	0	ok
+0x257C18	func_00257C18	0X258668	same	0	ok
 0x257D80	PsidebagNew	0X2587D0	same	0	ok
 0x257E68	func_00257E68	0X2588B8	identical	0	ok
 0x257E88	ResetPairHeap	0X2588D8	same	0	ok

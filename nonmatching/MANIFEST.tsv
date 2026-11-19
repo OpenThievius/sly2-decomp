@@ -41,13 +41,10 @@ address	name	size	file	score
 0X122B70	RefOpVectorProjectTangent	112	splice-bif_120f80/RefOpVectorProjectTangent.c	14
 0X122CE0	RefOpVectorRadianNormal	256	splice-bif_120f80/RefOpVectorRadianNormal.cpp	1
 0X122F00	RefOpMatrixInterpolateRotate	312	splice-bif_120f80/RefOpMatrixInterpolateRotate.c	85
-0X1238B0	RefOpMinimum	296	splice-bif_120f80/RefOpMinimum.cpp	18
 0X1242B8	func_001242B8	560	splice-bif-splice-eval/fun_001242b8.c	111
 0X125168	RefOpNearClipCenter	128	splice-bif-splice-eval/RefOpNearClipCenter.c	28
 0X1272E0	RefEvalApply	1368	splice-eval-splice-frame/RefEvalApply.cpp	53
-0X1286E0	CGc_Collect	800	new_127e90/CGc_Collect.cpp	18
 0X12A3D8	PpairSerializeIn	1104	splice-ref-splice-sidebag/PpairSerializeIn.cpp	55
-0X12C140	bevy_anim_keys_axis_segment	768	new_12ae28/bevy_anim_keys_axis_segment.cpp	19
 0X12C768	func_0012C768	768	new_12ae28/fun_0012c768.c	199
 0X12D220	GetActlaRotationGoal__FP5ACTLAfP7MATRIX3P6VECTOR	696	lookat/GetActlaRotationGoal__FP5ACTLAfP7MATRIX3P6VECTOR.c	145
 0X12D508	GetActbankRotationGoal	848	new_12d508/GetActbankRotationGoal.c	190
@@ -119,7 +116,6 @@ address	name	size	file	score
 0X14F898	FInsideCmMrd	152	cm_14e270/FInsideCmMrd.c	20
 0X14FE58	PosCplookAnchor	112	tn-rip/PosCplookAnchor.c	28
 0X14FEC8	PosCplookEye	112	tn-rip/PosCplookEye.c	18
-0X14FF38	ActivateCplook	552	tn-rip/ActivateCplook.cpp	7
 0X151340	bevy_camera_looks_update	720	tn-rip/bevy_camera_looks_update.c	179
 0X151700	bevy_camera_policy_update	456	tn-rip/bevy_camera_policy_update.c	140
 0X151950	UpdateCpattach	672	rip/UpdateCpattach.c	161
@@ -135,7 +131,6 @@ address	name	size	file	score
 0X158728	FillDzgDz	560	dzg_158668/FillDzgDz.cpp	21
 0X158E20	ApplyDzg	416	dzg-emitter/ApplyDzg.c	100
 0X159240	LoadEmitmeshFromBrx__FP8EMITMESHP18CBinaryInputStream	664	emitter_1591b0/LoadEmitmeshFromBrx__FP8EMITMESHP18CBinaryInputStream.c	170
-0X159C80	UpdateEmitter__FP7EMITTERf	1208	emitter_1591b0/UpdateEmitter__FP7EMITTERf.cpp	0
 0X15A2C0	WakeSoWater__FP2SOP5WATERfP6VECTORT3ff	1352	emitter_1591b0/WakeSoWater__FP2SOP5WATERfP6VECTORT3ff.cpp	11
 0X15B428	EmitBlips__FP5EMITBP5EMITGiP6VECTORT3PfT5T3T3	960	emitter_1591b0/EmitBlips__FP5EMITBP5EMITGiP6VECTORT3PfT5T3T3.c	244
 0X15B7E8	OriginateParticles__FiP5EMITBP7EMITGEN	520	emitter_1591b0/OriginateParticles__FiP5EMITBP7EMITGEN.c	115
@@ -376,7 +371,7 @@ address	name	size	file	score
 0X1D6848	FCalculateMuzzleVelocity__FP6VECTORT0fT0P2SO	424	vec_1d6848/FCalculateMuzzleVelocity__FP6VECTORT0fT0P2SO.c	96
 0X1D69F0	VelBallistic	160	vec-coin/VelBallistic.c	38
 0X1D6B00	LaunchSoAtTarget	1504	vec-coin/LaunchSoAtTarget.c	322
-0X1D8D80	ResetSaveKeepingOptions	632	splice-pair-jump/ResetSaveKeepingOptions.cpp	17
+0X1D8D80	ResetSaveKeepingOptions	632	splice-pair-jump/ResetSaveKeepingOptions.cpp	0
 0X1D8FF8	ApplyOptionsFromSave	648	splice-pair-jump/ApplyOptionsFromSave.cpp	19
 0X1D9B60	SetMeterState	664	splice-gc-wipe/SetMeterState.c	128
 0X1DB0C8	GadgetMenu_SetDirection	712	game-stepguard/GadgetMenu_SetDirection.c	162
@@ -421,7 +416,6 @@ address	name	size	file	score
 0X1F6068	CSo_Clone	1672	so_1f58f0/CSo_Clone.cpp	100
 0X1F6C08	EnsureSogeomLvo	752	so_1f58f0/EnsureSogeomLvo.cpp	41
 0X1F72F8	FPointInAloParts	280	so-sm/FPointInAloParts.c	77
-0X1F7598	PaloAbsorbWkr	552	so-sm/PaloAbsorbWkr.cpp	27
 0X1F9240	func_001F9240	464	new_1f88d8/fun_001f9240.c	131
 0X1F9C48	SleepSo	552	new_1f88d8/SleepSo.c	144
 0X1F9E70	bevy_physics_driver_1f9e70	1208	new_1f88d8/bevy_physics_driver_1f9e70.c	335
@@ -436,7 +430,6 @@ address	name	size	file	score
 0X1FAC98	AddSoAngularAcceleration	104	new_1f88d8/AddSoAngularAcceleration.c	20
 0X1FAD00	AdjustSoXpVelocity	208	new_1f88d8/AdjustSoXpVelocity.c	50
 0X1FB778	CalculateVolPan	360	sound/CalculateVolPan.c	77
-0X1FB8E0	UpdateAmb	536	sound/UpdateAmb.cpp	32
 0X1FC510	StartStreamAmb	392	new_1fbf20/StartStreamAmb.cpp	77
 0X1FEA60	SetSndbankVolumeFactor	912	light-button/SetSndbankVolumeFactor.cpp	57
 0X1FF4F0	func_001FF4F0	72	button-spliceobj/fun_001ff4f0.c	13
@@ -473,7 +466,6 @@ address	name	size	file	score
 0X20C2F8	SetJumperState	1024	steprun-stream/SetJumperState.cpp	69
 0X20C7E0	LoadDirAnimSet	360	steprun-stream/LoadDirAnimSet.c	71
 0X20E890	ExecuteSwLoadRequest	1840	new_20e040/ExecuteSwLoadRequest.c	327
-0X2124F0	PrepareBlotMovie	656	po-screen/PrepareBlotMovie.cpp	24
 0X214100	FStartSpriteDepthInstance	432	screen-font/FStartSpriteDepthInstance.cpp	4
 0X2149D8	LoadMovieCharacter	3048	screen-font/LoadMovieCharacter.cpp	17
 0X215F40	CMovieText_ClineWrap	408	font-break/CMovieText_ClineWrap.cpp	5
@@ -506,7 +498,6 @@ address	name	size	file	score
 0X225300	UpdateDysh	712	new_225300/UpdateDysh.c	146
 0X2255C8	func_002255C8	152	new_225300/fun_002255c8.c	33
 0X225660	SetDyshState	544	new_225300/SetDyshState.c	102
-0X226370	func_00226370	136	new_225aa8/fun_00226370.cpp	0
 0X2267C0	UpdateSwPaused	416	new_225aa8/UpdateSwPaused.cpp	15
 0X2275B8	func_002275B8	368	new_2271f8/fun_002275b8.cpp	74
 0X227C90	func_00227C90	144	new_2271f8/fun_00227c90.c	20
@@ -519,7 +510,6 @@ address	name	size	file	score
 0X22CB90	BuildXfAngularRateMatrix	112	vec-alo/BuildXfAngularRateMatrix.cpp	2
 0X22CCD0	BuildXfSpinRateMatrix	240	vec-alo/BuildXfSpinRateMatrix.c	57
 0X22CDC0	GetXfLocalRateMatrix	904	vec-alo/GetXfLocalRateMatrix.cpp	31
-0X22D148	func_0022D148	512	vec-alo/fun_0022d148.cpp	17
 0X22D348	VelocityXfAtPos	808	vec-alo/VelocityXfAtPos.c	130
 0X22FD38	ConvertXfMat	520	alo-lo/ConvertXfMat.c	133
 0X22FF40	ConvertXfMatrix4	216	alo-lo/ConvertXfMatrix4.cpp	9
@@ -612,8 +602,6 @@ address	name	size	file	score
 0X254EF0	func_00254EF0	16	sdk/fun_00254ef0.cpp	6
 0X256AF0	func_00256AF0	88	sdk/fun_00256af0.cpp	7
 0X256D28	__ml__FG8VU_FLOATG9VU_VECTOR	24	splice-bif_256ce8/__ml__FG8VU_FLOATG9VU_VECTOR.c	4
-0X257948	SweepProcs	360	bis-memcard/SweepProcs.cpp	32
-0X257C18	func_00257C18	360	bis-memcard/fun_00257c18.cpp	30
 0X258008	func_00258008	56	bis-memcard/fun_00258008.c	10
 0X259AC8	func_00259AC8	48	suv-end/fun_00259ac8.cpp	10
 0X259DA8	Vec4_GetY	24	suv-end/Vec4_GetY.c	4

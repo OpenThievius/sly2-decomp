@@ -5,6 +5,7 @@
 #include "types.h"
 #include "m2c_macros.h"
 #include "include_asm.h"
+#include "ps2inline.h"
 
 INCLUDE_ASM(0X225E98);
 
@@ -70,7 +71,31 @@ s32 FIgnoreTankIntersection(struct Tank *tank, struct TankIntersectionObject *ot
 }
 }
 
-INCLUDE_ASM(0X226370);
+struct ACT;
+
+struct XF;
+
+union VU_VECTOR { QW q; float v[4]; };
+
+struct TANK_226370 { char pad0[0x5C]; XF *pxf; char pad1[0x18C - 0x60]; float pan; float tilt; char pad2[0x1CC - 0x194]; int fRotAct; char pad3[8]; ACT *pact; };
+
+extern "C" ACT *func_0012DC18(TANK_226370 *, XF *, int, int, int, QW);
+
+extern "C" float func_0012E460(ACT **);
+
+void func_00226370(TANK_226370 *ptank, int fRotAct)
+{
+    VU_VECTOR euler;
+    if (ptank->fRotAct == fRotAct)
+        return;
+    ptank->fRotAct = fRotAct;
+    if (fRotAct) {
+        euler.q = VectorFromFloats3(0.0f, -ptank->tilt, ptank->pan);
+        ptank->pact = func_0012DC18(ptank, ptank->pxf, 1, 5, 3, euler.q);
+    } else {
+        func_0012E460(&ptank->pact);
+    }
+}
 
 extern "C" {
 s32 CreateSlotheapSwAlign(s32 *, s32, s32, s32); /* extern */
