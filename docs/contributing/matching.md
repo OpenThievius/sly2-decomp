@@ -187,6 +187,13 @@ it in memory (`CLo_Clone`); `if` forms for clamps, which give `movz` and a cross
 for `CFrame_AddParent`, `bevy_splice_frame_set_parent` and `FStgSwitchDone`: confirm each with the disassembly.
 Four functions (`ApplySpriteKeySounds`, `PumpCd`, `func_0021C888`, `PleaseAcquire`) end where retail sits between loop.c's default hoisting and
 `-fmove-all-movables`: one lever for that class would take several to 0.
+Loop-movable class, measured 2026-11-19 (nothing landed from it): the `-mvu0-use-vf0-NN` flag is binary here: `PumpCd`, `ApplySpriteKeySounds` and
+`func_0021C888` score the same for every NN from 0 to 31 (51, 53 and 20 against 51, 59 and 21 without), so docs/toolchain/loops.md's `64 + NN` threshold
+does not hold for this compiler and no per-function NN is a lever. Declaring `PumpCd`'s four callees `__attribute__((const))` (so loop.c sees no call and
+doubles the threshold) changes no hoist decision (106, worse). `-dL` on `PumpCd`: the loop has 126 real insns, the two constants retail hoists
+(the 1 of `cslotFilled == 1` and 0xFFF) are "savings 1, life 1, not desirable", while the two with savings 2 move; so retail's loop-opt saw
+`threshold * 1 * 1 >= insns`, a smaller loop (retail's body is about 115 physical insns with delay slots, ours 126 real): look for phantom insns
+(`sign_extend`, argument copies) that inflate ours by 20 or more before looking for a flag.
 
 ## Walls
 
