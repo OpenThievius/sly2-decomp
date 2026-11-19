@@ -1842,6 +1842,7 @@ address	name	size	file	whole_file	symbol
 0X14E698	CalcCmAdjust__FP2CMP2SOP6CPDEFIP6VECTOR	52	new_14d1d0/new_14d1d0_14d470.cpp	new_14d1d0/new_14d1d0_14d470.cpp	CalcCmAdjust__FP2CMP2SOP6CPDEFIP6VECTOR
 0X14E768	AdjustCmCpdefi__FP2CMP2SOfP6CPDEFI	440	new_14d1d0/new_14d1d0_14d470.cpp	new_14d1d0/new_14d1d0_14d470.cpp	AdjustCmCpdefi__FP2CMP2SOfP6CPDEFI
 0X14E920	ResetCmAdjust__FP2CMP2SOP6CPDEFI	72	new_14d1d0/new_14d1d0_14d470.cpp	new_14d1d0/new_14d1d0_14d470.cpp	ResetCmAdjust__FP2CMP2SOP6CPDEFI
+0X14E968	GetCmCpdefi__FP2CMP2SOfP6CPDEFI	160	new_14d1d0/new_14d1d0_14d470.cpp	new_14d1d0/new_14d1d0_14d470.cpp	GetCmCpdefi__FP2CMP2SOfP6CPDEFI
 0X14F030	func_0014F030	12	new_14d1d0/new_14d1d0_14d470.cpp	new_14d1d0/new_14d1d0_14d470.cpp	func_0014F030
 0X14F3C8	func_0014F3C8	96	new_14d1d0/new_14d1d0_14d470.cpp	new_14d1d0/new_14d1d0_14d470.cpp	func_0014F3C8
 0X14F428	SetCmMat	80	new_14d1d0/new_14d1d0_14d470.cpp	new_14d1d0/new_14d1d0_14d470.cpp	SetCmMat
@@ -3549,6 +3550,7 @@ address	name	size	file	whole_file	symbol
 0X1CE1C8	UpdateRipg	288	rip/UpdateRipg.cpp		
 0X1CE608	RenderRipgSelf__FP4RIPGP2CMP2RO	180	rip/RenderRipgSelf__FP4RIPGP2CMP2RO.cpp		
 0X1CE6C0	func_001CE6C0	16	rip/fun_001ce6c0.c		
+0X1CE6D0	ConstructRipOfType	440	rip/ConstructRipOfType.cpp		
 0X1CE888	PripNewRipg	152	rip/PripNewRipg.cpp		
 0X1CE920	InitRip__FP3RIPP6VECTORfP2SO	92	rip/InitRip__FP3RIPP6VECTORfP2SO.cpp		
 0X1CE980	RemoveRip	56	light/RemoveRip.c		
@@ -4826,6 +4828,7 @@ address	name	size	file	whole_file	symbol
 0X218710	func_00218710	40	font-break/fun_00218710.cpp		
 0X218738	func_00218738	12	font-break/fun_00218738.c		
 0X218748	PauseSpriteInstance	72	font-break/PauseSpriteInstance.cpp		
+0X218790	CombineColorTransforms	284	font-break/CombineColorTransforms.cpp		
 0X2188B0	RefreshSpriteInstance	2120	font-break/RefreshSpriteInstance.cpp		
 0X2190F8	func_002190F8	152	font-break/fun_002190f8.cpp		
 0X219348	ClearSpriteKeySlots	184	font-break/ClearSpriteKeySlots.cpp		

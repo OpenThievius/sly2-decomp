@@ -157,6 +157,15 @@ Ended near, with a row in `config/matching/walls.tsv`: `UpdateJtLootSave` (hi-on
 `DrawRhythmHud` (sched2 tie), `CSm_LoadFromBrx` (`-fmove-all-movables` against the group loop), `PsenseFindNotice` (VU0 register tie).
 `check_source.py` does not catch an unused steering argument (an old `UpdateJtLootSave` probe scored 0 with one): a reviewer must.
 
+Second round (wave W18, 2026-11-19, five `register`-class drafts with 195 to 326 earlier runs): three reached 0 and two of them were wrong
+prototypes, not allocation: `ConstructRipOfType` had a steering third parameter (retail's result is an uninitialised local that global alloc
+puts in `$a2`), and `GetCmCpdefi` took a float no slot-50 override reads (the extra `$f12` move lengthened the vtable pointer's life). Check
+a draft's parameters against its callers and the sibling overrides of the same vtable slot before anything else. `CombineColorTransforms`:
+a term that must not share the result's register gets its own function-scope local, with the product written first (`pm * s + pa`).
+Counter-example: a shared function-scope index lengthens the live range and loses global-alloc priority (`CAseg_LoadFromBrx`, 15 against 6):
+reuse locals only where retail's live ranges overlap. Note: `data/matching/include/` is the source of `include/` (`make src` copies it
+over): edit both, or a header edit is undone.
+
 ## Walls
 
 `config/matching/walls.tsv` is the list: address, name, class (`blocker`, `fragment`, `helper`, `toolchain`, `tie`, `exhausted`), the reason, the evidence and the `unlock` condition.

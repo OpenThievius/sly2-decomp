@@ -116,7 +116,6 @@ address	name	size	file	score
 0X14E1A8	SetCmLookAt	200	font-cm/SetCmLookAt.cpp	6
 0X14E328	SetCmPolicy__FP2CM3CPPP5CPLCYP2SOPv	416	cm_14e270/SetCmPolicy__FP2CM3CPPP5CPLCYP2SOPv.cpp	9
 0X14E6D0	SpringCm__FfffP2CMP6VECTORP6VECTORP6VECTOR	152	cm_14e270/SpringCm__FfffP2CMP6VECTORP6VECTORP6VECTOR.c	38
-0X14E968	GetCmCpdefi__FP2CMP2SOfP6CPDEFI	160	cm_14e270/GetCmCpdefi__FP2CMP2SOfP6CPDEFI.c	26
 0X14EA08	FFindCmClearInterval	360	cm_14e270/FFindCmClearInterval.cpp	52
 0X14EB70	FindCmClosestClearPos	560	cm_14e270/FindCmClosestClearPos.c	131
 0X14EDA0	SquishCmEye	656	cm_14e270/SquishCmEye.c	154
@@ -386,7 +385,6 @@ address	name	size	file	score
 0X1CD5F0	FillScreenRect__FiiiiffffP4GIFS	400	render/FillScreenRect__FiiiiffffP4GIFS.cpp	29
 0X1CD780	bevy_camera_cm_screen_px_ps2	536	new_1cd780/bevy_camera_cm_screen_px_ps2.c	125
 0X1CE2E8	BounceRipgRips__FP4RIPG	800	rip_1cde70/BounceRipgRips__FP4RIPG.cpp	106
-0X1CE6D0	ConstructRipOfType	440	rip_1cde70/ConstructRipOfType.cpp	23
 0X1CEB08	FBounceRip__FP3RIPP2SOP6VECTORT2	1216	rip_1ce9c0/FBounceRip__FP3RIPP2SOP6VECTORT2.c	321
 0X1CEFC8	FIsZeroV__FP6VECTOR	72	alo_1cefc8/FIsZeroV__FP6VECTOR.c	15
 0X1CF010	FIsZeroW__FP6VECTOR	72	alo_1cefc8/FIsZeroW__FP6VECTOR.c	16
@@ -521,7 +519,6 @@ address	name	size	file	score
 0X217058	EmitGlyphDma	576	font-break/EmitGlyphDma.cpp	49
 0X2174C8	DrawMovieShapeCharacter	792	font-break/DrawMovieShapeCharacter.cpp	52
 0X2177E0	DrawMovieBitmapCharacter	952	font-break/DrawMovieBitmapCharacter.cpp	97
-0X218790	CombineColorTransforms	288	font-break/CombineColorTransforms.cpp	10
 0X219190	ApplySpriteKeySounds	440	font-break/ApplySpriteKeySounds.cpp	23
 0X219400	PlaceSpriteKeyCharacters	3040	font-break/PlaceSpriteKeyCharacters.cpp	265
 0X21BC08	func_0021BC08	272	break-text/fun_0021bc08.cpp	17

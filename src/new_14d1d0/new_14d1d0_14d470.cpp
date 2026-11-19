@@ -6,6 +6,7 @@
 #include "types.h"
 #include "include_asm.h"
 #include "vu0inline.h"
+#include "so.h"
 
 extern "C" {
 void func_0014D470(void) {
@@ -23,7 +24,20 @@ struct CPLCY {
 
 struct CPR { CPLCY *pcplcy; int pad[3]; };
 
-struct CM { char pad[0x30C]; int ccpr; int unk310; CPR acpr[1]; };
+/* The camera's point definition, 0x50 bytes: what GetSoCpdefi (slot 50 of SO) fills; fields as in src/so/GetSoCpdefi__FP2SOfP6CPDEFI.cpp. */
+struct CPDEFI {
+    int grfcpd;
+    char pad[0xC];
+    QW pos;
+    QW vel;
+    float radHome;
+    float sAdjust;
+    float tMoveLast;
+    int cfk;
+    QW posAdjust;
+};
+
+struct CM { char pad[0x260]; SO *psoCpdefi; char pad2[0xC]; CPDEFI cpdefi; char pad3[0x4C]; int ccpr; int unk310; CPR acpr[1]; };
 
 struct CM2 : CM { };
 
@@ -432,8 +446,6 @@ void RevokeCmPolicy(CM_14E4C8 *pcm, int grf, CPP cpp, CPLCY_14E4C8 *pcplcy, SO *
     }
 }
 
-struct CPDEFI { char pad[0x30]; float radHome; float sAdjust; };
-
 extern "C" VECTOR *SetVectorCylind__FP6VECTORfff_14E698(VECTOR *, float, float, float);
 
 extern "C" VECTOR *CalcCmAdjust__FP2CMP2SOP6CPDEFIP6VECTOR(VECTOR *result, CPDEFI *cpdefi)
@@ -442,8 +454,6 @@ extern "C" VECTOR *CalcCmAdjust__FP2CMP2SOP6CPDEFIP6VECTOR(VECTOR *result, CPDEF
 }
 
 INCLUDE_ASM(0X14E6D0);
-
-struct CPDEFI;
 
 extern "C" QW CalcCmAdjust__FP2CMP2SOP6CPDEFIP6VECTOR_14E768(CM *, CPDEFI *);
 
@@ -521,7 +531,19 @@ extern "C" void ResetCmAdjust__FP2CMP2SOP6CPDEFI(CM_14E920 *arg0) {
     arg0->field_0x2F0[0] = 0;
 }
 
-INCLUDE_ASM(0X14E968);
+extern "C" QW CalcCmAdjust__FP2CMP2SOP6CPDEFIP6VECTOR_14E968(CM *pcm, CPDEFI *pcpdefi);
+
+/* Sly 1's name keeps a float dt; ActivateCptn (its only caller) sets no $f12, and no override of SO slot 50 reads one. */
+extern "C" void GetCmCpdefi__FP2CMP2SOfP6CPDEFI(CM *pcm, SO *pso, CPDEFI *pcpdefi)
+{
+    if (pso == pcm->psoCpdefi) {
+        *pcpdefi = pcm->cpdefi;
+    } else {
+        pso->GetCpdefi(pcpdefi);
+        QW adjust = CalcCmAdjust__FP2CMP2SOP6CPDEFIP6VECTOR_14E968(pcm, pcpdefi);
+        pcpdefi->posAdjust = VectorAdd(pcpdefi->pos, adjust);
+    }
+}
 
 INCLUDE_ASM(0X14EA08);
 
