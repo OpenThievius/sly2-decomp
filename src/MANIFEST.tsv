@@ -5321,7 +5321,6 @@ address	name	size	file	whole_file	symbol
 0X23EB40	__unwinding_cleanup	8	sdk/__unwinding_cleanup.cpp		
 0X23F240	func_0023F240	68	sdk/fun_0023f240.cpp		
 0X23F288	func_0023F288	80	sdk/fun_0023f288.cpp		
-0X23F3D8	func_0023F3D8	616	sdk/fun_0023f3d8.cpp		
 0X23F640	func_0023F640	72	sdk/fun_0023f640.c		
 0X23F688	func_0023F688	136	sdk/fun_0023f688.cpp		
 0X23F710	func_0023F710	316	sdk/fun_0023f710.cpp		

@@ -5321,7 +5321,6 @@ us_address	name	other_address	pair	score	addresses
 0x23EB40	__unwinding_cleanup	0X23F500	gap	0	ok
 0x23F240	func_0023F240	0X23FC00	identical	0	ok
 0x23F288	func_0023F288	0X23FC48	identical	0	ok
-0x23F3D8	func_0023F3D8	0X23FD98	same	0	ok
 0x23F640	func_0023F640	0X240000	identical	0	ok
 0x23F688	func_0023F688	0X240048	identical	0	ok
 0x23F710	func_0023F710	0X2400D0	same	0	ok
