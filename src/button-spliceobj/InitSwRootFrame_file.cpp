@@ -6,6 +6,8 @@
 #include "sw.h"
 #include "m2c_macros.h"
 #include "include_asm.h"
+#include "bis.h"
+#include "alloc.h"
 
 extern "C" {
 struct SwRoot {
@@ -49,7 +51,86 @@ void func_001FF830()
     ShutdownCatalog();
 }
 
-INCLUDE_ASM(0X1FF858);
+struct PAIR_1FF858 { s32 count; s32 pad4; u8 ref[8]; PAIR_1FF858 *next; };
+struct ENTRY_1FF858 { PAIR_1FF858 *ppair; void *pframe; };
+struct BLOCK_1FF858 { s32 id; s32 cEntry; ENTRY_1FF858 *aentry; BLOCK_1FF858 *pnext; };
+struct WORK16 {
+    union {
+        ALLOCREQ req;
+        PAIR_1FF858 *ppair;
+    };
+    s32 pad[2];
+};
+
+static inline ALLOCREQ *Aligned(ALLOCREQ *request)
+{
+    request->cbAlign = 0x10;
+    return request;
+}
+
+extern "C" {
+void CPairPtr_Destructor(void *, int);
+void UnlinkPairNode(PAIR_1FF858 *);
+void FreeSlotheapPv(SLOTHEAP *, void *);
+void PpairSerializeIn(WORK16 *, CBinaryInputStream *);
+void *PvAllocSwClearImpl__Fi(ALLOCREQ *);
+void *PvAllocSwImpl__Fi(ALLOCREQ *);
+void RunSpliceBlockEntry(WORK16 *, SW *, BLOCK_1FF858 *, int);
+void func_00128148(void *);
+void CRef_Destruct_1FF858(void *);
+extern s32 B_003E1C34;
+extern SLOTHEAP B_004520A8_1FF858;
+extern char g_2dd598[];
+
+void ReadSpliceBlock(SW *psw, int id, CBinaryInputStream *pbis)
+{
+    WORK16 ref;
+    WORK16 work;
+    int cEntry = pbis->U32Read();
+    if (cEntry != 0) {
+        int index = 0;
+        ref.req.cb = 0x10;
+        ref.req.cbAlign = 0x10;
+        BLOCK_1FF858 *pblock = (BLOCK_1FF858 *)PvAllocSwClearImpl__Fi(&ref.req);
+        pblock->id = id;
+        ref.req.cb = -1;
+        pblock->cEntry = cEntry;
+        work.req.cb = cEntry * 8;
+        pblock->aentry = (ENTRY_1FF858 *)PvAllocSwImpl__Fi(Aligned(&work.req));
+        for (; index < cEntry; index++) {
+            ENTRY_1FF858 *pentry = &pblock->aentry[index];
+            PpairSerializeIn(&work, pbis);
+            if (work.ppair != 0)
+                work.ppair->count++;
+            pentry->ppair = work.ppair;
+            pentry->pframe = 0;
+            if (B_003E1C34 != 0) {
+                pbis->Unknown1();
+                pbis->Unknown1();
+                pbis->Unknown1();
+            }
+            PAIR_1FF858 *ppair = work.ppair;
+            if (ppair != 0) {
+                if (--ppair->count == 0) {
+                    CPairPtr_Destructor(&ppair->next, 2);
+                    CRef_Destruct_1FF858(&ppair->ref);
+                    UnlinkPairNode(ppair);
+                    FreeSlotheapPv(&B_004520A8_1FF858, ppair);
+                }
+            }
+        }
+        for (index = 0; index < cEntry; index++) {
+            RunSpliceBlockEntry(&work, psw, pblock, index);
+            CRef_Destruct_1FF858(&work);
+        }
+        psw->pblockCur = (struct BLOCK *)pblock;
+        pblock->pnext = *(BLOCK_1FF858 **)((char *)psw + 0x39EC);
+        *(BLOCK_1FF858 **)((char *)psw + 0x39EC) = pblock;
+        func_00128148(g_2dd598);
+        CRef_Destruct_1FF858(&ref);
+    }
+}
+}
 
 struct ENTRY { int a; void *pframe; };
 

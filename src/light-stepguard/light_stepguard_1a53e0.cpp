@@ -7,6 +7,8 @@
 #include "m2c_macros.h"
 #include "so.h"
 #include "include_asm.h"
+#include "sw.h"
+#include "alloc.h"
 #include "ps2inline.h"
 #include "vu0inline.h"
 
@@ -763,7 +765,187 @@ void ClearLoGrfField(char *self, unsigned bits)
     *(unsigned *)(self + 0x40) = field & ~bits;
 }
 
-INCLUDE_ASM(0X1A6730);
+struct VARB_1A6730 {
+    s32 cref;
+    u8 unknown_0x4[0x8];
+    /* 0x0C */ u8 ref[0x8];
+    /* 0x14 */ void *pvarbNext;
+};
+
+struct SIDEBAG_1A6730 {
+    s32 cref;
+    u8 unknown_0x4[0x4];
+    /* 0x08 */ VARB_1A6730 *pvarb;
+};
+
+struct FRAME_1A6730 {
+    s32 cref;
+};
+
+struct SL_1A6730 { void *pvFirst; void *pvLast; s32 ibSle; };
+
+/* A clone node of the object's scope chain, 0x28 bytes (the same layout as PcnodeFindOrAddClonePath's CNODE). */
+struct CNODE_1A6730 {
+    s32 cloneid;
+    /* 0x04 */ CNODE_1A6730 *pcnodeParent;
+    /* 0x08 */ s32 oid;
+    /* 0x0C */ u8 sle0C[0x4];
+    /* 0x10 */ LO *plo;
+    /* 0x14 */ u8 sle14[0x4];
+    /* 0x18 */ SL_1A6730 slChild;
+    u8 unknown_0x24[0x4];
+};
+
+/* The bits of LO::grfo a clone takes from its template. */
+struct GRFO_1A6730 {
+    u64 unknown_0 : 48;
+    int f48 : 4;
+    int f52 : 4;
+    unsigned int f56 : 1;
+    unsigned int f57 : 1;
+    unsigned int f58 : 1;
+};
+
+struct CLS_1A6730 {
+    u8 unknown_0x0[0xC];
+    /* 0x0C */ s32 cb;
+};
+
+/* The handles PsidebagClone and PframeClone return by value: a counted pointer released when it goes out of scope. */
+struct SIDEBAGPTR_1A6730 {
+    SIDEBAG_1A6730 *psidebag;
+    SIDEBAGPTR_1A6730(const SIDEBAGPTR_1A6730 &sidebagptr);
+    ~SIDEBAGPTR_1A6730();
+};
+
+struct FRAMEPTR_1A6730 {
+    FRAME_1A6730 *pframe;
+    FRAMEPTR_1A6730(const FRAMEPTR_1A6730 &frameptr);
+    ~FRAMEPTR_1A6730();
+};
+
+extern "C" {
+void func_00128148(void *pv);
+SIDEBAGPTR_1A6730 PsidebagClone(SIDEBAG_1A6730 *psidebag, LO *plo);
+void SidebagPtr_Assign(SIDEBAG_1A6730 **ppsidebag, SIDEBAG_1A6730 *psidebag);
+void VarbPtr_Destructor(void *pvarbptr, int flags);
+void CRef_Destruct(void *pref);
+void UnlinkVarbNode(VARB_1A6730 *pvarb);
+void UnlinkSidebagNode(SIDEBAG_1A6730 *psidebag);
+int FreeSlotheapPv_1A6730(SLOTHEAP *pslotheap, void *pv);
+void func_00258178(SIDEBAG_1A6730 *psidebag);
+FRAMEPTR_1A6730 PframeClone(FRAME_1A6730 *pframe, LO *plo);
+void CFramePtr_Assign(FRAME_1A6730 **ppframe, FRAME_1A6730 *pframe);
+void CFrame_DeletingDestructor(FRAME_1A6730 *pframe, int flags);
+void func_00259A88(FRAME_1A6730 *pframe);
+void *PvAllocSwCopyImpl__FiPv(ALLOCREQ *preq, void *pvSrc);
+void ClearSle(void *psle);
+void ClearSl(SL_1A6730 *psl);
+void AppendSlEntry(SL_1A6730 *psl, void *pv);
+SL_1A6730 *func_0015E3C0(SW *psw, int oid);
+void CopyAb__FPvT0Ui(void *pvDst, void *pvSrc, u32 cb);
+extern SW B_003DD490_1A6730;
+extern SLOTHEAP B_004520D0_1A6730;
+extern SLOTHEAP B_00452148_1A6730;
+extern char g_2dd598[];
+void CLo_Clone(LO *plo, LO *ploBase);
+}
+
+inline SIDEBAGPTR_1A6730::~SIDEBAGPTR_1A6730()
+{
+    SIDEBAG_1A6730 *psidebag = this->psidebag;
+    if (psidebag != 0 && --psidebag->cref == 0) {
+        VARB_1A6730 *pvarb = psidebag->pvarb;
+        if (pvarb != 0 && --pvarb->cref == 0) {
+            VarbPtr_Destructor(&pvarb->pvarbNext, 2);
+            CRef_Destruct(pvarb->ref);
+            UnlinkVarbNode(pvarb);
+            FreeSlotheapPv_1A6730(&B_004520D0_1A6730, pvarb);
+        }
+        UnlinkSidebagNode(psidebag);
+        FreeSlotheapPv_1A6730(&B_00452148_1A6730, psidebag);
+    }
+}
+
+inline FRAMEPTR_1A6730::~FRAMEPTR_1A6730()
+{
+    FRAME_1A6730 *pframe = this->pframe;
+    if (pframe != 0 && --pframe->cref == 0)
+        CFrame_DeletingDestructor(pframe, 3);
+}
+
+/* The object's two script handles, at 0x0 and 0x4 of LO's first words. */
+struct LOHANDLES_1A6730 {
+    FRAME_1A6730 *pframe;
+    SIDEBAG_1A6730 *psidebag;
+};
+
+void CLo_Clone(LO *plo, LO *ploBase)
+{
+    LOHANDLES_1A6730 *phandles = (LOHANDLES_1A6730 *)plo;
+    LOHANDLES_1A6730 *phandlesBase = (LOHANDLES_1A6730 *)ploBase;
+
+    func_00128148(g_2dd598);
+
+    if (phandlesBase->psidebag != 0) {
+        {
+            SIDEBAGPTR_1A6730 sidebagptr = PsidebagClone(phandlesBase->psidebag, plo);
+            SidebagPtr_Assign(&phandles->psidebag, sidebagptr.psidebag);
+        }
+        func_00258178(phandles->psidebag);
+    }
+
+    if (phandlesBase->pframe != 0) {
+        CFramePtr_Assign(&phandles->pframe, PframeClone(phandlesBase->pframe, plo).pframe);
+        func_00259A88(phandles->pframe);
+    }
+
+    *(f32 *)((char *)plo + 0x38) = *(f32 *)((char *)ploBase + 0x38);
+
+    GRFO_1A6730 *pgrfo = (GRFO_1A6730 *)&plo->grfo;
+    GRFO_1A6730 *pgrfoBase = (GRFO_1A6730 *)&ploBase->grfo;
+    pgrfo->f52 = pgrfoBase->f52;
+    pgrfo->f57 = pgrfoBase->f57;
+    pgrfo->f48 = pgrfoBase->f48;
+    pgrfo->f58 = pgrfoBase->f58;
+
+    int grfBase = ploBase->grfSw;
+    if (!(grfBase & 1))
+        grfBase = ploBase->pgrfentry->grf;
+    int grf = plo->grfSw;
+    grfBase &= ~1;
+    if (!(grf & 1))
+        plo->pgrfentry->grf = grfBase | (plo->pgrfentry->grf & 1);
+    else
+        plo->grfSw = grfBase | (grf & 1);
+
+    plo->pdcb = ploBase->pdcb;
+
+    if (B_003DD490_1A6730.field_0x3F10 != -2) {
+        plo->pscope = ploBase->pscope;
+    } else {
+        CNODE_1A6730 *pcnode = (CNODE_1A6730 *)ploBase->pscope;
+        while (pcnode != 0 && pcnode->plo == ploBase) {
+            ALLOCREQ req;
+            req.cb = sizeof(CNODE_1A6730);
+            ALLOCREQ *preq = &req;
+            preq->cbAlign = 0x10;
+            CNODE_1A6730 *pcnodeClone = (CNODE_1A6730 *)PvAllocSwCopyImpl__FiPv(preq, pcnode);
+            pcnodeClone->plo = plo;
+            ClearSle(pcnodeClone->sle0C);
+            ClearSle(pcnodeClone->sle14);
+            ClearSl(&pcnodeClone->slChild);
+            AppendSlEntry(&pcnodeClone->pcnodeParent->slChild, pcnodeClone);
+            AppendSlEntry(func_0015E3C0(&B_003DD490_1A6730, pcnodeClone->oid), pcnodeClone);
+            pcnode = pcnode->pcnodeParent;
+        }
+    }
+
+    char *pvtable = *(char **)((char *)plo + 0xC);
+    CLS_1A6730 *(*pfnGetCls)(void *) = *(CLS_1A6730 *(**)(void *))(pvtable + 0x34);
+    CLS_1A6730 *pcls = pfnGetCls((char *)plo + *(s16 *)(pvtable + 0x30));
+    CopyAb__FPvT0Ui((char *)plo + sizeof(LO), (char *)ploBase + sizeof(LO), pcls->cb - sizeof(LO));
+}
 
 struct Object_1A6AD0;
 

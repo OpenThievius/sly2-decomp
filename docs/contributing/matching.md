@@ -135,6 +135,97 @@ used for the first call, a second declared just before the later use) removed an
 one reused local fixed an s1/s2 swap. An explicit empty `case 1: case 2: break;` arm gave `UpdateDependentTaskState` retail's switch tree (22 to 15).
 An old draft's score is no baseline when its callee prototype was wrong: fix the prototype and re-score before comparing.
 
+## Levers from the 1 to 3 KB drafts (wave L18, 2026-11-18)
+
+Seven Opus workers, one function each, 12 compiles: two reached 0 (`FlushRenderRecords` 45, `UpdateSwTargetList` 54), `DrawRhythmHud` 38 to 2,
+`CSm_LoadFromBrx` 39 to 3. What moved them, each measured on the function named, none yet a control that took a second function to 0:
+
+- **Function-scope locals, C style.** One `LO *plo` and the loop temporaries (`ptgtNew`, `itgtNew`) declared at the top and reused by both
+  loops gave retail's register homes (`UpdateSwTargetList` 21 to 0; `CSm_LoadFromBrx` search loop). A fresh local per loop did not.
+- **Read each callee's own disassembly for its prototype.** Return type (`void` against `int`) and the width of a tested field (`lw`
+  against `lh`) cost about 30 words in `FlushRenderRecords` (15 to 3); `GSmooth` takes five arguments, the draft passed three.
+- **A table of pairs as `T x[][2]`**, not an array of `{begin, end}` structs: retail's base-first `lw 4` and the folded `%hi/%lo` come
+  from the two-dimensional index (`FlushRenderRecords` 45 to 15).
+- **`int grf = p->flags; if (grf & 1)`** gives `lb`; a direct `signed char & 1` compiles to `lbu` (`CloneGlobset`).
+- **The existing inline `CTextBox(x, y, dx, dy, rgba)` constructor** and separate `Text` locals in place of an invented frame struct
+  (`DrawRhythmHud` 38 to 2, from `GadgetMenu_DrawSlotLabels`).
+- **A `for (int c = 1;; c++)` round loop** puts `c++` in the `bnez` delay slot as retail does (`CSm_LoadFromBrx`).
+- **Rewrite from the block structure, not the statement order.** All five near misses had 100 to 300 earlier runs of permutations;
+  the two matches and the two 2-to-3 results came from new types and locals, not from reordering.
+
+Ended near, with a row in `config/matching/walls.tsv`: `UpdateJtLootSave` (hi-only hoist), `CloneGlobset` (global-alloc tie),
+`DrawRhythmHud` (sched2 tie), `CSm_LoadFromBrx` (`-fmove-all-movables` against the group loop), `PsenseFindNotice` (VU0 register tie).
+`check_source.py` does not catch an unused steering argument (an old `UpdateJtLootSave` probe scored 0 with one): a reviewer must.
+
+Second round (wave W18, 2026-11-19, five `register`-class drafts with 195 to 326 earlier runs): three reached 0 and two of them were wrong
+prototypes, not allocation: `ConstructRipOfType` had a steering third parameter (retail's result is an uninitialised local that global alloc
+puts in `$a2`), and `GetCmCpdefi` took a float no slot-50 override reads (the extra `$f12` move lengthened the vtable pointer's life). Check
+a draft's parameters against its callers and the sibling overrides of the same vtable slot before anything else. `CombineColorTransforms`:
+a term that must not share the result's register gets its own function-scope local, with the product written first (`pm * s + pa`).
+Counter-example: a shared function-scope index lengthens the live range and loses global-alloc priority (`CAseg_LoadFromBrx`, 15 against 6):
+reuse locals only where retail's live ranges overlap. Note: `data/matching/include/` is the source of `include/` (`make src` copies it
+over): edit both, or a header edit is undone.
+
+Third round (wave X19, 2026-11-19, callee-signature mismatches from `build/check_calls.tsv`): four of four workers got a result, three matched.
+`UpdateSearchBeh` (`SetGoalTarget` takes `GOAL *` and a target; one `fRequest = 0` after the inner if/else, not one per branch, keeps GCC from
+merging the two `SetSearchState` tails), `bevy_player_p14_jts8_enter` (the made-up third argument of `SetBentleyState` was the only thing
+putting `self` in `$a2`; case 13 through the same inline as its siblings and a block-local `pjtOwner` in case 16) and `func_001BB250`
+(scores 0 only under `-fmove-all-movables`: listed in `config/us/move_movables.txt`). `ApplySpriteKeySounds` is a wall: the registry's 23 was a
+steering argument, the legal draft scores 59 (loop.c merges two identical in-loop multiplies). A check_calls flag can be false:
+`FStgSwitchDone(STG *)` is right though a matched file defines it `(void)`, because retail sets `$a0` before the call.
+Measured and closed: a typed `SAVE` global does not unlock the hi-only hoist (retail never reads a member through the hoisted high register;
+`StoreAudioModeInSave` is typed and still walled), and none of the 26 flag variants of `flag_sweep.py` moves `ApplySpriteKeySounds` (best 42 with
+`-fno-omit-frame-pointer`, a frame change, then 53).
+
+Fourth round (wave Y19, 2026-11-19, ten drafts from the non-blocker part of `build/check_calls.tsv`; blockers are in `config/us/blockers.tsv`, so queue
+through `claim.py` to filter, not by reading `walls.tsv`): four matched (`BlendPrevFrame`, `func_00136530`, `PpathFindBootyOid`, `CLo_Clone`), six
+ended near. New levers, each one measurement: a missing 0x640-byte buffer local that retail passes on (`BlendPrevFrame`, frame 0x80 to 0x6C0); a clock
+global typed `{t, dt}` as the matched sibling has it (8 to 1); an inline wrapper that retail also has out of line (`RefGetGameSaveValue`, stops loop.c hoisting
+`&path`); a `union VU_VECTOR { QW q; VECTOR v; }` position array stored through `.q`, which marks the store as in-struct so it no longer aliases a global (17 to 6);
+`Aligned(ALLOCREQ *)` setting `cbAlign` through the pointer (61 to 17); a class with a destructor and a declared copy constructor for a callee that returns
+it in memory (`CLo_Clone`); `if` forms for clamps, which give `movz` and a cross-jumped `and`, where a ternary gives MIN or an extra copy. A check_calls flag was false
+for `CFrame_AddParent`, `bevy_splice_frame_set_parent` and `FStgSwitchDone`: confirm each with the disassembly.
+Four functions (`ApplySpriteKeySounds`, `PumpCd`, `func_0021C888`, `PleaseAcquire`) end where retail sits between loop.c's default hoisting and
+`-fmove-all-movables`: one lever for that class would take several to 0.
+
+Fifth round (wave V20, 2026-11-19, 30 workers on the non-blocker drafts of `build/check_calls.tsv`; Sonnet up to 500 bytes, Opus above): 17 reached 0.
+Eleven of them were prototype or argument bugs the flag named; the rest were levers. Measured on the function named: a chained zero assignment
+`a = b = c = ... = 0.0f` stores the outermost target first and the rest innermost-first, and a `float` zero store needs the chain (separate `0.0f`
+statements emit `sw $zero`) (`UpdateBinoc`); a named pointer bound to `halves + fOther` fixed a commutative operand order that every expression form
+left (`AdjustStepXps`); `do { state = x->state; switch } while (x->state != state)` gives a latch with the reload in the `bnel` delay slot (`func_001C8350`);
+`int` loop counters and `if (cIn <= iend0 + iend1)` keep a sum out of the result's register (`ClsgMergeAlsg`); a `jr` delay slot the split cut off is a
+tail merge: `config/matching/merges.tsv` with `lead end members` (the 0x258-byte `ClsgMergeAlsg` was a size wall, not code). Four functions reach 0 only with
+`-fmove-all-movables` (`func_001BB250`, `func_001C8350`, `GoalIdle_Update`, `FStartSpriteLabelInstance`, `RefOpFilter`: rows in `move_movables.txt`) and
+one with the SDK assembler (`func_00241C98`, `sony_gcc29.txt`, with a `volatile` semaphore id marked `// volatile-ok`). Placement new
+(`operator new(unsigned, SLOTHEAP *)` calling the slot-heap allocator) gave retail's loop-preheader `lui` (`PaloAbsorbWkr`, 7 to 0): not tried on the call-argument
+hi-only functions. Whole-file landing: `make land` cannot merge a function whose types clash with its file's; suffix the clashing declarations `_<ADDR>`
+by hand (an 8-byte `char ref[8]` stands in for `CRef` when the file has its own `CRef`), then `make land ONLY=` registers it.
+
+Sixth round (wave U21, 2026-11-19, 39 workers on the next tier of `build/check_calls.tsv`: argument mismatches first, then typed globals): 19 reached 0,
+20 ended near. What the matches show, each one measurement on the function named. A flagged argument count is true in about three of four cases and false
+when retail only sets a register the callee ignores (`PosSpawnerFocus`, `PsmtChooseSmAny`, `free(void *)`, `CRef_SetS32`): read the callee's disassembly,
+not the count. Typing a global (`SW`, `SAVE`, `LM {gMin, gMax}`, `CLOCK {t, dt}`, `SLOTHEAP`) is usually neutral alone and necessary beside the real fix;
+the `D_FLT_` names fail the link check (use `D_<ADDR>`). Counted-pointer handles (`PairHandle`, `CFramePtr`, `SIDEBAGPTR`) with an inline destructor and a
+declared copy constructor reproduce a return in memory and the release block (`bif41_shuffle`, `UpdateSwCallbacks`, `CLo_Clone`); a `CRef` built as an
+argument temporary (`func_001D8B20(CRefS32(n), ...)`) allocates the return slot first (`CreateSwSavePaths`, which also reached the `s7` hi-only hoist with
+`SAVE` and `ACT` typed). A name-order lever: `static inline` helpers must be defined before use (`InitMeter`, 27 against 28). `if`/else forms with direct
+stores avoid if-conversion to `movn` (`RefreshOptionItem`) and the ternary gives it where retail has it. `volatile` on an IOP-written return buffer, marked
+`// volatile-ok`, keeps a store out of a `jal` delay slot (`snd_StartSoundSystem`). The g++-generated static initializer
+(`expl__static_initialization_and_destruction_0`) is not written as a function: define the globals with brace initialisers under their retail address names
+(`B_002DE5B0`, 8 hex digits, which `link_image.py` links), with union members where retail's store order shows a CLOBBER (sly1-decomp's finding) and the
+records non-const so each is built in a temporary and copied.
+Open pattern (not a lever yet): in the hi-only hoist class (`SetClueFound`, `StoreAudioModeInSave`, `UpdateJtLootSave`, `SetTaskState`, `SetGameCoins`,
+`SaveJobVariables`, `SaveTaskVariables`) the hoist is missing only in the Bool-tagged `CRef` blocks of the two Save*Variables functions and present in their S32
+blocks. Two functions (`CGc_Collect`, `PaloAbsorbWkr`) have an untouched 16-byte slot in retail's frame: one ruling on a typed dead local would decide both.
+
+Loop-movable class, measured 2026-11-19 (nothing landed from it): the `-mvu0-use-vf0-NN` flag is binary here: `PumpCd`, `ApplySpriteKeySounds` and
+`func_0021C888` score the same for every NN from 0 to 31 (51, 53 and 20 against 51, 59 and 21 without), so docs/toolchain/loops.md's `64 + NN` threshold
+does not hold for this compiler and no per-function NN is a lever. Declaring `PumpCd`'s four callees `__attribute__((const))` (so loop.c sees no call and
+doubles the threshold) changes no hoist decision (106, worse). `-dL` on `PumpCd`: the loop has 126 real insns, the two constants retail hoists
+(the 1 of `cslotFilled == 1` and 0xFFF) are "savings 1, life 1, not desirable", while the two with savings 2 move; so retail's loop-opt saw
+`threshold * 1 * 1 >= insns`, a smaller loop (retail's body is about 115 physical insns with delay slots, ours 126 real): look for phantom insns
+(`sign_extend`, argument copies) that inflate ours by 20 or more before looking for a flag.
+
 ## Walls
 
 `config/matching/walls.tsv` is the list: address, name, class (`blocker`, `fragment`, `helper`, `toolchain`, `tie`, `exhausted`), the reason, the evidence and the `unlock` condition.

@@ -4,6 +4,8 @@
 #include "sly2.h"
 #include "m2c_macros.h"
 #include "include_asm.h"
+#include "sw.h"
+#include "jt.h"
 
 struct Item { char pad[8]; float key; };
 
@@ -16,7 +18,130 @@ int func_00194F48(Item *left, Item *right)
     return 1;
 }
 
-INCLUDE_ASM(0X194F70);
+struct SMP;
+
+extern "C" {
+void FadeAloOut(LO *, float);
+LO *PloSpawnTargetIndicator(SW *, void *, TGT *);
+}
+
+extern "C" {
+extern char B_002DEB30;
+extern int B_002E1E50;
+extern SMP D_002BF718;
+extern float RO_002BF710;
+extern float RO_002BF714;
+extern float g_2dded0[];
+void bevy_camera_follow_activity(char *, int, int);
+void *memmove(void *, const void *, unsigned int);
+void qsort(void *, int, int, int (*)(const void *, const void *));
+}
+float GSmooth(float, float, float, SMP *, float *);
+
+extern "C" void UpdateSwTargetList(SW *psw, JT *pjt, int ctgt, TGT *atgt)
+{
+    float range[2];
+    QW pos;
+    float width;
+    int fWrap;
+    TGT *ptgtNew;
+    int itgtNew;
+    LO *plo;
+    if (ctgt > 0) {
+        qsort(atgt, ctgt, sizeof(TGT), (int (*)(const void *, const void *))func_00194F48);
+        if (atgt->ptgtdef->idLabel != -1)
+            atgt->iRank = 1;
+    }
+    int itgt = psw->ctgt;
+    TGT *list = psw->atgt;
+    while (--itgt >= 0) {
+        itgtNew = ctgt;
+        TGT *ptgt = &psw->atgt[itgt];
+        for (;;) {
+            itgtNew -= 1;
+            if (itgtNew < 0) {
+                if (ptgt->ploClone != 0)
+                    FadeAloOut(ptgt->ploClone, 0.5f);
+                memmove(ptgt, ptgt + 1, (3 - itgt) * sizeof(TGT));
+                psw->ctgt -= 1;
+                break;
+            }
+            ptgtNew = &atgt[itgtNew];
+            if (ptgt->oid != ptgtNew->oid)
+                continue;
+            ptgt->sRank = ptgtNew->sRank;
+            if (ptgt->ploClone == 0) {
+                ptgt->s = ptgtNew->s;
+                ptgt->dsdt = 0.0f;
+            } else {
+                fWrap = ptgtNew->ptgtdef->FGetWrapRange(range);
+                if (fWrap != 0) {
+                    width = range[1] - range[0];
+                    float sNew = ptgtNew->s;
+                    float s = ptgt->s;
+                    float ds = sNew - s;
+                    if (width * 0.5f < ds) {
+                        ds -= width;
+                        goto store;
+                    }
+                    if (ds < width * -0.5f) {
+                        ds += width;
+store:
+                        ptgtNew->s = s + ds;
+                    } else {
+                        fWrap = 0;
+                    }
+                }
+                if (B_002E1E50 != 0) {
+                    float dt = g_2dded0[1];
+                    float dsdt = ptgt->dsdt;
+                    float dsdtNew = dsdt + dt * ((ptgtNew->s - ptgt->s) * RO_002BF710 + (ptgtNew->dsdt - dsdt) * RO_002BF714);
+                    ptgt->dsdt = dsdtNew;
+                    float dsdtAvg = (dsdt + dsdtNew) * 0.5f;
+                    ptgt->s += dt * dsdtAvg;
+                } else {
+                    ptgt->s = GSmooth(ptgt->s, ptgtNew->s, g_2dded0[1], &D_002BF718, &ptgt->dsdt);
+                }
+                if (fWrap != 0) {
+                    float s = ptgt->s;
+                    float sWrap;
+                    if (range[1] < s) {
+                        sWrap = s - width;
+                        goto wrap;
+                    }
+                    if (s < range[0]) {
+                        sWrap = s + width;
+wrap:
+                        ptgt->s = sWrap;
+                    }
+                }
+                ptgt->ptgtdef->GetIndicatorPos(pjt, &pos, 0, ptgt->s);
+                plo = ptgt->ploClone;
+                plo->TranslateToPos(pos);
+            }
+            memmove(ptgtNew, ptgtNew + 1, (ctgt - itgtNew) * sizeof(TGT) - sizeof(TGT));
+            ctgt -= 1;
+            break;
+        }
+    }
+    for (itgtNew = 0; itgtNew < ctgt; itgtNew++) {
+        void *ptemplate = pjt->ptemplateTargetIndicator;
+        if (ptemplate != 0) {
+            ptgtNew = &atgt[itgtNew];
+            if (ptgtNew->iRank == 1) {
+                plo = PloSpawnTargetIndicator(psw, ptemplate, ptgtNew);
+                if (plo == 0)
+                    break;
+                ptgtNew->ploClone = plo;
+            }
+        }
+        int ctgtCur = psw->ctgt;
+        psw->atgt[ctgtCur] = atgt[itgtNew];
+        psw->ctgt = ctgtCur + 1;
+        bevy_camera_follow_activity(&B_002DEB30, 0x3D, atgt[itgtNew].oid);
+    }
+    qsort(list, psw->ctgt, sizeof(TGT), (int (*)(const void *, const void *))func_00194F48);
+}
 
 INCLUDE_ASM(0X195368);
 
@@ -54,21 +179,6 @@ extern "C" void func_00195608(STATE *state, void *key)
     }
 }
 
-struct VT_1956D0 {
-    char p0[0x48];
-    short d48; short i48; void (*f48)(void *);
-    char p1[0x98];
-    short dE8; short iE8; void (*fE8)(void *, QW);
-    short dF0; short iF0; void (*fF0)(void *, const void *);
-    char p2[0x20];
-    short d118; short i118; void (*f118)(void *, QW);
-    short d120; short i120; void (*f120)(void *, QW);
-};
-
-struct LO { char pad[0xC]; VT_1956D0 *vt; };
-
-struct TARGET { char pad[0x20]; QW pos; };
-
 extern "C" {
 LO *PloLeaseCloneObject(void *, int);
 void func_001A58D0(LO *, int, int);
@@ -79,18 +189,18 @@ extern QW g_2a2dd0;
 
 extern char RO_002A2D00[];
 
-extern "C" LO *PloSpawnTargetIndicator(void *psw, void *ptemplate, TARGET *ptarget)
+extern "C" LO *PloSpawnTargetIndicator(SW *psw, void *ptemplate, TGT *ptarget)
 {
     if (!ptemplate) return 0;
     LO *plo = PloLeaseCloneObject(ptemplate, 0);
     if (plo) {
         func_001A58D0(plo, 0, 0);
-        plo->vt->f48((char *)plo + plo->vt->d48);
+        plo->Remove();
         FadeAloIn(plo, 0.25f);
-        plo->vt->fE8((char *)plo + plo->vt->dE8, ptarget->pos);
-        plo->vt->fF0((char *)plo + plo->vt->dF0, RO_002A2D00);
-        plo->vt->f118((char *)plo + plo->vt->d118, g_2a2dd0);
-        plo->vt->f120((char *)plo + plo->vt->d120, g_2a2dd0);
+        plo->TranslateToPos(ptarget->pos);
+        plo->Slot30(RO_002A2D00);
+        plo->Slot35(g_2a2dd0);
+        plo->Slot36(g_2a2dd0);
     }
     return plo;
 }

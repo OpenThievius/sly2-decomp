@@ -67,7 +67,61 @@ extern "C" void StopBinoc(BINOC_19CCE8 *pbinoc)
 
 INCLUDE_ASM(0X19CD38);
 
-INCLUDE_ASM(0X19D330);
+struct ASEGA;
+struct STEP;
+struct STEP_19D330 { char pad0[0x150]; struct STEPPO_19D330 *ppo; char pad154[0x190 - 0x154]; QW xfIdentity; };
+struct STEPPO_19D330 { char pad0[0x10]; float v10, v14, v18, v1C, v20, v24, v28, v2C; char pad30[0x80 - 0x30]; int mode; };
+struct CM_19D330 { char pad0[0x460]; float radA; char pad464[0x470 - 0x464]; float fovA; char pad474[0x5C4 - 0x474]; float radB; char pad5C8[4]; float fovB; };
+struct BINOCHUD_19D330 { char pad0[0x3C - 0x24]; };
+struct BINOC_19D330 { STEP_19D330 *pstep; int state; char pad8[0xC]; ASEGA *pasega; char pad18[8]; int phase; BINOCHUD_19D330 hud; float fov; };
+
+extern "C" int FAsegaGone(ASEGA *);
+extern "C" void SetBinocState_19D330(BINOC_19D330 *, int);
+extern "C" void SetStepRadTarget(STEP_19D330 *, float);
+extern "C" void UpdateBinocHud_19D330(BINOCHUD_19D330 *);
+extern CM_19D330 B_002DDF40;
+extern "C" QW g_2a2dd0;
+
+void UpdateBinoc(BINOC_19D330 *binoc)
+{
+    int state;
+    do {
+        state = binoc->state;
+        switch (state) {
+        case 0:
+            binoc->pstep->xfIdentity = g_2a2dd0;
+            if (binoc->pasega == 0 || FAsegaGone(binoc->pasega) != 0)
+                SetBinocState_19D330(binoc, 1);
+            break;
+        case 1:
+            binoc->pstep->xfIdentity = g_2a2dd0;
+            switch (binoc->phase) {
+            case 0:
+                SetStepRadTarget(binoc->pstep, B_002DDF40.radA);
+                binoc->fov = B_002DDF40.fovA;
+                UpdateBinocHud_19D330(&binoc->hud);
+                break;
+            case 1:
+                SetStepRadTarget(binoc->pstep, B_002DDF40.radB);
+                binoc->fov = B_002DDF40.fovB;
+                UpdateBinocHud_19D330(&binoc->hud);
+                break;
+            }
+            break;
+        case 2:
+            binoc->pstep->xfIdentity = g_2a2dd0;
+            if (binoc->pasega == 0 || FAsegaGone(binoc->pasega) != 0)
+                SetBinocState_19D330(binoc, -1);
+            break;
+        }
+    } while (state != binoc->state);
+    if (binoc->phase != 0)
+        return;
+    STEPPO_19D330 *ppo = binoc->pstep->ppo;
+    if (ppo->mode == 1) {
+        ppo->v20 = ppo->v24 = ppo->v28 = ppo->v2C = ppo->v10 = ppo->v14 = ppo->v18 = ppo->v1C = 0.0f;
+    }
+}
 
 extern "C" {
 struct BinocHud {

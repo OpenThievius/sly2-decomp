@@ -96,7 +96,7 @@ struct JOY { char pad0[0x1C]; float uStick; char pad20[0x30 - 0x20]; u32 grfbtn;
 
 struct XFL { char pad0[0xA0]; void *pxf; char padA4[4]; float tLand; char padAC[0xB8 - 0xAC]; float dz; };
 
-struct ASEGA { char pad0[0x28]; u64 grfo; char pad30[0x17C - 0x30]; s32 kind; };
+struct ASEGA { char pad0[0x28]; u64 grfo; char pad30[0x10C - 0x30]; s32 field_0x10C; char pad110[0x124 - 0x110]; s32 field_0x124; char pad128[0x17C - 0x128]; s32 kind; };
 
 struct EDGEHOST { char pad0[0xEC]; void *poxa; };
 
@@ -117,7 +117,9 @@ struct JMP {
     s32 kind;
     s32 field_0x8;
     ASEGA *pasega;
-    char pad10[0xC];
+    char pad10[4];
+    f32 field_0x14;
+    char pad18[4];
     s32 state;
     float tState;
     s32 field_0x24;
@@ -192,7 +194,13 @@ extern "C" float TFindAsegLabel__FP4ASEG3OID(void *, int);
 
 extern "C" void CarryThrow_SetState(void *, int);
 
-extern "C" void StartAttach(void *, int, int, int);
+extern "C" void StartAttach(void *, int, void *, void *);
+
+extern "C" void SetBentleyState(void *, int);
+
+extern "C" void SetJtState(JT *, int, int);
+
+extern "C" void *g_2dd5bc;
 
 extern "C" EDGE *PxpFindJtBestEdge__FP2JTPiP6VECTOR(JMP *, int *, VECTOR *);
 
@@ -705,7 +713,65 @@ INCLUDE_ASM(0X19B110);
 
 INCLUDE_ASM(0X19C300);
 
-INCLUDE_ASM(0X19C688);
+static inline void StartJmpAttach(JMP *pjmp, s32 kind, int offset)
+{
+    ASEGA *pasega = pjmp->pasega;
+    StartAttach(pjmp->pjt->PvAttach(), kind, pasega, pasega ? (char *)pasega + offset : 0);
+}
+
+extern "C" void bevy_player_p14_jts8_enter(JMP *pjmp)
+{
+    ASEGA *pasega;
+    JT *pjt;
+    switch (pjmp->state) {
+    case 6:
+        StartJmpAttach(pjmp, 1, 0x150);
+        return;
+    case 11:
+        StartJmpAttach(pjmp, 0, 0x190);
+        return;
+    case 12:
+        StartJmpAttach(pjmp, 0, 0xE0);
+        return;
+    case 13:
+        StartJmpAttach(pjmp, pjmp->pasega->field_0x10C, 0xE0);
+        return;
+    case 9:
+        StartJmpAttach(pjmp, 4, 0xE0);
+        return;
+    case 10:
+        StartJmpAttach(pjmp, 3, 0x190);
+        return;
+    case 14:
+        pjt = pjmp->pjt;
+        pasega = pjmp->pasega;
+        JT_FIELD(pjt, ASEGA *, 0x18C4) = pasega;
+        if (pasega->field_0x124 == 3) {
+            SetJtState(pjt, 0x16, -1);
+            return;
+        }
+        SetJtState(pjt, 3, 1);
+        return;
+    case 15:
+        JT_FIELD(pjmp->pjt, ASEGA *, 0xF5C) = pjmp->pasega;
+        JT_FIELD(pjmp->pjt, f32, 0xF60) = pjmp->field_0x14;
+        pjt = pjmp->pjt;
+        pjt->SetMode(8);
+        return;
+    case 16: {
+        JT *pjtOwner = pjmp->pjt;
+        JT_FIELD(pjtOwner, ASEGA *, 0x1F18) = pjmp->pasega;
+        SetJtState(pjtOwner, 0x15, 10);
+        return;
+    }
+    case 18:
+        SetBentleyState(g_2dd5bc, 8);
+        return;
+    default:
+        SetJmpBodyState(pjmp, 4, 0);
+        return;
+    }
+}
 
 extern "C" void bevy_player_19c828(JMP *pjmp) {
     if (pjmp->state == 0x11) {

@@ -13,7 +13,7 @@ struct GEOM;
 
 struct SO : LO {
     virtual void Slot49();
-    virtual void GetCpdefi();           /* 50: GetSoCpdefi */
+    virtual void GetCpdefi(struct CPDEFI *pcpdefi); /* 50: GetSoCpdefi; GetCmCpdefi, GetJtCpdefi pass the CPDEFI to fill (no override reads $f12) */
     virtual void PxfFromRef();          /* 51: PxfFromAloRef */
     virtual void Slot52();
     virtual struct OXA *PoxaAlloc();    /* 53: PoxaAllocSo; RecalcSoLocked keeps the result */

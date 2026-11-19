@@ -76,7 +76,7 @@ start	end	file
 0x156918	0x157200	new_1569b8/SpawnSwHitFx_file.cpp
 0x157200	0x1578F8	dmas/StartupDma_file.cpp
 0x1578F8	0x157A50	dmas-dzg/dmas_dzg_1578f8.c
-0x157FA0	0x1585D8	dmas-dzg/dmas_dzg_157fa0.c
+0x157FA0	0x1585D8	dmas-dzg/dmas_dzg_157fa0.cpp
 0x1585D8	0x159118	dmas-dzg/InitDzg_file.cpp
 0x159118	0x15CD68	dzg-emitter/InitEmitb_file.cpp
 0x15DA88	0x15DC80	emitter-font/emitter_font_15da88.cpp
@@ -84,7 +84,7 @@ start	end	file
 0x15E380	0x15EF00	emitter-font/PdlFromSwOid_file.cpp
 0x15F8A8	0x1603B8	font/PglyffFromCh_file.cpp
 0x1603B8	0x1607A0	new_160260/LoadXfMirrors_file.cpp
-0x160F98	0x1613A8	frm-splice-frame/frm_splice_frame_160f98.c
+0x160F98	0x1613A8	frm-splice-frame/frm_splice_frame_160f98.cpp
 0x165E38	0x166270	sensor-geom/ApplyPendingSave_file.cpp
 0x166270	0x166920	geom/CedgeFindAtPos_file.cpp
 0x166920	0x167310	gifs/__4GIFS_file.cpp
