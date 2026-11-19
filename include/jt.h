@@ -63,7 +63,9 @@ struct JT : STEP {
     /* 0x9A0 */ struct SO *pcarried; /* in the attachment: func_00211420, after testing the object is class 52 */
     u8 unknown_0x9A4[0x18];
     /* 0x9BC */ s32 field_0x9BC; /* UseSlyGadget (Sly slot 100) */
-    u8 unknown_0x9C0[0x434];
+    u8 unknown_0x9C0[0x4];
+    /* 0x9C4 */ void *ptemplateTargetIndicator; /* UpdateSwTargetList spawns an indicator from it for a new candidate */
+    u8 unknown_0x9C8[0x42C];
     /* 0xDF4 */ s32 zapState; /* in the zap state InitJt starts at 0xDF0: UpdateJt (16), func_00143C78 (85) */
     u8 unknown_0xDF8[0x4];
     /* 0xDFC */ s32 field_0xDFC; /* JT_FLethalHit (86) */
@@ -150,6 +152,7 @@ SLY2_OFFSET_CHECK(JT, field_0x4CC, 0x4CC);
 SLY2_OFFSET_CHECK(JT, field_0x520, 0x520);
 SLY2_OFFSET_CHECK(JT, pcarried, 0x9A0);
 SLY2_OFFSET_CHECK(JT, field_0x9BC, 0x9BC);
+SLY2_OFFSET_CHECK(JT, ptemplateTargetIndicator, 0x9C4);
 SLY2_OFFSET_CHECK(JT, zapState, 0xDF4);
 SLY2_OFFSET_CHECK(JT, field_0xDFC, 0xDFC);
 SLY2_OFFSET_CHECK(JT, field_0xEFC, 0xEFC);

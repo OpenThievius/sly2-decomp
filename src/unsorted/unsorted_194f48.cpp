@@ -4,6 +4,8 @@
 #include "sly2.h"
 #include "m2c_macros.h"
 #include "include_asm.h"
+#include "sw.h"
+#include "jt.h"
 
 struct Item { char pad[8]; float key; };
 
@@ -16,63 +18,12 @@ int func_00194F48(Item *left, Item *right)
     return 1;
 }
 
-struct VT_1956D0 {
-    char p0[0x48];
-    short d48; short i48; void (*f48)(void *);
-    char p1[0x98];
-    short dE8; short iE8; void (*fE8)(void *, QW);
-    short dF0; short iF0; void (*fF0)(void *, const void *);
-    char p2[0x20];
-    short d118; short i118; void (*f118)(void *, QW);
-    short d120; short i120; void (*f120)(void *, QW);
-};
-
-struct LO { char pad[0xC]; VT_1956D0 *vt; };
-
-struct JT;
-
-/* the target interface a candidate points at: its label id at 0x14, its vtable at 0x20 */
-struct TGTDEF {
-    u8 unknown_0x0[0x14];
-    /* 0x14 */ s32 idLabel;
-    u8 unknown_0x18[0x8];
-    /* 0x20: the vtable pointer */
-    virtual int FGetWrapRange(float *prange);   /* 1: two floats, the low and the high end */
-    virtual void Slot2();
-    virtual void GetIndicatorPos(JT *pjt, QW *ppos, int grf, float s); /* 3 */
-};
-
-/* a candidate of the player's target list (0x30 bytes); the world keeps four (from 0x4680) */
-struct TGT {
-    /* 0x0 */ s32 oid;
-    /* 0x4 */ TGTDEF *ptgtdef;
-    /* 0x8 */ f32 sRank;
-    /* 0xC */ s32 iRank;
-    /* 0x10 */ LO *ploClone;
-    /* 0x14 */ f32 tShown;
-    /* 0x18 */ f32 s;
-    /* 0x1C */ f32 dsdt;
-    /* 0x20 */ QW pos;
-};
-
-struct SWTARGETS {
-    u8 unknown_0x0[0x4678];
-    /* 0x4678 */ s32 ctgt;
-    u8 unknown_0x467C[0x4];
-    /* 0x4680 */ TGT atgt[4];
-};
-
-struct JTTARGET {
-    u8 unknown_0x0[0x9C4];
-    /* 0x9C4 */ void *ptemplate;
-};
+struct SMP;
 
 extern "C" {
 void FadeAloOut(LO *, float);
-LO *PloSpawnTargetIndicator(void *, void *, TGT *);
+LO *PloSpawnTargetIndicator(SW *, void *, TGT *);
 }
-
-struct SMP;
 
 extern "C" {
 extern char B_002DEB30;
@@ -87,7 +38,7 @@ void qsort(void *, int, int, int (*)(const void *, const void *));
 }
 float GSmooth(float, float, float, SMP *, float *);
 
-extern "C" void UpdateSwTargetList(SWTARGETS *psw, JTTARGET *pjt, int ctgt, TGT *atgt)
+extern "C" void UpdateSwTargetList(SW *psw, JT *pjt, int ctgt, TGT *atgt)
 {
     float range[2];
     QW pos;
@@ -164,9 +115,9 @@ wrap:
                         ptgt->s = sWrap;
                     }
                 }
-                ptgt->ptgtdef->GetIndicatorPos((JT *)pjt, &pos, 0, ptgt->s);
+                ptgt->ptgtdef->GetIndicatorPos(pjt, &pos, 0, ptgt->s);
                 plo = ptgt->ploClone;
-                plo->vt->fE8((char *)plo + plo->vt->dE8, pos);
+                plo->TranslateToPos(pos);
             }
             memmove(ptgtNew, ptgtNew + 1, (ctgt - itgtNew) * sizeof(TGT) - sizeof(TGT));
             ctgt -= 1;
@@ -174,7 +125,7 @@ wrap:
         }
     }
     for (itgtNew = 0; itgtNew < ctgt; itgtNew++) {
-        void *ptemplate = pjt->ptemplate;
+        void *ptemplate = pjt->ptemplateTargetIndicator;
         if (ptemplate != 0) {
             ptgtNew = &atgt[itgtNew];
             if (ptgtNew->iRank == 1) {
@@ -238,18 +189,18 @@ extern QW g_2a2dd0;
 
 extern char RO_002A2D00[];
 
-extern "C" LO *PloSpawnTargetIndicator(void *psw, void *ptemplate, TGT *ptarget)
+extern "C" LO *PloSpawnTargetIndicator(SW *psw, void *ptemplate, TGT *ptarget)
 {
     if (!ptemplate) return 0;
     LO *plo = PloLeaseCloneObject(ptemplate, 0);
     if (plo) {
         func_001A58D0(plo, 0, 0);
-        plo->vt->f48((char *)plo + plo->vt->d48);
+        plo->Remove();
         FadeAloIn(plo, 0.25f);
-        plo->vt->fE8((char *)plo + plo->vt->dE8, ptarget->pos);
-        plo->vt->fF0((char *)plo + plo->vt->dF0, RO_002A2D00);
-        plo->vt->f118((char *)plo + plo->vt->d118, g_2a2dd0);
-        plo->vt->f120((char *)plo + plo->vt->d120, g_2a2dd0);
+        plo->TranslateToPos(ptarget->pos);
+        plo->Slot30(RO_002A2D00);
+        plo->Slot35(g_2a2dd0);
+        plo->Slot36(g_2a2dd0);
     }
     return plo;
 }

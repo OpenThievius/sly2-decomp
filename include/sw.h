@@ -54,6 +54,32 @@ struct SLOTHEAP {
     /* 0x14 */ s32 cslotMax;          /* PblipgNew: nonzero when the heap may not grow */
 };
 
+/* The target interface a candidate of the player's target list points at: its label id at 0x14 and its vtable at 0x20
+   (UpdateSwTargetList). */
+struct TGTDEF {
+    u8 unknown_0x0[0x14];
+    /* 0x14 */ s32 idLabel;
+    u8 unknown_0x18[0x8];
+    /* 0x20: the vtable pointer */
+    virtual int FGetWrapRange(float *prange);   /* 1: two floats, the low and the high end */
+    virtual void Slot2();
+    virtual void GetIndicatorPos(struct JT *pjt, QW *ppos, int grf, float s); /* 3 */
+};
+
+/* A candidate of the player's target list, 0x30 bytes: the world keeps four (atgt, from 0x4680) and UpdateSwTargetList merges
+   the player's new ones into them. s and dsdt are the smoothed position along the target and its rate. */
+struct TGT {
+    /* 0x00 */ s32 oid;
+    /* 0x04 */ TGTDEF *ptgtdef;
+    /* 0x08 */ f32 sRank;
+    /* 0x0C */ s32 iRank;
+    /* 0x10 */ LO *ploClone;   /* the indicator object spawned for it */
+    /* 0x14 */ f32 tShown;
+    /* 0x18 */ f32 s;
+    /* 0x1C */ f32 dsdt;
+    /* 0x20 */ QW pos;
+};
+
 struct SW : BASIC {
     u8 unknown_0x10[0x140];
     /* 0x150 */ s32 state; /* FUpdateSwDuringWipe */
@@ -156,7 +182,11 @@ struct SW : BASIC {
     /* 0x4638 */ void *ppool; /* func_0013CF38 */
     u8 unknown_0x463C[0x4];
     /* 0x4640 */ s32 field_0x4640; /* func_00210BE0, func_00211EC0 test it */
-    u8 unknown_0x4644[0x104];
+    u8 unknown_0x4644[0x34];
+    /* 0x4678 */ s32 ctgt; /* the target list's length: UpdateSwTargetList */
+    u8 unknown_0x467C[0x4];
+    /* 0x4680 */ TGT atgt[4]; /* the target list: UpdateSwTargetList */
+    u8 unknown_0x4740[0x8];
     /* 0x4748 */ s32 fGuardsFrozen; /* SetSwGuardsFrozen */
     /* 0x474C */ f32 tGuardsFrozen; /* SetSwGuardsFrozen */
     u8 unknown_0x4750[0x4];
@@ -172,6 +202,7 @@ struct SW : BASIC {
 SLY2_SIZE_CHECK(SLOTHEAP, 0x18);
 SLY2_SIZE_CHECK(LOADREQ, 0x4C);
 SLY2_SIZE_CHECK(GRFENTRY, 0x8);
+SLY2_SIZE_CHECK(TGT, 0x30);
 SLY2_SIZE_CHECK(SW, 0x4790);
 SLY2_OFFSET_CHECK(SW, state, 0x150);
 SLY2_OFFSET_CHECK(SW, pblockCur, 0x39E8);
@@ -249,6 +280,8 @@ SLY2_OFFSET_CHECK(SW, aregion, 0x4564);
 SLY2_OFFSET_CHECK(SW, ppzgraph, 0x45CC);
 SLY2_OFFSET_CHECK(SW, ppool, 0x4638);
 SLY2_OFFSET_CHECK(SW, field_0x4640, 0x4640);
+SLY2_OFFSET_CHECK(SW, ctgt, 0x4678);
+SLY2_OFFSET_CHECK(SW, atgt, 0x4680);
 SLY2_OFFSET_CHECK(SW, fGuardsFrozen, 0x4748);
 SLY2_OFFSET_CHECK(SW, tGuardsFrozen, 0x474C);
 SLY2_OFFSET_CHECK(SW, tL3, 0x4754);
