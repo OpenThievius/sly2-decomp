@@ -66,7 +66,6 @@ address	name	size	file	score
 0X134040	RecalcSwXpAll	720	bbmark-blend/RecalcSwXpAll.cpp	104
 0X134DA8	UpdateBentley	1184	bbmark-blend/UpdateBentley.c	241
 0X135940	PresetBentleyAccel	264	bbmark-blend/PresetBentleyAccel.cpp	6
-0X136530	func_00136530	680	bbmark-blend/fun_00136530.c	68
 0X136870	FBentleyCanUseGadget	440	bbmark-blend/FBentleyCanUseGadget.cpp	21
 0X137248	PresetJtOrbitAccel	664	bbmark-blend/PresetJtOrbitAccel.c	193
 0X1375D0	bevy_player_p25_1375d0	432	bbmark-blend/bevy_player_p25_1375d0.c	103
@@ -92,7 +91,6 @@ address	name	size	file	score
 0X140F90	HandleJtMessage	1528	new_13f888/HandleJtMessage.c	249
 0X1428D8	GetJtFocusScore	544	new_13f888/GetJtFocusScore.c	136
 0X143220	PredictLoLead	192	new_13f888/PredictLoLead.c	40
-0X143410	PpathFindBootyOid	616	new_13f888/PpathFindBootyOid.cpp	46
 0X143678	UpdateJtLootSave	1144	new_13f888/UpdateJtLootSave.cpp	13
 0X143AF0	func_00143AF0	232	new_13f888/fun_00143af0.cpp	6
 0X1448F0	func_001448F0	216	new_13f888/fun_001448f0.c	36
@@ -155,7 +153,6 @@ address	name	size	file	score
 0X15F9D0	ChNext__9CRichText	904	font_15f000/ChNext__9CRichText.cpp	60
 0X15FD68	ClineWrap__9CRichTextf	400	font_15f000/ClineWrap__9CRichTextf.cpp	4
 0X160CE0	ClearPendingFrame__FP3FRM	392	frm/ClearPendingFrame__FP3FRM.cpp	43
-0X160F98	BlendPrevFrame__Fv	672	frm/BlendPrevFrame__Fv.cpp	56
 0X161478	UpdatePlayTime	488	new_161458/UpdatePlayTime.cpp	42
 0X1617E0	SetGameCoins	136	new_161458/SetGameCoins.cpp	9
 0X163460	SaveJobVariables	320	new_161458/SaveJobVariables.cpp	23
@@ -294,7 +291,6 @@ address	name	size	file	score
 0X1A5FB8	func_001A5FB8	344	stepguard-jt/fun_001a5fb8.c	85
 0X1A6340	GetLoEulerDegrees	112	new_1a6290/GetLoEulerDegrees.c	22
 0X1A64E8	SetSoProperties	480	new_1a6290/SetSoProperties.cpp	50
-0X1A6730	CLo_Clone	928	new_1a6290/CLo_Clone.cpp	56
 0X1A7050	ConvertLoMat	352	stepguard-sw/ConvertLoMat.c	82
 0X1A7630	func_001A7630	608	stepguard-sw/fun_001a7630.cpp	15
 0X1A7E60	RecalcSwXpPos	352	sw-mark/RecalcSwXpPos.c	69

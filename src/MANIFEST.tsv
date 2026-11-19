@@ -1458,6 +1458,7 @@ address	name	size	file	whole_file	symbol
 0X136298	ReleaseBentleyGadget	92	bbmark-blend/ReleaseBentleyGadget.c		
 0X1362F8	SetBentleyAimState	60	bbmark-blend/SetBentleyAimState.c		
 0X136338	UpdateBentleyAim	500	bbmark-blend/UpdateBentleyAim.cpp		
+0X136530	func_00136530	676	bbmark-blend/fun_00136530.cpp		
 0X1367D8	func_001367D8	152	bbmark-blend/fun_001367d8.cpp		
 0X136A28	PslotBentleyGadget	100	bbmark-blend/PslotBentleyGadget.cpp		
 0X136A90	UseBentleyGadget	444	bbmark-blend/UseBentleyGadget.cpp		
@@ -1627,6 +1628,7 @@ address	name	size	file	whole_file	symbol
 0X1432E0	GiveJtLoot	160	new_13f888/GiveJtLoot.cpp		
 0X143380	DropJtLoot	68	new_13f888/DropJtLoot.cpp		
 0X1433C8	DeliverJtLoot	68	new_13f888/DeliverJtLoot.cpp		
+0X143410	PpathFindBootyOid	616	new_13f888/PpathFindBootyOid.cpp		
 0X143BD8	func_00143BD8	156	new_13f888/fun_00143bd8.cpp		
 0X143C78	func_00143C78	128	new_13f888/fun_00143c78.cpp		
 0X143CF8	JT_TranslateToPos	40	new_13f888/JT_TranslateToPos_file.cpp	new_13f888/JT_TranslateToPos_file.cpp	JT_TranslateToPos
@@ -2127,8 +2129,9 @@ address	name	size	file	whole_file	symbol
 0X160B70	FrameRenderLoop__FPv	272	frm/FrameRenderLoop__FPv.cpp		
 0X160C80	RenderFrame__FP3FRMi	92	frm/RenderFrame__FP3FRMi.cpp		
 0X160E68	FlushFrames__Fi	304	frm/FlushFrames__Fi.cpp		
-0X161238	func_00161238	332	frm-splice-frame/frm_splice_frame_160f98.c	frm-splice-frame/frm_splice_frame_160f98.c	func_00161238
-0X161388	func_00161388	32	frm-splice-frame/frm_splice_frame_160f98.c	frm-splice-frame/frm_splice_frame_160f98.c	func_00161388
+0X160F98	BlendPrevFrame__Fv	668	frm-splice-frame/frm_splice_frame_160f98.cpp	frm-splice-frame/frm_splice_frame_160f98.cpp	BlendPrevFrame__Fv
+0X161238	func_00161238	332	frm-splice-frame/frm_splice_frame_160f98.cpp	frm-splice-frame/frm_splice_frame_160f98.cpp	func_00161238
+0X161388	func_00161388	32	frm-splice-frame/frm_splice_frame_160f98.cpp	frm-splice-frame/frm_splice_frame_160f98.cpp	func_00161388
 0X1613A8	func_001613A8	76	frm-splice-frame/fun_001613a8.c		
 0X1613F8	JobMgr_Construct	96	splice-frame/JobMgr_Construct.cpp		
 0X161458	ClearDifficultySuckPaths_thunk	32	new_161458/ClearDifficultySuckPaths_thunk.c		
@@ -2954,6 +2957,7 @@ address	name	size	file	whole_file	symbol
 0X1A6450	bevy_world_loads_b5_apply_xform	148	light-stepguard/light_stepguard_1a53e0.cpp	light-stepguard/light_stepguard_1a53e0.cpp	bevy_world_loads_b5_apply_xform
 0X1A66C8	SetLoGrfField	44	light-stepguard/light_stepguard_1a53e0.cpp	light-stepguard/light_stepguard_1a53e0.cpp	SetLoGrfField
 0X1A66F8	ClearLoGrfField	52	light-stepguard/light_stepguard_1a53e0.cpp	light-stepguard/light_stepguard_1a53e0.cpp	ClearLoGrfField
+0X1A6730	CLo_Clone	924	light-stepguard/light_stepguard_1a53e0.cpp	light-stepguard/light_stepguard_1a53e0.cpp	CLo_Clone
 0X1A6AD0	CloneLoVirtual	40	light-stepguard/light_stepguard_1a53e0.cpp	light-stepguard/light_stepguard_1a53e0.cpp	CloneLoVirtual
 0X1A6AF8	func_001A6AF8	56	light-stepguard/light_stepguard_1a53e0.cpp	light-stepguard/light_stepguard_1a53e0.cpp	func_001A6AF8
 0X1A6B30	func_001A6B30	88	light-stepguard/light_stepguard_1a53e0.cpp	light-stepguard/light_stepguard_1a53e0.cpp	func_001A6B30

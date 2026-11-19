@@ -1458,6 +1458,7 @@ us_address	name	other_address	pair	score	addresses
 0x136298	ReleaseBentleyGadget	0X136298	same	0	ok
 0x1362F8	SetBentleyAimState	0X1362F8	same	0	ok
 0x136338	UpdateBentleyAim	0X136338	same	0	ok
+0x136530	func_00136530	0X136530	same	0	ok
 0x1367D8	func_001367D8	0X1367D8	identical	0	ok
 0x136A28	PslotBentleyGadget	0X136A28	same	0	ok
 0x136A90	UseBentleyGadget	0X136A90	same	0	ok
@@ -1627,6 +1628,7 @@ us_address	name	other_address	pair	score	addresses
 0x1432E0	GiveJtLoot	0X1432F8	same	0	ok
 0x143380	DropJtLoot	0X143398	same	0	ok
 0x1433C8	DeliverJtLoot	0X1433E0	same	0	ok
+0x143410	PpathFindBootyOid	0X143428	same	0	ok
 0x143BD8	func_00143BD8	0X143C18	same	0	ok
 0x143C78	func_00143C78	0X143CB8	same	0	ok
 0x143CF8	JT_TranslateToPos	0X143D38	same	0	ok
@@ -2127,6 +2129,7 @@ us_address	name	other_address	pair	score	addresses
 0x160B70	FrameRenderLoop__FPv	0X160B98	same	0	ok
 0x160C80	RenderFrame__FP3FRMi	0X160CA8	same	0	ok
 0x160E68	FlushFrames__Fi	0X160E90	same	0	ok
+0x160F98	BlendPrevFrame__Fv	0X160FC0	same	5	ok
 0x161238	func_00161238	0X161260	same	0	ok
 0x161388	func_00161388	0X1613B0	same	0	ok
 0x1613A8	func_001613A8	0X1613D0	gap	1	ok
@@ -2954,6 +2957,7 @@ us_address	name	other_address	pair	score	addresses
 0x1A6450	bevy_world_loads_b5_apply_xform	0X1A6430	identical	0	ok
 0x1A66C8	SetLoGrfField	0X1A66A8	identical	0	ok
 0x1A66F8	ClearLoGrfField	0X1A66D8	identical	0	ok
+0x1A6730	CLo_Clone	0X1A6710	same	0	ok
 0x1A6AD0	CloneLoVirtual	0X1A6AB0	identical	0	ok
 0x1A6AF8	func_001A6AF8	0X1A6AD8	identical	0	ok
 0x1A6B30	func_001A6B30	0X1A6B10	same	0	ok

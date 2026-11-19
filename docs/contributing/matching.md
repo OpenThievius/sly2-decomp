@@ -177,6 +177,17 @@ Measured and closed: a typed `SAVE` global does not unlock the hi-only hoist (re
 `StoreAudioModeInSave` is typed and still walled), and none of the 26 flag variants of `flag_sweep.py` moves `ApplySpriteKeySounds` (best 42 with
 `-fno-omit-frame-pointer`, a frame change, then 53).
 
+Fourth round (wave Y19, 2026-11-19, ten drafts from the non-blocker part of `build/check_calls.tsv`; blockers are in `config/us/blockers.tsv`, so queue
+through `claim.py` to filter, not by reading `walls.tsv`): four matched (`BlendPrevFrame`, `func_00136530`, `PpathFindBootyOid`, `CLo_Clone`), six
+ended near. New levers, each one measurement: a missing 0x640-byte buffer local that retail passes on (`BlendPrevFrame`, frame 0x80 to 0x6C0); a clock
+global typed `{t, dt}` as the matched sibling has it (8 to 1); an inline wrapper that retail also has out of line (`RefGetGameSaveValue`, stops loop.c hoisting
+`&path`); a `union VU_VECTOR { QW q; VECTOR v; }` position array stored through `.q`, which marks the store as in-struct so it no longer aliases a global (17 to 6);
+`Aligned(ALLOCREQ *)` setting `cbAlign` through the pointer (61 to 17); a class with a destructor and a declared copy constructor for a callee that returns
+it in memory (`CLo_Clone`); `if` forms for clamps, which give `movz` and a cross-jumped `and`, where a ternary gives MIN or an extra copy. A check_calls flag was false
+for `CFrame_AddParent`, `bevy_splice_frame_set_parent` and `FStgSwitchDone`: confirm each with the disassembly.
+Four functions (`ApplySpriteKeySounds`, `PumpCd`, `func_0021C888`, `PleaseAcquire`) end where retail sits between loop.c's default hoisting and
+`-fmove-all-movables`: one lever for that class would take several to 0.
+
 ## Walls
 
 `config/matching/walls.tsv` is the list: address, name, class (`blocker`, `fragment`, `helper`, `toolchain`, `tie`, `exhausted`), the reason, the evidence and the `unlock` condition.
