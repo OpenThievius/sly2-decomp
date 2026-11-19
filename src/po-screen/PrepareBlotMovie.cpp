@@ -35,14 +35,11 @@ extern NODE *B_003E106C;
 extern COUNTERS B_003E1C70;
 extern int g_2be538;
 }
-/* Retail: two passes over the movie-blot list (one `node` in $s0 for both loops), the newest end frame kept with slt/movn and
- * stored to B_003E1C70+0xC in Construct's delay slot; then a stack frame, a 0x10000 stack buffer and a file stream at sp+0x20.
- * The request (sp+0x10) and the four magic bytes share one slot: they are scoped to separate blocks. The file location is set
- * by the CFileLocation::Set inline seen in load_file_from_disc (kind 2, slot = r1^r15, hash = (r0^r13)+0xCA0). The failure
- * path (two destructors, then the epilogue) comes before the load path, as with the shared `fail` label.
- * NEAR 24: the only difference is $s1/$s2 swapped. Global allocation orders `latest` (10 weighted refs over 78 insns) before
- * the gcse-hoisted &stream pseudo (13 refs over 116 insns); retail gives &stream $s1. Max forms, `continue` forms, an inline
- * test and inline helpers for either loop did not flip it. */
+/* Two passes over the movie-blot list: the newest end frame of the live blots is kept, blots starting at or after it are
+ * reset, and it is stored to the arena's mark (B_003E1C70+0xC). Then the movie's BRX file is opened through a stack buffer,
+ * its "ZRB." magic and version 6 checked, and the dictionary and sprites loaded between two arena marks.
+ * Each early exit runs the stream and stack-frame destructors itself, as the scope exits of the original did; the
+ * post-reload cross-jump merges them into the one shared tail retail shows. */
 extern "C" void PrepareBlotMovie(BLOT *pblot)
 {
     int latest = 0;
@@ -76,24 +73,35 @@ extern "C" void PrepareBlotMovie(BLOT *pblot)
     CFileLocation *loc = &location;
     loc->kind = 2;
     loc->Clear();
-    if (!location.Set(pblot->movie)) goto fail;
-    if (CBinaryFileStream_FOpenLocation(&stream, &location) == 0) goto fail;
+    if (!location.Set(pblot->movie)) {
+        CBinaryFileStream_Destructor(&stream, 2);
+        CStackFrame_Destructor(frame, 2);
+        return;
+    }
+    if (CBinaryFileStream_FOpenLocation(&stream, &location) == 0) {
+        CBinaryFileStream_Destructor(&stream, 2);
+        CStackFrame_Destructor(frame, 2);
+        return;
+    }
+    func_001179D8(&stream, 0x4000, 0x70000000);
     {
-        func_001179D8(&stream, 0x4000, 0x70000000);
         char magic[4];
         magic[0] = U8Read__18CBinaryInputStream(&stream);
         magic[1] = U8Read__18CBinaryInputStream(&stream);
         magic[2] = U8Read__18CBinaryInputStream(&stream);
         magic[3] = U8Read__18CBinaryInputStream(&stream);
         int version = U16Read__18CBinaryInputStream(&stream);
-        if (func_00233470(magic, "ZRB.", 4) != 0) goto fail;
-        if (version == 6) goto load;
+        if (func_00233470(magic, "ZRB.", 4) != 0) {
+            CBinaryFileStream_Destructor(&stream, 2);
+            CStackFrame_Destructor(frame, 2);
+            return;
+        }
+        if (version != 6) {
+            CBinaryFileStream_Destructor(&stream, 2);
+            CStackFrame_Destructor(frame, 2);
+            return;
+        }
     }
-fail:
-    CBinaryFileStream_Destructor(&stream, 2);
-    CStackFrame_Destructor(frame, 2);
-    return;
-load:
     pblot->movie->start = B_003E1C70.limit;
     LoadMovieDictionary(pblot, &stream, pblot, &pblot->field50, &pblot->field54);
     LoadMovieSprites(pblot, &stream, pblot);

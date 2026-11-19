@@ -4,6 +4,7 @@
 #include "sly2.h"
 #include "m2c_macros.h"
 #include "include_asm.h"
+#include "alloc.h"
 
 struct Node_1281B0 { int pad0; unsigned low : 31; unsigned mark : 1; };
 
@@ -170,7 +171,165 @@ void CGc_MarkRef(Gc *gc, Ref *ref)
     }
 }
 
-INCLUDE_ASM(0X1286E0);
+// The slot heaps of the Splice nodes (CreateSlotheapSwAlign at 0x4520A8, 0x4520F8, 0x452120): sw.h SLOTHEAP lacks the
+// live-slot count at +0x10 (its unknown_0x10), so this overlay names it.
+struct SlotHeap_1286E0 {
+    char unknown_0x0[0x10];
+    int cslot;
+    int cslotMax;
+};
+struct Links_1286E0 {
+    unsigned prevIndex : 13;
+    unsigned prevPool : 2;
+    unsigned unused15 : 1;
+    unsigned nextIndex : 13;
+    unsigned nextPool : 2;
+    unsigned mark : 1;
+};
+struct FrameNode_1286E0 {
+    int pad0;
+    Links_1286E0 links;
+    char pad8[0x20];
+};
+struct Ref_1286E0 {
+    int tagk;
+    void *pv;
+};
+struct Sub_1286E0 {
+    int pad0;
+    Links_1286E0 links;
+    int pad8;
+    Ref_1286E0 ref;
+    Sub_1286E0 *next;
+};
+struct SidebagNode_1286E0 {
+    int pad0;
+    Links_1286E0 links;
+    Sub_1286E0 *subs;
+};
+struct Stack_1286E0 {
+    int count;
+    FrameNode_1286E0 **array;
+};
+struct Gc_1286E0 {
+    int gen;
+    Stack_1286E0 frames;
+    Stack_1286E0 procs;
+    Stack_1286E0 pairs;
+};
+struct Link_1286E0 {
+    int pad0;
+    Links_1286E0 links;
+    FrameNode_1286E0 *node;
+    int padC;
+    Link_1286E0 *next;
+};
+extern "C" {
+void func_002574E0(void);
+void func_002574E8(void);
+void func_002574F0(void);
+void func_002574F8(void);
+void func_00257500(void);
+void func_00257508(void);
+void *CStackFrame_Construct(void *);
+void CStackFrame_Destructor(void *, int);
+void *PvAllocStackImpl__Fi(ALLOCREQ *);
+void CGc_MarkRef(Gc_1286E0 *, Ref_1286E0 *);
+void bevy_splice_eval_reset_1286E0(Gc_1286E0 *);
+void SweepFrames(void);
+void SweepVarbs(void);
+void SweepPairs(void);
+void SweepProcs(void);
+void SweepSidebags(void);
+void func_00257C18(void);
+extern FrameNode_1286E0 *B_002DD2AC;
+extern SidebagNode_1286E0 *B_002DD2CC;
+extern Link_1286E0 *B_003E0E80;
+extern SlotHeap_1286E0 B_004520A8_1286E0;
+extern SlotHeap_1286E0 B_004520F8_1286E0;
+extern SlotHeap_1286E0 B_00452120_1286E0;
+extern FrameNode_1286E0 *B_004520E8[];
+extern SidebagNode_1286E0 *B_00452138[];
+extern Gc_1286E0 g_2dd598_1286E0;
+}
+
+// Allocates cb bytes, 16-byte aligned, on the stack frame's heap.
+static inline void *PvAllocStack(int cb)
+{
+    ALLOCREQ req;
+    VECTOR vecUnused; // frame: retail has an untouched 16-byte slot at sp+0x20
+    req.cb = cb;
+    req.cbAlign = 0x10;
+    return PvAllocStackImpl__Fi(&req);
+}
+
+static inline FrameNode_1286E0 *FrameNodeFromLink(unsigned index, unsigned pool)
+{
+    if (index == 0 && pool == 0)
+        return 0;
+    return B_004520E8[pool] + index;
+}
+
+static inline SidebagNode_1286E0 *SidebagNodeFromLink(unsigned index, unsigned pool)
+{
+    if (index == 0 && pool == 0)
+        return 0;
+    return B_00452138[pool] + index;
+}
+
+extern "C" void CGc_Collect(Gc_1286E0 *gc)
+{
+    char frame[0x10];
+    gc->gen = gc->gen == 0;
+    func_002574E0();
+    func_002574E8();
+    func_002574F0();
+    func_002574F8();
+    func_00257500();
+    func_00257508();
+    CStackFrame_Construct(frame);
+    gc->frames.array = (FrameNode_1286E0 **)PvAllocStack(B_004520F8_1286E0.cslot * 4);
+    gc->frames.count = 0;
+    gc->procs.array = (FrameNode_1286E0 **)PvAllocStack(B_004520A8_1286E0.cslot * 4);
+    gc->procs.count = 0;
+    gc->pairs.array = (FrameNode_1286E0 **)PvAllocStack(B_00452120_1286E0.cslot * 4);
+    gc->pairs.count = 0;
+    for (FrameNode_1286E0 *node = B_002DD2AC; node;) {
+        if (node->links.mark != g_2dd598_1286E0.gen) {
+            node->links.mark = g_2dd598_1286E0.gen;
+            gc->frames.array[gc->frames.count++] = node;
+        }
+        FrameNode_1286E0 *next;
+        next = FrameNodeFromLink(node->links.nextIndex, node->links.nextPool);
+        node = next;
+    }
+    for (SidebagNode_1286E0 *bag = B_002DD2CC; bag;) {
+        if (bag->links.mark != g_2dd598_1286E0.gen)
+            bag->links.mark = g_2dd598_1286E0.gen;
+        for (Sub_1286E0 *sub = bag->subs; sub; sub = sub->next) {
+            sub->links.mark = g_2dd598_1286E0.gen;
+            CGc_MarkRef(gc, &sub->ref);
+        }
+        SidebagNode_1286E0 *next;
+        next = SidebagNodeFromLink(bag->links.nextIndex, bag->links.nextPool);
+        bag = next;
+    }
+    for (Link_1286E0 *link = B_003E0E80; link; link = link->next) {
+        FrameNode_1286E0 *target = link->node;
+        if (target->links.mark != g_2dd598_1286E0.gen) {
+            target->links.mark = g_2dd598_1286E0.gen;
+            gc->procs.array[gc->procs.count++] = target;
+        }
+    }
+    bevy_splice_eval_reset_1286E0(gc);
+    SweepFrames();
+    SweepVarbs();
+    SweepPairs();
+    SweepProcs();
+    SweepSidebags();
+    func_00257C18();
+    CStackFrame_Destructor(frame, 2);
+}
 
 extern "C" {
 s32 CGc_Construct(s32 *);                   /* extern */

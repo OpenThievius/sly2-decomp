@@ -2,7 +2,6 @@
 #include "cref.h"
 struct CRefNil : CRef {
     CRefNil() { m_tagk = TAGK_Nil; }
-    CRefNil &operator=(const CRef &ref) { CRef::operator=(ref); return *this; }
 };
 struct SAVEVARS;
 struct SAVEPATH;
@@ -39,9 +38,8 @@ extern "C" void ResetSaveKeepingOptions(char *pbSave, int fKeepOptions)
         if (!FSaveDataMatchesLayout(&B_003E0EA8, pbSave))
             fKeepOptions = 0;
         if (fKeepOptions) {
-            CRefNil *pref = aref;
             for (unsigned int index = 0; index < 11; index++)
-                *pref++ = RefGetSaveValue(&B_003E0EA8, apath[index], pbSave);
+                aref[index].CRef::operator=(GetSaveValue(apath[index], pbSave));
         }
     }
     memset(pbSave, 0, 0x5400);

@@ -207,8 +207,8 @@ when retail only sets a register the callee ignores (`PosSpawnerFocus`, `PsmtCho
 not the count. Typing a global (`SW`, `SAVE`, `LM {gMin, gMax}`, `CLOCK {t, dt}`, `SLOTHEAP`) is usually neutral alone and necessary beside the real fix;
 the `D_FLT_` names fail the link check (use `D_<ADDR>`). Counted-pointer handles (`PairHandle`, `CFramePtr`, `SIDEBAGPTR`) with an inline destructor and a
 declared copy constructor reproduce a return in memory and the release block (`bif41_shuffle`, `UpdateSwCallbacks`, `CLo_Clone`); a `CRef` built as an
-argument temporary (`func_001D8B20(CRefS32(n), ...)`) allocates the return slot first (`CreateSwSavePaths`, which also reached the `s7` hi-only hoist with
-`SAVE` and `ACT` typed). A name-order lever: `static inline` helpers must be defined before use (`InitMeter`, 27 against 28). `if`/else forms with direct
+argument temporary (`func_001D8B20(CRefS32(n), ...)`) allocates the return slot first (`CreateSwSavePaths`; the `s7` there is `RO_002A8968`'s HIGH, not
+`B_003D4A60`'s, so it is not a control for the single-use hi-only form: corrected 2026-11-19). A name-order lever: `static inline` helpers must be defined before use (`InitMeter`, 27 against 28). `if`/else forms with direct
 stores avoid if-conversion to `movn` (`RefreshOptionItem`) and the ternary gives it where retail has it. `volatile` on an IOP-written return buffer, marked
 `// volatile-ok`, keeps a store out of a `jal` delay slot (`snd_StartSoundSystem`). The g++-generated static initializer
 (`expl__static_initialization_and_destruction_0`) is not written as a function: define the globals with brace initialisers under their retail address names
@@ -217,6 +217,23 @@ records non-const so each is built in a temporary and copied.
 Open pattern (not a lever yet): in the hi-only hoist class (`SetClueFound`, `StoreAudioModeInSave`, `UpdateJtLootSave`, `SetTaskState`, `SetGameCoins`,
 `SaveJobVariables`, `SaveTaskVariables`) the hoist is missing only in the Bool-tagged `CRef` blocks of the two Save*Variables functions and present in their S32
 blocks. Two functions (`CGc_Collect`, `PaloAbsorbWkr`) have an untouched 16-byte slot in retail's frame: one ruling on a typed dead local would decide both.
+Resolved 2026-11-19 (wave W22): the dead-local question is answered by the rule already in "Rulings": an unused local is allowed as a real shared type
+the original plausibly declared and retail's frame shows (`VECTOR vecUnused; // frame: ...`), never a padding array or an invented struct. An unused scalar
+(`QW`) is dropped by GCC (42), a struct or `VECTOR` keeps its slot (0). That took `PaloAbsorbWkr`, `CGc_Collect` and `UpdateEmitter` to 0. An "untouched
+16-byte slot" can also be a real typed value passed in a register: `func_00226370`'s was a `union VU_VECTOR euler` stored through `.q` in a `jal` delay slot.
+
+Seventh round (wave W22, 2026-11-19, the best-scoring drafts without a `check_calls` flag, plus the seven hi-only functions): 10 reached 0 and 9 landed
+(`ResetSaveKeepingOptions` scores 0 but its whole file defines its own 16-byte `CRef`: walled). New levers, each one measurement: duplicate each early exit's
+destructor calls instead of sharing one `goto fail` tail, so `&stream` gets more references and wins `$s1`, then cross-jump re-merges the tails
+(`PrepareBlotMovie`, 24 to 0: allocation priority is computed before cross-jumping); a draft's invented extra argument was the cause again
+(`bevy_anim_keys_axis_segment`, an `int index`); a matched sibling renamed with swapped compares and a `CRef *pref = &pair->ref;` bound inside each arm
+(`RefOpMinimum` from `RefOpMaximum`); a `do { ... } while (1)` first loop gives retail's unrotated shape (`LO_SetCloneId`, but it moves the registers);
+the `g_2dded0` clock typing took `ActivateCplook` from 7 to 0 and has now helped six functions: a shared `CLOCK {t, dt}` header would remove many local copies.
+The hi-only hoist class is closed as a wall for the single-use form (`SetClueFound`, `StoreAudioModeInSave`, `UpdateJtLootSave`, `SetTaskState`, `SetGameCoins`,
+`SaveJobVariables`, `SaveTaskVariables`; 7 workers, about 15 probe forms each): every form expands HIGH and LO_SUM together, either both before the copy call
+or both after it; `combine` will not merge the `lo_sum` into `$a3` across a call (not CONSTANT_P), `sched1` keeps it before the call because the HIGH pseudo crosses
+no call, so retail needs a HIGH already live across the copy call at flow time, which CSE gives when the address is used twice (`SetVaultOpen`). In
+`StoreAudioModeInSave` case 2 hoists and case 3 does not with the same source: position or CSE, not wording.
 
 Loop-movable class, measured 2026-11-19 (nothing landed from it): the `-mvu0-use-vf0-NN` flag is binary here: `PumpCd`, `ApplySpriteKeySounds` and
 `func_0021C888` score the same for every NN from 0 to 31 (51, 53 and 20 against 51, 59 and 21 without), so docs/toolchain/loops.md's `64 + NN` threshold
