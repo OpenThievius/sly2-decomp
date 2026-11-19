@@ -4,10 +4,19 @@ struct VT { char pad[0x188]; SLOT slot; };
 struct BLOT { char pad[0xC]; VT *vt; };
 struct TARGET { char pad[0xDFC]; int maximum; int *current; char pad2[0x1300 - 0xE04]; int powerMaximum; };
 struct METER { char pad[0x20]; float fill; float fillCopy; float power; float powerCopy; int zero; TARGET *target; BLOT *blot; int ids[5]; };
+static inline void SetMeterIds(METER *self, int first, int second, int third, int fourth, int fifth)
+{
+    self->ids[0] = first;
+    self->ids[1] = second;
+    self->ids[2] = third;
+    self->ids[3] = fourth;
+    self->ids[4] = fifth;
+}
 extern "C" {
-extern int B_003DD490;
-BLOT *PloFindSwObject_thunk(int *, int, int, int);
-TARGET *PpoSwFocusBase(int *);
+struct SW;
+extern SW B_003DD490;
+BLOT *PloFindSwObject_thunk(SW *, int, int, int);
+TARGET *PpoSwFocusBase(SW *);
 int FIsBasicDerivedFrom(void *, int);
 int GetJtPower(TARGET *);
 void SeekBlotLabel(BLOT *, int, float);
@@ -30,19 +39,12 @@ void InitMeter(METER *meter)
         float power = (float)GetJtPower(meter->target) / (float)meter->target->powerMaximum;
         meter->powerCopy = power;
         meter->power = power;
-        int a, b, c, d, e;
-        if (FIsBasicDerivedFrom(meter->target, 0x37) != 0) {
-            a = 0x347; b = 0x348; c = 0x349; d = 0x34A; e = 0x34B;
-        } else if (FIsBasicDerivedFrom(meter->target, 0x36) != 0) {
-            a = 0x342; b = 0x343; c = 0x344; d = 0x345; e = 0x346;
-        } else {
-            a = 0x33D; b = 0x33E; c = 0x33F; d = 0x340; e = 0x341;
-        }
-        meter->ids[0] = a;
-        meter->ids[1] = b;
-        meter->ids[2] = c;
-        meter->ids[3] = d;
-        meter->ids[4] = e;
+        if (FIsBasicDerivedFrom(meter->target, 0x37) != 0)
+            SetMeterIds(meter, 0x347, 0x348, 0x349, 0x34A, 0x34B);
+        else if (FIsBasicDerivedFrom(meter->target, 0x36) != 0)
+            SetMeterIds(meter, 0x342, 0x343, 0x344, 0x345, 0x346);
+        else
+            SetMeterIds(meter, 0x33D, 0x33E, 0x33F, 0x340, 0x341);
         BLOT *target = meter->blot;
         if (target != 0) {
             SLOT *slot = &target->vt->slot;

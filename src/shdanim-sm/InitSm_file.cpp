@@ -659,7 +659,120 @@ SMT_1F0CF0 *PsmtChooseSmAny(SM_1F0CF0 *sm, unsigned mask, int target)
     return PsmtChooseRandom_1F0CF0(sm, n, list);
 }
 
-INCLUDE_ASM(0X1F0D88);
+struct ASEG_1F0D88 { char pad0[0x74]; float tMax; };
+struct ASEGA_1F0D88;
+struct ALO_1F0D88;
+struct SMS_1F0D88 { int pad0; int ismsNext; };
+struct SM_1F0D88 { char pad0[0x54]; SMS_1F0D88 *asms; };
+struct SMT_1F0D88 { ASEG_1F0D88 *paseg; int ismsFrom; int ismsTo; unsigned grfsmt; };
+struct SMA_1F0D88 {
+    char pad0[0x24];
+    SM_1F0D88 *psm;
+    ALO_1F0D88 *paloRoot;
+    int grfapl;
+    ASEGA_1F0D88 *pasega;
+    int ismsCur;
+    int ismsNext;
+    int ismsGoal;
+    SMT_1F0D88 *psmt;
+    float svt;
+    unsigned grfsmt;
+};
+
+extern "C" {
+int FSmaRetracted_1F0D88(SMA_1F0D88 *psma);
+SMT_1F0D88 *PsmtChooseSmAny_1F0D88(SM_1F0D88 *psm, unsigned grfsmt, int isms, int unused);
+SMT_1F0D88 *PsmtChooseSmTowards_1F0D88(SM_1F0D88 *psm, unsigned grfsmt, int ismsFrom, int ismsTo, int unused);
+void ApplyAseg_1F0D88(ASEG_1F0D88 *paseg, ALO_1F0D88 *paloRoot, int grfapl, ASEGA_1F0D88 **ppasega, float tLocal, float svt);
+void NotifySmaSpliceOnEnterState_1F0D88(SMA_1F0D88 *psma, int ismsFrom, int ismsTo);
+void RetractAsega_1F0D88(ASEGA_1F0D88 *pasega);
+void SubscribeLoObject_1F0D88(ASEGA_1F0D88 *pasega, SMA_1F0D88 *psma);
+
+void ChooseSmaTransition(void *pv, int fReverse)
+{
+    SMA_1F0D88 *psma = (SMA_1F0D88 *)pv;
+    if (FSmaRetracted_1F0D88(psma))
+        return;
+    for (;;) {
+        SMT_1F0D88 *psmt;
+        int ismsCur = psma->ismsCur;
+        int ismsGoal = psma->ismsGoal;
+        if (ismsCur != ismsGoal) {
+            psmt = PsmtChooseSmTowards_1F0D88(psma->psm, psma->grfsmt, ismsCur, ismsGoal, 1);
+        } else {
+            SM_1F0D88 *psm = psma->psm;
+            SMS_1F0D88 *psms = &psm->asms[ismsCur];
+            int ismsNext = psms->ismsNext;
+            if (ismsNext == -1)
+                break;
+            if (ismsNext == -2) {
+                psmt = PsmtChooseSmAny_1F0D88(psm, psma->grfsmt, ismsCur, 0);
+                if (psmt)
+                    psma->ismsGoal = psmt->ismsFrom == psma->ismsCur ? psmt->ismsTo : psmt->ismsFrom;
+            } else {
+                psma->ismsGoal = ismsNext;
+                psmt = PsmtChooseSmTowards_1F0D88(psm, psma->grfsmt, ismsCur, ismsNext, 1);
+            }
+            fReverse = 0;
+        }
+        psma->psmt = psmt;
+        if (!psmt)
+            return;
+        int fDone = 0;
+        if (psmt->paseg) {
+            float tLocal;
+            float svt;
+            if (psmt->ismsFrom == psma->ismsCur) {
+                tLocal = 0.0f;
+                psma->ismsNext = psmt->ismsTo;
+                svt = psma->svt;
+            } else {
+                psma->ismsNext = psmt->ismsFrom;
+                svt = -psma->svt;
+                tLocal = psmt->paseg->tMax;
+            }
+            int grfapl = psma->grfapl;
+            if (fReverse == 1) {
+                grfapl |= 2;
+                grfapl &= ~1;
+                fDone = 1;
+                tLocal = psmt->paseg->tMax - tLocal;
+            } else if (psmt->paseg->tMax == 0.0f) {
+                fDone = 1;
+            }
+            ApplyAseg_1F0D88(psmt->paseg, psma->paloRoot, grfapl, &psma->pasega, tLocal, svt);
+        }
+        ASEGA_1F0D88 *pasega = psma->pasega;
+        if (!pasega) {
+            int ismsFrom = psma->ismsCur;
+            int ismsTo = psmt->ismsFrom;
+            if (ismsTo == ismsFrom)
+                ismsTo = psmt->ismsTo;
+            psma->ismsCur = ismsTo;
+            NotifySmaSpliceOnEnterState_1F0D88(psma, ismsFrom, ismsTo);
+            if (FSmaRetracted_1F0D88(psma))
+                return;
+            if (psma->pasega)
+                return;
+        } else if (fDone) {
+            int ismsTo = psma->ismsNext;
+            int ismsFrom = psma->ismsCur;
+            psma->ismsCur = ismsTo;
+            psma->ismsNext = -1;
+            RetractAsega_1F0D88(pasega);
+            psma->pasega = 0;
+            NotifySmaSpliceOnEnterState_1F0D88(psma, ismsFrom, ismsTo);
+            if (FSmaRetracted_1F0D88(psma))
+                return;
+            if (psma->pasega)
+                return;
+        } else {
+            SubscribeLoObject_1F0D88(pasega, psma);
+            return;
+        }
+    }
+}
+}
 
 struct SMA_1F0FA0 {
     char pad0[0x30];

@@ -3,18 +3,19 @@
 #include "vu0inline.h"
 struct CRef_225BA0 { int tagk; union { float g; int n; }; };
 struct Rows3_225BA0 { QW row[3]; };
-struct Locals_225BA0 { Rows3_225BA0 rotation; Rows3_225BA0 lookAt; float pan; float tilt; float pad[2]; QW targetPosition; };
-struct Stick_225BA0 { char pad0[0x10]; float x; char pad14[0]; };
+struct Locals_225BA0 { Rows3_225BA0 rotation; Rows3_225BA0 lookAt; float pan; float tilt; };
 struct Tank_225BA0 {
     char pad0[0x150]; char *input; char pad154[0x180 - 0x154]; char *target; int hasTarget; char pad188[4];
     float pan; float tilt; float panRate; float tiltRate; char tiltLimit[8]; char panLimit[8]; char pad1AC[0x1BC - 0x1AC];
     float skill; char pad1C0[0x1CC - 0x1C0]; int visible; char pad1D0[8]; void *act;
 };
 extern "C" {
-extern char B_003D4A60[];
+struct SAVE_225BA0;
+extern SAVE_225BA0 B_003D4A60;
 extern int B_003E0FE0;
 extern char D_002C4408[];
-extern float g_2dded0[];
+struct CLOCK { float t; float dt; };
+extern CLOCK g_2dded0;
 void CRef_Destruct(CRef_225BA0 *);
 void DecomposeRotateMatrixPanTilt__FP7MATRIX3PfT1(Rows3_225BA0 *, float *, float *);
 float GLimitAbs__Fff(float, float);
@@ -22,15 +23,14 @@ float GLimitLm__FP2LMf(void *, float);
 float GSmooth__FfffP3SMPPf(float, float, float, void *, float *);
 void LoadLookAtMatrix(Rows3_225BA0 *, QW);
 QW PosLoWorld(void *);
-void RefGetGameSaveValue(CRef_225BA0 *, int, void *);
+void RefGetGameSaveValue(CRef_225BA0 *, int, SAVE_225BA0 *);
 void func_0012D108(void *, QW);
 void UpdateTankAim(Tank_225BA0 *self) {
     if (self->target != 0 && self->hasTarget != 0) {
         Locals_225BA0 l;
         Rows3_225BA0 *plookAt = &l.lookAt;
-        l.targetPosition = PosLoWorld(self->target);
-        QW position = PosLoWorld(self);
-        QW direction = VectorSub(l.targetPosition, position);
+        QW targetPosition = PosLoWorld(self->target);
+        QW direction = VectorSub(targetPosition, PosLoWorld(self));
         LoadLookAtMatrix(plookAt, direction);
         l.rotation = l.lookAt;
         DecomposeRotateMatrixPanTilt__FP7MATRIX3PfT1(&l.rotation, &l.pan, &l.tilt);
@@ -53,7 +53,7 @@ void UpdateTankAim(Tank_225BA0 *self) {
                 self->panRate = 0.0f;
             }
             float tiltAccel = stickY * stickY * stickY * scale;
-            RefGetGameSaveValue(&ref, B_003E0FE0, B_003D4A60);
+            RefGetGameSaveValue(&ref, B_003E0FE0, &B_003D4A60);
             int invert = ref.n;
             CRef_Destruct(&ref);
             if (invert == 0) {
@@ -62,22 +62,22 @@ void UpdateTankAim(Tank_225BA0 *self) {
             if (tiltAccel * self->tiltRate <= 0.0f) {
                 self->tiltRate = 0.0f;
             }
-            self->panRate = GSmooth__FfffP3SMPPf(self->panRate, 0.0f, g_2dded0[1], D_002C4408, 0);
-            self->tiltRate = GSmooth__FfffP3SMPPf(self->tiltRate, 0.0f, g_2dded0[1], D_002C4408, 0);
-            self->panRate = GLimitAbs__Fff(self->panRate + panAccel * g_2dded0[1], limit * 0.9f);
-            float newTilt = GLimitAbs__Fff(self->tiltRate + tiltAccel * g_2dded0[1], limit * 0.8f);
+            self->panRate = GSmooth__FfffP3SMPPf(self->panRate, 0.0f, g_2dded0.dt, D_002C4408, 0);
+            self->tiltRate = GSmooth__FfffP3SMPPf(self->tiltRate, 0.0f, g_2dded0.dt, D_002C4408, 0);
+            self->panRate = GLimitAbs__Fff(self->panRate + panAccel * g_2dded0.dt, limit * 0.9f);
+            float newTilt = GLimitAbs__Fff(self->tiltRate + tiltAccel * g_2dded0.dt, limit * 0.8f);
             self->tiltRate = newTilt;
-            self->pan = self->pan + self->panRate * g_2dded0[1];
-            self->tilt = self->tilt + newTilt * g_2dded0[1];
+            self->pan = self->pan + self->panRate * g_2dded0.dt;
+            self->tilt = self->tilt + newTilt * g_2dded0.dt;
         }
     }
     self->pan = GLimitLm__FP2LMf(self->panLimit, self->pan);
     float tilt = GLimitLm__FP2LMf(self->tiltLimit, self->tilt);
     self->tilt = tilt;
     if (self->visible != 0) {
-        VECTOR vector;
-        *(QW *)&vector = JoinLowDoublewords(self->pan, InterleaveLowWords(-tilt, 0.0f));
-        func_0012D108(self->act, *(QW *)&vector);
+        union VU_VECTOR { QW q; VECTOR v; } vector;
+        vector.q = VectorFromFloats3(0.0f, -tilt, self->pan);
+        func_0012D108(self->act, vector.q);
     }
 }
 }

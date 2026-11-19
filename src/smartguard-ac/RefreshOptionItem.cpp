@@ -1,16 +1,20 @@
-struct CRef { int tagk; union { float g; int n; }; };
-extern "C" {
-void RefGetGameSaveValue(CRef *, void *, int *);
-void CRef_Destruct(CRef *);
-}
-extern "C" int B_003D4A60;
+#include "sly2.h"
+#include "cref.h"
+struct SAVE { char b[0x5408]; };
+extern SAVE B_003D4A60;
+extern "C" CRef RefGetGameSaveValue(void *, SAVE *);
 extern "C" void *B_003E0FC0, *B_003E0FD8, *B_003E0FDC, *B_003E0FE0;
 extern "C" int B_003DD050;
 extern "C" int g_2c2d8c;
 
+static inline int ReadSave(void *path)
+{
+    int value = RefGetGameSaveValue(path, &B_003D4A60).m_tag.m_n;
+    return value;
+}
+
 extern "C" void RefreshOptionItem(int *pitem)
 {
-    CRef ref;
     int item;
     switch (*pitem) {
     case 0x3F:
@@ -19,10 +23,11 @@ extern "C" void RefreshOptionItem(int *pitem)
     case 0x4C:
     case 0x4D:
     case 0x4E: {
-        RefGetGameSaveValue(&ref, B_003E0FC0, &B_003D4A60);
-        int value = ref.n;
-        CRef_Destruct(&ref);
+        int value = ReadSave(B_003E0FC0);
         switch (value) {
+        case 0:
+            item = 0x4E;
+            break;
         case 1:
             item = 0x4C;
             break;
@@ -45,9 +50,7 @@ extern "C" void RefreshOptionItem(int *pitem)
         int value;
         switch (g_2c2d8c) {
         case 1:
-            RefGetGameSaveValue(&ref, B_003E0FD8, &B_003D4A60);
-            value = ref.n;
-            CRef_Destruct(&ref);
+            value = ReadSave(B_003E0FD8);
             break;
         case 2:
             value = 0;
@@ -59,39 +62,28 @@ extern "C" void RefreshOptionItem(int *pitem)
             value = 0;
             break;
         }
-        *pitem = (value != 0) ? 0x49 : 0x48;
+        if (value != 0)
+            *pitem = 0x49;
+        else
+            *pitem = 0x48;
         break;
     }
     case 0x51:
     case 0x52: {
-        RefGetGameSaveValue(&ref, B_003E0FDC, &B_003D4A60);
-        int value = ref.n;
-        CRef_Destruct(&ref);
-        switch (value) {
-        case 0:
-            item = 0x51;
-            break;
-        default:
-            item = 0x52;
-            break;
-        }
-        *pitem = item;
+        int value = ReadSave(B_003E0FDC);
+        if (value != 0)
+            *pitem = 0x52;
+        else
+            *pitem = 0x51;
         break;
     }
     case 0x53:
     case 0x54: {
-        RefGetGameSaveValue(&ref, B_003E0FE0, &B_003D4A60);
-        int value = ref.n;
-        CRef_Destruct(&ref);
-        switch (value) {
-        case 0:
-            item = 0x53;
-            break;
-        default:
-            item = 0x54;
-            break;
-        }
-        *pitem = item;
+        int value = ReadSave(B_003E0FE0);
+        if (value != 0)
+            *pitem = 0x54;
+        else
+            *pitem = 0x53;
         break;
     }
     }

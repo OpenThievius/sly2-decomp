@@ -16,9 +16,42 @@ struct BLK { QW q[4]; };
 
 struct BLK2 { QW q[7]; };
 
+// A vector whose first float is a union's.
+struct __attribute__((aligned(16))) QUADRATIC_15CAD8 {
+    union {
+        f32 x;
+        u32 xBits;
+    };
+    f32 y, z, w;
+};
+union VU_VECTOR_15CAD8 {
+    VECTOR v;
+    QW q;
+};
+// 0x2DE5B0: an id (-1, none) and two vectors (the zero vector and the x axis).
+struct EXPLA_15CAD8 {
+    QW q00;
+    s32 id;
+    VU_VECTOR_15CAD8 v20;
+    VECTOR v30;
+};
+// 0x2DE5F0: 750 and 750, -1500 below, the z axis, 200, and the two quadratics.
+struct EXPLB_15CAD8 {
+    QUADRATIC_15CAD8 q00;
+    VECTOR v10;
+    VECTOR v20;
+    f32 f30;
+    s32 c34;
+    f32 f38;
+    f32 f3C;
+    QW q40;
+    QW q50;
+    QUADRATIC_15CAD8 q60;
+};
+
 extern "C" BLK g_2de5b0;
 
-extern "C" BLK2 B_002DE5F0;
+extern "C" EXPLB_15CAD8 B_002DE5F0;
 
 extern "C" void InitEmitb(EMITB *pemitb)
 {
@@ -26,7 +59,7 @@ extern "C" void InitEmitb(EMITB *pemitb)
     pemitb->refs = 1;
     pemitb->pk = -1;
     *(BLK *)&pemitb->a[0] = g_2de5b0;
-    *(BLK2 *)&pemitb->b[0] = B_002DE5F0;
+    *(BLK2 *)&pemitb->b[0] = *(BLK2 *)&B_002DE5F0;
 }
 
 struct EMITTER { char pad0[0x40]; unsigned tagged; char pad1[0xAC]; int unkF0; int unkF4; float unkF8; float unkFC; char pad2[0x18]; int unk118; char dl[0x2C]; float unk148; };
@@ -1166,12 +1199,27 @@ void FireExplsExplso(EXPLS *pexpls, EXPLSO *pexplso)
     }
 }
 
-INCLUDE_ASM(0X15CAD8);
-
+// 0x15CAD8 and 0x15CD48 are the static initializer g++ 2.95 generates for this file's globals and the constructor-list entry that calls it
+// (the generated `__static_initialization_and_destruction_0` and `_GLOBAL_$I$`), written as the globals' brace initialisers below. The two
+// records are named after their retail addresses (B_002DE5B0, B_002DE5F0): link_image.py links them there; g_2de5b0 is the same object.
 extern "C" {
-s32 expl__static_initialization_and_destruction_0(s32, s32); /* extern */
+extern VECTOR g_2a2dd0;
+extern VECTOR g_2a2da0_15CAD8;
+extern VECTOR g_2a2dc0;
+extern int B_002DD2E0, B_002DD2E4, B_002DD2E8, B_002DD2EC, B_002DD2F0, B_002DD2F4;
+extern char B_004520A8[], B_004520D0[], B_004520F8[], B_00452120[], B_00452148[], B_00452170[];
+void CreateSlotheapSwAlign(void *, int, int, int);
+}
+// data-ok: .bss in retail (zero), filled by this file's static initializer below
+EXPLA_15CAD8 B_002DE5B0 = {0, -1, {g_2a2dd0}, g_2a2da0_15CAD8};
+// data-ok: .bss in retail (zero), filled by this file's static initializer below
+EXPLB_15CAD8 B_002DE5F0 = {{750.0f, 750.0f, -1.0f, 1.0f}, {0.0f, 0.0f, -1500.0f, 0.0f}, g_2a2dc0, 0.0f, 200, 1.0f, 1.0f, 0, 0, {1.0f, 0.0f, -1.0f, 0.0f}};
+// The counted static objects of the slot heaps' header: the first file to run creates each heap.
+#define SLOTHEAP_INIT(cls, count, heap, cb, c) struct cls { cls() { if (++count == 1) CreateSlotheapSwAlign(heap, cb, c, 0x10); } }; static cls s_##cls;
+SLOTHEAP_INIT(SLOTHEAP_INIT_A8, B_002DD2E0, B_004520A8, 0x14, 0x2000)
+SLOTHEAP_INIT(SLOTHEAP_INIT_D0, B_002DD2E4, B_004520D0, 0x18, 0x800)
+SLOTHEAP_INIT(SLOTHEAP_INIT_F8, B_002DD2E8, B_004520F8, 0x28, 0x200)
+SLOTHEAP_INIT(SLOTHEAP_INIT_120, B_002DD2EC, B_00452120, 0x1C, 0x800)
+SLOTHEAP_INIT(SLOTHEAP_INIT_148, B_002DD2F0, B_00452148, 0xC, 0xC8)
+SLOTHEAP_INIT(SLOTHEAP_INIT_170, B_002DD2F4, B_00452170, 0x14, 0x100)
 
-void func_0015CD48(void) {
-    expl__static_initialization_and_destruction_0(1, 0xFFFF);
-}
-}

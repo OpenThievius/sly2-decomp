@@ -201,6 +201,23 @@ one with the SDK assembler (`func_00241C98`, `sony_gcc29.txt`, with a `volatile`
 hi-only functions. Whole-file landing: `make land` cannot merge a function whose types clash with its file's; suffix the clashing declarations `_<ADDR>`
 by hand (an 8-byte `char ref[8]` stands in for `CRef` when the file has its own `CRef`), then `make land ONLY=` registers it.
 
+Sixth round (wave U21, 2026-11-19, 39 workers on the next tier of `build/check_calls.tsv`: argument mismatches first, then typed globals): 19 reached 0,
+20 ended near. What the matches show, each one measurement on the function named. A flagged argument count is true in about three of four cases and false
+when retail only sets a register the callee ignores (`PosSpawnerFocus`, `PsmtChooseSmAny`, `free(void *)`, `CRef_SetS32`): read the callee's disassembly,
+not the count. Typing a global (`SW`, `SAVE`, `LM {gMin, gMax}`, `CLOCK {t, dt}`, `SLOTHEAP`) is usually neutral alone and necessary beside the real fix;
+the `D_FLT_` names fail the link check (use `D_<ADDR>`). Counted-pointer handles (`PairHandle`, `CFramePtr`, `SIDEBAGPTR`) with an inline destructor and a
+declared copy constructor reproduce a return in memory and the release block (`bif41_shuffle`, `UpdateSwCallbacks`, `CLo_Clone`); a `CRef` built as an
+argument temporary (`func_001D8B20(CRefS32(n), ...)`) allocates the return slot first (`CreateSwSavePaths`, which also reached the `s7` hi-only hoist with
+`SAVE` and `ACT` typed). A name-order lever: `static inline` helpers must be defined before use (`InitMeter`, 27 against 28). `if`/else forms with direct
+stores avoid if-conversion to `movn` (`RefreshOptionItem`) and the ternary gives it where retail has it. `volatile` on an IOP-written return buffer, marked
+`// volatile-ok`, keeps a store out of a `jal` delay slot (`snd_StartSoundSystem`). The g++-generated static initializer
+(`expl__static_initialization_and_destruction_0`) is not written as a function: define the globals with brace initialisers under their retail address names
+(`B_002DE5B0`, 8 hex digits, which `link_image.py` links), with union members where retail's store order shows a CLOBBER (sly1-decomp's finding) and the
+records non-const so each is built in a temporary and copied.
+Open pattern (not a lever yet): in the hi-only hoist class (`SetClueFound`, `StoreAudioModeInSave`, `UpdateJtLootSave`, `SetTaskState`, `SetGameCoins`,
+`SaveJobVariables`, `SaveTaskVariables`) the hoist is missing only in the Bool-tagged `CRef` blocks of the two Save*Variables functions and present in their S32
+blocks. Two functions (`CGc_Collect`, `PaloAbsorbWkr`) have an untouched 16-byte slot in retail's frame: one ruling on a typed dead local would decide both.
+
 Loop-movable class, measured 2026-11-19 (nothing landed from it): the `-mvu0-use-vf0-NN` flag is binary here: `PumpCd`, `ApplySpriteKeySounds` and
 `func_0021C888` score the same for every NN from 0 to 31 (51, 53 and 20 against 51, 59 and 21 without), so docs/toolchain/loops.md's `64 + NN` threshold
 does not hold for this compiler and no per-function NN is a lever. Declaring `PumpCd`'s four callees `__attribute__((const))` (so loop.c sees no call and

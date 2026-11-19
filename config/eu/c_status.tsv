@@ -1020,6 +1020,7 @@ us_address	name	other_address	pair	score	addresses
 0x120D78	RefOpNth	0X120D78	identical	0	ok
 0x120E10	RefOpIsMember	0X120E10	identical	0	ok
 0x120F80	RefOpList__FiP4CRefP6CFrame	0X120F80	identical	0	ok
+0x120FB0	bevy_splice_bif_bif41_shuffle	0X120FB0	same	0	ok
 0x1212F8	RefOpAppend	0X1212F8	same	0	ok
 0x121578	func_00121578	0X121578	same	0	ok
 0x121938	RefOpFilter	0X121938	same	0	ok
@@ -1580,6 +1581,7 @@ us_address	name	other_address	pair	score	addresses
 0x140558	UpdateJtFocus	0X140570	same	0	ok
 0x140678	SetJtFocus	0X140690	same	0	ok
 0x1406E8	func_001406E8	0X140700	same	0	ok
+0x140750	func_00140750	0X140768	same	0	ok
 0x1409B8	func_001409B8	0X1409D0	same	0	ok
 0x1409E8	func_001409E8	0X140A00	same	0	ok
 0x140C88	func_00140C88	0X140CA0	same	0	ok
@@ -1766,6 +1768,7 @@ us_address	name	other_address	pair	score	addresses
 0x149A50	QueueSwCallback	0X149A90	identical	0	ok
 0x149AB8	QueueSwCallbackOnce	0X149AF8	same	0	ok
 0x149B58	CancelSwCallbacks	0X149B98	identical	0	ok
+0x149C80	UpdateSwCallbacks	0X149CC0	same	0	ok
 0x149EB0	StaticInitSlotheaps_149eb0	0X149EF0	same	0	ok
 0x149FE8	StaticInitSlotheaps_149eb0_thunk	0X14A028	same	0	ok
 0x14A008	func_0014A008	0X14A048	same	0	ok
@@ -2068,6 +2071,7 @@ us_address	name	other_address	pair	score	addresses
 0x15C628	ExplodeExplsExplso	0X15C650	identical	0	ok
 0x15C650	PsfxEnsureExpls	0X15C678	same	0	ok
 0x15C690	FireExplsExplso__FP5EXPLSP6EXPLSO	0X15C6B8	same	0	ok
+0x15CAD8	expl__static_initialization_and_destruction_0	0X15CB00	same	0	ok
 0x15CD48	func_0015CD48	0X15CD70	same	0	ok
 0x15CD68	InitEpsel	0X15CD90	same	0	ok
 0x15CDA8	PostEpselLoad	0X15CDD0	same	0	ok
@@ -2372,6 +2376,7 @@ us_address	name	other_address	pair	score	addresses
 0x1733F8	func_001733F8	0X173380	same	0	ok
 0x173928	func_00173928	0X1738B0	same	0	ok
 0x173A18	PosSpawnerFocus	0X1739A0	same	0	ok
+0x173A68	func_00173A68	0X1739F0	same	0	ok
 0x173E78	func_00173E78	0X173E00	same	0	ok
 0x174490	func_00174490	0X174418	same	0	ok
 0x1746B8	func_001746B8	0X174640	same	0	ok
@@ -2753,6 +2758,7 @@ us_address	name	other_address	pair	score	addresses
 0x18ED70	EnsureAloSfx__FP3ALO	0X18ECF8	same	0	ok
 0x18EE38	ChooseJtCaneSwing	0X18EDC0	same	0	ok
 0x18F050	ChooseJtCaneAlternateSwing	0X18EFD8	same	0	ok
+0x18F0A8	UpdateJtCaneInput	0X18F030	same	0	ok
 0x18F560	ChooseJtSweepTarget__FP2JTP2BLP6ASEGBL	0X18F4E8	same	0	ok
 0x18F688	ChooseJtRushTarget__FP2JT	0X18F610	same	0	ok
 0x18F740	ChooseJtSmashTarget__FP2JT	0X18F6C8	same	0	ok
@@ -2842,6 +2848,7 @@ us_address	name	other_address	pair	score	addresses
 0x19F3F0	func_0019F3F0	0X19F378	gap	0	ok
 0x19F540	WarpJtToPoint	0X19F4C8	same	0	ok
 0x19F590	WarpJtToSafePoint	0X19F518	same	0	ok
+0x19F7D0	ScoreSafePoint	0X19F758	same	0	ok
 0x19FAF8	FindBestSafePoint	0X19FA80	same	0	ok
 0x19FC30	UpdateJtSafePoints	0X19FBB8	same	0	ok
 0x19FD30	AddSafePointOnMember	0X19FCB8	same	0	ok
@@ -3113,6 +3120,8 @@ us_address	name	other_address	pair	score	addresses
 0x1AF608	PauseMenu_Pop	0X1AF780	same	0	ok
 0x1AF660	PauseMenu_Close	0X1AF7D8	same	0	ok
 0x1AF6A0	func_001AF6A0	0X1AF818	same	0	ok
+0x1AF6D0	PauseMenu_AdjustOption	0X1AF848	gap	12	7
+0x1AF9C8	RefreshOptionItem	0X1AFB40	same	0	ok
 0x1AFB88	PauseMenu_ApplyOption		none		
 0x1AFF88	PauseMenu_CancelOption	0X1B0148	same	0	ok
 0x1B0078	func_001B0078	0X1B0238	same	0	ok
@@ -3276,6 +3285,7 @@ us_address	name	other_address	pair	score	addresses
 0x1BAED8	SetStgSwitchHitter	0X1BB140	gap	0	ok
 0x1BAF18	StepStgSwitch	0X1BB180	same	0	ok
 0x1BB250	func_001BB250	0X1BB4B8	same	0	ok
+0x1BB648	RunStgSwitchStage	0X1BB8B0	same	0	ok
 0x1BB918	AddStgSwitchClass	0X1BBB80	identical	0	ok
 0x1BB950	AddStgSwitchStage	0X1BBBB8	same	0	ok
 0x1BB9B8	InitStgSwitchPreStage	0X1BBC20	same	0	ok
@@ -3682,6 +3692,7 @@ us_address	name	other_address	pair	score	addresses
 0x1D7E80	PvFindSaveVar	0X1D80F8	same	0	ok
 0x1D7ED8	RefGetSaveValue	0X1D8150	same	0	ok
 0x1D80C8	RefSetSaveValue	0X1D8340	same	0	ok
+0x1D82B8	NPercentCompleteSaveData	0X1D8530	same	0	ok
 0x1D84B0	SnapshotSaveData	0X1D8728	same	0	ok
 0x1D8600	InitSymtab	0X1D8878	same	0	ok
 0x1D8640	NHashPchz	0X1D88B8	same	0	ok
@@ -3708,6 +3719,7 @@ us_address	name	other_address	pair	score	addresses
 0x1D98A8	func_001D98A8	0X1D9BF0	gap	0	ok
 0x1D98B0	CGc_PushScreen	0X1D9BF8	same	0	ok
 0x1D9910	CGc_PopScreen	0X1D9C58	same	0	ok
+0x1D9968	InitMeter	0X1D9CB0	same	0	ok
 0x1D9B30	ReleaseMeter	0X1D9E78	same	0	ok
 0x1D9DF8	UpdateMeter	0X1DA140	same	0	ok
 0x1DA2E0	FindHudLabelBlot	0X1DA628	same	0	ok
@@ -3761,6 +3773,7 @@ us_address	name	other_address	pair	score	addresses
 0x1DCD30	JobMenu_Update	0X1DD078	same	0	ok
 0x1DCE90	JobMenu_Select	0X1DD1D8	same	0	ok
 0x1DD1F8	JobMenu_UpdateBlot	0X1DD540	same	0	ok
+0x1DD300	JobMenu_SetPage	0X1DD648	same	0	ok
 0x1DD558	JobMenu_SetDirection	0X1DD8A0	same	0	ok
 0x1DD648	func_001DD648	0X1DD990	same	0	ok
 0x1DD690	func_001DD690	0X1DD9D8	same	0	ok
@@ -4115,6 +4128,7 @@ us_address	name	other_address	pair	score	addresses
 0x1F0AD0	PsmtChooseRandom	0X1F1290	identical	0	ok
 0x1F0B80	PsmtChooseSmTowards	0X1F1340	same	0	ok
 0x1F0CF0	PsmtChooseSmAny	0X1F14B0	same	0	ok
+0x1F0D88	ChooseSmaTransition	0X1F1548	same	0	ok
 0x1F0FA0	EndSmaTransition	0X1F1760	same	0	ok
 0x1F0FD8	SendSmaMessage	0X1F1798	identical	0	ok
 0x1F1078	HandleSmaMessage	0X1F1838	same	0	ok
@@ -4686,6 +4700,7 @@ us_address	name	other_address	pair	score	addresses
 0x20E180	AllocSwBuffers	0X20E940	same	0	ok
 0x20E2B0	func_0020E2B0	0X20EA70	same	0	ok
 0x20E338	func_0020E338	0X20EAF8	same	0	ok
+0x20E3C0	CreateSwSavePaths		none		
 0x20E740	func_0020E740	0X20EF38	same	0	ok
 0x20EFC0	SetHandsOff	0X20F7B8	same	0	ok
 0x20F030	ClearHandsOff	0X20F828	same	0	ok
@@ -4965,6 +4980,7 @@ us_address	name	other_address	pair	score	addresses
 0x225AA8	PostTankLoad	0X2262C8	same	0	ok
 0x225AE8	OnTankActive	0X226308	same	0	ok
 0x225B60	UpdateTank	0X226380	same	0	ok
+0x225BA0	UpdateTankAim	0X2263C0	same	0	ok
 0x226250	UpdateTankFire	0X226A70	same	0	ok
 0x226310	FIgnoreTankIntersection	0X226B30	same	0	ok
 0x2263F8	StaticInitSlotheaps_2263f8	0X226C18	same	0	ok
@@ -5125,6 +5141,7 @@ us_address	name	other_address	pair	score	addresses
 0x2317E0	LoadPloarrayFromBrx	0X232000	same	0	ok
 0x231890	func_00231890	0X2320B0	same	0	ok
 0x2319C8	func_002319C8	0X2321E8	same	0	ok
+0x2319E8	snd_StartSoundSystem	0X232208	same	0	ok
 0x231C48	snd_FlushSoundCommands	0X232468	same	0	ok
 0x231E90	snd_GotReturns__Fv	0X2326D8	same	0	ok
 0x231F38	func_00231F38	0X232780	same	0	ok
@@ -5304,6 +5321,7 @@ us_address	name	other_address	pair	score	addresses
 0x23EB40	__unwinding_cleanup	0X23F500	gap	0	ok
 0x23F240	func_0023F240	0X23FC00	identical	0	ok
 0x23F288	func_0023F288	0X23FC48	identical	0	ok
+0x23F3D8	func_0023F3D8	0X23FD98	same	0	ok
 0x23F640	func_0023F640	0X240000	identical	0	ok
 0x23F688	func_0023F688	0X240048	identical	0	ok
 0x23F710	func_0023F710	0X2400D0	same	0	ok
@@ -5459,6 +5477,7 @@ us_address	name	other_address	pair	score	addresses
 0x252608	func_00252608	0X253058	same	0	ok
 0x253478	func_00253478	0X253EC8	same	0	ok
 0x253518	func_00253518	0X253F68	same	0	ok
+0x2536B8	func_002536B8	0X254108	same	0	ok
 0x253C80	func_00253C80	0X2546D0	same	0	ok
 0x253D20	func_00253D20	0X254770	same	0	ok
 0x253E68	func_00253E68	0X2548B8	same	0	ok
