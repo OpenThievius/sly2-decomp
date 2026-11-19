@@ -4337,6 +4337,7 @@ address	name	size	file	whole_file	symbol
 0X1FB658	SetAmbGrf	80	sound/SetAmbGrf.cpp		
 0X1FB6A8	ActivateAmb	100	sound/ActivateAmb.cpp		
 0X1FB710	DeactivateAmb	100	sound/DeactivateAmb.cpp		
+0X1FB8E0	UpdateAmb	532	sound/UpdateAmb.cpp		
 0X1FBAF8	OnAmbVoiceStarted	56	sound/OnAmbVoiceStarted.cpp		
 0X1FBB30	OnAmbVoicePolled	96	sound/OnAmbVoicePolled.cpp		
 0X1FBB90	NewEmitter	52	sound/NewEmitter.c		
@@ -5583,7 +5584,9 @@ address	name	size	file	whole_file	symbol
 0X257510	SweepFrames	356	bis-memcard/SweepFrames.cpp		
 0X257678	SweepVarbs	356	bis-memcard/SweepVarbs.cpp		
 0X2577E0	SweepPairs	356	bis-memcard/SweepPairs.cpp		
+0X257948	SweepProcs	356	bis-memcard/SweepProcs.cpp		
 0X257AB0	SweepSidebags	356	bis-memcard/SweepSidebags.cpp		
+0X257C18	func_00257C18	356	bis-memcard/fun_00257c18.cpp		
 0X257D80	PsidebagNew	228	bis-memcard/PsidebagNew.cpp		
 0X257E68	func_00257E68	28	bis-memcard/fun_00257e68.cpp		
 0X257E88	ResetPairHeap	64	bis-memcard/ResetPairHeap.cpp		

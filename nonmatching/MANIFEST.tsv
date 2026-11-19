@@ -430,7 +430,6 @@ address	name	size	file	score
 0X1FAC98	AddSoAngularAcceleration	104	new_1f88d8/AddSoAngularAcceleration.c	20
 0X1FAD00	AdjustSoXpVelocity	208	new_1f88d8/AdjustSoXpVelocity.c	50
 0X1FB778	CalculateVolPan	360	sound/CalculateVolPan.c	77
-0X1FB8E0	UpdateAmb	536	sound/UpdateAmb.cpp	32
 0X1FC510	StartStreamAmb	392	new_1fbf20/StartStreamAmb.cpp	77
 0X1FEA60	SetSndbankVolumeFactor	912	light-button/SetSndbankVolumeFactor.cpp	57
 0X1FF4F0	func_001FF4F0	72	button-spliceobj/fun_001ff4f0.c	13
@@ -603,8 +602,6 @@ address	name	size	file	score
 0X254EF0	func_00254EF0	16	sdk/fun_00254ef0.cpp	6
 0X256AF0	func_00256AF0	88	sdk/fun_00256af0.cpp	7
 0X256D28	__ml__FG8VU_FLOATG9VU_VECTOR	24	splice-bif_256ce8/__ml__FG8VU_FLOATG9VU_VECTOR.c	4
-0X257948	SweepProcs	360	bis-memcard/SweepProcs.cpp	32
-0X257C18	func_00257C18	360	bis-memcard/fun_00257c18.cpp	30
 0X258008	func_00258008	56	bis-memcard/fun_00258008.c	10
 0X259AC8	func_00259AC8	48	suv-end/fun_00259ac8.cpp	10
 0X259DA8	Vec4_GetY	24	suv-end/Vec4_GetY.c	4

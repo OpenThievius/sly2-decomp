@@ -4337,6 +4337,7 @@ us_address	name	other_address	pair	score	addresses
 0x1FB658	SetAmbGrf	0X1FBE18	same	0	ok
 0x1FB6A8	ActivateAmb	0X1FBE68	same	0	ok
 0x1FB710	DeactivateAmb	0X1FBED0	same	0	ok
+0x1FB8E0	UpdateAmb	0X1FC0A0	same	0	ok
 0x1FBAF8	OnAmbVoiceStarted	0X1FC2B8	identical	0	ok
 0x1FBB30	OnAmbVoicePolled	0X1FC2F0	same	0	ok
 0x1FBB90	NewEmitter	0X1FC350	same	0	ok
@@ -5583,7 +5584,9 @@ us_address	name	other_address	pair	score	addresses
 0x257510	SweepFrames	0X257F60	same	0	ok
 0x257678	SweepVarbs	0X2580C8	same	0	ok
 0x2577E0	SweepPairs	0X258230	same	0	ok
+0x257948	SweepProcs	0X258398	same	0	ok
 0x257AB0	SweepSidebags	0X258500	same	0	ok
+0x257C18	func_00257C18	0X258668	same	0	ok
 0x257D80	PsidebagNew	0X2587D0	same	0	ok
 0x257E68	func_00257E68	0X2588B8	identical	0	ok
 0x257E88	ResetPairHeap	0X2588D8	same	0	ok
