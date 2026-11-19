@@ -24,7 +24,60 @@ extern "C" void PostHubLoad(char *arg0) {
     (*(void (**)(char *, int))(hub + 0x27C))(arg0 + *(short *)(hub + 0x278), 0);
 }
 
-INCLUDE_ASM(0X1D72A8);
+struct HUBENTRY { int sma; int button; int oid; };
+struct HUB_1D72A8 { char pad0[0x180]; int state; int sm; int sma; int centry; HUBENTRY entry[1]; };
+struct LO;
+
+extern "C" {
+int FActiveCplcy(void *);
+int FJoyButtonPressed(void *, int);
+int GetSmaCur(int);
+LO *PloFindSwObject_thunk(void *, int, int, void *);
+void ShopMenu_SetPage(void *, int);
+void StartJsg(LO *, int);
+void StepHubState_1D72A8(HUB_1D72A8 *, int);
+int UpdateJoyNavX(void *);
+void UpdateSo(void);
+extern char B_002DE2E0[];
+extern char B_002DFC00[];
+extern char B_002E0D00[];
+extern char B_003DA150[];
+extern char B_003DD490_1D72A8[];
+extern int g_2dfbc0;
+
+void UpdateHub(HUB_1D72A8 *hub)
+{
+    UpdateSo();
+    if (hub->state != 0) {
+        if (hub->state == 1 && hub->sma != 0 && FActiveCplcy(B_002DE2E0) == 0) {
+            char *joy;
+            if (g_2dfbc0 & 2)
+                joy = B_002DFC00;
+            else
+                joy = B_002E0D00;
+            int nav = UpdateJoyNavX(joy);
+            if (nav == 0) {
+                for (int index = 0; index < hub->centry; index++) {
+                    HUBENTRY *entry = &hub->entry[index];
+                    if (entry->sma == GetSmaCur(hub->sma) && FJoyButtonPressed(joy, entry->button) && entry->oid != -1) {
+                        if (entry->oid == 0x378) {
+                            ShopMenu_SetPage(B_003DA150, 0);
+                            break;
+                        }
+                        LO *found = PloFindSwObject_thunk(B_003DD490_1D72A8, 4, entry->oid, hub);
+                        if (found != 0) {
+                            StartJsg(found, 0);
+                            break;
+                        }
+                    }
+                }
+            } else {
+                StepHubState_1D72A8(hub, nav);
+            }
+        }
+    }
+}
+}
 
 extern "C" {
 s32 SetHubState_1D7418(s32, s32);                  /* extern */

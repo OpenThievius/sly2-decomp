@@ -187,6 +187,20 @@ it in memory (`CLo_Clone`); `if` forms for clamps, which give `movz` and a cross
 for `CFrame_AddParent`, `bevy_splice_frame_set_parent` and `FStgSwitchDone`: confirm each with the disassembly.
 Four functions (`ApplySpriteKeySounds`, `PumpCd`, `func_0021C888`, `PleaseAcquire`) end where retail sits between loop.c's default hoisting and
 `-fmove-all-movables`: one lever for that class would take several to 0.
+
+Fifth round (wave V20, 2026-11-19, 30 workers on the non-blocker drafts of `build/check_calls.tsv`; Sonnet up to 500 bytes, Opus above): 17 reached 0.
+Eleven of them were prototype or argument bugs the flag named; the rest were levers. Measured on the function named: a chained zero assignment
+`a = b = c = ... = 0.0f` stores the outermost target first and the rest innermost-first, and a `float` zero store needs the chain (separate `0.0f`
+statements emit `sw $zero`) (`UpdateBinoc`); a named pointer bound to `halves + fOther` fixed a commutative operand order that every expression form
+left (`AdjustStepXps`); `do { state = x->state; switch } while (x->state != state)` gives a latch with the reload in the `bnel` delay slot (`func_001C8350`);
+`int` loop counters and `if (cIn <= iend0 + iend1)` keep a sum out of the result's register (`ClsgMergeAlsg`); a `jr` delay slot the split cut off is a
+tail merge: `config/matching/merges.tsv` with `lead end members` (the 0x258-byte `ClsgMergeAlsg` was a size wall, not code). Four functions reach 0 only with
+`-fmove-all-movables` (`func_001BB250`, `func_001C8350`, `GoalIdle_Update`, `FStartSpriteLabelInstance`, `RefOpFilter`: rows in `move_movables.txt`) and
+one with the SDK assembler (`func_00241C98`, `sony_gcc29.txt`, with a `volatile` semaphore id marked `// volatile-ok`). Placement new
+(`operator new(unsigned, SLOTHEAP *)` calling the slot-heap allocator) gave retail's loop-preheader `lui` (`PaloAbsorbWkr`, 7 to 0): not tried on the call-argument
+hi-only functions. Whole-file landing: `make land` cannot merge a function whose types clash with its file's; suffix the clashing declarations `_<ADDR>`
+by hand (an 8-byte `char ref[8]` stands in for `CRef` when the file has its own `CRef`), then `make land ONLY=` registers it.
+
 Loop-movable class, measured 2026-11-19 (nothing landed from it): the `-mvu0-use-vf0-NN` flag is binary here: `PumpCd`, `ApplySpriteKeySounds` and
 `func_0021C888` score the same for every NN from 0 to 31 (51, 53 and 20 against 51, 59 and 21 without), so docs/toolchain/loops.md's `64 + NN` threshold
 does not hold for this compiler and no per-function NN is a lever. Declaring `PumpCd`'s four callees `__attribute__((const))` (so loop.c sees no call and

@@ -5,7 +5,57 @@
 #include "m2c_macros.h"
 #include "include_asm.h"
 
-INCLUDE_ASM(0X19FC30);
+struct ACT { char pad[0x148]; unsigned long flags; };
+
+struct GEOM { char pad0[0x40]; int unk40; char pad44[8]; ACT *act; char pad50[0x10]; QW pos; char pad70[0x18]; float unk88; };
+
+struct MEMBER { char pad[0x10C]; int flag; };
+
+struct SELF { char pad0[0x208]; GEOM *pgeom; char pad20C[0x4C0 - 0x20C]; char sub4C0[1]; char pad4C1[0x51F]; char sub9E0[1]; char pad9E1[0x56F]; char subF50[1]; char padF51[0x13B]; int flag108C; char pad1090[0x18C4 - 0x1090]; MEMBER *pmember; int jts; };
+
+extern VECTOR g_2a2dd0;
+
+extern "C" void AddSafePointOnGeom(void *, int, QW);
+
+extern "C" void AddSafePointOnMember(float, void *, void *);
+
+extern "C" void func_001942F0(void *);
+
+extern "C" void UpdateJtPipeLook(void *);
+
+void UpdateJtSafePoints(SELF *self)
+{
+    VECTOR vecZero = g_2a2dd0;
+    switch (self->jts) {
+    case 0: case 1: case 5: case 6: case 9: case 10: case 0xb: case 0xc:
+    case 0xf: case 0x10: case 0x11: case 0x14: case 0x17: case 0x18: {
+        GEOM *geom = self->pgeom;
+        if (geom) {
+            float level = geom->unk88;
+            if (0.7f < level) {
+                if (!(geom->act->flags & 0x20000000UL)) {
+                    if (self->flag108C == 0)
+                        AddSafePointOnGeom(self->sub9E0, geom->unk40, geom->pos);
+                }
+            }
+        }
+        break;
+    }
+    case 3:
+    case 0x16: {
+        MEMBER *pmember = self->pmember;
+        if (pmember->flag == 0)
+            AddSafePointOnMember(0.0f, self->sub9E0, pmember ? (char *)pmember + 0x100 : 0);
+        break;
+    }
+    case 7:
+        func_001942F0(self->sub4C0);
+        break;
+    case 8:
+        UpdateJtPipeLook(self->subF50);
+        break;
+    }
+}
 
 struct LOB { char pad[0x28]; unsigned long grfo; };
 
@@ -58,7 +108,6 @@ void AddSafePointOnMember(float parameter, SPL *list, MEM *pmember)
 }
 
 INCLUDE_ASM(0X19FEB0);
-
 
 struct SP_1A0048 { int a; int b; int c; int d; QW q1; };
 

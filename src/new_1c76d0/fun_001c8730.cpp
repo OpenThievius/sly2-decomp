@@ -1,0 +1,73 @@
+#include "types.h"
+struct Obj { char pad0[0xC]; char *vt; };
+struct KP {
+    char pad00[0xC]; char *vt; char pad0[0x180 - 0x10];
+    int state; float tState; char pad1[8];
+    Obj *obj; int cnt; char pad2[4]; int jsg; char pad3[4];
+    int stream; char pad4[0x1F4 - 0x1A8];
+    int streamB; int pad5; int streamA; int gadget; int pad6[2];
+    int jsgTable[8];
+};
+extern "C" {
+void StopStream(void *);
+void StopJsg(int);
+void StartJsg(int, Obj *);
+int StartStream(void *, int, int);
+void SetGadgetAcquired(int, int);
+void IncrementSwBinocCount(void *);
+void DecrementSwBinocCount(void *);
+void IncrementSwShowCount(void *);
+void DecrementSwShowCount(void *);
+void func_001C8918(void *, int);
+extern char B_003DD040;
+extern char B_003DD490;
+extern float g_2dded0[];
+}
+#define VCALL(o) ((void (*)(char *, int))(*(void **)((o)->vt + 0x27C)))((char *)(o) + *(short *)((o)->vt + 0x278), 1)
+void func_001C8730(KP *self, int state)
+{
+    if (state == self->state) return;
+    if (self->stream != 0) {
+        StopStream(&B_003DD040);
+        self->stream = 0;
+    }
+    if (self->jsg != 0) StopJsg(self->jsg);
+    switch (self->state) {
+    case 2:
+        func_001C8918(self, -1);
+        DecrementSwShowCount(&B_003DD490);
+        break;
+    case 3:
+        if (self->gadget != -1) SetGadgetAcquired(self->gadget, 1);
+        if (self->streamA != 0) self->stream = StartStream(&B_003DD040, self->streamA, 1);
+        break;
+    case 0:
+        if (self->obj != 0) IncrementSwBinocCount(&B_003DD490);
+        break;
+    }
+    self->state = state;
+    self->tState = g_2dded0[0];
+    switch (state) {
+    case -1:
+        return;
+    case 2:
+        self->cnt = 5;
+        func_001C8918(self, 1);
+        IncrementSwShowCount(&B_003DD490);
+        if (self->streamB != 0) self->stream = StartStream(&B_003DD040, self->streamB, 0);
+        break;
+    case 1:
+        VCALL(self);
+        break;
+    case 0:
+    case 5:
+        if (self->obj != 0) {
+            VCALL(self->obj);
+            self->obj = 0;
+            DecrementSwBinocCount(&B_003DD490);
+        }
+        break;
+    }
+    self->jsg = self->jsgTable[self->state];
+    if (self->jsg != 0) StartJsg(self->jsg, self->obj);
+}

@@ -7,6 +7,7 @@
 #include "include_asm.h"
 #include "vu0inline.h"
 #include "so.h"
+#include "sw.h"
 
 extern "C" {
 void func_0014D470(void) {
@@ -14,7 +15,95 @@ void func_0014D470(void) {
 }
 }
 
-INCLUDE_ASM(0X14D478);
+struct JOY;
+
+struct CPDEFI;
+
+struct VJOYCONFIG;
+
+struct CPLCY_14D478 {
+    int unk0; int unk4; int unk8;
+    virtual void v0(); virtual void v1(); virtual void v2(); virtual void v3(); virtual void v4();
+    virtual void Update(CPDEFI *pcpdefi, void *pjoy);
+};
+
+struct CM_14D478 {
+    char pad0[0x20]; float radFov; float radFovTarget; float dradFov; char smpFov[0x260 - 0x2C];
+    SO *psoCpdefi; char pad264[0xC]; char cpdefi[0x50]; char pad2C0[0x300 - 0x2C0];
+    int fCut; char pad304[0x30C - 0x304]; int ccpr; char pad310[4]; CPLCY_14D478 *pcplcy; SO *psoFocus;
+    char pad31C[0x620 - 0x31C]; float sStereo; float sStereoTarget;
+};
+
+extern "C" JOY B_002DFC00;
+
+extern "C" VJOYCONFIG B_002E0D00;
+
+extern "C" char B_003DD490;
+
+extern "C" char D_002BD810[];
+
+extern "C" void ResetCmAdjust__FP2CMP2SOP6CPDEFI_14D478(CM_14D478 *, CPDEFI *);
+
+extern "C" void AdjustCmCpdefi__FP2CMP2SOfP6CPDEFI_14D478(CM_14D478 *, SO *, CPDEFI *);
+
+extern "C" float GSmoothA__FffffP4SMPAPf_14D478(float, float, float, float, void *, void *);
+
+extern "C" float GSmooth__FfffP3SMPPf_14D478(float, float, float, void *, void *);
+
+extern "C" void SetCmFov_14D478(CM_14D478 *, float);
+
+void RecalcCmFrustrum_14D478(CM_14D478 *);
+
+extern int g_2dfbc0;
+
+extern float g_2dded4;
+
+extern float B_FLT_002DDEE0;
+
+extern "C" void UpdateCmLast(CM_14D478 *pcm)
+{
+    if (pcm->ccpr > 0) {
+        CPLCY_14D478 *pcplcyPrev = 0;
+        SO *psoDone = 0;
+        while (pcm->ccpr > 0) {
+            CPLCY_14D478 *pcplcy = pcm->pcplcy;
+            if (pcplcy == pcplcyPrev)
+                break;
+            SO *pso = pcm->psoFocus;
+            CPDEFI *pcpdefi;
+            if (pso != 0) {
+                pcpdefi = (CPDEFI *)pcm->cpdefi;
+                if (pso != psoDone) {
+                    pso->GetCpdefi(pcpdefi);
+                    if (pcplcyPrev != 0 || pso != pcm->psoCpdefi)
+                        ResetCmAdjust__FP2CMP2SOP6CPDEFI_14D478(pcm, pcpdefi);
+                    AdjustCmCpdefi__FP2CMP2SOfP6CPDEFI_14D478(pcm, pso, pcpdefi);
+                    pcm->psoCpdefi = pso;
+                    psoDone = pso;
+                }
+            } else {
+                pcm->psoCpdefi = 0;
+                pcpdefi = 0;
+                psoDone = 0;
+            }
+            pcplcy->Update(pcpdefi, (g_2dfbc0 & 1) ? (void *)&B_002DFC00 : (void *)&B_002E0D00);
+            pcplcyPrev = pcplcy;
+        }
+    }
+    if (pcm->fCut != 0) {
+        SetCmFov_14D478(pcm, pcm->radFovTarget);
+    } else {
+        float target = pcm->radFovTarget;
+        float current = pcm->radFov;
+        if (target != current) {
+            pcm->radFov = GSmoothA__FffffP4SMPAPf_14D478(current, pcm->dradFov, target, g_2dded4, &pcm->smpFov[0], &pcm->dradFov);
+            RecalcCmFrustrum_14D478(pcm);
+        }
+    }
+    pcm->fCut = 0;
+    if (((SW *)&B_003DD490)->field_0x3E38 != 0)
+        pcm->sStereo = GSmooth__FfffP3SMPPf_14D478(pcm->sStereo, pcm->sStereoTarget, B_FLT_002DDEE0, D_002BD810, 0);
+}
 
 struct CPLCY {
     int unk0; int unk4; int unk8;

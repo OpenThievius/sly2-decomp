@@ -1,5 +1,12 @@
 #include "sly2.h"
+#include "sw.h"
 struct AdjustStepXpsNode;
+struct AdjustStep;
+struct AdjustStepXpsHalf {
+    char pad0[0xC];
+    void *ownerStep;
+    char pad1[0x30];
+};
 struct AdjustStepXpsLink {
     AdjustStepXpsNode *head;
     AdjustStepXpsLink *next;
@@ -12,7 +19,7 @@ struct AdjustStepXpsSet {
 };
 struct AdjustStepXpsNode {
     char pad0[0x8];
-    int owner;
+    AdjustStep *owner;
     void *ownerStep;
     char pad1[0x40 - 0x10];
     void *alternate;
@@ -35,9 +42,9 @@ struct AdjustStep {
     QW chosenQuad;
 };
 extern "C" void func_001F4F10(void *);
-extern "C" void FreeSwMqList__FP2SWP2MQ(void *);
+extern "C" void FreeSwMqList__FP2SWP2MQ(SW *, AdjustStepXpsNode *);
 extern "C" float g_2dded0;
-extern "C" char B_003DD490[];
+extern "C" SW B_003DD490;
 
 extern "C" void AdjustStepXps(AdjustStep *step)
 {
@@ -65,21 +72,19 @@ extern "C" void AdjustStepXps(AdjustStep *step)
     AdjustStepXpsNode *removed = 0;
     link = step->set->links;
     for (;;) {
+        AdjustStepXpsHalf *halves;
         AdjustStepXpsNode **slot = link ? &link->head : &step->set->firstNode;
         AdjustStepXpsNode *node = *slot;
         while (node) {
-            AdjustStepXpsNode *endpoint = node->owner != (int)step ? (AdjustStepXpsNode *)node->alternate : node;
-            if (endpoint->ownerStep != step)
-                slot = &node->next;
-            else if (node->kind != 0xE)
-                slot = &node->next;
-            else if (node == best)
-                slot = &node->next;
-            else {
+            halves = (AdjustStepXpsHalf *)node;
+            int fOther = step != node->owner;
+            AdjustStepXpsHalf *half = halves + fOther;
+            if (half->ownerStep == step && node->kind == 0xE && node != best) {
                 *slot = node->next;
                 node->next = removed;
                 removed = node;
-            }
+            } else
+                slot = &node->next;
             node = *slot;
         }
         if (!link)
@@ -87,5 +92,5 @@ extern "C" void AdjustStepXps(AdjustStep *step)
         *link->outHead = link->head;
         link = link->next;
     }
-    FreeSwMqList__FP2SWP2MQ(B_003DD490);
+    FreeSwMqList__FP2SWP2MQ(&B_003DD490, removed);
 }

@@ -1022,6 +1022,7 @@ address	name	size	file	whole_file	symbol
 0X120F80	RefOpList__FiP4CRefP6CFrame	44	splice-bif/RefOpList__FiP4CRefP6CFrame.cpp		
 0X1212F8	RefOpAppend	636	splice-bif/RefOpAppend.cpp		
 0X121578	func_00121578	408	splice-bif/fun_00121578.cpp		
+0X121938	RefOpFilter	740	splice-bif/RefOpFilter.cpp		
 0X121C20	RefOpForEach	256	splice-bif/RefOpForEach.cpp		
 0X121D20	RefOpEval	180	splice-bif/RefOpEval.cpp		
 0X121DD8	RefOpVector	292	splice-bif/RefOpVector.cpp		
@@ -1348,6 +1349,7 @@ address	name	size	file	whole_file	symbol
 0X1308A8	Asega_AddRef	16	aseg-asega/Asega_AddRef.c		
 0X1308B8	Asega_Release	92	aseg-asega/Asega_Release.cpp		
 0X130918	UpdateAsega	508	aseg-asega/UpdateAsega.cpp		
+0X130B18	RetractAsega	532	aseg-asega/RetractAsega.cpp		
 0X130D30	SeekAsega	384	aseg-asega/SeekAsega.cpp		
 0X130F88	HandleAsegaEvents	372	asega/HandleAsegaEvents.cpp		
 0X131100	HandleAsegaEventsFF	368	asega/HandleAsegaEventsFF.cpp		
@@ -1817,6 +1819,7 @@ address	name	size	file	whole_file	symbol
 0X14C680	func_0014C680	32	new_14bff8/new_14bff8_14c548.c	new_14bff8/new_14bff8_14c548.c	func_0014C680
 0X14C6A0	ClsgClipEdgeToObject	56	new_14bff8/ClsgClipEdgeToObject.cpp		
 0X14C6D8	ClsgClipEdgeToObjectPruned	112	clip/ClsgClipEdgeToObjectPruned.cpp		
+0X14C9F8	ClsgMergeAlsg	600	clip/ClsgMergeAlsg.cpp		
 0X14CC58	PsoHitTestLineObjects__FiP6VECTORT1iPP2SOP3LSG	340	clip/PsoHitTestLineObjects__FiP6VECTORT1iPP2SOP3LSG.cpp		
 0X14CDB0	ClsgClipEdgeToObjects	216	new_14cdb0/ClsgClipEdgeToObjects.cpp		
 0X14CE88	func_0014CE88	308	new_14cdb0/fun_0014ce88.c		
@@ -1829,6 +1832,7 @@ address	name	size	file	whole_file	symbol
 0X14D3B8	GlobalCtorSlotheaps_14d3b8	32	new_14cdb0/InitClock_file.cpp	new_14cdb0/InitClock_file.cpp	GlobalCtorSlotheaps_14d3b8
 0X14D3D8	CM_Construct	152	new_14d1d0/CM_Construct.c		
 0X14D470	func_0014D470	8	new_14d1d0/new_14d1d0_14d470.cpp	new_14d1d0/new_14d1d0_14d470.cpp	func_0014D470
+0X14D478	UpdateCmLast	468	new_14d1d0/new_14d1d0_14d470.cpp	new_14d1d0/new_14d1d0_14d470.cpp	UpdateCmLast
 0X14D650	bevy_camera_cm_14d650	132	new_14d1d0/new_14d1d0_14d470.cpp	new_14d1d0/new_14d1d0_14d470.cpp	bevy_camera_cm_14d650
 0X14D6D8	InitCm	484	new_14d1d0/new_14d1d0_14d470.cpp	new_14d1d0/new_14d1d0_14d470.cpp	InitCm
 0X14D8C0	SetResetFlag__FP2CM	24	new_14d1d0/new_14d1d0_14d470.cpp	new_14d1d0/new_14d1d0_14d470.cpp	SetResetFlag
@@ -2439,6 +2443,7 @@ address	name	size	file	whole_file	symbol
 0X179A20	func_00179A20	52	hide-puffer/fun_00179a20.c		
 0X179A58	GoalIdle_Init	72	hide-puffer/GoalIdle_Init.c		
 0X179B60	GoalIdle_Deactivate	60	hide-puffer/GoalIdle_Deactivate.cpp		
+0X179BA0	GoalIdle_Update	396	hide-puffer/GoalIdle_Update.cpp		
 0X179D30	GoalIdle_SetState	332	hide-puffer/GoalIdle_SetState.cpp		
 0X179E80	func_00179E80	120	hide-puffer/fun_00179e80.cpp		
 0X179EF8	func_00179EF8	120	hide-puffer/fun_00179ef8.cpp		
@@ -2807,6 +2812,7 @@ address	name	size	file	whole_file	symbol
 0X19CC30	PostBinocLoad	28	cnvo-steppipe/bevy_player_p15_binoc_default_file.cpp	cnvo-steppipe/bevy_player_p15_binoc_default_file.cpp	PostBinocLoad
 0X19CC50	StartBinoc	148	cnvo-steppipe/bevy_player_p15_binoc_default_file.cpp	cnvo-steppipe/bevy_player_p15_binoc_default_file.cpp	StartBinoc
 0X19CCE8	StopBinoc	76	cnvo-steppipe/bevy_player_p15_binoc_default_file.cpp	cnvo-steppipe/bevy_player_p15_binoc_default_file.cpp	StopBinoc
+0X19D330	UpdateBinoc	416	cnvo-steppipe/bevy_player_p15_binoc_default_file.cpp	cnvo-steppipe/bevy_player_p15_binoc_default_file.cpp	UpdateBinoc
 0X19D4D0	InitBinocHud	108	cnvo-steppipe/bevy_player_p15_binoc_default_file.cpp	cnvo-steppipe/bevy_player_p15_binoc_default_file.cpp	InitBinocHud
 0X19D540	PostBinocHudLoad	284	cnvo-steppipe/bevy_player_p15_binoc_default_file.cpp	cnvo-steppipe/bevy_player_p15_binoc_default_file.cpp	PostBinocHudLoad
 0X19D660	SetBinocHudState	740	cnvo-steppipe/bevy_player_p15_binoc_default_file.cpp	cnvo-steppipe/bevy_player_p15_binoc_default_file.cpp	SetBinocHudState
@@ -2837,6 +2843,7 @@ address	name	size	file	whole_file	symbol
 0X19F540	WarpJtToPoint	76	transition/WarpJtToPoint.cpp		
 0X19F590	WarpJtToSafePoint	572	transition-jp/WarpJtToSafePoint.cpp		
 0X19FAF8	FindBestSafePoint	308	jp-stepzap/FindBestSafePoint.cpp		
+0X19FC30	UpdateJtSafePoints	256	jp-stepzap/AddSafePointOnMember_file.cpp	jp-stepzap/AddSafePointOnMember_file.cpp	UpdateJtSafePoints
 0X19FD30	AddSafePointOnMember	380	jp-stepzap/AddSafePointOnMember_file.cpp	jp-stepzap/AddSafePointOnMember_file.cpp	AddSafePointOnMember
 0X1A0048	RemoveSafePoints	136	jp-stepzap/AddSafePointOnMember_file.cpp	jp-stepzap/AddSafePointOnMember_file.cpp	RemoveSafePoints
 0X1A00D0	RemoveSafePointsOfLo	212	jp-stepzap/AddSafePointOnMember_file.cpp	jp-stepzap/AddSafePointOnMember_file.cpp	RemoveSafePointsOfLo
@@ -3262,6 +3269,7 @@ address	name	size	file	whole_file	symbol
 0X1BA9F8	StaticInitStgSwitch	308	mpeg-memcard/mpeg_memcard_1ba0b8.cpp	mpeg-memcard/mpeg_memcard_1ba0b8.cpp	StaticInitStgSwitch
 0X1BAB30	GlobalCtorStgSwitch	32	mpeg-memcard/mpeg_memcard_1ba0b8.cpp	mpeg-memcard/mpeg_memcard_1ba0b8.cpp	GlobalCtorStgSwitch
 0X1BAB50	InitStgSwitch	76	mpeg-memcard/InitStgSwitch.c		
+0X1BABA0	LoadStgSwitchFromBrx	476	mpeg-memcard/LoadStgSwitchFromBrx.cpp		
 0X1BAD80	func_001BAD80	52	mpeg-memcard/fun_001bad80.c		
 0X1BADB8	func_001BADB8	52	mpeg-memcard/fun_001badb8.c		
 0X1BADF0	func_001BADF0	232	mpeg-memcard/fun_001badf0.cpp		
@@ -3469,6 +3477,8 @@ address	name	size	file	whole_file	symbol
 0X1C8188	SetVaultOpen	248	new_1c76d0/SetVaultOpen.cpp		
 0X1C8280	func_001C8280	112	new_1c76d0/fun_001c8280.cpp		
 0X1C82F0	func_001C82F0	96	new_1c76d0/fun_001c82f0.c		
+0X1C8350	func_001C8350	392	new_1c76d0/fun_001c8350.cpp		
+0X1C8730	func_001C8730	488	new_1c76d0/fun_001c8730.cpp		
 0X1C8918	func_001C8918	472	new_1c76d0/new_1c76d0_1c8918.cpp	new_1c76d0/new_1c76d0_1c8918.cpp	func_001C8918
 0X1C8AF0	func_001C8AF0	120	new_1c76d0/new_1c76d0_1c8918.cpp	new_1c76d0/new_1c76d0_1c8918.cpp	func_001C8AF0
 0X1C8B68	func_001C8B68	308	new_1c76d0/new_1c76d0_1c8918.cpp	new_1c76d0/new_1c76d0_1c8918.cpp	func_001C8B68
@@ -3655,6 +3665,7 @@ address	name	size	file	whole_file	symbol
 0X1D7218	func_001D7218	32	vec-coin/InitLaunch_file.cpp	vec-coin/InitLaunch_file.cpp	func_001D7218
 0X1D7238	InitHub	44	coin/InitHub_file.cpp	coin/InitHub_file.cpp	InitHub
 0X1D7268	PostHubLoad	60	coin/InitHub_file.cpp	coin/InitHub_file.cpp	PostHubLoad
+0X1D72A8	UpdateHub	368	coin/InitHub_file.cpp	coin/InitHub_file.cpp	UpdateHub
 0X1D7418	SetHubPlayable	104	coin/InitHub_file.cpp	coin/InitHub_file.cpp	SetHubPlayable
 0X1D7480	SetHubState	708	coin/InitHub_file.cpp	coin/InitHub_file.cpp	SetHubState
 0X1D7748	AddHubEntry	56	coin/InitHub_file.cpp	coin/InitHub_file.cpp	AddHubEntry
@@ -4398,6 +4409,7 @@ address	name	size	file	whole_file	symbol
 0X1FF7E8	InitSwRootFrame	64	button-spliceobj/InitSwRootFrame_file.cpp	button-spliceobj/InitSwRootFrame_file.cpp	InitSwRootFrame
 0X1FF828	ClearSwRootFrameFlag	8	button-spliceobj/InitSwRootFrame_file.cpp	button-spliceobj/InitSwRootFrame_file.cpp	ClearSwRootFrameFlag
 0X1FF830	func_001FF830	36	button-spliceobj/InitSwRootFrame_file.cpp	button-spliceobj/InitSwRootFrame_file.cpp	func_001FF830
+0X1FF858	ReadSpliceBlock	484	button-spliceobj/InitSwRootFrame_file.cpp	button-spliceobj/InitSwRootFrame_file.cpp	Aligned
 0X1FFA40	PframeFromSpliceBlock	40	button-spliceobj/InitSwRootFrame_file.cpp	button-spliceobj/InitSwRootFrame_file.cpp	PframeFromSpliceBlock
 0X1FFA70	RunSpliceBlockEntry	300	button-spliceobj/InitSwRootFrame_file.cpp	button-spliceobj/InitSwRootFrame_file.cpp	RunSpliceBlockEntry
 0X1FFBA0	func_001FFBA0	308	button-spliceobj/InitSwRootFrame_file.cpp	button-spliceobj/InitSwRootFrame_file.cpp	func_001FFBA0
@@ -4457,6 +4469,7 @@ address	name	size	file	whole_file	symbol
 0X204660	SetStepRadTarget	80	new_204250/SetStepRadTarget.cpp		
 0X2046B0	SetStepRadTargetDir	60	new_204250/SetStepRadTargetDir.cpp		
 0X204740	RadYawSo	36	new_204250/RadYawSo.c		
+0X204768	AdjustStepXps	352	new_204250/AdjustStepXps.cpp		
 0X204C60	func_00204C60	72	new_204250/fun_00204c60.c		
 0X204CA8	FixStepAngularVelocity__FP4STEP	156	step/FixStepAngularVelocity__FP4STEP.cpp		
 0X204D48	SetStepSpinRatio__FP4STEPf	92	step/SetStepSpinRatio__FP4STEPf.cpp		
@@ -4490,6 +4503,7 @@ address	name	size	file	whole_file	symbol
 0X206DB0	func_00206DB0	156	step-rwm/fun_00206db0.cpp		
 0X206E50	func_00206E50	92	step-rwm/fun_00206e50.cpp		
 0X206EB0	FCanSetGuardMode	380	step-rwm/FCanSetGuardMode.cpp		
+0X207030	SetGuardMode	596	step-rwm/SetGuardMode.cpp		
 0X207288	UpdateGuardModeTimeout	196	step-rwm/UpdateGuardModeTimeout.cpp		
 0X207350	UpdateGuard	280	step-rwm/UpdateGuard.cpp		
 0X207468	FAbsorbGuardWkr	196	step-rwm/FAbsorbGuardWkr.cpp		
@@ -4787,6 +4801,7 @@ address	name	size	file	whole_file	symbol
 0X213CD8	func_00213CD8	212	screen-font/fun_00213cd8.cpp		
 0X213DB0	SwitchBlotLabel	112	screen-font/SwitchBlotLabel.cpp		
 0X213E20	FGetSpriteSlotTransform	332	screen-font/FGetSpriteSlotTransform.cpp		
+0X213F70	FStartSpriteLabelInstance	396	screen-font/FStartSpriteLabelInstance.cpp		
 0X2142B0	FSpriteHasLabel	80	screen-font/FSpriteHasLabel.cpp		
 0X214300	SetBlotModal	152	screen-font/SetBlotModal.c		
 0X214398	LoadMovieDictionary	200	screen-font/LoadMovieDictionary.cpp		
@@ -4873,6 +4888,7 @@ address	name	size	file	whole_file	symbol
 0X21DD40	WriteTftUl__FP3TFTP5OSTRMUl	772	text/WriteTftUl__FP3TFTP5OSTRMUl.cpp		
 0X21E048	ExpFirstFromG__Fd	144	text/ExpFirstFromG__Fd.cpp		
 0X21E0D8	ChDigitFromG__Fdii	216	text/ChDigitFromG__Fdii.cpp		
+0X21E1B0	CchAchFromDouble__FPciP3TFTd	776	text/CchAchFromDouble__FPciP3TFTd.cpp		
 0X21E4B8	WriteTftDouble__FP3TFTP5OSTRMd	604	text/WriteTftDouble__FP3TFTP5OSTRMd.cpp		
 0X21E718	WriteTft__FP3TFTP5OSTRMPPcPci	940	text/WriteTft_file.cpp	text/WriteTft_file.cpp	WriteTft__FP3TFTP5OSTRMPPcPci
 0X21EAC8	CchOstrmPrintf__FP5OSTRMPcT1	240	text/WriteTft_file.cpp	text/WriteTft_file.cpp	CchOstrmPrintf
@@ -5319,6 +5335,7 @@ address	name	size	file	whole_file	symbol
 0X241830	func_00241830	152	sdk/fun_00241830.c		
 0X241A30	func_00241A30	228	sdk/fun_00241a30.c		
 0X241C10	func_00241C10	120	sdk/fun_00241c10.cpp		
+0X241C98	func_00241C98	344	sdk/fun_00241c98.cpp		
 0X241DF0	func_00241DF0	152	sdk/fun_00241df0.cpp		
 0X241E88	sceCdSync	160	sdk/sceCdSync.cpp		
 0X241F28	func_00241F28	108	sdk/fun_00241f28.cpp		
