@@ -135,6 +135,28 @@ used for the first call, a second declared just before the later use) removed an
 one reused local fixed an s1/s2 swap. An explicit empty `case 1: case 2: break;` arm gave `UpdateDependentTaskState` retail's switch tree (22 to 15).
 An old draft's score is no baseline when its callee prototype was wrong: fix the prototype and re-score before comparing.
 
+## Levers from the 1 to 3 KB drafts (wave L18, 2026-11-18)
+
+Seven Opus workers, one function each, 12 compiles: two reached 0 (`FlushRenderRecords` 45, `UpdateSwTargetList` 54), `DrawRhythmHud` 38 to 2,
+`CSm_LoadFromBrx` 39 to 3. What moved them, each measured on the function named, none yet a control that took a second function to 0:
+
+- **Function-scope locals, C style.** One `LO *plo` and the loop temporaries (`ptgtNew`, `itgtNew`) declared at the top and reused by both
+  loops gave retail's register homes (`UpdateSwTargetList` 21 to 0; `CSm_LoadFromBrx` search loop). A fresh local per loop did not.
+- **Read each callee's own disassembly for its prototype.** Return type (`void` against `int`) and the width of a tested field (`lw`
+  against `lh`) cost about 30 words in `FlushRenderRecords` (15 to 3); `GSmooth` takes five arguments, the draft passed three.
+- **A table of pairs as `T x[][2]`**, not an array of `{begin, end}` structs: retail's base-first `lw 4` and the folded `%hi/%lo` come
+  from the two-dimensional index (`FlushRenderRecords` 45 to 15).
+- **`int grf = p->flags; if (grf & 1)`** gives `lb`; a direct `signed char & 1` compiles to `lbu` (`CloneGlobset`).
+- **The existing inline `CTextBox(x, y, dx, dy, rgba)` constructor** and separate `Text` locals in place of an invented frame struct
+  (`DrawRhythmHud` 38 to 2, from `GadgetMenu_DrawSlotLabels`).
+- **A `for (int c = 1;; c++)` round loop** puts `c++` in the `bnez` delay slot as retail does (`CSm_LoadFromBrx`).
+- **Rewrite from the block structure, not the statement order.** All five near misses had 100 to 300 earlier runs of permutations;
+  the two matches and the two 2-to-3 results came from new types and locals, not from reordering.
+
+Ended near, with a row in `config/matching/walls.tsv`: `UpdateJtLootSave` (hi-only hoist), `CloneGlobset` (global-alloc tie),
+`DrawRhythmHud` (sched2 tie), `CSm_LoadFromBrx` (`-fmove-all-movables` against the group loop), `PsenseFindNotice` (VU0 register tie).
+`check_source.py` does not catch an unused steering argument (an old `UpdateJtLootSave` probe scored 0 with one): a reviewer must.
+
 ## Walls
 
 `config/matching/walls.tsv` is the list: address, name, class (`blocker`, `fragment`, `helper`, `toolchain`, `tie`, `exhausted`), the reason, the evidence and the `unlock` condition.
