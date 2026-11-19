@@ -2345,6 +2345,7 @@ address	name	size	file	whole_file	symbol
 0X171F58	func_00171F58	72	new_1715f0/fun_00171f58.cpp		
 0X171FA0	func_00171FA0	48	new_1715f0/fun_00171fa0.c		
 0X171FD0	func_00171FD0	72	new_1715f0/fun_00171fd0.c		
+0X172018	UpdateSearchBeh	772	new_1715f0/UpdateSearchBeh.cpp		
 0X172320	SetSearchState	560	new_1715f0/SetSearchState.cpp		
 0X172550	func_00172550	16	new_1715f0/fun_00172550.c		
 0X172560	func_00172560	128	new_1715f0/fun_00172560.cpp		
@@ -2788,6 +2789,7 @@ address	name	size	file	whole_file	symbol
 0X19ABF0	GMeasureJumpPipe	148	new_1942f0/StartJmpDirectionAseg_file.cpp	new_1942f0/StartJmpDirectionAseg_file.cpp	GMeasureJumpPipe
 0X19B088	GAdjustJtLandingScore	32	new_1942f0/StartJmpDirectionAseg_file.cpp	new_1942f0/StartJmpDirectionAseg_file.cpp	GAdjustJtLandingScore
 0X19B0A8	func_0019B0A8	104	new_1942f0/StartJmpDirectionAseg_file.cpp	new_1942f0/StartJmpDirectionAseg_file.cpp	func_0019B0A8
+0X19C688	bevy_player_p14_jts8_enter	416	new_1942f0/StartJmpDirectionAseg_file.cpp	new_1942f0/StartJmpDirectionAseg_file.cpp	bevy_player_p14_jts8_enter
 0X19C828	bevy_player_19c828	68	new_1942f0/StartJmpDirectionAseg_file.cpp	new_1942f0/StartJmpDirectionAseg_file.cpp	bevy_player_19c828
 0X19C870	func_0019C870	60	new_1942f0/StartJmpDirectionAseg_file.cpp	new_1942f0/StartJmpDirectionAseg_file.cpp	func_0019C870
 0X19C8B0	func_0019C8B0	32	new_1942f0/StartJmpDirectionAseg_file.cpp	new_1942f0/StartJmpDirectionAseg_file.cpp	func_0019C8B0
@@ -3261,6 +3263,7 @@ address	name	size	file	whole_file	symbol
 0X1BADF0	func_001BADF0	232	mpeg-memcard/fun_001badf0.cpp		
 0X1BAED8	SetStgSwitchHitter	64	mpeg-memcard/SetStgSwitchHitter.cpp		
 0X1BAF18	StepStgSwitch	824	mpeg-memcard/StepStgSwitch.cpp		
+0X1BB250	func_001BB250	428	mpeg-memcard/fun_001bb250.cpp		
 0X1BB918	AddStgSwitchClass	52	mpeg-memcard/AddStgSwitchClass.cpp		
 0X1BB950	AddStgSwitchStage	104	mpeg-memcard/AddStgSwitchStage.cpp		
 0X1BB9B8	InitStgSwitchPreStage	96	mpeg-memcard/InitStgSwitchPreStage.cpp		

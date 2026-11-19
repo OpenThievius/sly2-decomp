@@ -166,6 +166,17 @@ Counter-example: a shared function-scope index lengthens the live range and lose
 reuse locals only where retail's live ranges overlap. Note: `data/matching/include/` is the source of `include/` (`make src` copies it
 over): edit both, or a header edit is undone.
 
+Third round (wave X19, 2026-11-19, callee-signature mismatches from `build/check_calls.tsv`): four of four workers got a result, three matched.
+`UpdateSearchBeh` (`SetGoalTarget` takes `GOAL *` and a target; one `fRequest = 0` after the inner if/else, not one per branch, keeps GCC from
+merging the two `SetSearchState` tails), `bevy_player_p14_jts8_enter` (the made-up third argument of `SetBentleyState` was the only thing
+putting `self` in `$a2`; case 13 through the same inline as its siblings and a block-local `pjtOwner` in case 16) and `func_001BB250`
+(scores 0 only under `-fmove-all-movables`: listed in `config/us/move_movables.txt`). `ApplySpriteKeySounds` is a wall: the registry's 23 was a
+steering argument, the legal draft scores 59 (loop.c merges two identical in-loop multiplies). A check_calls flag can be false:
+`FStgSwitchDone(STG *)` is right though a matched file defines it `(void)`, because retail sets `$a0` before the call.
+Measured and closed: a typed `SAVE` global does not unlock the hi-only hoist (retail never reads a member through the hoisted high register;
+`StoreAudioModeInSave` is typed and still walled), and none of the 26 flag variants of `flag_sweep.py` moves `ApplySpriteKeySounds` (best 42 with
+`-fno-omit-frame-pointer`, a frame change, then 53).
+
 ## Walls
 
 `config/matching/walls.tsv` is the list: address, name, class (`blocker`, `fragment`, `helper`, `toolchain`, `tie`, `exhausted`), the reason, the evidence and the `unlock` condition.

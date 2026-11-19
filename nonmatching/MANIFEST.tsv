@@ -175,7 +175,6 @@ address	name	size	file	score
 0X16EA80	CloneGlobset	1152	new_167320/CloneGlobset.cpp	18
 0X170548	AllocZpr	264	new_170448/AllocZpr.cpp	20
 0X170E90	FindClosestScriptCmd	616	jsg-jt/FindClosestScriptCmd.c	108
-0X172018	UpdateSearchBeh	776	new_1715f0/UpdateSearchBeh.cpp	18
 0X172658	func_00172658	264	new_1715f0/fun_00172658.c	52
 0X172798	FAddSearchCand	240	new_1715f0/FAddSearchCand.cpp	2
 0X173588	FInScreenBox	136	new_1715f0/FInScreenBox.c	32
@@ -268,7 +267,6 @@ address	name	size	file	score
 0X19AC88	GMeasureJumpSpire	376	stephide_19a4a0/GMeasureJumpSpire.c	89
 0X19B110	JtbsChooseJtLanding	4592	stephide_19a4a0/JtbsChooseJtLanding.cpp	101
 0X19C300	MeasureJtJumpToTargetAtTime	904	stephide_19a4a0/MeasureJtJumpToTargetAtTime.c	209
-0X19C688	bevy_player_p14_jts8_enter	416	new_19c688/bevy_player_p14_jts8_enter.cpp	3
 0X19CD38	SetBinocState	1528	cnvo-steppipe/SetBinocState.cpp	280
 0X19D330	UpdateBinoc	416	cnvo-steppipe/UpdateBinoc.cpp	66
 0X19D948	func_0019D948	304	cnvo-steppipe/fun_0019d948.cpp	19
@@ -335,7 +333,6 @@ address	name	size	file	score
 0X1B8B70	MoveMurrayAttack	448	mpeg-memcard/MoveMurrayAttack.c	101
 0X1B90B8	func_001B90B8	120	mpeg-memcard/fun_001b90b8.c	19
 0X1BABA0	LoadStgSwitchFromBrx	480	mpeg-memcard/LoadStgSwitchFromBrx.cpp	36
-0X1BB250	func_001BB250	432	mpeg-memcard/fun_001bb250.cpp	20
 0X1BB400	RunStgSwitch	584	mpeg-memcard/RunStgSwitch.c	101
 0X1BB648	RunStgSwitchStage	720	mpeg-memcard/RunStgSwitchStage.c	100
 0X1BC208	CmpPosXy	112	new_1bc198/CmpPosXy.c	20
