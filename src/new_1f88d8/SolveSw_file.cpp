@@ -8,6 +8,7 @@
 #include "vu0inline.h"
 #include "ps2inline.h"
 #include "types.h"
+#include "phys.h"
 #include "include_asm.h"
 
 extern "C" void RecalcSwXpAll(SW *);
@@ -33,8 +34,6 @@ void SolveSw(SW *psw)
 }
 
 struct SW;
-
-struct PHYS { char pad0[0xA0]; int ctTorque; char pad1[0x1C]; int ctForce; };
 
 struct SO;
 
@@ -149,9 +148,7 @@ INCLUDE_ASM(0X1F9240);
 
 INCLUDE_ASM(0X1F9410);
 
-struct PHYS_1F9B20 { char pad[0x80]; QW gravity; char pad1[0xC0 - 0x90]; int ctForce; };
-
-struct SO_1F9B20 { char pad[0x58]; void *pxfLinear; char pad1[0xE8 - 0x5C]; PHYS_1F9B20 *pphys; char pad2[0x138 - 0xEC]; int driven; };
+struct SO_1F9B20 { char pad[0x58]; void *pxfLinear; char pad1[0xE8 - 0x5C]; PHYS *pphys; char pad2[0x138 - 0xEC]; int driven; };
 
 extern QW g_2a2dd0;
 
@@ -167,7 +164,7 @@ static inline int NearLane(float a, float b) { return FFloatsNear__Ffff(a, b, 0.
 
 void AddSoGravityAcceleration(SO_1F9B20 *pso)
 {
-    QW gravity = pso->pphys->gravity;
+    QW gravity = pso->pphys->dvGravity;
     QW zero = g_2a2dd0;
     int apply = 0;
     int near = 0;
@@ -179,8 +176,8 @@ void AddSoGravityAcceleration(SO_1F9B20 *pso)
     if (!near)
         apply = pso->pphys->ctForce != 3;
     if (apply) {
-        PHYS_1F9B20 *pphys = pso->pphys;
-        AddSoAcceleration(pso, ApplyConstrLocal((char *)pphys + 0xB0, pso->pxfLinear, pphys->gravity));
+        PHYS *pphys = pso->pphys;
+        AddSoAcceleration(pso, ApplyConstrLocal((char *)pphys + 0xB0, pso->pxfLinear, pphys->dvGravity));
     }
     if (pso->driven != 0) UpdateSoDriven(pso);
 }

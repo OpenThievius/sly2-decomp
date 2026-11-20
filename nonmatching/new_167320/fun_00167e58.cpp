@@ -7,17 +7,19 @@ void func_00167E58(char *data)
     unsigned char *rowB = (unsigned char *)data + *(int *)(p + 0xC) * 16;
     unsigned char *end = (unsigned char *)data + *(int *)(p + 0x10) * 16;
     unsigned short *colA = (unsigned short *)(*(int *)(p + 0x14) + base);
-    unsigned char *alphaB = (unsigned char *)(*(int *)(p + 0x24) + base);
-    unsigned char *alphaA = (unsigned char *)(*(int *)(p + 0x20) + base);
     unsigned short *colB = (unsigned short *)(*(int *)(p + 0x18) + base);
+    unsigned char *alphaA = (unsigned char *)(*(int *)(p + 0x20) + base);
+    unsigned char *alphaB = (unsigned char *)(*(int *)(p + 0x24) + base);
+    unsigned short lastA;
+    unsigned short lastB;
     if (rowB < end) {
         do {
             unsigned short *dstA = colA;
             unsigned short *dstB = colB;
-            *dstB = ((rowB[4] >> 3) << 5) | (rowB[0] >> 3) | ((rowB[8] >> 3) << 10) | ((rowA[0xC] >> 7) << 15);
+            lastA = *dstA = ((rowA[4] >> 3) << 5) | (rowA[0] >> 3) | ((rowA[8] >> 3) << 10) | ((rowA[0xC] >> 7) << 15);
             colA++;
             colB++;
-            *dstA = ((rowA[4] >> 3) << 5) | (rowA[0] >> 3) | ((rowA[8] >> 3) << 10) | ((rowA[0xC] >> 7) << 15);
+            lastB = *dstB = ((rowB[4] >> 3) << 5) | (rowB[0] >> 3) | ((rowB[8] >> 3) << 10) | ((rowA[0xC] >> 7) << 15);
             *alphaB = rowB[0xC];
             alphaB++;
             if (*(int *)(p + 0x20) != 0) {

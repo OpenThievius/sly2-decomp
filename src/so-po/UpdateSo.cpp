@@ -1,5 +1,5 @@
 #include "sly2.h"
-struct PHYS { char pad[0xDC]; void *pregion; };
+#include "phys.h"
 #include "so.h"
 extern "C" float g_2dded4;
 extern "C" {
@@ -13,7 +13,7 @@ extern "C" void UpdateSo(SO *pso)
     UpdateLo(pso);
     void *link = 0;
     if (pso->pphys)
-        link = pso->pphys->pregion;
+        link = pso->pphys->plink;
     if (link) {
         QW pos = PosLoWorld(pso);
         func_001F37C8(pso, PpathzoneFindPos(pos, 1));

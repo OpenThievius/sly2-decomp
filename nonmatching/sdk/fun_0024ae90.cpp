@@ -65,129 +65,118 @@ typedef struct {
 } SLOTS;
 
 int func_0024AE90(SLOTS *obj, int arg1) {
-    s32 temp_a0;
-    s32 temp_t1;
-    s32 temp_t2;
-    s32 var_a0;
-    s32 var_a0_2;
-    s32 var_t5;
-    FRAME *temp_a0_2;
-    FRAME *temp_a0_3;
-    FRAME *temp_a2;
-    FRAME *temp_v1;
-    FRAME *temp_v1_2;
-    FRAME *var_t0;
-    FRAME *var_v0;
-    FRAME *var_v1;
-    temp_t1 = obj->f184;
-    temp_t2 = obj->f160;
-    int limit = (temp_t1 == 3) ? 2 : 4;
-    var_t0 = 0;
-    var_t5 = 0;
-    if (temp_t2 == 3) {
+    FRAME *frame = 0;
+    FRAME *ref;
+    int one;
+    int result = 0;
+    int state = obj->f184;
+    int mode = obj->f160;
+    int limit = (state == 3) ? 2 : 4;
+    if (mode == 3) {
         obj->f1D0 = obj->f1D4;
         obj->f1E0 = obj->f1E4;
         obj->f1F0 = obj->f1F4;
-        if ((obj->fB4 + obj->fB8) >= (limit)) {
+        if (obj->fB4 + obj->fB8 >= limit) {
             obj->fFC = 0;
             obj->f1B8 = 0;
             obj->f1B4 = 0;
         }
-        if (((obj->fFC != 0) || (obj->f1B8 != 0)) && (obj->f1B4 == 0)) {
+        if ((obj->fFC != 0 || obj->f1B8 != 0) && obj->f1B4 == 0) {
             obj->f1C8->f28 = 0;
             obj->f1D8->f28 = 0;
             obj->f1E8->f28 = 0;
+            state = obj->f184;
         }
         obj->fFC = 0;
         obj->f1B8 = 0;
-        if (obj->f184 == 3) {
-            var_a0 = 1;
-            if (obj->f1C8->f28 == 1) {
-                var_v1 = obj->f1CC;
-                goto block_18;
-            }
-            if (obj->f1B4 != 0) {
-                var_v1 = obj->f1CC;
-                goto block_18;
+        if (state == 3) {
+            one = 1;
+            if (obj->f1C8->f28 == 1 || obj->f1B4 != 0) {
+                ref = obj->f1CC;
+                goto tail;
             }
         } else {
-            temp_a0 = obj->f1D8->f28;
-            if (((temp_a0 == 1) && (obj->f1E8->f28 == temp_a0)) || (obj->f1B4 != 0)) {
-                var_a0 = obj->f1DC->f28;
-                if (var_a0 == 1) {
-                    var_v1 = obj->f1EC;
-block_18:
-                    var_t5 = ((var_v1->f28 ^ 1) != 0) ? 0 : var_a0;
+            one = obj->f1D8->f28;
+            if ((one == 1 && obj->f1E8->f28 == one) || obj->f1B4 != 0) {
+                one = obj->f1DC->f28;
+                if (one == 1) {
+                    ref = obj->f1EC;
+                tail:
+                    result = one;
+                    if ((ref->f28 ^ 1) != 0) {
+                        result = 0;
+                    }
                 }
             }
         }
     } else {
         if (arg1 == 0) {
-            obj->f1CC = obj->f1C8;
-            temp_a0_2 = obj->f1CC;
-            temp_v1 = obj->f1DC;
-            obj->f1DC = obj->f1D8;
-            temp_a2 = obj->f1E8;
-            obj->f1C8 = temp_a0_2;
-            obj->f1D8 = temp_v1;
-            obj->f1E8 = obj->f1EC;
-            obj->f1EC = temp_a2;
+            FRAME *first = obj->f1C8;
+            FRAME *second = obj->f1CC;
+            obj->f1CC = first;
+            first = obj->f1D8;
+            FRAME *third = obj->f1DC;
+            obj->f1DC = first;
+            first = obj->f1E8;
+            FRAME *fourth = obj->f1EC;
+            obj->f1C8 = second;
+            obj->f1D8 = third;
+            obj->f1E8 = fourth;
+            obj->f1EC = first;
         }
-        temp_a0_3 = obj->f1DC;
-        temp_v1_2 = obj->f1EC;
         obj->f1D0 = obj->f1CC;
-        obj->f1E0 = temp_a0_3;
-        obj->f1F0 = temp_v1_2;
-        if (temp_t1 == 3) {
-            if (temp_t2 == 2) {
-                var_v0 = obj->f1C8;
-                var_a0_2 = 1;
-                goto block_29;
+        obj->f1E0 = obj->f1DC;
+        obj->f1F0 = obj->f1EC;
+        if (state == 3) {
+            if (mode == 2) {
+                if (obj->f1C8->f28 == 1) {
+                    result = 1;
+                }
+            } else {
+                result = 1;
             }
-            goto block_30;
-        }
-        if ((temp_t2 == 2) && ((arg1 == 0) || ((((temp_t1 ^ 1) != 0) ? temp_a0_3 : temp_v1_2)->f28 != 1))) {
-            var_a0_2 = obj->f1D8->f28;
-            if (var_a0_2 == 1) {
-                var_v0 = obj->f1E8;
-block_29:
-                if (var_v0->f28 == var_a0_2) {
-                    goto block_30;
+        } else if (mode != 2) {
+            result = 1;
+        } else {
+            FRAME *chosen = (state != 1) ? obj->f1DC : obj->f1EC;
+            if (arg1 != 0 && chosen->f28 == 1) {
+                result = 1;
+            } else {
+                int first = obj->f1D8->f28;
+                if (first == 1 && obj->f1E8->f28 == first) {
+                    result = 1;
                 }
             }
-        } else {
-block_30:
-            var_t5 = 1;
         }
     }
-    switch (obj->f184) {        /* irregular */
+    switch (state) {
     case 1:
-        var_t0 = obj->f1E0;
+        frame = obj->f1E0;
         break;
     case 3:
-        var_t0 = obj->f1D0;
+        frame = obj->f1D0;
         break;
     case 2:
-        var_t0 = obj->f1F0;
+        frame = obj->f1F0;
         break;
     }
-    var_t0->f28 = 0;
-    var_t0->f18 = obj->f838;
-    var_t0->f2C = obj->f160;
-    var_t0->f20 = obj->f840;
-    var_t0->f30 = obj->f184;
-    var_t0->f34 = obj->f14C;
-    var_t0->f38 = obj->f198;
-    var_t0->f3C = obj->f188;
-    var_t0->f40 = obj->f194;
-    var_t0->f44 = obj->f19C;
-    var_t0->f48 = obj->f1A0;
-    var_t0->f4C = obj->f1A4;
-    var_t0->f50 = obj->f1A8;
-    var_t0->f54 = obj->f1AC;
-    var_t0->f58 = obj->f1B0;
-    var_t0->f5C = obj->f158;
-    var_t0->f60 = obj->f15C;
-    return var_t5;
+    frame->f28 = 0;
+    frame->f18 = obj->f838;
+    frame->f2C = obj->f160;
+    frame->f20 = obj->f840;
+    frame->f30 = obj->f184;
+    frame->f34 = obj->f14C;
+    frame->f38 = obj->f198;
+    frame->f3C = obj->f188;
+    frame->f40 = obj->f194;
+    frame->f44 = obj->f19C;
+    frame->f48 = obj->f1A0;
+    frame->f4C = obj->f1A4;
+    frame->f50 = obj->f1A8;
+    frame->f54 = obj->f1AC;
+    frame->f58 = obj->f1B0;
+    frame->f5C = obj->f158;
+    frame->f60 = obj->f15C;
+    return result;
 }
 }

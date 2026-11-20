@@ -99,11 +99,11 @@ int GoalBrain_FHandleMessage(char *pgoal, int nMsg, HIT *phit)
     case 9:
         if (!(GrficFromAlo((*(char **)(pgoal + 0x10)), phit->grftak) & 0x40)) {
             int hitA = *(int *)(*(char **)(pgoal + 0x10) + 0x350);
-            if (!(hitA & phit->grftak))
+            if (!(phit->grftak & hitA))
                 return 1;
-            if (!(hitA & *(unsigned long *)(*(char **)(pgoal + 0x18) + 0x5C)))
-                break;
-            return 1;
+            if (*(int *)(*(char **)(pgoal + 0x18) + 0x5C) & hitA)
+                return 1;
+            break;
         }
         break;
     case 0xA:
@@ -114,9 +114,9 @@ int GoalBrain_FHandleMessage(char *pgoal, int nMsg, HIT *phit)
         int knock = *(int *)((*(char **)(pgoal + 0x10)) + 0x358);
         if (!(phit->grftak & knock))
             return 1;
-        if (*(int *)(*(char **)(pgoal + 0x18) + 0x5C) & knock)
-            return 1;
-        break;
+        if (!(*(int *)(*(char **)(pgoal + 0x18) + 0x5C) & knock))
+            break;
+        return 1;
     }
     }
     pguard = *(char **)(pgoal + 0x10);
@@ -155,14 +155,20 @@ int GoalBrain_FHandleMessage(char *pgoal, int nMsg, HIT *phit)
             GoalBrain_SetCommand(pgoal, &fr.cmd);
         } else if (phit->grftak == 0x1000000 && (phit->grfhit & 8)) {
             memset(&fr.cmd, 0, 0x70);
-            fr.cmd.kind = func_0020A298(*(void **)(pgoal + 0x10), phit->ploSource, GrfsgsFromSgs(0x17)) ? 0xA : 9;
+            if (func_0020A298(*(void **)(pgoal + 0x10), phit->ploSource, GrfsgsFromSgs(0x17)))
+                fr.cmd.kind = 0xA;
+            else
+                fr.cmd.kind = 9;
             fr.cmd.hit = *phit;
             *(int *)(pgoal + 0x30) = -1;
             GoalBrain_SetCommand(pgoal, &fr.cmd);
             SetGuardMode(*(void **)(pgoal + 0x10), 8);
         } else if (phit->grftak == 0x2000000 && (phit->grfhit & 8)) {
             memset(&fr.cmd, 0, 0x70);
-            fr.cmd.kind = func_0020A298(*(void **)(pgoal + 0x10), phit->ploSource, GrfsgsFromSgs(0x17)) ? 0xA : 9;
+            if (func_0020A298(*(void **)(pgoal + 0x10), phit->ploSource, GrfsgsFromSgs(0x17)))
+                fr.cmd.kind = 0xA;
+            else
+                fr.cmd.kind = 9;
             fr.cmd.hit = *phit;
             *(int *)(pgoal + 0x30) = -1;
             GoalBrain_SetCommand(pgoal, &fr.cmd);

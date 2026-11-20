@@ -54,23 +54,19 @@ void ShopMenu_UpdateBlot(SHOPMENU *menu)
         SwitchBlotLabel(menu->pblot, -1, &menu->labelA);
     }
     int irow = menu->itop;
-    int *plabelC = &menu->labelC;
-    int *plabelB = &menu->labelB;
     if (irow < irowEnd) {
-        ROW *prow = &menu->arow[irow];
+        // addu operand order: retail adds the offset first; the typed &menu->arow[irow] scores 1, this form scores 0
+        ROW *prow = (ROW *)(irow * 8 + (int)menu->arow);
         do {
             int oid = D_002C3588[irow - menu->itop];
             switch (menu->page) {
-            case 1:
-                if (prow->oid != -1) func_00213BD8(menu->pblot, 0x455, oid);
-                else func_00213A08(menu->pblot, 0x455, oid);
-                break;
             case 0:
                 if (prow->oid != -1) {
-                    int type = D_002BCD04[prow->oid].type;
-                    if (type == 7) prow->label = 0x456;
-                    else if (type == 9) prow->label = 0x458;
-                    else if (type == 8) prow->label = 0x457;
+                    switch (D_002BCD04[prow->oid].type) {
+                    case 7: prow->label = 0x456; break;
+                    case 9: prow->label = 0x458; break;
+                    case 8: prow->label = 0x457; break;
+                    }
                     func_00213BD8(menu->pblot, 0x455, oid);
                     func_00213BD8(menu->pblot, prow->label, oid);
                 } else {
@@ -78,6 +74,10 @@ void ShopMenu_UpdateBlot(SHOPMENU *menu)
                     func_00213A08(menu->pblot, prow->label, oid);
                     prow->label = -1;
                 }
+                break;
+            case 1:
+                if (prow->oid != -1) func_00213BD8(menu->pblot, 0x455, oid);
+                else func_00213A08(menu->pblot, 0x455, oid);
                 break;
             }
             irow++;
@@ -100,10 +100,10 @@ void ShopMenu_UpdateBlot(SHOPMENU *menu)
             func_00213CD8(menu->pblot, label, vec);
             vec[5] += RO_002C35B0;
         }
-        SwitchBlotLabel(menu->pblot, label, plabelB);
+        SwitchBlotLabel(menu->pblot, label, &menu->labelB);
     } else {
-        SwitchBlotLabel(menu->pblot, -1, plabelB);
+        SwitchBlotLabel(menu->pblot, -1, &menu->labelB);
     }
-    SwitchBlotLabel(menu->pblot, ~menu->sel == 0 ? 0x439 : 0x43B, plabelC);
+    SwitchBlotLabel(menu->pblot, menu->sel != -1 ? 0x43B : 0x439, &menu->labelC);
 }
 // x

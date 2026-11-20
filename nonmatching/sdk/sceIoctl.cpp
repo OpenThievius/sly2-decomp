@@ -12,6 +12,7 @@ struct IoctlPacket {
     int field418;
     int dataSize;
 };
+struct Block { char bytes[0x400]; };
 struct Mem { char bytes[0x440]; };
 Slot *func_002376D0(unsigned int);
 void func_00237B50(int);
@@ -21,7 +22,7 @@ int CreateSema(SemaParam *);
 int DeleteSema(int);
 int WaitSema(int);
 int SignalSema(int);
-void func_0023B170(void *);
+void func_0023B170(void *, int);
 unsigned int func_002375E0(void *, int, int, void *, int, void *, int, int, int, int);
 void *memcpy(void *, const void *, unsigned);
 extern IoctlPacket B_0044A680;
@@ -58,8 +59,9 @@ int sceIoctl(int handle, int command, void *argument) {
     case 1: {
         int index;
         WaitSema(D_002C4A8C);
-        for (index = 0; index < 0x20; index++) {
-            if (D_002C49F8[index] != -1) break;
+        index = 0;
+        while (index < 0x20 && D_002C49F8[index] == -1) {
+            index++;
         }
         if (index == 0x20) {
             *B_0044A648 = 0;
@@ -76,6 +78,7 @@ int sceIoctl(int handle, int command, void *argument) {
         { result = 0; goto done; }
     }
     {
+        IoctlPacket *request = &B_0044A680;
         int semaphore;
         int result;
         SemaParam param;
@@ -87,7 +90,7 @@ int sceIoctl(int handle, int command, void *argument) {
             argument = &reply;
         } else {
             packet->dataSize = 0x400;
-            memcpy(packet->data, argument, 0x400);
+            *(Block *)packet->data = *(Block *)argument;
         }
         param.initCount = 1;
         param.maxCount = 0;
@@ -96,8 +99,8 @@ int sceIoctl(int handle, int command, void *argument) {
         packet->result = argument;
         packet->resultSize = 4;
         packet->semaphore = semaphore;
-        func_0023B170(packet);
-        if ((int)func_002375E0(B_0044BD80, 5, 0, packet, 0x420, B_0044B2C0, 4, 0, 0, 0) < 0) {
+        func_0023B170(request, 0x420);
+        if ((int)func_002375E0(B_0044BD80, 5, 0, request, 0x420, B_0044B2C0, 4, 0, 0, 0) < 0) {
             DeleteSema(semaphore);
             func_00237B80();
             return -11;

@@ -24,9 +24,11 @@ extern DMAS g_2dea28;
 }
 static inline void CopyWords(int *d, int *s, int n)
 {
-    for (int i = 0; i < n; i += 4) {
-        int w0 = s[i], w1 = s[i + 1], w2 = s[i + 2], w3 = s[i + 3];
-        d[i] = w0; d[i + 1] = w1; d[i + 2] = w2; d[i + 3] = w3;
+    for (int i = n - 4; i >= 0; i -= 4) {
+        int w0 = s[0], w1 = s[1], w2 = s[2], w3 = s[3];
+        d[0] = w0; d[1] = w1; d[2] = w2; d[3] = w3;
+        s += 4;
+        d += 4;
     }
 }
 static inline void AddDirect(DMAS *d, void *src, int count)
@@ -84,27 +86,29 @@ extern "C" void DrawMovieBitmapCharacter(DMC *pdmc, IN *pin, OUT *pout)
         loc.f3C = 1.0f;
         pout->iC = 0x7FFF;
         pout->i4 = 0;
-        unsigned *tag = g_2dea28.pb;
-        *(unsigned char *)tag = 0x10000000;
-        g_2dea28.pb += 4;
-        *g_2dea28.pb = 0x6C04C000;
-        g_2dea28.pb += 1;
-        CopyWords((int *)g_2dea28.pb, (int *)&loc, 16);
-        g_2dea28.pb += 0x10;
+        DMAS *dma = &g_2dea28;
+        unsigned *tag = dma->pb;
+        *(long *)tag = 0x10000000;
+        dma->pb += 4;
+        *dma->pb = 0x6C04C000;
+        dma->pb += 1;
+        CopyWords((int *)dma->pb, (int *)&loc, 16);
+        dma->pb += 0x10;
         AddUnpack(&g_2dea28, 0x6C03C004, (int *)pout, 12);
+        DMAS *dma2 = &g_2dea28;
         int count;
         void *src;
         if (pdmc->mode == 6) {
             SRC *ps = pdmc->psrc;
-            src = ps->src;
             count = ps->count;
-            Align3(&g_2dea28);
+            src = ps->src;
+            Align3(dma2);
         } else {
             count = pdmc->i1C;
-            Align3(&g_2dea28);
             src = pdmc->p20;
+            Align3(dma2);
         }
-        AddDirect(&g_2dea28, src, count);
+        AddDirect(dma2, src, count);
         PadEnd(&g_2dea28);
         *tag = *tag | (((int)g_2dea28.pb - (int)tag) >> 4) - 1;
         *(long *)g_2dea28.pb = 0x60000000;

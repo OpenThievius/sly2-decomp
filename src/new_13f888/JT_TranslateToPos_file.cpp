@@ -4,6 +4,7 @@
 #include "types.h"
 #include "sly2.h"
 #include "jt.h"
+#include "phys.h"
 #include "m2c_macros.h"
 #include "ps2inline.h"
 
@@ -51,7 +52,6 @@ void JT_TranslateToPos(JT_143CF8 *jt) {
 }
 }
 
-struct PHYS { char pad[0x88]; float gGravity; };
 
 extern "C" int FFindSurfaceAlongUp(QW *, int, int, float, float);
 
@@ -63,7 +63,7 @@ extern "C" int FJtLandsWithin(JT *pjt, float t)
     float vz = LaneZInGeneralRegister((pjt->GetVelocityVec()));
     float half = t * 0.5f;
     float dz = t * vz;
-    float acc = t * half * pjt->pphys->gGravity;
+    float acc = t * half * pjt->pphys->gravity[2];
     z = z + dz;
     z = z + acc;
     if (0.0f < z)

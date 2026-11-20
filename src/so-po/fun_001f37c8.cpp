@@ -1,6 +1,6 @@
 #include "sly2.h"
 struct LINK { char pad[0x10]; void *region; char pad2[0xC]; char sub[1]; };
-struct PHYS { char pad[0xDC]; LINK *link; };
+#include "phys.h"
 #include "so.h"
 struct REGION { char pad[0x118]; char dl[1]; };
 struct DL;
@@ -10,7 +10,7 @@ void AppendDlEntry(void *, void *);
 void ResetPathzoneQuery(void *, void *);
 void func_001F37C8(SO *so, REGION *region)
 {
-    LINK *link = so->pphys->link;
+    LINK *link = so->pphys->plink;
     REGION *old = (REGION *)link->region;
     if (old == region) return;
     if (old) {

@@ -243,6 +243,32 @@ doubles the threshold) changes no hoist decision (106, worse). `-dL` on `PumpCd`
 `threshold * 1 * 1 >= insns`, a smaller loop (retail's body is about 115 physical insns with delay slots, ours 126 real): look for phantom insns
 (`sign_extend`, argument copies) that inflate ours by 20 or more before looking for a flag.
 
+## Levers from the second and third pass on near misses (waves Z30 to Z32, 2026-11-20)
+
+Waves Z30 (55 drafts, 4 matched), Z31 (the 18 nearest, 7 matched) and Z32 (the 11 left, 9 matched, Opus). A near miss at 1 to 25 words is worth a
+second and a third pass: 20 of 29 reached 0, each by a lever the first pass had not tried. One measurement each:
+- **Run `permute.py` on the stores of one case** when the diff is the order of 2 to 3 stores (`JobMenu_BuildList`: 1 of 24 orders scored 0, after
+  three passes of hand rewordings).
+- **A prototype with an extra or missing argument**, not a register fix: the virtual method with a 4th argument made GCC copy `object` into `$a3`
+  (`func_00138BA0`, 12 to 0 once it was a real 4-argument virtual); the extra argument of an out-of-line constructor was a `void` return
+  (`PairHandle_Init`, the `asm` label gives the retail symbol; exceptions.md). `memmove` with an `unsigned int` size dropped an `daddu`.
+- **Operand order of one `addu`** (`IepSweepPathzoneCursor`): `agrf[word]` hands expand a MULT, which it puts first; a byte offset
+  `(char *)agrf + (word << 2)` keeps `agrf` first. No typed form scored 0; keep the cast and say why in a comment.
+- **A `static inline` helper with `unsigned char` parameters** adds the `andi 0xFF` before a byte store and keeps the alpha branch instead of `movz`
+  (`FilterColorRgba5551`); a `static inline` that sets its slot pointer first and returns the call's field fixed a return-slot address (`func_001AD538`).
+- **Two top-level loops, one after the other**, instead of the second inside the first `if`: GCC skips the second when the list is empty and fills the
+  first delay slot (`RecalcSwXpAll`). A `while` with the next index computed first (`int next = i + 1; ... i = next;`) reorders two adds
+  (`CBinaryInputStream_ReadGeom`). Indexing both arrays and stepping the counter after the last pointer step fixed a loop's register rotation.
+- **One `GMax(0.0f, x)` inline (`a >? b`) keeps zero as the first `max.s` operand**; a `LM {gMin, gMax}` pair read through one inline loads both
+  limits before the first test (`GetJmpLaunchVelocity`). An empty `case 0: break;` in a final switch gives retail's `slti`/`bnez` shape.
+
+Landing a function into a whole file by hand (what `make land` cannot merge): suffix the function's private types, globals and callees with its address
+(`B_002E65E0_1AD538`, the file's own convention), keep the file's declared signature and cast inside, rename the file's own struct when it clashes with a
+header (`TGT`, `CRef`), and run `make_whole_files.py --land ADDR --source FILE [--dry-run]` on the adapted copy; a C whole file becomes C++ by itself.
+`ninja` does not track `sw.h` as a dependency: a cached object hid a `TGT` redefinition in `LoadSwPzgraphFromBrx_file.cpp` for several rounds; after a
+header change run `make elf` on a clean `build/` or touch the whole files that include it. `link_image.py --fresh` after any failed whole-file attempt:
+a stale seed holds a file back as assembly and `make elf` still prints PASS.
+
 ## Walls
 
 `config/matching/walls.tsv` is the list: address, name, class (`blocker`, `fragment`, `helper`, `toolchain`, `tie`, `exhausted`), the reason, the evidence and the `unlock` condition.
@@ -553,5 +579,6 @@ More fixes from 2026-11-20 (waves Z23 to Z27: 8 SDK-range functions and 1 game f
   `lw a2,0(sp)` and the `mtlo/madd/mflo` update (combine forms the madd while `base` is still a register). The slots follow declaration order.
   `for (i = 0; i < n; i++)` loops, not a do/while with a mid-body `index++`, gave retail's counter register (priority, `globalalloc.py`).
 - **`-fmove-all-movables` for a whole file** is listed by its start address in `config/us/move_movables.txt` (`AdvanceLaserBeams`).
+- **Hints for the walls** (untested levers, by class): docs/contributing/wall-hints.md.
 - **Walls found with the dump tools** (`sched1.py`, `globalalloc.py`): a load into an asm helper costs 1 in GCC 2.95's scheduler, so a short chain
   loses to a reload chain by 2 (`CloneStepHullGeom`, 7); allocation priority ties and last-block store priorities (`FreeSwPoxa`, `func_0023AAF0`).

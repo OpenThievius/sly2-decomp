@@ -4,7 +4,6 @@
 #include "sly2.h"
 #include "dl.h"
 #include "m2c_macros.h"
-#include "include_asm.h"
 
 struct DL;
 
@@ -254,7 +253,44 @@ extern "C" void EnforceDzgDz__FP3DZGP2DZ(DZG_11A770 *dzg, DZ_11A770 *pdz) {
     } while (iterations < 10);
 }
 
-INCLUDE_ASM(0X11ABF8);
+struct DZ_11ABF8 { int dzk; int pad0[3]; float sdv; int pad1[3]; DZ_11ABF8 *next; };
+
+struct DZG_11ABF8 { char pad0[0xC]; DL pos; char pad1[0x18]; DL uncat; int cdzPos; };
+
+void RemoveDlEntry(DL *, void *);
+
+void AppendDlEntry(DL *, void *);
+
+extern "C" void EnforceDzgDz__FP3DZGP2DZ_11ABF8(DZG_11ABF8 *, DZ_11ABF8 *);
+
+void SolveDzgPrefilled(DZG_11ABF8 *dzg)
+{
+    DLI iterator;
+    DLI dliUnused; // frame: retail has an untouched 16-byte slot at sp+0x10 (a second DLI nothing reads or writes)
+    PushDli(&iterator, &dzg->uncat);
+    for (DZ_11ABF8 *row = (DZ_11ABF8 *)PvStep(&iterator); row != 0; row = (DZ_11ABF8 *)PvStep(&iterator)) {
+        if (row->dzk == 1) {
+            RemoveDlEntry(&dzg->uncat, row);
+            AppendDlEntry(&dzg->pos, row);
+            dzg->cdzPos = dzg->cdzPos + 1;
+        }
+    }
+    EnforceDzgDz__FP3DZGP2DZ_11ABF8(dzg, 0);
+    PopDli(&iterator);
+    while (true) {
+        DZ_11ABF8 *worst = 0;
+        float worstSdv = -0.01f;
+        for (DZ_11ABF8 *scan = (DZ_11ABF8 *)dzg->uncat.head; scan != 0; scan = scan->next) {
+            if (scan->sdv < worstSdv) {
+                worst = scan;
+                worstSdv = scan->sdv;
+            }
+        }
+        if (worst == 0)
+            break;
+        EnforceDzgDz__FP3DZGP2DZ_11ABF8(dzg, worst);
+    }
+}
 
 struct ALLOC { int cb; int align; };
 

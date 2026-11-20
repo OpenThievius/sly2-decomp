@@ -26,20 +26,18 @@ extern "C" int ChNext__9CRichText(CRichText *self)
             } else {
                 unsigned char *pdigit = self->cur + 1;
                 unsigned int value = 0;
-                if (self->cur[1] != 0 && pdigit - self->cur < 7) {
-                    do {
-                        unsigned int digit;
-                        if ((unsigned int)(*pdigit - '0') < 10)
-                            digit = *pdigit - '0';
-                        else if ((unsigned int)(*pdigit - 'A') < 6)
-                            digit = *pdigit - 'A' + 10;
-                        else if ((unsigned int)(*pdigit - 'a') < 6)
-                            digit = *pdigit - 'a' + 10;
-                        else
-                            break;
-                        pdigit++;
-                        value = value * 16 + digit;
-                    } while (*pdigit != 0 && pdigit - self->cur < 7);
+                unsigned int digit;
+                while (*pdigit != 0 && pdigit - self->cur < 7) {
+                    if ((unsigned int)(*pdigit - '0') < 10)
+                        digit = *pdigit - '0';
+                    else if ((unsigned int)(*pdigit - 'A') < 6)
+                        digit = *pdigit - 'A' + 10;
+                    else if ((unsigned int)(*pdigit - 'a') < 6)
+                        digit = *pdigit - 'a' + 10;
+                    else
+                        break;
+                    pdigit++;
+                    value = value * 16 + digit;
                 }
                 if (pdigit - self->cur >= 7) {
                     self->rgbaMarkup.b[0] = (((value >> 16) & 0xFF) + 1) >> 1;

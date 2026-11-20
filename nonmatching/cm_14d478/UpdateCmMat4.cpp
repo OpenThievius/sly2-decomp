@@ -44,14 +44,12 @@ void UpdateCmMat4(Cm *pcm)
         Frame fr;
         M4 &matShake = fr.a;
         M4 &matRoll = fr.b;
-        QW qShake;
-        qShake = QuadFromFloat(shake);
-        fr.shake = qShake;
+        fr.shake = QuadFromFloat(shake);
         QW rot;
-        rot = GeneralFromVector(VectorScaleX(D_002BD880, qShake));
+        rot = GeneralFromVector(VectorScaleX(D_002BD880, fr.shake));
         LoadRotateMatrix(&matRoll, rot);
         QW move;
-        move = GeneralFromVector(VectorScaleX(D_002BD870, qShake));
+        move = GeneralFromVector(VectorScaleX(D_002BD870, fr.shake));
         __as__6VECTORG9VU_VECTOR((M4 *)&matShake.row[3], move);
         matShake.row[1] = matRoll.row[1];
         matShake.row[2] = matRoll.row[2];

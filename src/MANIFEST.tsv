@@ -871,6 +871,7 @@ address	name	size	file	whole_file	symbol
 0X117F70	CBinaryInputStream_ReadVector4	32	geom/InitGeom_file.cpp	geom/InitGeom_file.cpp	CBinaryInputStream_ReadVector4
 0X117F90	func_00117F90	32	geom/InitGeom_file.cpp	geom/InitGeom_file.cpp	func_00117F90
 0X117FB0	func_00117FB0	32	geom/InitGeom_file.cpp	geom/InitGeom_file.cpp	func_00117FB0
+0X117FD0	CBinaryInputStream_ReadGeom	580	geom/InitGeom_file.cpp	geom/InitGeom_file.cpp	CBinaryInputStream_ReadGeom
 0X118220	CBinaryInputStream_ReadBspc	340	geom/InitGeom_file.cpp	geom/InitGeom_file.cpp	CBinaryInputStream_ReadBspc
 0X118380	func_00118380	156	geom/InitGeom_file.cpp	geom/InitGeom_file.cpp	func_00118380
 0X118420	Unknown1__18CBinaryInputStream	52	geom/InitGeom_file.cpp	geom/InitGeom_file.cpp	Unknown1__18CBinaryInputStream
@@ -921,6 +922,7 @@ address	name	size	file	whole_file	symbol
 0X11A550	func_0011A550	360	dl-dzg/dl_dzg_11a550.cpp	dl-dzg/dl_dzg_11a550.cpp	func_0011A550
 0X11A6B8	ClearDzgSolution__FP3DZG	184	dl-dzg/dl_dzg_11a550.cpp	dl-dzg/dl_dzg_11a550.cpp	ClearDzgSolution
 0X11A770	EnforceDzgDz__FP3DZGP2DZ	1160	dl-dzg/dl_dzg_11a550.cpp	dl-dzg/dl_dzg_11a550.cpp	EnforceDzgDz__FP3DZGP2DZ
+0X11ABF8	SolveDzgPrefilled	308	dl-dzg/dl_dzg_11a550.cpp	dl-dzg/dl_dzg_11a550.cpp	SolveDzgPrefilled
 0X11AD30	SolveInequalities	344	dl-dzg/dl_dzg_11a550.cpp	dl-dzg/dl_dzg_11a550.cpp	SolveInequalities
 0X11AE88	StaticInitSlotheaps_11ae88	308	dl-dzg/dl_dzg_11a550.cpp	dl-dzg/dl_dzg_11a550.cpp	StaticInitSlotheaps_11ae88
 0X11AFC0	func_0011AFC0	32	dl-dzg/dl_dzg_11a550.cpp	dl-dzg/dl_dzg_11a550.cpp	func_0011AFC0
@@ -1226,8 +1228,9 @@ address	name	size	file	whole_file	symbol
 0X12A0B0	SetTag__4CRef4TAGK	240	splice-ref-splice-sidebag/SetTag_file.cpp	splice-ref-splice-sidebag/SetTag_file.cpp	SetTag__4CRef4TAGK
 0X12A1A0	StaticInitializeRefSlotheaps	532	splice-ref-splice-sidebag/SetTag_file.cpp	splice-ref-splice-sidebag/SetTag_file.cpp	StaticInitializeRefSlotheaps
 0X12A3B8	StaticInitializeRefSlotheaps_thunk	32	splice-ref-splice-sidebag/SetTag_file.cpp	splice-ref-splice-sidebag/SetTag_file.cpp	StaticInitializeRefSlotheaps_thunk
-0X12A828	StaticInitializeSidebagSlotheaps	308	splice-ref-splice-sidebag/StaticInitializeSidebagSlotheaps_file.c	splice-ref-splice-sidebag/StaticInitializeSidebagSlotheaps_file.c	StaticInitializeSidebagSlotheaps
-0X12A960	StaticInitializeSidebagSlotheaps_thunk	32	splice-ref-splice-sidebag/StaticInitializeSidebagSlotheaps_file.c	splice-ref-splice-sidebag/StaticInitializeSidebagSlotheaps_file.c	StaticInitializeSidebagSlotheaps_thunk
+0X12A3D8	PpairSerializeIn	1104	splice-ref-splice-sidebag/StaticInitializeSidebagSlotheaps_file.cpp	splice-ref-splice-sidebag/StaticInitializeSidebagSlotheaps_file.cpp	PpairSerializeIn
+0X12A828	StaticInitializeSidebagSlotheaps	308	splice-ref-splice-sidebag/StaticInitializeSidebagSlotheaps_file.cpp	splice-ref-splice-sidebag/StaticInitializeSidebagSlotheaps_file.cpp	StaticInitializeSidebagSlotheaps
+0X12A960	StaticInitializeSidebagSlotheaps_thunk	32	splice-ref-splice-sidebag/StaticInitializeSidebagSlotheaps_file.cpp	splice-ref-splice-sidebag/StaticInitializeSidebagSlotheaps_file.cpp	StaticInitializeSidebagSlotheaps_thunk
 0X12A980	CSidebag_RefAddBinding	236	splice-ref-splice-sidebag/splice_ref_splice_sidebag_12a980.cpp	splice-ref-splice-sidebag/splice_ref_splice_sidebag_12a980.cpp	CSidebag_RefAddBinding
 0X12AA70	CSidebag_RefSetBinding	184	splice-ref-splice-sidebag/splice_ref_splice_sidebag_12a980.cpp	splice-ref-splice-sidebag/splice_ref_splice_sidebag_12a980.cpp	CSidebag_RefSetBinding
 0X12AB28	FFindBinding__8CSidebagiP4CRef	80	splice-ref-splice-sidebag/splice_ref_splice_sidebag_12a980.cpp	splice-ref-splice-sidebag/splice_ref_splice_sidebag_12a980.cpp	FFindBinding__8CSidebagiP4CRef
@@ -1260,6 +1263,7 @@ address	name	size	file	whole_file	symbol
 0X12C440	func_0012C440	304	new_12ae28/fun_0012c440.cpp		
 0X12C570	func_0012C570	408	new_12ae28/fun_0012c570.cpp		
 0X12C708	func_0012C708	96	new_12ae28/fun_0012c708.cpp		
+0X12C768	func_0012C768	768	new_12ae28/fun_0012c768.cpp		
 0X12CA68	func_0012CA68	304	new_12ae28/fun_0012ca68.cpp		
 0X12CB98	PacpNew__F4ACVK	200	ac/PacpNew__F4ACVK.cpp		
 0X12CC60	ExplodeExploExplso__FP5EXPLOP6EXPLSO	8	emitter/ExplodeExploExplso__FP5EXPLOP6EXPLSO.c		
@@ -1430,11 +1434,13 @@ address	name	size	file	whole_file	symbol
 0X133598	StaticInitBasic	308	lo/OnLoAdd_file.cpp	lo/OnLoAdd_file.cpp	StaticInitBasic
 0X1336D0	GlobalCtorBasic	32	lo/OnLoAdd_file.cpp	lo/OnLoAdd_file.cpp	GlobalCtorBasic
 0X1336F0	PoxaAllocSw	224	sensor-bbmark/PoxaAllocSw_file.cpp	sensor-bbmark/PoxaAllocSw_file.cpp	PoxaAllocSw
+0X133A38	UpdateSwPox	556	sensor-bbmark/PoxaAllocSw_file.cpp	sensor-bbmark/PoxaAllocSw_file.cpp	UpdateSwPox
 0X133C68	AllocSwOx	76	sensor-bbmark/PoxaAllocSw_file.cpp	sensor-bbmark/PoxaAllocSw_file.cpp	AllocSwOx
 0X133CB8	PoxExtractFromPoxa	80	sensor-bbmark/PoxaAllocSw_file.cpp	sensor-bbmark/PoxaAllocSw_file.cpp	PoxExtractFromPoxa
 0X133D08	FPoxaPairInteracts	292	sensor-bbmark/PoxaAllocSw_file.cpp	sensor-bbmark/PoxaAllocSw_file.cpp	FPoxaPairInteracts
 0X133E30	func_00133E30	80	sensor-bbmark/PoxaAllocSw_file.cpp	sensor-bbmark/PoxaAllocSw_file.cpp	func_00133E30
 0X133E80	UpdateSwAaox__FP2SW	444	sensor-bbmark/PoxaAllocSw_file.cpp	sensor-bbmark/PoxaAllocSw_file.cpp	UpdateSwAaox__FP2SW
+0X134040	RecalcSwXpAll	716	sensor-bbmark/PoxaAllocSw_file.cpp	sensor-bbmark/PoxaAllocSw_file.cpp	RecalcSwXpAll
 0X134310	IMax	16	sensor-bbmark/PoxaAllocSw_file.cpp	sensor-bbmark/PoxaAllocSw_file.cpp	IMax
 0X134320	RecalcSwOxfFilterForObject	120	sensor-bbmark/PoxaAllocSw_file.cpp	sensor-bbmark/PoxaAllocSw_file.cpp	RecalcSwOxfFilterForObject
 0X134398	StaticInitBbmark	308	sensor-bbmark/PoxaAllocSw_file.cpp	sensor-bbmark/PoxaAllocSw_file.cpp	StaticInitBbmark
@@ -1490,6 +1496,7 @@ address	name	size	file	whole_file	symbol
 0X138370	ImrsgLookUp__FffiP4MRSGPf	128	blend/FillBlAmrsg_file.cpp	blend/FillBlAmrsg_file.cpp	ImrsgLookUp
 0X1383F0	SetAsegblIpasegDominant	204	blend/FillBlAmrsg_file.cpp	blend/FillBlAmrsg_file.cpp	SetAsegblIpasegDominant
 0X1384C0	ReblendAsegbl	412	blend/FillBlAmrsg_file.cpp	blend/FillBlAmrsg_file.cpp	ReblendAsegbl
+0X138BA0	func_00138BA0	528	blend/FillBlAmrsg_file.cpp	blend/FillBlAmrsg_file.cpp	func_00138BA0
 0X138DB0	StaticInitSlotheaps_138db0	308	blend/FillBlAmrsg_file.cpp	blend/FillBlAmrsg_file.cpp	StaticInitSlotheaps_138db0
 0X138EE8	func_00138EE8	32	blend/FillBlAmrsg_file.cpp	blend/FillBlAmrsg_file.cpp	func_00138EE8
 0X138F08	BuildBlipAqwGifs__FiPP2QW	184	blip/BuildBlipAqwGifs__FiPP2QW.cpp		
@@ -2144,6 +2151,7 @@ address	name	size	file	whole_file	symbol
 0X160A98	CloseFrame__Fv	212	frm/CloseFrame__Fv.cpp		
 0X160B70	FrameRenderLoop__FPv	272	frm/FrameRenderLoop__FPv.cpp		
 0X160C80	RenderFrame__FP3FRMi	92	frm/RenderFrame__FP3FRMi.cpp		
+0X160CE0	ClearPendingFrame__FP3FRM	392	frm/ClearPendingFrame__FP3FRM.cpp		
 0X160E68	FlushFrames__Fi	304	frm/FlushFrames__Fi.cpp		
 0X160F98	BlendPrevFrame__Fv	668	frm-splice-frame/frm_splice_frame_160f98.cpp	frm-splice-frame/frm_splice_frame_160f98.cpp	BlendPrevFrame__Fv
 0X161238	func_00161238	332	frm-splice-frame/frm_splice_frame_160f98.cpp	frm-splice-frame/frm_splice_frame_160f98.cpp	func_00161238
@@ -2574,6 +2582,7 @@ address	name	size	file	whole_file	symbol
 0X17F770	func_0017F770	224	new_17dd70/fun_0017f770.cpp		
 0X17F850	Mount_PostLoad	116	new_17dd70/Mount_PostLoad.cpp		
 0X17F8C8	Mount_OnPoActive	100	new_17dd70/Mount_OnPoActive.cpp		
+0X17F930	Mount_Update	540	new_17dd70/Mount_Update.cpp		
 0X17FB50	Mount_AccelToward	148	new_17dd70/Mount_AccelToward.cpp		
 0X17FBE8	Mount_FTakeHit	200	new_17dd70/Mount_FTakeHit.cpp		
 0X17FCB0	Mount_ResetState	84	new_17dd70/Mount_ResetState.c		
@@ -2804,6 +2813,7 @@ address	name	size	file	whole_file	symbol
 0X197500	UpdateJmpBodyState	2708	new_1942f0/StartJmpDirectionAseg_file.cpp	new_1942f0/StartJmpDirectionAseg_file.cpp	UpdateJmpBodyState
 0X199298	func_00199298	364	new_1942f0/StartJmpDirectionAseg_file.cpp	new_1942f0/StartJmpDirectionAseg_file.cpp	func_00199298
 0X19A400	FTimeJtJumpToTarget	160	new_1942f0/StartJmpDirectionAseg_file.cpp	new_1942f0/StartJmpDirectionAseg_file.cpp	FTimeJtJumpToTarget
+0X19A750	GetJmpLaunchVelocity	776	new_1942f0/StartJmpDirectionAseg_file.cpp	new_1942f0/StartJmpDirectionAseg_file.cpp	GetJmpLaunchVelocity
 0X19AA58	GMeasureJumpRail__FP3MJRf	96	new_1942f0/StartJmpDirectionAseg_file.cpp	new_1942f0/StartJmpDirectionAseg_file.cpp	GMeasureJumpRail__FP3MJRf
 0X19AAB8	GMeasureJumpHpnt	128	new_1942f0/StartJmpDirectionAseg_file.cpp	new_1942f0/StartJmpDirectionAseg_file.cpp	GMeasureJumpHpnt
 0X19AB38	GMeasureJumpToHshape	128	new_1942f0/StartJmpDirectionAseg_file.cpp	new_1942f0/StartJmpDirectionAseg_file.cpp	GMeasureJumpToHshape
@@ -3077,6 +3087,7 @@ address	name	size	file	whole_file	symbol
 0X1AD320	SlotItem_Load	192	memcard-memory/memcard_memory_1accc8.cpp	memcard-memory/memcard_memory_1accc8.cpp	SlotItem_Load
 0X1AD3E0	func_001AD3E0	160	memcard-memory/memcard_memory_1accc8.cpp	memcard-memory/memcard_memory_1accc8.cpp	func_001AD3E0
 0X1AD480	func_001AD480	184	memcard-memory/memcard_memory_1accc8.cpp	memcard-memory/memcard_memory_1accc8.cpp	func_001AD480
+0X1AD538	func_001AD538	516	memcard-memory/memcard_memory_1accc8.cpp	memcard-memory/memcard_memory_1accc8.cpp	func_001AD538
 0X1AD740	func_001AD740	160	memcard-memory/memcard_memory_1accc8.cpp	memcard-memory/memcard_memory_1accc8.cpp	func_001AD740
 0X1AD7E0	FormatDialogText	64	memcard-memory/memcard_memory_1accc8.cpp	memcard-memory/memcard_memory_1accc8.cpp	FormatDialogText
 0X1AD820	FormatDialogButtons	264	memcard-memory/memcard_memory_1accc8.cpp	memcard-memory/memcard_memory_1accc8.cpp	FormatDialogButtons
@@ -3229,6 +3240,7 @@ address	name	size	file	whole_file	symbol
 0X1B49E0	PostMurrayLoad	188	mpeg-memcard/PostMurrayLoad.cpp		
 0X1B4AA0	UpdateMurrayActive	1432	mpeg-memcard/UpdateMurrayActive.cpp		
 0X1B5038	UpdateMurrayBinoc	120	mpeg-memcard/UpdateMurrayBinoc.cpp		
+0X1B5380	UpdateMurrayCarry	728	mpeg-memcard/UpdateMurrayCarry.cpp		
 0X1B5658	SetMurrayCarryState	452	mpeg-memcard/SetMurrayCarryState.cpp		
 0X1B5820	UpdateMurrayMash	364	mpeg-memcard/UpdateMurrayMash.cpp		
 0X1B5D30	func_001B5D30	360	mpeg-memcard/fun_001b5d30.cpp		
@@ -3295,6 +3307,7 @@ address	name	size	file	whole_file	symbol
 0X1BAED8	SetStgSwitchHitter	64	mpeg-memcard/SetStgSwitchHitter.cpp		
 0X1BAF18	StepStgSwitch	824	mpeg-memcard/StepStgSwitch.cpp		
 0X1BB250	func_001BB250	428	mpeg-memcard/fun_001bb250.cpp		
+0X1BB400	RunStgSwitch	584	mpeg-memcard/RunStgSwitch.cpp		
 0X1BB648	RunStgSwitchStage	716	mpeg-memcard/RunStgSwitchStage.cpp		
 0X1BB918	AddStgSwitchClass	52	mpeg-memcard/AddStgSwitchClass.cpp		
 0X1BB950	AddStgSwitchStage	104	mpeg-memcard/AddStgSwitchStage.cpp		
@@ -3377,6 +3390,7 @@ address	name	size	file	whole_file	symbol
 0X1C1138	HookupPzgraph	292	new_1c0920/LoadSwPzgraphFromBrx_file.cpp	new_1c0920/LoadSwPzgraphFromBrx_file.cpp	HookupPzgraph
 0X1C1260	BuildPzgraphAdjacency	476	new_1c0920/LoadSwPzgraphFromBrx_file.cpp	new_1c0920/LoadSwPzgraphFromBrx_file.cpp	BuildPzgraphAdjacency
 0X1C1440	ResetPathzoneQuery	100	new_1c0920/LoadSwPzgraphFromBrx_file.cpp	new_1c0920/LoadSwPzgraphFromBrx_file.cpp	ResetPathzoneQuery
+0X1C14A8	IepSweepPathzoneCursor	332	new_1c0920/LoadSwPzgraphFromBrx_file.cpp	new_1c0920/LoadSwPzgraphFromBrx_file.cpp	IepSweepPathzoneCursor
 0X1C15F8	SweepPathzoneAxis	260	new_1c0920/LoadSwPzgraphFromBrx_file.cpp	new_1c0920/LoadSwPzgraphFromBrx_file.cpp	SweepPathzoneAxis
 0X1C1700	CobstacleFindPathzoneBox	436	new_1c0920/LoadSwPzgraphFromBrx_file.cpp	new_1c0920/LoadSwPzgraphFromBrx_file.cpp	CobstacleFindPathzoneBox
 0X1C18B8	RemovePathzoneEndpoints	176	new_1c0920/LoadSwPzgraphFromBrx_file.cpp	new_1c0920/LoadSwPzgraphFromBrx_file.cpp	RemovePathzoneEndpoints
@@ -3732,6 +3746,7 @@ address	name	size	file	whole_file	symbol
 0X1D9910	CGc_PopScreen	88	splice-gc-wipe/CGc_PopScreen.c		
 0X1D9968	InitMeter	456	splice-gc-wipe/InitMeter.cpp		
 0X1D9B30	ReleaseMeter	44	splice-gc-wipe/ReleaseMeter.cpp		
+0X1D9B60	SetMeterState	660	splice-gc-wipe/SetMeterState.cpp		
 0X1D9DF8	UpdateMeter	1256	splice-gc-wipe/UpdateMeter.cpp		
 0X1DA2E0	FindHudLabelBlot	60	splice-gc-wipe/FindHudLabelBlot.c		
 0X1DA320	InitHudLabel	48	splice-gc-wipe/InitHudLabel.cpp		
@@ -3768,6 +3783,7 @@ address	name	size	file	whole_file	symbol
 0X1DBBA0	ShopMenu_IrowEnd	60	game-stepguard/ShopMenu_IrowEnd.cpp		
 0X1DBBE0	ShopMenu_Select	304	game-stepguard/ShopMenu_Select.cpp		
 0X1DBD10	ShopMenu_BuildList	480	game-stepguard/ShopMenu_BuildList.cpp		
+0X1DBEF0	ShopMenu_UpdateBlot	880	game-stepguard/ShopMenu_UpdateBlot.cpp		
 0X1DC260	ShopMenu_SetPage	592	game-stepguard/ShopMenu_SetPage.cpp		
 0X1DC4B0	ShopMenu_SetDirection	228	game-stepguard/ShopMenu_SetDirection.cpp		
 0X1DC598	GetGadgetMenuText	500	game-stepguard/GetGadgetMenuText.cpp		
@@ -3783,6 +3799,7 @@ address	name	size	file	whole_file	symbol
 0X1DCD08	JobMenu_InitPage	36	game-stepguard/JobMenu_InitPage.cpp		
 0X1DCD30	JobMenu_Update	352	game-stepguard/JobMenu_Update.cpp		
 0X1DCE90	JobMenu_Select	68	game-stepguard/JobMenu_Select.cpp		
+0X1DCED8	JobMenu_BuildList	796	game-stepguard/JobMenu_BuildList.cpp		
 0X1DD1F8	JobMenu_UpdateBlot	264	game-stepguard/JobMenu_UpdateBlot.cpp		
 0X1DD300	JobMenu_SetPage	600	game-stepguard/JobMenu_SetPage.cpp		
 0X1DD558	JobMenu_SetDirection	240	game-stepguard/JobMenu_SetDirection.cpp		
@@ -4039,6 +4056,7 @@ address	name	size	file	whole_file	symbol
 0X1ECBF0	BuildBmpGifs__FP3BMPiP4GIFS	56	gs/BuildBmpGifs__FP3BMPiP4GIFS.cpp		
 0X1ECC28	FBuildUploadBitmapGifs__FiP3GSBP4GIFS	556	gs/FBuildUploadBitmapGifs__FiP3GSBP4GIFS.cpp		
 0X1ECE58	PqwVifsBitmapUpload__Fi	840	gs/PqwVifsBitmapUpload__Fi.cpp		
+0X1ED1A8	FilterColorRgba5551_1ed1a8	208	new_1ed1a8/FilterColorRgba5551_1ed1a8.cpp		
 0X1ED278	FilterColorRgba8_1ed278	96	new_1ed1a8/FilterColorRgba8_1ed278.cpp		
 0X1ED3A8	InitIdHashTables_1ed3a8	156	new_1ed1a8/new_1ed1a8_1ed3a8.c	new_1ed1a8/new_1ed1a8_1ed3a8.c	InitIdHashTables_1ed3a8
 0X1ED448	ShutdownIdHashTables_1ed448	36	new_1ed1a8/new_1ed1a8_1ed3a8.c	new_1ed1a8/new_1ed1a8_1ed3a8.c	ShutdownIdHashTables_1ed448
@@ -4564,6 +4582,7 @@ address	name	size	file	whole_file	symbol
 0X2081C8	ResetGuardAnimrefArrays	64	step-rwm/ResetGuardAnimrefArrays.c		
 0X208208	CloneAnimrefArray	68	step-rwm/CloneAnimrefArray.cpp		
 0X208250	CloneGuardAnimrefs	128	step-rwm/CloneGuardAnimrefs.c		
+0X2082D0	func_002082D0	616	step-rwm/fun_002082d0.cpp		
 0X208538	func_00208538	8	unsorted/fun_00208538.c		
 0X208540	func_00208540	112	step-rwm/fun_00208540.c		
 0X2085B0	AddGuardSensedObject_thunk	28	step-rwm/AddGuardSensedObject_thunk.c		
@@ -5032,6 +5051,7 @@ address	name	size	file	whole_file	symbol
 0X227440	func_00227440	32	new_2271f8/new_2271f8_227350.cpp	new_2271f8/new_2271f8_227350.cpp	func_00227440
 0X227460	StaticInitSlotheaps_227460	308	new_2271f8/new_2271f8_227350.cpp	new_2271f8/new_2271f8_227350.cpp	StaticInitSlotheaps_227460
 0X227598	func_00227598	32	new_2271f8/new_2271f8_227350.cpp	new_2271f8/new_2271f8_227350.cpp	func_00227598
+0X2275B8	func_002275B8	364	new_2271f8/fun_002275b8.cpp		
 0X227728	func_00227728	92	new_2271f8/fun_00227728.cpp		
 0X227788	func_00227788	72	new_2271f8/fun_00227788.cpp		
 0X2277D0	func_002277D0	80	new_2271f8/fun_002277d0.c		

@@ -24,10 +24,9 @@ int FInvertMatrix__FiPfT1(int stride, int count, float *source, float *inverse) 
     pointer->align = 0x10;
     work = (float *)PvAllocStackImpl__Fi(pointer);
     CopyAb__FPvT0Ui(work, source, count * stride * 4);
-    for (row = 0; row < count; row++) {
-        cell = &inverse[row * stride];
-        for (column = 0; column < count; column++) {
-            if (row == column) {
+    for (step = 0; step < count; step++) {
+        for (column = 0, cell = &inverse[step * stride]; column < count; column++) {
+            if (step == column) {
                 *cell = 1.0f;
             } else {
                 *cell = 0;
@@ -39,9 +38,9 @@ int FInvertMatrix__FiPfT1(int stride, int count, float *source, float *inverse) 
         pivot = step;
         largest = __builtin_fabsf(work[step * stride + step]);
         for (column = step + 1; column < count; column++) {
-            candidate = __builtin_fabsf(work[step * stride + column]);
-            if (largest < candidate) {
-                largest = candidate;
+            candidate = work[step * stride + column];
+            if (largest < __builtin_fabsf(candidate)) {
+                largest = __builtin_fabsf(candidate);
                 pivot = column;
             }
         }
@@ -51,8 +50,8 @@ int FInvertMatrix__FiPfT1(int stride, int count, float *source, float *inverse) 
         if (pivot != step) {
             for (row = 0; row < count; row++) {
                 held = work[row * stride + step];
-                work[row * stride + pivot] = held;
                 work[row * stride + step] = work[row * stride + pivot];
+                work[row * stride + pivot] = held;
                 held = inverse[row * stride + step];
                 inverse[row * stride + step] = inverse[row * stride + pivot];
                 inverse[row * stride + pivot] = held;

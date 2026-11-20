@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
 #include "so.h"
+#include "phys.h"
 #include "sw.h"
 struct PZGRAPH { char pad[0x2C]; int field2C; };
 struct UL { unsigned long v; } __attribute__((packed));
@@ -36,7 +37,7 @@ extern "C" void AddSoLoHierarchy(SO *pso)
     PHYS *pphys = pso->pphys;
     int hasXr = 0;
     if (pphys != 0) {
-        hasXr = *(int *)((char *)pphys + 0xDC);
+        hasXr = (int)pphys->plink;
     }
     if (hasXr != 0) {
         PZGRAPH *pgraph = B_003DD490.ppzgraph;

@@ -47,7 +47,70 @@ void *PoxaAllocSw(SW *psw, SO *pso)
 
 INCLUDE_ASM(0X1337D0);
 
-INCLUDE_ASM(0X133A38);
+struct OX_133A38 { void *pmq; OX_133A38 *next; OX_133A38 *pair; SO *pobj; int flag; };
+struct POXA_133A38 { char pad0[0x60]; SO *pobj; OX_133A38 *head; };
+struct SwPoxNode;
+struct SwWorld;
+extern "C" {
+OX_133A38 *AllocSwOx_133A38(SW *, POXA_133A38 *, POXA_133A38 *);
+int FPoxaPairInteracts_133A38(SW *, POXA_133A38 *, POXA_133A38 *);
+void FreeSlotheapPv(void *, void *);
+void FreeSwMqList__FP2SWP2MQ(SW *, void *);
+OX_133A38 *PoxExtractFromPoxa_133A38(SW *, POXA_133A38 *, POXA_133A38 *);
+void func_001F5078(SO *);
+void UpdateSwPox(SwWorld *world, SwPoxNode *nodeA, SwPoxNode *nodeB, s32 mode)
+{
+    SW *psw = (SW *)world;
+    POXA_133A38 *pa = (POXA_133A38 *)nodeA;
+    POXA_133A38 *pb = (POXA_133A38 *)nodeB;
+    OX_133A38 *pnode = pa->head;
+    if (pnode != 0) {
+        if (pnode->pobj != pb->pobj) {
+            do {
+                pnode = pnode->next;
+            } while (pnode != 0 && pnode->pobj != pb->pobj);
+        }
+    }
+    int flag;
+    switch (mode) {
+    case 1: flag = 1; break;
+    case 2: flag = 0; break;
+    case 0: flag = 0; if (pnode) flag = pnode->flag; break;
+    }
+    OX_133A38 *pcur = pnode;
+    if (flag != 0 || FPoxaPairInteracts_133A38(psw, pa, pb) != 0) {
+        if (pcur == 0) {
+            OX_133A38 *pox = AllocSwOx_133A38(psw, pa, pb);
+            OX_133A38 *poxB = AllocSwOx_133A38(psw, pb, pa);
+            pox->pair = poxB;
+            poxB->pair = pox;
+            pcur = pox;
+        }
+    } else {
+        if (pcur == 0) return;
+        pa->pobj->Slot54(pb->pobj);
+        pb->pobj->Slot54(pa->pobj);
+        OX_133A38 *poxA = PoxExtractFromPoxa_133A38(psw, pa, pb);
+        OX_133A38 *poxB = PoxExtractFromPoxa_133A38(psw, pb, pa);
+        void *pheap;
+        if (poxA->pmq != 0) {
+            FreeSwMqList__FP2SWP2MQ(psw, poxA->pmq);
+            if (poxA->pobj->FIsLocked() == 0)
+                func_001F5078(poxA->pobj);
+            if (poxB->pobj->FIsLocked() == 0)
+                func_001F5078(poxB->pobj);
+        }
+        pheap = (char *)psw + 0x3CF8;
+        pcur = 0;
+        FreeSlotheapPv(pheap, poxA);
+        FreeSlotheapPv(pheap, poxB);
+    }
+    if (pcur != 0) {
+        pcur->pair->flag = flag;
+        pcur->flag = flag;
+    }
+}
+}
 
 struct SwOxNode {
     char pad_0x0[4];
@@ -184,7 +247,104 @@ extern "C" void UpdateSwAaox__FP2SW(SW *psw)
     }
 }
 
-INCLUDE_ASM(0X134040);
+struct MQ;
+
+struct OXA;
+
+struct LINK { MQ *pmq; LINK *next; MQ **ppmq; SO *pso; };
+
+struct OXA { char pad[0x58]; OXA *next; char pad2[4]; SO *owner; LINK *first; MQ *pmqList; char pad3[4]; u64 grf; };
+
+struct SWXP { char pad[0x3D34]; OXA *head; };
+
+struct SW;
+
+struct XP { char pad[0xEC]; OXA *poxa; };
+
+extern "C" void func_00133E30_134040(void *);
+
+extern "C" void UpdateSwAaox__FP2SW_134040(void *);
+
+extern "C" void CStackFrame_Construct(void *);
+
+extern "C" void CStackFrame_Destructor(void *, int);
+
+extern "C" void FreeSwMqList__FP2SWP2MQ_134040(void *, MQ *);
+
+extern "C" MQ *PxpMarkSwContactsRoot(void *, OXA *, OXA *);
+
+extern "C" void RemoveDlEntry(void *, void *);
+
+extern "C" void func_001F5078(SO *);
+
+extern "C" void RecalcSwXpAll(SWXP *sw)
+{
+    char frame[16];
+    OXA *list[0x300];
+    int count = 0;
+    func_00133E30_134040(sw);
+    UpdateSwAaox__FP2SW_134040(sw);
+    CStackFrame_Construct(frame);
+    OXA *oxa;
+    for (oxa = sw->head; oxa; oxa = oxa->next) {
+        u64 grf = oxa->grf;
+        if (!(grf & 4)) {
+            grf |= 0x10;
+            oxa->grf = grf;
+            if (!(grf & 8)) {
+                oxa->grf = grf | 8;
+                list[count++] = oxa;
+            }
+            LINK *link = (LINK *)((DL *)((char *)oxa + 0x64))->head;
+            if (link) {
+                OXA **slot = &list[count];
+                do {
+                    OXA *other = ((SO *)((void **)link)[3])->poxa;
+                    u64 grfOther = other->grf;
+                    if (!(grfOther & 0x10)) {
+                      if (!(grfOther & 4)) {
+                        if (!(grfOther & 8)) {
+                            count++;
+                            other->grf = grfOther | 8;
+                            *slot = other;
+                            slot++;
+                        }
+                        oxa->owner->Slot54(other->owner);
+                        other->owner->Slot54(oxa->owner);
+                        MQ *old = link->pmq;
+                        FreeSwMqList__FP2SWP2MQ_134040(sw, old);
+                        MQ *mq = PxpMarkSwContactsRoot(sw, oxa, other);
+                        link->pmq = mq;
+                        *link->ppmq = mq;
+                        if (old || link->pmq) {
+                            if (!oxa->owner->FIsLocked())
+                                func_001F5078(oxa->owner);
+                            if (!other->owner->FIsLocked())
+                                func_001F5078(other->owner);
+                        }
+                      }
+                    }
+                    link = link->next;
+                } while (link);
+            }
+        }
+    }
+    while ((oxa = sw->head) != 0) {
+        oxa->grf &= ~0x10UL;
+        oxa->owner->Slot54(0);
+        FreeSwMqList__FP2SWP2MQ_134040(sw, oxa->pmqList);
+        oxa->pmqList = 0;
+        oxa->owner->Slot59();
+        oxa->grf &= ~2UL;
+        RemoveDlEntry(&sw->head, oxa);
+    }
+    for (int index = 0; index < count; index++) {
+        oxa = list[index];
+        oxa->grf &= ~8UL;
+        oxa->owner->Slot58();
+    }
+    CStackFrame_Destructor(frame, 2);
+}
 
 extern "C" {
 s32 IMax(s32 arg0, s32 arg1) {

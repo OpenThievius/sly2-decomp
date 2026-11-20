@@ -20,19 +20,18 @@ float SRandNearCrv(CRV *pcrv, float s, float ds)
         float sCenter;
         if (s < ds) {
             sCenter = ds;
+        } else if (sMax - ds < s) {
+            sCenter = sMax - ds;
         } else {
-            float sLimit = sMax - ds;
             sCenter = s;
-            if (sLimit < s)
-                sCenter = sLimit;
         }
         float sTop = sCenter + ds;
-        sHigh = (sTop < sMax) ? sTop : sMax;
         float sBottom = sCenter - ds;
+        sHigh = (sTop < sMax) ? sTop : sMax;
         sLow = (0.0f < sBottom) ? sBottom : 0.0f;
     }
-    bounds[0] = sLow;
     bounds[1] = sHigh;
+    bounds[0] = sLow;
     float gRand = GRandInRange(-1.0f, 1.0f);
     if (g_2c3650 == 1) {
         gRand = gRand * (gRand < 0.0f ? -gRand : gRand);

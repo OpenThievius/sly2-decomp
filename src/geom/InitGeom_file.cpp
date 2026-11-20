@@ -343,7 +343,99 @@ extern "C" int func_00117FB0(void *stream, void *dest)
     return CBinaryInputStream_Read_thunk_117FB0(stream, 8, dest);
 }
 
-INCLUDE_ASM(0X117FD0);
+struct GEOMEDGE_117FD0 {
+    s16 ivertA;
+    s16 ivertB;
+    s16 iplane;
+    u16 iplaneOther;
+    GEOMEDGE_117FD0 *pedgePrev;
+    GEOMEDGE_117FD0 *pedgeNext;
+};
+struct GEOMPLANE_117FD0 {
+    float normal[3];
+    s32 dist;
+    GEOMEDGE_117FD0 *pedgeFirst;
+    GEOMEDGE_117FD0 *pedgeList;
+    s32 pad18;
+    s32 iface;
+};
+struct GEOM_117FD0 {
+    s32 cvert;
+    QW *avert;
+    s32 cplane;
+    GEOMPLANE_117FD0 *aplane;
+    s32 cedge;
+    GEOMEDGE_117FD0 *aedge;
+};
+extern "C" {
+void *PvAllocSwImpl__Fi(ALLOCREQ *);
+void *PvAllocSwClearImpl__Fi(ALLOCREQ *);
+void BuildPlane(GEOMPLANE_117FD0 *pplane, QW pos0, QW pos1, QW pos2);
+void ReadVector__18CBinaryInputStreamP6VECTOR_117FD0(void *stream, void *dest);
+}
+extern "C" void CBinaryInputStream_ReadGeom(void *pbis, GEOM_117FD0 *pgeom)
+{
+    union {
+        ALLOCREQ allocreq;
+        int aivert[3];
+    } scratch;
+    int ivert = 0;
+    int cvert = U16Read__18CBinaryInputStream((Stream117C20 *)pbis);
+    scratch.allocreq.cb = cvert * 0x10;
+    scratch.allocreq.cbAlign = 0x10;
+    pgeom->cvert = cvert;
+    pgeom->avert = (QW *)PvAllocSwImpl__Fi(&scratch.allocreq);
+    if (pgeom->cvert > 0) {
+        do {
+            ReadVector__18CBinaryInputStreamP6VECTOR_117FD0(pbis, pgeom->avert + ivert);
+            ivert++;
+        } while (ivert < pgeom->cvert);
+    }
+    pgeom->cplane = U16Read__18CBinaryInputStream((Stream117C20 *)pbis);
+    scratch.allocreq.cb = pgeom->cplane << 5;
+    scratch.allocreq.cbAlign = 0x10;
+    pgeom->aplane = (GEOMPLANE_117FD0 *)PvAllocSwClearImpl__Fi(&scratch.allocreq);
+    int cedge = U16Read__18CBinaryInputStream((Stream117C20 *)pbis);
+    scratch.allocreq.cbAlign = 0x10;
+    pgeom->cedge = cedge;
+    scratch.allocreq.cb = cedge * 0x10;
+    GEOMEDGE_117FD0 *pedge;
+    pedge = pgeom->aedge = (GEOMEDGE_117FD0 *)PvAllocSwClearImpl__Fi(&scratch.allocreq);
+    int iplane;
+    iplane = 0;
+    while (iplane < pgeom->cplane) {
+        int iplaneNext = iplane + 1;
+        {
+            GEOMPLANE_117FD0 *pplane = pgeom->aplane + iplane;
+            scratch.aivert[0] = U16Read__18CBinaryInputStream((Stream117C20 *)pbis);
+            scratch.aivert[1] = U16Read__18CBinaryInputStream((Stream117C20 *)pbis);
+            scratch.aivert[2] = U16Read__18CBinaryInputStream((Stream117C20 *)pbis);
+            QW *avert = pgeom->avert;
+            BuildPlane(pplane, avert[scratch.aivert[0]], avert[scratch.aivert[1]], avert[scratch.aivert[2]]);
+            pplane->iface = scratch.aivert[0];
+            for (int ifloat = 3; ifloat >= 0; ifloat--)
+                F32Read__18CBinaryInputStream((Stream117E38 *)pbis);
+            int cedgePlane = U8Read__18CBinaryInputStream((Stream117BD0 *)pbis);
+            for (int iedge = 0; iedge < cedgePlane; iedge++) {
+                GEOMEDGE_117FD0 *pedgeNew = pedge;
+                pedge++;
+                pedgeNew->ivertA = U16Read__18CBinaryInputStream((Stream117C20 *)pbis);
+                int ivertB = U16Read__18CBinaryInputStream((Stream117C20 *)pbis);
+                pedgeNew->iplane = iplane;
+                pedgeNew->ivertB = ivertB;
+                pedgeNew->iplaneOther = U16Read__18CBinaryInputStream((Stream117C20 *)pbis);
+                if (iedge == 0)
+                    pplane->pedgeFirst = pedgeNew;
+                else
+                    pedgeNew[-1].pedgePrev = pedgeNew;
+                GEOMPLANE_117FD0 *pplaneOther = pgeom->aplane + pedgeNew->iplaneOther;
+                pedgeNew->pedgeNext = pplaneOther->pedgeList;
+                pplaneOther->pedgeList = pedgeNew;
+            }
+        }
+        iplane = iplaneNext;
+    }
+}
 
 INCLUDE_ASM(0X118218);
 

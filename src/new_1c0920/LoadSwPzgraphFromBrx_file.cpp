@@ -234,7 +234,50 @@ extern "C" void ResetPathzoneQuery(PATHZONE *arg0, PATHZONEQUERY *arg1) {
     arg1->field_0x2C = temp_v0;
 }
 
-INCLUDE_ASM(0X1C14A8);
+struct SAPEP;
+struct SAPEP_1C14A8 { float g; unsigned short fMin; unsigned short islot; };
+extern "C" int IepSweepPathzoneCursor(SAPEP *aepFile, float g, int iep, unsigned *agrf, int fMinSigned)
+{
+    SAPEP_1C14A8 *aep = (SAPEP_1C14A8 *)aepFile;
+    unsigned fMin = fMinSigned;
+    if (g <= aep[iep].g) {
+        for (;;) {
+            SAPEP_1C14A8 *cur = &aep[iep];
+            if (aep[iep].g < g)
+                break;
+            if (cur->fMin == fMin) {
+                unsigned islot = cur->islot;
+                unsigned word = islot >> 5;
+                unsigned bit = islot - (word << 5);
+                // addu operand order: retail adds agrf first; agrf[word] puts the shifted index first (no typed form scores 0)
+                if (fMin == 0)
+                    *(unsigned *)((char *)agrf + (word << 2)) |= (1u << bit);
+                else
+                    *(unsigned *)((char *)agrf + (word << 2)) -= (1u << bit);
+            }
+            iep--;
+        }
+    } else {
+    iep++;
+    for (;;) {
+        SAPEP_1C14A8 *cur = &aep[iep];
+        if (g < aep[iep].g)
+            break;
+        if (cur->fMin == fMin) {
+            unsigned islot = cur->islot;
+            unsigned word = islot >> 5;
+            unsigned bit = islot - (word << 5);
+            if (fMin != 0)
+                *(unsigned *)((char *)agrf + (word << 2)) |= (1u << bit);
+            else
+                *(unsigned *)((char *)agrf + (word << 2)) -= (1u << bit);
+        }
+        iep++;
+    }
+    iep--;
+    }
+    return iep;
+}
 
 struct SAPEP { float g; int islot; };
 
@@ -473,7 +516,7 @@ extern "C" void GrowPathzoneSlots(PZ_1C1D20 *pz)
     }
 }
 
-struct TGT { void *crv; void *plo; int pad8[2]; QW vec; };
+struct TGT_1C1EC0 { void *crv; void *plo; int pad8[2]; QW vec; };
 
 extern "C" char B_003DD020[];
 
@@ -481,7 +524,7 @@ extern "C" void FindCrvClosestPointAll(void *, int, char *, QW *, int, int, int)
 
 extern "C" QW PosLoWorld(void *);
 
-extern "C" QW func_001C1EC0(TGT *target, int arg1) {
+extern "C" QW func_001C1EC0(TGT_1C1EC0 *target, int arg1) {
     QW result;
     if (target->crv) {
         FindCrvClosestPointAll(target->crv, arg1, B_003DD020, &result, 0, 0, 0);

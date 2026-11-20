@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
 #include "so.h"
+#include "phys.h"
 #include "sw.h"
 struct UL { unsigned long v; } __attribute__((packed));
 extern "C" {
@@ -21,7 +22,7 @@ extern "C" void RemoveSoLoHierarchy(SO *pso)
     PHYS *pphys = pso->pphys;
     int hasXr = 0;
     if (pphys != 0) {
-        hasXr = *(int *)((char *)pphys + 0xDC);
+        hasXr = (int)pphys->plink;
     }
     if (hasXr != 0) {
         CancelSwCallbacks(&B_003DD490, 3, pso, RO_002A8270.v, 0);

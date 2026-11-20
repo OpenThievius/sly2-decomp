@@ -251,9 +251,11 @@ def retarget_rodata(address, object_path):
     resolved_rodata = bytes(resolved_rodata)
     references = {}  # offset in the object's rodata -> the address retail's code loads it from
     printable = lambda blob: len(blob) >= 2 and all(32 <= byte < 127 or byte in (9, 10, 13) for byte in blob)
+    table_words = {entry_offset for entry_offset, _, _ in table_entries}  # a relocated word is a jump table entry, never text (its low bytes can look like it)
     cstring = lambda blob, start: blob[start:blob.find(0, start)] if blob.find(0, start) >= 0 else None
     # trim_rodata cut the section at its last non-zero byte, so the NUL that ends the last literal is gone: the end of the section ends the string
     own_string = lambda start: rodata_data[start:rodata_data.find(0, start)] if rodata_data.find(0, start) >= 0 else rodata_data[start:]
+    is_text = lambda start: start not in table_words and printable(own_string(start))
     patched = bytearray(open(object_path, 'rb').read())
     for index, (offset, kind, symbol) in enumerate(entries):
         if kind != 5 or symbol['st_shndx'] != rodata_index:
@@ -268,14 +270,14 @@ def retarget_rodata(address, object_path):
             return retarget_failed(address, f'the load at text+{offset:#x} reaches rodata+{object_value:#x}, outside the object\'s {len(rodata_data):#x} bytes')
         if references.setdefault(object_value, retail_value) != retail_value:
             return retarget_failed(address, f'rodata+{object_value:#x} is loaded from both {references[object_value]:#x} and {retail_value:#x}')
-        if printable(own_string(object_value)) and own_string(object_value) != cstring(retail, retail_at):
+        if is_text(object_value) and own_string(object_value) != cstring(retail, retail_at):
             return retarget_failed(address, f'the literal at rodata+{object_value:#x} ({rodata_data[object_value:object_value + 16]!r}) is not the string retail has at {retail_value:#x}')
         for at in (offset, low[0]):
             patched[text_offset + at:text_offset + at + 2] = retail[base + at:base + at + 2]
     object_starts, retail_starts = sorted(references), sorted(references.values())
     proved = []
     for object_value, retail_value in references.items():
-        if printable(own_string(object_value)):
+        if is_text(object_value):
             text_length = len(own_string(object_value))
             retail_end_at = FILE_OFFSET_OF_TEXT + retail_value - TEXT_START + text_length
             proved.append((retail_value, text_length + (1 if retail[retail_end_at] == 0 else 0)))
@@ -283,6 +285,11 @@ def retarget_rodata(address, object_path):
         object_end = next((start for start in object_starts if start > object_value), len(resolved_rodata))
         retail_end = next((start for start in retail_starts if start > retail_value), None)
         length = min(object_end - object_value, retail_end - retail_value) if retail_end is not None else object_end - object_value
+        if object_value in table_words:  # a jump table is its relocated words: the alignment padding after it is not its own
+            entries = 0
+            while object_value + 4 * entries in table_words:
+                entries += 1
+            length = min(length, 4 * entries)
         retail_at = FILE_OFFSET_OF_TEXT + retail_value - TEXT_START
         if length < 4 or resolved_rodata[object_value:object_value + length] != retail[retail_at:retail_at + length]:
             return retarget_failed(address, f'the item at rodata+{object_value:#x} ({resolved_rodata[object_value:object_value + 8].hex()}) is not what retail has at {retail_value:#x} ({retail[retail_at:retail_at + 8].hex()}) over {length:#x} bytes')
