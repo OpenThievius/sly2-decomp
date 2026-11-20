@@ -1858,6 +1858,7 @@ address	name	size	file	whole_file	symbol
 0X14F030	func_0014F030	12	new_14d1d0/new_14d1d0_14d470.cpp	new_14d1d0/new_14d1d0_14d470.cpp	func_0014F030
 0X14F3C8	func_0014F3C8	96	new_14d1d0/new_14d1d0_14d470.cpp	new_14d1d0/new_14d1d0_14d470.cpp	func_0014F3C8
 0X14F428	SetCmMat	80	new_14d1d0/new_14d1d0_14d470.cpp	new_14d1d0/new_14d1d0_14d470.cpp	SetCmMat
+0X14F4E0	func_0014F4E0	192	new_14d1d0/new_14d1d0_14d470.cpp	new_14d1d0/new_14d1d0_14d470.cpp	func_0014F4E0
 0X14F5A0	SetCmFov	88	new_14d1d0/new_14d1d0_14d470.cpp	new_14d1d0/new_14d1d0_14d470.cpp	SetCmFov
 0X14F5F8	func_0014F5F8	24	new_14d1d0/new_14d1d0_14d470.cpp	new_14d1d0/new_14d1d0_14d470.cpp	func_0014F5F8
 0X14F610	SetCmNearClip	28	new_14d1d0/new_14d1d0_14d470.cpp	new_14d1d0/new_14d1d0_14d470.cpp	SetCmNearClip

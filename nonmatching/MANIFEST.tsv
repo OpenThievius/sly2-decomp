@@ -111,7 +111,6 @@ address	name	size	file	score
 0X14F110	ClipCmEye	344	cm_14e270/ClipCmEye.c	110
 0X14F268	ConvertCmScreenToWorld	160	cm_14e270/ConvertCmScreenToWorld.c	39
 0X14F478	bevy_camera_cm_14f478	104	cm_14e270/bevy_camera_cm_14f478.c	22
-0X14F4E0	func_0014F4E0	192	cm_14e270/fun_0014f4e0.cpp	30
 0X14F850	FInsideCmFrustrum	72	cm_14e270/FInsideCmFrustrum.c	17
 0X14F898	FInsideCmMrd	152	cm_14e270/FInsideCmMrd.c	20
 0X14FE58	PosCplookAnchor	112	tn-rip/PosCplookAnchor.c	28
@@ -437,7 +436,7 @@ address	name	size	file	score
 0X202378	ProbeReconTargetVisibility	456	sprbuf-stepguard/ProbeReconTargetVisibility.c	92
 0X202540	PickReconTarget	440	sprbuf-stepguard/PickReconTarget.c	98
 0X202D38	bevy_ui_binoc_recon_202d38	2096	sprbuf-stepguard/bevy_ui_binoc_recon_202d38.cpp	123
-0X203AF0	CloneStepHullGeom	456	new_203790/CloneStepHullGeom.cpp	33
+0X203AF0	CloneStepHullGeom	456	new_203790/CloneStepHullGeom.cpp	7
 0X203D00	func_00203D00	264	new_203790/fun_00203d00.c	54
 0X203E08	UpdateStepPhys__FP4STEP	408	step/UpdateStepPhys__FP4STEP.cpp	29
 0X2044B0	AdjustStepXpVelocity	432	new_204250/AdjustStepXpVelocity.c	105
@@ -545,7 +544,7 @@ address	name	size	file	score
 0X23A920	func_0023A920	168	sdk/fun_0023a920.cpp	42
 0X23A9D8	func_0023A9D8	104	sdk/fun_0023a9d8.cpp	24
 0X23AAE0	func_0023AAE0	16	sdk/fun_0023aae0.cpp	3
-0X23AAF0	func_0023AAF0	640	sdk/fun_0023aaf0.c	42
+0X23AAF0	func_0023AAF0	640	sdk/fun_0023aaf0.c	7
 0X23ADA8	func_0023ADA8	120	sdk/fun_0023ada8.cpp	11
 0X23AE70	func_0023AE70	312	sdk/fun_0023ae70.cpp	42
 0X23BEE8	__fixunsdfdi	240	sdk/__fixunsdfdi.cpp	21
@@ -567,7 +566,7 @@ address	name	size	file	score
 0X2423D8	sceCdDiskReady	536	sdk/sceCdDiskReady.c	64
 0X242840	sceCdRead	480	sdk/sceCdRead.c	44
 0X242F70	func_00242F70	280	sdk/fun_00242f70.cpp	42
-0X243088	scePadPortOpen	488	sdk/scePadPortOpen.cpp	31
+0X243088	scePadPortOpen	488	sdk/scePadPortOpen.cpp	25
 0X243CB0	sceMcInit	552	sdk/sceMcInit.cpp	110
 0X244110	func_00244110	176	sdk/fun_00244110.cpp	25
 0X247028	__ieee754_sqrt	776	sdk/__ieee754_sqrt.cpp	226

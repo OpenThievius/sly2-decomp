@@ -18,14 +18,12 @@ int scePadPortOpen(int port, int slot, PadReportBuffer *buffer) {
     if (((unsigned int)buffer & 0x3F) != 0) {
         if (D_002C830C != 0) {
             func_00236960("libpad: buffer addr is not 64 byte align. %08x\n", buffer);
-            return 0;
         }
         return 0;
     }
     if (B_004505D0[port].slots[slot].state == 1) {
         if (D_002C830C != 0) {
             func_00236960("libpad: pad port is already open [%d][%d]\n", port, slot);
-            return 0;
         }
         return 0;
     }

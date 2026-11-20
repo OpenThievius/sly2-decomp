@@ -1858,6 +1858,7 @@ us_address	name	other_address	pair	score	addresses
 0x14F030	func_0014F030	0X14F058	gap	0	ok
 0x14F3C8	func_0014F3C8	0X14F3F0	same	0	ok
 0x14F428	SetCmMat	0X14F450	same	0	ok
+0x14F4E0	func_0014F4E0	0X14F508	same	0	ok
 0x14F5A0	SetCmFov	0X14F5C8	same	0	ok
 0x14F5F8	func_0014F5F8	0X14F620	identical	0	ok
 0x14F610	SetCmNearClip	0X14F638	same	0	ok
