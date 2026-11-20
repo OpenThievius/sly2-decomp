@@ -242,7 +242,7 @@ struct ACSB_138BA0 { int pad0; HOST_138BA0 *host; MRSGTABLE_138BA0 *mrsg; OBJ_13
 
 extern "C" int ImrsgLookUp__FffiP4MRSGPf(float, float, int, MRSG_138BA0 *, float *);
 
-extern "C" void func_00138BA0(ACSB_138BA0 *self, float *outA, float *outB, int unused, float time, float scale) {
+extern "C" void func_00138BA0(ACSB_138BA0 *self, float *outA, float *outB, float time, float scale) {
     float values[3];
     float base;
     float sumA;
