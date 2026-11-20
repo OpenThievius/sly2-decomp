@@ -1,6 +1,6 @@
 struct ROUTE { char pad0[0x120]; int mode; char pad1[0x128 - 0x124]; int pathzone; };
 struct LINK { char pad[0x10]; int zone; };
-struct PHYS { char pad[0xDC]; LINK *plink; };
+#include "phys.h"
 struct GUARD { char pad[0xE8]; PHYS *pphys; };
 #include "goal.h"
 struct GOAL_17E458 : GOAL {

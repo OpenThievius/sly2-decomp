@@ -7,6 +7,7 @@
 #include "include_asm.h"
 #include "so.h"
 #include "sw.h"
+#include "phys.h"
 #include "ps2inline.h"
 #include "vu0inline.h"
 
@@ -551,7 +552,7 @@ int FTimeJtJumpToTarget(JMP_19A400 *pjmp, QW pos, QW vJump, QW posTarget, QW vTa
 {
     float roots[4];
     char *pjt = pjmp->pjt;
-    float gravityZ = *(float *)(*(char **)(pjt + 0xE8) + 0x88);
+    float gravityZ = ((SO *)pjt)->pphys->gravity[2];
     float jumpZ = LaneZInGeneralRegister(vJump);
     float targetVelocityZ = LaneZInGeneralRegister(vTarget);
     float posZ = LaneZInGeneralRegister(pos);
@@ -619,7 +620,7 @@ extern "C" QW GetJmpLaunchVelocity(JMP *pjmp, int state)
     float roots[4];
     position.q = PosLoWorld(pjmp->pjt);
     velocity.q = pjmp->pjt->GetVelocityVec();
-    float gravity = *(float *)((char *)pjmp->pjt->pphys + 0x88);
+    float gravity = pjmp->pjt->pphys->gravity[2];
     float candidate;
     switch (state) {
     case 2:

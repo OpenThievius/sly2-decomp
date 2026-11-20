@@ -51,7 +51,7 @@ struct SO : LO {
     u8 unknown_0xD0[0x10];
     /* 0xE0 */ s32 cgeom;              /* ProjectSoTransform, RemoveSoGeomFromOxa (elements of 0xB0 bytes) */
     /* 0xE4 */ struct GEOM *ageom;     /* the same functions, PpartFindAlo, func_001F7A68 (as PART) */
-    /* 0xE8 */ struct PHYS *pphys;     /* FIsSoLocked, ProjectSoTransform, TranslateSoToPos, UpdateSo and others */
+    /* 0xE8 */ struct PHYS *pphys;     /* include/phys.h; FIsSoLocked, ProjectSoTransform, TranslateSoToPos, UpdateSo and others */
     /* 0xEC */ struct OXA *poxa;       /* GetSoNoXpsAll, FFilterSensorSight, RecalcSoLocked and others; func_001F7410 and
                                        func_001F7950 read the same object (+0x6C) as PHYS */
     u8 unknown_0xF0[0x3C];

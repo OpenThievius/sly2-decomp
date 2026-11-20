@@ -2,7 +2,7 @@
 #include "sly2.h"
 struct CRef { int tagk; union { int n; float g; QW *pv; }; };
 struct CPair { int cref; int pad4; CRef ref; CPair *next; };
-struct PHYS { char pad[0x80]; QW dvGravity; };
+#include "phys.h"
 #include "so.h"
 struct CFrame;
 extern "C" {

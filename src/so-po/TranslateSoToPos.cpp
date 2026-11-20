@@ -2,7 +2,7 @@
 #include "xf.h"
 struct G_1F40A0 { char pad[0x3D58]; int counter; };
 extern G_1F40A0 B_003DD490;
-struct PHYS { char pad[0xDC]; int link; };
+#include "phys.h"
 #include "so.h"
 extern "C" {
 void InvertMatrix4Affine(MATRIX4 *, MATRIX4 *);
@@ -61,7 +61,7 @@ extern "C" void TranslateSoToPos(SO *pso, QW pos)
     func_001F3900(pso);
     void *pregion = 0;
     if (pso->pphys != 0)
-        pregion = (void *)pso->pphys->link;
+        pregion = (void *)pso->pphys->plink;
     if (pregion != 0)
         func_001F37C8(pso, PpathzoneFindPos(PosLoWorld(pso), 1));
 }

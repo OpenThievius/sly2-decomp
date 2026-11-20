@@ -1,7 +1,7 @@
 #include "sly2.h"
 struct GEOM { char pad[0x10]; int lo; int hi; };
 #include "xf.h"
-struct PHYS { char pad[0x60]; QW linear; QW angular; };
+#include "phys.h"
 #include "so.h"
 extern "C" {
 extern float g_2dded0[];
