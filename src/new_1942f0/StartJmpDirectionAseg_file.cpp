@@ -619,7 +619,7 @@ extern "C" QW GetJmpLaunchVelocity(JMP *pjmp, int state)
     float roots[4];
     position.q = PosLoWorld(pjmp->pjt);
     velocity.q = pjmp->pjt->GetVelocityVec();
-    float gravity = *(float *)(*(char **)((char *)pjmp->pjt + 0xE8) + 0x88);
+    float gravity = *(float *)((char *)pjmp->pjt->pphys + 0x88);
     float candidate;
     switch (state) {
     case 2:
