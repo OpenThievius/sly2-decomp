@@ -632,6 +632,8 @@ def retarget_cause(elf, text_data, start, entries, rodata_index, retail, signed,
     resolved = bytes(resolved)
     printable = lambda blob: len(blob) >= 2 and all(32 <= byte < 127 or byte in (9, 10, 13) for byte in blob)
     own_string = lambda at: data[at:data.find(0, at)] if data.find(0, at) >= 0 else data[at:]
+    table_words = {offset for offset, _, _ in table}  # a relocated word is a jump table entry, never text (its low bytes can look like it)
+    is_text = lambda at: at not in table_words and printable(own_string(at))
     references = {}
     for position, (offset, kind, symbol) in enumerate(entries):
         if kind != 5 or symbol['st_shndx'] != rodata_index:
@@ -649,7 +651,7 @@ def retarget_cause(elf, text_data, start, entries, rodata_index, retail, signed,
     for object_value, retail_value in references.items():
         retail_blob = retail_words(retail_value, 4 * ((len(data) + 3) // 4))
         retail_bytes = b''.join(item.to_bytes(4, 'little') for item in retail_blob)
-        if printable(own_string(object_value)):
+        if is_text(object_value):
             text_here = own_string(object_value)
             if retail_bytes[:len(text_here)] != text_here or retail_bytes[len(text_here):len(text_here) + 1] not in (b'\0',):
                 return f'rodata: the literal at rodata+{object_value:#x} is not the string retail has at {retail_value:#X}'
@@ -657,6 +659,11 @@ def retarget_cause(elf, text_data, start, entries, rodata_index, retail, signed,
         object_end = next((value for value in object_starts if value > object_value), len(resolved))
         retail_end = next((value for value in retail_starts if value > retail_value), None)
         length = min(object_end - object_value, retail_end - retail_value) if retail_end is not None else object_end - object_value
+        if object_value in table_words:  # a jump table is its relocated words: the alignment padding after it is not its own
+            entries = 0
+            while object_value + 4 * entries in table_words:
+                entries += 1
+            length = min(length, 4 * entries)
         if length < 4 or resolved[object_value:object_value + length] != retail_bytes[:length]:
             return f'rodata differs at {retail_value:#X} (rodata+{object_value:#x}, {length:#x} bytes)'
     return None

@@ -29,7 +29,7 @@ start	end	file
 0x128CB8	0x128F70	new_127e90/PpairClone_file.cpp
 0x128F70	0x1291A8	new_127e90/PprocClone_file.cpp
 0x12A0B0	0x12A3D8	splice-ref-splice-sidebag/SetTag_file.cpp
-0x12A3D8	0x12A980	splice-ref-splice-sidebag/StaticInitializeSidebagSlotheaps_file.c
+0x12A3D8	0x12A980	splice-ref-splice-sidebag/StaticInitializeSidebagSlotheaps_file.cpp
 0x12A980	0x12AE18	splice-ref-splice-sidebag/splice_ref_splice_sidebag_12a980.cpp
 0x12AE18	0x12B0E8	cat/StartupCatalog_file.c
 0x12B0E8	0x12B3B0	new_12ae28/new_12ae28_12b0e8.cpp

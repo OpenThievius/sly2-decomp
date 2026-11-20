@@ -224,7 +224,83 @@ INCLUDE_ASM(0X138660);
 
 INCLUDE_ASM(0X138970);
 
-INCLUDE_ASM(0X138BA0);
+class OBJ_138BA0 {
+public:
+    virtual void Slot1();
+    virtual void Evaluate(float *outA, float *outB, float time, float scale);
+};
+
+struct CHANNEL_138BA0 { float weight; struct HOST_138BA0 *host; };
+
+struct HOST_138BA0 { char pad0[0x74]; float duration; char pad78[0xC0 - 0x78]; int stride; int count; char *base; };
+
+struct MRSG_138BA0 { float start; float length; };
+
+struct MRSGTABLE_138BA0 { int offset; int count; MRSG_138BA0 *entries; };
+
+struct ACSB_138BA0 { int pad0; HOST_138BA0 *host; MRSGTABLE_138BA0 *mrsg; OBJ_138BA0 **objects; float rest; };
+
+extern "C" int ImrsgLookUp__FffiP4MRSGPf(float, float, int, MRSG_138BA0 *, float *);
+
+extern "C" void func_00138BA0(ACSB_138BA0 *self, float *outA, float *outB, int unused, float time, float scale) {
+    float values[3];
+    float base;
+    float sumA;
+    float sumB;
+    int index;
+    int found;
+    MRSG_138BA0 *entry;
+    HOST_138BA0 *host;
+    if (self->mrsg == 0) {
+        base = time / self->host->duration;
+    } else {
+        found = ImrsgLookUp__FffiP4MRSGPf(time, self->host->duration, self->mrsg->count, self->mrsg->entries, &values[0]);
+        entry = &self->mrsg->entries[found];
+        base = values[0] / entry->length;
+    }
+    host = self->host;
+    sumA = 0.0f;
+    sumB = 0.0f;
+    {
+        for (index = 0; index < host->count; index++) {
+            CHANNEL_138BA0 *channel = (CHANNEL_138BA0 *)(host->base + index * host->stride);
+            if (channel->weight != 0.0f) {
+                OBJ_138BA0 *object = self->objects[index];
+                if (object == 0) {
+                    values[2] = 0.0f;
+                    values[1] = self->rest;
+                } else {
+                    float arg1Value;
+                    float arg2Value;
+                    if (self->mrsg == 0) {
+                        float channelDuration = channel->host->duration;
+                        arg2Value = (scale * channelDuration) / host->duration;
+                        arg1Value = base * channelDuration;
+                    } else {
+                        MRSG_138BA0 *record = (MRSG_138BA0 *)((char *)channel + self->mrsg->offset) + found;
+                        float channelDuration = channel->host->duration;
+                        float second = record->length;
+                        arg1Value = record->start + base * second;
+                        arg2Value = (scale * second) / entry->length;
+                        if (channelDuration < arg1Value) {
+                            arg1Value -= channelDuration;
+                        }
+                    }
+                    object->Evaluate(&values[1], &values[2], arg1Value, arg2Value);
+                }
+                sumA += channel->weight * values[1];
+                sumB += channel->weight * values[2];
+            }
+            host = self->host;
+        }
+    }
+    if (outA != 0) {
+        *outA = sumA;
+    }
+    if (outB != 0) {
+        *outB = sumB;
+    }
+}
 
 extern "C" {
 s32 CreateSlotheapSwAlign(s32 *, s32, s32, s32); /* extern */

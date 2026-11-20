@@ -5,6 +5,7 @@
 #include "m2c_macros.h"
 #include "types.h"
 #include "include_asm.h"
+#include "cref.h"
 
 struct MENU;
 
@@ -184,7 +185,7 @@ extern "C" void func_001AD168(MENU *pmenu)
     }
 }
 
-struct CRef { int tagk; float g; };
+struct CRef_1AD250 { int tagk; float g; };
 
 extern "C" char B_002E6604[];
 
@@ -194,9 +195,9 @@ struct SAVE { char pad[0x7D50]; char *pslotCur; };
 
 struct ITEM { char pad[8]; int slot; char pad2[0x10]; unsigned flags; };
 
-extern "C" CRef *RefGetGameSaveValue(CRef *, void *, void *);
+extern "C" CRef_1AD250 *RefGetGameSaveValue(CRef_1AD250 *, void *, void *);
 
-extern "C" void CRef_Destruct(CRef *);
+extern "C" void CRef_Destruct(CRef_1AD250 *);
 
 extern "C" void ResetSaveKeepingOptions(void *, int);
 
@@ -210,7 +211,7 @@ extern "C" void func_001AD250(ITEM *item)
 {
     char *base = B_002E6604;
     char *pslot = base + item->slot * 0x5464;
-    CRef ref;
+    CRef_1AD250 ref;
     RefGetGameSaveValue(&ref, B_003E0FAC, pslot);
     float g = ref.g;
     CRef_Destruct(&ref);
@@ -332,7 +333,77 @@ extern "C" void func_001AD480(ITEM_1AD480 *item)
         item->flags |= 2;
 }
 
-INCLUDE_ASM(0X1AD538);
+struct SLOT_1AD538 { char pad[0x5464]; };
+
+struct SAVE_1AD538 {
+    char pad0[0x24]; SLOT_1AD538 aslot[3];
+    char pad2[0xFD50 - 0x24 - 3 * 0x5464];
+    SLOT_1AD538 *pslotCur;
+};
+
+struct ENTRY_1AD538 { char pad[0x14]; int slot; int pad18; };
+
+struct PAUSEMENU_1AD538 { char pad[0x24]; int count; };
+
+struct MENU_1AD538 { char pad[0x44]; int phase; };
+
+struct SW_1AD538 { char pad[0x3B1C]; void *psavepathDt; };
+
+extern "C" SW_1AD538 B_003DD490_1AD538;
+
+extern "C" MENU_1AD538 B_002E6550_1AD538;
+
+extern "C" SAVE_1AD538 B_002E65E0_1AD538;
+
+extern "C" PAUSEMENU_1AD538 B_003D9ED0_1AD538;
+
+extern "C" ENTRY_1AD538 B_003D9EDC_1AD538[];
+
+extern "C" void func_001ACC38_1AD538(MENU_1AD538 *, int);
+
+extern "C" CRef RefGetGameSaveValue_1AD538(void *, void *);
+
+extern "C" int func_001B0078_1AD538(PAUSEMENU_1AD538 *);
+
+static inline float SaveValue(int index)
+{
+    SLOT_1AD538 *slot = &B_002E65E0_1AD538.aslot[index];
+    return RefGetGameSaveValue_1AD538(B_003DD490_1AD538.psavepathDt, slot).m_tag.m_g;
+}
+
+extern "C" void func_001AD538(void)
+{
+    float values[3];
+    func_001ACC38_1AD538(&B_002E6550_1AD538, 1);
+    if (B_003D9ED0_1AD538.count > 0) {
+        ENTRY_1AD538 *entry = &B_003D9EDC_1AD538[B_003D9ED0_1AD538.count];
+        for (int index = 0; index < 3; index++) {
+            values[index] = SaveValue(index);
+        }
+        switch (func_001B0078_1AD538(&B_003D9ED0_1AD538)) {
+        case 30:
+            for (int index = 0; index < 3; index++) {
+                if (values[index] == 0.0f) {
+                    entry->slot = index;
+                    break;
+                }
+            }
+            break;
+        case 31:
+            for (int index = 0; index < 3; index++) {
+                if (values[index] != 0.0f) {
+                    entry->slot = index;
+                    break;
+                }
+            }
+            break;
+        case 25:
+            if (B_002E65E0_1AD538.pslotCur != 0)
+                entry->slot = B_002E65E0_1AD538.pslotCur - B_002E65E0_1AD538.aslot;
+            break;
+        }
+    }
+}
 
 struct ITEM_1AD740 { int unk0; int unk4; int islot; };
 

@@ -4,16 +4,21 @@ struct RGBA5551 { unsigned short r : 5, g : 5, b : 5, a : 1; };
 extern "C" int B_003E12C8;
 extern "C" void FilterColorRgba8_1ed278(RGBA *);
 
+static inline void SetRgba(RGBA *prgba, unsigned char r, unsigned char g, unsigned char b, unsigned char a)
+{
+    prgba->r = r;
+    prgba->g = g;
+    prgba->b = b;
+    prgba->a = a;
+}
+
 void FilterColorRgba5551_1ed1a8(RGBA5551 *pcolor)
 {
     RGBA rgba;
     RGBA copy;
     RGBA5551 out;
     if (B_003E12C8) {
-        rgba.r = pcolor->r << 3;
-        rgba.g = pcolor->g << 3;
-        rgba.b = pcolor->b << 3;
-        rgba.a = pcolor->a ? 0xFF : 0;
+        SetRgba(&rgba, pcolor->r << 3, pcolor->g << 3, pcolor->b << 3, pcolor->a ? 0xFF : 0);
         FilterColorRgba8_1ed278(&rgba);
         copy = rgba;
         out.r = copy.r >> 3;

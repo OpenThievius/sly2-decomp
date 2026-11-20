@@ -38,17 +38,15 @@ extern "C" void func_0012C768(KEYS_12C768 *keys, STATE_12C768 *state) {
         state->nextPtr = &state->nextTime;
         state->prevTime = 0;
     }
-    float *defaultPtr = keys->defaults;
     unsigned int step = 0;
     int offset = index * 8;
-    float **axisPtr = keys->axes;
     int previousOffset = offset - 8;
     float *outD = state->vecD;
     float *outC = state->vecC;
     float *outB = state->vecB;
     float *outA = state->vecA;
     do {
-        char *base = (char *)*axisPtr;
+        char *base = (char *)keys->axes[step];
         if (base != 0) {
             char *previous = base + previousOffset;
             char *current = base + offset;
@@ -57,18 +55,16 @@ extern "C" void func_0012C768(KEYS_12C768 *keys, STATE_12C768 *state) {
             *outC = *(float *)current;
             *outD = *(float *)(current + 4);
         } else {
-            *outA = *defaultPtr;
+            *outA = keys->defaults[step];
             *(int *)outB = 0;
-            *outC = *defaultPtr;
+            *outC = keys->defaults[step];
             *(int *)outD = 0;
         }
-        step++;
         outD++;
         outC++;
         outB++;
         outA++;
-        defaultPtr++;
-        axisPtr++;
+        step++;
     } while (step < 3U);
     int ok = 0;
     if (Near3(*(QW *)state->vecA, *(QW *)state->vecC)) {

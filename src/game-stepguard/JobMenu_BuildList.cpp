@@ -48,9 +48,9 @@ extern "C" void JobMenu_BuildList(JOBMENU *menu)
                 if (func_00163430(owner) > 0 && owner->ready != -1) {
                     ITEM *item = &menu->items[menu->count];
                     menu->count++;
-                    item->first = -1;
                     item->task = owner;
                     item->second = -1;
+                    item->first = -1;
                     if (menu->current == owner)
                         menu->selected = item - menu->items;
                 }
