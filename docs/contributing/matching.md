@@ -553,5 +553,6 @@ More fixes from 2026-11-20 (waves Z23 to Z27: 8 SDK-range functions and 1 game f
   `lw a2,0(sp)` and the `mtlo/madd/mflo` update (combine forms the madd while `base` is still a register). The slots follow declaration order.
   `for (i = 0; i < n; i++)` loops, not a do/while with a mid-body `index++`, gave retail's counter register (priority, `globalalloc.py`).
 - **`-fmove-all-movables` for a whole file** is listed by its start address in `config/us/move_movables.txt` (`AdvanceLaserBeams`).
+- **Hints for the walls** (untested levers, by class): docs/contributing/wall-hints.md.
 - **Walls found with the dump tools** (`sched1.py`, `globalalloc.py`): a load into an asm helper costs 1 in GCC 2.95's scheduler, so a short chain
   loses to a reload chain by 2 (`CloneStepHullGeom`, 7); allocation priority ties and last-block store priorities (`FreeSwPoxa`, `func_0023AAF0`).
