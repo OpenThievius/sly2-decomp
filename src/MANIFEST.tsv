@@ -4451,6 +4451,7 @@ address	name	size	file	whole_file	symbol
 0X201600	func_00201600	32	spliceobj/RefGetOption_file.cpp	spliceobj/RefGetOption_file.cpp	func_00201600
 0X2017A0	SaveSprBuf__FPve	500	sprbuf/SaveSprBuf_file.cpp	sprbuf/SaveSprBuf_file.cpp	SaveSprBuf__FPve
 0X201998	func_00201998	88	sprbuf/SaveSprBuf_file.cpp	sprbuf/SaveSprBuf_file.cpp	func_00201998
+0X2019F0	sprbuf__static_initialization_and_destruction_0	872	sprbuf/SaveSprBuf_file.cpp	sprbuf/SaveSprBuf_file.cpp	UncachedAddress
 0X201D58	func_00201D58	32	sprbuf/SaveSprBuf_file.cpp	sprbuf/SaveSprBuf_file.cpp	func_00201D58
 0X201D78	func_00201D78	80	sprbuf-stepguard/fun_00201d78.cpp		
 0X201DC8	func_00201DC8	192	sprbuf-stepguard/fun_00201dc8.cpp		
@@ -5366,6 +5367,7 @@ address	name	size	file	whole_file	symbol
 0X241DF0	func_00241DF0	152	sdk/fun_00241df0.cpp		
 0X241E88	sceCdSync	160	sdk/sceCdSync.cpp		
 0X241F28	func_00241F28	108	sdk/fun_00241f28.cpp		
+0X241F98	func_00241F98	344	sdk/fun_00241f98.cpp		
 0X2425F0	func_002425F0	544	sdk/fun_002425f0.cpp		
 0X242810	sceCdGetReadPos	48	sdk/sceCdGetReadPos.c		
 0X242A20	sceCdGetDiskType	152	sdk/sceCdGetDiskType.c		
@@ -5408,6 +5410,7 @@ address	name	size	file	whole_file	symbol
 0X244F18	floorf	228	sdk/floorf.cpp		
 0X245000	sinf	240	sdk/sinf.c		
 0X2450F0	tanf	136	sdk/tanf.c		
+0X245178	logf	328	sdk/logf.cpp		
 0X2452C0	pow	1072	sdk/pow.cpp		
 0X2456F0	acosf	252	sdk/acosf.cpp		
 0X2457F0	asinf	252	sdk/asinf.cpp		
@@ -5415,6 +5418,7 @@ address	name	size	file	whole_file	symbol
 0X245A18	fmodf	316	sdk/fmodf.c		
 0X245B58	PowF_245b58	1288	sdk/PowF_245b58.c		
 0X246060	sqrtf	276	sdk/sqrtf.cpp		
+0X246178	__ieee754_log10	392	sdk/__ieee754_log10.cpp		
 0X246300	__ieee754_pow	3368	sdk/__ieee754_pow.cpp		
 0X247330	__ieee754_acosf	1072	sdk/__ieee754_acosf.cpp		
 0X247760	__ieee754_asinf	924	sdk/__ieee754_asinf.cpp		
