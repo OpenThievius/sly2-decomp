@@ -345,7 +345,6 @@ address	name	size	file	score
 0X1CC5E8	func_001CC5E8	960	new_1c90d0/fun_001cc5e8.cpp	61
 0X1CCAC0	Carry_SetState	456	new_1c90d0/Carry_SetState.cpp	48
 0X1CCC88	func_001CCC88	1040	new_1c90d0/fun_001ccc88.c	226
-0X1CD5F0	FillScreenRect__FiiiiffffP4GIFS	400	render/FillScreenRect__FiiiiffffP4GIFS.cpp	29
 0X1CD780	bevy_camera_cm_screen_px_ps2	536	new_1cd780/bevy_camera_cm_screen_px_ps2.c	125
 0X1CE2E8	BounceRipgRips__FP4RIPG	800	rip_1cde70/BounceRipgRips__FP4RIPG.cpp	106
 0X1CEB08	FBounceRip__FP3RIPP2SOP6VECTORT2	1216	rip_1ce9c0/FBounceRip__FP3RIPP2SOP6VECTORT2.c	321

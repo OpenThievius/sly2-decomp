@@ -3574,6 +3574,7 @@ address	name	size	file	whole_file	symbol
 0X1CD308	func_001CD308	400	new_1c90d0/Carry_Attach_file.cpp	new_1c90d0/Carry_Attach_file.cpp	func_001CD308
 0X1CD498	StaticInitSlotheaps_1cd498	308	new_1c90d0/Carry_Attach_file.cpp	new_1c90d0/Carry_Attach_file.cpp	StaticInitSlotheaps_1cd498
 0X1CD5D0	func_001CD5D0	32	new_1c90d0/Carry_Attach_file.cpp	new_1c90d0/Carry_Attach_file.cpp	func_001CD5D0
+0X1CD5F0	FillScreenRect__FP4RGBAP4GIFSffff	400	game/OnGameLoad_file.cpp	game/OnGameLoad_file.cpp	FillScreenRectImpl
 0X1CD998	OnGameLoad__FP4GAME	68	game/OnGameLoad_file.cpp	game/OnGameLoad_file.cpp	OnGameLoad__FP4GAME
 0X1CD9E0	func_001CD9E0	160	game/OnGameLoad_file.cpp	game/OnGameLoad_file.cpp	func_001CD9E0
 0X1CDA80	func_001CDA80	244	game/OnGameLoad_file.cpp	game/OnGameLoad_file.cpp	func_001CDA80

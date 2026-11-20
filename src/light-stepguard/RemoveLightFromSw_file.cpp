@@ -61,7 +61,8 @@ extern int D_002BFC60[12];
 
 void RebuildLight(LIGHT *plight);
 
-// Copies cword words, four at a time.
+// Copies cword words, four at a time. The do { } while (0) is the statement-macro form: its loop note is a scheduling
+// barrier in GCC 2.95 that keeps the stores before the following increments, as in retail (same form as func_0023B728).
 #define COPY_WORDS(pdest, psrc, cword) \
     do { \
         for (int iword = 0; iword < (cword); iword += 4) { \

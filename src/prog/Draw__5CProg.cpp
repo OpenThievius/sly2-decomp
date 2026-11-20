@@ -6,7 +6,7 @@ extern "C" {
 void __4GIFS(GIFS *);
 void AllocStatic__4DMASiP2QW(GIFS *, int, QW *);
 void AddDmaCnt__4DMAS(GIFS *);
-void FillScreenRect__FiiiiffffP4GIFS(RGBA *, GIFS *, float, float, float, float);
+void FillScreenRect__FP4RGBAP4GIFSffff(RGBA *, GIFS *, float, float, float, float);
 float GTrunc__Ff(float);
 void AddPrimEnd__4GIFS(GIFS *);
 void AddDmaEnd__4DMAS(GIFS *);
@@ -23,14 +23,14 @@ void Draw__5CProg(CPROG *self) {
     int width = (int)((float)fullWidth * ((float)(self->total - self->remaining) / (float)self->total));
     {
         RGBA back = self->c54;
-        FillScreenRect__FiiiiffffP4GIFS(&back, &gifs, 10.0f, GTrunc__Ff(412.90909f) * 1.1f, (float)(width + 10), GTrunc__Ff(412.90909f) * 1.1f + 6.6000004f);
+        FillScreenRect__FP4RGBAP4GIFSffff(&back, &gifs, 10.0f, GTrunc__Ff(412.90909f) * 1.1f, (float)(width + 10), GTrunc__Ff(412.90909f) * 1.1f + 6.6000004f);
     }
     RGBA fill;
     if (self->mode <= 0) fill = self->c58;
     else if (self->mode == 1) fill = self->c5c;
     else fill = self->c60;
     RGBA copy = fill;
-    FillScreenRect__FiiiiffffP4GIFS(&copy, &gifs, (float)(width + 10), GTrunc__Ff(412.90909f) * 1.1f, (float)(fullWidth + 10), GTrunc__Ff(412.90909f) * 1.1f + 6.6000004f);
+    FillScreenRect__FP4RGBAP4GIFSffff(&copy, &gifs, (float)(width + 10), GTrunc__Ff(412.90909f) * 1.1f, (float)(fullWidth + 10), GTrunc__Ff(412.90909f) * 1.1f + 6.6000004f);
     AddPrimEnd__4GIFS(&gifs);
     AddDmaEnd__4DMAS(&gifs);
     EndDmaCnt__4DMAS(&gifs);
