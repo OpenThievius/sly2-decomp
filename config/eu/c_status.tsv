@@ -5295,6 +5295,7 @@ us_address	name	other_address	pair	score	addresses
 0x23C820	func_0023C820	0X23D1E0	gap	0	ok
 0x23C828	__udivdi3	0X23D1E8	same	0	ok
 0x23CDF8	__umoddi3	0X23D7B8	same	0	ok
+0x23D338	func_0023D338	0X23DCF8	identical	0	ok
 0x23D468	func_0023D468	0X23DE28	identical	0	ok
 0x23D748	__adddf3	0X23E108	same	0	ok
 0x23D7A0	__subdf3	0X23E160	same	0	ok
@@ -5342,9 +5343,11 @@ us_address	name	other_address	pair	score	addresses
 0x23FE78	func_0023FE78	0X240838	same	0	ok
 0x2401C8	func_002401C8	0X240B88	gap	0	ok
 0x240328	func_00240328	0X240CE8	gap	0	ok
+0x240460	sceGsResetGraph	0X240E20	same	0	ok
 0x2405F0	func_002405F0	0X240FB0	gap	0	ok
 0x240600	sceGsPutDispEnv	0X240FC0	same	0	ok
 0x2406C0	sceGsPutDrawEnv	0X241080	same	0	ok
+0x2407A8	sceGsSetDefDBuff	0X241168	same	0	ok
 0x240A40	sceGsSwapDBuff	0X241400	same	0	ok
 0x240AA0	sceGsPutIMR	0X241460	same	0	ok
 0x240AE0	sceGsSetHalfOffset	0X2414A0	identical	0	ok
@@ -5474,6 +5477,7 @@ us_address	name	other_address	pair	score	addresses
 0x24F8D0	func_0024F8D0	0X250318	same	0	ok
 0x24FA38	func_0024FA38	0X250480	same	0	ok
 0x24FA90	func_0024FA90	0X2504D8	same	0	ok
+0x24FAD0	func_0024FAD0	0X250520	identical	0	ok
 0x24FC58	func_0024FC58	0X2506A8	same	0	ok
 0x2505B0	func_002505B0	0X251000	same	0	ok
 0x250A38	func_00250A38	0X251488	same	0	ok

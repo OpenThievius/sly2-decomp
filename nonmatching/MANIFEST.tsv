@@ -550,7 +550,6 @@ address	name	size	file	score
 0X23AE70	func_0023AE70	312	sdk/fun_0023ae70.cpp	42
 0X23BEE8	__fixunsdfdi	240	sdk/__fixunsdfdi.cpp	21
 0X23C7C0	__muldi3	96	sdk/__muldi3.c	17
-0X23D338	func_0023D338	304	sdk/fun_0023d338.c	34
 0X23D508	func_0023D508	576	sdk/fun_0023d508.cpp	27
 0X23E198	func_0023E198	48	sdk/fun_0023e198.cpp	10
 0X23E788	old_find_exception_handler	216	sdk/old_find_exception_handler.cpp	29
@@ -560,8 +559,6 @@ address	name	size	file	score
 0X23F850	func_0023F850	232	sdk/fun_0023f850.c	23
 0X23FA40	func_0023FA40	920	sdk/fun_0023fa40.cpp	81
 0X240050	func_00240050	376	sdk/fun_00240050.c	92
-0X240460	sceGsResetGraph	400	sdk/sceGsResetGraph.c	6
-0X2407A8	sceGsSetDefDBuff	664	sdk/sceGsSetDefDBuff.c	70
 0X240C38	sceGsSetDefDispEnv	888	sdk/sceGsSetDefDispEnv.cpp	126
 0X2418C8	func_002418C8	168	sdk/fun_002418c8.cpp	77
 0X241B18	func_00241B18	160	sdk/fun_00241b18.c	6
@@ -586,7 +583,6 @@ address	name	size	file	score
 0X24C4B0	func_0024C4B0	448	sdk/fun_0024c4b0.cpp	109
 0X24C670	func_0024C670	1240	sdk/fun_0024c670.cpp	12
 0X24F970	func_0024F970	200	sdk/fun_0024f970.cpp	13
-0X24FAD0	func_0024FAD0	392	sdk/fun_0024fad0.cpp	3
 0X250360	func_00250360	592	sdk/fun_00250360.cpp	139
 0X2515F0	func_002515F0	416	sdk/fun_002515f0.c	95
 0X251CE8	func_00251CE8	376	sdk/fun_00251ce8.cpp	46
