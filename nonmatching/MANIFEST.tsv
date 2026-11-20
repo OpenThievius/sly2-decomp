@@ -576,7 +576,6 @@ address	name	size	file	score
 0X24B660	func_0024B660	16	sdk/fun_0024b660.cpp	3
 0X24B670	func_0024B670	120	sdk/fun_0024b670.cpp	31
 0X24B6E8	func_0024B6E8	120	sdk/fun_0024b6e8.cpp	27
-0X24B9F0	func_0024B9F0	656	sdk/fun_0024b9f0.cpp	74
 0X24BC80	func_0024BC80	704	sdk/fun_0024bc80.cpp	99
 0X24C4B0	func_0024C4B0	448	sdk/fun_0024c4b0.cpp	109
 0X24C670	func_0024C670	1240	sdk/fun_0024c670.cpp	12

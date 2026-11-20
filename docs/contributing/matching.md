@@ -548,6 +548,10 @@ More fixes from 2026-11-20 (waves Z23 to Z27: 8 SDK-range functions and 1 game f
 - **A loop in a statement macro** (`#define RUN_LIST(list) do { ... } while (0)`, the form GCC's own constructor-list body has) is a real
   loop level in GCC 2.95: flow weights every reference by loop depth, so the allocator ranks the pointer above the index and `$s0`/`$s1` come out as
   retail's (`func_0023B728`, 10 to 0; `globalalloc.py` showed priorities 4.09 against 5.5). Allowed only where the original plausibly had the macro.
+- **Stack slots under register pressure can be spills, not a struct.** `func_0024B9F0` (74 to 0) had three slots at `0`, `4`, `8($sp)` that looked like
+  a local state struct; plain locals spill there when all nine callee-saved registers are taken, and reload then gives retail's `sw a0,0(sp)` /
+  `lw a2,0(sp)` and the `mtlo/madd/mflo` update (combine forms the madd while `base` is still a register). The slots follow declaration order.
+  `for (i = 0; i < n; i++)` loops, not a do/while with a mid-body `index++`, gave retail's counter register (priority, `globalalloc.py`).
 - **`-fmove-all-movables` for a whole file** is listed by its start address in `config/us/move_movables.txt` (`AdvanceLaserBeams`).
 - **Walls found with the dump tools** (`sched1.py`, `globalalloc.py`): a load into an asm helper costs 1 in GCC 2.95's scheduler, so a short chain
   loses to a reload chain by 2 (`CloneStepHullGeom`, 7); allocation priority ties and last-block store priorities (`FreeSwPoxa`, `func_0023AAF0`).
