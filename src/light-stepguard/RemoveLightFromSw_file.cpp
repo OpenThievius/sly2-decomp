@@ -49,7 +49,59 @@ INCLUDE_ASM(0X1A4258);
 
 INCLUDE_ASM(0X1A4478);
 
-INCLUDE_ASM(0X1A4AD8);
+struct LIGHT { u8 unknown_0x0[0x120]; int block[12]; };
+
+struct PACKETSTATE { u8 unknown_0x0[0xC]; u32 *pwrite; };
+
+struct LIGHTLIST { u8 unknown_0x0[0x14]; int cwordBlocks; u32 *pstart; };
+
+extern PACKETSTATE g_2dea28;
+
+extern int D_002BFC60[12];
+
+void RebuildLight(LIGHT *plight);
+
+// Copies cword words, four at a time. The do { } while (0) is the statement-macro form: its loop note is a scheduling
+// barrier in GCC 2.95 that keeps the stores before the following increments, as in retail (same form as func_0023B728).
+#define COPY_WORDS(pdest, psrc, cword) \
+    do { \
+        for (int iword = 0; iword < (cword); iword += 4) { \
+            int word0 = (psrc)[0]; \
+            int word1 = (psrc)[1]; \
+            int word2 = (psrc)[2]; \
+            int word3 = (psrc)[3]; \
+            (pdest)[0] = word0; \
+            (pdest)[1] = word1; \
+            (pdest)[2] = word2; \
+            (pdest)[3] = word3; \
+            (psrc) += 4; \
+            (pdest) += 4; \
+        } \
+    } while (0)
+
+static inline void AppendBlock(PACKETSTATE *pps, int icommand, const int *psource)
+{
+    *pps->pwrite = 0x6C03C000 | icommand;
+    pps->pwrite = pps->pwrite + 1;
+    u32 *pdest = pps->pwrite;
+    const int *psrc = psource;
+    COPY_WORDS(pdest, psrc, 12);
+    pps->pwrite += 12;
+}
+
+void func_001A4AD8(void *unused, int clight, LIGHT **pplight, LIGHTLIST *plist)
+{
+    int ilight = 0;
+    plist->pstart = g_2dea28.pwrite;
+    for (; ilight < clight; ilight++) {
+        LIGHT *plight = pplight[ilight];
+        RebuildLight(plight);
+        AppendBlock(&g_2dea28, ilight * 3 + 0x15, plight->block);
+    }
+    for (; ilight < 4; ilight++)
+        AppendBlock(&g_2dea28, ilight * 3 + 0x15, D_002BFC60);
+    plist->cwordBlocks = ((char *)g_2dea28.pwrite - (char *)plist->pstart) >> 4;
+}
 
 extern "C" {
 s32 CreateSlotheapSwAlign(s32 *, s32, s32, s32); /* extern */

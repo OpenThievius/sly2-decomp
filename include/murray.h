@@ -48,7 +48,9 @@ struct MURRAY : JT {
     /* 0x17F4 */ s32 field_0x17F4; /* InitMurray sets -1 */
     u8 unknown_0x17F8[0x18];
     /* 0x1810 */ s32 field_0x1810; /* InitMurray sets -1 */
-    u8 unknown_0x1814[0x1C];
+    u8 unknown_0x1814[8];
+    /* 0x181C */ s32 field_0x181C; /* UpdateMurrayAttack: attack latched flag */
+    u8 unknown_0x1820[0x10];
     /* 0x1830 */ QW field_0x1830; /* PredictMurrayLead (96) */
     /* 0x1840 */ s32 field_0x1840; /* InitMurray sets -1 */
     u8 unknown_0x1844[0x214];
@@ -88,6 +90,7 @@ SLY2_OFFSET_CHECK(MURRAY, pikLimbA, 0x1610);
 SLY2_OFFSET_CHECK(MURRAY, pikLimbB, 0x1614);
 SLY2_OFFSET_CHECK(MURRAY, field_0x17F4, 0x17F4);
 SLY2_OFFSET_CHECK(MURRAY, field_0x1810, 0x1810);
+SLY2_OFFSET_CHECK(MURRAY, field_0x181C, 0x181C);
 SLY2_OFFSET_CHECK(MURRAY, field_0x1830, 0x1830);
 SLY2_OFFSET_CHECK(MURRAY, field_0x1840, 0x1840);
 SLY2_OFFSET_CHECK(MURRAY, apasegState, 0x1A58);

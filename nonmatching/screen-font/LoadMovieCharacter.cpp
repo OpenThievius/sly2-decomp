@@ -66,7 +66,7 @@ static inline void Store2x3(float *pf, M3 mat)
     pf[4] = mat.mat[2][0];
     pf[5] = mat.mat[2][1];
 }
-void LoadMovieCharacter(BLOT *pblot, Bis *pbis, void *owner, int cchar, char *achar)
+void LoadMovieCharacter(BLOT *const pblot, Bis *pbis, void *owner, int cchar, char *achar)
 {
     CStackFrame frame;
     M3 mat;
@@ -83,7 +83,7 @@ void LoadMovieCharacter(BLOT *pblot, Bis *pbis, void *owner, int cchar, char *ac
     case 4:
         pchar->u.i[0] = pbis->U16Read();
         break;
-    case 8: {
+    case 8:
         D_002C40A4 = 1;
         LoadMovieDictionary(pblot, pbis, owner, &pchar->u.i[0], &pchar->u.i[1]);
         pchar->u.i[4] = pbis->U32Read();
@@ -92,11 +92,11 @@ void LoadMovieCharacter(BLOT *pblot, Bis *pbis, void *owner, int cchar, char *ac
             ((unsigned *)pchar->u.i[5])[icode] = pbis->U32Read();
         pchar->u.i[2] = pbis->U32Read();
         pchar->u.i[3] = (int)PvAllocSlotheapClearImpl__FP8SLOTHEAP(pblot->heap, pchar->u.i[2] << 2, 0x13);
-        for (int iadvance = 0; iadvance < pchar->u.i[2]; iadvance++)
-            ((float *)pchar->u.i[3])[iadvance] = pbis->F32Read();
+        int i;
+        for (i = 0; i < pchar->u.i[2]; i++)
+            ((float *)pchar->u.i[3])[i] = pbis->F32Read();
         D_002C40A4 = 0;
         break;
-    }
     case 3: {
         pchar->u.i[0] = pbis->U32Read();
         pchar->u.i[3] = pbis->U32Read();
@@ -245,8 +245,8 @@ void LoadMovieCharacter(BLOT *pblot, Bis *pbis, void *owner, int cchar, char *ac
         AllocStack__4DMASi(&vifs, pchar->u.shape.cqw << 1);
         AddDmaCnt__4DMAS(&vifs);
         AddVifStrow__4VIFSP2QW(&vifs, g_2a2e10);
-        for (int ibatch = 0; ibatch < pchar->u.shape.cbatch; ibatch++) {
-            BATCH *pbatch = abatch + ibatch;
+        for (i = 0; i < pchar->u.shape.cbatch; i++) {
+            BATCH *pbatch = abatch + i;
             int acount[2];
             acount[0] = pbatch->cprim;
             AddVifUnpack__4VIFS3UPKiPvi(&vifs, 4, 1, acount, 7);

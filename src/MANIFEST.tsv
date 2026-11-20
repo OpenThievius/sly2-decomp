@@ -1293,6 +1293,7 @@ address	name	size	file	whole_file	symbol
 0X12DD28	func_0012DD28	132	new_12d508/fun_0012dd28.cpp		
 0X12DDB0	func_0012DDB0	164	new_12d508/fun_0012ddb0.cpp		
 0X12DE58	func_0012DE58	148	new_12d508/fun_0012de58.cpp		
+0X12DEF0	func_0012DEF0	236	new_12d508/fun_0012def0.cpp		
 0X12DFE0	func_0012DFE0	48	new_12d508/fun_0012dfe0.cpp		
 0X12E010	func_0012E010	80	new_12d508/fun_0012e010.cpp		
 0X12E060	GetActvalPositionGoal	140	alo/GetActvalPositionGoal.cpp		
@@ -1355,6 +1356,7 @@ address	name	size	file	whole_file	symbol
 0X130918	UpdateAsega	508	aseg-asega/UpdateAsega.cpp		
 0X130B18	RetractAsega	532	aseg-asega/RetractAsega.cpp		
 0X130D30	SeekAsega	384	aseg-asega/SeekAsega.cpp		
+0X130EB0	UpdateAsegaIeaCur__FP5ASEGA	212	asega/UpdateAsegaIeaCur__FP5ASEGA.cpp		
 0X130F88	HandleAsegaEvents	372	asega/HandleAsegaEvents.cpp		
 0X131100	HandleAsegaEventsFF	368	asega/HandleAsegaEventsFF.cpp		
 0X131270	PloRootOrAseg	28	asega/PloRootOrAseg_file.cpp	asega/PloRootOrAseg_file.cpp	PloRootOrAseg
@@ -2922,6 +2924,7 @@ address	name	size	file	whole_file	symbol
 0X1A3B38	func_001A3B38	72	light-stepguard/fun_001a3b38.cpp		
 0X1A3E88	RemoveLightFromSw	92	light-stepguard/RemoveLightFromSw_file.cpp	light-stepguard/RemoveLightFromSw_file.cpp	RemoveLightFromSw
 0X1A3EE8	func_001A3EE8	140	light-stepguard/RemoveLightFromSw_file.cpp	light-stepguard/RemoveLightFromSw_file.cpp	func_001A3EE8
+0X1A4AD8	func_001A4AD8	468	light-stepguard/RemoveLightFromSw_file.cpp	light-stepguard/RemoveLightFromSw_file.cpp	func_001A4AD8
 0X1A4CB0	light__static_initialization_and_destruction_0	308	light-stepguard/RemoveLightFromSw_file.cpp	light-stepguard/RemoveLightFromSw_file.cpp	light__static_initialization_and_destruction_0
 0X1A4DE8	func_001A4DE8	32	light-stepguard/RemoveLightFromSw_file.cpp	light-stepguard/RemoveLightFromSw_file.cpp	func_001A4DE8
 0X1A4E08	StartBootQueue	92	light-stepguard/StartBootQueue.cpp		
@@ -3254,6 +3257,7 @@ address	name	size	file	whole_file	symbol
 0X1B8508	StartMurrayAttackA	196	mpeg-memcard/StartMurrayAttackA.cpp		
 0X1B85D0	StartMurrayAttackB	220	mpeg-memcard/StartMurrayAttackB.cpp		
 0X1B8938	EndMurrayAttack	80	mpeg-memcard/EndMurrayAttack.cpp		
+0X1B8988	UpdateMurrayAttack	484	mpeg-memcard/UpdateMurrayAttack.cpp		
 0X1B8EC0	func_001B8EC0	500	mpeg-memcard/fun_001b8ec0.cpp		
 0X1B9130	AdjustMurrayNewXp	456	mpeg-memcard/AdjustMurrayNewXp.cpp		
 0X1B92F8	UpdateMurrayLift	240	mpeg-memcard/UpdateMurrayLift.cpp		
@@ -3570,6 +3574,7 @@ address	name	size	file	whole_file	symbol
 0X1CD308	func_001CD308	400	new_1c90d0/Carry_Attach_file.cpp	new_1c90d0/Carry_Attach_file.cpp	func_001CD308
 0X1CD498	StaticInitSlotheaps_1cd498	308	new_1c90d0/Carry_Attach_file.cpp	new_1c90d0/Carry_Attach_file.cpp	StaticInitSlotheaps_1cd498
 0X1CD5D0	func_001CD5D0	32	new_1c90d0/Carry_Attach_file.cpp	new_1c90d0/Carry_Attach_file.cpp	func_001CD5D0
+0X1CD5F0	FillScreenRect__FP4RGBAP4GIFSffff	400	game/OnGameLoad_file.cpp	game/OnGameLoad_file.cpp	FillScreenRectImpl
 0X1CD998	OnGameLoad__FP4GAME	68	game/OnGameLoad_file.cpp	game/OnGameLoad_file.cpp	OnGameLoad__FP4GAME
 0X1CD9E0	func_001CD9E0	160	game/OnGameLoad_file.cpp	game/OnGameLoad_file.cpp	func_001CD9E0
 0X1CDA80	func_001CDA80	244	game/OnGameLoad_file.cpp	game/OnGameLoad_file.cpp	func_001CDA80

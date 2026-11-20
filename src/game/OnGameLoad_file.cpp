@@ -7,7 +7,27 @@
 #include "m2c_macros.h"
 #include "include_asm.h"
 
-INCLUDE_ASM(0X1CD5F0);
+struct GIFS {
+    void AddPrimPack(int cqw, int nloop, unsigned long tag);
+    void PackAD(long addr, long data);
+    void PackRGBA(unsigned int rgba);
+    void PackXYZF(int x, int y, int z, int f);
+};
+
+struct RGBA { unsigned char r, g, b, a; };
+
+void FillScreenRectImpl(RGBA *prgba, GIFS *pgifs, float x0, float y0, float x1, float y1)
+{
+    // Retail compares against 0xFE in a register (sltu), so the original held the threshold in a variable.
+    unsigned int alphaOpaque = 0xFE;
+    pgifs->AddPrimPack(prgba->a <= alphaOpaque ? 0x46 : 6, 5, 0x441EE);
+    prgba->a = (prgba->a + 1) >> 1;
+    pgifs->PackAD(0x47, 0x31001);
+    pgifs->PackAD(0x42, 0x44);
+    pgifs->PackRGBA(*(unsigned int *)prgba);
+    pgifs->PackXYZF((int)((x0 * 0.8f + 1792.0f) * 16.0f), (int)((y0 * 0.45454547f + 1936.0f) * 16.0f), 0, 0);
+    pgifs->PackXYZF((int)((x1 * 0.8f + 1792.0f) * 16.0f), (int)((y1 * 0.45454547f + 1936.0f) * 16.0f), 0, 0);
+}
 
 INCLUDE_ASM(0X1CD780);
 
@@ -19,7 +39,6 @@ extern "C" Slot_1CD998 *OnGameLoad__FP4GAME(void) {
     memset(B_003D4A50->data, 0, 8);
     return B_003D4A50++;
 }
-
 
 extern "C" int CploFindSwObjectsByClass(SW *, int, int, void *, int, SO **);
 

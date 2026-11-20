@@ -33,7 +33,7 @@ void CTextBox_SetSize(CTextBox *, float, float);
 void CTextBox_SetTextColor(CTextBox *, RGBA *);
 void CTextBox_SetHorizontalJust(CTextBox *, int);
 void CTextBox_SetVerticalJust(CTextBox *, int);
-void FillScreenRect__FiiiiffffP4GIFS(RGBA, GIFS *, float, float, float, float);
+void FillScreenRect__FP4RGBAP4GIFSffff(RGBA, GIFS *, float, float, float, float);
 void Draw__9CRichTextP8CTextBoxT1P4GIFS(CRichText *, CTextBox *, CTextBox *, GIFS *);
 extern CFont *B_002DE760;
 extern char B_003E1C20[];
@@ -105,7 +105,7 @@ void DrawMpegFrame(CMpeg *self)
         ptb->jh = 1;
         {
             RGBA rgbaBack(0x80000000);
-            FillScreenRect__FiiiiffffP4GIFS(rgbaBack, &gifs, textBox.x, textBox.y, textBox.x + textBox.dx, textBox.y + textBox.dy);
+            FillScreenRect__FP4RGBAP4GIFSffff(rgbaBack, &gifs, textBox.x, textBox.y, textBox.x + textBox.dx, textBox.y + textBox.dy);
         }
         Draw__9CRichTextP8CTextBoxT1P4GIFS(&richText, ptb, 0, &gifs);
         PopScaling__5CFont(B_002DE760);
