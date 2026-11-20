@@ -5289,6 +5289,7 @@ address	name	size	file	whole_file	symbol
 0X23B238	func_0023B238	56	unsorted/fun_0023b238.cpp		
 0X23B290	func_0023B290	196	sdk/fun_0023b290.cpp		
 0X23B368	func_0023B368	64	sdk/fun_0023b368.cpp		
+0X23B728	func_0023B728	176	sdk/fun_0023b728.c		
 0X23B7D8	__main__Fv	32	sdk/__main__Fv.c		
 0X23B7F8	__divdi3	1772	sdk/__divdi3.c		
 0X23BFE0	__floatdidf	152	sdk/__floatdidf.cpp		

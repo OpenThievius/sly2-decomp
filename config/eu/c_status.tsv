@@ -5289,6 +5289,7 @@ us_address	name	other_address	pair	score	addresses
 0x23B238	func_0023B238	0X23BBF8	identical	0	ok
 0x23B290	func_0023B290	0X23BC50	same	0	ok
 0x23B368	func_0023B368	0X23BD28	same	0	ok
+0x23B728	func_0023B728	0X23C0E8	same	0	ok
 0x23B7D8	__main__Fv	0X23C198	same	0	ok
 0x23B7F8	__divdi3	0X23C1B8	same	0	ok
 0x23BFE0	__floatdidf	0X23C9A0	same	0	ok

@@ -43,7 +43,6 @@ extern char func_0023B028[];
 
 void func_0023AAF0(void)
 {
-    SifEntry *entry;
     int index;
     int registerValue;
     int value;
@@ -61,16 +60,13 @@ void func_0023AAF0(void)
     B_0044EDD8.field14 = 0;
     B_0044EDD8.field18 = 0;
     B_0044EDD8.list = B_0044EF80;
-    entry = B_0044EE00;
-    do {
-        entry->function = 0;
-        entry->argument = 0;
-        entry++;
-    } while ((int)entry < (int)(B_0044EE00 + 32));
-    for (index = 0x1F; index >= 0; index--) {
+    for (index = 0; index < 32; index++) {
+        B_0044EE00[index].function = 0;
+        B_0044EE00[index].argument = 0;
+    }
+    for (index = 0; index < 32; index++) {
         B_0044EF80[index] = 0;
     }
-    index = 0x20;
     B_0044EE00[0].function = func_0023AAB8;
     B_0044EE00[1].function = func_0023AA98;
     B_0044EE00[0].argument = &B_0044EDD8;
@@ -78,7 +74,7 @@ void func_0023AAF0(void)
     func_002394A0();
     FlushCache(0);
     if (*(volatile u32 *)0x1000E010 & 0x20)
-        *(volatile u32 *)0x1000E010 = index;
+        *(volatile u32 *)0x1000E010 = 0x20;
     if (!(*(volatile u32 *)0x1000C000 & 0x100))
         sceSifSetDChain();
     B_0044EDD4 = AddDmacHandler(5, func_0023B028, 0);

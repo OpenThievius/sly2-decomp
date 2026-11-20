@@ -734,7 +734,7 @@ address	name	size	kind
 0X23B280	RFU116_SetSyscall_4	16	system
 0X23B358	RFU086_WaitEvnetFlag	16	system
 0X23B3A8	func_0023B3A8	536	system
-0X23B5C0	func_0023B5C0	536	system
+0X23B5C0	func_0023B5C0	360	system
 0X23BFD8	func_0023BFD8	8	remnant
 0X23E198	func_0023E198	48	remnant
 0X2401D8	func_002401D8	336	mmi
