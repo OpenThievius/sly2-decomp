@@ -533,3 +533,25 @@ about ten compiles each, `EXACT`/`NEAR`/`SKIP` reports, only the lead lands; 67 
   the Sonnet rounds did; it also refused to copy sources with pins or empty `asm` and rewrote or skipped them. Stop after two or three wordings when the only difference is
   store order, a float constant's load position or which of `$v0`/`$v1` holds a vtable pointer.
 
+More fixes from 2026-11-20 (waves Z23 to Z27: 8 SDK-range functions and 1 game function to 0):
+
+- **An SDK-range m2c draft is a rewrite, not a permutation.** `s64` pseudo-types, raw offsets and double-ABI drafts went to 0 in 2 to 6 runs as plain
+  C modelled on the matched `src/sdk/` siblings (`__muldf3`, `pow`, `sceGsPutIMR`); the same drafts had 60 to 100 earlier runs of reordering.
+  Sly 1's `PackDouble` (`work/sly1-decomp/src/lib/soft_float.c`) gave `pack_d` with one change in its denormal branch.
+- **Declare the callee's real return type.** `s32 GsPutIMR(s32)` in place of `void` removed a `$v0`/`$v1` swap (`sceGsResetGraph`).
+- **Store order flips with the source order.** When the compiler writes two fields in the reverse of the source, swap the two assignments
+  (`handlerId = 0; handlerCookie = 0;` gave retail's 0xC then 0x8).
+- **A 64-bit test through a `u64` union member** (`(word & 0xFFFF0000FFFFUL) == 0x100000001UL`) and bitfield structs for GS registers gave
+  retail's registers where field-by-field compares never merged (`sceGsSetDefDBuff`).
+- **Move an offset inside the inline helper** when `sw` waits on an ALU op in the join block: the compiler then splits it into both branches
+  and the store sits first (`func_0024FAD0`, found with a sched1 dump).
+- **A loop in a statement macro** (`#define RUN_LIST(list) do { ... } while (0)`, the form GCC's own constructor-list body has) is a real
+  loop level in GCC 2.95: flow weights every reference by loop depth, so the allocator ranks the pointer above the index and `$s0`/`$s1` come out as
+  retail's (`func_0023B728`, 10 to 0; `globalalloc.py` showed priorities 4.09 against 5.5). Allowed only where the original plausibly had the macro.
+- **Stack slots under register pressure can be spills, not a struct.** `func_0024B9F0` (74 to 0) had three slots at `0`, `4`, `8($sp)` that looked like
+  a local state struct; plain locals spill there when all nine callee-saved registers are taken, and reload then gives retail's `sw a0,0(sp)` /
+  `lw a2,0(sp)` and the `mtlo/madd/mflo` update (combine forms the madd while `base` is still a register). The slots follow declaration order.
+  `for (i = 0; i < n; i++)` loops, not a do/while with a mid-body `index++`, gave retail's counter register (priority, `globalalloc.py`).
+- **`-fmove-all-movables` for a whole file** is listed by its start address in `config/us/move_movables.txt` (`AdvanceLaserBeams`).
+- **Walls found with the dump tools** (`sched1.py`, `globalalloc.py`): a load into an asm helper costs 1 in GCC 2.95's scheduler, so a short chain
+  loses to a reload chain by 2 (`CloneStepHullGeom`, 7); allocation priority ties and last-block store priorities (`FreeSwPoxa`, `func_0023AAF0`).

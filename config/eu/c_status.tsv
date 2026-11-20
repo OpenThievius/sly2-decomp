@@ -1858,6 +1858,7 @@ us_address	name	other_address	pair	score	addresses
 0x14F030	func_0014F030	0X14F058	gap	0	ok
 0x14F3C8	func_0014F3C8	0X14F3F0	same	0	ok
 0x14F428	SetCmMat	0X14F450	same	0	ok
+0x14F4E0	func_0014F4E0	0X14F508	same	0	ok
 0x14F5A0	SetCmFov	0X14F5C8	same	0	ok
 0x14F5F8	func_0014F5F8	0X14F620	identical	0	ok
 0x14F610	SetCmNearClip	0X14F638	same	0	ok
@@ -3817,6 +3818,7 @@ us_address	name	other_address	pair	score	addresses
 0x1DEEA8	NotifyLaserXpEnded	0X1DF668	gap	0	ok
 0x1DF260	ClipLaserBeams	0X1DFA20	same	0	ok
 0x1DF3A0	UpdateLaser	0X1DFB60	same	0	ok
+0x1DF3D0	AdvanceLaserBeams	0X1DFB90	same	0	ok
 0x1DF980	StaticInitSlotheaps_1df980	0X1E0140	same	0	ok
 0x1DFAB8	StaticInitSlotheaps_1df980_thunk	0X1E0278	same	0	ok
 0x1DFAD8	InitJsg	0X1E0298	same	0	ok
@@ -4451,6 +4453,7 @@ us_address	name	other_address	pair	score	addresses
 0x201600	func_00201600	0X201DC0	same	0	ok
 0x2017A0	SaveSprBuf__FPve	0X201F60	same	0	ok
 0x201998	func_00201998	0X202158	same	0	ok
+0x2019F0	sprbuf__static_initialization_and_destruction_0	0X2021B0	same	0	ok
 0x201D58	func_00201D58	0X202518	same	0	ok
 0x201D78	func_00201D78	0X202538	same	2	ok
 0x201DC8	func_00201DC8	0X202588	same	0	ok
@@ -5286,6 +5289,7 @@ us_address	name	other_address	pair	score	addresses
 0x23B238	func_0023B238	0X23BBF8	identical	0	ok
 0x23B290	func_0023B290	0X23BC50	same	0	ok
 0x23B368	func_0023B368	0X23BD28	same	0	ok
+0x23B728	func_0023B728	0X23C0E8	same	0	ok
 0x23B7D8	__main__Fv	0X23C198	same	0	ok
 0x23B7F8	__divdi3	0X23C1B8	same	0	ok
 0x23BFE0	__floatdidf	0X23C9A0	same	0	ok
@@ -5294,10 +5298,12 @@ us_address	name	other_address	pair	score	addresses
 0x23C820	func_0023C820	0X23D1E0	gap	0	ok
 0x23C828	__udivdi3	0X23D1E8	same	0	ok
 0x23CDF8	__umoddi3	0X23D7B8	same	0	ok
+0x23D338	func_0023D338	0X23DCF8	identical	0	ok
 0x23D468	func_0023D468	0X23DE28	identical	0	ok
 0x23D748	__adddf3	0X23E108	same	0	ok
 0x23D7A0	__subdf3	0X23E160	same	0	ok
 0x23D808	__muldf3	0X23E1C8	same	0	ok
+0x23DAB0	func_0023DAB0	0X23E470	same	0	ok
 0x23DC18	func_0023DC18	0X23E5D8	identical	0	ok
 0x23DD30	dpcmp	0X23E6F0	same	0	ok
 0x23DD80	__floatsidf	0X23E740	same	0	ok
@@ -5340,9 +5346,11 @@ us_address	name	other_address	pair	score	addresses
 0x23FE78	func_0023FE78	0X240838	same	0	ok
 0x2401C8	func_002401C8	0X240B88	gap	0	ok
 0x240328	func_00240328	0X240CE8	gap	0	ok
+0x240460	sceGsResetGraph	0X240E20	same	0	ok
 0x2405F0	func_002405F0	0X240FB0	gap	0	ok
 0x240600	sceGsPutDispEnv	0X240FC0	same	0	ok
 0x2406C0	sceGsPutDrawEnv	0X241080	same	0	ok
+0x2407A8	sceGsSetDefDBuff	0X241168	same	0	ok
 0x240A40	sceGsSwapDBuff	0X241400	same	0	ok
 0x240AA0	sceGsPutIMR	0X241460	same	0	ok
 0x240AE0	sceGsSetHalfOffset	0X2414A0	identical	0	ok
@@ -5366,6 +5374,7 @@ us_address	name	other_address	pair	score	addresses
 0x241DF0	func_00241DF0	0X2427B0	same	0	ok
 0x241E88	sceCdSync	0X242848	same	0	ok
 0x241F28	func_00241F28	0X2428E8	same	0	ok
+0x241F98	func_00241F98	0X242958	same	0	ok
 0x2425F0	func_002425F0	0X242FB0	same	0	ok
 0x242810	sceCdGetReadPos	0X2431D0	same	0	ok
 0x242A20	sceCdGetDiskType	0X2433E0	same	0	ok
@@ -5408,6 +5417,7 @@ us_address	name	other_address	pair	score	addresses
 0x244F18	floorf	0X245960	identical	0	ok
 0x245000	sinf	0X245A48	same	0	ok
 0x2450F0	tanf	0X245B38	same	0	ok
+0x245178	logf	0X245BC0	same	0	ok
 0x2452C0	pow	0X245D08	same	0	ok
 0x2456F0	acosf	0X246138	same	0	ok
 0x2457F0	asinf	0X246238	same	0	ok
@@ -5415,6 +5425,7 @@ us_address	name	other_address	pair	score	addresses
 0x245A18	fmodf	0X246460	same	0	ok
 0x245B58	PowF_245b58	0X2465A0	same	0	ok
 0x246060	sqrtf	0X246AA8	same	0	ok
+0x246178	__ieee754_log10	0X246BC0	same	0	ok
 0x246300	__ieee754_pow	0X246D48	same	0	ok
 0x247330	__ieee754_acosf	0X247D78	same	0	ok
 0x247760	__ieee754_asinf	0X2481A8	same	0	ok
@@ -5458,6 +5469,7 @@ us_address	name	other_address	pair	score	addresses
 0x24B930	func_0024B930	0X24C378	same	0	ok
 0x24B9A0	func_0024B9A0	0X24C3E8	same	0	ok
 0x24B9C8	func_0024B9C8	0X24C410	same	0	ok
+0x24B9F0	func_0024B9F0	0X24C438	same	0	ok
 0x24BF40	func_0024BF40	0X24C988	same	0	ok
 0x24C360	func_0024C360	0X24CDA8	same	0	ok
 0x24C420	func_0024C420	0X24CE68	same	0	ok
@@ -5469,6 +5481,7 @@ us_address	name	other_address	pair	score	addresses
 0x24F8D0	func_0024F8D0	0X250318	same	0	ok
 0x24FA38	func_0024FA38	0X250480	same	0	ok
 0x24FA90	func_0024FA90	0X2504D8	same	0	ok
+0x24FAD0	func_0024FAD0	0X250520	identical	0	ok
 0x24FC58	func_0024FC58	0X2506A8	same	0	ok
 0x2505B0	func_002505B0	0X251000	same	0	ok
 0x250A38	func_00250A38	0X251488	same	0	ok

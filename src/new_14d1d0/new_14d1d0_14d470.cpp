@@ -8,6 +8,7 @@
 #include "vu0inline.h"
 #include "so.h"
 #include "sw.h"
+#include "ps2inline.h"
 
 extern "C" {
 void func_0014D470(void) {
@@ -717,7 +718,32 @@ extern "C" void SetCmMat(CM_14F428 *arg0, CMMATRIX *arg1) {
 
 INCLUDE_ASM(0X14F478);
 
-INCLUDE_ASM(0X14F4E0);
+struct M3 { QW row[3]; };
+
+extern "C" void LoadRotateMatrixEuler__FP6VECTORP7MATRIX3_14F4E0(M3 *, QW);
+
+extern "C" void SetCmPosMat_14F4E0(void *, M4 *);
+
+extern "C" void func_0014F4E0(char *camera, QW vecDegrees)
+{
+    struct LOCALS { M4 matrix; QW euler; M3 rotate; } l;
+    float x = LaneX(vecDegrees) * 0.017453294f;
+    float y = LaneYInGeneralRegister(vecDegrees) * 0.017453294f;
+    float z = LaneZInGeneralRegister(vecDegrees) * 0.017453294f;
+    l.matrix.row[0] = *(QW *)(camera + 0x60);
+    l.matrix.row[1] = *(QW *)(camera + 0x70);
+    l.matrix.row[2] = *(QW *)(camera + 0x80);
+    l.matrix.row[3] = *(QW *)(camera + 0x90);
+    l.euler = VectorFromFloats3(x, y, z);
+    LoadRotateMatrixEuler__FP6VECTORP7MATRIX3_14F4E0(&l.rotate, l.euler);
+    l.matrix.row[0] = l.rotate.row[0];
+    l.matrix.row[1] = l.rotate.row[1];
+    l.matrix.row[2] = l.rotate.row[2];
+    ((float *)&l.matrix.row[2])[3] = 0.0f;
+    ((float *)&l.matrix.row[1])[3] = 0.0f;
+    ((float *)&l.matrix.row[0])[3] = 0.0f;
+    SetCmPosMat_14F4E0(camera, &l.matrix);
+}
 
 extern "C" void RecalcCmFrustrum__FP2CM_14F5A0(void *camera);
 

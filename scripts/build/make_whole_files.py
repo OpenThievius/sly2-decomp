@@ -695,9 +695,10 @@ def compare_object(object_path, start, end):
         return rodata_cause(elf, data, start) if uses_rodata else None
 
 
-def compiler(name, vu0=False):
+def compiler(name, vu0=False, movables=False):
     """A compile_source(text, language) -> (ok, message) for resolve(), compiling in the scratch directory under `name`; `vu0` adds the
-    VU0 register flag, the flag set of a whole file whose start is listed in config/us/vu0_regs.txt (configure.py builds it so)."""
+    VU0 register flag, the flag set of a whole file whose start is listed in config/us/vu0_regs.txt, and `movables` adds -fmove-all-movables,
+    the flag set of a whole file whose start is listed in config/us/move_movables.txt (configure.py builds both so)."""
     import compile_unit
     os.makedirs(SCRATCH, exist_ok=True)
 
@@ -705,7 +706,7 @@ def compiler(name, vu0=False):
         source = os.path.join(SCRATCH, name + ('.c' if language == 'c' else '.cpp'))
         with open(source, 'w') as handle:
             handle.write(text)
-        return compile_unit.compile_object(language, source, os.path.join(SCRATCH, name + '.o'), vu0=vu0)
+        return compile_unit.compile_object(language, source, os.path.join(SCRATCH, name + '.o'), vu0=vu0, movables=movables)
     return compile_source
 
 
@@ -719,7 +720,7 @@ def make_and_prove(start, end, relative, functions, matched):
     compile as C++ is tried as C."""
     import compile_unit
     name = relative.replace('/', '__')
-    compile_source = compiler(name, compile_unit.vu0_for(start))
+    compile_source = compiler(name, compile_unit.vu0_for(start), compile_unit.movables_for(start))
     first_language, _, _ = build_whole_file(start, end, functions, matched)
     # the ways tried, in order: C++ with the C sources under extern "C" (their per-function linkage), C++ without it, then C
     attempts = [(first_language, True, False)] + ([('c++', False, False), ('c', True, False)] if first_language == 'c++' else []) + \
@@ -994,13 +995,18 @@ def land(address, source_path, wholes=None, compile_source=None, prove=None, wri
     if found is None:
         return False, f'{address:#X} is in no whole file', None
     start, end, file = found
-    flagged = listed_addresses('move_movables.txt') | listed_addresses('sony_gcc29.txt') | listed_addresses('sony_gcc29_01.txt')
+    # the compiler lists (the SDK range) are per function: a whole file has one flag set and cannot take one function's compiler
+    flagged = listed_addresses('sony_gcc29.txt') | listed_addresses('sony_gcc29_01.txt')
     if address in flagged:
         return False, f'{address:#X} is in a per-function flag list; src/{file} has one flag set: not changed', None
     # the VU0 flag (a function using the VU0 helpers of include/vu0inline.h) becomes the whole file's flag when the whole file proves with
     # it: its start is then listed in config/us/vu0_regs.txt, the one flag set of that file
     vu0_list = listed_addresses('vu0_regs.txt')
     vu0 = address in vu0_list or start in vu0_list
+    # -fmove-all-movables the same way: a function listed in config/us/move_movables.txt gives the whole file that flag as its one flag set
+    # when the whole range proves with it (the file's start is then listed there, as configure.py builds a whole file with its start's flags)
+    movables_list = listed_addresses('move_movables.txt')
+    movables = address in movables_list or start in movables_list
     path = os.path.join(ROOT, 'src', file)
     whole_text = open(path).read()
     if not include_asm_marker(address).search(whole_text):
@@ -1013,7 +1019,7 @@ def land(address, source_path, wholes=None, compile_source=None, prove=None, wri
     if promote:
         language = 'c++'
     name = f'land_{address:X}'
-    compile_source = compile_source or compiler(name, vu0)
+    compile_source = compile_source or compiler(name, vu0, movables)
     prove = prove or (lambda: compare_object(os.path.join(SCRATCH, name + '.o'), start, end))
     attempts = [(True, False)] + ([(False, False)] if language == 'c++' and source_is_c else []) + [(True, True)]
     cause = None
@@ -1046,6 +1052,10 @@ def land(address, source_path, wholes=None, compile_source=None, prove=None, wri
                 with open(os.path.join(ROOT, 'config', 'us', 'vu0_regs.txt'), 'a') as handle:
                     handle.write(f'0x{start:X}\n')
                 notes = notes + [f'the whole file now takes the VU0 flag ({start:#X} listed in config/us/vu0_regs.txt)']
+            if movables and start not in movables_list:
+                with open(os.path.join(ROOT, 'config', 'us', 'move_movables.txt'), 'a') as handle:
+                    handle.write(f'0x{start:X}  # whole file {file}: its one flag set (proved with {address:#X})\n')
+                notes = notes + [f'the whole file now takes -fmove-all-movables ({start:#X} listed in config/us/move_movables.txt)']
         notes = notes + dropped + ([] if write or not promote else [f'the whole file would become C++ ({file[:-2]}.cpp)'])
         return True, f'src/{file}: {address:#X} {"would land" if not write else "landed"}, {start:#X}-{end:#X} proved' + \
             (f' ({"; ".join(notes)})' if notes else ''), text

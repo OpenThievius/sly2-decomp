@@ -65,18 +65,18 @@ extern "C" void CloneStepHullGeom(HULLSTEP *pstep, HULLGEOM *pgeomSource)
     EnsureSogeomLvo(pstep->pgeom);
     HULLGEOM *pgeom = pstep->pgeom;
     float gMin = 3.4028235e38f;
-    for (int ivec = 0; ivec < pgeom->cvec; ivec++) {
-        float gZ = ((VECTOR *)pgeom->avec + ivec)->z;
+    for (int ivec = 0; ivec < pstep->pgeom->cvec; ivec++) {
+        float gZ = ((VECTOR *)pstep->pgeom->avec + ivec)->z;
         gMin = gMin < gZ ? gMin : gZ;
     }
     pstep->gMin = gMin;
     int cvec = pstep->pgeom->cvec;
-    int offset = cvec * 0x10;
-    *(QW *)((char *)pstep->pgeom->avec + offset) = pstep->qPos;
     pstep->pgeom->cvec = cvec + 2;
-    *(QW *)((char *)pstep->pgeom->avec + offset + 0x10) = AddScaled(pstep->qPos, g_2a2dc0, *(u32 *)&pstep->gValue);
+    pstep->pgeom->avec[cvec] = pstep->qPos;
+    QW *pdestination = pstep->pgeom->avec + cvec + 1;
+    *pdestination = AddScaled(pstep->qPos, g_2a2dc0, *(u32 *)&pstep->gValue);
     if (fExtra)
-        *(QW *)((char *)pstep->pgeom->avec + offset + 0x20) = g_2a2dd0;
+        pstep->pgeom->avec[cvec + 2] = g_2a2dd0;
     TransformGeom(pstep->pgeom->pxf + 1, &pstep->pgeom->field78, &pstep->pgeom->field90);
     pstep->pindexA = pstep->pgeom->pindex + cvec * 4;
     pstep->pindexB = pstep->pgeom->pindex + (cvec * 4 + 4);

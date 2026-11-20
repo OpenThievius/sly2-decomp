@@ -6,7 +6,7 @@ struct VT_1337D0 {
     char pad1B8[0x1F0 - 0x1B8];
     short delta1F0;
     short unused1F2;
-    int (*query)(void *, void *);
+    int (*query)(void *);
 };
 struct OBJ_1337D0 { char pad0[0xC]; VT_1337D0 *vt; char pad10[0xEC - 0x10]; int tag; };
 struct NODE_1337D0 { void *mq; NODE_1337D0 *next; int pad8; OBJ_1337D0 *obj; };
@@ -30,8 +30,8 @@ void FreeSwMqList__FP2SWP2MQ(SW_1337D0 *, void *);
 void *PoxExtractFromPoxa(SW_1337D0 *, int, POXA_1337D0 *);
 void RemoveDlEntry(void *, void *);
 void func_001F5078(OBJ_1337D0 *);
-void *memmove(void *, POXA_1337D0 *, int);
-void * FreeSwPoxa(SW_1337D0 *sw, POXA_1337D0 *poxa) {
+void *memmove(void *, const void *, unsigned int);
+void FreeSwPoxa(SW_1337D0 *sw, POXA_1337D0 *poxa) {
     NODE_1337D0 *node;
     NODE_1337D0 *current;
     OBJ_1337D0 *object;
@@ -51,8 +51,7 @@ void * FreeSwPoxa(SW_1337D0 *sw, POXA_1337D0 *poxa) {
             other->vt->bind((char *)other + other->vt->delta1B0, poxa->obj);
             extracted = PoxExtractFromPoxa(sw, node->obj->tag, poxa);
             if (node->mq != 0) {
-                other = node->obj;
-                if (other->vt->query((char *)other + other->vt->delta1F0, other) == 0) {
+                if (node->obj->vt->query((char *)node->obj + node->obj->vt->delta1F0) == 0) {
                     func_001F5078(node->obj);
                 }
                 FreeSwMqList__FP2SWP2MQ(sw, node->mq);
@@ -68,35 +67,30 @@ void * FreeSwPoxa(SW_1337D0 *sw, POXA_1337D0 *poxa) {
     if (FFindDlEntry(sw->dlB, poxa) != 0) {
         RemoveDlEntry(sw->dlB, poxa);
     }
-    if (poxa->flags & 1L) {
+    if ((poxa->flags & 1) == 1) {
         RemoveDlEntry(sw->dlC, poxa);
     }
-    if (poxa->flags & 2L) {
+    if (poxa->flags & 2) {
         RemoveDlEntry(sw->dlD, poxa);
     }
     slotheap = sw->slotheapA;
-    table = 0;
-    do {
+    for (table = 0; table < 3; table++) {
         base = sw->tables[table];
         entry = base;
         for (;;) {
-            if (entry->owner != poxa) {
+            while (entry->owner != poxa) {
                 entry++;
-                continue;
             }
-            if (entry->flag == 0) {
-                first = entry;
-                entry++;
-                continue;
+            if (entry->flag != 0) {
+                break;
             }
-            break;
+            first = entry;
+            entry++;
         }
-        memmove(first, poxa, (entry - first) * 0xC - 0xC);
-        memmove(entry - 1, poxa, (sw->count - (entry - base)) * 0xC - 0xC);
-        table++;
-    } while (table < 3);
+        memmove(first, first + 1, (entry - first) * sizeof(ENTRY_1337D0) - sizeof(ENTRY_1337D0));
+        memmove(entry - 1, entry + 1, (sw->count - (entry - base)) * sizeof(ENTRY_1337D0) - sizeof(ENTRY_1337D0));
+    }
     sw->count -= 2;
     FreeSlotheapPv(slotheap, poxa);
-    return extracted;
 }
 }

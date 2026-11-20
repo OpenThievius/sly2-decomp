@@ -1858,6 +1858,7 @@ address	name	size	file	whole_file	symbol
 0X14F030	func_0014F030	12	new_14d1d0/new_14d1d0_14d470.cpp	new_14d1d0/new_14d1d0_14d470.cpp	func_0014F030
 0X14F3C8	func_0014F3C8	96	new_14d1d0/new_14d1d0_14d470.cpp	new_14d1d0/new_14d1d0_14d470.cpp	func_0014F3C8
 0X14F428	SetCmMat	80	new_14d1d0/new_14d1d0_14d470.cpp	new_14d1d0/new_14d1d0_14d470.cpp	SetCmMat
+0X14F4E0	func_0014F4E0	192	new_14d1d0/new_14d1d0_14d470.cpp	new_14d1d0/new_14d1d0_14d470.cpp	func_0014F4E0
 0X14F5A0	SetCmFov	88	new_14d1d0/new_14d1d0_14d470.cpp	new_14d1d0/new_14d1d0_14d470.cpp	SetCmFov
 0X14F5F8	func_0014F5F8	24	new_14d1d0/new_14d1d0_14d470.cpp	new_14d1d0/new_14d1d0_14d470.cpp	func_0014F5F8
 0X14F610	SetCmNearClip	28	new_14d1d0/new_14d1d0_14d470.cpp	new_14d1d0/new_14d1d0_14d470.cpp	SetCmNearClip
@@ -3817,6 +3818,7 @@ address	name	size	file	whole_file	symbol
 0X1DEEA8	NotifyLaserXpEnded	236	game-stepguard/game_stepguard_1dedb0.cpp	game-stepguard/game_stepguard_1dedb0.cpp	NotifyLaserXpEnded
 0X1DF260	ClipLaserBeams	320	game-stepguard/game_stepguard_1dedb0.cpp	game-stepguard/game_stepguard_1dedb0.cpp	ClipLaserBeams
 0X1DF3A0	UpdateLaser	44	game-stepguard/game_stepguard_1dedb0.cpp	game-stepguard/game_stepguard_1dedb0.cpp	UpdateLaser
+0X1DF3D0	AdvanceLaserBeams	480	game-stepguard/game_stepguard_1dedb0.cpp	game-stepguard/game_stepguard_1dedb0.cpp	AdvanceLaserBeams
 0X1DF980	StaticInitSlotheaps_1df980	308	game-stepguard/game_stepguard_1dedb0.cpp	game-stepguard/game_stepguard_1dedb0.cpp	StaticInitSlotheaps_1df980
 0X1DFAB8	StaticInitSlotheaps_1df980_thunk	32	game-stepguard/game_stepguard_1dedb0.cpp	game-stepguard/game_stepguard_1dedb0.cpp	StaticInitSlotheaps_1df980_thunk
 0X1DFAD8	InitJsg	56	game-stepguard/InitJsg.cpp		
@@ -4451,6 +4453,7 @@ address	name	size	file	whole_file	symbol
 0X201600	func_00201600	32	spliceobj/RefGetOption_file.cpp	spliceobj/RefGetOption_file.cpp	func_00201600
 0X2017A0	SaveSprBuf__FPve	500	sprbuf/SaveSprBuf_file.cpp	sprbuf/SaveSprBuf_file.cpp	SaveSprBuf__FPve
 0X201998	func_00201998	88	sprbuf/SaveSprBuf_file.cpp	sprbuf/SaveSprBuf_file.cpp	func_00201998
+0X2019F0	sprbuf__static_initialization_and_destruction_0	872	sprbuf/SaveSprBuf_file.cpp	sprbuf/SaveSprBuf_file.cpp	UncachedAddress
 0X201D58	func_00201D58	32	sprbuf/SaveSprBuf_file.cpp	sprbuf/SaveSprBuf_file.cpp	func_00201D58
 0X201D78	func_00201D78	80	sprbuf-stepguard/fun_00201d78.cpp		
 0X201DC8	func_00201DC8	192	sprbuf-stepguard/fun_00201dc8.cpp		
@@ -5286,6 +5289,7 @@ address	name	size	file	whole_file	symbol
 0X23B238	func_0023B238	56	unsorted/fun_0023b238.cpp		
 0X23B290	func_0023B290	196	sdk/fun_0023b290.cpp		
 0X23B368	func_0023B368	64	sdk/fun_0023b368.cpp		
+0X23B728	func_0023B728	176	sdk/fun_0023b728.c		
 0X23B7D8	__main__Fv	32	sdk/__main__Fv.c		
 0X23B7F8	__divdi3	1772	sdk/__divdi3.c		
 0X23BFE0	__floatdidf	152	sdk/__floatdidf.cpp		
@@ -5294,10 +5298,12 @@ address	name	size	file	whole_file	symbol
 0X23C820	func_0023C820	8	sdk/fun_0023c820.c		
 0X23C828	__udivdi3	1488	sdk/__udivdi3.c		
 0X23CDF8	__umoddi3	1344	sdk/__umoddi3.c		
+0X23D338	func_0023D338	300	sdk/fun_0023d338.c		
 0X23D468	func_0023D468	156	sdk/fun_0023d468.c		
 0X23D748	__adddf3	88	sdk/__adddf3.cpp		
 0X23D7A0	__subdf3	100	sdk/__subdf3.cpp		
 0X23D808	__muldf3	680	sdk/__muldf3.cpp		
+0X23DAB0	func_0023DAB0	360	sdk/fun_0023dab0.cpp		
 0X23DC18	func_0023DC18	276	sdk/fun_0023dc18.c		
 0X23DD30	dpcmp	76	sdk/dpcmp.cpp		
 0X23DD80	__floatsidf	184	sdk/__floatsidf.cpp		
@@ -5340,9 +5346,11 @@ address	name	size	file	whole_file	symbol
 0X23FE78	func_0023FE78	472	sdk/fun_0023fe78.cpp		
 0X2401C8	func_002401C8	12	sdk/fun_002401c8.cpp		
 0X240328	func_00240328	16	sdk/fun_00240328.cpp		
+0X240460	sceGsResetGraph	400	sdk/sceGsResetGraph.c		
 0X2405F0	func_002405F0	12	sdk/fun_002405f0.c		
 0X240600	sceGsPutDispEnv	188	sdk/sceGsPutDispEnv.cpp		
 0X2406C0	sceGsPutDrawEnv	232	sdk/sceGsPutDrawEnv.cpp		
+0X2407A8	sceGsSetDefDBuff	664	sdk/sceGsSetDefDBuff.c		
 0X240A40	sceGsSwapDBuff	92	sdk/sceGsSwapDBuff.cpp		
 0X240AA0	sceGsPutIMR	60	sdk/sceGsPutIMR.cpp		
 0X240AE0	sceGsSetHalfOffset	136	sdk/sceGsSetHalfOffset.c		
@@ -5366,6 +5374,7 @@ address	name	size	file	whole_file	symbol
 0X241DF0	func_00241DF0	152	sdk/fun_00241df0.cpp		
 0X241E88	sceCdSync	160	sdk/sceCdSync.cpp		
 0X241F28	func_00241F28	108	sdk/fun_00241f28.cpp		
+0X241F98	func_00241F98	344	sdk/fun_00241f98.cpp		
 0X2425F0	func_002425F0	544	sdk/fun_002425f0.cpp		
 0X242810	sceCdGetReadPos	48	sdk/sceCdGetReadPos.c		
 0X242A20	sceCdGetDiskType	152	sdk/sceCdGetDiskType.c		
@@ -5408,6 +5417,7 @@ address	name	size	file	whole_file	symbol
 0X244F18	floorf	228	sdk/floorf.cpp		
 0X245000	sinf	240	sdk/sinf.c		
 0X2450F0	tanf	136	sdk/tanf.c		
+0X245178	logf	328	sdk/logf.cpp		
 0X2452C0	pow	1072	sdk/pow.cpp		
 0X2456F0	acosf	252	sdk/acosf.cpp		
 0X2457F0	asinf	252	sdk/asinf.cpp		
@@ -5415,6 +5425,7 @@ address	name	size	file	whole_file	symbol
 0X245A18	fmodf	316	sdk/fmodf.c		
 0X245B58	PowF_245b58	1288	sdk/PowF_245b58.c		
 0X246060	sqrtf	276	sdk/sqrtf.cpp		
+0X246178	__ieee754_log10	392	sdk/__ieee754_log10.cpp		
 0X246300	__ieee754_pow	3368	sdk/__ieee754_pow.cpp		
 0X247330	__ieee754_acosf	1072	sdk/__ieee754_acosf.cpp		
 0X247760	__ieee754_asinf	924	sdk/__ieee754_asinf.cpp		
@@ -5458,6 +5469,7 @@ address	name	size	file	whole_file	symbol
 0X24B930	func_0024B930	108	sdk/fun_0024b930.cpp		
 0X24B9A0	func_0024B9A0	36	sdk/fun_0024b9a0.cpp		
 0X24B9C8	func_0024B9C8	36	sdk/fun_0024b9c8.cpp		
+0X24B9F0	func_0024B9F0	656	sdk/fun_0024b9f0.cpp		
 0X24BF40	func_0024BF40	1056	sdk/fun_0024bf40.c		
 0X24C360	func_0024C360	192	sdk/fun_0024c360.cpp		
 0X24C420	func_0024C420	144	sdk/fun_0024c420.cpp		
@@ -5469,6 +5481,7 @@ address	name	size	file	whole_file	symbol
 0X24F8D0	func_0024F8D0	160	sdk/fun_0024f8d0.cpp		
 0X24FA38	func_0024FA38	84	sdk/fun_0024fa38.cpp		
 0X24FA90	func_0024FA90	64	sdk/fun_0024fa90.cpp		
+0X24FAD0	func_0024FAD0	388	sdk/fun_0024fad0.cpp		
 0X24FC58	func_0024FC58	1796	sdk/fun_0024fc58.cpp		
 0X2505B0	func_002505B0	1160	sdk/fun_002505b0.cpp		
 0X250A38	func_00250A38	540	sdk/fun_00250a38.c		

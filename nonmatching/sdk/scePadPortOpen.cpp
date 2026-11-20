@@ -18,14 +18,12 @@ int scePadPortOpen(int port, int slot, PadReportBuffer *buffer) {
     if (((unsigned int)buffer & 0x3F) != 0) {
         if (D_002C830C != 0) {
             func_00236960("libpad: buffer addr is not 64 byte align. %08x\n", buffer);
-            return 0;
         }
         return 0;
     }
     if (B_004505D0[port].slots[slot].state == 1) {
         if (D_002C830C != 0) {
             func_00236960("libpad: pad port is already open [%d][%d]\n", port, slot);
-            return 0;
         }
         return 0;
     }
@@ -39,6 +37,7 @@ int scePadPortOpen(int port, int slot, PadReportBuffer *buffer) {
         report->field60 = 0;
         report++;
     }
+    unsigned char *padReport;
     request = &B_004507C0;
     request->command = 1;
     request->port = port;
@@ -47,12 +46,13 @@ int scePadPortOpen(int port, int slot, PadReportBuffer *buffer) {
     if (sceSifCallRpc(B_00450580, 1, 0, request, 0x80, request, 0x80, 0, 0) < 0) {
         return 0;
     }
+    padReport = B_004506C0[port][slot];
+    B_004505D0[port].slots[slot].state = 1;
+    *(int *)padReport = 0;
     B_004505D0[port].slots[slot].fieldC = 0;
     B_004505D0[port].slots[slot].field8 = request->field14;
-    B_004505D0[port].slots[slot].report = B_004506C0[port][slot];
     B_004505D0[port].slots[slot].buffer = (unsigned char *)buffer;
-    *(int *)B_004506C0[port][slot] = 0;
-    B_004505D0[port].slots[slot].state = 1;
+    B_004505D0[port].slots[slot].report = padReport;
     return request->result;
 }
 }
