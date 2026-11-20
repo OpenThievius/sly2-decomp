@@ -40,3 +40,4 @@
 0x213F70  # 74 > 0
 0x121938  # frame 0xC0 > 0
 0x1DEDB0  # whole file game-stepguard/game_stepguard_1dedb0.cpp: its one flag set (proved with 0X1DF3D0)
+0x1B8988  # 34 > 0 (loop-exit constant kept in a register)

@@ -1293,6 +1293,7 @@ us_address	name	other_address	pair	score	addresses
 0x12DD28	func_0012DD28	0X12DD28	same	0	ok
 0x12DDB0	func_0012DDB0	0X12DDB0	same	0	ok
 0x12DE58	func_0012DE58	0X12DE58	same	0	ok
+0x12DEF0	func_0012DEF0	0X12DEF0	same	0	ok
 0x12DFE0	func_0012DFE0	0X12DFE0	identical	0	ok
 0x12E010	func_0012E010	0X12E010	same	0	ok
 0x12E060	GetActvalPositionGoal	0X12E060	same	0	ok
@@ -1355,6 +1356,7 @@ us_address	name	other_address	pair	score	addresses
 0x130918	UpdateAsega	0X130918	same	0	ok
 0x130B18	RetractAsega	0X130B18	same	0	ok
 0x130D30	SeekAsega	0X130D30	same	0	ok
+0x130EB0	UpdateAsegaIeaCur__FP5ASEGA	0X130EB0	identical	0	ok
 0x130F88	HandleAsegaEvents	0X130F88	identical	0	ok
 0x131100	HandleAsegaEventsFF	0X131100	same	0	ok
 0x131270	PloRootOrAseg	0X131270	identical	0	ok
@@ -2922,6 +2924,7 @@ us_address	name	other_address	pair	score	addresses
 0x1A3B38	func_001A3B38	0X1A3B00	same	0	ok
 0x1A3E88	RemoveLightFromSw	0X1A3E50	identical	0	ok
 0x1A3EE8	func_001A3EE8	0X1A3EB0	same	0	ok
+0x1A4AD8	func_001A4AD8	0X1A4AA0	same	0	ok
 0x1A4CB0	light__static_initialization_and_destruction_0	0X1A4C78	same	0	ok
 0x1A4DE8	func_001A4DE8	0X1A4DB0	same	0	ok
 0x1A4E08	StartBootQueue	0X1A4DD0	same	1	ok
@@ -3254,6 +3257,7 @@ us_address	name	other_address	pair	score	addresses
 0x1B8508	StartMurrayAttackA	0X1B8770	same	0	ok
 0x1B85D0	StartMurrayAttackB	0X1B8838	same	0	ok
 0x1B8938	EndMurrayAttack	0X1B8BA0	same	0	ok
+0x1B8988	UpdateMurrayAttack	0X1B8BF0	same	0	ok
 0x1B8EC0	func_001B8EC0	0X1B9128	same	0	ok
 0x1B9130	AdjustMurrayNewXp	0X1B9398	same	0	ok
 0x1B92F8	UpdateMurrayLift	0X1B9560	same	0	ok

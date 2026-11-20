@@ -50,11 +50,9 @@ address	name	size	file	score
 0X12D508	GetActbankRotationGoal	848	new_12d508/GetActbankRotationGoal.c	190
 0X12D958	GetActadjGoal	120	new_12d508/GetActadjGoal.c	24
 0X12D9D0	GetActadjPositionGoal	96	new_12d508/GetActadjPositionGoal.c	20
-0X12DEF0	func_0012DEF0	240	new_12d508/fun_0012def0.cpp	35
 0X12E120	func_0012E120	208	alo-missile/fun_0012e120.c	50
 0X12F2A8	CAseg_LoadFromBrx	744	aseg/CAseg_LoadFromBrx.cpp	6
 0X1300B8	PredictAsegEffect	976	aseg/PredictAsegEffect.cpp	19
-0X130EB0	UpdateAsegaIeaCur__FP5ASEGA	216	asega/UpdateAsegaIeaCur__FP5ASEGA.cpp	33
 0X1337D0	FreeSwPoxa	616	sensor-bbmark/FreeSwPoxa.cpp	9
 0X133A38	UpdateSwPox	560	sensor-bbmark/UpdateSwPox.cpp	82
 0X134040	RecalcSwXpAll	720	bbmark-blend/RecalcSwXpAll.cpp	104
@@ -267,7 +265,6 @@ address	name	size	file	score
 0X1A3D00	AddLightToSw	392	light-stepguard/AddLightToSw.cpp	56
 0X1A4258	func_001A4258	544	light-stepguard/fun_001a4258.c	132
 0X1A4478	func_001A4478	1632	light-stepguard/fun_001a4478.c	399
-0X1A4AD8	func_001A4AD8	472	light-stepguard/fun_001a4ad8.cpp	30
 0X1A5FB8	func_001A5FB8	344	stepguard-jt/fun_001a5fb8.c	85
 0X1A6340	GetLoEulerDegrees	112	new_1a6290/GetLoEulerDegrees.c	22
 0X1A64E8	SetSoProperties	480	new_1a6290/SetSoProperties.cpp	50
@@ -303,7 +300,6 @@ address	name	size	file	score
 0X1B7970	ThrowMurrayObject	264	mpeg-memcard/ThrowMurrayObject.c	55
 0X1B7A78	StartMurrayThrow	112	mpeg-memcard/StartMurrayThrow.c	23
 0X1B86B0	SetMurrayAttackState	648	mpeg-memcard/SetMurrayAttackState.c	125
-0X1B8988	UpdateMurrayAttack	488	mpeg-memcard/UpdateMurrayAttack.cpp	34
 0X1B8B70	MoveMurrayAttack	448	mpeg-memcard/MoveMurrayAttack.c	101
 0X1B90B8	func_001B90B8	120	mpeg-memcard/fun_001b90b8.c	19
 0X1BB400	RunStgSwitch	584	mpeg-memcard/RunStgSwitch.c	101
@@ -464,7 +460,7 @@ address	name	size	file	score
 0X20C7E0	LoadDirAnimSet	360	steprun-stream/LoadDirAnimSet.c	71
 0X20E890	ExecuteSwLoadRequest	1840	new_20e040/ExecuteSwLoadRequest.c	327
 0X214100	FStartSpriteDepthInstance	432	screen-font/FStartSpriteDepthInstance.cpp	4
-0X2149D8	LoadMovieCharacter	3048	screen-font/LoadMovieCharacter.cpp	17
+0X2149D8	LoadMovieCharacter	3048	screen-font/LoadMovieCharacter.cpp	5
 0X215F40	CMovieText_ClineWrap	408	font-break/CMovieText_ClineWrap.cpp	5
 0X2160D8	CMovieText_UpdateFont	240	font-break/CMovieText_UpdateFont.cpp	38
 0X216750	CMovieText_DrawGlyphs	1008	font-break/CMovieText_DrawGlyphs.cpp	2

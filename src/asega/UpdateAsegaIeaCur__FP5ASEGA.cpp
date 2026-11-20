@@ -5,23 +5,22 @@ struct ASEGA { char pad[0x14]; ASEG *paseg; char pad18[4]; float tLocal; char pa
 
 extern "C" void UpdateAsegaIeaCur__FP5ASEGA(ASEGA *pasega)
 {
-    ASEG *paseg = pasega->paseg;
-    int iea = paseg->cea;
-    if (iea == 0)
+    int cea = pasega->paseg->cea;
+    if (cea == 0)
         return;
+    int iea = cea;
     if (pasega->svtLocal >= 0.0f) {
-        int cea = iea;
-        iea = 0;
-        for (; iea < cea; iea++) {
-            if (pasega->tLocal <= paseg->aea[iea].tLocal)
+        for (iea = 0; iea < pasega->paseg->cea; iea++) {
+            if (pasega->tLocal <= pasega->paseg->aea[iea].tLocal)
                 break;
         }
         pasega->ieaCur = iea;
         return;
     }
-    for (iea--; iea >= 0; iea--) {
-        if (pasega->paseg->aea[iea].tLocal <= pasega->tLocal)
-            break;
+    for (iea--;; iea--) {
+        if (iea < 0 || pasega->paseg->aea[iea].tLocal <= pasega->tLocal)
+            goto found;
     }
+found:
     pasega->ieaCur = iea + 1;
 }
