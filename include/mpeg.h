@@ -65,7 +65,7 @@ typedef struct MPEGDEC {
     int backwardCode;                             /* 0x170 */
     int motionCode[2][2];                         /* 0x174, [direction][horizontal, vertical] */
     int pictureStructure;                         /* 0x184, 3 is a frame picture */
-    u8 unknown_0x188[0x18C - 0x188];
+    int topFieldFirst;                            /* 0x188, picks which dual-prime vector pair goes first; source:func_0024FAD0 */
     int framePredFrameDct;                        /* 0x18C */
     int concealmentVectors;                       /* 0x190 */
     u8 unknown_0x194[0x1C0 - 0x194];

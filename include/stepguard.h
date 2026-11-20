@@ -36,7 +36,12 @@ struct STEPGUARD : STEP {
     /* 0x360 */ f32 field_0x360; /* OnGuardRemove (27) */
     u8 unknown_0x364[0x2C];
     /* 0x390 */ s32 field_0x390; /* OnGuardRemove (27) */
-    u8 unknown_0x394[0x60];
+    /* 0x394 */ s32 cgroup; /* UpdateGuardSensor draft (nonmatching) */
+    /* 0x398 */ s32 agroup[3]; /* UpdateGuardSensor draft */
+    /* 0x3A4 */ s32 csensed; /* UpdateGuardSensor draft */
+    u8 unknown_0x3A8[0x3CC - 0x3A8];
+    /* 0x3CC */ struct GUARDTARGET *ptarget; /* UpdateGuardSensor draft */
+    u8 unknown_0x3D0[0x3F4 - 0x3D0];
     /* 0x3F4 */ struct LO *field_0x3F4; /* PostGuardLoad (15) */
     /* 0x3F8 */ struct LO *field_0x3F8; /* PostGuardLoad (15) */
     u8 unknown_0x3FC[0x88];
