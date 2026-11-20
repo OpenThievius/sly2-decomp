@@ -565,7 +565,7 @@ address	name	size	file	score
 0X2423D8	sceCdDiskReady	536	sdk/sceCdDiskReady.c	64
 0X242840	sceCdRead	480	sdk/sceCdRead.c	44
 0X242F70	func_00242F70	280	sdk/fun_00242f70.cpp	42
-0X243088	scePadPortOpen	488	sdk/scePadPortOpen.cpp	25
+0X243088	scePadPortOpen	488	sdk/scePadPortOpen.cpp	23
 0X243CB0	sceMcInit	552	sdk/sceMcInit.cpp	110
 0X244110	func_00244110	176	sdk/fun_00244110.cpp	25
 0X247028	__ieee754_sqrt	776	sdk/__ieee754_sqrt.cpp	226

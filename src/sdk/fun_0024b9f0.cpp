@@ -13,10 +13,6 @@ struct MPEGSTREAM {
     int sizeSelect;           /* 0x10 */
 };
 
-/* MPEGDEC 0xF4 (strideSelect) and 0xF8 (strideStep), not yet in mpeg.h */
-#define STRIDE_SELECT(decoder) (((int *)(decoder)->unknown_0xF0)[1])
-#define STRIDE_STEP(decoder) (((int *)(decoder)->unknown_0xF0)[2])
-
 void func_0024B9F0(MPEGDEC *decoder, MPEGSTREAM *stream) {
     int passCount;
     unsigned int baseAddress;
@@ -25,8 +21,8 @@ void func_0024B9F0(MPEGDEC *decoder, MPEGSTREAM *stream) {
     int blockBytes;
     int quadwordCount;
     int destinationStep;
-    if (decoder->pictureStructure == 3 || STRIDE_SELECT(decoder) == 0) {
-        int selector = STRIDE_SELECT(decoder);
+    if (decoder->pictureStructure == 3 || decoder->strideSelect == 0) {
+        int selector = decoder->strideSelect;
         blockBytes = stream->sizeSelect * 0x180;
         quadwordCount = blockBytes >> 4;
         if (selector != 0)
@@ -35,7 +31,7 @@ void func_0024B9F0(MPEGDEC *decoder, MPEGSTREAM *stream) {
             destinationStep = blockBytes;
         passCount = 1;
     } else {
-        destinationStep = (STRIDE_SELECT(decoder) >> 4) * 0xC0;
+        destinationStep = (decoder->strideSelect >> 4) * 0xC0;
         blockBytes = (stream->sizeSelect >> 1) * 0x180;
         passCount = 2;
         quadwordCount = blockBytes >> 4;
@@ -68,7 +64,7 @@ void func_0024B9F0(MPEGDEC *decoder, MPEGSTREAM *stream) {
             destination += destinationStep;
             sourceAddress += blockBytes;
         }
-        baseAddress += STRIDE_STEP(decoder) * 0xC0;
+        baseAddress += decoder->strideStep * 0xC0;
     }
 }
 }

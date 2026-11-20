@@ -49,7 +49,10 @@ typedef struct MPEGDEC {
     u8 unknown_0xC0[0xE8 - 0xC0];
     int targetE8;                                 /* 0x0E8 */
     unsigned int imageBuffer;                     /* 0x0EC */
-    u8 unknown_0xF0[0x12C - 0xF0];
+    u8 unknown_0xF0[4];
+    int strideSelect;                             /* 0x0F4, a multiple of 16: 0 means the destination steps by the block size; source:func_0024B9F0 */
+    int strideStep;                               /* 0x0F8, the base advances by strideStep * 0xC0 per pass; source:func_0024B9F0 */
+    u8 unknown_0xFC[0x12C - 0xFC];
     int field_0x12C;                              /* a fault flag in one reader, "last code zero" in another */
     u8 unknown_0x130[0x13C - 0x130];
     int width;                                    /* 0x13C, in macroblocks */
@@ -108,6 +111,8 @@ typedef char check_MPEGDEC_output[((unsigned int)&((MPEGDEC *)0)->output == 0x83
 typedef char check_MPEGDEC_topBits[((unsigned int)&((MPEGDEC *)0)->topBits == 0x848) ? 1 : -1];
 typedef char check_MPEGDEC_stop[((unsigned int)&((MPEGDEC *)0)->stop == 0x834) ? 1 : -1];
 typedef char check_MPEGDEC_imageBuffer[((unsigned int)&((MPEGDEC *)0)->imageBuffer == 0xEC) ? 1 : -1];
+typedef char check_MPEGDEC_strideSelect[((unsigned int)&((MPEGDEC *)0)->strideSelect == 0xF4) ? 1 : -1];
+typedef char check_MPEGDEC_strideStep[((unsigned int)&((MPEGDEC *)0)->strideStep == 0xF8) ? 1 : -1];
 typedef char check_MPEGDEC_pictureStructure[((unsigned int)&((MPEGDEC *)0)->pictureStructure == 0x184) ? 1 : -1];
 typedef char check_MPEGDEC_quantizerScaleCode[((unsigned int)&((MPEGDEC *)0)->quantizerScaleCode == 0x1C4) ? 1 : -1];
 typedef char check_MPEGDEC_sameFrame[((unsigned int)&((MPEGDEC *)0)->sameFrame == 0x87C) ? 1 : -1];
