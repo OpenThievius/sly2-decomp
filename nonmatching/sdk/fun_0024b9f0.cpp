@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 extern "C" {
 int func_00239450(void);
 void func_002394A0(void);
@@ -29,27 +30,22 @@ void func_0024B9F0(Transfer *transfer, Stream *stream) {
     int blockBytes;
     int quadwordCount;
     int destinationStep;
-    if (state.transfer->mode != 3) {
-        int selector = state.transfer->strideSelect;
-        if (selector != 0) {
-            destinationStep = (selector >> 4) * 0xC0;
-            blockBytes = (stream->sizeSelect >> 1) * 0x180;
-            state.passCount = 2;
-            quadwordCount = blockBytes >> 4;
-            goto run;
-        }
-    }
-    {
-        int selector = state.transfer->strideSelect;
-        quadwordCount = blockBytes >> 4;
+    int selector;
+    if (state.transfer->mode == 3 || (selector = state.transfer->strideSelect) == 0) {
+        selector = state.transfer->strideSelect;
         blockBytes = stream->sizeSelect * 0x180;
+        quadwordCount = blockBytes >> 4;
         if (selector != 0)
             destinationStep = (selector >> 4) * 0x180;
         else
             destinationStep = blockBytes;
         state.passCount = 1;
+    } else {
+        destinationStep = (selector >> 4) * 0xC0;
+        blockBytes = (stream->sizeSelect >> 1) * 0x180;
+        state.passCount = 2;
+        quadwordCount = blockBytes >> 4;
     }
-run:
     int pass = 0;
     if (state.passCount != 0) {
         do {

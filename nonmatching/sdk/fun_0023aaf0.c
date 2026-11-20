@@ -1,16 +1,16 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later */
 typedef unsigned int u32;
 typedef struct SifEntry {
-    void *function;
+    void (*function)();
     void *argument;
     int unused;
 } SifEntry;
 typedef struct SifState {
-    int count;
     u32 sendUncached;
-    int registerValue;
     u32 receiveUncached;
+    int registerValue;
     SifEntry *entries;
+    int count;
     int field14;
     int field18;
     u32 *list;
@@ -37,35 +37,31 @@ extern SifState B_0044EDD8;
 extern SifEntry B_0044EE00[32];
 extern u32 B_0044EF80[32];
 extern int D_002C5A60;
-extern char func_0023AA68[];
+void func_0023AA98();
+void func_0023AAB8();
 extern char func_0023B028[];
 
 void func_0023AAF0(void)
 {
-    u32 receiveAddress;
-    u32 sendAddress;
     SifEntry *entry;
     int index;
     u32 *slot;
     int registerValue;
     int value;
-    u32 words;
     func_00239450();
     if (D_002C5A60 != 0) {
         func_002394A0();
         return;
     }
-    receiveAddress = (u32)B_0044ED80 | 0x20000000;
-    sendAddress = (u32)B_0044ED00 | 0x20000000;
     D_002C5A60 = 1;
-    words = 0x20;
-    B_0044EDD8.sendUncached = sendAddress;
+    B_0044EDD8.sendUncached = (u32)B_0044ED00 | 0x20000000;
     B_0044EDD8.list = B_0044EF80;
-    B_0044EDD8.receiveUncached = receiveAddress;
-    B_0044EDD8.count = words;
+    B_0044EDD8.receiveUncached = (u32)B_0044ED80 | 0x20000000;
+    B_0044EDD8.count = 0x20;
+    B_0044EDD8.registerValue = 0;
     B_0044EDD8.entries = B_0044EE00;
     B_0044EDD8.field14 = 0;
-    B_0044EDD8.registerValue = B_0044EDD8.field18 = 0;
+    B_0044EDD8.field18 = 0;
     entry = B_0044EE00;
     do {
         entry->function = 0;
@@ -80,11 +76,11 @@ void func_0023AAF0(void)
         slot--;
     } while (index >= 0);
     index = 0x20;
-    B_0044EE00[1].function = func_0023AA68 + 0x30;
-    B_0044EE00[0].function = func_0023AA68 + 0x50;
+    B_0044EE00[1].function = func_0023AA98;
+    B_0044EE00[0].function = func_0023AAB8;
     B_0044EE00[0].argument = &B_0044EDD8;
     B_0044EE00[1].argument = &B_0044EDD8;
-    func_002394A0(B_0044EE00, receiveAddress, sendAddress, words);
+    func_002394A0(B_0044EE00, B_0044EDD8.receiveUncached, B_0044EDD8.sendUncached, 0x20);
     FlushCache(0);
     if (*(volatile u32 *)0x1000E010 & 0x20)
         *(volatile u32 *)0x1000E010 = index;
