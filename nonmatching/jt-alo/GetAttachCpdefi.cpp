@@ -53,27 +53,28 @@ void GetAttachCpdefi(ATTACH *pattach, CPDEFI *pcpdefi)
     if (pattach->pso->pvCam != pattach->pcam)
         return;
     pcpdefi->unk34 = 0;
-    unsigned int dir = pattach->dir;
-    if (dir < 3) {
-        if (dir > 0) {
+    int dir = pattach->dir;
+    switch (dir) {
+    case 1:
+    case 2: {
             if (FIsBasicDerivedFrom(pattach->pcrv, 0xC)) {
                 CRV *pcrv = pattach->pcrv;
                 float s;
                 if (pattach->dir == 1) {
-                    s = pattach->s + pattach->speed * (pattach->speed * 125.0f);
+                    s = pattach->s + (pattach->speed * 125.0f) * pattach->speed;
                     if (!pcrv->fClosed) {
                         float sMax = SMaxCrv(pcrv);
                         if (pcrv->grfCrv & 2)
                             sMax += 100.0f;
-                        s = sMax < s ? sMax : s;
+                        s = s < sMax ? s : sMax;
                     }
                 } else {
-                    s = pattach->s - pattach->speed * (pattach->speed * 125.0f);
+                    s = pattach->s - (pattach->speed * 125.0f) * pattach->speed;
                     if (!pcrv->fClosed) {
                         float sMin = SMinCrv(pcrv);
                         if (pcrv->grfCrv & 1)
                             sMin -= 100.0f;
-                        s = sMin > s ? sMin : s;
+                        s = s > sMin ? s : sMin;
                     }
                 }
                 GetPathPosFromS(pcrv, s, (QW *)&pattach->posTarget, 0);
@@ -82,22 +83,26 @@ void GetAttachCpdefi(ATTACH *pattach, CPDEFI *pcpdefi)
                 if (pattach->dir == 1) {
                     QW posBase = PosLoWorld(pattach->pso);
                     VU_SCALE scale;
-                    tmp0.q = scale.q = VectorFromFloat(pattach->speed * (pattach->speed * 125.0f));
+                    tmp0.q = scale.q = VectorFromFloat((pattach->speed * 125.0f) * pattach->speed);
                     MATRIX *pmat = PmatLoWorld(pattach->pso);
                     *(QW *)&pattach->posTarget = VectorAdd(posBase, VectorScaleX(pmat->row1, scale.q));
                 } else {
                     QW posBase = PosLoWorld(pattach->pso);
                     VU_SCALE scale;
-                    tmp0.q = scale.q = VectorFromFloat(pattach->speed * (pattach->speed * 125.0f));
+                    tmp0.q = scale.q = VectorFromFloat((pattach->speed * 125.0f) * pattach->speed);
                     MATRIX *pmat = PmatLoWorld(pattach->pso);
                     *(QW *)&pattach->posTarget = VectorSub(posBase, VectorScaleX(pmat->row1, scale.q));
                 }
                 pattach->posTarget.z += 50.0f;
             }
-        } else if (dir == 0) {
-            *(QW *)&pattach->posTarget = PosLoWorld(pattach->pso);
-            pattach->posTarget.z += 50.0f;
-        }
+        break;
+    }
+    case 0:
+        *(QW *)&pattach->posTarget = PosLoWorld(pattach->pso);
+        pattach->posTarget.z += 50.0f;
+        break;
+    default:
+        break;
     }
     if (FIsBasicDerivedFrom(pattach->pcrv, 0xC) && !pattach->pcrv->fClosed) {
         float sEdge = 30.0f;

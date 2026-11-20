@@ -70,13 +70,13 @@ extern "C" void ActivateCptn__FP4CPTNPv(CPTN *pcptn, void *pso, TN *ptn)
     QW nose[1];
     QW closest[1];
     QW sum[1];
-    pcptn->ptn = ptn;
     ActivateCplcy(pcptn, pso);
+    pcptn->ptn = ptn;
     if (ptn == 0) {
         pcptn->ptnfn = &D_002C4120;
     } else {
         TNFNELEM *pbest = ptn->atnfn;
-        for (int index = 1; index < ptn->ctnfn; index++) {
+        for (int index = 1; index < pcptn->ptn->ctnfn; index++) {
             TNFNELEM *ptnfn = &pcptn->ptn->atnfn[index];
             if (FIsBasicDerivedFrom(pso, ptnfn->cid)) {
                 if (FIsCidDerivedFrom(ptnfn->cid, pbest->cid))
@@ -98,9 +98,10 @@ extern "C" void ActivateCptn__FP4CPTNPv(CPTN *pcptn, void *pso, TN *ptn)
         }
         GetTnfnNose__FP4TNFNP6CPDEFIP6VECTORP2TN(pcptn->ptnfn, (CPDEFI *)cpdefi, nose, pcptn->ptn);
     }
-    CM *pcm = &B_002DDF40;
-    sum[0] = VectorAdd(nose[0], pcm->pos2E0);
-    DecomposeSphere(VectorSub(pcm->pos90, sum[0]), &pcptn->yaw, &pcptn->pitch, &pcptn->dist);
+    QW *pposition = &B_002DDF40.pos2E0;
+    CM *pcm = (CM *)((char *)pposition - 0x2E0);
+    sum[0] = VectorAdd(nose[0], *pposition);
+    DecomposeSphere(VectorSub(pposition[-0x25], sum[0]), &pcptn->yaw, &pcptn->pitch, &pcptn->dist);
     pcptn->dist = pcptn->dist - pcm->f4C;
     pcptn->posSphere = VectorAdd(sum[0], SetVectorSphere__FP6VECTORfff(pcptn->yaw, pcptn->pitch, pcptn->dist));
     pcptn->f24 = *(float *)((char *)pcptn->ptnfn + 0x5C);

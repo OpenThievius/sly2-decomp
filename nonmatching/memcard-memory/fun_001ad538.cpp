@@ -1,78 +1,54 @@
-typedef int s32;
-typedef float f32;
-struct Obj_1AD538 { char bytes[0x5464]; };
-struct Cards_1AD538 { char head[0x24]; Obj_1AD538 saves[3]; Obj_1AD538 *current; };
-struct Entry_1AD538 { char bytes[0x1C]; };
-struct Table_1AD538 { char pad[0xC]; Entry_1AD538 entries[1]; };
-struct Result_1AD538 { s32 pad0; f32 value; s32 pad8; s32 padC; };
+#include "cref.h"
+struct SLOT { char pad[0x5464]; };
+struct SAVE {
+    char pad0[0x24]; SLOT aslot[3];
+    char pad2[0xFD50 - 0x24 - 3 * 0x5464];
+    SLOT *pslotCur;
+};
+struct ENTRY { char pad[0x14]; int slot; int pad18; };
+struct PAUSEMENU { char pad[0x24]; int count; };
+struct MENU { char pad[0x44]; int phase; };
 extern "C" {
-void CRef_Destruct(void *);
-s32 RefGetGameSaveValue(void *, s32, void *);
-void func_001ACC38(void *, s32);
-s32 func_001B0078(void *);
-extern char B_002E6550[];
-extern Cards_1AD538 B_002E65E0;
-extern Table_1AD538 B_003D9ED0;
-extern char B_003DD490[];
-void func_001AD538(void) {
-    Result_1AD538 result;
-    f32 values[3];
-    char *entry;
-    Obj_1AD538 *save;
-    s32 index;
-    s32 count;
-    s32 mode;
-    func_001ACC38(B_002E6550, 1);
-    count = *(s32 *)((char *)&B_003D9ED0 + 0x24);
-    if (count > 0) {
-        save = B_002E65E0.saves;
-        entry = (char *)&B_003D9ED0.entries[count];
-        for (index = 0; index < 3; index++) {
-            f32 value;
-            RefGetGameSaveValue(&result, *(s32 *)(B_003DD490 + 0x3B1C), save);
-            save++;
-            value = result.value;
+#include "sw.h"
+extern SW B_003DD490;
+extern MENU B_002E6550;
+extern SAVE B_002E65E0;
+extern PAUSEMENU B_003D9ED0;
+extern ENTRY B_003D9EDC[];
+void func_001ACC38(MENU *, int);
+CRef RefGetGameSaveValue(void *, void *);
+int func_001B0078(PAUSEMENU *);
+void func_001AD538(void)
+{
+    float values[3];
+    func_001ACC38(&B_002E6550, 1);
+    if (B_003D9ED0.count > 0) {
+        ENTRY *entry = &B_003D9EDC[B_003D9ED0.count];
+        for (int index = 0; index < 3; index++) {
+            float value = RefGetGameSaveValue(B_003DD490.psavepathDt, &B_002E65E0.aslot[index]).m_tag.m_g;
             values[index] = value;
-            CRef_Destruct(&result);
         }
-        mode = func_001B0078(&B_003D9ED0);
-        switch (mode) {
+        switch (func_001B0078(&B_003D9ED0)) {
         case 30:
-            if (values[0] != 0.0f) {
-                index = 1;
-                while (index < 3) {
-                    if (values[index] != 0.0f) {
-                        index++;
-                        continue;
-                    }
-                    *(s32 *)(entry + 0x14) = index;
+            for (int index = 0; index < 3; index++) {
+                if (values[index] == 0.0f) {
+                    entry->slot = index;
                     break;
                 }
-            } else {
-                *(s32 *)(entry + 0x14) = 0;
             }
             break;
         case 31:
-            if (values[0] != 0.0f) {
-                *(s32 *)(entry + 0x14) = 0;
-            } else {
-                index = 1;
-                while (index < 3) {
-                    if (values[index] != 0.0f) {
-                        *(s32 *)(entry + 0x14) = index;
-                        break;
-                    }
-                    index++;
+            for (int index = 0; index < 3; index++) {
+                if (values[index] != 0.0f) {
+                    entry->slot = index;
+                    break;
                 }
             }
             break;
-        case 25: {
-            Obj_1AD538 *current = B_002E65E0.current;
-            if (current != 0) {
-                *(s32 *)(entry + 0x14) = current - B_002E65E0.saves;
-            }
+        case 25:
+            if (B_002E65E0.pslotCur != 0)
+                entry->slot = B_002E65E0.pslotCur - B_002E65E0.aslot;
             break;
-        }
         }
     }
 }

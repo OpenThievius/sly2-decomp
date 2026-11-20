@@ -921,6 +921,7 @@ us_address	name	other_address	pair	score	addresses
 0x11A550	func_0011A550	0X11A550	same	0	ok
 0x11A6B8	ClearDzgSolution__FP3DZG	0X11A6B8	identical	0	ok
 0x11A770	EnforceDzgDz__FP3DZGP2DZ	0X11A770	same	0	ok
+0x11ABF8	SolveDzgPrefilled	0X11ABF8	same	0	ok
 0x11AD30	SolveInequalities	0X11AD30	same	0	ok
 0x11AE88	StaticInitSlotheaps_11ae88	0X11AE88	same	0	ok
 0x11AFC0	func_0011AFC0	0X11AFC0	identical	0	ok
@@ -2144,6 +2145,7 @@ us_address	name	other_address	pair	score	addresses
 0x160A98	CloseFrame__Fv	0X160AC0	same	0	ok
 0x160B70	FrameRenderLoop__FPv	0X160B98	same	0	ok
 0x160C80	RenderFrame__FP3FRMi	0X160CA8	same	0	ok
+0x160CE0	ClearPendingFrame__FP3FRM	0X160D08	same	0	ok
 0x160E68	FlushFrames__Fi	0X160E90	same	0	ok
 0x160F98	BlendPrevFrame__Fv	0X160FC0	same	5	ok
 0x161238	func_00161238	0X161260	same	0	ok
@@ -4564,6 +4566,7 @@ us_address	name	other_address	pair	score	addresses
 0x2081C8	ResetGuardAnimrefArrays	0X208988	same	0	ok
 0x208208	CloneAnimrefArray	0X2089C8	same	0	ok
 0x208250	CloneGuardAnimrefs	0X208A10	same	0	ok
+0x2082D0	func_002082D0	0X208A90	same	0	ok
 0x208538	func_00208538	0X208CF8	gap	0	ok
 0x208540	func_00208540	0X208D00	same	0	ok
 0x2085B0	AddGuardSensedObject_thunk	0X208D70	same	0	ok
@@ -5032,6 +5035,7 @@ us_address	name	other_address	pair	score	addresses
 0x227440	func_00227440	0X227C60	same	0	ok
 0x227460	StaticInitSlotheaps_227460	0X227C80	same	0	ok
 0x227598	func_00227598	0X227DB8	same	0	ok
+0x2275B8	func_002275B8	0X227DD8	same	0	ok
 0x227728	func_00227728	0X227F48	same	0	ok
 0x227788	func_00227788	0X227FA8	same	0	ok
 0x2277D0	func_002277D0	0X227FF0	same	0	ok

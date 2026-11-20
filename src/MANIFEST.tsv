@@ -921,6 +921,7 @@ address	name	size	file	whole_file	symbol
 0X11A550	func_0011A550	360	dl-dzg/dl_dzg_11a550.cpp	dl-dzg/dl_dzg_11a550.cpp	func_0011A550
 0X11A6B8	ClearDzgSolution__FP3DZG	184	dl-dzg/dl_dzg_11a550.cpp	dl-dzg/dl_dzg_11a550.cpp	ClearDzgSolution
 0X11A770	EnforceDzgDz__FP3DZGP2DZ	1160	dl-dzg/dl_dzg_11a550.cpp	dl-dzg/dl_dzg_11a550.cpp	EnforceDzgDz__FP3DZGP2DZ
+0X11ABF8	SolveDzgPrefilled	308	dl-dzg/dl_dzg_11a550.cpp	dl-dzg/dl_dzg_11a550.cpp	SolveDzgPrefilled
 0X11AD30	SolveInequalities	344	dl-dzg/dl_dzg_11a550.cpp	dl-dzg/dl_dzg_11a550.cpp	SolveInequalities
 0X11AE88	StaticInitSlotheaps_11ae88	308	dl-dzg/dl_dzg_11a550.cpp	dl-dzg/dl_dzg_11a550.cpp	StaticInitSlotheaps_11ae88
 0X11AFC0	func_0011AFC0	32	dl-dzg/dl_dzg_11a550.cpp	dl-dzg/dl_dzg_11a550.cpp	func_0011AFC0
@@ -2144,6 +2145,7 @@ address	name	size	file	whole_file	symbol
 0X160A98	CloseFrame__Fv	212	frm/CloseFrame__Fv.cpp		
 0X160B70	FrameRenderLoop__FPv	272	frm/FrameRenderLoop__FPv.cpp		
 0X160C80	RenderFrame__FP3FRMi	92	frm/RenderFrame__FP3FRMi.cpp		
+0X160CE0	ClearPendingFrame__FP3FRM	392	frm/ClearPendingFrame__FP3FRM.cpp		
 0X160E68	FlushFrames__Fi	304	frm/FlushFrames__Fi.cpp		
 0X160F98	BlendPrevFrame__Fv	668	frm-splice-frame/frm_splice_frame_160f98.cpp	frm-splice-frame/frm_splice_frame_160f98.cpp	BlendPrevFrame__Fv
 0X161238	func_00161238	332	frm-splice-frame/frm_splice_frame_160f98.cpp	frm-splice-frame/frm_splice_frame_160f98.cpp	func_00161238
@@ -4564,6 +4566,7 @@ address	name	size	file	whole_file	symbol
 0X2081C8	ResetGuardAnimrefArrays	64	step-rwm/ResetGuardAnimrefArrays.c		
 0X208208	CloneAnimrefArray	68	step-rwm/CloneAnimrefArray.cpp		
 0X208250	CloneGuardAnimrefs	128	step-rwm/CloneGuardAnimrefs.c		
+0X2082D0	func_002082D0	616	step-rwm/fun_002082d0.cpp		
 0X208538	func_00208538	8	unsorted/fun_00208538.c		
 0X208540	func_00208540	112	step-rwm/fun_00208540.c		
 0X2085B0	AddGuardSensedObject_thunk	28	step-rwm/AddGuardSensedObject_thunk.c		
@@ -5032,6 +5035,7 @@ address	name	size	file	whole_file	symbol
 0X227440	func_00227440	32	new_2271f8/new_2271f8_227350.cpp	new_2271f8/new_2271f8_227350.cpp	func_00227440
 0X227460	StaticInitSlotheaps_227460	308	new_2271f8/new_2271f8_227350.cpp	new_2271f8/new_2271f8_227350.cpp	StaticInitSlotheaps_227460
 0X227598	func_00227598	32	new_2271f8/new_2271f8_227350.cpp	new_2271f8/new_2271f8_227350.cpp	func_00227598
+0X2275B8	func_002275B8	364	new_2271f8/fun_002275b8.cpp		
 0X227728	func_00227728	92	new_2271f8/fun_00227728.cpp		
 0X227788	func_00227788	72	new_2271f8/fun_00227788.cpp		
 0X2277D0	func_002277D0	80	new_2271f8/fun_002277d0.c		

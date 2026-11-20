@@ -54,7 +54,7 @@ extern "C" PairHandle PpairSerializeIn(CBinaryInputStream *pbis)
         return PairHandle(0);
     }
     PairHandle h(PpairNew());
-    if (B_003E1C34 != 0) {
+    if (B_003E1C34) {
         S32Read__18CBinaryInputStream(pbis);
         S16Read__18CBinaryInputStream(pbis);
         S16Read__18CBinaryInputStream(pbis);
@@ -67,7 +67,6 @@ extern "C" PairHandle PpairSerializeIn(CBinaryInputStream *pbis)
     unsigned char fNext = code >> 7;
     int tagk = code & 0x7F;
     CRef *pref = &ppairNew->ref;
-    int i;
     switch (tagk) {
     case 0: case 1: case 2: case 5: case 6: case 7: case 8: case 9: case 10: case 11: case 12: case 13: case 14:
     case 15: case 16: case 17: case 18: case 20:
@@ -95,7 +94,7 @@ extern "C" PairHandle PpairSerializeIn(CBinaryInputStream *pbis)
     case 26:
         CRef_Destruct(pref);
         SetTag__4CRef4TAGK(pref, 0x1A);
-        for (i = 0; i < 3; i++) {
+        for (int i = 0; i < 3; i++) {
             float *pv = &pref->pv[i];
             *pv = F32Read__18CBinaryInputStream(pbis);
         }
@@ -103,7 +102,7 @@ extern "C" PairHandle PpairSerializeIn(CBinaryInputStream *pbis)
     case 27:
         CRef_Destruct(pref);
         SetTag__4CRef4TAGK(pref, 0x1B);
-        for (i = 0; i < 16; i++)
+        for (int i = 0; i < 16; i++)
         {
             float *pv = pref->pv;
             float value = F32Read__18CBinaryInputStream(pbis);
@@ -114,7 +113,7 @@ extern "C" PairHandle PpairSerializeIn(CBinaryInputStream *pbis)
     case 28:
         CRef_Destruct(pref);
         SetTag__4CRef4TAGK(pref, 0x1C);
-        for (i = 0; i < 3; i++)
+        for (int i = 0; i < 3; i++)
         {
             float *pv = pref->pv;
             float value = F32Read__18CBinaryInputStream(pbis);
@@ -125,7 +124,7 @@ extern "C" PairHandle PpairSerializeIn(CBinaryInputStream *pbis)
     case 29:
         CRef_Destruct(pref);
         SetTag__4CRef4TAGK(pref, 0x1D);
-        for (i = 0; i < 2; i++)
+        for (int i = 0; i < 2; i++)
         {
             float *pv = pref->pv;
             float value = F32Read__18CBinaryInputStream(pbis);
@@ -136,7 +135,7 @@ extern "C" PairHandle PpairSerializeIn(CBinaryInputStream *pbis)
     case 30:
         CRef_Destruct(pref);
         SetTag__4CRef4TAGK(pref, 0x1E);
-        for (i = 0; i < 3; i++)
+        for (int i = 0; i < 3; i++)
         {
             float *pv = pref->pv;
             float value = F32Read__18CBinaryInputStream(pbis);
@@ -150,7 +149,8 @@ extern "C" PairHandle PpairSerializeIn(CBinaryInputStream *pbis)
     }
     if (fNext) {
         CPair *ppair = h.p;
-        ppair->next = PpairSerializeIn(pbis).p;
+        PairHandle nextHandle = PpairSerializeIn(pbis);
+        ppair->next = nextHandle.p;
     }
     return PairHandle(h.p);
 }

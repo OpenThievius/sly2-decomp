@@ -17,9 +17,8 @@ void func_00138BA0(ACSB_138BA0 *self, float *outA, float *outB, int unused, floa
     float sumA;
     float sumB;
     int index;
-    int found = unused;
-    char *entryBase = 0;
-    char *entryRow = 0;
+    int found;
+    char *entryRow;
     HOST_138BA0 *host;
     if (self->mrsg == 0) {
         base = time / self->host->duration;
@@ -29,18 +28,24 @@ void func_00138BA0(ACSB_138BA0 *self, float *outA, float *outB, int unused, floa
         base = values[0] / *(float *)(entryRow + 4);
     }
     host = self->host;
-    index = 0;
     sumA = 0.0f;
     sumB = 0.0f;
-    if (host->count > 0) {
-        do {
+    {
+        for (index = 0; index < host->count; index++) {
             CHANNEL_138BA0 *channel = (CHANNEL_138BA0 *)(host->base + index * host->stride);
             if (channel->weight != 0.0f) {
                 OBJ_138BA0 *object = self->objects[index];
-                if (object != 0) {
+                if (object == 0) {
+                    values[2] = 0.0f;
+                    values[1] = self->rest;
+                } else {
                     float arg1Value;
                     float arg2Value;
-                    if (self->mrsg != 0) {
+                    if (self->mrsg == 0) {
+                        float channelDuration = channel->host->duration;
+                        arg2Value = (scale * channelDuration) / host->duration;
+                        arg1Value = base * channelDuration;
+                    } else {
                         char *record = (char *)channel + *(int *)self->mrsg + found * 8;
                         float channelDuration = channel->host->duration;
                         float second = *(float *)(record + 4);
@@ -49,23 +54,17 @@ void func_00138BA0(ACSB_138BA0 *self, float *outA, float *outB, int unused, floa
                         if (channelDuration < arg1Value) {
                             arg1Value -= channelDuration;
                         }
-                    } else {
-                        float channelDuration = channel->host->duration;
-                        arg2Value = (scale * channelDuration) / host->duration;
-                        arg1Value = base * channelDuration;
                     }
                     VT_138BA0 *vt = object->vt;
-                    vt->fn((char *)object + vt->delta, &values[1], &values[2], object, arg1Value, arg2Value);
-                } else {
-                    values[2] = 0.0f;
-                    values[1] = self->rest;
+                    short delta = vt->delta;
+                    void (*method)(void *, float *, float *, void *, float, float) = vt->fn;
+                    method((char *)object + delta, &values[1], &values[2], object, arg1Value, arg2Value);
                 }
                 sumA += channel->weight * values[1];
                 sumB += channel->weight * values[2];
             }
             host = self->host;
-            index++;
-        } while (index < host->count);
+        }
     }
     if (outA != 0) {
         *outA = sumA;

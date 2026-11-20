@@ -110,7 +110,7 @@ struct SO_1F6068 {
 
 extern "C" {
 void CLo_Clone(SO_1F6068 *pso);
-void *PvAllocSwCopyImpl__FiPv(ALLOCREQ *preq);
+void *PvAllocSwCopyImpl__FiPv(ALLOCREQ *preq, void *pvSource);
 void *PvAllocStackImpl__Fi(ALLOCREQ *preq);
 void *CStackFrame_Construct(void *pframe);
 void CStackFrame_Destructor(void *pframe, int grf);
@@ -123,6 +123,12 @@ void CloneBspc__FP4GEOMP4BSPCT0T1(void *pbspcBase, GEOMDATA_1F6068 *pgeomBase, v
 void AddSoGeomsToOxa(SO_1F6068 *pso);
 void func_001F2500(SO_1F6068 *pso);
 extern s32 D_002C44F0;
+}
+
+static inline ALLOCREQ *Aligned(ALLOCREQ *request)
+{
+    request->cbAlign = 0x10;
+    return request;
 }
 
 /* SO's slot 52 (vtable +0x1A0): relocate the pointer at ppv from the template to the clone */
@@ -146,13 +152,10 @@ extern "C" void CSo_Clone(SO_1F6068 *pso, SO_1F6068 *psoBase)
 
     ALLOCREQ req;
     {
-        ALLOCREQ *preq = &req;
         req.cb = pso->centry << 8;
-        preq->cbAlign = 0x10;
-        pso->aentry = (ENTRY_1F6068 *)PvAllocSwCopyImpl__FiPv(preq);
+        pso->aentry = (ENTRY_1F6068 *)PvAllocSwCopyImpl__FiPv(Aligned(&req), pso->aentry);
     }
     for (; ientry < pso->centry; ientry++) {
-        ALLOCREQ *preq = &req;
         ENTRY_1F6068 *pentry = &pso->aentry[ientry];
         Relocate(pso, psoBase, &pentry->pvA0);
         switch (pentry->kind) {
@@ -160,9 +163,9 @@ extern "C" void CSo_Clone(SO_1F6068 *pso, SO_1F6068 *psoBase)
             Relocate(pso, psoBase, &pentry->pvA8);
             break;
         case 0xD: {
+            void *pvSource = pentry->pvA8;
             req.cb = 0xE0;
-            preq->cbAlign = 0x10;
-            CHAIN_1F6068 *pchain = (CHAIN_1F6068 *)PvAllocSwCopyImpl__FiPv(preq);
+            CHAIN_1F6068 *pchain = (CHAIN_1F6068 *)PvAllocSwCopyImpl__FiPv(Aligned(&req), pvSource);
             Relocate(pso, psoBase, &pchain->pv0);
             Relocate(pso, psoBase, &pchain->pv4);
             Relocate(pso, psoBase, &pchain->pv8);
@@ -172,9 +175,9 @@ extern "C" void CSo_Clone(SO_1F6068 *pso, SO_1F6068 *psoBase)
             break;
         }
         case 0xF: {
+            void *pvSource = pentry->pvA8;
             req.cb = 0x10;
-            preq->cbAlign = 0x10;
-            CHAIN_1F6068 *pchain = (CHAIN_1F6068 *)PvAllocSwCopyImpl__FiPv(preq);
+            CHAIN_1F6068 *pchain = (CHAIN_1F6068 *)PvAllocSwCopyImpl__FiPv(Aligned(&req), pvSource);
             pentry->pvA8 = pchain;
             if (pchain->pv0 != &D_002C44F0)
                 Relocate(pso, psoBase, &pchain->pv0);
@@ -186,11 +189,9 @@ extern "C" void CSo_Clone(SO_1F6068 *pso, SO_1F6068 *psoBase)
             SET_1F6068 *pset = plink->pset;
             if (plink == pset->alink) {
                 req.cb = 0x50;
-                preq->cbAlign = 0x10;
-                preq->cbAlign = 0x10;
-                pset = (SET_1F6068 *)PvAllocSwCopyImpl__FiPv(preq);
+                pset = (SET_1F6068 *)PvAllocSwCopyImpl__FiPv(Aligned(&req), pset);
                 req.cb = pset->clink * 0x70;
-                pset->alink = (LINK_1F6068 *)PvAllocSwCopyImpl__FiPv(preq);
+                pset->alink = (LINK_1F6068 *)PvAllocSwCopyImpl__FiPv(Aligned(&req), pset->alink);
                 for (int ilink = 0; ilink < pset->clink; ilink++) {
                     LINK_1F6068 *plinkNew = &pset->alink[ilink];
                     plinkNew->pset = pset;
@@ -202,18 +203,19 @@ extern "C" void CSo_Clone(SO_1F6068 *pso, SO_1F6068 *psoBase)
         }
         }
 
-        ACT_1F6068 *pact = pentry->pactFirst;
-        if (pact != 0) {
+        ACT_1F6068 *pactFirst = pentry->pactFirst;
+        ACT_1F6068 *pact;
+        if (pactFirst != 0) {
             int cact = 0;
+            pact = pactFirst;
             do {
                 pact = pact->pactNext;
                 cact++;
             } while (pact != 0);
             u8 frame[16];
             CStackFrame_Construct(frame);
-            preq->cbAlign = 0x10;
             req.cb = cact * 4;
-            ACT_1F6068 **apact = (ACT_1F6068 **)PvAllocStackImpl__Fi(preq);
+            ACT_1F6068 **apact = (ACT_1F6068 **)PvAllocStackImpl__Fi(Aligned(&req));
             ACT_1F6068 **ppact = apact;
             for (pact = pentry->pactFirst; pact != 0; pact = pact->pactNext)
                 *ppact++ = pact;
@@ -230,11 +232,9 @@ extern "C" void CSo_Clone(SO_1F6068 *pso, SO_1F6068 *psoBase)
     CloneGlobset(pso->globset, pso, psoBase);
     VTENTRY_1F6068 *pvte = (VTENTRY_1F6068 *)((u8 *)pso->vt + 0x1F8);
     int cgeomExtra = ((int (*)(void *))pvte->pfn)((u8 *)pso + pvte->delta);
-    req.cbAlign = 0x10;
     req.cb = (pso->cgeom + cgeomExtra) * 0xB0;
-    pso->ageom = (GEOM_1F6068 *)PvAllocSwCopyImpl__FiPv(&req);
+    pso->ageom = (GEOM_1F6068 *)PvAllocSwCopyImpl__FiPv(Aligned(&req), pso->ageom);
     for (int igeom = 0; igeom < pso->cgeom; igeom++) {
-        ALLOCREQ *preq = &req;
         GEOM_1F6068 *pgeom = &pso->ageom[igeom];
         Relocate(pso, psoBase, pgeom);
         pgeom->pso = pso;
@@ -244,32 +244,27 @@ extern "C" void CSo_Clone(SO_1F6068 *pso, SO_1F6068 *psoBase)
         pgeom->geom = geom;
         GEOM_1F6068 *pgeomBase = &psoBase->ageom[igeom];
         CloneBspc__FP4GEOMP4BSPCT0T1(pgeomBase->bspc, &pgeomBase->geom, pgeom->bspc, &pgeom->geom);
-        if (pgeom->pbsps != 0) {
+        BSPS_1F6068 *pbspsBase = pgeom->pbsps;
+        if (pbspsBase != 0) {
             req.cb = 0xC;
-            preq->cbAlign = 0x10;
-            BSPS_1F6068 *pbsps = (BSPS_1F6068 *)PvAllocSwCopyImpl__FiPv(preq);
+            BSPS_1F6068 *pbsps = (BSPS_1F6068 *)PvAllocSwCopyImpl__FiPv(Aligned(&req), pbspsBase);
             pgeom->pbsps = pbsps;
             req.cb = pgeom->cvtx << 4;
-            pgeom->pbsps->pv0 = PvAllocSwCopyImpl__FiPv(preq);
-            preq->cbAlign = 0x10;
-            preq->cbAlign = 0x10;
+            pgeom->pbsps->pv0 = PvAllocSwCopyImpl__FiPv(Aligned(&req), pbsps->pv0);
             req.cb = pgeom->cvtx << 4;
-            pgeom->pbsps->pv4 = PvAllocSwCopyImpl__FiPv(preq);
-            preq->cbAlign = 0x10;
+            pgeom->pbsps->pv4 = PvAllocSwCopyImpl__FiPv(Aligned(&req), pgeom->pbsps->pv4);
             req.cb = pgeom->ctri * 0xC;
-            pgeom->pbsps->pv8 = PvAllocSwCopyImpl__FiPv(preq);
+            pgeom->pbsps->pv8 = PvAllocSwCopyImpl__FiPv(Aligned(&req), pgeom->pbsps->pv8);
         }
     }
 
     if (pso->pphys != 0) {
         req.cb = 0xE0;
-        req.cbAlign = 0x10;
-        PHYSX_1F6068 *pphys = (PHYSX_1F6068 *)PvAllocSwCopyImpl__FiPv(&req);
+        PHYSX_1F6068 *pphys = (PHYSX_1F6068 *)PvAllocSwCopyImpl__FiPv(Aligned(&req), pso->pphys);
         pso->pphys = pphys;
         if (pphys->ppso != 0) {
-            req.cbAlign = 0x10;
             req.cb = 0x70;
-            pso->pphys->ppso = (SO_1F6068 **)PvAllocSwCopyImpl__FiPv(&req);
+            pso->pphys->ppso = (SO_1F6068 **)PvAllocSwCopyImpl__FiPv(Aligned(&req), pso->pphys->ppso);
             *pso->pphys->ppso = pso;
         }
     }
