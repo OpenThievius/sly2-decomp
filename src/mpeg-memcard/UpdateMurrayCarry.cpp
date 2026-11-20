@@ -64,6 +64,8 @@ void UpdateMurrayCarry(MURRAY *pmurray)
     }
 
     switch (pmurray->iapasegByIndex) {
+    case 0:
+        break;
     case 1:
         SetStepRadTarget(pmurray, pmurray->pjoy->radStick);
         SetRunBlendU(((char *)pmurray + 0x1460), pmurray->pjoy->uStick);

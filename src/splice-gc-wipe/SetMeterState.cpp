@@ -23,12 +23,11 @@ extern "C" void SetMeterState(Meter *self, unsigned state)
     if (self->state == 2 || self->state == 6) CALL(self->blot, self->arg3C);
     self->state = state;
     if (state >= 8) return;
-    int argument;
     switch (state) {
     case 0:
     case 5:
-        argument = self->arg44;
-        goto common;
+        CALL(self->blot, self->arg44);
+        break;
     case 1: {
         int count = 0;
         GADGETMENUENTRY *entries = 0;
@@ -40,10 +39,8 @@ extern "C" void SetMeterState(Meter *self, unsigned state)
         else if (FIsBasicDerivedFrom(self->actor, 0x36)) { count = 8; entries = D_002C3148; }
         GADGETMENUENTRY *entry = entries;
         int found = 0;
-        for (int index = 0; index < count; index++) {
+        for (int index = 0; index < count; entry++, index++) {
             int id = entry->id;
-            GADGETMENUENTRY *next = entry + 1;
-            entry = next;
             if (FGadgetAcquired(id)) {
                 ITEMDEF item = D_002BCD00[id];
                 if (item.shown > 0) { found = 1; break; }
@@ -58,12 +55,10 @@ extern "C" void SetMeterState(Meter *self, unsigned state)
         break;
     }
     case 2:
-        argument = self->arg40;
-        goto common;
+        CALL(self->blot, self->arg40);
+        break;
     case 6:
-        argument = self->arg48;
-    common:
-        CALL(self->blot, argument);
+        CALL(self->blot, self->arg48);
         break;
     case 7:
         CALL(self->blot, self->arg4C);

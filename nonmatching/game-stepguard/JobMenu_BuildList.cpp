@@ -13,7 +13,7 @@ void JobMenu_Select(JOBMENU *, int);
 void OrderTasks(int *, TASKINFO ***);
 int func_00163430(TASKINFO *);
 void func_00213928(int, int);
-void *memmove(void *, const void *, unsigned long);
+void *memmove(void *, const void *, unsigned int);
 void *memset(void *, int, unsigned long);
 void qsort(void *, int, unsigned long, int (*)(const void *, const void *));
 int func_00165C28(const void *, const void *);
@@ -46,7 +46,8 @@ extern "C" void JobMenu_BuildList(JOBMENU *menu)
             if (owner != 0 && previous != owner) {
                 previous = owner;
                 if (func_00163430(owner) > 0 && owner->ready != -1) {
-                    ITEM *item = &menu->items[menu->count++];
+                    ITEM *item = &menu->items[menu->count];
+                    menu->count++;
                     item->first = -1;
                     item->task = owner;
                     item->second = -1;

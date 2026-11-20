@@ -55,7 +55,7 @@ void ShopMenu_UpdateBlot(SHOPMENU *menu)
     }
     int irow = menu->itop;
     if (irow < irowEnd) {
-        ROW *prow = (ROW *)((int)menu + 0x4C + irow * 8);
+        ROW *prow = (ROW *)(irow * 8 + (int)menu->arow);
         do {
             int oid = D_002C3588[irow - menu->itop];
             switch (menu->page) {

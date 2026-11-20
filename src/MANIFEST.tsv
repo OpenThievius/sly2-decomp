@@ -871,6 +871,7 @@ address	name	size	file	whole_file	symbol
 0X117F70	CBinaryInputStream_ReadVector4	32	geom/InitGeom_file.cpp	geom/InitGeom_file.cpp	CBinaryInputStream_ReadVector4
 0X117F90	func_00117F90	32	geom/InitGeom_file.cpp	geom/InitGeom_file.cpp	func_00117F90
 0X117FB0	func_00117FB0	32	geom/InitGeom_file.cpp	geom/InitGeom_file.cpp	func_00117FB0
+0X117FD0	CBinaryInputStream_ReadGeom	580	geom/InitGeom_file.cpp	geom/InitGeom_file.cpp	CBinaryInputStream_ReadGeom
 0X118220	CBinaryInputStream_ReadBspc	340	geom/InitGeom_file.cpp	geom/InitGeom_file.cpp	CBinaryInputStream_ReadBspc
 0X118380	func_00118380	156	geom/InitGeom_file.cpp	geom/InitGeom_file.cpp	func_00118380
 0X118420	Unknown1__18CBinaryInputStream	52	geom/InitGeom_file.cpp	geom/InitGeom_file.cpp	Unknown1__18CBinaryInputStream
@@ -1431,6 +1432,7 @@ address	name	size	file	whole_file	symbol
 0X133598	StaticInitBasic	308	lo/OnLoAdd_file.cpp	lo/OnLoAdd_file.cpp	StaticInitBasic
 0X1336D0	GlobalCtorBasic	32	lo/OnLoAdd_file.cpp	lo/OnLoAdd_file.cpp	GlobalCtorBasic
 0X1336F0	PoxaAllocSw	224	sensor-bbmark/PoxaAllocSw_file.cpp	sensor-bbmark/PoxaAllocSw_file.cpp	PoxaAllocSw
+0X133A38	UpdateSwPox	556	sensor-bbmark/PoxaAllocSw_file.cpp	sensor-bbmark/PoxaAllocSw_file.cpp	UpdateSwPox
 0X133C68	AllocSwOx	76	sensor-bbmark/PoxaAllocSw_file.cpp	sensor-bbmark/PoxaAllocSw_file.cpp	AllocSwOx
 0X133CB8	PoxExtractFromPoxa	80	sensor-bbmark/PoxaAllocSw_file.cpp	sensor-bbmark/PoxaAllocSw_file.cpp	PoxExtractFromPoxa
 0X133D08	FPoxaPairInteracts	292	sensor-bbmark/PoxaAllocSw_file.cpp	sensor-bbmark/PoxaAllocSw_file.cpp	FPoxaPairInteracts
@@ -2576,6 +2578,7 @@ address	name	size	file	whole_file	symbol
 0X17F770	func_0017F770	224	new_17dd70/fun_0017f770.cpp		
 0X17F850	Mount_PostLoad	116	new_17dd70/Mount_PostLoad.cpp		
 0X17F8C8	Mount_OnPoActive	100	new_17dd70/Mount_OnPoActive.cpp		
+0X17F930	Mount_Update	540	new_17dd70/Mount_Update.cpp		
 0X17FB50	Mount_AccelToward	148	new_17dd70/Mount_AccelToward.cpp		
 0X17FBE8	Mount_FTakeHit	200	new_17dd70/Mount_FTakeHit.cpp		
 0X17FCB0	Mount_ResetState	84	new_17dd70/Mount_ResetState.c		
@@ -3231,6 +3234,7 @@ address	name	size	file	whole_file	symbol
 0X1B49E0	PostMurrayLoad	188	mpeg-memcard/PostMurrayLoad.cpp		
 0X1B4AA0	UpdateMurrayActive	1432	mpeg-memcard/UpdateMurrayActive.cpp		
 0X1B5038	UpdateMurrayBinoc	120	mpeg-memcard/UpdateMurrayBinoc.cpp		
+0X1B5380	UpdateMurrayCarry	728	mpeg-memcard/UpdateMurrayCarry.cpp		
 0X1B5658	SetMurrayCarryState	452	mpeg-memcard/SetMurrayCarryState.cpp		
 0X1B5820	UpdateMurrayMash	364	mpeg-memcard/UpdateMurrayMash.cpp		
 0X1B5D30	func_001B5D30	360	mpeg-memcard/fun_001b5d30.cpp		
@@ -3297,6 +3301,7 @@ address	name	size	file	whole_file	symbol
 0X1BAED8	SetStgSwitchHitter	64	mpeg-memcard/SetStgSwitchHitter.cpp		
 0X1BAF18	StepStgSwitch	824	mpeg-memcard/StepStgSwitch.cpp		
 0X1BB250	func_001BB250	428	mpeg-memcard/fun_001bb250.cpp		
+0X1BB400	RunStgSwitch	584	mpeg-memcard/RunStgSwitch.cpp		
 0X1BB648	RunStgSwitchStage	716	mpeg-memcard/RunStgSwitchStage.cpp		
 0X1BB918	AddStgSwitchClass	52	mpeg-memcard/AddStgSwitchClass.cpp		
 0X1BB950	AddStgSwitchStage	104	mpeg-memcard/AddStgSwitchStage.cpp		
@@ -3734,6 +3739,7 @@ address	name	size	file	whole_file	symbol
 0X1D9910	CGc_PopScreen	88	splice-gc-wipe/CGc_PopScreen.c		
 0X1D9968	InitMeter	456	splice-gc-wipe/InitMeter.cpp		
 0X1D9B30	ReleaseMeter	44	splice-gc-wipe/ReleaseMeter.cpp		
+0X1D9B60	SetMeterState	660	splice-gc-wipe/SetMeterState.cpp		
 0X1D9DF8	UpdateMeter	1256	splice-gc-wipe/UpdateMeter.cpp		
 0X1DA2E0	FindHudLabelBlot	60	splice-gc-wipe/FindHudLabelBlot.c		
 0X1DA320	InitHudLabel	48	splice-gc-wipe/InitHudLabel.cpp		
@@ -3770,6 +3776,7 @@ address	name	size	file	whole_file	symbol
 0X1DBBA0	ShopMenu_IrowEnd	60	game-stepguard/ShopMenu_IrowEnd.cpp		
 0X1DBBE0	ShopMenu_Select	304	game-stepguard/ShopMenu_Select.cpp		
 0X1DBD10	ShopMenu_BuildList	480	game-stepguard/ShopMenu_BuildList.cpp		
+0X1DBEF0	ShopMenu_UpdateBlot	880	game-stepguard/ShopMenu_UpdateBlot.cpp		
 0X1DC260	ShopMenu_SetPage	592	game-stepguard/ShopMenu_SetPage.cpp		
 0X1DC4B0	ShopMenu_SetDirection	228	game-stepguard/ShopMenu_SetDirection.cpp		
 0X1DC598	GetGadgetMenuText	500	game-stepguard/GetGadgetMenuText.cpp		

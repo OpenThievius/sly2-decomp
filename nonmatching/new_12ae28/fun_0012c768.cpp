@@ -26,7 +26,8 @@ static inline int Near3(QW p, QW q)
     return Near(LaneX(p), LaneX(q)) && Near(LaneYInGeneralRegister(p), LaneYInGeneralRegister(q)) &&
            Near(LaneZInGeneralRegister(p), LaneZInGeneralRegister(q));
 }
-extern "C" void func_0012C768(KEYS_12C768 *keys, STATE_12C768 *state, int index) {
+extern "C" void func_0012C768(KEYS_12C768 *keys, STATE_12C768 *state) {
+    int index;
     if (keys->count != 0) {
         index = func_0012C708(keys, *state->currentPtr);
         state->prevTime = keys->times[index - 1];
@@ -37,9 +38,9 @@ extern "C" void func_0012C768(KEYS_12C768 *keys, STATE_12C768 *state, int index)
         state->nextPtr = &state->nextTime;
         state->prevTime = 0;
     }
+    float *defaultPtr = keys->defaults;
     unsigned int step = 0;
     int offset = index * 8;
-    float *defaultPtr = keys->defaults;
     float **axisPtr = keys->axes;
     int previousOffset = offset - 8;
     float *outD = state->vecD;

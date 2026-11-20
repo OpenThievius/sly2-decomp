@@ -61,11 +61,10 @@ void Mount_Update(char *mount) {
         break;
     case 1: {
         char *data = *(char **)(mount + 0x150);
+        float scale = g_2be7e8;
         int index = 0;
-        float width = *(float *)(data + 0x1C) * g_2be7e8;
-        float radius = *(float *)(data + 0x18);
-        *(float *)(mount + 0x218) = radius;
-        *(QW *)(mount + 0x220) = SetVectorCylind__FP6VECTORfff(radius, width, 0.0f);
+        *(float *)(mount + 0x218) = *(float *)(data + 0x18);
+        *(QW *)(mount + 0x220) = SetVectorCylind__FP6VECTORfff(*(float *)(data + 0x18), *(float *)(data + 0x1C) * scale, 0.0f);
         float second = *(float *)(*(char **)(mount + 0x150) + 0x28);
         union VectorQuad { QW q; VECTOR v; } stored;
         stored.q = VectorFromFloats3(0.0f, 0.0f, second);

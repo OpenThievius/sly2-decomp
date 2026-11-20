@@ -8,6 +8,7 @@ void FilterColorRgba5551_1ed1a8(RGBA5551 *pcolor)
 {
     RGBA rgba;
     RGBA copy;
+    RGBA5551 out;
     if (B_003E12C8) {
         rgba.r = pcolor->r << 3;
         rgba.g = pcolor->g << 3;
@@ -15,9 +16,10 @@ void FilterColorRgba5551_1ed1a8(RGBA5551 *pcolor)
         rgba.a = pcolor->a ? 0xFF : 0;
         FilterColorRgba8_1ed278(&rgba);
         copy = rgba;
-        pcolor->r = copy.r >> 3;
-        pcolor->g = copy.g >> 3;
-        pcolor->b = copy.b >> 3;
-        pcolor->a = copy.a >> 7;
+        out.r = copy.r >> 3;
+        out.g = copy.g >> 3;
+        out.b = copy.b >> 3;
+        out.a = copy.a >> 7;
+        *pcolor = out;
     }
 }

@@ -47,7 +47,70 @@ void *PoxaAllocSw(SW *psw, SO *pso)
 
 INCLUDE_ASM(0X1337D0);
 
-INCLUDE_ASM(0X133A38);
+struct OX_133A38 { void *pmq; OX_133A38 *next; OX_133A38 *pair; SO *pobj; int flag; };
+struct POXA_133A38 { char pad0[0x60]; SO *pobj; OX_133A38 *head; };
+struct SwPoxNode;
+struct SwWorld;
+extern "C" {
+OX_133A38 *AllocSwOx_133A38(SW *, POXA_133A38 *, POXA_133A38 *);
+int FPoxaPairInteracts_133A38(SW *, POXA_133A38 *, POXA_133A38 *);
+void FreeSlotheapPv(void *, void *);
+void FreeSwMqList__FP2SWP2MQ(SW *, void *);
+OX_133A38 *PoxExtractFromPoxa_133A38(SW *, POXA_133A38 *, POXA_133A38 *);
+void func_001F5078(SO *);
+void UpdateSwPox(SwWorld *world, SwPoxNode *nodeA, SwPoxNode *nodeB, s32 mode)
+{
+    SW *psw = (SW *)world;
+    POXA_133A38 *pa = (POXA_133A38 *)nodeA;
+    POXA_133A38 *pb = (POXA_133A38 *)nodeB;
+    OX_133A38 *pnode = pa->head;
+    if (pnode != 0) {
+        if (pnode->pobj != pb->pobj) {
+            do {
+                pnode = pnode->next;
+            } while (pnode != 0 && pnode->pobj != pb->pobj);
+        }
+    }
+    int flag;
+    switch (mode) {
+    case 1: flag = 1; break;
+    case 2: flag = 0; break;
+    case 0: flag = 0; if (pnode) flag = pnode->flag; break;
+    }
+    OX_133A38 *pcur = pnode;
+    if (flag != 0 || FPoxaPairInteracts_133A38(psw, pa, pb) != 0) {
+        if (pcur == 0) {
+            OX_133A38 *pox = AllocSwOx_133A38(psw, pa, pb);
+            OX_133A38 *poxB = AllocSwOx_133A38(psw, pb, pa);
+            pox->pair = poxB;
+            poxB->pair = pox;
+            pcur = pox;
+        }
+    } else {
+        if (pcur == 0) return;
+        pa->pobj->Slot54(pb->pobj);
+        pb->pobj->Slot54(pa->pobj);
+        OX_133A38 *poxA = PoxExtractFromPoxa_133A38(psw, pa, pb);
+        OX_133A38 *poxB = PoxExtractFromPoxa_133A38(psw, pb, pa);
+        void *pheap;
+        if (poxA->pmq != 0) {
+            FreeSwMqList__FP2SWP2MQ(psw, poxA->pmq);
+            if (poxA->pobj->FIsLocked() == 0)
+                func_001F5078(poxA->pobj);
+            if (poxB->pobj->FIsLocked() == 0)
+                func_001F5078(poxB->pobj);
+        }
+        pheap = (char *)psw + 0x3CF8;
+        pcur = 0;
+        FreeSlotheapPv(pheap, poxA);
+        FreeSlotheapPv(pheap, poxB);
+    }
+    if (pcur != 0) {
+        pcur->pair->flag = flag;
+        pcur->flag = flag;
+    }
+}
+}
 
 struct SwOxNode {
     char pad_0x0[4];

@@ -7,7 +7,7 @@ struct STGPART { int unknown; int active; };
 struct STGSWITCH : LO {
     u8 unknown_0x50[0x100];
     /* 0x150 */ int cpart;
-    u8 unknown_0x154[0x4];
+    /* 0x154 */ STGPART *apart;
     /* 0x158 */ int cframe;
     /* 0x15C */ int istage;
     /* 0x160 */ int cstage;
@@ -66,10 +66,12 @@ void RunStgSwitch(STGSWITCH *psw)
             }
         }
     }
-    if (FStgSwitchInStageRange(psw) != 0 && psw->anode[psw->istage].fForward <= 0) {
-        STGPART *apart = (STGPART *)*(void **)((char *)psw + 0x154);
-        for (int ipart = 0; ipart < psw->cpart; ipart++)
-            apart[ipart].active = 0;
+    if (FStgSwitchInStageRange(psw) != 0) {
+        pnode = &psw->anode[psw->istage];
+        if (pnode->fForward <= 0) {
+            for (int ipart = 0; ipart < psw->cpart; ipart++)
+                psw->apart[ipart].active = 0;
+        }
     }
 }
 }

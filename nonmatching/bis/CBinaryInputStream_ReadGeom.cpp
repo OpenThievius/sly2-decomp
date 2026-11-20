@@ -59,7 +59,9 @@ extern "C" void CBinaryInputStream_ReadGeom(CBinaryInputStream *pbis, GEOM *pgeo
     GEOMEDGE *pedge;
     pedge = pgeom->aedge = (GEOMEDGE *)PvAllocSwClearImpl__Fi(&allocreq);
     int iplane;
-    for (iplane = 0; iplane < pgeom->cplane; iplane++) {
+    iplane = 0;
+    while (iplane < pgeom->cplane) {
+        int iplaneNext = iplane + 1;
         {
             GEOMPLANE *pplane = pgeom->aplane + iplane;
             scratch.aivert[0] = pbis->U16Read();
@@ -88,5 +90,6 @@ extern "C" void CBinaryInputStream_ReadGeom(CBinaryInputStream *pbis, GEOM *pgeo
                 pplaneOther->pedgeList = pedgeNew;
             }
         }
+        iplane = iplaneNext;
     }
 }

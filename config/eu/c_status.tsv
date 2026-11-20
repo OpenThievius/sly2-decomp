@@ -871,6 +871,7 @@ us_address	name	other_address	pair	score	addresses
 0x117F70	CBinaryInputStream_ReadVector4	0X117F70	identical	0	ok
 0x117F90	func_00117F90	0X117F90	identical	0	ok
 0x117FB0	func_00117FB0	0X117FB0	identical	0	ok
+0x117FD0	CBinaryInputStream_ReadGeom	0X117FD0	same	0	ok
 0x118220	CBinaryInputStream_ReadBspc	0X118220	same	0	ok
 0x118380	func_00118380	0X118380	identical	0	ok
 0x118420	Unknown1__18CBinaryInputStream	0X118420	identical	0	ok
@@ -1431,6 +1432,7 @@ us_address	name	other_address	pair	score	addresses
 0x133598	StaticInitBasic	0X133598	same	0	ok
 0x1336D0	GlobalCtorBasic	0X1336D0	identical	0	ok
 0x1336F0	PoxaAllocSw	0X1336F0	identical	0	ok
+0x133A38	UpdateSwPox	0X133A38	same	0	ok
 0x133C68	AllocSwOx	0X133C68	identical	0	ok
 0x133CB8	PoxExtractFromPoxa	0X133CB8	identical	0	ok
 0x133D08	FPoxaPairInteracts	0X133D08	identical	0	ok
@@ -2576,6 +2578,7 @@ us_address	name	other_address	pair	score	addresses
 0x17F770	func_0017F770	0X17F6F8	same	0	ok
 0x17F850	Mount_PostLoad	0X17F7D8	same	0	ok
 0x17F8C8	Mount_OnPoActive	0X17F850	same	0	ok
+0x17F930	Mount_Update	0X17F8B8	same	0	ok
 0x17FB50	Mount_AccelToward	0X17FAD8	same	0	ok
 0x17FBE8	Mount_FTakeHit	0X17FB70	same	0	ok
 0x17FCB0	Mount_ResetState	0X17FC38	same	0	ok
@@ -3231,6 +3234,7 @@ us_address	name	other_address	pair	score	addresses
 0x1B49E0	PostMurrayLoad	0X1B4C48	same	0	ok
 0x1B4AA0	UpdateMurrayActive	0X1B4D08	same	0	ok
 0x1B5038	UpdateMurrayBinoc	0X1B52A0	same	0	ok
+0x1B5380	UpdateMurrayCarry	0X1B55E8	same	0	ok
 0x1B5658	SetMurrayCarryState	0X1B58C0	same	0	ok
 0x1B5820	UpdateMurrayMash	0X1B5A88	same	0	ok
 0x1B5D30	func_001B5D30	0X1B5F98	same	0	ok
@@ -3297,6 +3301,7 @@ us_address	name	other_address	pair	score	addresses
 0x1BAED8	SetStgSwitchHitter	0X1BB140	gap	0	ok
 0x1BAF18	StepStgSwitch	0X1BB180	same	0	ok
 0x1BB250	func_001BB250	0X1BB4B8	same	0	ok
+0x1BB400	RunStgSwitch	0X1BB668	same	0	ok
 0x1BB648	RunStgSwitchStage	0X1BB8B0	same	0	ok
 0x1BB918	AddStgSwitchClass	0X1BBB80	identical	0	ok
 0x1BB950	AddStgSwitchStage	0X1BBBB8	same	0	ok
@@ -3734,6 +3739,7 @@ us_address	name	other_address	pair	score	addresses
 0x1D9910	CGc_PopScreen	0X1D9C58	same	0	ok
 0x1D9968	InitMeter	0X1D9CB0	same	0	ok
 0x1D9B30	ReleaseMeter	0X1D9E78	same	0	ok
+0x1D9B60	SetMeterState	0X1D9EA8	same	0	ok
 0x1D9DF8	UpdateMeter	0X1DA140	same	0	ok
 0x1DA2E0	FindHudLabelBlot	0X1DA628	same	0	ok
 0x1DA320	InitHudLabel	0X1DA668	same	0	ok
@@ -3770,6 +3776,7 @@ us_address	name	other_address	pair	score	addresses
 0x1DBBA0	ShopMenu_IrowEnd	0X1DBEE8	same	0	ok
 0x1DBBE0	ShopMenu_Select	0X1DBF28	same	0	ok
 0x1DBD10	ShopMenu_BuildList	0X1DC058	same	0	ok
+0x1DBEF0	ShopMenu_UpdateBlot	0X1DC238	same	0	ok
 0x1DC260	ShopMenu_SetPage	0X1DC5A8	same	0	ok
 0x1DC4B0	ShopMenu_SetDirection	0X1DC7F8	same	0	ok
 0x1DC598	GetGadgetMenuText	0X1DC8E0	same	2	ok
