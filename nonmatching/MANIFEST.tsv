@@ -552,7 +552,6 @@ address	name	size	file	score
 0X23C7C0	__muldi3	96	sdk/__muldi3.c	17
 0X23D338	func_0023D338	304	sdk/fun_0023d338.cpp	73
 0X23D508	func_0023D508	576	sdk/fun_0023d508.cpp	27
-0X23DAB0	func_0023DAB0	360	sdk/fun_0023dab0.c	66
 0X23E198	func_0023E198	48	sdk/fun_0023e198.cpp	10
 0X23E788	old_find_exception_handler	216	sdk/old_find_exception_handler.cpp	29
 0X23E860	find_exception_handler	328	sdk/find_exception_handler.c	61

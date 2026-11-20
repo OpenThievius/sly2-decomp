@@ -5299,6 +5299,7 @@ address	name	size	file	whole_file	symbol
 0X23D748	__adddf3	88	sdk/__adddf3.cpp		
 0X23D7A0	__subdf3	100	sdk/__subdf3.cpp		
 0X23D808	__muldf3	680	sdk/__muldf3.cpp		
+0X23DAB0	func_0023DAB0	360	sdk/fun_0023dab0.cpp		
 0X23DC18	func_0023DC18	276	sdk/fun_0023dc18.c		
 0X23DD30	dpcmp	76	sdk/dpcmp.cpp		
 0X23DD80	__floatsidf	184	sdk/__floatsidf.cpp		
