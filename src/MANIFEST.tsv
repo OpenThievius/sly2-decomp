@@ -3818,6 +3818,7 @@ address	name	size	file	whole_file	symbol
 0X1DEEA8	NotifyLaserXpEnded	236	game-stepguard/game_stepguard_1dedb0.cpp	game-stepguard/game_stepguard_1dedb0.cpp	NotifyLaserXpEnded
 0X1DF260	ClipLaserBeams	320	game-stepguard/game_stepguard_1dedb0.cpp	game-stepguard/game_stepguard_1dedb0.cpp	ClipLaserBeams
 0X1DF3A0	UpdateLaser	44	game-stepguard/game_stepguard_1dedb0.cpp	game-stepguard/game_stepguard_1dedb0.cpp	UpdateLaser
+0X1DF3D0	AdvanceLaserBeams	480	game-stepguard/game_stepguard_1dedb0.cpp	game-stepguard/game_stepguard_1dedb0.cpp	AdvanceLaserBeams
 0X1DF980	StaticInitSlotheaps_1df980	308	game-stepguard/game_stepguard_1dedb0.cpp	game-stepguard/game_stepguard_1dedb0.cpp	StaticInitSlotheaps_1df980
 0X1DFAB8	StaticInitSlotheaps_1df980_thunk	32	game-stepguard/game_stepguard_1dedb0.cpp	game-stepguard/game_stepguard_1dedb0.cpp	StaticInitSlotheaps_1df980_thunk
 0X1DFAD8	InitJsg	56	game-stepguard/InitJsg.cpp		

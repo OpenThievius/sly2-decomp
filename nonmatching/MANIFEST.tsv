@@ -379,7 +379,6 @@ address	name	size	file	score
 0X1DDB08	StartNewGame	200	game-stepguard/StartNewGame.cpp	8
 0X1DE5D8	BuildLaserBeams	2008	game-stepguard/BuildLaserBeams.cpp	110
 0X1DF0A0	AddLaserCustomXps	448	game-stepguard/AddLaserCustomXps.c	102
-0X1DF3D0	AdvanceLaserBeams	480	game-stepguard/AdvanceLaserBeams.cpp	0
 0X1DF908	AddLaserBeam	120	game-stepguard/AddLaserBeam.cpp	15
 0X1E5280	DetachSeqnodeObject	240	splice-ref-crv/DetachSeqnodeObject.cpp	18
 0X1E57A0	StartSeqnodeCameraMove	760	splice-ref-crv/StartSeqnodeCameraMove.c	179

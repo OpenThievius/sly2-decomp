@@ -3818,6 +3818,7 @@ us_address	name	other_address	pair	score	addresses
 0x1DEEA8	NotifyLaserXpEnded	0X1DF668	gap	0	ok
 0x1DF260	ClipLaserBeams	0X1DFA20	same	0	ok
 0x1DF3A0	UpdateLaser	0X1DFB60	same	0	ok
+0x1DF3D0	AdvanceLaserBeams	0X1DFB90	same	0	ok
 0x1DF980	StaticInitSlotheaps_1df980	0X1E0140	same	0	ok
 0x1DFAB8	StaticInitSlotheaps_1df980_thunk	0X1E0278	same	0	ok
 0x1DFAD8	InitJsg	0X1E0298	same	0	ok

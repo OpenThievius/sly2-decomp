@@ -565,7 +565,7 @@ class WholeFileRecordTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.insert('void Second() {}\n', address=0x100018)
 
-    def land(self, prove_result, vu0_listed=False, folder_out=None):
+    def land(self, prove_result, vu0_listed=False, folder_out=None, movables_listed=None):
         import tempfile
         folder = tempfile.mkdtemp()
         self.addCleanup(__import__('shutil').rmtree, folder)
@@ -573,6 +573,9 @@ class WholeFileRecordTests(unittest.TestCase):
         if vu0_listed:
             os.makedirs(os.path.join(folder, 'config', 'us'))
             open(os.path.join(folder, 'config', 'us', 'vu0_regs.txt'), 'w').write('# list\n0x100010\n')
+        if movables_listed is not None:
+            os.makedirs(os.path.join(folder, 'config', 'us'), exist_ok=True)
+            open(os.path.join(folder, 'config', 'us', 'move_movables.txt'), 'w').write(movables_listed)
         if folder_out is not None:
             folder_out.append(folder)
         whole_path, source = os.path.join(folder, 'src', 'm', 'a.cpp'), os.path.join(folder, '100010.cpp')
@@ -596,6 +599,23 @@ class WholeFileRecordTests(unittest.TestCase):
         (ok, _, _), _ = self.land(None, vu0_listed=True, folder_out=folders)
         listed = open(os.path.join(folders[0], 'config', 'us', 'vu0_regs.txt')).read().split()
         self.assertEqual((ok, listed[-1]), (True, '0x100000'))
+
+    def test_land_gives_the_whole_file_the_movables_flag_of_its_function(self):
+        folders = []
+        (ok, message, _), _ = self.land(None, movables_listed='# list\n0x100010\n', folder_out=folders)
+        listed = open(os.path.join(folders[0], 'config', 'us', 'move_movables.txt')).read().split('\n')
+        self.assertEqual((ok, listed[-2].split()[0]), (True, '0x100000'))
+        self.assertIn('-fmove-all-movables', message)
+
+    def test_land_keeps_the_movables_list_when_the_file_already_has_the_flag(self):
+        folders = []
+        (ok, _, _), _ = self.land(None, movables_listed='# list\n0x100000\n', folder_out=folders)
+        self.assertEqual((ok, open(os.path.join(folders[0], 'config', 'us', 'move_movables.txt')).read()), (True, '# list\n0x100000\n'))
+
+    def test_land_leaves_the_movables_list_when_the_range_differs(self):
+        folders = []
+        self.land('bytes differ at 0X100014', movables_listed='# list\n0x100010\n', folder_out=folders)
+        self.assertEqual(open(os.path.join(folders[0], 'config', 'us', 'move_movables.txt')).read(), '# list\n0x100010\n')
 
     def test_land_leaves_the_vu0_list_when_the_range_differs(self):
         folders = []
