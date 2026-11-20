@@ -654,7 +654,7 @@ extern "C" QW GetJmpLaunchVelocity(JMP *pjmp, int state)
             break;
         }
         JT *pjt = pjmp->pjt;
-        float height = *(float *)(*(char **)((char *)pjt + 0x218) + 8) - pjt->field_0x238 - margin;
+        float height = ((float *)pjt->ppos)[2] - pjt->field_0x238 - margin;
         candidate = Sqrt(GMax(0.0f, (gravity + gravity) * height));
         break;
     }
