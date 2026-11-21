@@ -62,10 +62,57 @@ def check_files(paths):
     """Problems for added files that could be game data or build output."""
     return [f'{path}: game data or build output must not be committed (see .gitignore)' for path in paths if FORBIDDEN_FILES.search(path)]
 
+TREE_METRICS = (  # --all: what is left to clean in matched code, counted per module (ROADMAP item 1)
+    ('local_shared_type', SOURCE_WARNING_RULES[0][0]),
+    ('padding', WARNING_RULES[0][0]),
+    ('cast_offset', WARNING_RULES[1][0]),
+    ('char_offset', re.compile(r'\(\s*(char|u8)\s*\*\s*\)\s*\w+\s*\+\s*(0x[0-9A-Fa-f]+|\d+)')),
+    ('vtable_call', WARNING_RULES[2][0]),
+    ('m2c_macro', LINE_RULES[0][0]),
+    ('bare_long', WARNING_RULES[3][0]),
+)
+
+def module_of(path):
+    """The module of a source in src/: its folder under src/ (a file directly in src/ is its own module)."""
+    parts = path.split('/')
+    return parts[1] if len(parts) > 2 else parts[-1]
+
+def tree_counts(sources):
+    """{module: {metric: lines}} over (path, text) pairs of sources in src/; every module gets every metric, zero included."""
+    counts = {}
+    for path, text in sources:
+        if not (CODE.match(path) and path.startswith('src/')):
+            continue
+        row = counts.setdefault(module_of(path), dict.fromkeys((name for name, _ in TREE_METRICS), 0))
+        for name, pattern in TREE_METRICS:
+            row[name] += sum(1 for line in text.split('\n') if pattern.search(line))
+    return counts
+
+def print_tree_counts(counts):
+    """A TSV: one row per module, most to clean first, then a total row."""
+    names = [name for name, _ in TREE_METRICS]
+    print('\t'.join(['module'] + names))
+    totals = dict.fromkeys(names, 0)
+    for module, row in sorted(counts.items(), key=lambda item: (-sum(item[1].values()), item[0])):
+        print('\t'.join([module] + [str(row[name]) for name in names]))
+        for name in names:
+            totals[name] += row[name]
+    print('\t'.join(['total'] + [str(totals[name]) for name in names]))
+
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--base', required=True)
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument('--base', help='check what HEAD adds over this ref')
+    group.add_argument('--all', action='store_true', help='count the tie-break patterns over every tracked source in src/, per module')
     arguments = parser.parse_args()
+    if arguments.all:
+        paths = subprocess.check_output(['git', 'ls-files', 'src'], text=True).split()
+        sources = []
+        for path in paths:
+            with open(path, encoding='utf-8', errors='replace') as handle:
+                sources.append((path, handle.read()))
+        print_tree_counts(tree_counts(sources))
+        return
     diff = subprocess.check_output(['git', 'diff', '-U0', '--diff-filter=AM', arguments.base, 'HEAD'], text=True)
     new_files = subprocess.check_output(['git', 'diff', '--name-only', '--diff-filter=A', arguments.base, 'HEAD'], text=True).split()
     added = parse_diff(diff)

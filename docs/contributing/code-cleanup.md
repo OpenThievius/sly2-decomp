@@ -27,5 +27,8 @@ added code; they do not fail it, because a local struct stays allowed while no s
 | A hand-written vtable call (`vt->fn((char *)obj + vt->delta, ...)`) | A `virtual` member function: slot n is declared n-th in `lo.h`/`so.h` (it matches) |
 | A bare `long` / `long long` | `s64` / `QW` (on the EE `long` is 64 bits, `long long` 128) |
 
+`python3 scripts/check_cleanup.py --all` counts these patterns (plus `(char *)p + 0x..` offsets and `M2C_UNK`/`M2C_FIELD`) over every
+tracked source in `src/`, one row per module, most to clean first: the measure of ROADMAP item 1.
+
 A matched function stays matched: after a cleanup run `make elf`, then `make unit UNIT=<module>`. Every function of the module
 must still link from C and the image must still pass the byte check.

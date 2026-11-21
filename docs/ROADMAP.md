@@ -61,6 +61,8 @@ waves. Item numbers are stable: tools and docs cite them.
    their `source:`. A field enters a header when a method of the class reads it, or two readers agree. Left: the goal subclasses,
    `GUARD`, the `CRef` remainder (195 files), the `aseg` segment type, 24 local `JT`-like structs, 9 Murray/Bentley copies, 48 guard
    layouts, 288 files with hand-written vtable calls. Editing `include/` changes the scorer fingerprint: do it between waves.
+   Measure: `python3 scripts/check_cleanup.py --all`. Baseline 2026-11-21 (lines in `src/`): 324 local copies of shared types,
+   4,561 padding members, 1,557 cast offsets, 708 `(char *)p + offset`, 402 hand-written vtable calls, 4,463 m2c macros, 614 bare `long`.
 2. **Whole files** (In Progress). Left: `po_screen_210eb0`, `SyncVBlank_file`, `StartupJmt_file`, `PloFindSpawn_file` (one callee or
    global written with several types), `QueueSwCallback_file` and `PsoHitTestLineObjects_file` (compile to another size), and four
    files with per-function flag lists. Then the 826 low-confidence cuts inside a span, checked as item 3's first stage.
