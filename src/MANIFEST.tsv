@@ -2303,31 +2303,31 @@ address	name	size	file	whole_file	symbol
 0X16F148	func_0016F148	44	new_167320/new_167320_16f148.cpp	new_167320/new_167320_16f148.cpp	func_0016F148
 0X16F178	Blend__static_initialization_and_destruction_0	308	new_167320/new_167320_16f148.cpp	new_167320/new_167320_16f148.cpp	Blend__static_initialization_and_destruction_0
 0X16F2B0	GlobalCtorBlend	32	new_167320/new_167320_16f148.cpp	new_167320/new_167320_16f148.cpp	GlobalCtorBlend
-0X16F2D0	BlendDisplayOnBufferMismatch__Fv	404	gs/BlendDisplayOnBufferMismatch__Fv.cpp		
-0X16F468	VBlankS_Interrupt__Fi	244	gs/VBlankS_Interrupt__Fi.cpp		
-0X16F560	SyncVBlank__Fv	44	gs/SyncVBlank__Fv.cpp		
-0X16F590	SwapGsBuffers__Fv	296	gs/SwapGsBuffers__Fv.cpp		
-0X16F6B8	RestoreGsBuffers__Fv	204	gs/RestoreGsBuffers__Fv.cpp		
-0X16F788	GS_Interrupt__Fi	220	gs/GS_Interrupt__Fi.c		
-0X16F868	ResetGs__Fv	80	gs/ResetGs__Fv.cpp		
-0X16F8B8	SendDmaSyncGsFinish__FP10sceDmaChanP2QW	164	gs/SendDmaSyncGsFinish__FP10sceDmaChanP2QW.cpp		
-0X16F960	BuildClearGifs__FP2QWG4RGBAi	408	gs/BuildClearGifs__FP2QWG4RGBAi.cpp		
-0X16FAF8	BuildFbaGif	128	gs/BuildFbaGif.cpp		
-0X16FB78	BuildFrameTextureGifs	300	gs/BuildFrameTextureGifs.cpp		
-0X16FCA8	BuildDrawEnvGifs	924	gs/BuildDrawEnvGifs.cpp		
-0X170048	BuildAllDrawEnvGifs	132	gs/BuildAllDrawEnvGifs.cpp		
-0X1700D0	StartupGs__Fv	424	gs/StartupGs__Fv.cpp		
-0X170278	BlastAqwGifsBothFrames__FP2QW	204	gs/BlastAqwGifsBothFrames__FP2QW.cpp		
-0X170348	ClearFrameBuffers__Fv	108	gs/ClearFrameBuffers__Fv.cpp		
-0X1703C0	NLog2__FUi	56	gs/NLog2__FUi.cpp		
-0X1703F8	InitZpr__FP3ZPR3ZPKP2LO	80	stepzap/InitZpr__FP3ZPR3ZPKP2LO.cpp		
-0X170448	ICeilLog2	108	new_170448/ICeilLog2.cpp		
-0X1704B8	FlushZprPage	144	new_170448/FlushZprPage.cpp		
-0X170650	BuildImageGifs__FiiiiiiP4GIFS	220	gs/BuildImageGifs__FiiiiiiP4GIFS.cpp		
-0X170730	UploadBitmaps__FiP3GSB	244	gs/UploadBitmaps__FiP3GSB.cpp		
-0X170828	func_00170828	36	gs-jsg/fun_00170828.c		
-0X170850	StaticInitSlotheaps_170850	308	gs-jsg/StaticInitSlotheaps_170850.c		
-0X170988	StaticInitSlotheaps_170850_thunk	32	gs-jsg/StaticInitSlotheaps_170850_thunk.c		
+0X16F2D0	BlendDisplayOnBufferMismatch__Fv	404	gs/BlendDisplayOnBufferMismatch_file.cpp	gs/BlendDisplayOnBufferMismatch_file.cpp	BlendDisplayOnBufferMismatch
+0X16F468	VBlankS_Interrupt__Fi	244	gs/BlendDisplayOnBufferMismatch_file.cpp	gs/BlendDisplayOnBufferMismatch_file.cpp	VBlankS_Interrupt
+0X16F560	SyncVBlank__Fv	44	gs/BlendDisplayOnBufferMismatch_file.cpp	gs/BlendDisplayOnBufferMismatch_file.cpp	SyncVBlank
+0X16F590	SwapGsBuffers__Fv	296	gs/BlendDisplayOnBufferMismatch_file.cpp	gs/BlendDisplayOnBufferMismatch_file.cpp	SwapGsBuffers
+0X16F6B8	RestoreGsBuffers__Fv	204	gs/BlendDisplayOnBufferMismatch_file.cpp	gs/BlendDisplayOnBufferMismatch_file.cpp	RestoreGsBuffers
+0X16F788	GS_Interrupt__Fi	220	gs/BlendDisplayOnBufferMismatch_file.cpp	gs/BlendDisplayOnBufferMismatch_file.cpp	GS_Interrupt__Fi
+0X16F868	ResetGs__Fv	80	gs/BlendDisplayOnBufferMismatch_file.cpp	gs/BlendDisplayOnBufferMismatch_file.cpp	ResetGs
+0X16F8B8	SendDmaSyncGsFinish__FP10sceDmaChanP2QW	164	gs/BlendDisplayOnBufferMismatch_file.cpp	gs/BlendDisplayOnBufferMismatch_file.cpp	SendDmaSyncGsFinish__FP10sceDmaChanP2QW
+0X16F960	BuildClearGifs__FP2QWG4RGBAi	408	gs/BlendDisplayOnBufferMismatch_file.cpp	gs/BlendDisplayOnBufferMismatch_file.cpp	BuildClearGifs__FP2QWG4RGBAi
+0X16FAF8	BuildFbaGif	128	gs/BlendDisplayOnBufferMismatch_file.cpp	gs/BlendDisplayOnBufferMismatch_file.cpp	BuildFbaGif
+0X16FB78	BuildFrameTextureGifs	300	gs/BlendDisplayOnBufferMismatch_file.cpp	gs/BlendDisplayOnBufferMismatch_file.cpp	BuildFrameTextureGifs
+0X16FCA8	BuildDrawEnvGifs	924	gs/BlendDisplayOnBufferMismatch_file.cpp	gs/BlendDisplayOnBufferMismatch_file.cpp	BuildDrawEnvGifs
+0X170048	BuildAllDrawEnvGifs	132	gs/BlendDisplayOnBufferMismatch_file.cpp	gs/BlendDisplayOnBufferMismatch_file.cpp	BuildAllDrawEnvGifs
+0X1700D0	StartupGs__Fv	424	gs/BlendDisplayOnBufferMismatch_file.cpp	gs/BlendDisplayOnBufferMismatch_file.cpp	StartupGs
+0X170278	BlastAqwGifsBothFrames__FP2QW	204	gs/BlendDisplayOnBufferMismatch_file.cpp	gs/BlendDisplayOnBufferMismatch_file.cpp	BlastAqwGifsBothFrames__FP2QW
+0X170348	ClearFrameBuffers__Fv	108	gs/BlendDisplayOnBufferMismatch_file.cpp	gs/BlendDisplayOnBufferMismatch_file.cpp	ClearFrameBuffers
+0X1703C0	NLog2__FUi	56	gs/BlendDisplayOnBufferMismatch_file.cpp	gs/BlendDisplayOnBufferMismatch_file.cpp	NLog2
+0X1703F8	InitZpr__FP3ZPR3ZPKP2LO	80	gs/BlendDisplayOnBufferMismatch_file.cpp	gs/BlendDisplayOnBufferMismatch_file.cpp	InitZpr
+0X170448	ICeilLog2	108	gs/BlendDisplayOnBufferMismatch_file.cpp	gs/BlendDisplayOnBufferMismatch_file.cpp	ICeilLog2
+0X1704B8	FlushZprPage	144	gs/BlendDisplayOnBufferMismatch_file.cpp	gs/BlendDisplayOnBufferMismatch_file.cpp	FlushZprPage
+0X170650	BuildImageGifs__FiiiiiiP4GIFS	220	gs/BlendDisplayOnBufferMismatch_file.cpp	gs/BlendDisplayOnBufferMismatch_file.cpp	BuildImageGifs
+0X170730	UploadBitmaps__FiP3GSB	244	gs/BlendDisplayOnBufferMismatch_file.cpp	gs/BlendDisplayOnBufferMismatch_file.cpp	UploadBitmaps__FiP3GSB
+0X170828	func_00170828	36	gs/BlendDisplayOnBufferMismatch_file.cpp	gs/BlendDisplayOnBufferMismatch_file.cpp	func_00170828
+0X170850	StaticInitSlotheaps_170850	308	gs/BlendDisplayOnBufferMismatch_file.cpp	gs/BlendDisplayOnBufferMismatch_file.cpp	StaticInitSlotheaps_170850
+0X170988	StaticInitSlotheaps_170850_thunk	32	gs/BlendDisplayOnBufferMismatch_file.cpp	gs/BlendDisplayOnBufferMismatch_file.cpp	StaticInitSlotheaps_170850_thunk
 0X1709A8	func_001709A8	76	gs-jsg/fun_001709a8.cpp		
 0X1709F8	InitScript	48	gs-jsg/InitScript.c		
 0X170A28	PostLoadScript	44	gs-jsg/PostLoadScript.c		
@@ -5064,28 +5064,28 @@ address	name	size	file	whole_file	symbol
 0X227E58	func_00227E58	52	new_2271f8/new_2271f8_227bb8.cpp	new_2271f8/new_2271f8_227bb8.cpp	func_00227E58
 0X227E90	StaticInitSlotheaps_227e90	308	new_2271f8/new_2271f8_227bb8.cpp	new_2271f8/new_2271f8_227bb8.cpp	StaticInitSlotheaps_227e90
 0X227FC8	func_00227FC8	32	new_2271f8/new_2271f8_227bb8.cpp	new_2271f8/new_2271f8_227bb8.cpp	func_00227FC8
-0X227FE8	PloFindSpawn	232	new_2271f8/PloFindSpawn.cpp		
-0X2280D0	func_002280D0	108	new_2271f8/fun_002280d0.cpp		
-0X228140	func_00228140	44	new_2271f8/fun_00228140.cpp		
-0X228170	func_00228170	116	new_2271f8/fun_00228170.cpp		
-0X2281E8	InitWarp	104	new_2271f8/InitWarp.cpp		
-0X228250	func_00228250	96	new_2271f8/fun_00228250.cpp		
-0X2282B0	LoadWarpFromBrx	164	new_2271f8/LoadWarpFromBrx.cpp		
-0X228358	Warp_SetState	120	new_2271f8/Warp_SetState.cpp		
-0X2283D0	Warp_Start	268	new_2271f8/Warp_Start.cpp		
-0X2284E0	func_002284E0	56	new_2271f8/fun_002284e0.cpp		
-0X228518	func_00228518	28	new_2271f8/fun_00228518.c		
-0X228538	UpdateWarp	488	new_2271f8/UpdateWarp.cpp		
-0X228720	func_00228720	44	new_2271f8/fun_00228720.cpp		
-0X228750	ActivateSpawn	388	new_2271f8/ActivateSpawn.cpp		
-0X2288D8	Spawn_AddRsmg	68	new_2271f8/Spawn_AddRsmg.cpp		
-0X228920	Spawn_AddTask	56	new_2271f8/Spawn_AddTask.cpp		
-0X228958	AddBrkTouchObject__FP3BRK3OID	48	break/AddBrkTouchObject__FP3BRK3OID.cpp		
-0X228988	AddBrkTouchClass	40	break-mat/AddBrkTouchClass.cpp		
-0X2289B0	func_002289B0	28	break-mat/fun_002289b0.cpp		
-0X2289D0	func_002289D0	28	break-mat/fun_002289d0.cpp		
-0X2289F0	CreateSharedSlotheaps_2289f0	308	break-mat/CreateSharedSlotheaps_2289f0.c		
-0X228B28	CreateSharedSlotheaps_2289f0_thunk	32	break-mat/CreateSharedSlotheaps_2289f0_thunk.c		
+0X227FE8	PloFindSpawn	232	new_2271f8/PloFindSpawn_file.cpp	new_2271f8/PloFindSpawn_file.cpp	PloFindSpawn
+0X2280D0	func_002280D0	108	new_2271f8/PloFindSpawn_file.cpp	new_2271f8/PloFindSpawn_file.cpp	func_002280D0
+0X228140	func_00228140	44	new_2271f8/PloFindSpawn_file.cpp	new_2271f8/PloFindSpawn_file.cpp	func_00228140
+0X228170	func_00228170	116	new_2271f8/PloFindSpawn_file.cpp	new_2271f8/PloFindSpawn_file.cpp	func_00228170
+0X2281E8	InitWarp	104	new_2271f8/PloFindSpawn_file.cpp	new_2271f8/PloFindSpawn_file.cpp	InitWarp
+0X228250	func_00228250	96	new_2271f8/PloFindSpawn_file.cpp	new_2271f8/PloFindSpawn_file.cpp	func_00228250
+0X2282B0	LoadWarpFromBrx	164	new_2271f8/PloFindSpawn_file.cpp	new_2271f8/PloFindSpawn_file.cpp	LoadWarpFromBrx
+0X228358	Warp_SetState	120	new_2271f8/PloFindSpawn_file.cpp	new_2271f8/PloFindSpawn_file.cpp	Warp_SetState
+0X2283D0	Warp_Start	268	new_2271f8/PloFindSpawn_file.cpp	new_2271f8/PloFindSpawn_file.cpp	Warp_Start
+0X2284E0	func_002284E0	56	new_2271f8/PloFindSpawn_file.cpp	new_2271f8/PloFindSpawn_file.cpp	func_002284E0
+0X228518	func_00228518	28	new_2271f8/PloFindSpawn_file.cpp	new_2271f8/PloFindSpawn_file.cpp	func_00228518
+0X228538	UpdateWarp	488	new_2271f8/PloFindSpawn_file.cpp	new_2271f8/PloFindSpawn_file.cpp	UpdateWarp
+0X228720	func_00228720	44	new_2271f8/PloFindSpawn_file.cpp	new_2271f8/PloFindSpawn_file.cpp	func_00228720
+0X228750	ActivateSpawn	388	new_2271f8/PloFindSpawn_file.cpp	new_2271f8/PloFindSpawn_file.cpp	ActivateSpawn
+0X2288D8	Spawn_AddRsmg	68	new_2271f8/PloFindSpawn_file.cpp	new_2271f8/PloFindSpawn_file.cpp	Spawn_AddRsmg
+0X228920	Spawn_AddTask	56	new_2271f8/PloFindSpawn_file.cpp	new_2271f8/PloFindSpawn_file.cpp	Spawn_AddTask
+0X228958	AddBrkTouchObject__FP3BRK3OID	48	new_2271f8/PloFindSpawn_file.cpp	new_2271f8/PloFindSpawn_file.cpp	AddBrkTouchObject
+0X228988	AddBrkTouchClass	40	new_2271f8/PloFindSpawn_file.cpp	new_2271f8/PloFindSpawn_file.cpp	AddBrkTouchClass
+0X2289B0	func_002289B0	28	new_2271f8/PloFindSpawn_file.cpp	new_2271f8/PloFindSpawn_file.cpp	func_002289B0
+0X2289D0	func_002289D0	28	new_2271f8/PloFindSpawn_file.cpp	new_2271f8/PloFindSpawn_file.cpp	func_002289D0
+0X2289F0	CreateSharedSlotheaps_2289f0	308	new_2271f8/PloFindSpawn_file.cpp	new_2271f8/PloFindSpawn_file.cpp	CreateSharedSlotheaps_2289f0
+0X228B28	CreateSharedSlotheaps_2289f0_thunk	32	new_2271f8/PloFindSpawn_file.cpp	new_2271f8/PloFindSpawn_file.cpp	CreateSharedSlotheaps_2289f0_thunk
 0X228B48	InitBrk	100	break-mat/InitBrk_file.cpp	break-mat/InitBrk_file.cpp	InitBrk
 0X228BB0	func_00228BB0	68	break-mat/InitBrk_file.cpp	break-mat/InitBrk_file.cpp	func_00228BB0
 0X228BF8	PostBrkLoad	28	break-mat/InitBrk_file.cpp	break-mat/InitBrk_file.cpp	PostBrkLoad

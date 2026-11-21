@@ -90,6 +90,7 @@ start	end	file
 0x166920	0x167310	gifs/__4GIFS_file.cpp
 0x167870	0x16F148	new_167320/LoadGlobsetBndTreeFromBrx_file.cpp
 0x16F148	0x16F2D0	new_167320/new_167320_16f148.cpp
+0x16F2D0	0x1709A8	gs/BlendDisplayOnBufferMismatch_file.cpp
 0x1715B8	0x171F58	jt/PloFindScriptObject_file.cpp
 0x172F10	0x173158	new_1715f0/new_1715f0_172f10.cpp
 0x174490	0x174898	new_1715f0/new_1715f0_174490.cpp
@@ -192,6 +193,7 @@ start	end	file
 0x227350	0x2275B8	new_2271f8/new_2271f8_227350.cpp
 0x227940	0x227BB8	new_2271f8/new_2271f8_227940.cpp
 0x227BB8	0x227FE8	new_2271f8/new_2271f8_227bb8.cpp
+0x227FE8	0x228B48	new_2271f8/PloFindSpawn_file.cpp
 0x228B48	0x229EF0	break-mat/InitBrk_file.cpp
 0x22A908	0x22B040	so-wr/so_wr_22a908.c
 0x22B040	0x22B720	so-wr/so_wr_22b040.cpp
