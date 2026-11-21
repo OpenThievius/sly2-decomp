@@ -5,6 +5,7 @@
 #include "ps2inline.h"
 #include "sly2.h"
 #include "sw.h"
+#include "critsect.h"
 #include "include_asm.h"
 
 struct GsPmode { u32 en1 : 1; u32 rest : 31; u32 hi : 32; };
@@ -108,12 +109,6 @@ void SyncVBlank(void)
     B_002DFB58 = 1;
     WaitSema(B_002DFB4C);
 }
-
-struct CRITSECT { int cEnter; int thread; int sema; };
-
-void EnterCritSect(CRITSECT *);
-
-void LeaveCritSect(CRITSECT *);
 
 extern CRITSECT B_002DFB40;
 
@@ -498,7 +493,6 @@ extern QW B_002DF700[];
 
 extern QW B_002DF720[];
 
-void InitCritSect(CRITSECT *);
 
 extern "C" void sceGsSetDefDBuff(void *, int, int, int, int, int, int);
 
