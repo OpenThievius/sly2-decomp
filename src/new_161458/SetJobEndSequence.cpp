@@ -1,3 +1,4 @@
+#include "types.h"
 struct V;
 struct VT {
     char pad0[0x188];
@@ -34,7 +35,7 @@ void SetJobEndSequence(OBJ *self, int arg1) {
             int dep;
             for (dep = 0; dep < self->pick->cdeps; dep++) {
                 int other = self->pick->deps[dep];
-                if (other == (int)self->owner) continue;
+                if (other == (sptr)self->owner) continue;
                 if (FTaskComplete(other) == 0) {
                     self->pick = 0;
                     break;

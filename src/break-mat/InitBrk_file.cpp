@@ -25,11 +25,11 @@ extern "C" void InitBrk(BrkObject *brk) {
     brk->field_0x180 = 1;
     brk->field_0x184 = -0xA;
     brk->field_0x188 = 0x2000;
-    if (((s32)temp_a2 ^ 1) & 1) {
+    if (((sptr)temp_a2 ^ 1) & 1) {
         *temp_a2 = *temp_a2 | 2;
         return;
     }
-    brk->field_0x40 = (s32 *)((s32)temp_a2 | 2);
+    brk->field_0x40 = (s32 *)((sptr)temp_a2 | 2);
 }
 
 struct BrkTarget {

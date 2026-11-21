@@ -19,16 +19,16 @@ void ClearSl(void *);
 extern DMAS_213300 g_2dea28;
 }
 static inline void Pad64(DMAS_213300 *dmas) {
-    while ((int)dmas->p & 0x3F) { *(int *)dmas->p = 0; dmas->p = dmas->p + 4; }
+    while ((sptr)dmas->p & 0x3F) { *(int *)dmas->p = 0; dmas->p = dmas->p + 4; }
 }
 static inline void Uncache(DMAS_213300 *dmas) {
     Pad64(dmas);
-    dmas->p = (char *)((unsigned)dmas->p | 0x30000000);
+    dmas->p = (char *)((uptr)dmas->p | 0x30000000);
     dmas->base |= 0x30000000;
 }
 static inline void Recache(DMAS_213300 *dmas) {
     Pad64(dmas);
-    dmas->p = (char *)((unsigned)dmas->p & 0x0FFFFFFF);
+    dmas->p = (char *)((uptr)dmas->p & 0x0FFFFFFF);
     dmas->base &= 0x0FFFFFFF;
 }
 static inline float Clamp(float value, float low, float high) {

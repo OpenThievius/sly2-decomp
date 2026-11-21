@@ -18,7 +18,7 @@ int *HashTable_Insert(HashTable *table, int *key, int *value)
     entry->hash = hash;
     entry->key = *key;
     entry->value = *value;
-    entry->next = (int)table->table[bucket];
+    entry->next = (sptr)table->table[bucket];
     table->table[bucket] = entry;
     return &entry->value;
 }

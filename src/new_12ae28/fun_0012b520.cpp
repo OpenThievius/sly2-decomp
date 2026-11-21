@@ -14,8 +14,8 @@ void func_0012B520(s8 *arg0, s8 *arg1) {
     temp_a3 = arg1 + 0xD0;
     M2C_FIELD(arg1, f32 *, 0x84) = 1.0f;
     temp_t0 = arg1 + 0xF0;
-    M2C_FIELD(arg1, s32 *, 0x88) = (s32) (arg1 + 0x80);
-    M2C_FIELD(arg1, s32 *, 0x8C) = (s32) (arg1 + 0x84);
+    M2C_FIELD(arg1, s32 *, 0x88) = (sptr) (arg1 + 0x80);
+    M2C_FIELD(arg1, s32 *, 0x8C) = (sptr) (arg1 + 0x84);
     M2C_FIELD(arg1, s32 *, 0x80) = 0;
     struct V3 { f32 x, y, z; };
     M2C_FIELD(arg1, V3 *, 0xC0) = M2C_FIELD(arg0, V3 *, 4);

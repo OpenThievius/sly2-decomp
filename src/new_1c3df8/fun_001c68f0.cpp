@@ -66,7 +66,7 @@ void func_001C68F0(DP *dp, int newState)
             struct { int msg[2]; char pad[0x38]; } loc;
             int *msg = loc.msg;
             msg[0] = 1;
-            msg[1] = (int)dp;
+            msg[1] = (sptr)dp;
             VTB *vtobj = obj->vt;
             vtobj->fn((char *)obj + vtobj->delta, msg);
         }

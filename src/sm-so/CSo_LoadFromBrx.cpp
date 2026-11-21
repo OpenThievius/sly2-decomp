@@ -102,10 +102,10 @@ extern "C" void CSo_LoadFromBrx(SO *pso, Bis *pbis)
     LoadOptionsFromBrx__FPvP18CBinaryInputStream(pso, pbis);
     if (pso->fieldB8 != 0) {
         int *flags = pso->field40;
-        if (((unsigned)flags ^ 1) & 1) {
+        if (((uptr)flags ^ 1) & 1) {
             *flags |= 8;
         } else {
-            pso->field40 = (int *)((int)flags | 8);
+            pso->field40 = (int *)((sptr)flags | 8);
         }
     }
     func_001F2500(pso);

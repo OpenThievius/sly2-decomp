@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "types.h"
 struct LO1A5270 {
     char pad0[0x10];
     LO1A5270 *pparent;
@@ -44,5 +45,5 @@ extern "C" void InitLo__FP2LO(LO1A5270 *plo)
         oid = B_003E139C;
     plo->oid = oid;
     func_001A5448(plo->pparent, (int *)&pdl, (int **)&ppfirst);
-    InsertDlEntryBefore((int)pdl, *ppfirst, plo);
+    InsertDlEntryBefore((sptr)pdl, *ppfirst, plo);
 }

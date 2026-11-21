@@ -103,8 +103,11 @@ waves. Item numbers are stable: tools and docs cite them.
    - **Members instead of raw offsets.** 1,594 reads at a raw offset in 465 files, 386 of them pointer reads (sly1-decomp: 269 and
      32). Under native 64-bit pointers (PORTING.md route A) every type takes the host's layout, so these, not the layouts, are the
      cost; it also settles `virtual` (55 files rely on gcc 2.95's vtable layout, which even a modern 32-bit compiler does not keep).
-   - **An integer type for addresses**: `sptr`/`uptr` in `include/types.h`, as sly1-decomp has, for the places where a pointer type
-     would change retail's code (220 addresses cast to `int`/`u32`).
+   - **An integer type for addresses** (In Progress): `sptr`/`uptr` in `include/types.h` since 2026-11-21, as sly1-decomp has,
+     for the places where a pointer type would change retail's code. 285 casts of a pointer to a 32-bit integer in 167 files now
+     use them (same types, `make elf` PASS, reports unchanged); with a port's 64-bit `sptr`/`uptr` the x86-64-only pointer-to-integer
+     casts fall from 278 to 1 (`CloseFrame`, whose local `QW` clashes with `types.h`). Next: the integer fields and locals those
+     values land in (214 x86-64 truncations with the 64-bit typedefs), and the 218 integer-to-pointer casts.
    - **A host syntax check that reports, never gates**: `clang -fsyntax-only` for i386 and x86-64 over `src/` with a shim header,
      writing a warnings report. Moved forward from "when a port starts": it measures the items above. First measurement
      (2026-11-21, [PORTING.md](PORTING.md) "Measured"): 278 pointer-to-integer and 224 integer-to-pointer casts only on x86-64.

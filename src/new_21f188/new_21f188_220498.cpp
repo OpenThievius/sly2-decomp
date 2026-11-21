@@ -28,7 +28,7 @@ s32 func_00220498(struct STATEOBJ *pstateobj, struct TARGETOBJ *ptarget, s32 arg
     if ((void *)ptarget == pstateobj->pvTarget) {
         temp_a0 = pstateobj->level;
         if (temp_a0 != -1) {
-            if ((temp_a0 >= 3) || (((s32)ptarget == g_2dd5bc) && (ptarget->state == 0x12))) {
+            if ((temp_a0 >= 3) || (((sptr)ptarget == g_2dd5bc) && (ptarget->state == 0x12))) {
                 return IMax(arg2, 3);
             }
             return arg2;

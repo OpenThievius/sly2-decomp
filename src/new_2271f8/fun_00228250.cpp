@@ -20,7 +20,7 @@ void func_00228250(s8 *stream, s32 *result) {
     HEADER header __attribute__((aligned(16)));
     CBinaryInputStream_Read_thunk(stream, 0x40, &header);
     if (header.field_0x4 != header.field_0x3C) {
-        *result = (s32) PvAllocSwCopy(0x40, &header);
+        *result = (sptr) PvAllocSwCopy(0x40, &header);
         return;
     }
     *result = 0;

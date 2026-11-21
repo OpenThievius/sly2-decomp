@@ -21,7 +21,7 @@ void InitJob(s8 *arg0) {
     M2C_FIELD(arg0, s32 *, 0xAC) = -1;
     M2C_FIELD(arg0, s32 *, 0xB0) = -1;
     M2C_FIELD(arg0, s32 *, 0xB4) = -1;
-    InitSl((int)(arg0 + 0x80), 0x84);
+    InitSl((sptr)(arg0 + 0x80), 0x84);
 }
 
 }

@@ -60,7 +60,7 @@ extern "C" SND *func_001FCD38(SND *psnd)
 {
     psnd->unk0 = 0;
     psnd->unk4 = 0;
-    psnd->vtable = (int)D_002CA510;
+    psnd->vtable = (sptr)D_002CA510;
     CreateSlotheapSwAlign(psnd->heapA, 0x70, 0x80, 0x10);
     CreateSlotheapSwAlign(psnd->heapB, 0x3C0, 0x10, 0x10);
     psnd->unk200 = 0;
@@ -198,7 +198,7 @@ struct Owner { char pad0[0xF0]; Node *first; int last; };
 extern "C" int func_001FD080(Owner *owner, int target) {
     Node *node = owner->first;
     while (node != 0) {
-        if ((int)node == target) {
+        if ((sptr)node == target) {
             return 1;
         }
         node = node->next;

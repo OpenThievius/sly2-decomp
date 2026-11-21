@@ -163,7 +163,7 @@ void GoalBrain_Update(BRAIN *self) {
                                 if (other->vt->fn26C((char *)other + other->vt->delta268) == 2) {
                                     int victim = func_00174898(*(int *)((char *)other + 0xE20));
                                     if (victim != 0) {
-                                        if (victim != (int)self->player) {
+                                        if (victim != (sptr)self->player) {
                                             next.arg = victim;
                                             next.type = 0x11;
                                         }

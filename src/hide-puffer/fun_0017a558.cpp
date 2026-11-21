@@ -14,7 +14,7 @@ extern s128 g_2a2dd0;
 void func_0017A558(s8 *arg0) {
     func_00174B28();
     GoalFlinch_SetState(arg0, -1);
-    ReplaceSwHitFx(&B_003DD490, -1, g_2a2dd0, 0, (s32)(M2C_FIELD(arg0, s8 **, 0x10) + 0x35C));
+    ReplaceSwHitFx(&B_003DD490, -1, g_2a2dd0, 0, (sptr)(M2C_FIELD(arg0, s8 **, 0x10) + 0x35C));
     return;
 }
 

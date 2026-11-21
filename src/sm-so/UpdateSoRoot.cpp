@@ -7,10 +7,10 @@ struct VECTOR { float x, y, z, w; } __attribute__((aligned(16)));
 void UpdateSoRoot(SO *pso, SO *psoStop, SO *psoOther)
 {
     VECTOR local;
-    func_001A5B80(pso, (int)psoStop, psoOther);
+    func_001A5B80(pso, (sptr)psoStop, psoOther);
     LO *plo;
     for (plo = (LO *)pso->dlChild.head; plo; plo = plo->ploNext)
-        plo->Slot13((int)psoStop, psoOther);
+        plo->Slot13((sptr)psoStop, psoOther);
     if (pso->cgeom != 0) {
         plo = pso;
         if (!(pso->grfo & FLAG)) {

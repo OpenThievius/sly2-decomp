@@ -36,7 +36,7 @@ void UpdateDancer(char *dancer, float dt)
     }
     char *anim = *(char **)(dancer + 0x408);
     if (anim) {
-        QW vel = func_00204E38(dancer, (int)anim, *(float *)(anim + 0x1C));
+        QW vel = func_00204E38(dancer, (sptr)anim, *(float *)(anim + 0x1C));
         VU_SCALE scale;
         scale.q = VectorFromFloat(-1.0f);
         *(QW *)(dancer + 0x190) = VectorScaleX(vel, scale.q);

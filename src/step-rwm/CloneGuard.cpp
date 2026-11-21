@@ -13,7 +13,7 @@ void CloneGuard(STEPGUARD *arg0, STEPGUARD *arg1) {
     arg0->psensor = (SENSOR *)part;
     VEnt *vt = part->vt;
     void (*fn)(void *, s32) = vt->fn;
-    fn((char *)part + vt->adj, (s32)arg1->psensor);
+    fn((char *)part + vt->adj, (sptr)arg1->psensor);
     CloneGuardAnimrefs(arg0);
 }
 }

@@ -177,10 +177,10 @@ extern "C" void LoadAloFromBrx(ALO *palo, Bis *pbis)
     palo->p60 = ReadXf(palo, pbis);
     if (palo->count > 0) {
         int *pword = palo->pflags;
-        if (((int)pword ^ 1) & 1) {
+        if (((sptr)pword ^ 1) & 1) {
             *pword &= ~0x20;
             return;
         }
-        palo->pflags = (int *)((int)pword & ~0x20);
+        palo->pflags = (int *)((sptr)pword & ~0x20);
     }
 }

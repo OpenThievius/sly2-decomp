@@ -47,7 +47,7 @@ static inline unsigned char LerpByte(int from, int to, float u)
 }
 static inline INST *PinstFromLabel(LABEL *label, int iinst)
 {
-    return (INST *)(iinst * sizeof(INST) + (unsigned)label->psprite->insts);
+    return (INST *)(iinst * sizeof(INST) + (uptr)label->psprite->insts);
 }
 extern "C" void AdvanceSpriteInstance(float dt, LABEL *label, int iinst, AFF *pxf, RGBA4 *prgbaAdd, RGBA4 *prgbaMul)
 {
@@ -67,7 +67,7 @@ extern "C" void AdvanceSpriteInstance(float dt, LABEL *label, int iinst, AFF *px
     aslot = PinstFromLabel(label, iinst)->aslot;
     do {
         if (ikey < label->ckey) {
-            KEY *key = (__typeof__(&(label->akey)[0]))((ikey) * sizeof((label->akey)[0]) + (unsigned)(label->akey));
+            KEY *key = (__typeof__(&(label->akey)[0]))((ikey) * sizeof((label->akey)[0]) + (uptr)(label->akey));
             float tKey = key->t;
             if (tKey <= tNow) {
                 tLast = tKey;

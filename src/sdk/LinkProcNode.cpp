@@ -24,7 +24,7 @@ struct GNODE { int cref; unsigned prevIndex : 13; unsigned prevChunk : 2; unsign
 
 extern "C" void LinkProcNode(void *pnode, unsigned *ppnodeHead)
 {
-    unsigned pnodeAddress = (unsigned)pnode;
+    unsigned pnodeAddress = (uptr)pnode;
     unsigned inode;
     unsigned ichunk;
     LocateGcNode(pnodeAddress, &inode, &ichunk);

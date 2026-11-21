@@ -37,7 +37,7 @@ extern "C" void AddSoLoHierarchy(SO *pso)
     PHYS *pphys = pso->pphys;
     int hasXr = 0;
     if (pphys != 0) {
-        hasXr = (int)pphys->plink;
+        hasXr = (sptr)pphys->plink;
     }
     if (hasXr != 0) {
         PZGRAPH *pgraph = B_003DD490.ppzgraph;

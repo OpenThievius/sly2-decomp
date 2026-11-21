@@ -10,7 +10,7 @@ extern int B_003DD490;
 typedef void (*Fn6)(void *, int, int, int, int, int);
 
 void func_00181780(s8 *arg0) {
-    TriggerRsmg(&B_003DD490, M2C_FIELD(arg0, s32 *, 0x200), (int)(arg0 + 0x204), arg0, 1);
+    TriggerRsmg(&B_003DD490, M2C_FIELD(arg0, s32 *, 0x200), (sptr)(arg0 + 0x204), arg0, 1);
     s8 *vtable = M2C_FIELD(arg0, s8 **, 0xC);
     s16 offset = M2C_FIELD(vtable, s16 *, 0x18);
     Fn6 method = M2C_FIELD(vtable, Fn6 *, 0x1C);

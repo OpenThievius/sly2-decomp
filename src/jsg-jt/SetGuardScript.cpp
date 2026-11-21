@@ -1,3 +1,4 @@
+#include "types.h"
 struct SCRIPTSTATE { int pcmd; int context; };
 struct SCRIPT { int frame; char pad[0x4C]; int first; };
 struct BEHB {
@@ -56,7 +57,7 @@ extern "C" void SetGuardScript(BEH *beh, SCRIPT *script, int flag, SCRIPTSTATE *
     if (resume == 0 || resume->pcmd == 0) {
         SCRIPT *current = beh->script;
         int first = current->first;
-        beh->context = (int)current;
+        beh->context = (sptr)current;
         beh->cmd = first;
     } else {
         beh->cmd = resume->pcmd;

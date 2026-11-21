@@ -102,7 +102,7 @@ script is a scratch tool (not in the repository); the regular expressions are ro
 | Pointers read at a raw offset `*(T **)(p + 0x..)` | 32, 13 | 386, 200 |
 | Addresses cast to `int`/`u32` | 411, 110 | 220, 159 |
 | Uncached or scratchpad aliases | 82, 33 | 56, 37 |
-| An integer type for "holds an address" | `sptr`/`uptr` (include/common.h) | none |
+| An integer type for "holds an address" | `sptr`/`uptr` (include/common.h) | none (`sptr`/`uptr` added after this measurement, ROADMAP item 7) |
 
 Our layout checks only compile for the PS2 (`#if defined(__mips__)`); they were measured with `offsetof` in a scratch copy of
 `include/`. Not counted anywhere: `int` fields and padding that hold pointers without a cast, which no compiler sees.

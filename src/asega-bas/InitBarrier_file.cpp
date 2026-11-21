@@ -103,7 +103,7 @@ extern "C" void NotifyBarrierImpact(BARRIER_132298 *pbarrier)
     int ipso;
     for (NODE *pnode = pbarrier->poxa->pnode; pnode != 0; pnode = pnode->pnodeNext) {
         for (XP *pxp = pnode->pxpChain; pxp != 0; pxp = pxp->pxpNext) {
-            int fNotSelf = pxp->side[0].pso != (int)pbarrier;
+            int fNotSelf = pxp->side[0].pso != (sptr)pbarrier;
             int pso = pxp->side[1 - fNotSelf].pso;
             for (ipso = 0; ipso < cpso; ipso++) {
                 if (pso == apso[ipso])

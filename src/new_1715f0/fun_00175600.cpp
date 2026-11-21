@@ -21,11 +21,11 @@ extern "C" void func_00175600(GOAL_175600 *goal)
         case 0:
             if (goal->target != 0)
                 func_00175488(goal, 1);
-            else if (FGoalAnimDone(((int)goal->pgoalChild)) != 0)
+            else if (FGoalAnimDone(((sptr)goal->pgoalChild)) != 0)
                 func_00175488(goal, -1);
             break;
         case 1:
-            if (FGoalAnimDone(((int)goal->pgoalChild)) != 0)
+            if (FGoalAnimDone(((sptr)goal->pgoalChild)) != 0)
                 func_00175488(goal, -1);
             break;
         }

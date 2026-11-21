@@ -1,3 +1,4 @@
+#include "types.h"
 extern int D_002C676C;
 extern int D_002C7940;
 extern int D_002C82C0;
@@ -18,7 +19,7 @@ int sceCdGetDiskType(void)
         SignalSema(D_002C676C);
         return -1;
     }
-    result = *(int *)((unsigned int)&D_002C7940 | 0x20000000);
+    result = *(int *)((uptr)&D_002C7940 | 0x20000000);
     SignalSema(D_002C676C);
     return result;
 }

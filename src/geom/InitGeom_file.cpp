@@ -37,7 +37,7 @@ void CBinaryInputStream_Pump(CBinaryInputStream *pbis)
         } else {
             pbis->RawPump();
             pbis->cb = pbis->cbRaw;
-            pbis->unk0x4 = (int)pbis->pbRaw;
+            pbis->unk0x4 = (sptr)pbis->pbRaw;
             pbis->pbRaw = pbis->pbRaw + pbis->cbRaw;
             pbis->cbRaw = 0;
         }
@@ -464,16 +464,16 @@ void CBinaryInputStream_ReadBspc(CBinaryInputStream_118220 *pbis, GEOM *pgeom, B
         BSPNODE *pbsp = &pbspc->absp[ibsp];
         unsigned isurf = pbis->U16Read();
         if (isurf == 0xFFFF) {
-            pbsp->psurf = (unsigned)&D_002BBAF0;
+            pbsp->psurf = (uptr)&D_002BBAF0;
             continue;
         }
-        pbsp->psurf = (unsigned)(pgeom->psurf + isurf * 0x20);
+        pbsp->psurf = (uptr)(pgeom->psurf + isurf * 0x20);
         unsigned ibspNeg = pbis->U32Read();
         if (ibspNeg != 0xFFFFFFFFu)
-            pbsp->pbspNeg = (unsigned)(pbspc->absp + ibspNeg);
+            pbsp->pbspNeg = (uptr)(pbspc->absp + ibspNeg);
         unsigned ibspPos = pbis->U32Read();
         if (ibspPos != 0xFFFFFFFFu)
-            pbsp->pbspPos = (unsigned)(pbspc->absp + ibspPos);
+            pbsp->pbspPos = (uptr)(pbspc->absp + ibspPos);
     }
 }
 

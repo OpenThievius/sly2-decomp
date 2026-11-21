@@ -22,7 +22,7 @@ void func_001EB678(SHD *pshd, FRAMES *pframes)
     pframes->atex0 = (long *)PvAllocSwClearImpl__Fi(&allocreq);
     for (int iframe = 0; iframe < pframes->cframe; iframe++)
     {
-        long *slot = (long *)(iframe * 8 + (int)pframes->atex0);
+        long *slot = (long *)(iframe * 8 + (sptr)pframes->atex0);
         *slot = func_001EA6C8(atex, iframe, 0);
     }
 }

@@ -170,9 +170,9 @@ struct Buf1A57A8 { s32 first; s32 *second; s32 pad[2]; };
 
 extern "C" void func_001A57A8(LO *lo) {
     Buf1A57A8 buf;
-    func_001A5448_1A57A8((s32)lo->psoParent, (s8 *)&buf, &buf.second);
-    if (*buf.second == (s32)lo) {
-        *buf.second = (s32)lo->ploNext;
+    func_001A5448_1A57A8((sptr)lo->psoParent, (s8 *)&buf, &buf.second);
+    if (*buf.second == (sptr)lo) {
+        *buf.second = (sptr)lo->ploNext;
     }
     RemoveDlEntry_1A57A8(buf.first, lo);
 }
@@ -327,7 +327,7 @@ s32 func_001A53E0_1A5B80();                            /* extern */
 
 void func_001A5B80(struct LOLINK *plolink, s32 arg1, s32 arg2) {
     if (plolink->plolinkParent != NULL) {
-        if ((arg1 == (s32)plolink) && (arg2 == 0)) {
+        if ((arg1 == (sptr)plolink) && (arg2 == 0)) {
             func_001A53E0_1A5B80();
         }
         plolink->field_0x14 = (s32) plolink->plolinkParent->field_0x14;

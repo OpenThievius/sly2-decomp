@@ -31,7 +31,7 @@ void bevy_camera_follow_push_out(SW *psw, QW posA, QW posB, int (*pfn)(void *, v
             continue;
         GEOM *pgeom = pnode->pgeom;
         if (!pgeom) continue;
-        GEOM **pslot = (GEOM **)(count * 4 + (int)list);
+        GEOM **pslot = (GEOM **)(count * 4 + (sptr)list);
         do {
             if ((!pfn || pfn(pvArg, pgeom)) && count < 0x100) {
                 *pslot++ = pgeom;

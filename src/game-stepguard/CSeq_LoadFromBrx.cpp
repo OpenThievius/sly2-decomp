@@ -18,7 +18,7 @@ void CSeq_LoadFromBrx(JSG *pjsg, void *pbis)
     ALLOCREQ *preq = &req;
     preq->cb = 0xA000;
     preq->cbAlign = 0x10;
-    pjsg->ajsge = (int)PvAllocStackImpl__Fi(preq);
+    pjsg->ajsge = (sptr)PvAllocStackImpl__Fi(preq);
     AddJsgContext(pjsg, -1);
     pjsg->fPendingCut = 1;
     LoadLoFromBrx(pjsg, pbis);
@@ -31,7 +31,7 @@ void CSeq_LoadFromBrx(JSG *pjsg, void *pbis)
     preq->cb = (capacity + 1) * 0x50;
     preq->cbAlign = 0x10;
     void *heap = PvAllocSwImpl__Fi(preq);
-    pjsg->ajsge = (int)heap;
+    pjsg->ajsge = (sptr)heap;
     CopyAb__FPvT0Ui(heap, ajsgeStack, pjsg->cjsge * 0x50);
     CStackFrame_Destructor(frame, 2);
 }

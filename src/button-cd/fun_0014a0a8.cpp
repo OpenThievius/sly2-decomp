@@ -23,7 +23,7 @@ void func_0014A0A8(Path *ppath)
         void *plo = PloFindSwObject_thunk(&B_003DD490, 4, pnode->oid, ppath);
         pnode->plo = plo;
         if (plo) {
-            QW *dest = (QW *)((inode << 4) + (int)ppath->pcrv->apos);
+            QW *dest = (QW *)((inode << 4) + (sptr)ppath->pcrv->apos);
             *dest = PosLoWorld(plo);
         }
     }

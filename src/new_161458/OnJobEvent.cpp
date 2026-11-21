@@ -15,7 +15,7 @@ void OnJobEvent(JOB *job, int event, int arg)
         void *args[2];
         args[0] = &eventValue;
         args[1] = &argValue;
-        job->vtbl->fn((char *)job + job->vtbl->delta, 0x11, 0, 2, (int)args, 0);
+        job->vtbl->fn((char *)job + job->vtbl->delta, 0x11, 0, 2, (sptr)args, 0);
         for (int index = 0; index < job->cevFail; index++) {
             if (eventValue == job->aevFail[index]) {
                 bevy_jobs_162dd0(job);

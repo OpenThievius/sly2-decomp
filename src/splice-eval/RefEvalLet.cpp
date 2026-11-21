@@ -51,7 +51,7 @@ extern "C" CRef *RefEvalLet(CRef *pref, P *ppair, CFrame *pframe)
             RefEval(ptemp, psym->next, pframe);
             *pinit = *(CRef *)ptemp;
             CRefRaw_Destruct(ptemp);
-            CFrame_RefAddBinding(ptemp, pframeLet.p, (int)psym->pv, pinit);
+            CFrame_RefAddBinding(ptemp, pframeLet.p, (sptr)psym->pv, pinit);
             *pbinding = *(CRef *)ptemp;
             CRefRaw_Destruct(ptemp);
         }

@@ -567,7 +567,7 @@ extern "C" void func_001CB518(SO *so, void *pool)
     so->islot = -1;
     int link = 0;
     if (so->pphys != 0)
-        link = (int)so->pphys->plink;
+        link = (sptr)so->pphys->plink;
     if (link != 0) {
         QW pos = PosLoWorld_1CB518(so);
         func_001F37C8(so, PpathzoneFindPos(pos, 1));
@@ -591,7 +591,7 @@ void func_001CB5D0(SO *so, void *pool)
     func_001CB5C8_1CB5D0();
     int link = 0;
     if (so->pphys != 0)
-        link = (int)so->pphys->plink;
+        link = (sptr)so->pphys->plink;
     if (link != 0)
         func_001F37C8_1CB5D0(so, 0);
     for (LO *child = (LO *)so->dlChild.head; child != 0; child = child->ploNext)

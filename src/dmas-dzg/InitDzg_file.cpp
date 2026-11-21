@@ -56,7 +56,7 @@ extern "C" void SolveDzg__FP3DZGiiPP2XPPiPPP2SO(char *dzg, s32 arg1)
 {
     DLI iterator;
     DLI second;
-    s32 list = (s32)dzg + 0x30;
+    s32 list = (sptr)dzg + 0x30;
     iterator.m_ppv = (void **)list;
     iterator.m_pdl = (DL *)list;
     DLI *previous = g_2dd2fc;

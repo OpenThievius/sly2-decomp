@@ -11,7 +11,7 @@ CRef *RefOpConvertObjectMatrix(CRef *pref, int carg, CRef *aref, CFrame *pframe)
     CRef refResult;
     SetTag__4CRef4TAGK(&refResult, 0x1B);
     MATRIX4 *pdest = refResult.pmat;
-    MATRIX4 mat = ConvertAloMat((int)aref[0].pmat, (int)aref[1].pmat, aref[2].pmat);
+    MATRIX4 mat = ConvertAloMat((sptr)aref[0].pmat, (sptr)aref[1].pmat, aref[2].pmat);
     *pdest = mat;
     CRef_CopyConstruct(pref, &refResult);
     CRef_Destruct(&refResult);

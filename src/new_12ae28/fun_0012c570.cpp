@@ -18,7 +18,7 @@ void func_0012C570(Acr *acr, Bis *bis)
     req.cb = ckey << 2;
     req.cbAlign = 0x10;
     acr->ckey = ckey;
-    acr->at = (float *)PvAllocSwImpl((int)&req);
+    acr->at = (float *)PvAllocSwImpl((sptr)&req);
     for (ikey = 0; ikey < acr->ckey; ikey++) {
         int frame = U16Read__18CBinaryInputStream(bis);
         acr->at[ikey] = (float)frame * (1.0f / 60.0f);
@@ -30,7 +30,7 @@ void func_0012C570(Acr *acr, Bis *bis)
             continue;
         req.cbAlign = 0x10;
         req.cb = acr->ckey << 3;
-        float *apg = (float *)PvAllocSwImpl((int)&req);
+        float *apg = (float *)PvAllocSwImpl((sptr)&req);
         acr->apg[iaxis] = apg;
         for (ikey = 0; ikey < acr->ckey; ikey++) {
             apg[ikey * 2] = F32Read__18CBinaryInputStream(bis);

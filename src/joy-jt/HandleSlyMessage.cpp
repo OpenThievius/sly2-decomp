@@ -75,12 +75,12 @@ extern "C" void HandleSlyMessage(SLY_188F20 *psly, int msg, void *pv)
     HandleJtMessage(psly, msg, pv);
     switch (msg) {
     case 3:
-        if ((int)pv == psly->id18E0) {
+        if ((sptr)pv == psly->id18E0) {
             if (psly->jtcs == 10)
                 SetJtJtcs(psly, 2);
             else
                 SetJtJtcs(psly, -1);
-        } else if ((int)pv == psly->id1030) {
+        } else if ((sptr)pv == psly->id1030) {
             switch (psly->state) {
             case 9:
             case 11:
@@ -175,12 +175,12 @@ extern "C" void HandleSlyMessage(SLY_188F20 *psly, int msg, void *pv)
         switch (psly->state) {
         case 3:
         case 0x16:
-            if (psly->n18C4 == (int)pv)
+            if (psly->n18C4 == (sptr)pv)
                 SetJmpState(psly->jmp, 0, 0, 0);
             break;
         case 7:
             if (psly->attachState < 5) {
-                if (psly->attachState >= 3 && psly->attachTarget == (int)pv)
+                if (psly->attachState >= 3 && psly->attachTarget == (sptr)pv)
                     SetJmpState(psly->jmp, 0, 0, 0);
             }
             break;
@@ -188,7 +188,7 @@ extern "C" void HandleSlyMessage(SLY_188F20 *psly, int msg, void *pv)
         {
             WATCH_188F20 *pwatch = psly->awatch;
             for (int i = 3; i >= 0; i--, pwatch++) {
-                if (pwatch->target == (int)pv)
+                if (pwatch->target == (sptr)pv)
                     func_0018D698(psly, pwatch, 0);
             }
         }

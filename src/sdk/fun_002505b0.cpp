@@ -11,7 +11,7 @@ extern void (*D_002C8498[])(MPEGBLOCK *);
 
 void func_002505B0(MPEGDEC *decoder, MpegReference *reference, int fieldOffset, int destinationRow, int row,
                    int height, int column, int rowOffset, int vectorX, int vectorY, int fieldPrediction, int average) {
-    u32 output = (u32)decoder->output;
+    u32 output = (uptr)decoder->output;
     int index = decoder->buffers[decoder->bufferIndex].blockCount;
     MPEGBLOCK *luma = &decoder->buffers[decoder->bufferIndex].blocks[index];
     MPEGBLOCK *chroma = &decoder->buffers[decoder->bufferIndex].blocks[4 + index];

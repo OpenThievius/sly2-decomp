@@ -13,7 +13,7 @@ void AppendSlEntry(s32, s8 *);                 /* extern */
 
 void Vector_Init(s8 *arg0, s32 *arg1) {
     M2C_FIELD(arg0, s32 **, 0) = arg1;
-    AppendSlEntry((int)((char *)arg1 + 4), arg0);
+    AppendSlEntry((sptr)((char *)arg1 + 4), arg0);
     M2C_FIELD(arg0, s32 *, 0x24) = (s32) *arg1;
 }
 

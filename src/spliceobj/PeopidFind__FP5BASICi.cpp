@@ -14,7 +14,7 @@ void *PeopidFind__FP5BASICi(BASIC *pbasic, int optid)
     if (high >= 0) {
         do {
             int mid = (low + high) >> 1;
-            const SPLOPT *psplopt = (const SPLOPT *)((char *)(mid << 3) + (int)asplopt);
+            const SPLOPT *psplopt = (const SPLOPT *)((char *)(mid << 3) + (sptr)asplopt);
             if (psplopt->optid == optid)
                 return psplopt->peopid;
             if (optid < psplopt->optid)

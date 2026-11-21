@@ -13,7 +13,7 @@ void func_00207C48(STEPGUARD *guard, CRef *ref, int a, int b, int c, int d)
     ANIM *anim = PguardanimEnsure(guard, GrfsgsFromRef(ref));
     anim->kind = 3;
     DIR *dir = func_0020CA00(0xD0);
-    anim->pv = (int)dir;
+    anim->pv = (sptr)dir;
     func_0020C7D8(dir);
     ((DIR *)anim->pv)->a = a;
     ((DIR *)anim->pv)->b = b;

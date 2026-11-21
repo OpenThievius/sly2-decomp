@@ -19,7 +19,7 @@ void HandlePoMessage(s8 *arg0, s32 arg1) {
 
     HandleLoMessage();
     if (arg1 == 5) {
-        temp_s0 = (s32)(arg0 + 0x174);
+        temp_s0 = (sptr)(arg0 + 0x174);
         if (temp_s0 != 0) {
             temp_a0 = M2C_FIELD(arg0, s32 *, 0x174);
             if (temp_a0 != 0) {

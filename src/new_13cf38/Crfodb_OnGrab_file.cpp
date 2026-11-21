@@ -55,16 +55,16 @@ extern "C" void Crfodb_OnGrab(Guard *guard, JT *jt)
     UpdateJtLootSave(jt, 0, guard);
     if (jt->plootHeld != 0) {
         if (guard->ploot != 0) {
-            jt->plootHeld->pguard = (int)guard;
+            jt->plootHeld->pguard = (sptr)guard;
             SetLootState(jt->plootHeld, 3);
-            guard->ploot->pthief = (int)jt;
+            guard->ploot->pthief = (sptr)jt;
             SetLootState(guard->ploot, 2);
         } else {
-            jt->plootHeld->pguard = (int)guard;
+            jt->plootHeld->pguard = (sptr)guard;
             SetLootState(jt->plootHeld, 3);
         }
     } else {
-        guard->ploot->pthief = (int)jt;
+        guard->ploot->pthief = (sptr)jt;
         SetLootState(guard->ploot, 2);
     }
     func_00184130(guard, jt);

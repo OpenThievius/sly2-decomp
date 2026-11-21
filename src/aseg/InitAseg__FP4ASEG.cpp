@@ -16,7 +16,7 @@ void InitAseg__FP4ASEG(s8 *arg0) {
     s8 *temp_v0;
 
     InitLo();
-    InitDl__FP2DLi((int)(arg0 + 0x50), 0x2C);
+    InitDl__FP2DLi((sptr)(arg0 + 0x50), 0x2C);
     temp_v0 = arg0 + 0x80;
     M2C_FIELD(arg0, f32 *, 0x78) = 1.0f;
     M2C_FIELD(arg0, f32 *, 0x80) = 1.0f;

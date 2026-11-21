@@ -39,7 +39,7 @@ void SetCoinState(COIN *coin, int state)
         OBJ *owner = coin->owner;
         if (owner) {
             l.msg[0] = state;
-            l.msg[1] = (int)coin;
+            l.msg[1] = (sptr)coin;
             VTB *vt = owner->vt;
             vt->fn((char *)owner + vt->delta, l.msg);
         }

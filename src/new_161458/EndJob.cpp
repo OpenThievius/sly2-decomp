@@ -18,7 +18,7 @@ extern s8 *B_003E0FA0;
 void EndJob(s8 *arg0) {
     ResetJob();
     SetTaskState(M2C_FIELD(arg0, s32 *, 0x64), 1);
-    if (((s32)B_003E0FA0 != NULL) && (M2C_FIELD(B_003E0FA0, s32 *, 0x7C) == (s32)arg0)) {
+    if (((sptr)B_003E0FA0 != NULL) && (M2C_FIELD(B_003E0FA0, s32 *, 0x7C) == (sptr)arg0)) {
         LeaveTaskIfCurrent(B_003E0FA0);
     }
     bevy_camera_follow_activity(&B_002DEB30, 0x1F, arg0);

@@ -15,7 +15,7 @@ void HandleGadgetObjMessage(s32 arg0, s32 arg1, Obj *arg2) {
     HandleLoMessage(arg0, arg1, arg2);
     if (arg1 == 4) {
         Obj *obj = ((Msg *)arg2)->obj;
-        if ((s32)obj == arg0 && (u32)(obj->state - 1) < 2U) {
+        if ((sptr)obj == arg0 && (u32)(obj->state - 1) < 2U) {
             obj->vtbl->handler((s8 *)obj + obj->vtbl->adjust, 3);
         }
     }

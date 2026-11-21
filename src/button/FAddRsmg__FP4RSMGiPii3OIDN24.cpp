@@ -17,7 +17,7 @@ extern "C" int FAddRsmg__FP4RSMGiPii3OIDN24(void *unused, RSMG *arsmg, int crsmg
     if (irsmgNew + 1 >= crsmgMax)
         return 0;
     *pcrsmg = irsmgNew + 1;
-    RSMG *prsmgNew = (RSMG *)(irsmgNew * 16 + (int)arsmg);
+    RSMG *prsmgNew = (RSMG *)(irsmgNew * 16 + (sptr)arsmg);
     prsmgNew->oidRoot = oidRoot;
     prsmgNew->oidSM = oidSM;
     if (fOnTrigger != 0) {

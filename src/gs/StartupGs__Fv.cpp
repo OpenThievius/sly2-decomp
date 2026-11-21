@@ -26,14 +26,14 @@ extern "C" void StartupGs__Fv()
     InitCritSect__FP8CRITSECT(B_002DFB40);
     sceGsResetGraph(0, 1, 2, 1);
     sceGsSetDefDBuff(B_002DEB80, 0, 0x200, 0xE0, 3, 0x30, 0);
-    int address = (int)B_002DEB80;
+    int address = (sptr)B_002DEB80;
     do {
         int *pmode = (int *)address;
         *pmode &= -2;
         ((unsigned char *)pmode)[1] = 0x80;
         *pmode |= 0x20;
         address += 0x28;
-    } while (address < (int)B_002DEB80 + 0x50);
+    } while (address < (sptr)B_002DEB80 + 0x50);
     unsigned color;
     color = 0x80000000;
     BuildClearGifs__FP2QWG4RGBAi(B_002DEDC0, &color, 3);

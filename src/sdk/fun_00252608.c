@@ -26,7 +26,7 @@ void func_00252608(char *base)
     if (*(int *)(base + 0x87C) == 0) {
     index = *(int *)(base + 0x820);
     count = dev->chain[index].count;
-    tag = (unsigned long *)(((unsigned)D_451E80 & 0xFFFFFFF) | 0x20000000);
+    tag = (unsigned long *)(((uptr)D_451E80 & 0xFFFFFFF) | 0x20000000);
     for (slot = 0; slot < count; slot++) {
         unsigned first = dev->chain[index].first[slot];
         unsigned second = dev->chain[index].second[slot];
@@ -42,7 +42,7 @@ void func_00252608(char *base)
     flag = func_00239450();
     MemoryBarrier();
     *(volatile unsigned *)0x1000D480 = dev->chain[*(int *)(base + 0x820)].head;
-    *(volatile unsigned *)0x1000D430 = (unsigned)D_451E80;
+    *(volatile unsigned *)0x1000D430 = (uptr)D_451E80;
     *(volatile unsigned *)0x1000D420 = 0;
     *(volatile unsigned *)0x1000D400 = 0x105;
     if (flag) {

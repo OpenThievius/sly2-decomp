@@ -13,7 +13,7 @@ M2C_UNK InitSo();                                   /* extern */
 void InitButton(s8 *arg0) {
     s32 temp_v1;
     InitSo();
-    InitBtn((int)(arg0 + 0x150));
+    InitBtn((sptr)(arg0 + 0x150));
     temp_v1 = M2C_FIELD(arg0, s32 *, 0x40);
     if ((temp_v1 ^ 1) & 1) {
         *(s32 *)temp_v1 = (s32) (*(s32 *)temp_v1 | 2);

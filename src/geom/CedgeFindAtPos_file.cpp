@@ -61,7 +61,7 @@ s32 CedgeFindAtPos(CedgeDst *dst, CedgeSrc *src, s32 key, s32 maxOut, CedgeEntry
             CedgeElem *element = (CedgeElem *)(buffer + index * 12);
             CedgeEntry *entry = element->holder->head;
             if (entry == 0) continue;
-            CedgeEntry **slot = (CedgeEntry **)(found * 4 + (s32)out);
+            CedgeEntry **slot = (CedgeEntry **)(found * 4 + (sptr)out);
             while (entry != 0) {
                 if (key == entry->key0 || key == entry->key1) {
                     s32 scan;

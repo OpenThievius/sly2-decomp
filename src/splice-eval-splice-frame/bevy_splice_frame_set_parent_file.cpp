@@ -28,7 +28,7 @@ extern "C" void CFrame_AddParent(CFrame *pframe)
 {
     int index = pframe->cparent;
     pframe->cparent = index + 1;
-    CFramePtr_Assign_127B40((int *)(index * 4 + (int)pframe + 12));
+    CFramePtr_Assign_127B40((int *)(index * 4 + (sptr)pframe + 12));
 }
 
 struct CFrame_127B70 { int pad0; int pad4; int count; CFrame_127B70 *parents[1]; };
@@ -207,7 +207,7 @@ extern "C" HFrame *PframeClone(HFrame *result, CFrame_127E90 *src, unsigned long
     func_00257058(&h, PframeNew());
     h.p->slotCount = src->slotCount;
     for (i = 0; i < src->slotCount; i++) {
-        CFramePtr_Assign_127E90((char *)(i * 4) + (int)h.p + 0xC, src->slots[i]);
+        CFramePtr_Assign_127E90((char *)(i * 4) + (sptr)h.p + 0xC, src->slots[i]);
     }
     if (src->varbs != 0) {
         HV_127E90 varbs;

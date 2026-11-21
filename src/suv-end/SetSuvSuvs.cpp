@@ -11,7 +11,7 @@ static inline int Alloc(int size)
     SZ request;
     request.size = size;
     request.align = 0x10;
-    return (int)PvAllocSwClearImpl__Fi(&request);
+    return (sptr)PvAllocSwClearImpl__Fi(&request);
 }
 extern "C" void SetSuvSuvs(OBJ *obj, int value)
 {

@@ -45,7 +45,7 @@ SLOT *func_001BEB28(RTALO *alo)
                         inner->vt->fnB8((char *)inner + inner->vt->deltaB8);
                     }
                 }
-                unsigned flags = (unsigned)child->pgrf;
+                unsigned flags = (uptr)child->pgrf;
                 if (((flags ^ 1) & 1) != 0)
                     flags = *child->pgrf;
                 if ((flags & 8) != 0) {

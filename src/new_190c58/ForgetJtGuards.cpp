@@ -25,7 +25,7 @@ extern "C" void ForgetJtGuards(void **arg0)
     QW posGuard;
     QW posTarget;
     for (GUARD_192A28 *pguard = B_003E1444; pguard != 0; pguard = pguard->pnext) {
-        void *pentry = PentryFindSensorLo((int)pguard->psensor, *arg0);
+        void *pentry = PentryFindSensorLo((sptr)pguard->psensor, *arg0);
         if (pentry != 0 && *(int *)((char *)pentry + 4) != 0 && (*(int *)(pguard->psensor + 0xF8) & 1) == 0) {
             posGuard = PosLoWorld(pguard);
             posTarget = PosLoWorld(*arg0);

@@ -381,8 +381,8 @@ void CopyGlobDmaChain(GLOB *pglob, GLOBI *pglobi, int cqw, char *source, int rel
     int align = 0x10;
     req.cb = cqw << 4;
     char *chain = (char *)PvAllocSwCopyImpl__FiPv_169EB8((req.cbAlign = align, &req), source);
-    pglobi->chain = (int)chain;
-    pglobi->data = pglobi->data + ((int)chain - (int)source);
+    pglobi->chain = (sptr)chain;
+    pglobi->data = pglobi->data + ((sptr)chain - (sptr)source);
     if (relocate != 0) {
         char *pw = chain;
         int delta = newBase - oldBase;

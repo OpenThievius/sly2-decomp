@@ -1,3 +1,4 @@
+#include "types.h"
 extern "C" char B_003DD490[];
 extern "C" int D_002C0908[][5];
 extern "C" int D_002C0948[][5];
@@ -17,7 +18,7 @@ void UpdateMurrayMash(char *arg0)
     int temp_a0_2;
     int var_s1;
 
-    if (PpoSwFocusBase(B_003DD490) == (int)arg0 && FSwHandsOff(B_003DD490) == 0) {
+    if (PpoSwFocusBase(B_003DD490) == (sptr)arg0 && FSwHandsOff(B_003DD490) == 0) {
         var_s1 = GetSmaCur(*(int *)(arg0 + 0x1034));
         if (var_s1 == GetSmaGoal(*(int *)(arg0 + 0x1034)) && var_s1 < 0x1D0 && var_s1 >= 0x1CB) {
             *(float *)(arg0 + 0x1524) = *(float *)(arg0 + 0x1524) - g_2dded4;

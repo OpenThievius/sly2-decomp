@@ -25,10 +25,10 @@ void CMpeg_Start(CMpeg *mpeg, int pbas)
     mpeg->pbas = pbas;
     mpeg->s10C = 0;
     void *sdk = mpeg->sdk;
-    mpeg->queue.Init(0x40000, (void *)((int)(mpeg->pbBuffer + 0x245A80) | 0x20000000));
+    mpeg->queue.Init(0x40000, (void *)((sptr)(mpeg->pbBuffer + 0x245A80) | 0x20000000));
     mpeg->audio.Init();
     sceMpegInit();
-    sceMpegCreate(sdk, (int)(mpeg->pbBuffer + 0x98000), 0x1ADA60);
+    sceMpegCreate(sdk, (sptr)(mpeg->pbBuffer + 0x98000), 0x1ADA60);
     sceMpegAddStrCallback(sdk, 0, 0, (void *)FMpegAcceptVideo__FP7sceMpegP16sceMpegCbDataStrP5CMpeg, mpeg);
     sceMpegAddStrCallback(sdk, 2, 0, (void *)FMpegAcceptAudio__FP7sceMpegP16sceMpegCbDataStrP5CMpeg, mpeg);
     sceMpegAddStrCallback(sdk, 3, 0, (void *)FMpegAcceptAudio__FP7sceMpegP16sceMpegCbDataStrP5CMpeg, mpeg);

@@ -15,7 +15,7 @@ void HandleBombMessage__FP4BOMB5MSGIDPv(s32 arg0, s32 arg1, s8 *arg2) {
     HandleLoMessage();
     if (arg1 == 4) {
         temp_a0 = M2C_FIELD(arg2, s8 **, 4);
-        if (((s32)temp_a0 == arg0) && (M2C_FIELD(temp_a0, s32 *, 0x150) == 0)) {
+        if (((sptr)temp_a0 == arg0) && (M2C_FIELD(temp_a0, s32 *, 0x150) == 0)) {
             PrimeBomb__FP4BOMBf(temp_a0, 0.0f);
         }
     }

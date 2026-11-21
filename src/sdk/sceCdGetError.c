@@ -20,7 +20,7 @@ s32 sceCdGetError(void) {
         SignalSema(D_002C676C);
         return -1;
     }
-    value = *(s32 *)((u32)&D_002C7940 | 0x20000000);
+    value = *(s32 *)((uptr)&D_002C7940 | 0x20000000);
     SignalSema(D_002C676C);
     return value;
 }

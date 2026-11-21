@@ -112,7 +112,7 @@ extern "C" void Proxy_AddAloHierarchy(PROXY_12ED20 *pproxy)
         SetAmbRange(pamb, psnd->sStart, psnd->sFull);
         SetAmbVolume(pamb, psnd->uVolume);
         SetAmbPitch(pamb, psnd->uPitch);
-        VirtualRefPtr_Assign((void **)(isnd * 4 + (int)pproxy->aref), pamb);
+        VirtualRefPtr_Assign((void **)(isnd * 4 + (sptr)pproxy->aref), pamb);
     }
 }
 
@@ -130,7 +130,7 @@ extern "C" void Proxy_RemoveAloHierarchy(PROXY_12EDE8 *pproxy)
 {
     RemoveAloHierarchy(pproxy);
     for (int index = 0; index < pproxy->count; index++) {
-        AMB **pslot = (AMB **)(index * 4 + (int)pproxy->slots);
+        AMB **pslot = (AMB **)(index * 4 + (sptr)pproxy->slots);
         if (pslot != 0 && *pslot != 0) {
             StopAmb(*pslot, 0.0f);
             VirtualRefPtr_Assign_12EDE8(pslot, 0);

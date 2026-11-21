@@ -1,3 +1,4 @@
+#include "types.h"
 struct AMB;
 struct SPRITEINST { char pad[8]; short ilabel; short pad2; float t; int fPaused; AMB *pamb; };
 struct STAMP218660 { unsigned long v; };
@@ -19,7 +20,7 @@ static inline void StopAmbRef(AMB **ppamb)
 }
 extern "C" void StopSpriteInstance(SPRITE *psprite, int iinst)
 {
-    SPRITEINST *pinst = (SPRITEINST *)(iinst * 0x18 + (int)psprite->ainst);
+    SPRITEINST *pinst = (SPRITEINST *)(iinst * 0x18 + (sptr)psprite->ainst);
     if (pinst->ilabel >= 0) {
         int ilabel = pinst->ilabel;
         float t = pinst->t;

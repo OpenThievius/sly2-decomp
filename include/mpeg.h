@@ -102,20 +102,20 @@ typedef struct MPEGHANDLE {
 
 typedef char check_MPEGBLOCK_size[(sizeof(MPEGBLOCK) == 0x1C) ? 1 : -1];
 typedef char check_MPEGBUFFER_size[(sizeof(MPEGBUFFER) == 0x140) ? 1 : -1];
-typedef char check_MPEGBUFFER_blocks[((unsigned int)&((MPEGBUFFER *)0)->blocks == 0x48) ? 1 : -1];
-typedef char check_MPEGBUFFER_destination[((unsigned int)&((MPEGBUFFER *)0)->destination == 0x128) ? 1 : -1];
-typedef char check_MPEGBUFFER_noCoefficients[((unsigned int)&((MPEGBUFFER *)0)->noCoefficients == 0x13C) ? 1 : -1];
-typedef char check_MPEGDEC_buffers[((unsigned int)&((MPEGDEC *)0)->buffers == 0x5A0) ? 1 : -1];
-typedef char check_MPEGDEC_bufferIndex[((unsigned int)&((MPEGDEC *)0)->bufferIndex == 0x820) ? 1 : -1];
-typedef char check_MPEGDEC_output[((unsigned int)&((MPEGDEC *)0)->output == 0x830) ? 1 : -1];
-typedef char check_MPEGDEC_topBits[((unsigned int)&((MPEGDEC *)0)->topBits == 0x848) ? 1 : -1];
-typedef char check_MPEGDEC_stop[((unsigned int)&((MPEGDEC *)0)->stop == 0x834) ? 1 : -1];
-typedef char check_MPEGDEC_imageBuffer[((unsigned int)&((MPEGDEC *)0)->imageBuffer == 0xEC) ? 1 : -1];
-typedef char check_MPEGDEC_strideSelect[((unsigned int)&((MPEGDEC *)0)->strideSelect == 0xF4) ? 1 : -1];
-typedef char check_MPEGDEC_strideStep[((unsigned int)&((MPEGDEC *)0)->strideStep == 0xF8) ? 1 : -1];
-typedef char check_MPEGDEC_pictureStructure[((unsigned int)&((MPEGDEC *)0)->pictureStructure == 0x184) ? 1 : -1];
-typedef char check_MPEGDEC_quantizerScaleCode[((unsigned int)&((MPEGDEC *)0)->quantizerScaleCode == 0x1C4) ? 1 : -1];
-typedef char check_MPEGDEC_sameFrame[((unsigned int)&((MPEGDEC *)0)->sameFrame == 0x87C) ? 1 : -1];
-typedef char check_MPEGDEC_field_0x878[((unsigned int)&((MPEGDEC *)0)->field_0x878 == 0x878) ? 1 : -1];
+typedef char check_MPEGBUFFER_blocks[((uptr)&((MPEGBUFFER *)0)->blocks == 0x48) ? 1 : -1];
+typedef char check_MPEGBUFFER_destination[((uptr)&((MPEGBUFFER *)0)->destination == 0x128) ? 1 : -1];
+typedef char check_MPEGBUFFER_noCoefficients[((uptr)&((MPEGBUFFER *)0)->noCoefficients == 0x13C) ? 1 : -1];
+typedef char check_MPEGDEC_buffers[((uptr)&((MPEGDEC *)0)->buffers == 0x5A0) ? 1 : -1];
+typedef char check_MPEGDEC_bufferIndex[((uptr)&((MPEGDEC *)0)->bufferIndex == 0x820) ? 1 : -1];
+typedef char check_MPEGDEC_output[((uptr)&((MPEGDEC *)0)->output == 0x830) ? 1 : -1];
+typedef char check_MPEGDEC_topBits[((uptr)&((MPEGDEC *)0)->topBits == 0x848) ? 1 : -1];
+typedef char check_MPEGDEC_stop[((uptr)&((MPEGDEC *)0)->stop == 0x834) ? 1 : -1];
+typedef char check_MPEGDEC_imageBuffer[((uptr)&((MPEGDEC *)0)->imageBuffer == 0xEC) ? 1 : -1];
+typedef char check_MPEGDEC_strideSelect[((uptr)&((MPEGDEC *)0)->strideSelect == 0xF4) ? 1 : -1];
+typedef char check_MPEGDEC_strideStep[((uptr)&((MPEGDEC *)0)->strideStep == 0xF8) ? 1 : -1];
+typedef char check_MPEGDEC_pictureStructure[((uptr)&((MPEGDEC *)0)->pictureStructure == 0x184) ? 1 : -1];
+typedef char check_MPEGDEC_quantizerScaleCode[((uptr)&((MPEGDEC *)0)->quantizerScaleCode == 0x1C4) ? 1 : -1];
+typedef char check_MPEGDEC_sameFrame[((uptr)&((MPEGDEC *)0)->sameFrame == 0x87C) ? 1 : -1];
+typedef char check_MPEGDEC_field_0x878[((uptr)&((MPEGDEC *)0)->field_0x878 == 0x878) ? 1 : -1];
 
 #endif

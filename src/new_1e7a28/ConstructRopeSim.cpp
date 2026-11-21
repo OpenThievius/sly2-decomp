@@ -43,8 +43,8 @@ ROPESIM *ConstructRopeSim(ROPESIM *prope, CRV *pcrv)
     QW *mat = crv->vt->fn((char *)crv + crv->vt->d);
     for (int icv = 0; icv < prope->pcrv->ccv; icv++) {
         int offset = icv << 4;
-        QW *ppos = (QW *)(offset + (int)prope->pcrv->apos);
-        QW *pdest = (QW *)(offset + (int)prope->apos);
+        QW *ppos = (QW *)(offset + (sptr)prope->pcrv->apos);
+        QW *pdest = (QW *)(offset + (sptr)prope->apos);
         *pdest = TransformByRows(mat, ppos);
     }
     prope->pxf1 = &D_002C44F0;

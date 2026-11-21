@@ -12,7 +12,7 @@ void HandleLoMessage(s8 *, s32, s8 *);
 void SetSlotSoState(s8 *, M2C_UNK);
 void HandleSlotSoMessage(s8 *arg0, s32 arg1, s8 *arg2) {
     HandleLoMessage(arg0, arg1, arg2);
-    if ((arg1 == 2) && ((s32)arg2 == M2C_FIELD(arg0, s32 *, 0x1C4))) {
+    if ((arg1 == 2) && ((sptr)arg2 == M2C_FIELD(arg0, s32 *, 0x1C4))) {
         if (M2C_FIELD(arg2, s32 *, 0x14) == M2C_FIELD(arg0, s32 *, 0x1A4)) {
             SetSlotSoState(arg0, 4);
         }

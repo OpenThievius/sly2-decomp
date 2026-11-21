@@ -1,3 +1,4 @@
+#include "types.h"
 extern "C" {
 int func_00241C98(int);
 int sceSifCallRpc(int *, int, int, void *, int, int *, int, int, int);
@@ -17,7 +18,7 @@ int func_00241DF0(void) {
         SignalSema(D_002C6768);
         return 0;
     }
-    int value = *(int *)((unsigned int)buffer | 0x20000000);
+    int value = *(int *)((uptr)buffer | 0x20000000);
     SignalSema(D_002C6768);
     return value;
 }

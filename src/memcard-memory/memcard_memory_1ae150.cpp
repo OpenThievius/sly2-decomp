@@ -31,7 +31,7 @@ extern "C" int g_2f6388_1AE168;
 extern "C" int g_2f639c;
 
 extern "C" void func_001AE168(void) {
-    int base = (int)&D_0047220F & ~0xF;
+    int base = (sptr)&D_0047220F & ~0xF;
 g_2f6380 = g_2f6384_1AE168 = base;
     g_2f6388_1AE168 = B_002F638C = 0x02000000;
     g_2f639c = -1;
@@ -246,7 +246,7 @@ extern "C" void CopyAqw__FPvT0i_1AE5A0(void *, void *, int);
 
 void CopyAb__FPvT0Ui(void *pvDst, void *pvSrc, unsigned int cb)
 {
-    unsigned int grfAlign = (unsigned int)pvDst | (unsigned int)pvSrc | cb;
+    unsigned int grfAlign = (uptr)pvDst | (uptr)pvSrc | cb;
     if ((grfAlign & 3) != 0) {
         unsigned char *pbDst = (unsigned char *)pvDst;
         unsigned char *pbSrc = (unsigned char *)pvSrc;
