@@ -1,27 +1,37 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "sw.h"
+
+struct JOB;
+
+/* A task: the job that runs it at 0x7C. */
+struct TASK {
+    u8 unknown_0x0[0x7C];
+    /* 0x7C */ struct JOB *pjob; /* EndJob */
+};
+
+/* A job: the task it ends at 0x64. */
+struct JOB {
+    u8 unknown_0x0[0x64];
+    /* 0x64 */ TASK *ptask; /* EndJob */
+};
+
 extern "C" {
-struct _m2c_stack_EndJob {
-    /* 0x00 */ char pad0[0x20];
-};                                                  /* size = 0x20 */
-void LeaveTaskIfCurrent(s8 *);
-void ResetJob();
-void SetTaskState(s32, M2C_UNK);
-void StopJobIfCurrent(s8 *);
-void bevy_camera_follow_activity(M2C_UNK *, M2C_UNK, s8 *);
-extern M2C_UNK B_002DEB30;
-extern s8 *B_003E0FA0;
-void EndJob(s8 *arg0) {
-    ResetJob();
-    SetTaskState(M2C_FIELD(arg0, s32 *, 0x64), 1);
-    if (((sptr)B_003E0FA0 != NULL) && (M2C_FIELD(B_003E0FA0, s32 *, 0x7C) == (sptr)arg0)) {
-        LeaveTaskIfCurrent(B_003E0FA0);
-    }
-    bevy_camera_follow_activity(&B_002DEB30, 0x1F, arg0);
-    StopJobIfCurrent(arg0);
+void LeaveTaskIfCurrent(TASK *);
+void ResetJob(JOB *);
+void SetTaskState(TASK *, int);
+void StopJobIfCurrent(JOB *);
+void bevy_camera_follow_activity(void *, int, JOB *);
+extern int B_002DEB30;
+extern SW B_003DD490;
 }
+
+extern "C" void EndJob(JOB *pjob)
+{
+    ResetJob(pjob);
+    SetTaskState(pjob->ptask, 1);
+    if (B_003DD490.ptaskCurrent != 0 && B_003DD490.ptaskCurrent->pjob == pjob) {
+        LeaveTaskIfCurrent(B_003DD490.ptaskCurrent);
+    }
+    bevy_camera_follow_activity(&B_002DEB30, 0x1F, pjob);
+    StopJobIfCurrent(pjob);
 }

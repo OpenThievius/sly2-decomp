@@ -1,19 +1,22 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
-extern "C" {
-int TriggerRsmg(void *, int, int, void *, int);
-extern int B_003DD490;
-typedef void (*Fn6)(void *, int, int, int, int, int);
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "lo.h"
 
-void func_00181780(s8 *arg0) {
-    TriggerRsmg(&B_003DD490, M2C_FIELD(arg0, s32 *, 0x200), (sptr)(arg0 + 0x204), arg0, 1);
-    s8 *vtable = M2C_FIELD(arg0, s8 **, 0xC);
-    s16 offset = M2C_FIELD(vtable, s16 *, 0x18);
-    Fn6 method = M2C_FIELD(vtable, Fn6 *, 0x1C);
-    method(arg0 + offset, 5, 0, 0, 0, 0);
+struct RSMG;
+
+extern "C" {
+void TriggerRsmg(void *, int, void *, void *, int);
+extern int B_003DD490;
 }
+
+/* A subclass of LO with its rule state machines at 0x200, as the alarm button keeps them (crsmg, arsmg). */
+struct RSMGLO : LO {
+    u8 unknown_0x50[0x200 - 0x50];
+    /* 0x200 */ int crsmg;            /* func_00181780 */
+    /* 0x204 */ struct RSMG *arsmg[1]; /* func_00181780 passes its address */
+};
+
+extern "C" void func_00181780(RSMGLO *plo)
+{
+    TriggerRsmg(&B_003DD490, plo->crsmg, plo->arsmg, plo, 1);
+    plo->HandleSpliceEvent(5, 0, 0, 0, 0);
 }

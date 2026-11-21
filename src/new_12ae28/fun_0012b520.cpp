@@ -1,30 +1,29 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
-extern "C" {
-struct Bytes8 { u8 bytes[8]; };
-struct _m2c_stack_func_0012B520 {};                 /* size 0x0 */
-void func_0012B520(s8 *arg0, s8 *arg1) {
-    s8 *temp_a3;
-    s8 *temp_t0;
-    M2C_FIELD(arg1, s16 *, 0x9A) = 2;
-    temp_a3 = arg1 + 0xD0;
-    M2C_FIELD(arg1, f32 *, 0x84) = 1.0f;
-    temp_t0 = arg1 + 0xF0;
-    M2C_FIELD(arg1, s32 *, 0x88) = (sptr) (arg1 + 0x80);
-    M2C_FIELD(arg1, s32 *, 0x8C) = (sptr) (arg1 + 0x84);
-    M2C_FIELD(arg1, s32 *, 0x80) = 0;
-    struct V3 { f32 x, y, z; };
-    M2C_FIELD(arg1, V3 *, 0xC0) = M2C_FIELD(arg0, V3 *, 4);
-    M2C_FIELD(arg1, s128 *, 0xE0) = (s128) M2C_FIELD(arg1, s128 *, 0xC0);
-    M2C_FIELD(temp_a3, s32 *, 8) = 0;
-    M2C_FIELD(temp_a3, s32 *, 4) = 0;
-    M2C_FIELD(arg1, s32 *, 0xD0) = 0;
-    M2C_FIELD(temp_t0, s32 *, 8) = 0;
-    M2C_FIELD(temp_t0, s32 *, 4) = 0;
-    M2C_FIELD(arg1, s32 *, 0xF0) = 0;
-}
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "xf.h"
+
+struct VECTOR3 { f32 x, y, z; };
+
+/* The source of the goal position: three floats at 4. */
+struct XFSOURCE {
+    u8 unknown_0x0[0x4];
+    /* 0x4 */ VECTOR3 pos; /* func_0012B520 */
+};
+
+extern "C" void func_0012B520(XFSOURCE *psrc, XF *pxf)
+{
+    pxf->sub = 2;
+    s32 *pvelGoal = (s32 *)&pxf->velGoal;
+    pxf->field_0x84 = 1.0f;
+    s32 *paccel = pxf->accel;
+    pxf->pfield_0x80 = &pxf->field_0x80;
+    pxf->pfield_0x84 = &pxf->field_0x84;
+    pxf->field_0x80 = 0;
+    *(VECTOR3 *)&pxf->posGoal = psrc->pos;
+    *(QW *)pxf->unknown_0xE0 = pxf->posGoal;
+    pvelGoal[2] = 0;
+    pvelGoal[1] = 0;
+    pvelGoal[0] = 0;
+    paccel[2] = 0;
+    paccel[1] = 0;
+    paccel[0] = 0;
 }

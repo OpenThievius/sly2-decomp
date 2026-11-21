@@ -17,7 +17,9 @@ struct SLOTSO : SO {
     u8 unknown_0x170[0x4];
     /* 0x174 */ f32 uWander;           /* func_001B0D90: the position along pcrvWander */
     /* 0x178 */ f32 duWander;          /* func_001B0D90 */
-    u8 unknown_0x17C[0x48];
+    u8 unknown_0x17C[0x28];
+    /* 0x1A4 */ s32 field_0x1A4;       /* HandleSlotSoMessage: compared with word 0x14 of the message's ACT */
+    u8 unknown_0x1A8[0x1C];
     /* 0x1C4 */ struct ACT *pactAnim;  /* UpdateSlotSo */
     u8 unknown_0x1C8[0x10];
     /* 0x1D8 */ f32 radHeading;        /* FSlotSoFacingHeading */
@@ -34,6 +36,7 @@ SLY2_SIZE_CHECK(SLOTSO, 0x250);
 SLY2_OFFSET_CHECK(SLOTSO, dtFade, 0x168);
 SLY2_OFFSET_CHECK(SLOTSO, pcrvWander, 0x16C);
 SLY2_OFFSET_CHECK(SLOTSO, uWander, 0x174);
+SLY2_OFFSET_CHECK(SLOTSO, field_0x1A4, 0x1A4);
 SLY2_OFFSET_CHECK(SLOTSO, pactAnim, 0x1C4);
 SLY2_OFFSET_CHECK(SLOTSO, radHeading, 0x1D8);
 SLY2_OFFSET_CHECK(SLOTSO, state, 0x220);
