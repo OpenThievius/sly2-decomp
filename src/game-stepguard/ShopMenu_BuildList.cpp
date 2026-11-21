@@ -1,12 +1,11 @@
-struct CRef { int tagk; int n; int p2; int p3; CRef &operator=(const CRef &); };
+#include "cref.h"
 struct ITEM { int index; int b; };
 struct SHOP { char pad0[0x40]; int mode; int pad44; int count; ITEM items[0x41]; };
 extern "C" {
-void CRef_Destruct(CRef *);
 int FGadgetAcquired(int);
 int FGadgetOnSale(int);
 void ShopMenu_Select(SHOP *, int);
-void func_001D8A38(CRef *, const char *, const char *, char *, int);
+CRef func_001D8A38(const char *, const char *, char *, int);
 int sprintf(char *, const char *, ...);
 extern const char RO_002A79A0[];
 extern const char RO_002A79D0[];
@@ -36,24 +35,16 @@ void ShopMenu_BuildList(SHOP *menu)
         for (int index = 0; index < 0x40; index++) {
             CRef ref;
             char name[0x20];
-            CRef temp;
-            ref.tagk = -1;
+            ref.m_tagk = TAGK_Nil;
             sprintf(name, RO_002A79A0, index);
-            func_001D8A38(&temp, RO_002A79D0, RO_002A79D8, name, 0);
-            ref = temp;
-            CRef_Destruct(&temp);
-            if (ref.n == 0) {
-                CRef_Destruct(&ref);
+            ref = func_001D8A38(RO_002A79D0, RO_002A79D8, name, 0);
+            if (ref.m_tag.m_n == 0)
                 continue;
-            }
             unsigned int count = menu->count;
-            if (count >= 0x41) {
-                CRef_Destruct(&ref);
+            if (count >= 0x41)
                 break;
-            }
             menu->items[count].index = index;
             menu->count = count + 1;
-            CRef_Destruct(&ref);
         }
         break;
     }

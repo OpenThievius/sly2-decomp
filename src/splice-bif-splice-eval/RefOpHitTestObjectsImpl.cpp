@@ -1,11 +1,5 @@
-#include "types.h"
-struct CRef {
-    int tagk; union { int n; QW *pv; };
-    CRef() { tagk = -1; }
-    CRef(const CRef &) asm("CRef_CopyConstruct");
-    inline ~CRef();
-    CRef &operator=(const CRef &);
-};
+#include "sly2.h"
+#include "cref.h"
 struct CPair { int cref; int pad4; CRef ref; CPair *next; };
 struct PairHandle;
 struct SLOTHEAP;
@@ -17,23 +11,20 @@ struct CRefList { int tagk; CNode *pnode; CRef start; CRef end; };
 extern "C" {
 CPair *PpairNew(void);
 void PairHandle_Assign(CPair **, CPair *);
-void CRef_Destruct(CRef *);
 void CPairPtr_Destructor(CPair **, int);
 void UnlinkPairNode(CPair *);
 void FreeSlotheapPv(SLOTHEAP *, void *);
-void CRef_SetBasic(CRef *, void *);
 void CRef_SetVectorPtr(CRef *, QW *);
 CRef *bevy_splice_value_list_ref(CRef *, CPair *);
 int ClsgClipEdgeToObject(ELEM *, QW, QW, int, CLIP *);
 extern SLOTHEAP B_004520A8;
 }
-CRef::~CRef() { CRef_Destruct(this); }
 static inline void ReleasePair_1249A8(CPair *held)
 {
     if (held) {
         if (--held->cref == 0) {
             CPairPtr_Destructor(&held->next, 2);
-            CRef_Destruct(&held->ref);
+            held->ref.Decref();
             UnlinkPairNode(held);
             FreeSlotheapPv(&B_004520A8, held);
         }
@@ -48,6 +39,7 @@ struct PairHandle {
 extern "C" CRef RefOpHitTestObjectsImpl(int op, int unused, CRefList *aref)
 {
     CRef result;
+    result.m_tagk = TAGK_Nil;
     if (aref->tagk == 0) {
         result = *(CRef *)aref;
     } else {
@@ -56,18 +48,18 @@ extern "C" CRef RefOpHitTestObjectsImpl(int op, int unused, CRefList *aref)
         CLIP clip;
         for (CNode *node = aref->pnode; node != 0; node = node->next) {
             CRef *pend = &aref->end;
-            OBJ *pobj = (OBJ *)node->ref.n;
+            OBJ *pobj = (OBJ *)node->ref.m_tag.m_n;
             if (pobj != 0) {
                 for (int index = 0; index < pobj->count; index++) {
                     ELEM *pelem = &pobj->elems[index];
                     CRef *pstart = &aref->start;
                     if (!(pelem->flags & (0x8000L << 35)) &&
-                        ClsgClipEdgeToObject(pelem, *pstart->pv, *pend->pv, 1, &clip) > 0) {
+                        ClsgClipEdgeToObject(pelem, *(QW *)pstart->m_tag.m_pvector, *(QW *)pend->m_tag.m_pvector, 1, &clip) > 0) {
                         CPair *pnewA = PpairNew();
                         PairHandle pairA(pnewA);
                         CPair *pnewB = PpairNew();
                         PairHandle pairB(pnewB);
-                        CRef_SetBasic(&pairA.p->ref, pobj);
+                        pairA.p->ref.SetBasic((BASIC *)pobj);
                         PairHandle_Assign(&pairA.p->next, pairB.p);
                         if (op == 0x7B) {
                             CPair *pnewC = PpairNew();
@@ -95,7 +87,7 @@ extern "C" CRef RefOpHitTestObjectsImpl(int op, int unused, CRefList *aref)
         if (first.p != 0)
             bevy_splice_value_list_ref(&result, first.p);
         else
-            result.tagk = 0;
+            result.m_tagk = (TAGK)0;
     }
     return result;
 }

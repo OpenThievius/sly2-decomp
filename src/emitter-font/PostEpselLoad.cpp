@@ -1,5 +1,5 @@
 #include "sly2.h"
-struct CRef { int a; union { float g; int n; }; int c; int d; };
+#include "cref.h"
 struct EPSEL { char pad0[0x110]; int episode; int pad1; int last; char pad2[0xC]; int row; };
 extern int D_002BE26C;
 extern int D_002BE270;
@@ -9,25 +9,18 @@ extern int B_003E100C[];
 extern char B_002DFC00;
 static inline int PathAt(int *base, int index) { return base[index]; }
 extern "C" void PostBlotLoad(EPSEL *);
-extern "C" void RefGetGameSaveValue(CRef *, int, int *);
-extern "C" void CRef_Destruct(CRef *);
+extern "C" CRef RefGetGameSaveValue(int, int *);
 extern "C" void SetEpselMode(EPSEL *, int, int);
 extern "C" void func_00187E78(char *);
 // steer-ok: GetSaveFloat and GetSaveInt read the value through an inline return, which shortens its live range and raises its allocation priority (matching.md "Register allocation"); the two CRef temporaries share one frame slot
 static inline float GetSaveFloat(int path)
 {
-    CRef ref;
-    RefGetGameSaveValue(&ref, path, &B_003D4A60);
-    float g = ref.g;
-    CRef_Destruct(&ref);
+    float g = RefGetGameSaveValue(path, &B_003D4A60).m_tag.m_g;
     return g;
 }
 static inline int GetSaveInt(int path)
 {
-    CRef ref;
-    RefGetGameSaveValue(&ref, path, &B_003D4A60);
-    int n = ref.n;
-    CRef_Destruct(&ref);
+    int n = RefGetGameSaveValue(path, &B_003D4A60).m_tag.m_n;
     return n;
 }
 extern "C" void PostEpselLoad(EPSEL *pepsel)

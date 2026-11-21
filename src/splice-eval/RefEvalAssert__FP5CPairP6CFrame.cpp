@@ -1,34 +1,26 @@
-struct CRef { int tagk; int n; CRef &operator=(const CRef &); };
+#include "sly2.h"
+#include "cref.h"
 struct CPair { int count; int pad4; CRef ref; CPair *next; };
 struct CFrame;
 extern "C" {
-void CRef_CopyConstruct(CRef *, CRef *);
-void CRef_Destruct(CRef *);
-void RefEval(CRef *, CPair *, CFrame *);
-CRef *RefOpPrint(CRef *, int, CRef *, CFrame *);
-void SetTag__4CRef4TAGK(CRef *, int);
+CRef RefEval(CPair *, CFrame *);
+CRef RefOpPrint(int, CRef *, CFrame *);
 int printf(const char *, ...);
 }
 
-extern "C" CRef *RefEvalAssert__FP5CPairP6CFrame(CRef *pref, CPair *ppair, CFrame *pframe)
+extern "C" CRef RefEvalAssert__FP5CPairP6CFrame(CPair *ppair, CFrame *pframe)
 {
     CRef refResult;
-    CRef refTemp;
-    refResult.tagk = -1;
-    CPair *pexpr = ((CPair *)ppair->ref.n)->next;
+    refResult.m_tagk = TAGK_Nil;
+    CPair *pexpr = ((CPair *)ppair->ref.m_tag.m_n)->next;
     CPair *pmessage = pexpr->next;
-    RefEval(&refTemp, pexpr, pframe);
-    refResult = refTemp;
-    CRef_Destruct(&refTemp);
-    if (refResult.n == 0) {
-        CPair *pmessageNext = ((CPair *)pmessage->ref.n)->next;
+    refResult = RefEval(pexpr, pframe);
+    if (refResult.m_tag.m_n == 0) {
+        CPair *pmessageNext = ((CPair *)pmessage->ref.m_tag.m_n)->next;
         printf("Splice assert: ");
-        RefOpPrint(&refTemp, 1, &pmessageNext->ref, pframe);
-        CRef_Destruct(&refTemp);
+        RefOpPrint(1, &pmessageNext->ref, pframe);
     }
-    CRef_Destruct(&refResult);
-    SetTag__4CRef4TAGK(&refResult, 0x24);
-    CRef_CopyConstruct(pref, &refResult);
-    CRef_Destruct(&refResult);
-    return pref;
+    refResult.Decref();
+    refResult.SetTag(TAGK_Void);
+    return refResult;
 }

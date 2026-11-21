@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-struct CRef { int tagk; int n; };
+#include "sly2.h"
+#include "cref.h"
 struct CPair;
 struct CPair { int cref; int pad4; CRef ref; CPair *next; };
 struct PairHandle { CPair *p; };
@@ -23,11 +24,11 @@ extern "C" PairHandle *func_00121578(PairHandle *pret, CRef **pprefCallee, CRef 
     PairHandle_Init(&outer, PpairNew());
     CRef *prefOuter = &outer.p->ref;
     bevy_splice_value_list_ref(prefOuter, PpairNew());
-    CPair *call = (CPair *)((CRef*)((char*)outer.p+8))->n;
+    CPair *call = (CPair *)((CRef*)((char*)outer.p+8))->m_tag.m_n;
     CRef *prefCall = &call->ref;
     bevy_splice_value_list_ref(prefCall, PpairNew());
     tmp = PpairNew(); PairHandle_Assign(&call->next, tmp);
-    CPair *callee = (CPair *)prefCall->n;
+    CPair *callee = (CPair *)prefCall->m_tag.m_n;
     CRef *prefCallee = &callee->ref;
     CRef_Destruct(prefCallee);
     SetTag__4CRef4TAGK(prefCallee, 0x12);
@@ -35,7 +36,7 @@ extern "C" PairHandle *func_00121578(PairHandle *pret, CRef **pprefCallee, CRef 
     *pprefCallee = &((CPair *)*(int *)((char *)callee + 0x10))->ref;
     CRef *prefArgForm = &call->next->ref;
     bevy_splice_value_list_ref(prefArgForm, PpairNew());
-    CPair *arg = (CPair *)prefArgForm->n;
+    CPair *arg = (CPair *)prefArgForm->m_tag.m_n;
     CRef *prefArg = &arg->ref;
     CRef_Destruct(prefArg);
     SetTag__4CRef4TAGK(prefArg, 0x12);

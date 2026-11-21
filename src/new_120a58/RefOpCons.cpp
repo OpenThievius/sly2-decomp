@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-struct CRef { int tagk; int n; CRef &operator=(const CRef &); };
+#include "sly2.h"
+#include "cref.h"
 struct CPair { int cref; int pad4; CRef ref; CPair *next; };
 struct PairHandle { CPair *p; };
 struct SLOTHEAP;
@@ -21,8 +22,8 @@ extern "C" CRef *RefOpCons(CRef *pref, int carg, CRef *aref, CFrame *pframe)
     PairHandle_Init(&h, PpairNew());
     h.p->ref = *aref;
     CRef *pcdr = &aref[1];
-    if (pcdr->tagk == 0x1F) {
-        PairHandle_Assign(&h.p->next, (CPair *)pcdr->n);
+    if (pcdr->m_tagk == 0x1F) {
+        PairHandle_Assign(&h.p->next, (CPair *)pcdr->m_tag.m_n);
     }
     CRef_ConstructPair(pref, h.p);
     CPair *held = h.p;

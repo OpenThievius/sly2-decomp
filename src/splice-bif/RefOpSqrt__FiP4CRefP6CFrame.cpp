@@ -1,4 +1,5 @@
-struct CRef { int tagk; int n; CRef(const CRef &); ~CRef(); };
+#include "sly2.h"
+#include "cref.h"
 struct CFrame;
 enum UFOK { kUfokSqrt };
 CRef RefUfo__FP4CRef4UFOK(CRef *, UFOK);

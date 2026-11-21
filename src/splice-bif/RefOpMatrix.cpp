@@ -1,21 +1,16 @@
 #include "sly2.h"
-struct CRef { int tagk; union { int n; float g; float *pg; QW *pq; }; };
+#include "cref.h"
 struct CPair { int cref; int pad4; CRef ref; CPair *next; };
 struct CFrame;
-extern "C" {
-void SetTag__4CRef4TAGK(CRef *, int);
-void CRef_RefCoerceF32(CRef *, CRef *);
-void CRef_Destruct(CRef *);
-CRef *CRef_CopyConstruct(CRef *, CRef *);
-}
+extern "C" CRef CRef_RefCoerceF32(CRef *pref);
 void *memset(void *, int, unsigned int);
-extern "C" CRef *RefOpMatrix(CRef *pret, int carg, CRef *aref, CFrame *pframe)
+extern "C" CRef RefOpMatrix(int carg, CRef *aref, CFrame *pframe)
 {
     CRef refMatrix;
-    SetTag__4CRef4TAGK(&refMatrix, 0x1B);
-    float *pg = refMatrix.pg;
+    refMatrix.SetTag(TAGK_Matrix);
+    float *pg = (float *)refMatrix.m_tag.m_pmatrix;
     CPair *ppair;
-    if (carg > 0) ppair = (CPair *)aref[0].n;
+    if (carg > 0) ppair = (CPair *)aref[0].m_tag.m_n;
     memset(pg, 0, 0x40);
     pg[15] = 1.0f;
     pg[10] = 1.0f;
@@ -25,19 +20,17 @@ extern "C" CRef *RefOpMatrix(CRef *pret, int carg, CRef *aref, CFrame *pframe)
     case 0:
         break;
     case 1: {
-        CRef refTemp;
-        CRef_RefCoerceF32(&refTemp, &ppair->ref);
-        float g = refTemp.g;
+        CRef refTemp = CRef_RefCoerceF32(&ppair->ref);
+        float g = refTemp.m_tag.m_g;
         pg[10] = g;
         pg[5] = g;
         pg[0] = g;
-        CRef_Destruct(&refTemp);
         break;
     }
     case 3:
     case 4: {
         for (int irow = 0; irow < carg; irow++) {
-            ((QW *)pg)[irow] = *ppair->ref.pq;
+            ((QW *)pg)[irow] = *(QW *)ppair->ref.m_tag.m_pvector;
             ppair = ppair->next;
         }
         break;
@@ -47,17 +40,13 @@ extern "C" CRef *RefOpMatrix(CRef *pret, int carg, CRef *aref, CFrame *pframe)
         int cdim = (carg == 9) ? 3 : 4;
         for (int irow = 0; irow < cdim; irow++) {
             for (int icol = 0; icol < cdim; icol++) {
-                CRef refTemp;
-                CRef_RefCoerceF32(&refTemp, &ppair->ref);
-                pg[irow * 4 + icol] = refTemp.g;
+                CRef refTemp = CRef_RefCoerceF32(&ppair->ref);
+                pg[irow * 4 + icol] = refTemp.m_tag.m_g;
                 ppair = ppair->next;
-                CRef_Destruct(&refTemp);
             }
         }
         break;
     }
     }
-    CRef_CopyConstruct(pret, &refMatrix);
-    CRef_Destruct(&refMatrix);
-    return pret;
+    return refMatrix;
 }

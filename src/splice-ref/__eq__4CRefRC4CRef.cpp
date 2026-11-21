@@ -1,4 +1,5 @@
-struct CRef { int tagk; union { int n; float *pg; void *pv; }; int operator==(const CRef &);  };
+#include "sly2.h"
+#include "cref.h"
 int memcmp(const void *, const void *, unsigned int);
 int CRef::operator==(const CRef &other)
 {
@@ -7,9 +8,9 @@ int CRef::operator==(const CRef &other)
     int result;
     float x;
     float y;
-    if (tagk != other.tagk)
+    if (m_tagk != other.m_tagk)
         return 0;
-    switch (tagk) {
+    switch (m_tagk) {
     case 0x15:
     case 0x16:
     case 0x17:
@@ -20,12 +21,12 @@ int CRef::operator==(const CRef &other)
     case 0x21:
     case 0x22:
     case 0x23:
-        return n == other.n;
+        return m_tag.m_n == other.m_tag.m_n;
     case 0x1B:
-        return memcmp(pv, other.pv, 0x40) == 0;
+        return memcmp(m_tag.m_pmatrix, other.m_tag.m_pmatrix, 0x40) == 0;
     case 0x1D:
-        a = pg;
-        b = other.pg;
+        a = (float *)m_tag.m_pclq;
+        b = (float *)other.m_tag.m_pclq;
         result = 0;
         if (a[0] == b[0]) {
             x = a[1];
@@ -37,8 +38,8 @@ int CRef::operator==(const CRef &other)
     case 0x1A:
     case 0x1C:
     case 0x1E:
-        a = pg;
-        b = other.pg;
+        a = (float *)m_tag.m_pclq;
+        b = (float *)other.m_tag.m_pclq;
         result = 0;
         if (a[0] == b[0]) {
             if (a[1] == b[1]) {

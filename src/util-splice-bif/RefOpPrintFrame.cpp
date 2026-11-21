@@ -1,7 +1,7 @@
-enum TAGK { kTagkVoid = 0x24 };
-struct CRef { int tagk; int n; void SetTag(TAGK); };
+#include "sly2.h"
+#include "cref.h"
 CRef *RefOpPrintFrame(CRef *prefReturn)
 {
-    prefReturn->SetTag(kTagkVoid);
+    prefReturn->SetTag(TAGK_Void);
     return prefReturn;
 }

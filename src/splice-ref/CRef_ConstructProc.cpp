@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-struct CRef { int tagk; void *pv; };
+#include "sly2.h"
+#include "cref.h"
 extern "C" CRef *CRef_ConstructProc(CRef *pref, int *pshared)
 {
-    pref->pv = pshared;
-    pref->tagk = 0x20;
+    pref->m_tag.m_pproc = (CProc *)pshared;
+    pref->m_tagk = TAGK_Proc;
     (*pshared)++;
     return pref;
 }

@@ -1,20 +1,17 @@
-struct CRef { int tagk; int pad[3]; };
-struct Raw8 { char b[8]; };
-extern "C" void RefSetArgsFromSplice__FiP4CRefP4OTYPe(CRef*, int, CRef*, const void*, ...);
-extern "C" void CRef_Destruct(CRef*);
-extern "C" void SetTag__4CRef4TAGK(CRef*, int);
-extern "C" CRef *CRef_CopyConstruct(CRef*, CRef*);
-extern "C" const Raw8 RO_002A3C70;
-extern "C" void AddSeqRecordSignalSequence(void*, int, int);
-extern "C" CRef* F106D50(CRef* result, void* self, int count, CRef* args)
+#include "sly2.h"
+#include "cref.h"
+CRef RefSetArgsFromSplice(int cref, CRef *aref, const void *aotyp, ...);
+struct BASIC;
+struct AOT { char b[8]; };
+extern "C" const AOT RO_002A3C70;
+extern "C" void AddSeqRecordSignalSequence(void *, int, int);
+extern "C" CRef F106D50(void *self, int count, CRef *args)
 {
-    struct F { Raw8 types; char pad[8]; CRef ref; int a; int b; } f;
-    f.types = RO_002A3C70;
-    RefSetArgsFromSplice__FiP4CRefP4OTYPe(&f.ref, 2, args, &f.types, &f.a, &f.b);
-    CRef_Destruct(&f.ref);
-    SetTag__4CRef4TAGK(&f.ref, 0x24);
-    AddSeqRecordSignalSequence(self, f.a, f.b);
-    CRef_CopyConstruct(result, &f.ref);
-    CRef_Destruct(&f.ref);
-    return result;
+    AOT aotyp = RO_002A3C70;
+    int first, second;
+    RefSetArgsFromSplice(2, args, &aotyp, &first, &second);
+    CRef refResult;
+    refResult.SetTag(TAGK_Void);
+    AddSeqRecordSignalSequence(self, first, second);
+    return refResult;
 }

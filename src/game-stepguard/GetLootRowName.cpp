@@ -1,4 +1,4 @@
-struct CRef { int tagk; int n; int p2; int p3; CRef &operator=(const CRef &); };
+#include "cref.h"
 struct ENT { int id; int unk; };
 struct SHOPMENU { char pad0[0x4C]; ENT aent[0x40]; char padx[0x250 - 0x4C - 0x40 * 8]; int ifirst; };
 struct LOOT { int a; int sidName; int c; };
@@ -11,8 +11,7 @@ extern "C" const char RO_002A79D8[];
 extern "C" const char RO_002A7A30[];
 extern "C" int sprintf(char *, const char *, ...);
 extern "C" char *strcpy(char *, const char *);
-extern "C" void func_001D8A38(CRef *, const char *, const char *, const char *, int);
-extern "C" void CRef_Destruct(CRef *);
+extern "C" CRef func_001D8A38(const char *, const char *, const char *, int);
 const char *PchzStringFromId(void *, int);
 
 void GetLootRowName(char *pchz, int irow)
@@ -22,16 +21,12 @@ void GetLootRowName(char *pchz, int irow)
     unsigned loot = B_003DA150.aent[B_003DA150.ifirst + irow].id;
     if (loot < 0x40) {
         CRef ref;
-        ref.tagk = -1;
+        ref.m_tagk = TAGK_Nil;
         char achzIndex[0x20];
         sprintf(achzIndex, RO_002A79A0, loot);
-        CRef refResult;
-        func_001D8A38(&refResult, RO_002A79D0, RO_002A79D8, achzIndex, 0);
-        ref = refResult;
-        CRef_Destruct(&refResult);
+        ref = func_001D8A38(RO_002A79D0, RO_002A79D8, achzIndex, 0);
         sid = D_002C3288[loot].sidName;
-        cloot = ref.n;
-        CRef_Destruct(&ref);
+        cloot = ref.m_tag.m_n;
     }
     if (sid != -1) {
         strcpy(pchz, PchzStringFromId(&B_003DD490, sid));

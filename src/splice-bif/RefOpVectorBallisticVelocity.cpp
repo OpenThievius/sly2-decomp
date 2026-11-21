@@ -1,30 +1,27 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
-struct CRef { int tagk; union { int n; float g; QW *pv; }; };
+#include "cref.h"
 struct CPair { int cref; int pad4; CRef ref; CPair *next; };
 #include "phys.h"
 #include "so.h"
 struct CFrame;
 extern "C" {
-void SetTag__4CRef4TAGK(CRef *, int);
 void CRef_RefCoerceF32(CRef *, CRef *);
-void CRef_Destruct(CRef *);
-CRef *CRef_CopyConstruct(CRef *, CRef *);
 QW FCalculateMuzzleVelocity__FP6VECTORT0fT0P2SO(QW, QW, float, QW);
 }
-static inline QW *PvSetTag_122BE0(CRef *pref, int tagk)
+static inline QW *PvSetTag_122BE0(CRef *pref, TAGK tagk)
 {
-    SetTag__4CRef4TAGK(pref, tagk);
-    return pref->pv;
+    pref->SetTag(tagk);
+    return (QW *)pref->m_tag.m_pvector;
 }
-extern "C" CRef *RefOpVectorBallisticVelocity(CRef *pret, int carg, CRef *aref, CFrame *pframe)
+extern "C" CRef RefOpVectorBallisticVelocity(int carg, CRef *aref, CFrame *pframe)
 {
     VECTOR accel;
     accel.x = 0.0f;
     accel.z = -1750.0f;
     accel.y = 0.0f;
-    if (aref[3].tagk != 0) {
-        SO *pso = (SO *)((CPair *)aref[3].n)->ref.n;
+    if (aref[3].m_tagk != 0) {
+        SO *pso = (SO *)((CPair *)aref[3].m_tag.m_n)->ref.m_tag.m_n;
         if (pso != 0) {
             if (pso->pphys != 0) {
                 *(QW *)&accel = pso->pphys->dvGravity;
@@ -32,15 +29,14 @@ extern "C" CRef *RefOpVectorBallisticVelocity(CRef *pret, int carg, CRef *aref, 
         }
     }
     CRef refVelocity;
-    QW *pvelocity = PvSetTag_122BE0(&refVelocity, 0x1A);
-    CRef refTemp;
+    QW *pvelocity = PvSetTag_122BE0(&refVelocity, TAGK_Vector);
     QW accelValue = *(QW *)&accel;
-    QW posFrom = *aref[0].pv;
-    QW posTo = *aref[1].pv;
-    CRef_RefCoerceF32(&refTemp, &aref[2]);
-    *pvelocity = FCalculateMuzzleVelocity__FP6VECTORT0fT0P2SO(posFrom, posTo, refTemp.g, accelValue);
-    CRef_Destruct(&refTemp);
-    CRef_CopyConstruct(pret, &refVelocity);
-    CRef_Destruct(&refVelocity);
-    return pret;
+    QW posFrom = *(QW *)aref[0].m_tag.m_pvector;
+    QW posTo = *(QW *)aref[1].m_tag.m_pvector;
+    {
+        CRef refTemp;
+        CRef_RefCoerceF32(&refTemp, &aref[2]);
+        *pvelocity = FCalculateMuzzleVelocity__FP6VECTORT0fT0P2SO(posFrom, posTo, refTemp.m_tag.m_g, accelValue);
+    }
+    return refVelocity;
 }

@@ -1,31 +1,22 @@
-struct CRef { int tagk; union { int n; float g; }; };
+#include "sly2.h"
+#include "cref.h"
 struct CFrame;
 extern "C" {
-void CRef_RefCoerceF32(CRef *, CRef *);
-void CRef_Destruct(CRef *);
-CRef *CRef_CopyConstruct(CRef *, CRef *);
-void CRef_SetS32(CRef *, int);
-void CRef_SetF32(CRef *, float);
+CRef CRef_RefCoerceF32(CRef *pref);
 int NRandInRange(int, int);
 float GRandInRange(float, float);
+void CRef_SetF32(CRef *, float);
 }
-extern "C" CRef *RefOpRandom(CRef *pret, int carg, CRef *aref, CFrame *pframe)
+extern "C" CRef RefOpRandom(int carg, CRef *aref, CFrame *pframe)
 {
     CRef refRandom;
-    refRandom.tagk = -1;
-    if (aref[0].tagk == 0x15 && aref[1].tagk == 0x15) {
-        CRef_SetS32(&refRandom, NRandInRange(aref[0].n, aref[1].n));
+    refRandom.m_tagk = TAGK_Nil;
+    if (aref[0].m_tagk == TAGK_S32 && aref[1].m_tagk == TAGK_S32) {
+        refRandom.SetS32(NRandInRange(aref[0].m_tag.m_n, aref[1].m_tag.m_n));
     } else {
-        CRef refTemp;
-        CRef_RefCoerceF32(&refTemp, &aref[0]);
-        float gMin = refTemp.g;
-        CRef_Destruct(&refTemp);
-        CRef_RefCoerceF32(&refTemp, &aref[1]);
-        float gMax = refTemp.g;
-        CRef_Destruct(&refTemp);
+        float gMin = CRef_RefCoerceF32(&aref[0]).m_tag.m_g;
+        float gMax = CRef_RefCoerceF32(&aref[1]).m_tag.m_g;
         CRef_SetF32(&refRandom, GRandInRange(gMin, gMax));
     }
-    CRef_CopyConstruct(pret, &refRandom);
-    CRef_Destruct(&refRandom);
-    return pret;
+    return refRandom;
 }

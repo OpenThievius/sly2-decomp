@@ -1,24 +1,15 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-struct CRef { int tagk; union { int n; float *pg; float g; }; };
+#include "sly2.h"
+#include "cref.h"
 struct CFrame;
-extern "C" {
-void SetTag__4CRef4TAGK(CRef *, int);
-void CRef_RefCoerceF32(CRef *, CRef *);
-void CRef_Destruct(CRef *);
-CRef *CRef_CopyConstruct(CRef *, CRef *);
-}
-extern "C" CRef *RefOpSmp(CRef *pret, int carg, CRef *aref, CFrame *pframe)
+extern "C" CRef CRef_RefCoerceF32(CRef *pref);
+extern "C" CRef RefOpSmp(int carg, CRef *aref, CFrame *pframe)
 {
     CRef ref;
-    SetTag__4CRef4TAGK(&ref, 0x1E);
-    float *pvec = ref.pg;
+    ref.SetTag(TAGK_Smp);
+    float *pvec = (float *)ref.m_tag.m_psmp;
     for (int index = 0; index < 3; index++) {
-        CRef refTemp;
-        CRef_RefCoerceF32(&refTemp, &aref[index]);
-        pvec[index] = refTemp.g;
-        CRef_Destruct(&refTemp);
+        pvec[index] = CRef_RefCoerceF32(&aref[index]).m_tag.m_g;
     }
-    CRef_CopyConstruct(pret, &ref);
-    CRef_Destruct(&ref);
-    return pret;
+    return ref;
 }

@@ -1,5 +1,5 @@
 #include "sly2.h"
-struct CRef { int tagk; int n; };
+#include "cref.h"
 struct Frame;
 struct Pair;
 struct SLOTHEAP;
@@ -18,7 +18,6 @@ void CRef_CopyConstruct(CRef *, CRef *);
 void PpairClone(HP *, void *, Frame *, unsigned long);
 void PprocClone(Proc **, void *, Frame *);
 void CPairPtr_Destructor(Pair **, int);
-void CRef_Destruct(CRef *);
 void UnlinkPairNode(Pair *);
 void FreeSlotheapPv(SLOTHEAP *, void *);
 void CProc_DeletingDestructor(Proc *, int);
@@ -27,40 +26,40 @@ extern SLOTHEAP B_004520A8;
 struct PairView { int cref; int pad4; CRef ref; Pair *next; };
 extern "C" CRef *CRef_RefClone(CRef *pref, CRef *ref, Frame *pframe, unsigned long ulArg)
 {
-    switch (ref->tagk) {
-    case 0x1A:
-        CRef_ConstructVector(pref, (void *)ref->n);
+    switch (ref->m_tagk) {
+    case TAGK_Vector:
+        CRef_ConstructVector(pref, (void *)ref->m_tag.m_n);
         return pref;
-    case 0x1B:
-        CRef_ConstructMatrix(pref, (void *)ref->n);
+    case TAGK_Matrix:
+        CRef_ConstructMatrix(pref, (void *)ref->m_tag.m_n);
         return pref;
-    case 0x1C:
-        CRef_ConstructClq(pref, (void *)ref->n);
+    case TAGK_Clq:
+        CRef_ConstructClq(pref, (void *)ref->m_tag.m_n);
         return pref;
-    case 0x1D:
-        CRef_ConstructLm(pref, (void *)ref->n);
+    case TAGK_Lm:
+        CRef_ConstructLm(pref, (void *)ref->m_tag.m_n);
         return pref;
-    case 0x1E:
-        CRef_ConstructSmp(pref, (void *)ref->n);
+    case TAGK_Smp:
+        CRef_ConstructSmp(pref, (void *)ref->m_tag.m_n);
         return pref;
-    case 0x1F: {
+    case TAGK_Pair: {
         HP clone;
-        PpairClone(&clone, (void *)ref->n, pframe, ulArg);
+        PpairClone(&clone, (void *)ref->m_tag.m_n, pframe, ulArg);
         CRef_ConstructPair(pref, clone.p);
         PairView *held = (PairView *)clone.p;
         if (held) {
             if (--held->cref == 0) {
                 CPairPtr_Destructor(&held->next, 2);
-                CRef_Destruct(&held->ref);
+                held->ref.Decref();
                 UnlinkPairNode((Pair *)held);
                 FreeSlotheapPv(&B_004520A8, held);
             }
         }
         return pref;
     }
-    case 0x20: {
+    case TAGK_Proc: {
         struct { Proc *p; int pad[3]; } cloneBox;
-        PprocClone(&cloneBox.p, (void *)ref->n, pframe);
+        PprocClone(&cloneBox.p, (void *)ref->m_tag.m_n, pframe);
         CRef_ConstructProc(pref, cloneBox.p);
         Proc *held = cloneBox.p;
         if (held) {
@@ -69,8 +68,8 @@ extern "C" CRef *CRef_RefClone(CRef *pref, CRef *ref, Frame *pframe, unsigned lo
         }
         return pref;
     }
-    case 0x21:
-        CRef_ConstructBasic(pref, (void *)ref->n);
+    case TAGK_Basic:
+        CRef_ConstructBasic(pref, (void *)ref->m_tag.m_n);
         return pref;
     default:
         CRef_CopyConstruct(pref, ref);
