@@ -15,7 +15,7 @@ void *CBinaryInputStream_ConstructFromBuffer(void *pstream, int size, int addres
     int *pint = (int *)pstream;
     CBinaryInputStream_Constructor(pstream);
     int start = (address + 0x3F) & ~0x3F;
-    pint[0x30 / 4] = (int)D_002D2918;
+    pint[0x30 / 4] = (sptr)D_002D2918;
     pint[0] = grf;
     pint[0x34 / 4] = (address + size - start) & ~0x3F;
     pint[0x50 / 4] = -1;

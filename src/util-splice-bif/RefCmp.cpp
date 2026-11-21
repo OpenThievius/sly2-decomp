@@ -1,13 +1,13 @@
 #include "sly2.h"
-struct CRef { int tagk; union { int n; float g; }; };
+#include "cref.h"
 extern "C" CRef *RefCmp(CRef *prefReturn, const CRef *aref, int cmpk, int unused, int nUnknownResult)
 {
     float agOperand[2];
     for (int iOperand = 0; iOperand < 2; ++iOperand) {
-        if (aref[iOperand].tagk == 0x16)
-            agOperand[iOperand] = aref[iOperand].g;
+        if (aref[iOperand].m_tagk == TAGK_F32)
+            agOperand[iOperand] = aref[iOperand].m_tag.m_g;
         else
-            agOperand[iOperand] = (float)aref[iOperand].n;
+            agOperand[iOperand] = (float)aref[iOperand].m_tag.m_n;
     }
     int fResult;
     switch (cmpk) {
@@ -26,7 +26,7 @@ extern "C" CRef *RefCmp(CRef *prefReturn, const CRef *aref, int cmpk, int unused
     default:
         fResult = nUnknownResult;
     }
-    prefReturn->n = fResult;
-    prefReturn->tagk = 0x17;
+    prefReturn->m_tag.m_n = fResult;
+    prefReturn->m_tagk = TAGK_Bool;
     return prefReturn;
 }

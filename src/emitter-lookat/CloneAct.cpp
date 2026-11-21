@@ -18,7 +18,7 @@ void CloneAct(s8 *arg0, s8 *arg1, s32 arg2, s32 arg3) {
     M2C_FIELD(arg0, s32 *, 0x14) = (s32) M2C_FIELD(arg1, s32 *, 0x14);
     M2C_FIELD(arg0, s32 *, 4) = arg2;
     M2C_FIELD(arg0, s32 *, 8) = arg3;
-    CopyAb__FPvT0Ui((int)(arg0 + 0x1C), arg1 + 0x1C, B_003E123C - 0x1C);
+    CopyAb__FPvT0Ui((sptr)(arg0 + 0x1C), arg1 + 0x1C, B_003E123C - 0x1C);
 }
 
 }

@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-struct CRef { int tagk; float g; };
-struct CRefInt { int tagk; int n; };
-inline CRefInt *SetIntRef(CRefInt *pref, int value)
+#include "sly2.h"
+#include "cref.h"
+inline CRef *SetIntRef(CRef *pref, int value)
 {
-    pref->tagk = 0x15;
-    pref->n = value;
+    pref->m_tagk = TAGK_S32;
+    pref->m_tag.m_n = value;
     return pref;
 }
-extern "C" CRefInt *func_001236B0(CRefInt *pref, int carg, CRef *aref, void *pframe)
+extern "C" CRef *func_001236B0(CRef *pref, int carg, CRef *aref, void *pframe)
 {
-    return SetIntRef(pref, (int)(aref[0].g + 0.5f));
+    return SetIntRef(pref, (int)(aref[0].m_tag.m_g + 0.5f));
 }

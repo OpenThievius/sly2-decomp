@@ -10,7 +10,7 @@ extern "C" void func_0012BE68(ACRBL *pacrbl, float t, float svt, QW *pvecPos, QW
     QW posPrev;
     QW posNext;
     int ikey = func_0012BB70(pacrbl, t);
-    int pkey = ikey * 0x20 + (int)pacrbl->akey;
+    int pkey = ikey * 0x20 + (sptr)pacrbl->akey;
     *(B12 *)&posPrev = *(B12 *)(pkey - 0x20);
     *(B12 *)&posNext = *(B12 *)pkey;
     float tPrev = *(float *)(pkey - 0x14);

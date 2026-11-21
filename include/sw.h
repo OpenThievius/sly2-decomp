@@ -16,6 +16,7 @@ struct BLOCK;
 struct TIMEDCALL;
 struct JOB;
 struct TASK;
+struct WARP;
 struct OBR;
 struct PO;
 struct CLONESET;
@@ -117,7 +118,8 @@ struct SW : BASIC {
     /* 0x3BEC */ s32 cblotActive; /* SetBlotBlots counts the blots of 16 frames or more that enter state 2 and up */
     /* 0x3BF0 */ s32 fLoadPending; /* SetSwLoadRequest sets it with the request */
     /* 0x3BF4 */ LOADREQ loadreq; /* SetSwLoadRequest copies one in whole */
-    u8 unknown_0x3C40[0x48];
+    u8 unknown_0x3C40[0x44];
+    /* 0x3C84 */ struct WARP *pwarpActive; /* Warp_SetState sets it when a warp starts (state 4) */
     /* 0x3C88 */ s32 field_0x3C88; /* func_00162A60 sets it to 0x189 when it restarts a task */
     /* 0x3C8C */ s32 field_0x3C8C; /* func_00162A60 sets it to -1 with 0x3C88 */
     /* 0x3C90 */ SLOTHEAP slotheapCb; /* the callbacks, func_00149B58 */
@@ -284,6 +286,7 @@ SLY2_OFFSET_CHECK(SW, ctgt, 0x4678);
 SLY2_OFFSET_CHECK(SW, atgt, 0x4680);
 SLY2_OFFSET_CHECK(SW, fGuardsFrozen, 0x4748);
 SLY2_OFFSET_CHECK(SW, tGuardsFrozen, 0x474C);
+SLY2_OFFSET_CHECK(SW, pwarpActive, 0x3C84);
 SLY2_OFFSET_CHECK(SW, tL3, 0x4754);
 SLY2_OFFSET_CHECK(SW, sTimeScale, 0x475C);
 SLY2_OFFSET_CHECK(SW, ptarget, 0x4774);

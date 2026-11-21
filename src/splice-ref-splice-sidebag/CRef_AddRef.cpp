@@ -1,32 +1,31 @@
-struct VT { char pad[8]; short delta; short index; void (*fn)(void *); };
-struct OBJ { char pad[0xC]; VT *vt; };
-struct CRef { int tagk; int *p; };
+#include "lo.h"
+#include "cref.h"
 extern "C" void CRef_AddRef(CRef *pref)
 {
-    switch (pref->tagk) {
-    case 27:
-        pref->p[0x10]++;
+    switch (pref->m_tagk) {
+    case TAGK_Matrix:
+        ((int *)pref->m_tag.m_pbasic)[0x10]++;
         break;
-    case 26:
-    case 28:
-        pref->p[4]++;
+    case TAGK_Vector:
+    case TAGK_Clq:
+        ((int *)pref->m_tag.m_pbasic)[4]++;
         break;
-    case 29:
-        pref->p[2]++;
+    case TAGK_Lm:
+        ((int *)pref->m_tag.m_pbasic)[2]++;
         break;
-    case 30:
-        pref->p[3]++;
+    case TAGK_Smp:
+        ((int *)pref->m_tag.m_pbasic)[3]++;
         break;
-    case 33: {
-        OBJ *pobj = (OBJ *)pref->p;
-        if (pobj != 0)
-            pobj->vt->fn((char *)pobj + pobj->vt->delta);
+    case TAGK_Basic: {
+        BASIC *pbasic = pref->m_tag.m_pbasic;
+        if (pbasic != 0)
+            pbasic->OnAdd();
         break;
     }
-    case 31:
-    case 32:
-    case 34:
-        pref->p[0]++;
+    case TAGK_Pair:
+    case TAGK_Proc:
+    case TAGK_Method:
+        ((int *)pref->m_tag.m_pbasic)[0]++;
         break;
     }
 }

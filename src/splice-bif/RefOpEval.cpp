@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-struct CRef { int tagk; int n; CRef &operator=(const CRef &); };
+#include "sly2.h"
+#include "cref.h"
 struct CPair { int cref; int pad4; CRef ref; CPair *next; };
 struct PairHandle { CPair *p; };
 struct SLOTHEAP;

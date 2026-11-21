@@ -117,7 +117,7 @@ extern "C" void InitSaa(SAA *saa, SAAF *saaf) {
     saa->field_0x18 = saaf->field_0x4;
     saa->field_0x20 = saaf->field_0x8;
     saa->field_0x1C = saaf->field_0xA;
-    InitSl((s32)&saa->field_0x34, 0x10);
+    InitSl((sptr)&saa->field_0x34, 0x10);
     if (saa->field_0x30 == 0) {
         PrependSlEntry(&B_003E159C, saa);
         return;
@@ -553,7 +553,7 @@ extern "C" f32 g_2dded0;
 extern "C" f32 g_2dded4_1EE228;
 
 extern "C" void UpdateEyes__FP4EYESf(Eyes* eyes) {
-    if (FIsSlEmpty_1EE228((int)&eyes->slotList) == 0) {
+    if (FIsSlEmpty_1EE228((sptr)&eyes->slotList) == 0) {
         s32 frameCount = eyes->frameCount;
         if (frameCount >= 2) {
             s32 state = eyes->state;

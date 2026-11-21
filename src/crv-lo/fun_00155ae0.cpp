@@ -76,7 +76,7 @@ extern "C" void func_00155AE0(PG *pg, int state)
         break; }
     case 3: {
         GO *go = func_00205438(pg->actor, 0xA4);
-        go->a3C = (int)pg->a54;
+        go->a3C = (sptr)pg->a54;
         go->a30 = pg->a4C;
         VT *vt = go->vptr;
         vt->fn((char *)go + vt->delta);

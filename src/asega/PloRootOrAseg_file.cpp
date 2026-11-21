@@ -8,10 +8,10 @@
 // 0x131270 PloRootOrAseg
 extern "C" void *PloRootOrAseg(void *arg0)
 {
-    unsigned int v0 = *(unsigned int *)((unsigned int)arg0 + 0x18);
+    unsigned int v0 = *(unsigned int *)((uptr)arg0 + 0x18);
     if (v0 != 0)
         return (void *)v0;
-    return *(void **)((unsigned int)arg0 + 0x14);
+    return *(void **)((uptr)arg0 + 0x14);
 }
 
 struct BASIC { char pad[0xC]; virtual void v0(); virtual void v1(); virtual void v2(int, int, int, void *, int); virtual void v3(int, void *); };
@@ -181,7 +181,7 @@ extern "C" void HandleAsegaEvent(ASEGA *pasega, EVT *pevt)
         SnapAsega(pasega, pevt->pv);
         break;
     case 22:
-        SetAloSelectedOid(self->oidSel, (int)pevt->pv);
+        SetAloSelectedOid(self->oidSel, (sptr)pevt->pv);
         break;
     case 23:
         SetAloSelectedOid(self->oidSel, -1);

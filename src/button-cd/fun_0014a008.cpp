@@ -14,10 +14,10 @@ void func_0014A008(PATH *path, void *bis)
     int align = 0x10;
     preq->cb = 0xC00;
     preq->cbAlign = align;
-    path->anode = (int)PvAllocStackClearImpl__Fi(preq);
+    path->anode = (sptr)PvAllocStackClearImpl__Fi(preq);
     LoadLoFromBrx(path, bis);
     preq->cb = path->cnode * 0xC;
     preq->cbAlign = align;
-    path->anode = (int)PvAllocSwCopyImpl__FiPv(preq, (void *)path->anode);
+    path->anode = (sptr)PvAllocSwCopyImpl__FiPv(preq, (void *)path->anode);
     CStackFrame_Destructor(frame, 2);
 }

@@ -1,20 +1,16 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-struct CRef { int tagk; union { int n; float *pg; float g; }; };
+#include "sly2.h"
+#include "cref.h"
 struct CPair { int cref; int pad4; CRef ref; CPair *next; };
 struct CFrame;
-extern "C" {
-void SetTag__4CRef4TAGK(CRef *, int);
-void CRef_RefCoerceF32(CRef *, CRef *);
-void CRef_Destruct(CRef *);
-CRef *CRef_CopyConstruct(CRef *, CRef *);
-}
-extern "C" CRef *RefOpVector(CRef *pret, int carg, CRef *aref, CFrame *pframe)
+extern "C" CRef CRef_RefCoerceF32(CRef *pref);
+extern "C" CRef RefOpVector(int carg, CRef *aref, CFrame *pframe)
 {
     CRef refVector;
-    SetTag__4CRef4TAGK(&refVector, 0x1A);
-    float *pvec = refVector.pg;
+    refVector.SetTag(TAGK_Vector);
+    float *pvec = (float *)refVector.m_tag.m_pvector;
     CPair *ppair;
-    if (carg > 0) ppair = (CPair *)aref[0].n;
+    if (carg > 0) ppair = (CPair *)aref[0].m_tag.m_n;
     switch (carg) {
     case 0:
         pvec[2] = 0.0f;
@@ -22,27 +18,21 @@ extern "C" CRef *RefOpVector(CRef *pret, int carg, CRef *aref, CFrame *pframe)
         pvec[0] = 0.0f;
         break;
     case 1: {
-        CRef refTemp;
-        CRef_RefCoerceF32(&refTemp, &ppair->ref);
-        float g = refTemp.g;
+        CRef refTemp = CRef_RefCoerceF32(&ppair->ref);
+        float g = refTemp.m_tag.m_g;
         pvec[2] = g;
         pvec[1] = g;
         pvec[0] = g;
-        CRef_Destruct(&refTemp);
         break;
     }
     case 3: {
         for (int index = 0; index < 3; index++) {
-            CRef refTemp;
-            CRef_RefCoerceF32(&refTemp, &ppair->ref);
-            pvec[index] = refTemp.g;
+            CRef refTemp = CRef_RefCoerceF32(&ppair->ref);
+            pvec[index] = refTemp.m_tag.m_g;
             ppair = ppair->next;
-            CRef_Destruct(&refTemp);
         }
         break;
     }
     }
-    CRef_CopyConstruct(pret, &refVector);
-    CRef_Destruct(&refVector);
-    return pret;
+    return refVector;
 }

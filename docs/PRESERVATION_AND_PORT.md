@@ -1,7 +1,8 @@
 # Preservation first, port-friendly second
 
 A review of the project's choices (2026-11-09), with preservation as the absolute priority and a later PC port as the second
-user of the work. The ordered steps it leads to are in [ROADMAP.md](ROADMAP.md) "Next".
+user of the work. The ordered steps it leads to are in [ROADMAP.md](ROADMAP.md) "Next"; what a port needs, measured against the Sly 1
+port, is in [PORTING.md](PORTING.md).
 
 ## The rule
 
@@ -131,7 +132,8 @@ line). Track these as the shared-types work moves files over.
 3. Layout asserts, the layer column and the exports.
 4. Matching on measured levers only: the 162 remnants out of the open count (done 2026-11-09), then a lever per pool measured on a pilot; one
    line of semantics per blocker in every worker brief.
-5. Reference C and the host syntax check only when a port starts.
+5. Reference C only when a port starts. The host syntax check moved forward on 2026-11-21 (ROADMAP.md item 7): it measures the
+   host-portability items of [PORTING.md](PORTING.md).
 
 ## Open questions
 

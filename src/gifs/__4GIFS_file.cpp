@@ -55,7 +55,7 @@ extern "C" void EndPrim__4GIFSi(Gifs_1669E0 *self, int eop) {
     if (self->tag != 0) {
         unsigned count = self->dividend / self->divisor;
         unsigned long *cursor = self->cursor;
-        if (((unsigned)cursor & 0xF) != 0) {
+        if (((uptr)cursor & 0xF) != 0) {
             self->cursor = cursor + 1;
             *cursor = 0;
         }

@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "types.h"
 extern "C" {
 struct ParseState {
     char *cursor;
@@ -39,7 +40,7 @@ ParseResult *func_0023FE78(unsigned limit, ParseResult *output)
     memset(&workspace, 0, sizeof(ParseWorkspace));
     workspace.head.field29A = state.field10;
     char *header = chunk - (*(int *)(chunk + 4) - 4);
-    unsigned end = (unsigned)(header + *(int *)header + 4);
+    unsigned end = (uptr)(header + *(int *)header + 4);
     workspace.head.field4 = state.field4;
     if (cursor < end) {
         do {
@@ -47,10 +48,10 @@ ParseResult *func_0023FE78(unsigned limit, ParseResult *output)
         } while (cursor < end);
     }
     char *body = chunk + 0x10;
-    cursor = (unsigned)body;
+    cursor = (uptr)body;
     if (*state.cursor == 0x7A)
         cursor = func_0023F240(cursor, &skipped) + skipped;
-    end = (unsigned)(chunk + *(int *)chunk + 4);
+    end = (uptr)(chunk + *(int *)chunk + 4);
     deadline = *(unsigned *)(chunk + 8);
     if (cursor < end) {
         if (limit >= deadline) {

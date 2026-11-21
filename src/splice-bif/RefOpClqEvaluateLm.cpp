@@ -1,25 +1,23 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-struct CRef { int tagk; union { int n; float *pg; float g; }; };
+#include "sly2.h"
+#include "cref.h"
 struct CFrame;
 extern "C" {
-void CRef_RefCoerceF32(CRef *, CRef *);
-void CRef_Destruct(CRef *);
+CRef CRef_RefCoerceF32(CRef *);
 }
 extern "C" CRef *RefOpClqEvaluateLm(CRef *pret, int carg, CRef *aref, CFrame *pframe)
 {
-    const float *pclq = aref[0].pg;
-    const float *plm = aref[1].pg;
-    CRef refT;
-    CRef_RefCoerceF32(&refT, &aref[2]);
-    float gValue = pclq[0] + refT.g * (pclq[1] + refT.g * pclq[2]);
+    const float *pclq = (const float *)aref[0].m_tag.m_pclq;
+    const float *plm = (const float *)aref[1].m_tag.m_plm;
+    CRef refT = CRef_RefCoerceF32(&aref[2]);
+    float gValue = pclq[0] + refT.m_tag.m_g * (pclq[1] + refT.m_tag.m_g * pclq[2]);
     float gLo = plm[0];
     float gHi = plm[1];
     if (gValue < gLo)
         gValue = gLo;
     else if (gHi < gValue)
         gValue = gHi;
-    pret->g = gValue;
-    pret->tagk = 0x16;
-    CRef_Destruct(&refT);
+    pret->m_tag.m_g = gValue;
+    pret->m_tagk = TAGK_F32;
     return pret;
 }

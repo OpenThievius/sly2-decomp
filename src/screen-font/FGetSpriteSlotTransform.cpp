@@ -27,8 +27,8 @@ extern "C" int FGetSpriteSlotTransform(Root *blot, int isprite, QW *mat, B4 *add
                     *mul = cur->mul;
                     return 1;
                 }
-                Sprite *sp = (Sprite *)(chr->sprite * sizeof(Sprite) + (unsigned)blot->sprites);
-                Inst *inst = (Inst *)(cur->instIndex * sizeof(Inst) + (unsigned)sp->insts);
+                Sprite *sp = (Sprite *)(chr->sprite * sizeof(Sprite) + (uptr)blot->sprites);
+                Inst *inst = (Inst *)(cur->instIndex * sizeof(Inst) + (uptr)sp->insts);
                 if (FGetSpriteSlotTransform(blot, isprite, mat, add, mul, inst->count, inst->slots)) return 1;
             }
             i++;

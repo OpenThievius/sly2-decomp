@@ -30,7 +30,7 @@ static inline void DmaSkip(DMAS *d) { d->pb += 4; }
 static inline void AddFlush(DMAS *d) { *d->pb = 0x11000000; d->pb += 1; }
 static inline void AddDirect(DMAS *d, void *src, int count)
 {
-    while (((unsigned)d->pb & 0xF) != 0xC) {
+    while (((uptr)d->pb & 0xF) != 0xC) {
         *d->pb = 0;
         d->pb += 1;
     }
@@ -41,7 +41,7 @@ static inline void AddDirect(DMAS *d, void *src, int count)
 }
 static inline void PadEnd(DMAS *d)
 {
-    while ((unsigned)d->pb & 0xF) {
+    while ((uptr)d->pb & 0xF) {
         *d->pb = 0;
         d->pb += 1;
     }
@@ -79,13 +79,13 @@ void CMovieText_Draw(MT *pmt, ARGS *pargs, int arg2)
         AddDirect(&g_2dea28, B_002DF010, 0x25);
         AddFlush(&g_2dea28);
         PadEnd(&g_2dea28);
-        *tag = *tag | (((int)g_2dea28.pb - (int)tag) >> 4) - 1;
+        *tag = *tag | (((sptr)g_2dea28.pb - (sptr)tag) >> 4) - 1;
         *(long *)g_2dea28.pb = 0x60000000;
         g_2dea28.pb += 4;
         PKT *p = OnGameLoad__FP4GAME();
         p->a = 0x15;
         p->b = (float)(pmt->i94 << 18);
-        p->c = (unsigned)tag & 0x0FFFFFFF;
+        p->c = (uptr)tag & 0x0FFFFFFF;
         p->d = 0;
     }
 }

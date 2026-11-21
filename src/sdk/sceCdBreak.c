@@ -1,3 +1,4 @@
+#include "types.h"
 extern volatile int D_002C67A0;  // volatile-ok: CD library busy flag, set to 8 around the RPC here and written by the interrupt callback func_002418C8 (it calls iSignalSema)
 extern volatile int D_002C676C;  // volatile-ok: the CD library semaphore id (a library semaphore id shared between threads), signalled on every exit
 extern char B_002C82C0[];
@@ -20,7 +21,7 @@ int sceCdBreak(void)
         return 0;
     }
     D_002C67A0 = 0;
-    result = *(int *)((unsigned int)B_002C7940 | 0x20000000);
+    result = *(int *)((uptr)B_002C7940 | 0x20000000);
     SignalSema(D_002C676C);
     return result;
 }

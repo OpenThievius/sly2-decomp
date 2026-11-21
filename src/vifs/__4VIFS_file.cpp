@@ -41,7 +41,7 @@ void Align__4VIFSi(VIFS_226C58 *pvifs, int align)
         *pcur++ = 0;
         phase = (phase + 1) % 4;
     }
-    pvifs->addr = (int)pcur;
+    pvifs->addr = (sptr)pcur;
 }
 
 class VIFS_226CA8 {
@@ -77,7 +77,7 @@ public:
 
 void VIFS_226CE0::AddVifMscal(void *program)
 {
-    int address = (int)program / 8; unsigned *slot = cursor; cursor = slot + 1; *slot = address | 0x14000000;
+    int address = (sptr)program / 8; unsigned *slot = cursor; cursor = slot + 1; *slot = address | 0x14000000;
 }
 
 typedef struct { char pad[0xC]; int unk0xC; } VIFS_226D10;

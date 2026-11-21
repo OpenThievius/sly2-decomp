@@ -56,7 +56,7 @@ void ShopMenu_UpdateBlot(SHOPMENU *menu)
     int irow = menu->itop;
     if (irow < irowEnd) {
         // addu operand order: retail adds the offset first; the typed &menu->arow[irow] scores 1, this form scores 0
-        ROW *prow = (ROW *)(irow * 8 + (int)menu->arow);
+        ROW *prow = (ROW *)(irow * 8 + (sptr)menu->arow);
         do {
             int oid = D_002C3588[irow - menu->itop];
             switch (menu->page) {

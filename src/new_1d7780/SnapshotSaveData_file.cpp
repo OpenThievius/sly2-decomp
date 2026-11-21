@@ -41,7 +41,7 @@ extern "C" void InitSymtab(char *arg0, s32 arg1) {
     pair[0] = arg1 << 4;
     pair[1] = 0x10;
     *(s32 *)(arg0 + 0xD4) = arg1;
-    *(void **)(arg0 + 0xD8) = PvAllocSwImpl__Fi((s32)pair);
+    *(void **)(arg0 + 0xD8) = PvAllocSwImpl__Fi((sptr)pair);
 }
 
 extern "C" unsigned char RO_002AA6A1[];

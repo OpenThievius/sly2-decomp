@@ -10,7 +10,7 @@ extern "C" void EvaluateAcrb(ACRB *pacrb, float t, float svt, QW *pvecPos, QW *p
     QW posPrev;
     QW posNext;
     int ikey = IkeyFindAcrb(pacrb, t);
-    int pkey = ikey * 0x30 + (int)pacrb->akey;
+    int pkey = ikey * 0x30 + (sptr)pacrb->akey;
     *(B12 *)&posPrev = *(B12 *)(pkey - 0x30);
     *(B12 *)&posNext = *(B12 *)pkey;
     float tPrev = *(float *)(pkey - 0x24);

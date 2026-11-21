@@ -28,7 +28,7 @@ extern "C" void SaveSprBuf__FPve(void *pvDest, ...)
     SPRBUF *psprbuf = &B_003DD2C0[g_2c3c5c];
     psprbuf->sprbs = 3;
     func_002417F0(g_2de59c, 0, 0);
-    int pv = (int)pvDest;
+    int pv = (sptr)pvDest;
     char *argp = (char *)__builtin_next_arg(pvDest) - 56;
     while (pv != 0) {
         apvDest[ientry] = pv;
@@ -80,7 +80,7 @@ extern char B_003DD380[], B_003DD400[];
 int CreateSlotheapSwAlign(int *slotheap, int cb, int c, int align);
 }
 // The uncached (0x20000000) mirror of a main-memory address.
-inline unsigned UncachedAddress(void *pv) { return (unsigned)pv | 0x20000000; }
+inline unsigned UncachedAddress(void *pv) { return (uptr)pv | 0x20000000; }
 // data-ok: .bss in retail (zero), filled by this file's static initializer below
 extern "C" SPRBUF B_003DD2C0[2] = {
     {UncachedAddress(B_003DD380), 0x70000000},

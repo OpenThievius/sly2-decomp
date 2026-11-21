@@ -32,7 +32,8 @@ struct STEPGUARD : STEP {
     /* 0x33C */ s32 field_0x33C; /* OnGuardAdd (26) */
     /* 0x340 */ s32 field_0x340; /* OnGuardAdd (26) */
     /* 0x344 */ s32 field_0x344; /* OnGuardAdd (26) */
-    u8 unknown_0x348[0x18];
+    u8 unknown_0x348[0x14];
+    /* 0x35C */ s32 field_0x35C; /* func_0017A4E8, func_0017A558 pass its address to ReplaceSwHitFx */
     /* 0x360 */ f32 field_0x360; /* OnGuardRemove (27) */
     u8 unknown_0x364[0x2C];
     /* 0x390 */ s32 field_0x390; /* OnGuardRemove (27) */
@@ -83,6 +84,7 @@ SLY2_OFFSET_CHECK(STEPGUARD, field_0x330, 0x330);
 SLY2_OFFSET_CHECK(STEPGUARD, field_0x338, 0x338);
 SLY2_OFFSET_CHECK(STEPGUARD, field_0x33C, 0x33C);
 SLY2_OFFSET_CHECK(STEPGUARD, field_0x340, 0x340);
+SLY2_OFFSET_CHECK(STEPGUARD, field_0x35C, 0x35C);
 SLY2_OFFSET_CHECK(STEPGUARD, field_0x344, 0x344);
 SLY2_OFFSET_CHECK(STEPGUARD, field_0x360, 0x360);
 SLY2_OFFSET_CHECK(STEPGUARD, field_0x390, 0x390);

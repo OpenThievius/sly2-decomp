@@ -1,6 +1,6 @@
 #include "sly2.h"
+#include "cref.h"
 struct MEMCARD;
-struct CRef { int tagk; float g; };
 struct SLOT { char pad[0x5464]; };
 struct SAVE {
     char pad0[8]; int state; int want; float tStamp;
@@ -23,8 +23,7 @@ int BusyMenu_FShowing(void *);
 void BusyMenu_Hide(void *);
 void MemcardMenu_SetState(MENU *, int);
 void CreateMemcardThread__FP7MEMCARDii(MEMCARD *, long);
-CRef *RefGetGameSaveValue(CRef *, void *, void *);
-void CRef_Destruct(CRef *);
+CRef RefGetGameSaveValue(void *, void *);
 void ResetSaveKeepingOptions(void *, int);
 }
 int CompareSaves(SAVE *, SAVE *);
@@ -56,10 +55,7 @@ void SetSaveState(SAVE *psave, int nState)
         psave->pslotNewest = &psave->aslot[0];
         for (int islot = 0; islot < 3; islot++) {
             SLOT *pslot = &psave->aslot[islot];
-            CRef ref;
-            RefGetGameSaveValue(&ref, B_003DD490.psavepathDt, pslot);
-            float dt = ref.g;
-            CRef_Destruct(&ref);
+            float dt = RefGetGameSaveValue(B_003DD490.psavepathDt, pslot).m_tag.m_g;
             if (dt != 0.0f) {
                 if (CompareSaves((SAVE *)((char *)psave->pslotNewest + 0x5408), (SAVE *)((char *)pslot + 0x5408)) < 0)
                     psave->pslotNewest = pslot;

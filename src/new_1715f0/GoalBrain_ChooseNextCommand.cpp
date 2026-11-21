@@ -42,11 +42,11 @@ void GoalBrain_ChooseNextCommand(GOAL_177BA0 *pgoal)
         if (target != 0) {
             if (func_00208B38(((GUARD *)pgoal->pstep), target) != 0) {
                 cmd.kind = 0x12;
-                cmd.arg = (int)target;
+                cmd.arg = (sptr)target;
                 cmd.g = func_00208BB0(((GUARD *)pgoal->pstep));
             } else {
                 cmd.kind = 4;
-                cmd.arg = (int)target;
+                cmd.arg = (sptr)target;
             }
         } else {
             int running = pgoal->kindRunning;

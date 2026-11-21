@@ -15,7 +15,7 @@ extern s128 g_2a2da0;
 
 void InitPipe__FP4PIPE(s8 *arg0) {
     InitCrv();
-    bevy_player_p6_182c70((int)(arg0 + 0x190));
+    bevy_player_p6_182c70((sptr)(arg0 + 0x190));
     M2C_FIELD(arg0, s128 *, 0x1C0) = (s128) g_2a2da0;
     M2C_FIELD(arg0, s32 *, 0x1D4) = 9;
     M2C_FIELD(arg0, s32 *, 0x1D0) = 8;

@@ -1,25 +1,19 @@
 #include "sly2.h"
-struct CRef { int tagk; int pad[3]; };
+#include "cref.h"
+CRef RefSetArgsFromSplice(int cref, CRef *aref, const void *aotyp, ...);
 struct BASIC;
-struct B16 { char b[16]; };
-extern "C" const B16 RO_002A4008;
-extern "C" void RefSetArgsFromSplice__FiP4CRefP4OTYPe(CRef *, int, CRef *, const void *, ...);
-extern "C" void CRef_Destruct(CRef *);
-extern "C" void SetTag__4CRef4TAGK(CRef *, int);
-extern "C" void *CRef_CopyConstruct(CRef *, CRef *);
+struct AOT { char b[16]; };
+extern "C" const AOT RO_002A4008;
 extern "C" void AddTaskToggle(BASIC *, int, CRef *, int, int);
-
-CRef *RefCallAddTaskToggle(CRef *result, BASIC *object, int count, CRef *args)
+CRef RefCallAddTaskToggle(BASIC *object, int count, CRef *args)
 {
-    struct L { B16 aotyp; CRef states; CRef ref; int oid, parent, level; } l;
-    l.aotyp = RO_002A4008;
-    l.states.tagk = -1;
-    RefSetArgsFromSplice__FiP4CRefP4OTYPe(&l.ref, 4, args, &l.aotyp, &l.oid, &l.states, &l.parent, &l.level);
-    CRef_Destruct(&l.ref);
-    SetTag__4CRef4TAGK(&l.ref, 0x24);
-    AddTaskToggle(object, l.oid, &l.states, l.parent, l.level);
-    CRef_CopyConstruct(result, &l.ref);
-    CRef_Destruct(&l.ref);
-    CRef_Destruct(&l.states);
-    return result;
+    AOT aotyp = RO_002A4008;
+    int oid, parent, level;
+    CRef states;
+    states.m_tagk = TAGK_Nil;
+    RefSetArgsFromSplice(4, args, &aotyp, &oid, &states, &parent, &level);
+    CRef refResult;
+    refResult.SetTag(TAGK_Void);
+    AddTaskToggle(object, oid, &states, parent, level);
+    return refResult;
 }

@@ -1,3 +1,4 @@
+#include "types.h"
 struct sceMpeg; struct sceMpegCbData;
 struct CMpeg { char pad[0x174]; int cbUsed; };
 extern "C" int CMpeg_CbDemuxed(CMpeg *, int);
@@ -22,7 +23,7 @@ int FMpegDecodeVideo__FP7sceMpegP13sceMpegCbDataP5CMpeg(sceMpeg *, sceMpegCbData
         if (result == 1)
             Update__10CMpegAudio((char *)pmpeg + 0x180);
     }
-    work[0] = (int)D_002D4220;
+    work[0] = (sptr)D_002D4220;
     FreeDrain__10CByteQueuei((char *)pmpeg + 0x160, 0);
     CbDrain__10CByteQueueiP12CQueueOutput((char *)pmpeg + 0x160, 0, work);
     return 1;

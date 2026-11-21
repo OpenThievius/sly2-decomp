@@ -36,7 +36,7 @@ void RemoveSoGeomFromOxa(SO *pso, GEOM *pgeom)
         for (;;) {
             igeom--;
             if (igeom >= 0) {
-                if (FFindDlEntry(pso->poxa->dl, (GEOM *)(igeom * sizeof(GEOM) + (unsigned int)pso->ageom)) == 0)
+                if (FFindDlEntry(pso->poxa->dl, (GEOM *)(igeom * sizeof(GEOM) + (uptr)pso->ageom)) == 0)
                     continue;
                 break;
             } else {

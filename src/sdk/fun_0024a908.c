@@ -1,3 +1,4 @@
+#include "types.h"
 typedef struct Mpeg {
     char pad0[0x5A0];
     unsigned int field5A0;
@@ -31,9 +32,9 @@ void func_0024A908(Mpeg *mpeg)
         mpeg->field6E4 = scratchpad + 0x3300;
         mpeg->field820 = 0;
     } else if (mpeg->bufferType == 1) {
-        mpeg->field830 = (unsigned int)mpeg->bufferE80;
-        mpeg->field5A4 = ((unsigned int)mpeg->buffer880 & 0xFFFFFFF) | 0x30000000;
-        mpeg->field6E4 = ((unsigned int)mpeg->bufferB80 & 0xFFFFFFF) | 0x30000000;
+        mpeg->field830 = (uptr)mpeg->bufferE80;
+        mpeg->field5A4 = ((uptr)mpeg->buffer880 & 0xFFFFFFF) | 0x30000000;
+        mpeg->field6E4 = ((uptr)mpeg->bufferB80 & 0xFFFFFFF) | 0x30000000;
         mpeg->field5A0 = 0;
         mpeg->field6E0 = 0;
         mpeg->field820 = 0;

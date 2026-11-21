@@ -1,24 +1,8 @@
-struct CRef;
+#include "sly2.h"
+#include "cref.h"
 struct CFrame;
 struct SWW;
 struct SLOTHEAP;
-struct CPair;
-extern "C" {
-void CRef_CopyConstruct(CRef *, const CRef *);
-void CRef_Destruct(CRef *);
-}
-struct CRef {
-    int tagk;
-    union {
-        int n;
-        float g;
-    };
-    CRef(int tag, int value) { n = value; tagk = tag; }
-    CRef() {}
-    CRef(const CRef &other) { CRef_CopyConstruct(this, &other); }
-    ~CRef() { CRef_Destruct(this); }
-    CRef &operator=(const CRef &);
-};
 struct CPair { int cref; int pad4; CRef ref; CPair *next; };
 struct TIMEDCALL { float tFire; void *powner; CPair *ppair; int idCall; };
 struct PairHandle;
@@ -48,7 +32,7 @@ struct PairHandle {
         if (held) {
             if (--held->cref == 0) {
                 CPairPtr_Destructor(&held->next, 2);
-                CRef_Destruct(&held->ref);
+                held->ref.Decref();
                 UnlinkPairNode(held);
                 FreeSlotheapPv(&B_004520A8, held);
             }
@@ -58,24 +42,24 @@ struct PairHandle {
 extern "C" CRef RefOpScheduleCallback(int carg, CRef *aref, CFrame *pframe)
 {
     CRef refId;
-    refId.n = -1;
-    refId.tagk = 0x15;
-    void *pproc = (void *)aref[1].n;
+    refId.m_tag.m_n = -1;
+    refId.m_tagk = TAGK_S32;
+    void *pproc = (void *)aref[1].m_tag.m_n;
     PairHandle handle(PpairNew());
     bevy_splice_value_list_ref(&handle.p->ref, PpairNew());
-    CPair *form = (CPair *)handle.p->ref.n;
+    CPair *form = (CPair *)handle.p->ref.m_tag.m_n;
     CRef_SetProc(&form->ref, pproc);
     if (carg > 2) {
         CPair *tail = form;
-        for (CPair *arg = (CPair *)aref[2].n; arg != 0; arg = arg->next) {
+        for (CPair *arg = (CPair *)aref[2].m_tag.m_n; arg != 0; arg = arg->next) {
             CPair *tmp = PpairNew();
             PairHandle_Assign(&tail->next, tmp);
             tail = tail->next;
             CRef *prefTail = &tail->ref;
             bevy_splice_value_list_ref(prefTail, PpairNew());
-            CPair *quote = (CPair *)prefTail->n;
+            CPair *quote = (CPair *)prefTail->m_tag.m_n;
             CRef *prefQuote = &quote->ref;
-            CRef_Destruct(prefQuote);
+            prefQuote->Decref();
             SetTag__4CRef4TAGK(prefQuote, 0x12);
             tmp = PpairNew();
             PairHandle_Assign(&quote->next, tmp);
@@ -84,7 +68,7 @@ extern "C" CRef RefOpScheduleCallback(int carg, CRef *aref, CFrame *pframe)
     }
     SWW *psw = &B_003DD490;
     float tNow = g_2dded0;
-    TIMEDCALL *pcall = AddSwTimedCall(psw, 0, handle.p, tNow + CRef_RefCoerceF32(aref).g);
+    TIMEDCALL *pcall = AddSwTimedCall(psw, 0, handle.p, tNow + CRef_RefCoerceF32(aref).m_tag.m_g);
     CRef_SetS32(&refId, pcall->idCall);
     return refId;
 }

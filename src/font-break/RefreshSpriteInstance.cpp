@@ -40,7 +40,7 @@ static inline char LerpByte(int from, int to, float u)
 }
 extern "C" void RefreshSpriteInstance(float dt, LABEL *label, int iinst, AFF *pxf, RGBA4 *prgbaAdd, RGBA4 *prgbaMul)
 {
-    INST *inst = (INST *)(iinst * sizeof(INST) + (unsigned)label->psprite->insts);
+    INST *inst = (INST *)(iinst * sizeof(INST) + (uptr)label->psprite->insts);
     SLOT *aslot = inst->aslot;
     int cslot = inst->cslot;
     float t = inst->t;

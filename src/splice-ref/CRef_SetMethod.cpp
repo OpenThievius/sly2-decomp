@@ -1,12 +1,12 @@
-struct CRef { int tagk; int *pm; };
+#include "sly2.h"
+#include "cref.h"
 extern "C" {
-void CRef_Destruct(CRef *);
 CRef *CRef_SetMethod(CRef *pref, int *pm)
 {
     ++*pm;
-    CRef_Destruct(pref);
-    pref->pm = pm;
-    pref->tagk = 0x22;
+    pref->Decref();
+    pref->m_tag.m_pmethod = (CMethod *)pm;
+    pref->m_tagk = TAGK_Method;
     return pref;
 }
 }

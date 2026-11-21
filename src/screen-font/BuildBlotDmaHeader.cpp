@@ -1,3 +1,4 @@
+#include "types.h"
 struct DMAS { char pad[0xC]; int *cur; };
 struct Slot { int kind; float scale; int tagAddress; int zero; };
 struct BLOT { char pad[0xA4]; int shift; };
@@ -10,7 +11,7 @@ extern DMAS g_2dea28;
 }
 static inline void Flush(DMAS *dmas) { *dmas->cur = 0x11000000; dmas->cur = dmas->cur + 1; }
 static inline void Pad(DMAS *dmas, int remainder) {
-    while (((int)dmas->cur & 0xF) != remainder) { *dmas->cur = 0; dmas->cur = dmas->cur + 1; }
+    while (((sptr)dmas->cur & 0xF) != remainder) { *dmas->cur = 0; dmas->cur = dmas->cur + 1; }
 }
 static inline void Bulk(DMAS *dmas, int tag, void *source, int count) {
     *dmas->cur = tag;
@@ -29,12 +30,12 @@ static inline int *PartA(DMAS *dmas, void *source) {
 }
 static inline void PartB(DMAS *dmas, void *source) {
     int *p = dmas->cur;
-    if (((int)p & 0xF) != 0xC) {
+    if (((sptr)p & 0xF) != 0xC) {
         do {
             *p = 0;
             dmas->cur = dmas->cur + 1;
             p = dmas->cur;
-        } while (((int)p & 0xF) != 0xC);
+        } while (((sptr)p & 0xF) != 0xC);
     }
     Bulk(dmas, 0x50000025, source, 0x25);
 }
@@ -43,7 +44,7 @@ static inline void PartC(DMAS *dmas) {
     Pad(dmas, 0);
 }
 static inline void PartD(DMAS *dmas, int *tag) {
-    *tag |= (((int)dmas->cur - (int)tag) >> 4) - 1;
+    *tag |= (((sptr)dmas->cur - (sptr)tag) >> 4) - 1;
     *(long *)dmas->cur = 0x60000000;
     dmas->cur = dmas->cur + 4;
 }
@@ -57,5 +58,5 @@ extern "C" void BuildBlotDmaHeader(BLOT *self)
     slot->kind = 0x15; //P
     slot->scale = (float)(self->shift << 18); //P
     slot->zero = 0; //P
-    slot->tagAddress = (int)tag & 0x0FFFFFFF; //P
+    slot->tagAddress = (sptr)tag & 0x0FFFFFFF; //P
 }

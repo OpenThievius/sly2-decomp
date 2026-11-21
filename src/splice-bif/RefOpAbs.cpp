@@ -1,25 +1,22 @@
-struct CRef { int tagk; union { int n; float g; }; };
+#include "sly2.h"
+#include "cref.h"
 struct CFrame;
 extern "C" {
-CRef *CRef_CopyConstruct(CRef *, CRef *);
-void CRef_Destruct(CRef *);
 void CRef_SetS32(CRef *, int);
 void CRef_SetF32(CRef *, float);
 }
-extern "C" CRef *RefOpAbs(CRef *pret, int carg, CRef *aref, CFrame *pframe)
+extern "C" CRef RefOpAbs(int carg, CRef *aref, CFrame *pframe)
 {
     CRef refAbs;
-    refAbs.tagk = -1;
-    if (aref[0].tagk == 0x15) {
-        CRef_SetS32(&refAbs, aref[0].n < 0 ? -aref[0].n : aref[0].n);
+    refAbs.m_tagk = TAGK_Nil;
+    if (aref[0].m_tagk == TAGK_S32) {
+        CRef_SetS32(&refAbs, aref[0].m_tag.m_n < 0 ? -aref[0].m_tag.m_n : aref[0].m_tag.m_n);
     } else {
-        float gAbs = aref[0].g;
+        float gAbs = aref[0].m_tag.m_g;
         if (gAbs < 0.0f) {
             gAbs = -gAbs;
         }
         CRef_SetF32(&refAbs, gAbs);
     }
-    CRef_CopyConstruct(pret, &refAbs);
-    CRef_Destruct(&refAbs);
-    return pret;
+    return refAbs;
 }

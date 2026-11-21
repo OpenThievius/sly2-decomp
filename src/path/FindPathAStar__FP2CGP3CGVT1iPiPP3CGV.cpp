@@ -33,7 +33,7 @@ static inline int FSkip(CG *pcg, CGV *pcgvNext, CGV *pcgvGoal, int *avisited)
 {
     if (pcgvNext == pcgvGoal)
         return 0;
-    int *pvisited = (int *)(IcgvFromPcgv__FP2CGP3CGV(pcg, pcgvNext) * 4 + (int)avisited);
+    int *pvisited = (int *)(IcgvFromPcgv__FP2CGP3CGV(pcg, pcgvNext) * 4 + (sptr)avisited);
     if (*pvisited != 0)
         return 1;
     *pvisited = 1;

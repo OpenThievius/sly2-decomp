@@ -22,7 +22,7 @@ extern "C" void RemoveSoLoHierarchy(SO *pso)
     PHYS *pphys = pso->pphys;
     int hasXr = 0;
     if (pphys != 0) {
-        hasXr = (int)pphys->plink;
+        hasXr = (sptr)pphys->plink;
     }
     if (hasXr != 0) {
         CancelSwCallbacks(&B_003DD490, 3, pso, RO_002A8270.v, 0);

@@ -18,7 +18,7 @@ void func_001C5098(DPRIZE *prize, int msg, int *pv)
                 if (lo) {
                     int amsg[16];
                     amsg[0] = 1;
-                    amsg[1] = (int)prize;
+                    amsg[1] = (sptr)prize;
                     VTmsg *vtable = lo->vt;
                     vtable->fn((char *)lo + vtable->delta, amsg);
                 }

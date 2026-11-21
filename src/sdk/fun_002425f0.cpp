@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "types.h"
 extern "C" {
 struct SifClient_2425F0 {
     char field_0x0[0x24];
@@ -81,7 +82,7 @@ int func_002425F0(int mode)
     if (D_002C6750 > 0) {
         func_00236960("DiskReady ended\n");
     }
-    result = *(int *)((int)D_002C81C0 | 0x20000000);
+    result = *(int *)((sptr)D_002C81C0 | 0x20000000);
     SignalSema(D_002C6770);
     return result;
 }

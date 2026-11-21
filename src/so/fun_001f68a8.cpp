@@ -5,7 +5,7 @@ extern "C" {
 void func_001F68A8(SO_1F68A8 *so, int value)
 {
     for (int index = 0; index < so->count; index++) {
-        ELEM_1F68A8 *elem = (ELEM_1F68A8 *)(index * 0xB0 + (unsigned)so->elems);
+        ELEM_1F68A8 *elem = (ELEM_1F68A8 *)(index * 0xB0 + (uptr)so->elems);
         elem->flags = (elem->flags & ~(1L << 48)) | ((long)(value & 1) << 48);
     }
 }

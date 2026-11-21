@@ -101,8 +101,8 @@ s32 sceMpegCreate(MPEG *mpeg, s8 *workArea, s32 workSize) {
     s32 temp_s2;
     s32 temp_v0;
     memset(workArea, 0, workSize);
-    temp_s2 = ((u32) ((s32)workArea + 3) >> 2) * 4;
-    temp_a2 = workSize - (temp_s2 - (s32)workArea);
+    temp_s2 = ((u32) ((sptr)workArea + 3) >> 2) * 4;
+    temp_a2 = workSize - (temp_s2 - (sptr)workArea);
     if (temp_a2 < 0x19A0) {
         func_0024FA38(temp_s2, (const char *)("The size of work area is too small"), temp_a2);
         return 0;

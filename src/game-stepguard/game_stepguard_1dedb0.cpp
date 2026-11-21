@@ -116,7 +116,7 @@ void ClipLaserBeams(LASER *plaser)
             }
             WKR wkr;
             memset(&wkr, 0, 0x60);
-            wkr.ploSource = (int)plaser;
+            wkr.ploSource = (sptr)plaser;
             wkr.ppartSource = pmqNearest->plo;
             wkr.ploTarget = pmqNearest->pgeom;
             wkr.grftak = 0x1000;

@@ -1,4 +1,5 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "types.h"
 extern int D_002C676C;
 extern int D_002C7D80;
 extern char B_002C82C0[];
@@ -22,7 +23,7 @@ int sceCdMmode(int mode)
         SignalSema(D_002C676C);
         return 0;
     }
-    result = *(int *)((unsigned int)B_002C7940 | 0x20000000);
+    result = *(int *)((uptr)B_002C7940 | 0x20000000);
     SignalSema(D_002C676C);
     return result;
 }

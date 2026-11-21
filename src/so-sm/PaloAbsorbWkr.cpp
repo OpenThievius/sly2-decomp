@@ -61,9 +61,9 @@ SO *PaloAbsorbWkr(WKR *pwkr)
                 pwkr->plo->PostMessage(0xB, aargs);
                 aargs2[0] = &palo;
                 aargs2[1] = &pwkr->field0C;
-                pwkr->plo->HandleSpliceEvent(0xA, 1, 2, (int)aargs2, 0);
+                pwkr->plo->HandleSpliceEvent(0xA, 1, 2, (sptr)aargs2, 0);
                 aargs2[0] = pwkr;
-                palo->HandleSpliceEvent(0xB, 1, 2, (int)aargs2, 0);
+                palo->HandleSpliceEvent(0xB, 1, 2, (sptr)aargs2, 0);
             }
             return palo;
         }

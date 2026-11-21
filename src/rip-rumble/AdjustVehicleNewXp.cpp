@@ -49,6 +49,6 @@ void AdjustVehicleNewXp(SO *pvehicle, MQ *pcontact, int side)
         pcontact->bounce = 0.1f;
     }
     if (FIsBasicDerivedFrom(plo, 0x6C)) {
-        QueueSwCallbackOnce(B_003DD490, pvehicle, RO_002A7840.v, (int)plo);
+        QueueSwCallbackOnce(B_003DD490, pvehicle, RO_002A7840.v, (sptr)plo);
     }
 }

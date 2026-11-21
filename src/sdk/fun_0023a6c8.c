@@ -1,3 +1,4 @@
+#include "types.h"
 typedef struct Slot { struct Slot *next; volatile int id; int field8; int fieldC; } Slot;  // volatile-ok: id is written by the alarm callback func_0023A668 (interrupt context) and by the callers between interrupt disable and enable
 extern Slot *B_0044E700;
 extern int func_00239450(void);
@@ -50,5 +51,5 @@ int func_0023A6C8(int arg0, int arg1, int arg2) {
     if (flag != 0) {
         func_002394A0();
     }
-    return ((int)slot << 4) | (id & 0xFE) | 1;
+    return ((sptr)slot << 4) | (id & 0xFE) | 1;
 }

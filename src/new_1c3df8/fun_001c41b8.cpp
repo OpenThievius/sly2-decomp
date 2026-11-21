@@ -8,7 +8,7 @@ int func_001C41B8(BASIC *pbasic)
     CRef ref;
     ref.m_tag.m_bool = fResult;
     ref.m_tagk = TAGK_Bool;
-    pbasic->HandleSpliceEvent(0xD, 0, 0, 0, (int)&ref);
+    pbasic->HandleSpliceEvent(0xD, 0, 0, 0, (sptr)&ref);
     if (ref.m_tagk == TAGK_Bool) {
         fResult = ref.m_tag.m_bool;
     }

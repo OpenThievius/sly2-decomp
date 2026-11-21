@@ -15,5 +15,5 @@ int func_001B01E8(GCH *gc)
         int alt = gc->alt;
         if (index < alt) item = (ITEM *)((char *)gc + 0xC) + alt;
     }
-    return item->type == (int)&D_002BFE08;
+    return item->type == (sptr)&D_002BFE08;
 }

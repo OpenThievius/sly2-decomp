@@ -99,7 +99,7 @@ void RunStgSwitchStage(STGSWITCH *psw, NODE *pnode)
         case 11: {
             void *apv[1];
             apv[0] = &ent->arg;
-            psw->HandleSpliceEvent(4, 0, 1, (int)apv, 0);
+            psw->HandleSpliceEvent(4, 0, 1, (sptr)apv, 0);
             break;
         }
         case 12:

@@ -208,7 +208,7 @@ extern "C" void AddDmaRefs__4DMASiP2QW(DMAS_157500 *pdmas, int cqw, QW *pqw)
     }
     unsigned long *pullTag = pdmas->pb;
     pdmas->pb = pullTag + 2;
-    pullTag[0] = ((unsigned long)(long)cqw | 0x40000000UL) | ((long)(int)pqw << 32);
+    pullTag[0] = ((unsigned long)(long)cqw | 0x40000000UL) | ((long)(sptr)pqw << 32);
     pullTag[1] = 0;
     if (fCntWasOpen) {
         unsigned long *pullCnt = pdmas->pb;
@@ -232,7 +232,7 @@ extern "C" void AddDmaCall__4DMASP2QW(DMAS_157598 *pdmas, QW *pqw)
     }
     unsigned long *pullTag = pdmas->pb;
     pdmas->pb = pullTag + 2;
-    pullTag[0] = ((long)(int)pqw << 32) | 0x50000000UL;
+    pullTag[0] = ((long)(sptr)pqw << 32) | 0x50000000UL;
     pullTag[1] = 0;
     if (fCntWasOpen) {
         unsigned long *pullCnt = pdmas->pb;
@@ -306,9 +306,9 @@ void EndDmaCnt__4DMAS(DMAS_1576F0 *dmas)
 {
     if (dmas->fPad) {
         unsigned *cursor = dmas->pb;
-        if ((unsigned)cursor & 0xF) {
+        if ((uptr)cursor & 0xF) {
             *cursor = 0;
-            while ((unsigned)++cursor & 0xF)
+            while ((uptr)++cursor & 0xF)
                 *cursor = 0;
         }
         dmas->pb = cursor;
@@ -317,7 +317,7 @@ void EndDmaCnt__4DMAS(DMAS_1576F0 *dmas)
     }
     unsigned *cnt = dmas->pqwCnt;
     if (cnt) {
-        *cnt = *cnt | (((int)dmas->pb - (int)cnt) >> 4) - 1;
+        *cnt = *cnt | (((sptr)dmas->pb - (sptr)cnt) >> 4) - 1;
         dmas->pqwCnt = 0;
     }
 }

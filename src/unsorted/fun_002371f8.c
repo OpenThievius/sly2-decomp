@@ -1,3 +1,4 @@
+#include "types.h"
 struct Source {
     int word0;
     int word4;
@@ -48,11 +49,11 @@ void func_002371F8(struct Source *source)
     int first;
     int second;
     if (queue->head == 0) {
-        queue->head = (int)destination;
+        queue->head = (sptr)destination;
     } else {
-        ((struct Destination *)queue->tail)->next = (int)destination;
+        ((struct Destination *)queue->tail)->next = (sptr)destination;
     }
-    queue->tail = (int)destination;
+    queue->tail = (sptr)destination;
     /* Choice: source->word14 and word1C are read into locals before the stores to destination, as retail loads them first (a load does not move
        above an earlier store that may alias it). The locals hold real values read from the source and stored; see exceptions.md, "typed local". */
     first = source->word14;

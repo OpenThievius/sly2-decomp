@@ -20,7 +20,7 @@ extern "C" void HandleBentleyMessage(char *pbentley, int msgid, int *pv)
             if (pv[0] == PI(0x1030)) {
                 if (pv[2] == 0x216) {
                     void *plo = PloLeaseCloneObject(((int *)PI(0x16B4))[1], 0);
-                    PI(0x186C) = (int)plo;
+                    PI(0x186C) = (sptr)plo;
                     LockLeaseOfPlo(((int *)PI(0x16B4))[1], plo);
                     *(int *)(PI(0x186C) + 0x15C) = *(int *)PI(0x16B4);
                     GOBJ *pgadget = *(GOBJ **)(pbentley + 0x186C);

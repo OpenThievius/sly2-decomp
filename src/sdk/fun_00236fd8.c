@@ -1,4 +1,5 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "types.h"
 typedef struct Request {
     int field00[5];
     int field14;
@@ -42,7 +43,7 @@ void func_00236FD8(Request *request, int arg1)
         packet->field24 = 0;
         packet->field28 = 0;
     } else {
-        packet->field24 = (int)entry;
+        packet->field24 = (sptr)entry;
         packet->field28 = entry->field08;
     }
     if (func_0023AFE8(0x80000008, packet, 0x40, 0, 0, 0) == 0) {

@@ -96,7 +96,7 @@ void func_0021C5F8(SO_21C5F8 *so, QW center)
     VECTOR v;
     for (NODE *node = so->first; node != 0; node = node->next) {
         int index = node->glob - so->globs;
-        CENTER *entry = (CENTER *)(index * sizeof(CENTER) + (unsigned)so->centers);
+        CENTER *entry = (CENTER *)(index * sizeof(CENTER) + (uptr)so->centers);
         *(QW *)&v = center;
         float x = func_00259D98(&v);
         float y = Vec4_GetY(&v);

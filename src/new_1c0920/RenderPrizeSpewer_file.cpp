@@ -21,9 +21,9 @@ void RenderPrizeSpewer(PrizeSpewer *spewer) {
     s32 temp_a0;
 
     func_001F3C70();
-    temp_a0 = (s32)spewer->ploPrize;
+    temp_a0 = (sptr)spewer->ploPrize;
     if (temp_a0 != 0) {
-        func_001A5EE8(temp_a0, (s32)spewer->pxf + 0x40, 1.0f, 1.0f);
+        func_001A5EE8(temp_a0, (sptr)spewer->pxf + 0x40, 1.0f, 1.0f);
     }
 }
 

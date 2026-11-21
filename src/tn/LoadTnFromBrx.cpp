@@ -36,7 +36,7 @@ extern "C" void LoadTnFromBrx(TNX *tn, void *bis)
     ALLOCREQ *req = (ALLOCREQ *)&pa;
     req->cb = 0x240;
     req->cbAlign = align;
-    tn->steps = (int)PvAllocStackImpl__Fi(req);
+    tn->steps = (sptr)PvAllocStackImpl__Fi(req);
     func_00221818(tn, 0x30);
     LoadOptionsFromBrx__FPvP18CBinaryInputStream(tn, bis);
     func_00221940(tn);
@@ -44,8 +44,8 @@ extern "C" void LoadTnFromBrx(TNX *tn, void *bis)
     req->cbAlign = align;
     void *world = PvAllocSwCopyImpl__FiPv(req, (void *)tn->steps);
     tn->stepsFixed = 1;
-    tn->steps = (int)world;
-    tn->stepsWorld = (int)world;
+    tn->steps = (sptr)world;
+    tn->stepsWorld = (sptr)world;
     InitPloarray(&pa);
     LoadPloarrayFromBrx(tn, bis, &pa);
     if (pa.cplo != 0) {

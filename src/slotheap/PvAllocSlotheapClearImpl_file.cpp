@@ -44,7 +44,7 @@ void *PvAllocSwAlign16(void *, int cb)
     ALLOCREQ req;
     req.cb = cb;
     req.cbAlign = 0x10;
-    return PvAllocSwImpl((int)&req);
+    return PvAllocSwImpl((sptr)&req);
 }
 
 struct VT { char pad[8]; short delta; short idx; int (*fn)(void *, int, int); };

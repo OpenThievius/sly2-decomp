@@ -62,7 +62,7 @@ void Swarm_PostLoad(SWHOLDER *self)
                 request.cb = 0x70;
                 request.cbAlign = 0x10;
                 s32 *entry = (s32 *)PvAllocSwClearImpl__Fi(&request);
-                entry[8] = (s32)part;
+                entry[8] = (sptr)part;
                 entry[9] = -1;
                 AppendDlEntry(&part->dl, entry);
             }

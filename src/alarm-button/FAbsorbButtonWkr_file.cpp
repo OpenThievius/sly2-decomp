@@ -204,11 +204,11 @@ extern "C" void InitVolbtn(VOLBTN *button) {
     button->field_0x1CC = 1;
     func_001A6CA8(button, 0);
     u32 *flags = button->field_0x40;
-    if (((s32)flags ^ 1) & 1) {
+    if (((sptr)flags ^ 1) & 1) {
         *flags |= 2;
         return;
     }
-    button->field_0x40 = (u32 *)((u32)flags | 2);
+    button->field_0x40 = (u32 *)((uptr)flags | 2);
 }
 
 void LoadVolumeFromBrx(void *pvolbtn, void *pbis);

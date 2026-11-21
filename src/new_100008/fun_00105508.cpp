@@ -1,20 +1,18 @@
-struct CRef { int tagk; int pad[3]; };
-struct Raw8 { char b[8]; };
-extern "C" void RefSetArgsFromSplice__FiP4CRefP4OTYPe(CRef*, int, CRef*, const void*, ...);
-extern "C" void CRef_Destruct(CRef*);
-extern "C" void SetTag__4CRef4TAGK(CRef*, int);
-extern "C" CRef *CRef_CopyConstruct(CRef*, CRef*);
-extern "C" const Raw8 RO_002A3C08;
-extern "C" void func_00149828(void*, int, int);
-extern "C" CRef* F105508(CRef* result, void* self, int count, CRef* args)
+#include "sly2.h"
+#include "cref.h"
+CRef RefSetArgsFromSplice(int cref, CRef *aref, const void *aotyp, ...);
+struct AOT { int v[2]; };
+extern "C" const AOT RO_002A3C08;
+extern "C" void func_00149828(void *, int, int);
+
+extern "C" CRef F105508(void *self, int count, CRef *args)
 {
-    struct F { Raw8 types; char pad[8]; CRef ref; int a; int b; } f;
-    f.types = RO_002A3C08;
-    RefSetArgsFromSplice__FiP4CRefP4OTYPe(&f.ref, 2, args, &f.types, &f.a, &f.b);
-    CRef_Destruct(&f.ref);
-    SetTag__4CRef4TAGK(&f.ref, 0x24);
-    func_00149828(self, f.a, f.b);
-    CRef_CopyConstruct(result, &f.ref);
-    CRef_Destruct(&f.ref);
-    return result;
+    AOT aotyp = RO_002A3C08;
+    int first;
+    int second;
+    RefSetArgsFromSplice(2, args, &aotyp, &first, &second);
+    CRef refResult;
+    refResult.SetTag(TAGK_Void);
+    func_00149828(self, first, second);
+    return refResult;
 }

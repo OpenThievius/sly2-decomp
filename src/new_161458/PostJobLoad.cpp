@@ -1,5 +1,5 @@
 #include "sly2.h"
-struct CRef { int tagk; union { float g; int n; }; };
+#include "cref.h"
 struct JOB { char pad0[0x7C]; int cStart; char pad1[0xC]; int ctoggle; void *atoggle; int canim; void *aanim; char pad2[8]; float tJob; int saveVar; int oidAseg; char pad3[8]; int ploAseg; int ploAsegDone; char pad4[0x10]; char pathStart[0x10]; char pathTime[8]; char pathVar[8]; };
 extern "C" char B_003E0EA8[];
 extern "C" int B_003D4A60;
@@ -8,13 +8,11 @@ extern "C" int FIsCurrentJob(JOB *);
 extern "C" int FJobRunning(JOB *);
 extern "C" void ApplyTaskToggles(JOB *, int, int, void *);
 extern "C" void ApplyTaskAnims(JOB *, int, int, void *, int);
-extern "C" void RefGetGameSaveValue(CRef *, void *, int *);
-extern "C" void CRef_Destruct(CRef *);
+extern "C" CRef RefGetGameSaveValue(void *, int *);
 extern "C" int PvFindSaveVar(void *, void *, int *);
 extern "C" int PloFindSwObject_thunk(void *, int, int, int);
 void PostJobLoad(JOB *job)
 {
-    CRef ref;
     char *base;
     PostLoLoad(job);
     if (!FIsCurrentJob(job) && FJobRunning(job)) {
@@ -23,16 +21,12 @@ void PostJobLoad(JOB *job)
     }
     char *pathStart = job->pathStart;
     if (*(int *)pathStart != 0) {
-        RefGetGameSaveValue(&ref, pathStart, &B_003D4A60);
-        int start = ref.n;
-        CRef_Destruct(&ref);
+        int start = RefGetGameSaveValue(pathStart, &B_003D4A60).m_tag.m_n;
         job->cStart = start;
     }
     char *pathTime = job->pathTime;
     if (*(int *)pathTime != 0) {
-        RefGetGameSaveValue(&ref, pathTime, &B_003D4A60);
-        float time = ref.g;
-        CRef_Destruct(&ref);
+        float time = RefGetGameSaveValue(pathTime, &B_003D4A60).m_tag.m_g;
         job->tJob = time;
     }
     base = B_003E0EA8;

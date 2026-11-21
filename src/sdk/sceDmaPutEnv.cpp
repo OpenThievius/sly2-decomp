@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "types.h"
 struct DmaEnvironment {
     unsigned char stallSource;
     unsigned char stallDrain;
@@ -49,7 +50,7 @@ int sceDmaPutEnv(DmaEnvironment* environment) {
     ringBufferStart = (environment->field04 << 16) | environment->field06;
     ringBufferSize = (environment->field0A << 16) | environment->field08;
     holdCount = environment->field10;
-    holdAddress = (unsigned int)environment->field0C;
+    holdAddress = (uptr)environment->field0C;
     *(volatile unsigned int*)0x1000E000 = control;
     *(volatile unsigned int*)0x1000E020 = ringBufferStart;
     *(volatile unsigned int*)0x1000E030 = ringBufferSize;

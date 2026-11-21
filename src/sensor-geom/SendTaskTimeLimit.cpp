@@ -9,7 +9,7 @@ void SendTaskTimeLimit(s8 *arg0, s32 arg1) {
 
     timeLimitBlock[0] = arg1;
     if (FTaskRunning(arg0) != 0) {
-        timeLimitBlock[1] = (s32)timeLimitBlock;
+        timeLimitBlock[1] = (sptr)timeLimitBlock;
         temp_v1 = *(s8 **)(arg0 + 0xC);
         (*(void (**)(s8 *, s32, s32, s32, s32 *, s32))(temp_v1 + 0x1C))(arg0 + *(s16 *)(temp_v1 + 0x18), 0x17, 0, 1, &timeLimitBlock[1], 0);
     }

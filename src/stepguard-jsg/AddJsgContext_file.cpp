@@ -2463,7 +2463,7 @@ extern "C" int FSeqnodeRecordDone(SEQNODE *pseqnodeBase, REC *precBase) {
             fDone = 1;
         }
         if (fDone != 0 && prec->arg[4].n != -1) {
-            JT_EndPose((int)pjt);
+            JT_EndPose((sptr)pjt);
         }
         return fDone;
     }
@@ -2481,7 +2481,7 @@ extern "C" int FSeqnodeRecordDone(SEQNODE *pseqnodeBase, REC *precBase) {
         if (fDone != 0) {
             GoalStack_Clear((char *)pjt + 0x26C);
             if (prec->arg[5].n != -1) {
-                JT_EndPose((int)pjt);
+                JT_EndPose((sptr)pjt);
             }
         }
         return fDone;
@@ -2500,7 +2500,7 @@ extern "C" int FSeqnodeRecordDone(SEQNODE *pseqnodeBase, REC *precBase) {
         if (fDone != 0) {
             GoalStack_Clear((char *)pjt + 0x26C);
             if (prec->arg[5].n != -1) {
-                JT_EndPose((int)pjt);
+                JT_EndPose((sptr)pjt);
             }
         }
         return fDone;
@@ -3499,7 +3499,7 @@ SEQNODE_1E5AE0 *PseqnodeNew(OWNER *powner, REC_1E5AE0 *prec, SEQNODE_1E5AE0 *ppa
         pseqnode->pownerRoot = powner;
     int oid = prec->oid;
     if (oid != -1)
-        pseqnode->plo = (int)PloFindSwObject_thunk_1E5AE0(&B_003DD490_1E5AE0, 5, oid, 0);
+        pseqnode->plo = (sptr)PloFindSwObject_thunk_1E5AE0(&B_003DD490_1E5AE0, 5, oid, 0);
     pseqnode->prec = (char *)prec;
     void *pdl = (char *)powner + 0x5C;
     char *precLast = powner->arec + (powner->crec * 0x50 - 0x50);

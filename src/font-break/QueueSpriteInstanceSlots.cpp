@@ -8,7 +8,7 @@ extern "C" void PrependSlEntry(void *, SLOT *);
 
 void QueueSpriteInstanceSlots(LABEL *label, int index, int alpha)
 {
-    INST *inst = (INST *)(index * sizeof(INST) + (unsigned)label->movie->insts);
+    INST *inst = (INST *)(index * sizeof(INST) + (uptr)label->movie->insts);
     SLOT *slots = inst->slots;
     for (int slot = inst->count - 1; slot >= 0; slot--) {
         SLOT *entry = &slots[slot];

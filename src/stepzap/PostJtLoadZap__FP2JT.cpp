@@ -12,7 +12,7 @@ void PostJtLoadZap(JT *pzap)
     pzap->count = 7;
     req.cb = 0x54;
     req.cbAlign = 0x10;
-    pzap->aent = (JTENT *)PvAllocSwCopyImpl((int)&req, D_002BFA30);
+    pzap->aent = (JTENT *)PvAllocSwCopyImpl((sptr)&req, D_002BFA30);
     for (i = 0; i < pzap->count; i++) {
         JTENT *pent = &pzap->aent[i];
         pent->pxf = func_001F4C58(pzap->pjt, pent->oid, 6);

@@ -1,4 +1,4 @@
-struct CRef { int tagk; union { float g; int n; }; };
+#include "cref.h"
 struct Task {
     char pad0[0x28]; long dw28; char pad30[0x40 - 0x30]; unsigned flags; char pad44[0x64 - 0x44];
     int cEnter; int cComplete; char pad6C[0x78 - 0x6C]; float tLimit; char *pjob; void *marker;
@@ -13,13 +13,11 @@ extern "C" int FIsCurrentTask(Task *);
 extern "C" int FTaskRunning(Task *);
 extern "C" void ApplyTaskToggles(Task *, int, int, void *);
 extern "C" void ApplyTaskAnims(Task *, int, int, void *, int);
-extern "C" void RefGetGameSaveValue(CRef *, void *, int *);
-extern "C" void CRef_Destruct(CRef *);
+extern "C" CRef RefGetGameSaveValue(void *, int *);
 extern "C" int PloFindSwObject_thunk(void *, int, int, int);
 extern "C" void func_001A6CA8(Task *, int);
 extern "C" void PostLoadTask(Task *task)
 {
-    CRef ref;
     int i, found;
     PostLoLoad(task);
     if (task->pjob != 0)
@@ -45,15 +43,11 @@ extern "C" void PostLoadTask(Task *task)
         ApplyTaskAnims(task, 5, task->canim, task->aanim, 1);
     }
     if (*(int *)task->pathEnter != 0) {
-        RefGetGameSaveValue(&ref, pathEnter, &B_003D4A60);
-        int cEnter = ref.n;
-        CRef_Destruct(&ref);
+        int cEnter = RefGetGameSaveValue(pathEnter, &B_003D4A60).m_tag.m_n;
         task->cEnter = cEnter;
     }
     if (*(int *)task->pathComplete != 0) {
-        RefGetGameSaveValue(&ref, pathComplete, &B_003D4A60);
-        int cComplete = ref.n;
-        CRef_Destruct(&ref);
+        int cComplete = RefGetGameSaveValue(pathComplete, &B_003D4A60).m_tag.m_n;
         task->cComplete = cComplete;
     }
     float limit = task->tLimit;

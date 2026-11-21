@@ -88,7 +88,7 @@ void func_0014AE38(Goal_14AE38 *self, int newState) {
         case 3: {
             Ent_14AE38 *ent = func_00205438(self->owner, 0xA4);
             ent->f30 = *(int *)((char *)self->owner + 0x38C);
-            ent->f3C = (int)self->f44;
+            ent->f3C = (sptr)self->f44;
             ent->vt->f44((char *)ent + ent->vt->d40);
             self->owner->fF04 = 3.4028235e38f;
             return; }

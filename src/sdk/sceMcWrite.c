@@ -1,3 +1,4 @@
+#include "types.h"
 typedef struct McClient {
     int pad00[9];
     int server;
@@ -46,12 +47,12 @@ int sceMcWrite(int fd, unsigned char *buffer, int size)
         B_00450900.tailSize = 0;
         B_00450900.tailPointer = 0;
     } else {
-        alignedEnd = (unsigned char *)(((unsigned int)buffer - 1) & 0xFFFFFFF0);
+        alignedEnd = (unsigned char *)(((uptr)buffer - 1) & 0xFFFFFFF0);
         headBase = buffer - 0x10;
         offset = alignedEnd - headBase;
         B_00450900.tailSize = size - offset;
         B_00450900.headLength = offset;
-        B_00450900.tailPointer = (int)(buffer + offset);
+        B_00450900.tailPointer = (sptr)(buffer + offset);
     }
     for (index = 0; index < (unsigned int)B_00450900.headLength; index++)
         B_00450900.data[index] = buffer[index];

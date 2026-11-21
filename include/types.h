@@ -16,4 +16,9 @@ typedef unsigned int u128 __attribute__((mode(TI)));
 typedef int QW __attribute__((mode(TI))); /* a quadword in one 128-bit register */
 typedef float f32;
 typedef double f64;
+/* An integer that holds an address: where retail's code keeps a pointer in an integer (masks it, aligns it, tests it, stores it
+   in an integer field) and a pointer type would change that code. The EE's pointers are 32 bits, so these are retail's s32 and
+   u32; a port to 64-bit pointers makes them intptr_t and uintptr_t (docs/PORTING.md), as sly1-decomp's sptr and uptr. */
+typedef s32 sptr;
+typedef u32 uptr;
 #endif

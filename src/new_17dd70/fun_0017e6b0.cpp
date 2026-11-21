@@ -64,7 +64,7 @@ extern "C" void func_0017E6B0(GOAL_17E6B0 *pgoal, int newState)
         break;
     case 1: {
         OBJ *pgoto = func_00205438(pgoal->pstep, 0xBF);
-        char *psrc = (char *)(pgoal->index * 32 + (int)pgoal->pctx);
+        char *psrc = (char *)(pgoal->index * 32 + (sptr)pgoal->pctx);
         VT *vtable = pgoto->vptr;
         *(QW *)((char *)pgoto + 0x30) = *(QW *)(psrc + 0x60);
         *(QW *)((char *)pgoto + 0x40) = *(QW *)(psrc + 0x70);

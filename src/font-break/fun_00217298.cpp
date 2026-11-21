@@ -1,10 +1,11 @@
+#include "types.h"
 struct VIFS { char pad[0xC]; char *p; };
 struct SLOT { int a; float f; int c; int d; };
 extern "C" {
 extern VIFS g_2dea28;
 extern char VU1_START_0[], VU1_ENTRY_C0[], VU1_ENTRY_100[];
 SLOT *OnGameLoad__FP4GAME(void);
-static inline void Pad(VIFS *pv) { while ((int)pv->p & 0xF) { *(int *)pv->p = 0; pv->p = pv->p + 4; } }
+static inline void Pad(VIFS *pv) { while ((sptr)pv->p & 0xF) { *(int *)pv->p = 0; pv->p = pv->p + 4; } }
 static inline void Emit(VIFS *pv, unsigned first, unsigned second)
 {
     *(int *)pv->p = 0x13000000;
@@ -21,29 +22,29 @@ void func_00217298(char *self, int kind, int unused, float base)
     switch (kind) {
     case 1:
         *(int *)g_2dea28.p = 0x13000000;
-        *(unsigned *)(g_2dea28.p += 4) = ((unsigned)VU1_START_0 >> 3) | 0x14000000;
-        *(unsigned *)(g_2dea28.p += 4) = ((unsigned)(VU1_ENTRY_C0) >> 3) | 0x14000000;
+        *(unsigned *)(g_2dea28.p += 4) = ((uptr)VU1_START_0 >> 3) | 0x14000000;
+        *(unsigned *)(g_2dea28.p += 4) = ((uptr)(VU1_ENTRY_C0) >> 3) | 0x14000000;
         *(int *)(g_2dea28.p += 4) = 0x13000000;
         g_2dea28.p += 4;
         break;
     case 2:
         *(int *)g_2dea28.p = 0x13000000;
-        *(unsigned *)(g_2dea28.p += 4) = ((unsigned)(VU1_START_0 + 0x30) >> 3) | 0x14000000;
-        *(unsigned *)(g_2dea28.p += 4) = ((unsigned)(VU1_ENTRY_C0) >> 3) | 0x14000000;
+        *(unsigned *)(g_2dea28.p += 4) = ((uptr)(VU1_START_0 + 0x30) >> 3) | 0x14000000;
+        *(unsigned *)(g_2dea28.p += 4) = ((uptr)(VU1_ENTRY_C0) >> 3) | 0x14000000;
         *(int *)(g_2dea28.p += 4) = 0x13000000;
         g_2dea28.p += 4;
         break;
     case 3:
         *(int *)g_2dea28.p = 0x13000000;
-        *(unsigned *)(g_2dea28.p += 4) = ((unsigned)(VU1_ENTRY_100) >> 3) | 0x14000000;
-        *(unsigned *)(g_2dea28.p += 4) = ((unsigned)(VU1_START_0 + 0x60) >> 3) | 0x14000000;
+        *(unsigned *)(g_2dea28.p += 4) = ((uptr)(VU1_ENTRY_100) >> 3) | 0x14000000;
+        *(unsigned *)(g_2dea28.p += 4) = ((uptr)(VU1_START_0 + 0x60) >> 3) | 0x14000000;
         *(int *)(g_2dea28.p += 4) = 0x13000000;
         g_2dea28.p += 4;
         break;
     case 4:
         *(int *)g_2dea28.p = 0x13000000;
-        *(unsigned *)(g_2dea28.p += 4) = ((unsigned)(VU1_ENTRY_100) >> 3) | 0x14000000;
-        *(unsigned *)(g_2dea28.p += 4) = ((unsigned)(VU1_START_0 + 0x90) >> 3) | 0x14000000;
+        *(unsigned *)(g_2dea28.p += 4) = ((uptr)(VU1_ENTRY_100) >> 3) | 0x14000000;
+        *(unsigned *)(g_2dea28.p += 4) = ((uptr)(VU1_START_0 + 0x90) >> 3) | 0x14000000;
         *(int *)(g_2dea28.p += 4) = 0x13000000;
         g_2dea28.p += 4;
         break;
@@ -55,7 +56,7 @@ void func_00217298(char *self, int kind, int unused, float base)
     SLOT *slot = OnGameLoad__FP4GAME();
     slot->a = 0x15;
     float scaled = (float)(*(int *)(self + 0xA4) << 0x12);
-    slot->c = (int)tag & 0x0FFFFFFF;
+    slot->c = (sptr)tag & 0x0FFFFFFF;
     slot->d = 0;
     slot->f = base + scaled;
 }

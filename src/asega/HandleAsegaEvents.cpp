@@ -1,3 +1,4 @@
+#include "types.h"
 struct EA { float tLocal; int eatyp; int a; int b; };
 struct ASEG { char pad[0xA0]; int cea; EA *aea; };
 struct ASEGAVT { char pad[8]; short deltaAddRef; short idxAddRef; void (*fnAddRef)(void *); short deltaRelease; short idxRelease; void (*fnRelease)(void *); };
@@ -25,7 +26,7 @@ extern "C" void HandleAsegaEvents(ASEGB *pasega)
     pasega->tTarget = pasega->tLocal;
     while (!FAsegaGone(pasega)) {
         if (pasega->iea < pasega->paseg->cea) {
-            EA *pea = (EA *)(pasega->iea * sizeof(EA) + (unsigned)pasega->paseg->aea);
+            EA *pea = (EA *)(pasega->iea * sizeof(EA) + (uptr)pasega->paseg->aea);
             float tEvent = pea->tLocal;
             if (tEvent < pasega->tTarget || (pasega->tTarget == tEvent && zero < pasega->svtLocal)) {
                 pasega->iea = pasega->iea + 1;
@@ -36,10 +37,10 @@ extern "C" void HandleAsegaEvents(ASEGB *pasega)
         ASEG *paseg = pasega->paseg;
         int iea = pasega->iea;
         if (iea > 0) {
-            float tPrev = ((EA *)(iea * sizeof(EA) + (unsigned)paseg->aea))[-1].tLocal;
+            float tPrev = ((EA *)(iea * sizeof(EA) + (uptr)paseg->aea))[-1].tLocal;
             if (pasega->tTarget < tPrev || (pasega->tTarget == tPrev && pasega->svtLocal < zero)) {
                 pasega->iea = iea - 1;
-                HandleAsegaEvent(pasega, (EA *)((unsigned)paseg->aea + (iea - 1) * sizeof(EA)));
+                HandleAsegaEvent(pasega, (EA *)((uptr)paseg->aea + (iea - 1) * sizeof(EA)));
                 continue;
             }
         }

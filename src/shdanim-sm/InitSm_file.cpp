@@ -320,7 +320,7 @@ void RetractSma(SMA_1F0598 *sma)
             RetractAsega(a);
         }
         RemoveDlEntry(sma->psm + 0x68, sma);
-        RemoveDlEntry((int)B_003E126C_1F0598, sma);
+        RemoveDlEntry((sptr)B_003E126C_1F0598, sma);
         sma->v2(3, 0, 0, 0, 0);
         sma->v1();
     }

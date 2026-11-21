@@ -1,26 +1,21 @@
 #include "sly2.h"
-struct CRef { int tagk; int pad[3]; };
+#include "cref.h"
+CRef RefSetArgsFromSplice(int cref, CRef *aref, const void *aotyp, ...);
 struct BASIC;
-extern "C" void RefSetArgsFromSplice__FiP4CRefP4OTYPe(CRef *, int, CRef *, const int *, ...);
-extern "C" void CRef_Destruct(CRef *);
-extern "C" void SetTag__4CRef4TAGK(CRef *, int);
-extern "C" CRef *CRef_CopyConstruct(CRef *, CRef *);
+struct AOT { int v[2]; };
+extern const AOT RO_002A3B70;
 extern "C" void SetGuardRefLists(BASIC *, CRef *, CRef *);
-extern const struct B8 { char b[8]; } RO_002A3B70;
 
-CRef *func_00103B38(CRef *result, BASIC *object, int count, CRef *args)
+CRef func_00103B38(BASIC *object, int count, CRef *args)
 {
-    struct L { B8 aotyp; int pad[2]; CRef a; CRef b; CRef ref; } l;
-    l.aotyp = RO_002A3B70;
-    l.a.tagk = -1;
-    l.b.tagk = -1;
-    RefSetArgsFromSplice__FiP4CRefP4OTYPe(&l.ref, 2, args, (const int *)&l.aotyp, &l.a, &l.b);
-    CRef_Destruct(&l.ref);
-    SetTag__4CRef4TAGK(&l.ref, 0x24);
-    SetGuardRefLists(object, &l.a, &l.b);
-    CRef_CopyConstruct(result, &l.ref);
-    CRef_Destruct(&l.ref);
-    CRef_Destruct(&l.b);
-    CRef_Destruct(&l.a);
-    return result;
+    AOT aotyp = RO_002A3B70;
+    CRef first;
+    first.m_tagk = TAGK_Nil;
+    CRef second;
+    second.m_tagk = TAGK_Nil;
+    RefSetArgsFromSplice(2, args, &aotyp, &first, &second);
+    CRef refResult;
+    refResult.SetTag(TAGK_Void);
+    SetGuardRefLists(object, &first, &second);
+    return refResult;
 }

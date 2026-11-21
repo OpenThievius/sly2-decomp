@@ -1,27 +1,26 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-struct CRef { int tagk; int n; CRef &operator=(const CRef &); };
+#include "sly2.h"
+#include "cref.h"
 struct CPair { int pad0; int pad4; CRef ref; };
 #include "sw.h"
 struct CFrame;
 extern SW B_003DD490;
 extern "C" {
-void CRef_Destruct(CRef *);
-CRef *CRef_CopyConstruct(CRef *, CRef *);
 int CploFindSwObjects(SW *, int, int, LO *, SCOPE *, int, int *);
-void RefFromAplo(CRef *, int, int *);
+CRef RefFromAplo(int, int *);
 }
-extern "C" CRef *RefOpFindNearestObjects(CRef *pret, int carg, CRef *aref, CFrame *pframe)
+extern "C" CRef RefOpFindNearestObjects(int carg, CRef *aref, CFrame *pframe)
 {
     CRef refResult;
-    LO *basis = (LO *)aref[1].n;
-    refResult.tagk = -1;
+    LO *basis = (LO *)aref[1].m_tag.m_n;
+    refResult.m_tagk = TAGK_Nil;
     LO *scopeObject;
-    if (aref[2].tagk != 0)
-        scopeObject = (LO *)((CPair *)aref[2].n)->ref.n;
+    if (aref[2].m_tagk != 0)
+        scopeObject = (LO *)((CPair *)aref[2].m_tag.m_n)->ref.m_tag.m_n;
     else
         scopeObject = basis;
     SW *psw = &B_003DD490;
-    int id = aref[0].n;
+    int id = aref[0].m_tag.m_n;
     SCOPE *pscope;
     if (scopeObject != 0)
         pscope = scopeObject->pscope;
@@ -29,11 +28,9 @@ extern "C" CRef *RefOpFindNearestObjects(CRef *pret, int carg, CRef *aref, CFram
         pscope = psw->pscopeDefault;
     int aplo[0x40];
     int cplo = CploFindSwObjects(psw, 4, id, basis, pscope, 0x40, aplo);
-    CRef refList;
-    RefFromAplo(&refList, cplo, aplo);
-    refResult = refList;
-    CRef_Destruct(&refList);
-    CRef_CopyConstruct(pret, &refResult);
-    CRef_Destruct(&refResult);
-    return pret;
+    {
+        CRef refList = RefFromAplo(cplo, aplo);
+        refResult = refList;
+    }
+    return refResult;
 }

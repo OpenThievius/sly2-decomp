@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "types.h"
 extern "C" void *memmove(void *, const void *, unsigned int);
 struct CLOCK_2085D0 { float t; float dt; };
 extern "C" CLOCK_2085D0 g_2dded0;
@@ -33,7 +34,7 @@ extern "C" SensedEntry *PentryFindSensorLo(SensedList *list, void *plo);
 // struct (Clock_135248 elsewhere): as a plain float its load is hoisted above the stores.
 static inline unsigned int OffsetInList(SensedList *list, unsigned int offset)
 {
-    return (unsigned int)list + offset;
+    return (uptr)list + offset;
 }
 
 extern "C" int AddGuardSensedObject(Guard *guard, void *plo, int append)
@@ -43,7 +44,7 @@ extern "C" int AddGuardSensedObject(Guard *guard, void *plo, int append)
             return 0;
         unsigned int slot = 0;
         if (append == 0)
-            slot = (unsigned int)PentryFindSensorLo(guard->psensed, plo);
+            slot = (uptr)PentryFindSensorLo(guard->psensed, plo);
         if (slot != 0)
             return 0;
         SensedList *list = guard->psensed;
@@ -64,7 +65,7 @@ extern "C" int AddGuardSensedObject(Guard *guard, void *plo, int append)
                 return 0;
             }
         } else if (append != 0) {
-            slot = (unsigned int)&list->entries[slot];
+            slot = (uptr)&list->entries[slot];
         } else {
             int tail = guard->tail;
             slot -= tail;

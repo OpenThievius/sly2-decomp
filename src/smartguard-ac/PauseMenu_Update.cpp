@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-struct CRef { int tagk; union { int n; float g; }; int pad[2]; };
+#include "cref.h"
 struct ITEM;
 typedef void (*PFNITEM)(ITEM *);
 struct ITEM { int f0; PFNITEM pfnActivate; int f8; int fC; PFNITEM pfnUpdate; int f14; int f18; int grf; };
@@ -11,7 +11,6 @@ struct PAGE { int citem; ITEM *aitem; BLOT *pblot; int fSub; int f10; int iitemC
 struct PAUSEMENU { char pad0[0x10]; void *pjoy; char pad14[0x24 - 0x14]; int depth; PAGE apage[16]; int state; int depthNext; };
 struct SAVE { char pad[0x5464]; };
 extern "C" {
-void CRef_Destruct(CRef *);
 int FBlotLabelPlaying(BLOT *, int);
 int FJoyButtonPressed(void *, int);
 void MemcardMenu_SetState(void *, int);
@@ -21,7 +20,7 @@ void PauseMenu_CancelOption(PAUSEMENU *, ITEM *);
 void PauseMenu_Close(PAUSEMENU *);
 void PauseMenu_Pop(PAUSEMENU *);
 void PauseMenu_SetState(PAUSEMENU *, int);
-void RefGetGameSaveValue(CRef *, int, SAVE *);
+CRef RefGetGameSaveValue(int, SAVE *);
 int UpdateJoyNavY(void *);
 void func_001AF490(PAUSEMENU *);
 int func_001B0078(PAUSEMENU *);
@@ -139,10 +138,7 @@ extern "C" void PauseMenu_Update(PAUSEMENU *pmenu)
                     int kind = func_001B0078(pmenu);
                     if (kind == 0x19 || kind == 0x1E) {
                         SAVE *psave = &B_002E6604.asave[ppage->iitemCur];
-                        CRef ref;
-                        RefGetGameSaveValue(&ref, B_003E0FAC, psave);
-                        float value = ref.g;
-                        CRef_Destruct(&ref);
+                        float value = RefGetGameSaveValue(B_003E0FAC, psave).m_tag.m_g;
                         if (value != 0.0f) {
                             char *pcard = (char *)&B_002E6604 + 0x7FDC;
                             *(SAVE **)(pcard + 0x7D58) = psave;

@@ -1,3 +1,4 @@
+#include "types.h"
 extern "C" {
 struct Segment_23F710 {
     int low;
@@ -29,7 +30,7 @@ void func_0023F710(Segment_23F710 *segment) {
         cursor = list;
         total = 0;
         while (*cursor != 0) {
-            total += func_0023F640((int)*cursor);
+            total += func_0023F640((sptr)*cursor);
             cursor++;
         }
     } else {
@@ -46,7 +47,7 @@ void func_0023F710(Segment_23F710 *segment) {
     if (list2 != 0) {
         cursor = list2;
         while (*cursor != 0) {
-            func_0023F688((int)*cursor, &builder, &builder.low, &builder.high);
+            func_0023F688((sptr)*cursor, &builder, &builder.low, &builder.high);
             cursor++;
         }
     } else {

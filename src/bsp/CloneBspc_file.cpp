@@ -34,14 +34,14 @@ void CloneBspc(GEOM *src, BSPC *srcBspc, GEOM *dst, BSPC *dstBspc)
     req.cbAlign = 0x10;
     dst->cbspFull = src->cbspFull;
     req.cb = src->cbsp * 12;
-    dst->absn = (BSPN *)PvAllocSwImpl((int)&req);
+    dst->absn = (BSPN *)PvAllocSwImpl((sptr)&req);
     for (int i = 0; i < dst->cbsp; i++) {
         BSPN *s = (BSPN *)((char *)src->absn + i * 12);
         BSPN *d = (BSPN *)((char *)dst->absn + i * 12);
         if ((char *)s->psurf == D_002BBAF0)
             d->psurf = s->psurf;
         else
-            d->psurf = (int)((char *)dstBspc->plane + ((char *)s->psurf - (char *)srcBspc->plane));
+            d->psurf = (sptr)((char *)dstBspc->plane + ((char *)s->psurf - (char *)srcBspc->plane));
         d->neg = s->neg == 0 ? 0 : (BSPN *)((char *)dst->absn + ((char *)s->neg - (char *)src->absn));
         d->pos = s->pos == 0 ? 0 : (BSPN *)((char *)dst->absn + ((char *)s->pos - (char *)src->absn));
     }

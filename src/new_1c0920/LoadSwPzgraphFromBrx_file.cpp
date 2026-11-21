@@ -494,7 +494,7 @@ extern "C" void GrowPathzoneSlots(PZ_1C1D20 *pz)
     CopyAb__FPvT0Ui_1C1D20(aslot, pz->aslot, pz->cslot * sizeof(int));
     int cslotOld = pz->cslot;
     unsigned int cb = (cslotNew - cslotOld) * sizeof(int);
-    memset_1C1D20((void *)((cslotOld << 2) + (int)aslot), 0, cb);
+    memset_1C1D20((void *)((cslotOld << 2) + (sptr)aslot), 0, cb);
     pz->aepY = aepY;
     pz->aslot = aslot;
     pz->cslot = cslotNew;
@@ -638,7 +638,7 @@ extern "C" void PostPzlinkLoad(PZLINK_1C2170 *link) {
     QW pos = func_001C1F28_1C2170((char *)link + 0x60);
     link->posA = pos;
     link->pathzoneA = PpathzoneFindPos(pos, 0);
-    pos = func_001C1F28_1C2170((char *)((link->index << 5) + (int)link + 0x40));
+    pos = func_001C1F28_1C2170((char *)((link->index << 5) + (sptr)link + 0x40));
     link->posB = pos;
     link->pathzoneB = PpathzoneFindPos(pos, 0);
 }

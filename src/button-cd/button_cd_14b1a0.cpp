@@ -59,7 +59,7 @@ void func_0014B218(s32 arg0, s32 arg1, struct MSGARGS *pmsgargs) {
     HandleStepguardMessage();
     if ((FIsGuardInSgs(arg0, 0x24) == 0) && (arg1 == 0xB)) {
         pguard = pmsgargs->pguard;
-        if ((s32)pguard == arg0) {
+        if ((sptr)pguard == arg0) {
             func_00154038(pguard->sgsGuard, pmsgargs->value, 1);
         }
     }
@@ -84,7 +84,7 @@ extern "C" float g_2bd4b0[3];
 
 extern "C" char *func_0014B290(Sgs *psgs)
 {
-    if (FIsGuardInSgs((int)psgs, 0x24) != 0)
+    if (FIsGuardInSgs((sptr)psgs, 0x24) != 0)
         return (char *)func_002082D0(psgs);
     char *result = 0;
     float bestDistance;

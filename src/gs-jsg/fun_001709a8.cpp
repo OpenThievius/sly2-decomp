@@ -1,18 +1,10 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
-extern "C" {
-struct _m2c_stack_func_001709A8 {
-    /* 0x00 */ char pad0[0x20];
-};                                                  /* size = 0x20 */
-s32 FIsBasicDerivedFrom(...);              /* extern */
-s32 func_001709A8(s32 arg0) {
-    if (FIsBasicDerivedFrom(arg0, 0xD) == 0) {
-        return (FIsBasicDerivedFrom(arg0, 0xB) == 0) ? -1 : 1;
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "lo.h"
+extern "C" int FIsBasicDerivedFrom(BASIC *, int);
+extern "C" int func_001709A8(BASIC *pbasic)
+{
+    if (FIsBasicDerivedFrom(pbasic, 0xD) == 0) {
+        return (FIsBasicDerivedFrom(pbasic, 0xB) == 0) ? -1 : 1;
     }
     return 0;
-}
 }

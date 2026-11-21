@@ -131,6 +131,20 @@ class CleanupTests(unittest.TestCase):
         flagged = check_cleanup.check_files(['work/elf/SCUS_973.16', 'a/b.irx', 'x/y.s', 'build/a', 'tools/wibo'])
         self.assertEqual(len(flagged), 5)
 
+    def test_tree_counts_cast_offsets_per_module(self):
+        counts = check_cleanup.tree_counts([('src/mat/Foo.cpp', 'x = *(int *)(self + 0x10);\ny = 1;')])
+        self.assertEqual(counts['mat']['cast_offset'], 1)
+
+    def test_tree_counts_char_offsets(self):
+        counts = check_cleanup.tree_counts([('src/mat/Foo.cpp', 'p = (char *)pbtn + 0xB4;')])
+        self.assertEqual(counts['mat']['char_offset'], 1)
+
+    def test_tree_counts_skip_headers_outside_src(self):
+        self.assertEqual(check_cleanup.tree_counts([('include/so.h', 'struct SO { char pad[4]; };')]), {})
+
+    def test_tree_counts_give_zero_for_clean_module(self):
+        self.assertEqual(check_cleanup.tree_counts([('src/mat/Foo.cpp', 'int Foo(void) { return 1; }')])['mat']['padding'], 0)
+
     def test_source_files_are_not_flagged(self):
         self.assertEqual(check_cleanup.check_files(['src/mat/Foo.c', 'tools/README.md', 'docs/build/building.md', 'scripts/workflow.py']), [])
 

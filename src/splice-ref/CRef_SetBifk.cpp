@@ -1,15 +1,9 @@
-// 0x129618 CRef_SetBifk
-extern "C" {
-struct CRef {
-    int tagk;   // 0
-    int n;      // 4
-};
-void CRef_Destruct(CRef *pref);
-}
-CRef* CRef_SetBifk(CRef* pref, int bifk)
+#include "sly2.h"
+#include "cref.h"
+CRef *CRef_SetBifk(CRef *pref, int bifk)
 {
-    CRef_Destruct(pref);
-    pref->n = bifk;
-    pref->tagk = 0x19;
+    pref->Decref();
+    pref->m_tag.m_bifk = bifk;
+    pref->m_tagk = TAGK_Bifk;
     return pref;
 }

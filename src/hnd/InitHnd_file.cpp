@@ -19,7 +19,7 @@ s32 bevy_player_p6_182c70(s32);                     /* extern */
 
 void InitHnd__FP3HND(HND *hnd) {
     InitTarget();
-    bevy_player_p6_182c70((s32)hnd + 0x100);
+    bevy_player_p6_182c70((sptr)hnd + 0x100);
     hnd->field_0xE8 = 1;
     hnd->field_0x12C = 8;
     hnd->field_0x130 = 9;

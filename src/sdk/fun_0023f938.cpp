@@ -17,7 +17,7 @@ extern "C" s32 func_0023F938(u8 *arg0, s32 *arg1) {
     s32 result;
     u8 *end;
     u8 *cursor;
-    arg1[0] = (s32)arg0 - *(s32 *)(arg0 + 4) + 13;
+    arg1[0] = (sptr)arg0 - *(s32 *)(arg0 + 4) + 13;
     if (func_002401D8(arg1[0], RO_002AB220) != 0 && func_002401D8(arg1[0], RO_002AB228) != 0 && *(s8 *)arg1[0] != 0x7A) {
         result = 0;
     } else {
@@ -35,7 +35,7 @@ extern "C" s32 func_0023F938(u8 *arg0, s32 *arg1) {
         if (*(s8 *)arg1[0] == 0x7A) {
             cursor = func_0023F240(cursor, &nestedLength) + nestedLength;
         }
-        result = (s32)cursor;
+        result = (sptr)cursor;
     }
     return result;
 }
