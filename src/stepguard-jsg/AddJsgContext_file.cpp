@@ -33,31 +33,27 @@ extern "C" void AddSeqRecordDestroyThread(JSG *jsg, int value)
     item->value = value;
 }
 
-struct CRef { int tagk; int pad[3]; };
+#include "cref.h"
 
 struct JSGE { char pad[0x10]; int coid; int aoid[4]; };
 
-extern "C" void func_002013D8(CRef *, CRef *, int, int, unsigned *, int *);
+extern "C" CRef func_002013D8(CRef *, int, int, unsigned *, int *);
 
 extern "C" JSGE *PjsgeAllocJsg_1E0310(JSG *, int, int);
-
-extern "C" CRef *CRef_Destruct(CRef *);
 
 extern "C" void *CopyAb__FPvT0Ui_1E0310(void *, void *, unsigned);
 
 extern "C" void AddSeqRecordSync(JSG *pjsg, CRef *prefOids)
 {
     int aoid[8];
-    CRef refResult;
     unsigned coid;
-    func_002013D8(&refResult, prefOids, 6, 8, &coid, aoid);
+    CRef refResult = func_002013D8(prefOids, 6, 8, &coid, aoid);
     JSGE *pjsge = PjsgeAllocJsg_1E0310(pjsg, 3, 0);
     if (coid > 4)
         coid = 4;
     unsigned n = coid;
     pjsge->coid = n;
     CopyAb__FPvT0Ui_1E0310(&pjsge->aoid[0], aoid, n << 2);
-    CRef_Destruct(&refResult);
 }
 
 extern "C" s8 *PjsgeAllocJsg_1E03A0(void *, s32, s32);

@@ -99,7 +99,7 @@ void SetHubPlayable(s32 arg0, s32 arg1) {
 
 struct SM;
 
-struct CRef { int tagk; int n; int pad[2]; };
+#include "cref.h"
 
 struct PAD12 { char pad[0xC]; };
 
@@ -176,9 +176,8 @@ extern "C" void bevy_player_p18_gadget_refill(void *, int);
 
 extern "C" void func_00187E78(void *);
 
-extern "C" void func_001D8A38(CRef *, const char *, int);
+extern "C" CRef func_001D8A38(const char *, int);
 
-extern "C" void CRef_Destruct(CRef *);
 
 extern "C" void func_001F1448(SM *, HUB *, int, int, int *);
 
@@ -191,7 +190,6 @@ void SetHubState(HUB *hub, int state)
     void *players[4];
     NOTIFY_OBJECT *notified[0x20];
     RESET_OBJECT *reset[0x20];
-    CRef ref;
     if (hub->state == state)
         return;
     if (hub->state == 1) {
@@ -218,9 +216,11 @@ void SetHubState(HUB *hub, int state)
         reset[index]->Reset();
     int oid;
     if (hub->sm) {
-        func_001D8A38(&ref, RO_002A7878, 0);
-        int value = ref.n;
-        CRef_Destruct(&ref);
+        int value;
+        {
+            CRef ref = func_001D8A38(RO_002A7878, 0);
+            value = ref.m_tag.m_n;
+        }
         if (IsmsFindSmOptional__FP2SM3OID(hub->sm, value) == -1)
             oid = OidFromSmIsms(hub->sm, 0);
         else
@@ -246,16 +246,14 @@ extern "C" void AddHubEntry(char *hub, int a, int b, int c)
     }
 }
 
-extern "C" void CRef_Destruct_1D7780(s8 *);
-
 extern "C" void StepHubState_1D7780(s8 *, s32);
 
-extern "C" void func_002013D8(s8 *, s32, s32, s32, s8 *, s8 *);
+extern "C" CRef func_002013D8(CRef *, s32, s32, unsigned *, s32 *);
 
-extern "C" void SetHubAllowedStates(s8 *arg0, s32 arg1) {
-    s8 sp[0x10] __attribute__((aligned(16)));
-    func_002013D8(sp, arg1, 6, 6, arg0 + 0x220, arg0 + 0x224);
-    CRef_Destruct_1D7780(sp);
+extern "C" void SetHubAllowedStates(s8 *arg0, CRef *prefStates) {
+    {
+        CRef refResult = func_002013D8(prefStates, 6, 6, (unsigned *)(arg0 + 0x220), (s32 *)(arg0 + 0x224));
+    }
     StepHubState_1D7780(arg0, 0);
 }
 

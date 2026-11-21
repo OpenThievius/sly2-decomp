@@ -99,26 +99,22 @@ extern "C" void *PpathCrfodbLoot(void *guard)
     return PpathConcatStack(func_002109B8(idLevel), &path);
 }
 
-struct CRef { int tagk; int n; int p2; int p3; };
+#include "cref.h"
 
 extern "C" {
 extern int B_003D4A60[];
 void CStackFrame_Construct(void *);
 void CStackFrame_Destructor(void *, int);
 void *PpathCrfodbLoot(void *);
-void CRef_Destruct(CRef *);
-void RefGetGameSaveValue(CRef *, void *, int *);
+CRef RefGetGameSaveValue(void *, int *);
 }
 
 struct GUARD { char pad[0x184]; int idLootDefault; };
 
 static inline int GetSaveInt_13D248(void *path)
 {
-    CRef ref;
-    RefGetGameSaveValue(&ref, path, B_003D4A60);
-    int n = ref.n;
-    CRef_Destruct(&ref);
-    return n;
+    CRef ref = RefGetGameSaveValue(path, B_003D4A60);
+    return ref.m_tag.m_n;
 }
 
 int IdlootCrfodb(GUARD *guard)

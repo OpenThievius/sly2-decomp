@@ -32,7 +32,7 @@ extern "C" void func_001B0848(int *out)
         *out = 0x46;
 }
 
-struct CRef { int a; union { float g; int n; }; int c; int d; };
+#include "cref.h"
 
 struct ITEM { char pad[0x1C]; unsigned grf; };
 
@@ -54,9 +54,7 @@ extern "C" void bevy_camera_follow_activity_1B0878(void *, int, int);
 
 extern "C" void RestartBootQueue();
 
-extern "C" void RefGetGameSaveValue(CRef *, int, int *);
-
-extern "C" void CRef_Destruct(CRef *);
+extern "C" CRef RefGetGameSaveValue(int, int *);
 
 extern "C" void MemcardMenu_SetState(void *, int);
 
@@ -68,11 +66,12 @@ extern "C" void func_001B0878(ITEM *pitem)
     bevy_camera_follow_activity_1B0878(B_002DEB30_1B0878, 0x2E, 0);
     if (B_002E65E0_1B0878.fHasMemcard != 0) {
         B_002E6550.fPending = 1;
-        CRef ref;
-        RefGetGameSaveValue(&ref, B_003E0FE4, &B_003D4A60);
-        int n = ref.n;
-        CRef_Destruct(&ref);
-        if (n == 0) {
+        int fSaved;
+        {
+            CRef ref = RefGetGameSaveValue(B_003E0FE4, &B_003D4A60);
+            fSaved = ref.m_tag.m_bool;
+        }
+        if (fSaved == 0) {
             MemcardMenu_SetState(&B_002E6550, 0x22);
         } else {
             MemcardMenu_SetState(&B_002E6550, 0x1A);

@@ -62,11 +62,14 @@ union TAG {
 /* The special members as retail shows them in the Splice bindings: a default constructor that does nothing (no call), an
    out-of-line copy constructor (0x1291A8: copies the two words and calls Incref) used to return a CRef by value, and an inline
    destructor that calls Decref (0x129EC8) with `this` alone; an out-of-line destructor would also pass g++'s in-charge flag,
-   which retail's calls lack. */
+   which retail's calls lack. CRef(tagk, n) is inline and builds a value in place, tag first: func_00120960 and func_00120A20
+   return one, bevy_splice_bif_ref_equal (0x1205B8) returns its Bool result with it and
+   ShopMenu_Update (0x1DB870) passes one as a temporary; 0x125510 still differs with it (constants loaded in the other order). */
 struct CRef {
     TAGK m_tagk;
     TAG m_tag;
     CRef() {}
+    CRef(TAGK tagk, int n) { m_tagk = tagk; m_tag.m_n = n; }
     CRef(const CRef &ref);
     ~CRef() { Decref(); }
     CRef &operator=(const CRef &ref);
