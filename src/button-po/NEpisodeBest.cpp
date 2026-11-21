@@ -1,14 +1,13 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
 #include "cref.h"
+
+/* Reads a value of the game's save by a key built from a format and its arguments (other callers pass a format and names); the
+   key here is "episodeBest" at 0x2A8A78. */
 extern "C" {
-CRef func_001D8A38(M2C_UNK *, M2C_UNK);
-extern M2C_UNK RO_002A8A78;
-s32 NEpisodeBest(void) {
-    return func_001D8A38(&RO_002A8A78, 0).m_tag.m_n;
+CRef func_001D8A38(const char *pchzFormat, ...);
+extern const char RO_002A8A78[];
+
+s32 NEpisodeBest(void)
+{
+    return func_001D8A38(RO_002A8A78, 0).m_tag.m_n;
 }
 }
