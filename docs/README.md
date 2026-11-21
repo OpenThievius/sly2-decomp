@@ -8,7 +8,9 @@ Then [CONTRIBUTING.md](../CONTRIBUTING.md) and [AGENTS.md](../AGENTS.md).
 
 | Page | Read it when |
 | :--- | :--- |
-| [ROADMAP.md](ROADMAP.md) | what is done and the next steps, in order |
+| [ROADMAP.md](ROADMAP.md) | where the project stands, what "100%" means, and the next steps in order |
+| [ROADMAP_HISTORY.md](ROADMAP_HISTORY.md) | how a past step was done and measured (the former roadmap and path to 100%, verbatim) |
+| [PORTING.md](PORTING.md) | what a native port needs from this repository, what the Sly 1 port teaches, platforms |
 | [PRESERVATION_AND_PORT.md](PRESERVATION_AND_PORT.md) | why preservation comes first and what is added for a later port (shared types, the tie-break rule, blocker notes) |
 | [AGENT_WORKFLOW.md](AGENT_WORKFLOW.md) | matching a function from pick to land, for people and AI agents |
 | [TOOLCHAIN.md](TOOLCHAIN.md) | which compiler, assembler and flags, in one table |
