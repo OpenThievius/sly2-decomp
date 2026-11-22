@@ -4,6 +4,7 @@
 #include "types.h"
 #include "sly2.h"
 #include "alloc.h"
+#include "sw.h"
 #include "m2c_macros.h"
 #include "include_asm.h"
 
@@ -22,14 +23,12 @@ SlotheapSwAlign *CreateSlotheapSwAlign(SlotheapSwAlign *self, s32 arg1, s32 arg2
     return self;
 }
 
-struct SLOTHEAP { int cb; int c; int cbAlign; char *pvFree; int cAlloc; char *pvBlock; };
-
 extern "C" char *PvAllocSwImpl__Fi(ALLOCREQ *);
 
 char *PvAllocSlotheapImpl(SLOTHEAP *pslotheap)
 {
     char *slot;
-    if (!pslotheap->pvFree) {
+    if (!pslotheap->pslotFree) {
         ALLOCREQ req;
         req.cb = pslotheap->c * pslotheap->cb;
         req.cbAlign = pslotheap->cbAlign;
@@ -38,26 +37,20 @@ char *PvAllocSlotheapImpl(SLOTHEAP *pslotheap)
         for (index = 1; index < pslotheap->c; index++)
             *(char **)(block + (index - 1) * pslotheap->cb) = block + index * pslotheap->cb;
         *(char **)(block + (index - 1) * pslotheap->cb) = 0;
-        pslotheap->pvFree = block;
-        pslotheap->pvBlock = block;
+        pslotheap->pslotFree = block;
+        pslotheap->pblockCur = block;
     }
-    slot = pslotheap->pvFree;
-    pslotheap->pvFree = *(char **)slot;
+    slot = (char *)pslotheap->pslotFree;
+    pslotheap->pslotFree = *(char **)slot;
     memset(slot, 0, pslotheap->cb);
-    pslotheap->cAlloc++;
+    pslotheap->cslotUsed++;
     return slot;
 }
 
-struct SLOTHEAP_11CD98 {
-    char pad[0xC];
-    void **ppvFree;
-    s32 cpvUsed;
-};
-
-void FreeSlotheapPv(struct SLOTHEAP_11CD98 *pslotheap, void **ppv) {
-    pslotheap->cpvUsed = pslotheap->cpvUsed - 1;
-    *ppv = pslotheap->ppvFree;
-    pslotheap->ppvFree = ppv;
+void FreeSlotheapPv(SLOTHEAP *pslotheap, void **ppv) {
+    pslotheap->cslotUsed = pslotheap->cslotUsed - 1;
+    *ppv = pslotheap->pslotFree;
+    pslotheap->pslotFree = ppv;
 }
 
 void func_0011CDB8(void* arg0)

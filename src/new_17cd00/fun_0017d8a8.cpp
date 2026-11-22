@@ -1,13 +1,15 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "goal.h"
+#include "step.h"
+#include "phys.h"
 #include "sly2.h"
 struct SWX { char pad[0x45CC]; void *graph; };
 struct PZ { char pad[1]; };
 struct PZLINK { char pad[0x128]; PZ *zoneFar; };
-struct PZL { char pad[0x10]; PZ *zone; };
-struct GX2 { char pad[0xDC]; PZL *pzl; };
-struct GUARDX { char pad[0xE8]; GX2 *g2; };
-struct GOAL {
-    char pad0[0x10]; GUARDX *guard; char pad1[0x40 - 0x14];
+struct LINK { char pad[0x10]; PZ *zone; };
+/* a GOAL subclass (GoalGoto family): the path state sits past GOAL's 0x30 bytes */
+struct GOALGOTO : GOAL {
+    char pad30[0x10];
     QW target0; QW target1;
     QW resolved0; QW resolved1;
     int pad80[(0xB4 - 0x80) / 4];
@@ -21,29 +23,29 @@ PZ *PpathzoneFindPos(QW, int);
 int CpzlinkFindPath(void *, void *, QW, int, int, PZLINK **);
 void FFindPathzoneClosestPoint(PZ *, QW, QW *, int);
 }
-void func_0017D8A8(GOAL *goal)
+void func_0017D8A8(GOALGOTO *goal)
 {
     goal->cpzlink = 0;
     goal->resolved0 = goal->target0;
     goal->resolved1 = goal->target1;
     if (goal->fStraight)
         return;
-    QW posGuard = PosLoWorld(goal->guard);
+    QW posGuard = PosLoWorld(goal->pstep);
     QW posTarget = func_001C1EC0(&goal->target0, posGuard);
-    GX2 *g2 = goal->guard->g2;
-    PZL *pzl = g2 ? g2->pzl : 0;
-    PZ *zoneGuard = pzl ? pzl->zone : 0;
+    PHYS *pphys = goal->pstep->pphys;
+    LINK *plink = pphys ? pphys->plink : 0;
+    PZ *zoneGuard = plink ? plink->zone : 0;
     PZ *zoneTarget = PpathzoneFindPos(posTarget, 0);
     int stay = 0;
     if (zoneTarget == 0) {
         stay = 1;
     } else if (zoneTarget != zoneGuard) {
         int count;
-        if ((goal->cpzlink = CpzlinkFindPath(B_003DD490.graph, goal->guard, posTarget, 1, 1, goal->pzlink)) <= 0) {
+        if ((goal->cpzlink = CpzlinkFindPath(B_003DD490.graph, goal->pstep, posTarget, 1, 1, goal->pzlink)) <= 0) {
             if (goal->fLink == 0) {
                 stay = 1;
             } else {
-                count = CpzlinkFindPath(B_003DD490.graph, goal->guard, posTarget, 0, 1, goal->pzlink);
+                count = CpzlinkFindPath(B_003DD490.graph, goal->pstep, posTarget, 0, 1, goal->pzlink);
                 goal->cpzlink = count;
                 if (count == 0) {
                     stay = 1;

@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "sw.h"
 #include "sly2.h"
 #include "alloc.h"
 #include "vu0inline.h"
-struct SW { char pad[0x3D1C]; struct BVNODE *pbvnode; };
 struct GEOM { char pad[0x60]; GEOM *pgeomNext; };
-struct BVNODE { float lo[3]; float pad0; float hi[3]; char pad1[0x18]; GEOM *pgeom; char pad2[8]; BVNODE *pnext; };
+struct SWNODE { float lo[3]; float pad0; float hi[3]; char pad1[0x18]; GEOM *pgeom; char pad2[8]; SWNODE *pnext; };
 union BOXES { QW q[2]; float f[8]; };
 extern "C" {
 void *PvAllocStackImpl__Fi(ALLOCREQ *);
@@ -26,7 +26,7 @@ void bevy_camera_follow_push_out(SW *psw, QW posA, QW posB, int (*pfn)(void *, v
     GEOM **list = (GEOM **)PvAllocStackImpl__Fi(preq);
     func_00133E30(psw);
     UpdateSwAaox__FP2SW(psw);
-    for (BVNODE *pnode = psw->pbvnode; pnode; pnode = pnode->pnext) {
+    for (SWNODE *pnode = psw->pnodeFirst; pnode; pnode = pnode->pnext) {
         if (pnode->lo[0] > box.f[4] || pnode->hi[0] < box.f[0] || pnode->lo[1] > box.f[5] || pnode->hi[1] < box.f[1] || pnode->lo[2] > box.f[6] || pnode->hi[2] < box.f[2])
             continue;
         GEOM *pgeom = pnode->pgeom;

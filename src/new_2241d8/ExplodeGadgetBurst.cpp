@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "sw.h"
 #include "sly2.h"
 #include "vu0inline.h"
-struct SW { char pad[0x402C]; int hitfx; };
 extern SW B_003DD490;
 extern int D_002C4368[];
 extern float D_002C4338[];
@@ -42,6 +42,6 @@ extern "C" void ExplodeGadgetBurst(char *pgadget, int arg1, int arg2, QW origin,
     }
     for (int ientry = 0; ientry < centry; ientry++)
         PaloAbsorbWkr(&aentry[ientry]);
-    PhitfxSpawn(B_003DD490.hitfx, origin, pgadget)[0x15] = 1;
+    PhitfxSpawn(B_003DD490.field_0x402C, origin, pgadget)[0x15] = 1;
     CStackFrame_Destructor(frame, 2);
 }

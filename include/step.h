@@ -38,8 +38,8 @@ struct STEP : PO {
     /* 0x248 */ f32 field_0x248; /* func_00141588 */
     u8 unknown_0x24C[0x14];
     /* 0x260 */ f32 field_0x260; /* PostGuardLoad (GUARD slot 15) */
-    u8 unknown_0x264[0x4];
-    /* 0x268 */ void *pasegDefault; /* the fallback of SetMurrayAnimBase and func_00135D80 (slot 90 of Murray and Bentley) */
+    /* 0x264 */ s32 keyHull; /* PostStepLoad: key of the hull geometry (-1 = none) */
+    /* 0x268 */ void *pasegDefault; /* the fallback of SetMurrayAnimBase and func_00135D80 (slot 90 of Murray and Bentley); PostStepLoad stores the hull geometry PpartFindAlo returns here */
     u8 unknown_0x26C[0x4];
     /* 0x270 */ s32 field_0x270; /* UpdateJt (JT slot 16) */
     u8 unknown_0x274[0x20];

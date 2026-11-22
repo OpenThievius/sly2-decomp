@@ -24,9 +24,15 @@ struct BENTLEY : JT {
     /* 0x16B4 */ BENTLEYSLOT *pslotActive; /* UseBentleyGadget (100) sets it; HandleBentleyMessage (5) */
     u8 unknown_0x16B8[0x4];
     /* 0x16BC */ s32 field_0x16BC; /* InitBentley sets -1 */
-    u8 unknown_0x16C0[0x30];
+    u8 unknown_0x16C0[0x18];
+    /* 0x16D8 */ s32 field_0x16D8; /* ThrowBentleyBomb: the pool selector, 0 or 1 (Bentley's own function: one reader) */
+    /* 0x16DC */ s32 field_0x16DC; /* ThrowBentleyBomb: pool for selector 0 (Bentley's own function: one reader) */
+    /* 0x16E0 */ s32 field_0x16E0; /* ThrowBentleyBomb: pool for selector 1 (Bentley's own function: one reader) */
+    /* 0x16E4 */ struct LAUNCH *field_0x16E4; /* ThrowBentleyBomb: the launcher whose target it sets (Bentley's own function: one reader) */
+    u8 unknown_0x16E8[0x8];
     /* 0x16F0 */ QW posTarget; /* the bomb target: CalcBentleyBombTarget and ThrowBentleyBomb (two readers) */
-    u8 unknown_0x1700[0x100];
+    /* 0x1700 */ f32 field_0x1700; /* ThrowBentleyBomb sets it from a constant (Bentley's own function: one reader) */
+    u8 unknown_0x1704[0xFC];
     /* 0x1800 */ s32 field_0x1800; /* InitBentley sets -1 */
     u8 unknown_0x1804[0x20];
     /* 0x1824 */ BENTLEYSLOT aslot[6]; /* InitBentley sets each gadget; HandleBentleyMessage (5) walks them */
