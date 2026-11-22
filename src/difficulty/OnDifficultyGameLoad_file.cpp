@@ -23,7 +23,7 @@ void func_00154A80(void *a0)
 
 INCLUDE_ASM(0X154A90);
 
-struct CRef { int tag; union { float g; int n; }; int field8; int fieldC; };
+#include "cref.h"
 
 struct DIFF { char pad[8]; int p0, p1, p2; };
 
@@ -33,17 +33,12 @@ extern LS *B_003E0F9C;
 
 extern int B_003D4A60;
 
-extern "C" void RefGetGameSaveValue(CRef *, int, int *);
-
-extern "C" void CRef_Destruct(CRef *);
+extern "C" CRef RefGetGameSaveValue(int, int *);
 
 static inline float Load(int path)
 {
-    CRef ref;
-    RefGetGameSaveValue(&ref, path, &B_003D4A60);
-    float value = ref.g;
-    CRef_Destruct(&ref);
-    return value;
+    CRef ref = RefGetGameSaveValue(path, &B_003D4A60);
+    return ref.m_tag.m_g;
 }
 
 // The mean is two statements, `suck = first + second + third; suck *= 0.33333334f;`. With `suck` set before the 1/3 constant is loaded,

@@ -1,16 +1,7 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later */
 #include "types.h"
 #include "goal.h"
-
-/* STEPGUARD (include/stepguard.h) lacks the mode fields at 0xFBC and 0xFC0: local overlay. */
-struct GUARD {
-    u8 unknown_0x0[0x190];
-    /* 0x190 */ f32 velGoal[3];
-    u8 unknown_0x19C[0xFBC - 0x19C];
-    /* 0xFBC */ s32 mode;
-    /* 0xFC0 */ f32 tMode;
-    /* 0xFC4 */ void *field_0xFC4;
-};
+#include "stepguard.h"
 struct ASEGA_REF;
 struct ASEGA_INFO { u8 unknown_0x0[0x78]; f32 svtMaster; };
 struct ASEGA { u8 unknown_0x0[0x14]; ASEGA_INFO *pinfo; };
@@ -22,17 +13,17 @@ struct GOAL_GUARD : GOAL {
 };
 
 extern "C" {
-int FCanSetGuardMode(GUARD *, int);
-GOAL_GUARD *func_00205458(GUARD *, int);
+int FCanSetGuardMode(STEPGUARD *, int);
+GOAL_GUARD *func_00205458(STEPGUARD *, int);
 ASEGA *func_00209518(ASEGA_REF *);
 void SetAsegaMasterSpeed(ASEGA *, f32);
-void RemoveGuardPriorityClass(GUARD *, int);
-void AddGuardPriorityClass(GUARD *, int);
-void func_00206E50(GUARD *);
-void func_00206DB0(GUARD *);
+void RemoveGuardPriorityClass(STEPGUARD *, int);
+void AddGuardPriorityClass(STEPGUARD *, int);
+void func_00206E50(STEPGUARD *);
+void func_00206DB0(STEPGUARD *);
 void func_0012D108(void *, QW);
 ASEGA_REF *PpoSwFocusBase(void *);
-void SetGuardMode(GUARD *pguard, int mode);
+void SetGuardMode(STEPGUARD *pguard, int mode);
 void GoalBrain_ChooseNextCommand(GOAL_GUARD *);
 extern char B_003DD490[];
 struct CLOCK { f32 t; f32 dt; };
@@ -41,7 +32,7 @@ extern QW RO_002A2DE0;
 extern QW D_002C3D30;
 }
 
-void SetGuardMode(GUARD *pguard, int mode)
+void SetGuardMode(STEPGUARD *pguard, int mode)
 {
     if (mode == pguard->mode) return;
     if (!FCanSetGuardMode(pguard, mode)) return;
@@ -102,10 +93,10 @@ void SetGuardMode(GUARD *pguard, int mode)
                 SetAsegaMasterSpeed(pasega, 0.0f);
             }
         }
-        f32 *pvel = pguard->velGoal;
+        f32 *pvel = (f32 *)&pguard->velGoal;
         pvel[2] = 0.0f;
         pvel[1] = 0.0f;
-        pguard->velGoal[0] = 0.0f;
+        ((f32 *)&pguard->velGoal)[0] = 0.0f;
         break;
     }
     case 21: {

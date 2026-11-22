@@ -20,12 +20,12 @@ struct XFMIRROR;
 struct XF {
     /* 0x00 */ struct MATRIX4 mat;      /* row 3: the position */
     /* 0x40 */ struct MATRIX4 matWorld; /* row 3: the world position */
-    /* 0x80 to 0x8C: two values and a pointer to each; func_0012B520 sets them (0, 1.0, &field_0x80, &field_0x84), func_00231220
+    /* 0x80 to 0x8C: two values and a pointer to each; func_0012B520 sets them (0, 1.0, &tMin, &tMax), func_00231220
        re-points 0x88 and 0x8C at the copy's own 0x80 and 0x84 when it clones an XF (0x100-byte pool entries). */
-    /* 0x80 */ s32 field_0x80;
-    /* 0x84 */ f32 field_0x84;
-    /* 0x88 */ s32 *pfield_0x80;
-    /* 0x8C */ f32 *pfield_0x84;
+    /* 0x80 */ f32 tMin;               /* func_0012B520 (0), SeekAsega, SetAsegblIpasegDominant: a float range with tMax */
+    /* 0x84 */ f32 tMax;               /* func_0012B520 (1.0), SeekAsega, SetAsegblIpasegDominant */
+    /* 0x88 */ f32 *ptMin;             /* func_0012B520 points it at tMin; SeekAsega reads the value it points at */
+    /* 0x8C */ f32 *ptMax;             /* func_0012B520 points it at tMax; SetAsegblIpasegDominant redirects both */
     /* 0x90 */ struct ACT *pactFirst;  /* the acts on this transform: InsertXfAct, RemoveXfAct, ResortXfActList, func_001F8910 */
     /* 0x94 */ s32 dof;                /* PchnFindAseg (an XF from SO's slot 51), func_00131B60 */
     /* 0x98 */ s16 kind;               /* func_001F4898, func_001F4930, ProjectSoTransform, func_001F8F80 (FXfKind* tests) */
@@ -50,8 +50,8 @@ typedef struct XF XF;
 
 #if defined(__mips__)
 typedef char check_XF_matWorld[((unsigned int)&((struct XF *)0)->matWorld == 0x40) ? 1 : -1];
-typedef char check_XF_field_0x80[((unsigned int)&((struct XF *)0)->field_0x80 == 0x80) ? 1 : -1];
-typedef char check_XF_pfield_0x84[((unsigned int)&((struct XF *)0)->pfield_0x84 == 0x8C) ? 1 : -1];
+typedef char check_XF_field_0x80[((unsigned int)&((struct XF *)0)->tMin == 0x80) ? 1 : -1];
+typedef char check_XF_pfield_0x84[((unsigned int)&((struct XF *)0)->ptMax == 0x8C) ? 1 : -1];
 typedef char check_XF_pactFirst[((unsigned int)&((struct XF *)0)->pactFirst == 0x90) ? 1 : -1];
 typedef char check_XF_kind[((unsigned int)&((struct XF *)0)->kind == 0x98) ? 1 : -1];
 typedef char check_XF_pxfParent[((unsigned int)&((struct XF *)0)->pxfParent == 0xA0) ? 1 : -1];

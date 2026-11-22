@@ -1,20 +1,9 @@
-struct CRef;
-extern "C" void CRef_Destruct(CRef *);
-struct CRef {
-    int tagk;
-    int n;
-    int p2;
-    int p3;
-    CRef(int tag, int value) { tagk = tag; n = value; }
-    CRef() { tagk = -1; }
-    ~CRef() { CRef_Destruct(this); }
-    CRef &operator=(const CRef &);
-};
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "cref.h"
 struct SHOP { char pad0[0x10]; void *dev; char pad14[0x1C]; int dialog; char pad34[0xC]; int mode; };
 struct GADGET { int pad0; int pad4; int price; char pad[0x14]; };
 struct COINBAG { int amount; int b; int c; };
 extern "C" {
-void CRef_Destruct(CRef *);
 int FJoyButtonPressed(void *, int);
 int GetGameCoins(void *);
 void Menu_SetDialog(void *, int, int);
@@ -82,10 +71,11 @@ void ShopMenu_Update(SHOP *menu)
             } else {
                 CRef ref;
                 char name[0x20];
+                ref.m_tagk = TAGK_Nil;
                 sprintf(name, RO_002A79A0, slot);
                 ref = func_001D8A38(RO_002A79D0, RO_002A79D8, name, 0);
-                if (ref.n > 0) {
-                    func_001D8B20(CRef(0x15, ref.n - 1), RO_002A79D0, RO_002A79D8, name, 0);
+                if (ref.m_tag.m_n > 0) {
+                    func_001D8B20(CRef(ref.m_tag.m_n - 1, TAGK_S32), RO_002A79D0, RO_002A79D8, name, 0);
                     SetGameCoins(B_002DEB30, GetGameCoins(B_002DEB30) + D_002C3288[*(int *)((char *)menu + 0x258)].amount);
                     ShopMenu_BuildList(menu);
                     SetEmitterUnpositioned(NewEmitter(0x29), 0);

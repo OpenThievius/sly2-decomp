@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-struct GUARD { char pad[0xF3C]; int fFlag; };
 struct ANIM { char pad[8]; void *ptarget; };
+#include "stepguard.h"
 #include "goal.h"
 struct GOAL_1752F0 : GOAL {
     char pad_30[0x10];
@@ -16,10 +16,10 @@ int func_001752F0(GOAL_1752F0 *pgoal, int nMsg, int *pmsg)
     if (nMsg == 9 && pgoal->panim != 0 && func_00209518(pgoal->panim) == pmsg[0]) {
         switch (pmsg[2]) {
         case 0x2d:
-            ((GUARD *)pgoal->pstep)->fFlag = 1;
+            ((STEPGUARD *)pgoal->pstep)->fFlag = 1;
             return 1;
         case 0x2e:
-            ((GUARD *)pgoal->pstep)->fFlag = 0;
+            ((STEPGUARD *)pgoal->pstep)->fFlag = 0;
             return 1;
         case 0x30:
             pgoal->field_50 = 0;

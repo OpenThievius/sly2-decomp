@@ -2273,7 +2273,7 @@ us_address	name	other_address	pair	score	addresses
 0x167150	AddImage__4GIFSi	0X1670D8	identical	0	ok
 0x1671B8	glob__static_initialization_and_destruction_0	0X167140	same	0	ok
 0x1672F0	func_001672F0	0X167278	same	0	ok
-0x167310	__4CRef	0X167298	gap	0	ok
+0x167310	__7GLOBSET	0X167298	gap	0	ok
 0x167320	LoadGlobsetFromBrx	0X1672A8	same	0	ok
 0x167870	LoadGlobsetBndTreeFromBrx	0X1677F8	same	0	ok
 0x167FC0	UploadRelightLights	0X167F48	same	0	ok

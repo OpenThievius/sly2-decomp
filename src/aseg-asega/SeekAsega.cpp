@@ -1,5 +1,6 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "xf.h"
 struct ASEG { char pad[0x74]; float tMax; float svtMaster; };
-struct XF { char pad[0x80]; float tMin; float tMax; float *ptCurrent; };
 struct ALO;
 struct ACTVT { char pad[0x20]; short delta; short idx; void (*fn)(void *); };
 struct ACT { char pad0[4]; ALO *palo; XF *pxf; char pad1[0xC]; ACTVT *vt; char pad2[0xC]; ACT *pactNext; };
@@ -33,7 +34,7 @@ extern "C" void SeekAsega(ASEGA *pasega, int seek, float dtLocal, float svtLocal
         for (ACT *pact = pasega->pactFirst; pact != 0; pact = pact->pactNext) {
             if (!FActDrivesXf(pact))
                 continue;
-            float tCurrent = *pact->pxf->ptCurrent;
+            float tCurrent = *pact->pxf->ptMin;
             if (tCurrent < pact->pxf->tMin || pact->pxf->tMax < tCurrent)
                 pact->vt->fn((char *)pact + pact->vt->delta);
             WakeXf(pact->palo, pact->pxf);

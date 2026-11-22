@@ -8,20 +8,24 @@
 #include "so.h"
 
 struct JOY;
+struct TN;
 
 struct PO : SO {
     virtual int FInvulnerable(int grf); /* 76: FInvulnerablePo, FInvulnerableJt, FInvulnerableBentley, FInvulnerableMurray; UpdateGuardDamage passes the damage's flags */
     virtual int NAlertLevel();          /* 77: func_001C3ED0 (PO), NGuardAlertLevel (STEPGUARD); NNextSensorState reads it */
-    virtual void OnActive();            /* 78: OnPoActive, JT_OnPoActive */
-    virtual void SetPlayable();         /* 79: SetPoPlayable */
+    virtual void OnActive(int fActive); /* 78: OnPoActive, JT_OnPoActive; SetSwFocusBase passes 1 or 0 (W11: signature added) */
+    virtual void SetPlayable(int vjoym); /* 79: SetPoPlayable; SetPoPlayable's caller passes 0 (W11: signature added) */
     virtual void FIsAvailable();        /* 80: func_001C41B8, JT_FIsPoAvailable */
     virtual void Slot81();              /* 81: func_001C4228 */
     /* 0x150 */ struct JOY *pjoy;      /* the controller: UpdateLookRig, which calls JT slot 99 on the object */
-    u8 unknown_0x154[0x2C];
+    u8 unknown_0x154[0x18];
+    /* 0x16C */ struct TN *ptn;        /* reader: OnPoActive, func_001C4130 (both PO methods/certain) */
+    u8 unknown_0x170[0x10];
 };
 
 #if defined(__mips__)
 SLY2_SIZE_CHECK(PO, 0x180);
 SLY2_OFFSET_CHECK(PO, pjoy, 0x150);
+SLY2_OFFSET_CHECK(PO, ptn, 0x16C);
 #endif
 #endif

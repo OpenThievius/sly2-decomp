@@ -5,6 +5,7 @@
 #include "types.h"
 #include "sly2.h"
 #include "include_asm.h"
+#include "jt.h"
 
 extern "C" {
 s32 AppendDlEntry(s32 *, s32);              /* extern */
@@ -68,7 +69,6 @@ done:
 
 struct CRV { char pad[0xE4]; int closed; };
 
-struct JT { char pad[0x218]; QW *ppos; };
 
 extern "C" void FindCrvClosestPointAll(CRV *, QW, void *, QW *, void *, void *, float *);
 

@@ -17,7 +17,7 @@ struct GOAL : BASIC {
     virtual void Update();              /* 10: func_001EEF98 (empty); GoalBrain_Update, GoalHit_Update */
     virtual void Slot11();              /* 11: func_001EEFB8 (empty) */
     virtual void Slot12();              /* 12: func_001EEFA0 */
-    virtual void FHandleMessage();      /* 13: Goal_FHandleMessage */
+    virtual int FHandleMessage(int arg1, int arg2);      /* 13: Goal_FHandleMessage; GoalStack_HandleMessage calls it with two ints */
     virtual void FillVjoy();            /* 14: Goal_FillVjoy */
     /* 0x10 */ struct STEP *pstep;      /* the actor: Goal_FillVjoy (14) reads its heading (STEP 0x1A8), func_001EEFA0 (12) its 0x204 */
     u8 unknown_0x14[0x4];

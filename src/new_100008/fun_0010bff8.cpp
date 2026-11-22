@@ -1,23 +1,17 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
-struct CRef { int tagk; int pad[3]; };
+#include "cref.h"
+CRef RefSetArgsFromSplice(int cref, CRef *aref, const void *aotyp, ...);
 struct BASIC;
-struct B8 { int w[3]; };
-extern "C" void RefSetArgsFromSplice__FiP4CRefP4OTYPe(CRef *, int, CRef *, const int *, ...);
-extern "C" void CRef_Destruct(CRef *);
-extern "C" void SetTag__4CRef4TAGK(CRef *, int);
-extern "C" CRef *CRef_CopyConstruct(CRef *, CRef *);
-
+struct AOT { int w[3]; };
 extern "C" BASIC *SpawnSwHitFx(BASIC *, int, QW, int);
-extern "C" CRef *CRef_SetBasic(CRef *, BASIC *);
-extern const B8 RO_002A3F20;
-
-CRef *func_0010BFF8(CRef *result, BASIC *object, int count, CRef *args)
+extern const AOT RO_002A3F20;
+CRef func_0010BFF8(BASIC *object, int count, CRef *args)
 {
-    struct L { B8 aotyp; int pad; QW vec; CRef ref; int a; int c; } l;
-    l.aotyp = RO_002A3F20;
-    RefSetArgsFromSplice__FiP4CRefP4OTYPe(&l.ref, 3, args, (const int *)&l.aotyp, &l.a, &l.vec, &l.c);
-    CRef_SetBasic(&l.ref, SpawnSwHitFx(object, l.a, l.vec, l.c));
-    CRef_CopyConstruct(result, &l.ref);
-    CRef_Destruct(&l.ref);
-    return result;
+    AOT aotyp = RO_002A3F20;
+    int a, c;
+    VECTOR vec;
+    CRef ref = RefSetArgsFromSplice(3, args, &aotyp, &a, &vec, &c);
+    ref.SetBasic(SpawnSwHitFx(object, a, *(QW *)&vec, c));
+    return ref;
 }

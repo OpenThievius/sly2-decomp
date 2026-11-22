@@ -1,7 +1,12 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
-struct VT { char pad[0x260]; short delta; short index; void (*fn)(void *, int); };
-struct LO { char pad[0xC]; VT *vt; };
-struct SW;
+#include "so.h"
+#include "sw.h"
+// DPRIZE: a prize the world leases clones of (CpdprizeLeaseSwDprizes), a subclass of SO; classes 91 to 93 of retail's class table
+// (parent 90 of 0x230 bytes) add one virtual, slot 76, which this function calls with 2 on each clone. Its size is not known.
+struct DPRIZE : SO {
+    virtual void Slot76(int arg);       /* 76: CpdprizeLeaseSwDprizes calls it with 2 on a fresh clone */
+};
 extern "C" LO *PloFindSwObject_thunk(SW *, int, int, int);
 extern "C" LO *PloLeaseCloneObject(LO *, int);
 extern "C" void LockLeaseOfPlo(LO *, LO *);
@@ -31,7 +36,7 @@ int func_001C6CE8(SW *sw, int cid, int count, LO **out)
         if (lo == 0)
             break;
         made++;
-        lo->vt->fn((char *)lo + lo->vt->delta, 2);
+        static_cast<DPRIZE *>(lo)->Slot76(2);
         LockLeaseOfPlo(templ, lo);
         *slot = lo;
         slot++;

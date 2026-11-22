@@ -12,7 +12,8 @@ struct ALO;
 
  struct XF;
 
-struct SO { char *p0; char *basic; };
+struct SO;
+struct BOUNCEHIT { char *pso; char *basic; };
 
 struct M34 { float m[3][4]; } __attribute__((aligned(16)));
 
@@ -28,11 +29,11 @@ extern "C" STUCK *CreateStuck__FP3RIPP3ALOP2SOP6VECTORT3PP5STUCK(RIP *, ALO *, S
 
 extern "C" M34 ConvertLoMat(int, char *, M34 *);
 
-int FBounceLeaf__FP4LEAFP2SOP6VECTORT2(LEAF *leaf, SO *so, QW pos, QW normal)
+int FBounceLeaf__FP4LEAFP2SOP6VECTORT2(LEAF *leaf, BOUNCEHIT *so, QW pos, QW normal)
 {
     if (FIsBasicDerivedFrom(so->basic, 0x33))
         return 0;
-    STUCK *stuck = CreateStuck__FP3RIPP3ALOP2SOP6VECTORT3PP5STUCK((RIP *)leaf, leaf->alo, (SO *)so->p0, pos, normal);
+    STUCK *stuck = CreateStuck__FP3RIPP3ALOP2SOP6VECTORT3PP5STUCK((RIP *)leaf, leaf->alo, (SO *)so->pso, pos, normal);
     if (stuck != 0)
         stuck->mat = ConvertLoMat(0, so->basic, &stuck->mat);
     RemoveRip((RIP *)leaf);

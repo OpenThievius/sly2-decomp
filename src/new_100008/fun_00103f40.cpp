@@ -1,22 +1,20 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
-struct CRef { int tagk; int pad[3]; };
+#include "cref.h"
+CRef RefSetArgsFromSplice(int cref, CRef *aref, const void *aotyp, ...);
 struct BASIC;
-struct Raw8 { char b[8]; };
-extern "C" void RefSetArgsFromSplice__FiP4CRefP4OTYPe(CRef *, int, CRef *, const void *, ...);
-extern "C" void CRef_Destruct(CRef *);
-extern "C" void SetTag__4CRef4TAGK(CRef *, int);
-extern "C" int CRef_CopyConstruct(CRef *, CRef *);
-extern "C" const Raw8 RO_002A3B78;
+struct AOT { int v[2]; };
+extern "C" const AOT RO_002A3B78;
 extern "C" void SetGuardGotoTarget(BASIC *, int, QW);
-CRef *func_00103F40(CRef *result, BASIC *object, int count, CRef *args)
+
+CRef func_00103F40(BASIC *object, int count, CRef *args)
 {
-    struct F { Raw8 types; QW second; CRef ref; int first; } f;
-    f.types = RO_002A3B78;
-    RefSetArgsFromSplice__FiP4CRefP4OTYPe(&f.ref, 2, args, &f.types, &f.first, &f.second);
-    CRef_Destruct(&f.ref);
-    SetTag__4CRef4TAGK(&f.ref, 0x24);
-    SetGuardGotoTarget(object, f.first, f.second);
-    CRef_CopyConstruct(result, &f.ref);
-    CRef_Destruct(&f.ref);
-    return result;
+    AOT aotyp = RO_002A3B78;
+    int first;
+    VECTOR second;
+    RefSetArgsFromSplice(2, args, &aotyp, &first, &second);
+    CRef refResult;
+    refResult.SetTag(TAGK_Void);
+    SetGuardGotoTarget(object, first, *(QW *)&second);
+    return refResult;
 }

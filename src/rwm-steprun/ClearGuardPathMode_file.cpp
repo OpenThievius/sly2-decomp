@@ -7,16 +7,16 @@
 #include "alloc.h"
 #include "m2c_macros.h"
 
-struct GUARD { char pad[0xF80]; int mode; int target; };
+typedef STEPGUARD GUARD;
 
 extern "C" void func_00204F78(void *, int, int);
 
 void ClearGuardPathMode(GUARD *pguard)
 {
- switch (pguard->mode) { case 0: func_00204F78(pguard, pguard->target, 0); break; case 1: func_00204F78(pguard, pguard->target, 0); break; case 2: func_00204F78(pguard, pguard->target, 0); break; case 3: func_00204F78(pguard, pguard->target, 0); break; }
- pguard->target = 0; pguard->mode = -1; }
+ switch (pguard->modePath) { case 0: func_00204F78(pguard, (int)pguard->ptargetPath, 0); break; case 1: func_00204F78(pguard, (int)pguard->ptargetPath, 0); break; case 2: func_00204F78(pguard, (int)pguard->ptargetPath, 0); break; case 3: func_00204F78(pguard, (int)pguard->ptargetPath, 0); break; }
+ pguard->ptargetPath = 0; pguard->modePath = -1; }
 
-struct Guard { char pad[0xF80]; int mode; void *target; float arc; int n; void *ref; };
+typedef STEPGUARD Guard;
 
 struct Obj { char pad[0x124]; int f124; };
 
@@ -30,24 +30,24 @@ extern "C" void func_00204F78_20B2A8(Guard *, void *, int);
 
 void SetGuardPathTarget(Guard *guard, void *target, int n)
 {
-    guard->target = target;
-    guard->n = n;
+    guard->ptargetPath = target;
+    guard->nPath = n;
     if (FIsBasicDerivedFrom(target, 0xB) != 0) {
-        guard->mode = 1;
-        FindCrvClosestPointAll(guard->target, PosLoWorld(guard->ref), 0, 0, 0, 0, &guard->arc);
-        func_00204F78_20B2A8(guard, guard->target, 1);
-    } else if (FIsBasicDerivedFrom(guard->target, 0xD) != 0) {
-        guard->mode = 0;
-        FindCrvClosestPointAll(guard->target, PosLoWorld(guard), 0, 0, 0, 0, &guard->arc);
-        func_00204F78_20B2A8(guard, guard->target, 1);
-    } else if (FIsBasicDerivedFrom(guard->target, 0x13) != 0 && ((Obj *)guard->target)->f124 == 3) {
-        guard->mode = 2;
-        func_00204F78_20B2A8(guard, guard->target, 1);
-    } else if (FIsBasicDerivedFrom(guard->target, 0x27) != 0) {
-        guard->mode = 3;
-        func_00204F78_20B2A8(guard, guard->target, 1);
+        guard->modePath = 1;
+        FindCrvClosestPointAll(guard->ptargetPath, PosLoWorld(guard->prefPath), 0, 0, 0, 0, &guard->sPath);
+        func_00204F78_20B2A8(guard, guard->ptargetPath, 1);
+    } else if (FIsBasicDerivedFrom(guard->ptargetPath, 0xD) != 0) {
+        guard->modePath = 0;
+        FindCrvClosestPointAll(guard->ptargetPath, PosLoWorld(guard), 0, 0, 0, 0, &guard->sPath);
+        func_00204F78_20B2A8(guard, guard->ptargetPath, 1);
+    } else if (FIsBasicDerivedFrom(guard->ptargetPath, 0x13) != 0 && ((Obj *)guard->ptargetPath)->f124 == 3) {
+        guard->modePath = 2;
+        func_00204F78_20B2A8(guard, guard->ptargetPath, 1);
+    } else if (FIsBasicDerivedFrom(guard->ptargetPath, 0x27) != 0) {
+        guard->modePath = 3;
+        func_00204F78_20B2A8(guard, guard->ptargetPath, 1);
     } else {
-        guard->target = 0;
+        guard->ptargetPath = 0;
     }
 }
 
@@ -67,14 +67,9 @@ extern "C" s32 NGuardAlertLevel(STEPGUARD *arg0) {
 }
 
 extern "C" {
-typedef struct Guard20B438 {
-    char pad[0xFFC];
-    s32 busyGoalCount;
-} Guard20B438;
-
 void func_001A6CA8(void *, s32);
 
-void AddGuardBusyGoal(Guard20B438 *guard) {
+void AddGuardBusyGoal(STEPGUARD *guard) {
     if (guard->busyGoalCount == 0) {
         func_001A6CA8(guard, 1);
     }
@@ -84,12 +79,10 @@ void AddGuardBusyGoal(Guard20B438 *guard) {
 
 extern "C" void func_001A6CA8_20B478(void *, int);
 
-struct Owner { char pad0[0xFFC]; int busy; };
-
-void RemoveGuardBusyGoal(Owner *owner)
+void RemoveGuardBusyGoal(STEPGUARD *owner)
 {
-    int busy = owner->busy - 1;
-    owner->busy = busy;
+    int busy = owner->busyGoalCount - 1;
+    owner->busyGoalCount = busy;
     if (busy == 0) func_001A6CA8_20B478(owner, 0);
 }
 
@@ -137,11 +130,7 @@ void PostGuardRespawnerLoad(PLO *plo)
     CploFindSwObjectsByClass(B_003DD490, 0x405, 0x38, 0, plo->count, array);
 }
 
-struct VT { char pad[0x48]; short delta; short index; void (*fn)(void *); };
-
-struct GUARD_20B590 { char pad0[0xC]; VT *vt; };
-
-struct LIST { char pad[0x50]; int count; GUARD_20B590 **pguards; };
+struct LIST { char pad[0x50]; int count; STEPGUARD **pguards; };
 
 void *memset(void *, int, unsigned int);
 
@@ -159,21 +148,17 @@ extern "C" void GoalBrain_SetCommand(void *, void *);
 
 extern "C" void ResetSensorStates(void *);
 
-#define I(base, off) (*(int *)((char *)(base) + (off)))
-
-#define F(base, off) (*(float *)((char *)(base) + (off)))
-
 extern "C" void func_0020B590(LIST *list)
 {
     UpdateLo(list);
     int count = list->count;
-    GUARD_20B590 **pguards = list->pguards;
+    STEPGUARD **pguards = list->pguards;
     for (int index = 0; index < count; index++) {
-        GUARD_20B590 *guard = pguards[index];
-        if (((int)(*(unsigned long *)((char *)guard + 0x28) >> 60) & 1) != 0 && g_2dded0 - F(guard, 0xFF8) > g_2c3dbc) {
-            switch (I(guard, 0x1000)) {
+        STEPGUARD *guard = pguards[index];
+        if (((int)(guard->grfo >> 60) & 1) != 0 && g_2dded0 - guard->field_0xFF8 > g_2c3dbc) {
+            switch (guard->field_0x1000) {
             case 1:
-                guard->vt->fn((char *)guard + guard->vt->delta);
+                guard->Remove();
                 break;
             case 0:
                 break;
@@ -185,12 +170,12 @@ extern "C" void func_0020B590(LIST *list)
                     command[0] = 1;
                     GoalBrain_SetCommand(goal, command);
                 }
-                if (I(guard, 0xF64) != 0)
-                    ResetSensorStates((void *)I(guard, 0xF64));
+                if (guard->psensor != 0)
+                    ResetSensorStates(guard->psensor);
                 break;
             }
             }
-            F(guard, 0xFF8) = RO_FLT_002A88CC;
+            guard->field_0xFF8 = RO_FLT_002A88CC;
         }
     }
 }

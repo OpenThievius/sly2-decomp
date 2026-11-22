@@ -1,23 +1,24 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
-struct CRef { int tagk; int pad[3]; };
-struct B8 { char b[8]; };
-struct VT { char pad[0x270]; short delta; short index; void (*fn)(void *, int, void *); };
-struct BASIC { char pad[0xC]; VT *vptr; };
-extern "C" void RefSetArgsFromSplice__FiP4CRefP4OTYPe(CRef *, int, CRef *, const int *, ...);
-extern "C" void CRef_Destruct(CRef *);
-extern "C" void SetTag__4CRef4TAGK(CRef *, int);
-extern "C" int CRef_CopyConstruct(CRef *, CRef *);
-extern const B8 RO_002A3BF0;
-CRef *T(CRef *result, BASIC *object, int count, CRef *args)
+#include "cref.h"
+#include "so.h"
+CRef RefSetArgsFromSplice(int cref, CRef *aref, const void *aotyp, ...);
+/* an SO subclass of unknown class whose slot 78 takes an object and a vector (SO declares slots up to 75) */
+struct SO_104E80 : SO {
+    virtual void Slot76();
+    virtual void Slot77();
+    virtual void Slot78(int pobject, VECTOR *pvec);
+};
+struct AOT { int v[2]; };
+extern const AOT RO_002A3BF0;
+CRef T(SO_104E80 *object, int count, CRef *args)
 {
-    struct L { B8 aotyp; int pad[2]; int vec[4]; CRef ref; int pobject; } l __attribute__((aligned(16)));
-    l.aotyp = RO_002A3BF0;
-    RefSetArgsFromSplice__FiP4CRefP4OTYPe(&l.ref, 2, args, (const int *)&l.aotyp, &l.pobject, l.vec);
-    CRef_Destruct(&l.ref);
-    SetTag__4CRef4TAGK(&l.ref, 0x24);
-    VT *vt = object->vptr;
-    vt->fn((char *)object + vt->delta, l.pobject, l.vec);
-    CRef_CopyConstruct(result, &l.ref);
-    CRef_Destruct(&l.ref);
-    return result;
+    AOT aotyp = RO_002A3BF0;
+    int pobject;
+    VECTOR vec;
+    RefSetArgsFromSplice(2, args, &aotyp, &pobject, &vec);
+    CRef refResult;
+    refResult.SetTag(TAGK_Void);
+    object->Slot78(pobject, &vec);
+    return refResult;
 }

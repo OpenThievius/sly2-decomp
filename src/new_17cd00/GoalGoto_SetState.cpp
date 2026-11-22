@@ -1,7 +1,8 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
 struct VT { char pad[0x40]; short delta; short index; void (*fn)(void *); };
 struct OBJ { char pad[0xC]; VT *vptr; };
-struct GUARD { char pad[0x294]; void *crv; char pad1[0xFE8 - 0x298]; unsigned grf; };
+#include "stepguard.h"
 #include "goal.h"
 struct GOAL_17D450 : GOAL {
     int state;
@@ -13,7 +14,7 @@ struct GOAL_17D450 : GOAL {
     int straight;
 };
 extern "C" void Goal_Pop(void *);
-extern "C" OBJ *func_00205438(GUARD *, int);
+extern "C" OBJ *func_00205438(STEPGUARD *, int);
 extern "C" void GoalFollowCrv_SetCrv(OBJ *, void *, int);
 extern float g_2dded0;
 // Retail computes the follow mode straight into $v0 with three branches (9 in the first two delay slots, 8 in
@@ -36,14 +37,14 @@ extern "C" void GoalGoto_SetState(GOAL_17D450 *goal, int newState)
     case 1:
         break;
     case 5: {
-        OBJ *hold = func_00205438(((GUARD *)goal->pstep), 0x9E);
+        OBJ *hold = func_00205438(((STEPGUARD *)goal->pstep), 0x9E);
         *(int *)((char *)hold + 0x38) = *(int *)((char *)goal + 0xA8);
         VT *vtable = hold->vptr;
         vtable->fn((char *)hold + vtable->delta);
         break;
     }
     case 4: {
-        OBJ *route = func_00205438(((GUARD *)goal->pstep), 0xBE);
+        OBJ *route = func_00205438(((STEPGUARD *)goal->pstep), 0xBE);
         *(int *)((char *)route + 0x30) = *(int *)((char *)goal + 0xB8);
         VT *vtable = route->vptr;
         vtable->fn((char *)route + vtable->delta);
@@ -53,23 +54,23 @@ extern "C" void GoalGoto_SetState(GOAL_17D450 *goal, int newState)
     case 3: {
         OBJ *follow = ((OBJ *)goal->pgoalChild);
         if (follow == 0) {
-            follow = func_00205438(((GUARD *)goal->pstep), 0xA7);
+            follow = func_00205438(((STEPGUARD *)goal->pstep), 0xA7);
             *(int *)((char *)follow + 0xC8) = *(int *)((char *)goal + 0xA8);
             *(int *)((char *)follow + 0x40) = *(int *)((char *)goal + 0xBC);
-            if (*(int *)((char *)goal + 0xA8) != 0 && *(int *)((char *)goal + 0xAC) == 0 && (((GUARD *)goal->pstep)->grf & 4) != 0)
+            if (*(int *)((char *)goal + 0xA8) != 0 && *(int *)((char *)goal + 0xAC) == 0 && (((STEPGUARD *)goal->pstep)->grf & 4) != 0)
                 *(int *)((char *)follow + 0xC0) = 8;
             else
                 *(int *)((char *)follow + 0xC0) = 9;
-            GoalFollowCrv_SetCrv(follow, ((GUARD *)goal->pstep)->crv, 0);
+            GoalFollowCrv_SetCrv(follow, ((STEPGUARD *)goal->pstep)->pcrv, 0);
             VT *vtable = follow->vptr;
             vtable->fn((char *)follow + vtable->delta);
             break;
         }
-        GoalFollowCrv_SetCrv(follow, ((GUARD *)goal->pstep)->crv, 0);
+        GoalFollowCrv_SetCrv(follow, ((STEPGUARD *)goal->pstep)->pcrv, 0);
         break;
     }
     case 6: {
-        OBJ *snap = func_00205438(((GUARD *)goal->pstep), 0xBF);
+        OBJ *snap = func_00205438(((STEPGUARD *)goal->pstep), 0xBF);
         *(QW *)((char *)snap + 0x30) = *(QW *)((char *)goal + 0x80);
         *(QW *)((char *)snap + 0x40) = *(QW *)((char *)goal + 0x90);
         VT *vtable = snap->vptr;

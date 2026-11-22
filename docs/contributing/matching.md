@@ -269,6 +269,20 @@ header (`TGT`, `CRef`), and run `make_whole_files.py --land ADDR --source FILE [
 header change run `make elf` on a clean `build/` or touch the whole files that include it. `link_image.py --fresh` after any failed whole-file attempt:
 a stale seed holds a file back as assembly and `make elf` still prints PASS.
 
+## Levers from the shared-type pass (2026-11-22)
+
+Rewriting matched code onto the shared headers (ROADMAP item 1), measured on the Splice bindings and the class waves:
+- **The frame shows the types.** GCC 2.95 gives a struct or array local its stack slot at its declaration, and a scalar (`int`, `QW`, a pointer)
+  only when its address is first taken, which for a call's out-arguments is after the call's return slot. A binding whose vector sat after its
+  result `CRef` declared it `QW`; as `VECTOR` (a struct) it lands before, as in retail: 33 bindings of `new_100008` moved from score 3 to 31 to 0
+  with that alone (a vector passed by value then goes as `*(QW *)&vec`). A 20-byte type array copies with a plain `lw` tail as `int v[5]`.
+- **One variable for Decref then SetTag.** Retail destroys a result, sets its tag again and copies it out: `ref.Decref(); ref.SetTag(TAGK_Void);
+  return ref;` on one `CRef`, not a second local.
+- **A constructor's argument order is its load order.** `CRef(int n, TAGK tagk)` loads the value first, as retail does (`func_00125510`).
+- **A local copy named after a shared class is often another class.** Check size, vtable at 0xC and the class table: a subclass derives from the
+  shared type and adds fields past its size; a misnamed type gets an honest name (a script object, a 2D affine, a list node); a field inside the
+  base that one function reads on a guessed class goes through a local view (see Rulings).
+
 ## Walls
 
 `config/matching/walls.tsv` is the list: address, name, class (`blocker`, `fragment`, `helper`, `toolchain`, `tie`, `exhausted`), the reason, the evidence and the `unlock` condition.
@@ -459,6 +473,11 @@ What AGENTS.md allows and bans, in one place (the full list with reasons and dat
 - **Game data** (a palette, a header read out of retail) is referenced with an `extern` at retail's address, never defined in source.
 - **One assembler** (`tools/ps2eeas/Ps2EeAs-loop5.exe`: `ps2eeas` with its short-loop constant changed from 6 to 5, docs/build/assembler.md) and one flag set per source file; a function that only matches with something else stays in
   `nonmatching/`.
+- **A field that one function reads on an object whose class is a guess** stays out of the shared headers: the source keeps the shared base
+  type and reads the field through an honestly named local subclass (past the base's size) or local view struct (maintainer, 2026-11-22;
+  `UpdateJtStand`, `ShowReconLinks`).
+- **A static inline wrapper written only to move instructions** is refused, even when it reaches score 0 (`RefOpMatrixLookAt`,
+  `RefOpMatrixTiltUpright`: their local `CRef` stays; maintainer, 2026-11-22).
 - Plain C++ that the original plausibly had is fine: casts, types, statement order, `goto`, a `union` when retail's frame shows two
   locals sharing a slot, a padding-virtual base class to reach a vtable slot.
 

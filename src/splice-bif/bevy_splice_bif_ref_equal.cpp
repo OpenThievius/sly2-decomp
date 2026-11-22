@@ -1,58 +1,46 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
-struct CRef { int tagk; int n; CRef &operator=(const CRef &); };
+#include "cref.h"
 struct CPair { int pad0; int pad4; CRef ref; CPair *next; };
 struct CProc { int pad0; int pad4; int frame; int cArg; int fRest; int pad14; CPair *body; };
 struct CMeth { int pad0; int pad4; int ctx; int fn; };
-extern "C" void CRef_Destruct(CRef *);
 extern "C" void CRef_ConstructPair(CRef *, CPair *);
-extern "C" CRef *bevy_splice_bif_ref_equal(CRef *pref, CRef *refA, CRef *refB)
+extern "C" CRef bevy_splice_bif_ref_equal(CRef *refA, CRef *refB)
 {
     int f;
-    if (refA->tagk != refB->tagk) {
+    if (refA->m_tagk != refB->m_tagk) {
         f = 0;
     } else {
-        switch (refA->tagk) {
+        switch (refA->m_tagk) {
         case 0x1F: {
-            CPair *pairA = (CPair *)refA->n;
-            CPair *pairB = (CPair *)refB->n;
+            CPair *pairA = (CPair *)refA->m_tag.m_n;
+            CPair *pairB = (CPair *)refB->m_tag.m_n;
             if (pairA == pairB) {
                 f = 1;
             } else if ((pairA->next == 0) != (pairB->next == 0)) {
                 f = 0;
             } else {
                 CRef result;
-                result.tagk = -1;
-                {
-                    CRef car;
-                    bevy_splice_bif_ref_equal(&car, &pairA->ref, &pairB->ref);
-                    result = car;
-                    CRef_Destruct(&car);
-                }
-                if (result.n == 0) {
+                result.m_tagk = TAGK_Nil;
+                result = bevy_splice_bif_ref_equal(&pairA->ref, &pairB->ref);
+                if (result.m_tag.m_n == 0) {
                     f = 0;
                 } else if (pairA->next == 0) {
                     f = 1;
                 } else {
                     CRef tailA;
                     CRef tailB;
-                    CRef tail;
                     CRef_ConstructPair(&tailA, pairA->next);
                     CRef_ConstructPair(&tailB, pairB->next);
-                    bevy_splice_bif_ref_equal(&tail, &tailA, &tailB);
-                    result = tail;
-                    CRef_Destruct(&tail);
-                    f = result.n;
-                    CRef_Destruct(&tailB);
-                    CRef_Destruct(&tailA);
+                    result = bevy_splice_bif_ref_equal(&tailA, &tailB);
+                    f = result.m_tag.m_n;
                 }
-                CRef_Destruct(&result);
             }
             break;
         }
         case 0x20: {
-            CProc *procA = (CProc *)refA->n;
-            CProc *procB = (CProc *)refB->n;
+            CProc *procA = (CProc *)refA->m_tag.m_n;
+            CProc *procB = (CProc *)refB->m_tag.m_n;
             if (procA == procB) {
                 f = 1;
             } else if (procA->cArg != procB->cArg || procA->fRest != procB->fRest || procA->frame != procB->frame) {
@@ -60,23 +48,19 @@ extern "C" CRef *bevy_splice_bif_ref_equal(CRef *pref, CRef *refA, CRef *refB)
             } else {
                 CRef bodyA;
                 CRef bodyB;
-                CRef bodies;
                 CRef_ConstructPair(&bodyA, procA->body);
                 CRef_ConstructPair(&bodyB, procB->body);
-                bevy_splice_bif_ref_equal(&bodies, &bodyA, &bodyB);
-                f = bodies.n;
-                CRef_Destruct(&bodies);
-                CRef_Destruct(&bodyB);
-                CRef_Destruct(&bodyA);
+                CRef bodies = bevy_splice_bif_ref_equal(&bodyA, &bodyB);
+                f = bodies.m_tag.m_n;
             }
             break;
         }
         case 0x15: case 0x17: case 0x18: case 0x19: case 0x21:
-            if (refA->n == refB->n) f = 1; else f = 0;
+            if (refA->m_tag.m_n == refB->m_tag.m_n) f = 1; else f = 0;
             break;
         case 0x22: {
-            CMeth *methA = (CMeth *)refA->n;
-            CMeth *methB = (CMeth *)refB->n;
+            CMeth *methA = (CMeth *)refA->m_tag.m_n;
+            CMeth *methB = (CMeth *)refB->m_tag.m_n;
             if (methA == methB) {
                 f = 1;
             } else if (f = 0, methA->ctx == methB->ctx) {
@@ -93,7 +77,5 @@ extern "C" CRef *bevy_splice_bif_ref_equal(CRef *pref, CRef *refA, CRef *refB)
             break;
         }
     }
-    pref->n = f;
-    pref->tagk = 0x17;
-    return pref;
+    return CRef(f, TAGK_Bool);
 }

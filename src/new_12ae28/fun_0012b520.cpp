@@ -13,11 +13,11 @@ extern "C" void func_0012B520(XFSOURCE *psrc, XF *pxf)
 {
     pxf->sub = 2;
     s32 *pvelGoal = (s32 *)&pxf->velGoal;
-    pxf->field_0x84 = 1.0f;
+    pxf->tMax = 1.0f;
     s32 *paccel = pxf->accel;
-    pxf->pfield_0x80 = &pxf->field_0x80;
-    pxf->pfield_0x84 = &pxf->field_0x84;
-    pxf->field_0x80 = 0;
+    pxf->ptMin = &pxf->tMin;
+    pxf->ptMax = &pxf->tMax;
+    pxf->tMin = 0;
     *(VECTOR3 *)&pxf->posGoal = psrc->pos;
     *(QW *)pxf->unknown_0xE0 = pxf->posGoal;
     pvelGoal[2] = 0;

@@ -27,6 +27,7 @@ struct SAVEPATH;
 struct CB;
 struct SWNODE;
 struct PZGRAPH;
+struct SWSTRING;
 
 /* A level load request (SetSwLoadRequest copies one, 0x4C bytes, into the world). func_00165280 and func_0020E180 test and set
    bits 4 and 8 of its first word; func_00165280 also writes 0x44 and 0x48. */
@@ -49,10 +50,12 @@ struct GRFENTRY {
    each one 0x18 bytes on (pcbFirst after the callbacks' heap at 0x3C90, dlWkr after slotheapWkr). PblipgNew reads two fields
    of the blip groups' heap before it allocates: no free slot and a fixed size means no new group. */
 struct SLOTHEAP {
-    u8 unknown_0x0[0xC];
-    /* 0x0C */ void *pslotFree;       /* PblipgNew */
-    u8 unknown_0x10[0x4];
-    /* 0x14 */ s32 cslotMax;          /* PblipgNew: nonzero when the heap may not grow */
+    /* 0x00 */ s32 cb;                /* PvAllocSlotheapImpl: slot size */
+    /* 0x04 */ s32 c;                 /* PvAllocSlotheapImpl: slots per block */
+    /* 0x08 */ s32 cbAlign;           /* PvAllocSlotheapImpl */
+    /* 0x0C */ void *pslotFree;       /* PblipgNew, PvAllocSlotheapImpl, FreeSlotheapPv */
+    /* 0x10 */ s32 cslotUsed;         /* PvAllocSlotheapImpl (++), FreeSlotheapPv (--) */
+    /* 0x14 */ void *pblockCur;       /* PvAllocSlotheapImpl stores the block it allocates; PblipgNew tests it for nonzero */
 };
 
 /* The target interface a candidate of the player's target list points at: its label id at 0x14 and its vtable at 0x20
@@ -165,7 +168,9 @@ struct SW : BASIC {
     /* 0x3FFC */ DL dlHitfx; /* func_00156548 */
     /* 0x4008 */ SLOTHEAP slotheapHitfx; /* func_00156548 */
     /* 0x4020 */ struct BASIC *phitfxdef; /* func_0017A7F8 hands it to PhitfxSpawn, whose Splice binding passes a BASIC */
-    u8 unknown_0x4024[0x18];
+    u8 unknown_0x4024[0x8];
+    /* 0x402C */ s32 field_0x402C; /* ExplodeGadgetBurst passes it to PhitfxSpawn (a hit effect id/def) */
+    u8 unknown_0x4030[0xC];
     /* 0x403C */ SLOTHEAP slotheapRipg; /* PripgNew */
     /* 0x4054 */ SLOTHEAP slotheapRip; /* PripNewRipg */
     /* 0x406C */ struct PRIPG *pripgCached; /* PripgNew */
@@ -183,8 +188,9 @@ struct SW : BASIC {
     u8 unknown_0x45D0[0x68];
     /* 0x4638 */ void *ppool; /* func_0013CF38 */
     u8 unknown_0x463C[0x4];
-    /* 0x4640 */ s32 field_0x4640; /* func_00210BE0, func_00211EC0 test it */
-    u8 unknown_0x4644[0x34];
+    /* 0x4640 */ s32 field_0x4640; /* func_00210BE0, func_00211EC0 test it; LoadSwStringsFromBrx stores the string count */
+    /* 0x4644 */ struct SWSTRING *astring; /* LoadSwStringsFromBrx: the string table, cstring (0x4640) entries of 8 bytes */
+    u8 unknown_0x4648[0x30];
     /* 0x4678 */ s32 ctgt; /* the target list's length: UpdateSwTargetList */
     u8 unknown_0x467C[0x4];
     /* 0x4680 */ TGT atgt[4]; /* the target list: UpdateSwTargetList */
@@ -201,6 +207,8 @@ struct SW : BASIC {
 };
 
 #if defined(__mips__)
+SLY2_OFFSET_CHECK(SW, astring, 0x4644);
+SLY2_OFFSET_CHECK(SW, field_0x402C, 0x402C);
 SLY2_SIZE_CHECK(SLOTHEAP, 0x18);
 SLY2_SIZE_CHECK(LOADREQ, 0x4C);
 SLY2_SIZE_CHECK(GRFENTRY, 0x8);

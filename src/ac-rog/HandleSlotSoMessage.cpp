@@ -16,7 +16,7 @@ extern "C" void HandleSlotSoMessage(SLOTSO *pslotso, int msgid, ACT *pact)
 {
     HandleLoMessage(pslotso, msgid, pact);
     if (msgid == 2 && pact == pslotso->pactAnim) {
-        if (pact->field_0x14 == pslotso->field_0x1A4) {
+        if (pact->field_0x14 == pslotso->aslot[3].field_0x4) {
             SetSlotSoState(pslotso, 4);
         }
     }

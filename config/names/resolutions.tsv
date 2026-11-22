@@ -116,3 +116,4 @@ address	name	reason
 0x13CEF8	PostCrfodbLoad	Sly 2 CRFODB is the pickpocket guard (ATTACHPT, AttachPt_PostLoad); Sly 1 CRFODB is a STEPGUARD with a different body; same name, unrelated class, so the Sly 1 mangled signature is wrong (sly1-ref slice 2)
 0x18ED70	UpdateJtCarryReach	JT cane block: if the cane state is 0, Carry_UpdateReach on the JT at +0x17D0; Sly 1 EnsureAloSfx (NewSfx when psfx is null) is unrelated (sly1-ref slice 2)
 0x1A7E10	FreeSwXpList	sits in the mark module after PxpAdd, frees the XP chain via XP +0xAC; Sly 1 has two same-shape clones, FreeSwMqList (sw.c) and FreeSwXpList (mark.c), and the bsim match took the wrong one; argument is XP* (sly1-ref slice 2)
+0x167310	__7GLOBSET	constructor of the globset embedded at SO+0x80 (every caller passes object+0x80; stores -1 at +0x4C); was __4CRef, which is not CRef (config/us calls it Globset_Construct)

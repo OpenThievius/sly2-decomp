@@ -10,6 +10,7 @@
 #include "ps2inline.h"
 #include "sw.h"
 #include "lo.h"
+#include "jt.h"
 
 struct ITEM { char pad[0x10]; int value; };
 
@@ -33,31 +34,27 @@ extern "C" void AddSeqRecordDestroyThread(JSG *jsg, int value)
     item->value = value;
 }
 
-struct CRef { int tagk; int pad[3]; };
+#include "cref.h"
 
 struct JSGE { char pad[0x10]; int coid; int aoid[4]; };
 
-extern "C" void func_002013D8(CRef *, CRef *, int, int, unsigned *, int *);
+extern "C" CRef func_002013D8(CRef *, int, int, unsigned *, int *);
 
 extern "C" JSGE *PjsgeAllocJsg_1E0310(JSG *, int, int);
-
-extern "C" CRef *CRef_Destruct(CRef *);
 
 extern "C" void *CopyAb__FPvT0Ui_1E0310(void *, void *, unsigned);
 
 extern "C" void AddSeqRecordSync(JSG *pjsg, CRef *prefOids)
 {
     int aoid[8];
-    CRef refResult;
     unsigned coid;
-    func_002013D8(&refResult, prefOids, 6, 8, &coid, aoid);
+    CRef refResult = func_002013D8(prefOids, 6, 8, &coid, aoid);
     JSGE *pjsge = PjsgeAllocJsg_1E0310(pjsg, 3, 0);
     if (coid > 4)
         coid = 4;
     unsigned n = coid;
     pjsge->coid = n;
     CopyAb__FPvT0Ui_1E0310(&pjsge->aoid[0], aoid, n << 2);
-    CRef_Destruct(&refResult);
 }
 
 extern "C" s8 *PjsgeAllocJsg_1E03A0(void *, s32, s32);
@@ -3138,7 +3135,6 @@ extern "C" void func_001E4F20(SEQNODE *pseqnode, LO *plo)
     }
 }
 
-struct PO { char p0[0x1044]; int fLook; float rad; char p1[0x14]; QW look; QW dir; };
 
 extern "C" QW PosLoWorld(LO *);
 
@@ -3148,9 +3144,9 @@ extern QW g_2a2dd0;
 
 extern "C" void func_001E5000(SEQNODE *pseqnode, LO *pso)
 {
-    PO *ppo;
+    JT *ppo;
     if (pseqnode->psubject != 0 && FIsBasicDerivedFrom(pseqnode->psubject, 0x34) != 0)
-        ppo = (PO *)pseqnode->psubject;
+        ppo = (JT *)pseqnode->psubject;
     else
         ppo = 0;
     if (pseqnode->ploLook != 0) {
@@ -3167,7 +3163,7 @@ extern "C" void func_001E5000(SEQNODE *pseqnode, LO *pso)
         if (ppo != 0) {
             ppo->fLook = 1;
             GetSeqnodeObjectPosRad(pseqnode, pso, (VECTOR *)&ppo->look, 0);
-            ((float *)&ppo->look)[2] += ppo->rad;
+            ((float *)&ppo->look)[2] += ppo->field_0x1048;
             ppo->dir = g_2a2dd0;
         }
         pseqnode->ploLook = pso;
@@ -3207,10 +3203,6 @@ done:
     seq->fHandsOff = on;
 }
 
-struct SOVT { char pad[0x298]; short delta; short idx; void (*fn)(void *, int, int); };
-
-struct SO { char pad0[0xC]; SOVT *vt; };
-
 extern "C" int FIsBasicDerivedFrom_1E51A0(void *, int);
 
 extern "C" void AttachSeqnodeObject(SEQNODE *pseqnode, LO *plo, int n1, int n2)
@@ -3227,8 +3219,7 @@ extern "C" void AttachSeqnodeObject(SEQNODE *pseqnode, LO *plo, int n1, int n2)
         pseqnode->an2Attach[pseqnode->cattach] = n2;
         pseqnode->aploAttach[pseqnode->cattach] = plo;
         pseqnode->cattach++;
-        SO *pso = (SO *)plo;
-        pso->vt->fn((char *)pso + pso->vt->delta, n1, n2);
+        ((STEP *)plo)->RetainSmKinds(n1, n2);
     }
 }
 

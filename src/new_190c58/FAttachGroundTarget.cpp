@@ -1,6 +1,9 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
+#include "sw.h"
+// A candidate of the world's target list (SW::atgt, 0x30 bytes) as this function reads it: word 0 an object it passes to
+// FIsBasicDerivedFrom (UpdateSwTargetList reads the same word as an object id, TGT::oid), word 1 a member, word 2 the distance (TGT::sRank).
 struct TARGET { void *plo; void *pmember; float dist; char pad[0x30 - 0xC]; };
-struct SW { char pad[0x4678]; int ctarget; int pad2; TARGET atarget[1]; };
 struct ATTACH { void *pjt; };
 extern SW B_003DD490;
 extern void *g_2e1e40;
@@ -12,9 +15,9 @@ void StartAttach(ATTACH *, int, void *, void *);
 int FAttachGroundTarget(ATTACH *pattach)
 {
     int itarget = 0;
-    int ctarget = B_003DD490.ctarget;
+    int ctarget = B_003DD490.ctgt;
     for (; itarget < ctarget; itarget++) {
-        TARGET *ptarget = &B_003DD490.atarget[itarget];
+        TARGET *ptarget = (TARGET *)&B_003DD490.atgt[itarget];
         if (ptarget->dist > D_FLT_002BF660)
             break;
         void *plo = ptarget->plo;

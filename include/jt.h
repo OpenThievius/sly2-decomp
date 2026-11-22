@@ -13,9 +13,10 @@
 #define SLY2_JT_H
 #include "step.h"
 
-struct GUARD;
+struct STEPGUARD;
 struct LOOT;
 struct SM;
+struct GADGETSTATE;
 
 /* One of the player's three gadget slots: LoadJtGadgetSlots fills gadget from the level data, three 0xC-byte entries. */
 struct GADGETSLOT {
@@ -29,10 +30,10 @@ struct JT : STEP {
     virtual void Slot89();
     virtual void Slot90();
     virtual void Slot91();
-    virtual void Slot92();
+    virtual int Slot92(); /* 92: UpdateJtStand tests the result */
     virtual void Slot93();              /* 93: func_00140EB0; ZapContinue calls it without arguments */
     virtual void Slot94();
-    virtual void SetFocus(int prioNear, struct GUARD *pguardNear, int prioBest, struct GUARD *pguardBest); /* 95: SetJtFocus; UpdateJtFocus */
+    virtual void SetFocus(int prioNear, struct STEPGUARD *pguardNear, int prioBest, struct STEPGUARD *pguardBest); /* 95: SetJtFocus; UpdateJtFocus */
     virtual void PredictLead(float dt, struct LEAD *plead); /* 96: PredictLoLead; GoalAnimLeap_SetState passes a 0x30-byte LEAD */
     virtual void Slot97();              /* 97: func_00141588 */
     virtual void Slot98();              /* 98: func_001409B8 */
@@ -71,7 +72,8 @@ struct JT : STEP {
     /* 0xDFC */ s32 field_0xDFC; /* JT_FLethalHit (86) */
     u8 unknown_0xE00[0xFC];
     /* 0xEFC */ s32 field_0xEFC; /* UpdateJt (16) */
-    u8 unknown_0xF00[0x20];
+    u8 unknown_0xF00[0x1C];
+    /* 0xF1C */ struct SO *field_0xF1C; /* func_001B81B8 (Murray slot 87) sets it to the held object */
     /* 0xF20 */ s32 binocPhase; /* in the binoculars InitJt starts at 0xF00: FInvulnerableJt (76); BindTextBinocReadout */
     u8 unknown_0xF24[0x18];
     /* 0xF3C */ f32 field_0xF3C; /* BindTextBinocReadout, which reads binocPhase too */
@@ -90,12 +92,16 @@ struct JT : STEP {
     u8 unknown_0x1038[0x4];
     /* 0x103C */ f32 field_0x103C; /* InitJt sets 20 */
     /* 0x1040 */ s32 field_0x1040; /* InitBentley sets 0 */
-    u8 unknown_0x1044[0x4];
+    /* 0x1044 */ s32 fLook; /* func_001E5000: set while the seqnode's look target steers it (guess: reader is certain JT, class 0x34 test) */
     /* 0x1048 */ f32 field_0x1048; /* InitJt sets 125; func_00141588 */
     /* 0x104C */ f32 field_0x104C; /* func_00141588 */
-    u8 unknown_0x1050[0x30];
+    u8 unknown_0x1050[0x10];
+    /* 0x1060 */ QW look; /* func_001E5000 */
+    /* 0x1070 */ QW dir; /* func_001E5000 */
     /* 0x1080 */ f32 field_0x1080; /* GetMurrayCpdefi (Murray slot 50) */
-    u8 unknown_0x1084[0x14];
+    u8 unknown_0x1084[0x4];
+    /* 0x1088 */ struct GADGETSTATE *field_0x1088; /* SetMurrayLiftState (guess: one reader) */
+    u8 unknown_0x108C[0xC];
     /* 0x1098 */ f32 field_0x1098; /* InitMurray and InitBentley set -100 */
     /* 0x109C */ f32 field_0x109C; /* InitMurray and InitBentley set 100 */
     /* 0x10A0 */ f32 field_0x10A0; /* InitMurray and InitBentley set 50 */
@@ -138,7 +144,7 @@ struct JT : STEP {
     /* 0x1310 */ s32 field_0x1310; /* bevy_player_input_from_pad_cm */
     /* 0x1314 */ s32 field_0x1314; /* bevy_player_input_from_pad_cm */
     /* 0x1318 */ s32 sidDefault; /* InitJt sets -1; func_00211420 */
-    u8 unknown_0x131C[0x4];
+    u8 field_0x131C[0x4]; /* func_001B6BA8 passes its address */
 };
 
 #if defined(__mips__)
@@ -169,6 +175,9 @@ SLY2_OFFSET_CHECK(JT, field_0x1040, 0x1040);
 SLY2_OFFSET_CHECK(JT, field_0x1048, 0x1048);
 SLY2_OFFSET_CHECK(JT, field_0x104C, 0x104C);
 SLY2_OFFSET_CHECK(JT, field_0x1080, 0x1080);
+SLY2_OFFSET_CHECK(JT, field_0x1088, 0x1088);
+SLY2_OFFSET_CHECK(JT, field_0xF1C, 0xF1C);
+SLY2_OFFSET_CHECK(JT, field_0x131C, 0x131C);
 SLY2_OFFSET_CHECK(JT, field_0x1098, 0x1098);
 SLY2_OFFSET_CHECK(JT, field_0x109C, 0x109C);
 SLY2_OFFSET_CHECK(JT, field_0x10A0, 0x10A0);

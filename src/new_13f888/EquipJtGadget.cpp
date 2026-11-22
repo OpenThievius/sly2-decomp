@@ -1,27 +1,26 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
-struct CRef { int tagk; int n; int pad[2]; };
+#include "cref.h"
+#include "jt.h"
 struct Slot { int gadget; int state; float t; };
-struct JVT { char pad[0x338]; short delta; short idx; void *(*fn)(void *); char pad2[0x348 - 0x340]; short delta2; short idx2; void (*fn2)(void *); };
-struct JtObj { char pad[0xC]; JVT *vt; };
 extern "C" {
-void SetJtGadgetSlotState(void *, Slot *, int);
-void CRef_Destruct(CRef *);
-void func_001D8B20(CRef *, CRef *, void *, const char *, char *, int);
+CRef func_001D8B20(const CRef &value, const char *first, ...);
+void SetJtGadgetSlotState(JT *, Slot *, int);
 int sprintf(char *, const char *, ...);
 extern float g_2dded0[];
 extern const char RO_002A4D50[];
 extern const char RO_002A4D58[];
 }
-void EquipJtGadget(char *jt, unsigned slot, int gadget)
+void EquipJtGadget(JT *jt, unsigned slot, int gadget)
 {
     if (slot < 3) {
-        Slot *equip = (Slot *)(jt + 0x1180 + slot * 0xC);
+        Slot *equip = (Slot *)&jt->aslot[slot];
         SetJtGadgetSlotState(jt, equip, -1);
         equip->gadget = gadget;
         equip->state = 0;
         equip->t = g_2dded0[0];
-        Slot *scan = (Slot *)(jt + 0x1180);
-        Slot *other = (Slot *)(jt + 0x1180);
+        Slot *scan = (Slot *)jt->aslot;
+        Slot *other = (Slot *)jt->aslot;
         for (int index = 0; index < 3; index++, other++) {
             if (index != slot && other->gadget == gadget) {
                 SetJtGadgetSlotState(jt, other, -1);
@@ -29,17 +28,10 @@ void EquipJtGadget(char *jt, unsigned slot, int gadget)
             }
             char name[16];
             sprintf(name, RO_002A4D50, index);
-            CRef result;
-            CRef value;
-            value.tagk = 0x15;
-            value.n = scan->gadget;
+            int value = scan->gadget;
             scan++;
-            JtObj *obj = (JtObj *)jt;
-            func_001D8B20(&result, &value, obj->vt->fn((char *)obj + obj->vt->delta), RO_002A4D58, name, 0);
-            CRef_Destruct(&result);
-            CRef_Destruct(&value);
+            func_001D8B20(CRef(value, TAGK_S32), jt->Slot103(), RO_002A4D58, name, 0);
         }
-        JtObj *obj2 = (JtObj *)jt;
-        obj2->vt->fn2((char *)obj2 + obj2->vt->delta2);
+        jt->Slot105();
     }
 }

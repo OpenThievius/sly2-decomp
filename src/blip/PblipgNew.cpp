@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
 #include "sw.h"
 struct BLIPG;
@@ -13,7 +14,7 @@ void AppendSlEntry(void *, void *);
 BLIPG *PblipgNew(SW *psw)
 {
     if (psw->slotheapBlipg.pslotFree == 0) {
-        if (psw->slotheapBlipg.cslotMax != 0)
+        if (psw->slotheapBlipg.pblockCur != 0)
             return 0;
     }
     BLIPG *pblipg = (BLIPG *)PvAllocSlotheapImpl(&psw->slotheapBlipg);

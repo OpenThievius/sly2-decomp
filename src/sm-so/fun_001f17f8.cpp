@@ -1,19 +1,13 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
-struct VT48 { char pad[0x48]; short delta; short index; void (*fn)(void *); };
-struct VT40 { char pad[0x40]; short delta; short index; void (*fn)(void *); };
+#include "stepguard.h"
 struct RIGOBJ { char pad[0x16C]; void *psma; };
-struct GUARD {
-    char pad0[0x3F4]; char *light0; char *light1; int state; float tState; char pad1[0x90]; RIGOBJ *prig;
-};
 struct CLOCK { float t; float dt; };
 extern "C" CLOCK g_2dded0;
 extern "C" int D_002C3738[];
 extern "C" void SetSmaGoalIfReachable(void *, int);
 
-#define CALL48(light) ((*(VT48 **)((light) + 0xC))->fn((light) + (*(VT48 **)((light) + 0xC))->delta))
-#define CALL40(light) ((*(VT40 **)((light) + 0xC))->fn((light) + (*(VT40 **)((light) + 0xC))->delta))
-
-void func_001F17F8(GUARD *pguard, int state)
+void func_001F17F8(STEPGUARD *pguard, int state)
 {
     if (state == pguard->state)
         return;
@@ -22,17 +16,17 @@ void func_001F17F8(GUARD *pguard, int state)
     switch (state) {
     case -1:
     case 0:
-        if (pguard->light0)
-            CALL48(pguard->light0);
-        if (pguard->light1)
-            CALL48(pguard->light1);
+        if (pguard->field_0x3F4)
+            pguard->field_0x3F4->Remove();
+        if (pguard->field_0x3F8)
+            pguard->field_0x3F8->Remove();
         break;
     case 1:
     case 2:
-        if (pguard->light0)
-            CALL40(pguard->light0);
-        if (pguard->light1)
-            CALL40(pguard->light1);
+        if (pguard->field_0x3F4)
+            pguard->field_0x3F4->Add();
+        if (pguard->field_0x3F8)
+            pguard->field_0x3F8->Add();
         break;
     }
     void *psma = pguard->prig->psma;

@@ -2273,7 +2273,7 @@ address	name	size	file	whole_file	symbol
 0X167150	AddImage__4GIFSi	100	gifs/__4GIFS_file.cpp	gifs/__4GIFS_file.cpp	AddImage__4GIFSi
 0X1671B8	glob__static_initialization_and_destruction_0	308	gifs/__4GIFS_file.cpp	gifs/__4GIFS_file.cpp	glob__static_initialization_and_destruction_0
 0X1672F0	func_001672F0	32	gifs/__4GIFS_file.cpp	gifs/__4GIFS_file.cpp	func_001672F0
-0X167310	__4CRef	16	splice-ref/__4CRef.cpp		
+0X167310	__7GLOBSET	16	splice-ref/__7GLOBSET.cpp		
 0X167320	LoadGlobsetFromBrx	1360	new_167320/LoadGlobsetFromBrx.cpp		
 0X167870	LoadGlobsetBndTreeFromBrx	760	new_167320/LoadGlobsetBndTreeFromBrx_file.cpp	new_167320/LoadGlobsetBndTreeFromBrx_file.cpp	LoadGlobsetBndTreeFromBrx
 0X167FC0	UploadRelightLights	492	new_167320/LoadGlobsetBndTreeFromBrx_file.cpp	new_167320/LoadGlobsetBndTreeFromBrx_file.cpp	UploadRelightLights

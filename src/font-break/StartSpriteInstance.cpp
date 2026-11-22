@@ -1,12 +1,13 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
-struct XF { float a, b, c, d, e, f; float pad[2]; } __attribute__((aligned(16)));
+struct AFFINE2D { float a, b, c, d, e, f; float pad[2]; } __attribute__((aligned(16)));
 struct INST { char pad0[8]; short ilabel; short pause; float t; int key; int unk; };
 struct LABEL { char pad[0x18]; };
-struct SPRITE { int unk0; LABEL *labels; INST *insts; char pad[0x20]; XF *pxf; };
+struct SPRITE { int unk0; LABEL *labels; INST *insts; char pad[0x20]; AFFINE2D *pxf; };
 struct B4 { char b[4]; };
-struct L { XF composed; QW add; QW mul; };
-extern "C" void AdvanceSpriteInstance(LABEL *plabel, int iinst, XF *pxf, QW *padd, QW *pmul, float t);
-void StartSpriteInstance(float t, SPRITE *psprite, int ilabel, int iinst, XF *pxf, B4 *padd, B4 *pmul)
+struct L { AFFINE2D composed; QW add; QW mul; };
+extern "C" void AdvanceSpriteInstance(LABEL *plabel, int iinst, AFFINE2D *pxf, QW *padd, QW *pmul, float t);
+void StartSpriteInstance(float t, SPRITE *psprite, int ilabel, int iinst, AFFINE2D *pxf, B4 *padd, B4 *pmul)
 {
     INST *pinst = psprite->insts + iinst;
     pinst->ilabel = ilabel;
@@ -14,10 +15,10 @@ void StartSpriteInstance(float t, SPRITE *psprite, int ilabel, int iinst, XF *px
     pinst->t = t;
     pinst->pause = 0;
     L l;
-    XF *pxfcall;
+    AFFINE2D *pxfcall;
     if (psprite->pxf) {
-        XF *pv = psprite->pxf;
-        XF tmp;
+        AFFINE2D *pv = psprite->pxf;
+        AFFINE2D tmp;
         float xa = pxf->a, xb = pxf->b, xc = pxf->c, xd = pxf->d, xe = pxf->e, xf = pxf->f;
         tmp.a = xa * pv->a + xb * pv->c;
         tmp.b = xa * pv->b + xb * pv->d;

@@ -1,8 +1,9 @@
-struct SO { char pad[0x70]; unsigned long flags; };
-extern "C" SO *PoxaAllocSo(void);
-extern "C" SO *PoxaAllocLaser(void)
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "oxa.h"
+extern "C" OXA *PoxaAllocSo(void);
+extern "C" OXA *PoxaAllocLaser(void)
 {
-    SO *so = PoxaAllocSo();
-    so->flags |= 0x20;
-    return so;
+    OXA *poxa = PoxaAllocSo();
+    poxa->grf |= 0x20;
+    return poxa;
 }

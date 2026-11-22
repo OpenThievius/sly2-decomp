@@ -95,7 +95,7 @@ void RumbleUnknown1__Fv(void) {
 
 INCLUDE_ASM(0X1D54B8);
 
-struct CRef { int a; union { float g; int n; }; int c; int d; };
+#include "cref.h"
 
 extern int g_2c2d8c;
 
@@ -103,9 +103,7 @@ extern int B_003E0FD8;
 
 extern int B_003D4A60;
 
-extern "C" void RefGetGameSaveValue(CRef *, int, int *);
-
-extern "C" void CRef_Destruct(CRef *);
+extern "C" CRef RefGetGameSaveValue(int, int *);
 
 unsigned int func_001D55B8(void)
 {
@@ -121,10 +119,11 @@ unsigned int func_001D55B8(void)
     default:
         break;
     }
-    CRef ref;
-    RefGetGameSaveValue(&ref, B_003E0FD8, &B_003D4A60);
-    unsigned int on = ref.n;
-    CRef_Destruct(&ref);
+    unsigned int on;
+    {
+        CRef ref = RefGetGameSaveValue(B_003E0FD8, &B_003D4A60);
+        on = ref.m_tag.m_bool;
+    }
     return on ^ 1;
 }
 

@@ -58,11 +58,16 @@ Order: shared types first (item 1), because every match landed on padded local s
 waves. Item numbers are stable: tools and docs cite them.
 
 1. **Shared types** (In Progress). One definition per class in `include/`, typed from what retail's code does, field names keeping
-   their `source:`. A field enters a header when a method of the class reads it, or two readers agree. Left: the goal subclasses,
-   `GUARD`, the `CRef` remainder (195 files), the `aseg` segment type, 24 local `JT`-like structs, 9 Murray/Bentley copies, 48 guard
-   layouts, 288 files with hand-written vtable calls. Editing `include/` changes the scorer fingerprint: do it between waves.
-   Measure: `python3 scripts/check_cleanup.py --all`. Baseline 2026-11-21 (lines in `src/`): 324 local copies of shared types,
-   4,561 padding members, 1,557 cast offsets, 708 `(char *)p + offset`, 402 hand-written vtable calls, 4,463 m2c macros, 614 bare `long`.
+   their `source:`. A field enters a header when a method of the class reads it, or two readers agree. Editing `include/` changes
+   the scorer fingerprint: do it between waves. Measure: `python3 scripts/check_cleanup.py --all`. Baseline 2026-11-21 (lines in
+   `src/`): 324 local copies of shared types, 4,561 padding members, 1,557 cast offsets, 708 `(char *)p + offset`, 402 hand-written
+   vtable calls, 4,463 m2c macros, 614 bare `long`. 2026-11-22, after the class waves (CRef, STEPGUARD, SO/LO/BASIC, PO/JT/MURRAY/XF,
+   SW/SLOTHEAP/STEP/GOAL/BENTLEY) and the closing pass (CRef's frame "wall" was typing: a binding's vector is a `VECTOR`,
+   a struct GCC 2.95 places at its declaration, not a `QW`; misnamed local types renamed, subclasses derived from the shared type,
+   one-reader fields on a guessed class through local views; 0x167310 is GLOBSET's constructor, not CRef's): 3, 4,287, 1,534, 699,
+   362, 4,407, 571. The 3 left are by ruling or measurement: `RefOpMatrixLookAt` and `RefOpMatrixTiltUpright` (only with SetTag
+   wrappers, refused), `RefOpIsMember` (needs a CRef default constructor storing -1, which breaks 328 matched functions). Next: the
+   m2c macros, cast offsets and padding module by module.
 2. **Whole files** (In Progress). Left: `po_screen_210eb0`, `SyncVBlank_file`, `StartupJmt_file`, `PloFindSpawn_file` (one callee or
    global written with several types), `QueueSwCallback_file` and `PsoHitTestLineObjects_file` (compile to another size), and four
    files with per-function flag lists. Then the 826 low-confidence cuts inside a span, checked as item 3's first stage.

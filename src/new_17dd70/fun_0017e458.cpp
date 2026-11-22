@@ -1,7 +1,8 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 struct ROUTE { char pad0[0x120]; int mode; char pad1[0x128 - 0x124]; int pathzone; };
 struct LINK { char pad[0x10]; int zone; };
 #include "phys.h"
-struct GUARD { char pad[0xE8]; PHYS *pphys; };
+#include "step.h"
 #include "goal.h"
 struct GOAL_17E458 : GOAL {
     ROUTE *proute;
@@ -54,7 +55,7 @@ extern "C" void func_0017E458(GOAL_17E458 *pgoal)
                 func_0017E6B0(pgoal, 1);
                 return;
             }
-            pphys = ((GUARD *)pgoal->pstep)->pphys;
+            pphys = pgoal->pstep->pphys;
             plink = 0;
             if (pphys)
                 plink = pphys->plink;
