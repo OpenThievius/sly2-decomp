@@ -1,6 +1,6 @@
 #include "m2c_macros.h"
 
-M2C_UNK __4CRef(s32);                               /* extern */
+M2C_UNK __7GLOBSET(s32);                               /* extern */
 void *__builtin_new(M2C_UNK);                       /* extern */
 extern M2C_UNK D_002CB780;
 extern M2C_UNK D_002D9978;
@@ -12,7 +12,7 @@ void *func_00111E40(void) {
     M2C_FIELD(temp_v0, M2C_UNK **, 0xC) = &D_002D9978;
     M2C_FIELD(temp_v0, s32 *, 0) = 0;
     M2C_FIELD(temp_v0, s32 *, 4) = 0;
-    __4CRef(temp_v0 + 0x80);
+    __7GLOBSET(temp_v0 + 0x80);
     M2C_FIELD(temp_v0, M2C_UNK **, 0xC) = &D_002CB780;
     return temp_v0;
 }

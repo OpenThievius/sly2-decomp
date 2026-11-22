@@ -4,7 +4,7 @@ struct PRIPG { int a; int b; int c; VT *vt; char pad[0x80 - 0x10]; char globset[
 #include "sw.h"
 extern "C" void *PvAllocSlotheapImpl(void *);
 void *memset(void *, int, unsigned int);
-extern "C" void *__4CRef(void *);
+extern "C" void *__7GLOBSET(void *);
 extern "C" void *PdlFromSwCid(SW *, int);
 extern "C" void AppendSlEntry(void *, void *);
 extern char D_002D9978[];
@@ -21,7 +21,7 @@ PRIPG *PripgNew(SW *sw, int mode)
     pripg->a = 0;
     pripg->b = 0;
     pripg->vt = (VT *)D_002D9978;
-    __4CRef(pripg->globset);
+    __7GLOBSET(pripg->globset);
     pripg->mode = mode;
     pripg->vt = (VT *)D_002D77D8;
     AppendSlEntry(PdlFromSwCid(sw, 0x57), pripg);

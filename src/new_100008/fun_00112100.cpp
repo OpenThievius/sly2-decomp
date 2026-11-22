@@ -1,10 +1,12 @@
+#include "types.h"
 // The class declares Virtual0 itself (no inline body): it becomes the key function, so gcc leaves the vtable external instead of emitting its own copy.
 // new() factory of a class with two bases. The primary chain: a base with three words (the first two zeroed) and its
-// vptr at +0xC, then a class holding a CRef at +0x80 (its vptr, retail D_002D9978, is stored before the CRef
+// vptr at +0xC, then a class holding the globset at +0x80 (its vptr, retail D_002D9978, is stored before the globset
 // constructor runs). The second base sits at +0x164 with its vptr at +0x170. The derived class's inline constructor
 // then stores its two vtables (retail D_002D20D0 at +0xC, D_002D2090 at +0x170).
 // Link: gcc names the vtables _vt$16CRefHolder112100, _vt$13CObject112100 and _vt$13CObject112100$16CSecondary112100.
-struct CRef { int tagk; int pad[3]; CRef(); };
+/* the globset an SO embeds at 0x80; its out-of-line constructor is GLOBSET::GLOBSET (0x167310) */
+struct GLOBSET { u8 unknown_0x0[0x4C]; s32 field_0x4C; GLOBSET(); };
 struct CBase112100 {
     int unk0x0;
     int unk0x4;
@@ -14,8 +16,8 @@ struct CBase112100 {
 };
 struct CRefHolder112100 : CBase112100 {
     char pad[0x70];
-    CRef ref;
-    char pad2[0xD4];
+    GLOBSET globset;
+    char pad2[0x94];
     virtual void Virtual0();
 };
 struct CSecondary112100 {
