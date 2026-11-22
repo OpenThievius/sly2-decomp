@@ -1,106 +1,102 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
-struct Owner_14AE38;
-struct Vt_14AE38 { char pad0[0x40]; short d40; short i40; void (*f44)(void *); char pad1[0x118 - 0x48]; short d118; short i118; void (*f11C)(void *, QW); short d120; short i120; void (*f124)(void *, QW); };
-struct Ent_14AE38 { char pad0[0xC]; Vt_14AE38 *vt; char pad1[0x30 - 0x10]; int f30; char pad2[0x38 - 0x34]; int f38; int f3C; int f40; char pad3[0x50 - 0x44]; QW f50; char pad4[0x64 - 0x60]; float f64; int f68; char pad5[0xC0 - 0x6C]; int fC0; char pad6[4]; int fC8; };
-struct Crv_14AE38 { char pad0[0xE8]; int fE8; char pad1[0xF4 - 0xEC]; QW *fF4; };
-struct Owner_14AE38 { char pad0[0xC]; Vt_14AE38 *vt; char pad1[0xF04 - 0x10]; float fF04; };
-struct Goal_14AE38 { char pad0[0x10]; Owner_14AE38 *owner; char pad1[0x18 - 0x14]; char child[0x18]; int state; float t; char pad2[0x44 - 0x38]; char *f44; };
+#include "clock.h"
+#include "crv.h"
+#include "goalpatrol.h"
+#include "sw.h"
 extern "C" {
 float GRandInRange(float, float);
-void GoalFollowCrv_SetCrv(void *, void *, int);
-void Goal_Pop(void *);
-void MeasureCrv(void *);
-QW PosLoWorld(void *);
-int PpoSwFocusBase(void *);
-void SetSoCnstrForce(void *, int);
-void SetSoCnstrTorque(void *, int);
-void *func_0014AE18(void *);
-Ent_14AE38 *func_00205438(void *, int);
-void func_0020AC28(void *, int, int, QW);
-extern char B_003DD490[];
+void GoalFollowCrv_SetCrv(GOALFOLLOWCRV *, CRV *, int);
+void Goal_Pop(GOAL **);
+void MeasureCrv(CRV *);
+QW PosLoWorld(LO *);
+PO *PpoSwFocusBase(SW *);
+void SetSoCnstrForce(SO *, int);
+void SetSoCnstrTorque(SO *, int);
+LO *func_0014AE18(GOALPATROL *);
+GOAL *func_00205438(STEPGUARD *, int);
+void func_0020AC28(STEPGUARD *, int, int, QW);
+extern SW B_003DD490;
 extern QW g_2a2dd0;
-struct CK_14AE38 { float t; };
-extern CK_14AE38 g_2dded0;
-void func_0014AE38(Goal_14AE38 *self, int newState) {
-    int old = self->state;
-    if (newState != old) {
-        switch (old) {
+void func_0014AE38(GOALPATROL *pgoal, int stateNew) {
+    int stateOld = pgoal->state;
+    if (stateNew != stateOld) {
+        switch (stateOld) {
         case 0:
-            func_0020AC28(self->owner, 0, 0, g_2a2dd0);
+            func_0020AC28(GOAL_GUARD(pgoal), 0, 0, g_2a2dd0);
             break;
         case 1:
         case -1:
-            SetSoCnstrForce(self->owner, 1);
-            SetSoCnstrTorque(self->owner, 1);
+            SetSoCnstrForce(GOAL_GUARD(pgoal), 1);
+            SetSoCnstrTorque(GOAL_GUARD(pgoal), 1);
             break;
         case 3: {
-            char *range = self->f44;
+            NOTICE *pnotice = pgoal->pnotice;
             float now = g_2dded0.t;
-            self->owner->fF04 = now + GRandInRange(*(float *)(range + 0x60), *(float *)(range + 0x64));
-            self->f44 = 0;
+            GOAL_GUARD(pgoal)->tCooldown = now + GRandInRange(pnotice->low, pnotice->high);
+            pgoal->pnotice = 0;
             break; }
         }
-        Goal_Pop(self->child);
-        self->state = newState;
-        self->t = g_2dded0.t;
-        switch (newState) {
+        Goal_Pop(&pgoal->pgoalChild);
+        pgoal->state = stateNew;
+        pgoal->tState = g_2dded0.t;
+        switch (stateNew) {
         case 0: {
-            Ent_14AE38 *ent = func_00205438(self->owner, 0x9E);
-            ent->f38 = PpoSwFocusBase(B_003DD490);
-            ent->vt->f44((char *)ent + ent->vt->d40);
+            GOALANIM *pwatch = (GOALANIM *)func_00205438(GOAL_GUARD(pgoal), 0x9E);
+            pwatch->ptarget = PpoSwFocusBase(&B_003DD490);
+            pwatch->Activate();
             {
-                Owner_14AE38 *owner = self->owner;
-                owner->vt->f11C((char *)owner + owner->vt->d118, g_2a2dd0);
-                owner = self->owner;
-                owner->vt->f124((char *)owner + owner->vt->d120, g_2a2dd0);
-                int *zero = (int *)((char *)self->owner + 0x190);
-                zero[2] = 0;
-                zero[1] = 0;
-                zero[0] = 0;
+                STEPGUARD *pguard = GOAL_GUARD(pgoal);
+                pguard->Slot35(g_2a2dd0);
+                pguard = GOAL_GUARD(pgoal);
+                pguard->Slot36(g_2a2dd0);
+                VECTOR *pvelGoal = (VECTOR *)&GOAL_GUARD(pgoal)->velGoal;
+                pvelGoal->z = 0.0f;
+                pvelGoal->y = 0.0f;
+                pvelGoal->x = 0.0f;
             }
             return; }
         case 1: {
-            Crv_14AE38 *crv = *(Crv_14AE38 **)((char *)self->owner + 0x294);
-            crv->fE8 = 2;
-            QW *first = crv->fF4;
-            *first = PosLoWorld(self->owner);
-            QW *second = crv->fF4;
-            second[1] = PosLoWorld(func_0014AE18(self));
-            MeasureCrv(crv);
-            Ent_14AE38 *ent = func_00205438(self->owner, 0xA7);
-            GoalFollowCrv_SetCrv(ent, crv, 0);
-            ent->f64 = 25.0f;
-            ent->fC0 = 8;
-            ent->f40 = 1;
-            ent->fC8 = PpoSwFocusBase(B_003DD490);
-            ent->vt->f44((char *)ent + ent->vt->d40);
-            self->owner->fF04 = g_2dded0.t;
-            SetSoCnstrForce(self->owner, 0);
-            SetSoCnstrTorque(self->owner, 0);
+            CRV *pcrv = (CRV *)GOAL_GUARD(pgoal)->pcrv;
+            pcrv->ccv = 2;
+            QW *first = pcrv->apos;
+            *first = PosLoWorld(GOAL_GUARD(pgoal));
+            QW *second = pcrv->apos;
+            second[1] = PosLoWorld(func_0014AE18(pgoal));
+            MeasureCrv(pcrv);
+            GOALFOLLOWCRVANIM *pfollow = (GOALFOLLOWCRVANIM *)func_00205438(GOAL_GUARD(pgoal), 0xA7);
+            GoalFollowCrv_SetCrv(pfollow, pcrv, 0);
+            pfollow->field_0x64 = 25.0f;
+            pfollow->kind = 8;
+            pfollow->field_0x40 = 1;
+            pfollow->ptarget = PpoSwFocusBase(&B_003DD490);
+            pfollow->Activate();
+            GOAL_GUARD(pgoal)->tCooldown = g_2dded0.t;
+            SetSoCnstrForce(GOAL_GUARD(pgoal), 0);
+            SetSoCnstrTorque(GOAL_GUARD(pgoal), 0);
             return; }
         case 2: {
-            Ent_14AE38 *ent = func_00205438(self->owner, 0xAC);
-            ent->f50 = PosLoWorld(func_0014AE18(self));
-            ent->f68 = 1;
-            ent->vt->f44((char *)ent + ent->vt->d40);
+            GOALJUMP *pjump = (GOALJUMP *)func_00205438(GOAL_GUARD(pgoal), 0xAC);
+            pjump->posTarget = PosLoWorld(func_0014AE18(pgoal));
+            pjump->fTrackTarget = 1;
+            pjump->Activate();
             return; }
         case 3: {
-            Ent_14AE38 *ent = func_00205438(self->owner, 0xA4);
-            ent->f30 = *(int *)((char *)self->owner + 0x38C);
-            ent->f3C = (sptr)self->f44;
-            ent->vt->f44((char *)ent + ent->vt->d40);
-            self->owner->fF04 = 3.4028235e38f;
+            GOALREACT *preact = (GOALREACT *)func_00205438(GOAL_GUARD(pgoal), 0xA4);
+            preact->ptarget = (LO *)GOAL_GUARD(pgoal)->pbasicAlert;
+            preact->pxf = (XF *)pgoal->pnotice;
+            preact->Activate();
+            GOAL_GUARD(pgoal)->tCooldown = 3.4028235e38f;
             return; }
         case 4: {
-            Ent_14AE38 *ent = func_00205438(self->owner, 0x9E);
-            ent->f38 = PpoSwFocusBase(B_003DD490);
-            ent->f3C = 1;
-            ent->vt->f44((char *)ent + ent->vt->d40);
+            GOALANIM *pwatch = (GOALANIM *)func_00205438(GOAL_GUARD(pgoal), 0x9E);
+            pwatch->ptarget = PpoSwFocusBase(&B_003DD490);
+            pwatch->sgs = 1;
+            pwatch->Activate();
             return; }
         case -1:
-            SetSoCnstrForce(self->owner, 0);
-            SetSoCnstrTorque(self->owner, 0);
+            SetSoCnstrForce(GOAL_GUARD(pgoal), 0);
+            SetSoCnstrTorque(GOAL_GUARD(pgoal), 0);
             break;
         }
     }

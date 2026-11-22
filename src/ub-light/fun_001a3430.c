@@ -1,9 +1,10 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "light.h"
 
-M2C_UNK AddLoHierarchy();                           /* extern */
-M2C_UNK RebuildLight(s32);                          /* extern */
+void AddLoHierarchy(struct LIGHT *light);
+void RebuildLight(struct LIGHT *light);
 
-void func_001A3430(s32 arg0) {
-    AddLoHierarchy();
-    RebuildLight(arg0);
+void func_001A3430(struct LIGHT *light) {
+    AddLoHierarchy(light);
+    RebuildLight(light);
 }

@@ -1,23 +1,21 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
-extern "C" {
-M2C_UNK InitDprize();                               /* extern */
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "dprize.h"
 
-void func_001C6508(s8 *arg0) {
-    InitDprize();
-    M2C_FIELD(arg0, f32 *, 0x1D8) = 45.0f;
-    M2C_FIELD(arg0, f32 *, 0x1DC) = 65.0f;
-    M2C_FIELD(arg0, f32 *, 0x1D0) = 250.0f;
-    M2C_FIELD(arg0, f32 *, 0x1D4) = 150.0f;
-    M2C_FIELD(arg0, f32 *, 0x1E0) = 0.5f;
-    M2C_FIELD(arg0, f32 *, 0x1E4) = 0.25f;
-    M2C_FIELD(arg0, f32 *, 0x1A0) = 0.25f;
-    M2C_FIELD(arg0, f32 *, 0x230) = 5.0f;
-    M2C_FIELD(arg0, f32 *, 0x234) = 5.0f;
+extern "C" {
+void InitDprize(DPRIZE *);
+
+// InitDprizeCoin
+void func_001C6508(DPRIZECOIN *pcoin) {
+    InitDprize(pcoin);
+    pcoin->field_0x1D8 = 45.0f;
+    pcoin->field_0x1DC = 65.0f;
+    pcoin->field_0x1D0 = 250.0f;
+    pcoin->field_0x1D4 = 150.0f;
+    pcoin->field_0x1E0 = 0.5f;
+    pcoin->field_0x1E4 = 0.25f;
+    pcoin->field_0x1A0 = 0.25f;
+    pcoin->waitMin = 5.0f;
+    pcoin->waitMax = 5.0f;
 }
 
 }

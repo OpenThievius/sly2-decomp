@@ -1,36 +1,23 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
-struct PadSlot_2432D0 {
-    s32 buffer;
-    s32 pad[3];
-    s32 opened;
-    s32 pad2[2];
-};
-struct PadPort_2432D0 {
-    PadSlot_2432D0 slot[4];
-};
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "pad.h"
 extern "C" {
 s32 func_00239450();
 void func_002394A0();
-char *func_00243270(s32, s32);
-void *memcpy(void *, const void *, u32);
-extern PadPort_2432D0 B_004505D0[];
-s32 scePadRead(s32 arg0, s32 arg1, void *arg2) {
+PADFRAME *func_00243270(s32 port, s32 slot);
+void *memcpy(void *destination, const void *source, u32 size);
+extern PADPORT B_004505D0[];
+s32 scePadRead(s32 port, s32 slot, void *destination) {
     s32 interrupts;
-    char *buffer;
-    if (B_004505D0[arg0].slot[arg1].opened == 0) {
+    PADFRAME *frame;
+    if (B_004505D0[port].slot[slot].opened == 0) {
         return 0;
     }
     interrupts = func_00239450();
-    buffer = func_00243270(arg0, arg1);
-    memcpy(arg2, buffer, *(s32 *)(buffer + 0x60));
+    frame = func_00243270(port, slot);
+    memcpy(destination, frame, frame->length);
     if (interrupts == 1) {
         func_002394A0();
     }
-    return *(s32 *)(buffer + 0x60);
+    return frame->length;
 }
 }

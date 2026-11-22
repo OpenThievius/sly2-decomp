@@ -1,19 +1,12 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later */
 #include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
 extern "C" {
-struct _m2c_stack_sceGsPutIMR {
-    /* 0x00 */ char pad0[0x30];
-};                                                  /* size = 0x30 */
-s32 GsGetIMR();                                     /* extern */
-M2C_UNK GsPutIMR(s32);                              /* extern */
-s32 sceGsPutIMR(s32 arg0) {
-    s32 temp_s1;
-    temp_s1 = GsGetIMR();
-    GsPutIMR(arg0);
-    return temp_s1;
+s32 GsGetIMR();
+s32 GsPutIMR(s32 mask);
+s32 sceGsPutIMR(s32 mask) {
+    s32 previous;
+    previous = GsGetIMR();
+    GsPutIMR(mask);
+    return previous;
 }
 }

@@ -1,20 +1,21 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "sl.h"
+/* a container its cursors watch (named after Vector_Init; not the 3D VECTOR of sly2.h) */
+struct VECTORCONTAINER {
+    s32 serial;
+    SL cursors; /* 0x04, every cursor opened on the vector */
+};
+struct VECTORCURSOR {
+    VECTORCONTAINER *container;
+    u8 unknown_0x4[0x20];
+    s32 serial; /* 0x24, the container's serial when the cursor was opened */
+};
 extern "C" {
-struct _m2c_stack_Vector_Init {
-    /* 0x00 */ char pad0[0x30];
-};                                                  /* size = 0x30 */
+void AppendSlEntry(SL *list, void *entry);
 
-void AppendSlEntry(s32, s8 *);                 /* extern */
-
-void Vector_Init(s8 *arg0, s32 *arg1) {
-    M2C_FIELD(arg0, s32 **, 0) = arg1;
-    AppendSlEntry((sptr)((char *)arg1 + 4), arg0);
-    M2C_FIELD(arg0, s32 *, 0x24) = (s32) *arg1;
+void Vector_Init(VECTORCURSOR *cursor, VECTORCONTAINER *container) {
+    cursor->container = container;
+    AppendSlEntry(&container->cursors, cursor);
+    cursor->serial = container->serial;
 }
-
 }

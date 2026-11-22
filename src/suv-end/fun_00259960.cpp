@@ -1,34 +1,25 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "emitter.h"
 extern "C" {
-struct _m2c_stack_func_00259960 {
-    /* 0x00 */ char pad0[0x20];
-};                                                  /* size = 0x20 */
-
-s32 *func_00259330(s8 *);
-void func_00259830(s8 *, s32);
+EMITPARAMS *func_00259330(EMITTER *, s32);
+void func_00259830(EMITTER *, s32);
 extern s32 B_002DE750;
 
-s32 *func_00259960(s8 *arg0, s32 arg1) {
-    s32 * result;
-    s32 *var_a0;
+s32 *func_00259960(EMITTER *emitter, s32 ensk) {
+    EMITPARAMS *params;
+    s32 *result;
 
-    if (arg1 == 1) {
-        func_00259830(arg0, 1);
-        var_a0 = (s32 *)(M2C_FIELD(arg0, s32 *, 0xE4) + 0xC0);
+    if (ensk == 1) {
+        func_00259830(emitter, 1);
+        params = &emitter->pemitb->params;
     } else {
-        var_a0 = func_00259330(arg0);
+        params = func_00259330(emitter, ensk);
     }
-    if (*var_a0 == 1) {
-        { result = var_a0 + 0xC; goto done; }
+    if (params->kind == 1) {
+        result = &params->payload;
+    } else {
+        result = &B_002DE750;
     }
-    { result = &B_002DE750; goto done; }
-done:
     return result;
 }
-
 }

@@ -1,8 +1,13 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "types.h"
+struct OBJECT3EA8 {
+    u8 unknown_0x0[0x3EA8];
+    s32 field_0x3EA8;
+};
 
-void *func_00210978(void *arg0, s32 arg1) {
-    if (arg1 == 1) {
-        M2C_FIELD(arg0, s32 *, 0x3EA8) = arg1;
+struct OBJECT3EA8 *func_00210978(struct OBJECT3EA8 *object, s32 value) {
+    if (value == 1) {
+        object->field_0x3EA8 = value;
     }
-    return arg0;
+    return object;
 }

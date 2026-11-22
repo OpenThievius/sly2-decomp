@@ -1,8 +1,9 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "hbsk.h"
 
-M2C_UNK func_001CB518();                            /* extern */
+void func_001CB518(struct HBSK *phbsk); /* extern */
 
-void OnHbskPoolClaim(void *arg0) {
-    func_001CB518();
-    M2C_FIELD(arg0, s32 *, 0x17C) = 0;
+void OnHbskPoolClaim(struct HBSK *phbsk) {
+    func_001CB518(phbsk);
+    phbsk->hbsks = 0;
 }

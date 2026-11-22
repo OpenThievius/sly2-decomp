@@ -1,13 +1,16 @@
-#include "m2c_macros.h"
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "stepguard.h"
+#include "goals.h"
+#include "sly2.h"
 extern "C" {
 
-M2C_UNK GoalIdle_SetState(void *, M2C_UNK);         /* extern */
-M2C_UNK Goal_Deactivate(void *);                    /* extern */
-M2C_UNK RemoveGuardSgs(s32, M2C_UNK);               /* extern */
+void GoalIdle_SetState(GOALIDLE *pgoal, int state);
+void Goal_Deactivate(GOAL *pgoal);
+void RemoveGuardSgs(STEPGUARD *pguard, int sgs);
 
-void GoalIdle_Deactivate(void *arg0) {
-    GoalIdle_SetState(arg0, -1);
-    Goal_Deactivate(arg0);
-    RemoveGuardSgs(M2C_FIELD(arg0, s32 *, 0x10), 0x1E);
+void GoalIdle_Deactivate(GOALIDLE *pgoal) {
+    GoalIdle_SetState(pgoal, -1);
+    Goal_Deactivate(pgoal);
+    RemoveGuardSgs((STEPGUARD *)pgoal->pstep, 0x1E);
 }
 }

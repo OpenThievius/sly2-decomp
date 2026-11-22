@@ -1,20 +1,16 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 #include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
+#include "clock.h"
+#include "guard.h"
 extern "C" {
-extern f32 g_2dded0;
 
-void ResetSensorStates(s8 *arg0) {
-    s32 var_a1;
-    s8 *var_v1;
-
-    for (var_a1 = 0; var_a1 < M2C_FIELD(arg0, s32 *, 0xFC); var_a1++) {
-        var_v1 = arg0 + 0x108 + var_a1 * 0x10;
-            M2C_FIELD(var_v1, s32 *, -4) = 0;
-            M2C_FIELD(var_v1, f32 *, 0) = (f32) g_2dded0;
+// retail walks a bare pointer to each entry's tState (aentry[0].tState = 0x108), state sits one word before it;
+// the typed member form (struct member stores) lets the compiler hoist the g_2dded0.t load: best 3 words off
+void ResetSensorStates(SENSOR *sensor) {
+    for (s32 ientry = 0; ientry < sensor->centry; ientry++) {
+        char *entryTime = (char *)&sensor->aentry[0].tState + ientry * sizeof(SENSORENTRY);
+        *(s32 *)(entryTime - 4) = 0;
+        *(f32 *)entryTime = g_2dded0.t;
     }
 }
 

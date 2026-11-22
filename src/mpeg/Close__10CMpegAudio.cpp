@@ -1,20 +1,14 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
-extern "C" {
-M2C_UNK snd_CloseMovieSound();                      /* extern */
-M2C_UNK snd_ContinueAllSoundsInGroup(u32);      /* extern */
-M2C_UNK snd_SetMasterVolume(M2C_UNK, s32);          /* extern */
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "cmpeg.h"
+extern "C" void snd_CloseMovieSound();
+extern "C" void snd_ContinueAllSoundsInGroup(u32);
+extern "C" void snd_SetMasterVolume(int, int);
 
-void Close__10CMpegAudio(s8 *arg0) {
-    M2C_FIELD(arg0, s32 *, 0) = 0;
+void CMpegAudio::Close()
+{
+    state = 0;
     snd_CloseMovieSound();
-    snd_SetMasterVolume(2, M2C_FIELD(arg0, s32 *, 0xA0));
-    snd_SetMasterVolume(0x10, M2C_FIELD(arg0, s32 *, 0xA4));
+    snd_SetMasterVolume(2, volumeMovie);
+    snd_SetMasterVolume(0x10, volumeMusic);
     snd_ContinueAllSoundsInGroup(0xFFFFFFFFu);
-}
-
 }

@@ -1,8 +1,16 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "rip.h"
 
-s128 PosLoWorld(s32);                               /* extern */
+struct LO;
+QW PosLoWorld(struct LO *plo);
 
-void ProjectGlintTransform(void *arg0) {
-    M2C_FIELD(arg0, s128 *, 0x80) = (s128) M2C_FIELD(arg0, s128 *, 0x70);
-    M2C_FIELD(arg0, s128 *, 0x70) = PosLoWorld(M2C_FIELD(arg0, s32 *, 0xF0));
+/* a GLINT follows an object: its RIP is followed by the object at 0xF0 */
+struct GLINT {
+    struct RIP rip;
+    struct LO *plo; /* ProjectGlintTransform */
+};
+
+void ProjectGlintTransform(struct GLINT *glint) {
+    glint->rip.posPrev = glint->rip.pos;
+    glint->rip.pos = PosLoWorld(glint->plo);
 }

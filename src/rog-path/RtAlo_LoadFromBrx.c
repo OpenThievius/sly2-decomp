@@ -1,7 +1,8 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "types.h"
 
-M2C_UNK LoadXfmFromBrx();                           /* extern */
+void LoadXfmFromBrx(void *prtalo, void *pbis);
 
-void RtAlo_LoadFromBrx(void) {
-    LoadXfmFromBrx();
+void RtAlo_LoadFromBrx(void *prtalo, void *pbis) {
+    LoadXfmFromBrx(prtalo, pbis);
 }

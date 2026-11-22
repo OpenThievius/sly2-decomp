@@ -1,27 +1,28 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "bentleyview.h"
+#include "clock.h"
 
-M2C_UNK GetJtCpdefi(void *, s32 *);                 /* extern */
-M2C_UNK func_0019EA00(void *, s32 *);               /* extern */
-extern f32 g_2dded0;
+void GetJtCpdefi(void *pbentley, s32 *pgrf);
+void func_0019EA00(void *ppipe, s32 *pgrf);
 
-void GetBentleyCpdefi(void *arg0, s32 *arg1) {
-    s32 temp_v1;
-    s32 temp_v1_2;
+void GetBentleyCpdefi(struct BENTLEYVIEW *pbentley, s32 *pgrf) {
+    s32 stateBefore;
+    s32 stateAfter;
 
-    temp_v1 = M2C_FIELD(arg0, s32 *, 0x13D0);
-    if (temp_v1 != 0) {
-        if ((temp_v1 != 9) && (M2C_FIELD(arg0, s32 *, 0x4CC) != 0)) {
-            M2C_FIELD(arg0, f32 *, 0x1080) = (f32) g_2dded0;
+    stateBefore = pbentley->state;
+    if (stateBefore != 0) {
+        if ((stateBefore != 9) && (pbentley->field_0x4CC != 0)) {
+            pbentley->field_0x1080 = (f32) g_2dded0.t;
         }
     }
-    GetJtCpdefi(arg0, arg1);
-    temp_v1_2 = M2C_FIELD(arg0, s32 *, 0x13D0);
-    switch (temp_v1_2) {                            /* irregular */
+    GetJtCpdefi(pbentley, pgrf);
+    stateAfter = pbentley->state;
+    switch (stateAfter) {
     case 13:
-        func_0019EA00(arg0 + 0xF50, arg1);
+        func_0019EA00(pbentley->pipe, pgrf);
         return;
     case 5:
-        *arg1 |= 1;
+        *pgrf |= 1;
         return;
     }
 }

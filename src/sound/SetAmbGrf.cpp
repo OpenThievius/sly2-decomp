@@ -1,23 +1,23 @@
-#include "types.h"
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "amb.h"
 extern "C" {
-s32 ActivateAmb(s8 *, s32, s32);
-s32 DeactivateAmb(s8 *, s32, s32);
+void ActivateAmb(AMB *);
+void DeactivateAmb(AMB *);
 
-void SetAmbGrf(s8 *arg0, s32 arg1, s32 arg2) {
-    s32 temp_a1;
-    u16 temp_v0;
-    s32 temp_a2;
+void SetAmbGrf(AMB *pamb, s32 grfMask, s32 grfValue)
+{
+    s32 mask;
+    s32 value;
+    u16 grf;
 
-    temp_a1 = arg1 & 0xFFFF;
-    temp_a2 = (u16) arg2 & temp_a1;
-    temp_v0 = (M2C_FIELD(arg0, u16 *, 0x50) & ~temp_a1) | temp_a2;
-    M2C_FIELD(arg0, u16 *, 0x50) = temp_v0;
-    if (temp_v0 != 0) {
-        ActivateAmb(arg0, temp_a1, temp_a2);
+    mask = grfMask & 0xFFFF;
+    value = (u16)grfValue & mask;
+    grf = (pamb->grf & ~mask) | value;
+    pamb->grf = grf;
+    if (grf != 0) {
+        ActivateAmb(pamb);
         return;
     }
-    DeactivateAmb(arg0, temp_a1, temp_a2);
+    DeactivateAmb(pamb);
 }
-
 }

@@ -1,7 +1,8 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "types.h"
 
-extern M2C_UNK D_002BAD68;
+extern u8 D_002BAD68[];
 
-M2C_UNK *func_002599C8(void) {
-    return &D_002BAD68;
+u8 *func_002599C8(void) {
+    return D_002BAD68;
 }

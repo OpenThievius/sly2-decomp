@@ -1,27 +1,24 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "hitfx.h"
+#include "sw.h"
 extern "C" {
-M2C_UNK Basic_FreeSubscribers(s8 *);              /* extern */
-M2C_UNK CFramePtr_Assign(s8 *, M2C_UNK);                  /* extern */
-M2C_UNK FreeSlotheapPv(M2C_UNK *, s8 *);          /* extern */
-M2C_UNK SidebagPtr_Assign(s8 *, M2C_UNK);         /* extern */
-extern M2C_UNK B_003E1498;
+void Basic_FreeSubscribers(BASIC *);
+void CFramePtr_Assign(void *, int);
+void FreeSlotheapPv(SLOTHEAP *, void *);
+void SidebagPtr_Assign(CSidebag **, int);
+extern SLOTHEAP B_003E1498;
 
-void HitFx_Release(s8 *arg0) {
-    s32 temp_v0;
+void HitFx_Release(HITFX *pfx)
+{
+    s32 cRef;
 
-    temp_v0 = M2C_FIELD(arg0, s32 *, 0x10) - 1;
-    M2C_FIELD(arg0, s32 *, 0x10) = temp_v0;
-    if (temp_v0 <= 0) {
-        CFramePtr_Assign(arg0, 0);
-        SidebagPtr_Assign(arg0 + 4, 0);
-        Basic_FreeSubscribers(arg0);
-        FreeSlotheapPv(&B_003E1498, arg0);
+    cRef = pfx->cRef - 1;
+    pfx->cRef = cRef;
+    if (cRef <= 0) {
+        CFramePtr_Assign(pfx, 0);
+        SidebagPtr_Assign(&pfx->psidebag, 0);
+        Basic_FreeSubscribers(pfx);
+        FreeSlotheapPv(&B_003E1498, pfx);
     }
 }
-
 }

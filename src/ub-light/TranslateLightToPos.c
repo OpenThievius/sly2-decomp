@@ -1,9 +1,10 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "light.h"
 
-M2C_UNK RebuildLight(s32);                          /* extern */
-M2C_UNK TranslateXfmToPos();                        /* extern */
+void RebuildLight(struct LIGHT *light);
+void TranslateXfmToPos(struct LIGHT *light);
 
-void TranslateLightToPos(s32 arg0) {
-    TranslateXfmToPos();
-    RebuildLight(arg0);
+void TranslateLightToPos(struct LIGHT *light) {
+    TranslateXfmToPos(light);
+    RebuildLight(light);
 }

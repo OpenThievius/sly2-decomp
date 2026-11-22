@@ -1,9 +1,11 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "script.h"
 
-M2C_UNK func_00171CF8(s32, s32);                    /* extern */
+struct STEPGUARD;
+void func_00171CF8(struct STEPGUARD *pguard, s32 arg);
 
-void RunGuardScriptIfActor(s32 arg0, s32 arg1) {
-    if (arg1 != 0) {
-        func_00171CF8(arg1, arg0);
+void RunGuardScriptIfActor(s32 arg, struct STEPGUARD *pguard) {
+    if (pguard != 0) {
+        func_00171CF8(pguard, arg);
     }
 }

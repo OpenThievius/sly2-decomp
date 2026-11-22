@@ -1,5 +1,6 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "crv.h"
 
-f32 SMinCrv(void *arg0) {
-    return *M2C_FIELD(arg0, f32 **, 0xF0);
+f32 SMinCrv(struct CRV *crv) {
+    return crv->as[0];
 }

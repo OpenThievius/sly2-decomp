@@ -1,18 +1,17 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "goals.h"
+#include "sly2.h"
 
-M2C_UNK AddGuardSgs(s32, s32);                      /* extern */
-M2C_UNK GoalGoto_Replan(void *);                    /* extern */
-M2C_UNK GoalGoto_SetState(void *, M2C_UNK);         /* extern */
-M2C_UNK func_001EEF70(void *);                      /* extern */
+void AddGuardSgs(void *pguard, s32 sgs);
+void GoalGoto_Replan(struct GOALGOTO *pgoal);
+void GoalGoto_SetState(struct GOALGOTO *pgoal, s32 state);
+void func_001EEF70(struct GOALGOTO *pgoal);
 
-void GoalGoto_Activate(void *arg0) {
-    s32 temp_a1;
-
-    temp_a1 = M2C_FIELD(arg0, s32 *, 0x38);
-    if (temp_a1 != -1) {
-        AddGuardSgs(M2C_FIELD(arg0, s32 *, 0x10), temp_a1);
+void GoalGoto_Activate(struct GOALGOTO *pgoal) {
+    if (pgoal->field_0x38 != -1) {
+        AddGuardSgs(pgoal->pstep, pgoal->field_0x38);
     }
-    func_001EEF70(arg0);
-    GoalGoto_SetState(arg0, 4);
-    GoalGoto_Replan(arg0);
+    func_001EEF70(pgoal);
+    GoalGoto_SetState(pgoal, 4);
+    GoalGoto_Replan(pgoal);
 }

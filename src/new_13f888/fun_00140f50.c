@@ -1,7 +1,8 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "jtview.h"
 
-M2C_UNK ZapTakeDamage(s32);                         /* extern */
+void ZapTakeDamage(void *pvZap);
 
-void func_00140F50(s32 arg0) {
-    ZapTakeDamage(arg0 + 0xDF0);
+void func_00140F50(struct JTVIEW *pjt) {
+    ZapTakeDamage(pjt->zap);
 }

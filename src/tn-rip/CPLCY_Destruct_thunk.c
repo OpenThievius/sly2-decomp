@@ -1,6 +1,7 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "cplcy.h"
 
-M2C_UNK CPLCY_Destruct();                           /* extern */
+void CPLCY_Destruct(void);
 
 void CPLCY_Destruct_thunk(void) {
     CPLCY_Destruct();

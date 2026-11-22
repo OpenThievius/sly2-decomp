@@ -1,7 +1,10 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "types.h"
 
-M2C_UNK func_00154A80(M2C_UNK *);                   /* extern */
-extern M2C_UNK B_002DE578;
+struct DIFFICULTY;
+
+void func_00154A80(struct DIFFICULTY *pdifficulty);
+extern struct DIFFICULTY B_002DE578;
 
 void ClearDifficultySuckPaths_thunk(void) {
     func_00154A80(&B_002DE578);

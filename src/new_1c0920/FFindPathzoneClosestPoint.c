@@ -1,7 +1,8 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "pathzone.h"
 
-M2C_UNK FFindClosestPointInCg(s32);                 /* extern */
+s32 FFindClosestPointInCg(struct CG *pcg, QW pos, QW *pposOut);
 
-void FFindPathzoneClosestPoint(s32 arg0) {
-    FFindClosestPointInCg(arg0 + 0xE0);
+s32 FFindPathzoneClosestPoint(struct PATHZONE *pzone, QW pos, QW *pposOut) {
+    return FFindClosestPointInCg(&pzone->cg, pos, pposOut);
 }

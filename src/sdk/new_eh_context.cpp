@@ -1,24 +1,17 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "ehcontext.h"
 extern "C" {
-struct _m2c_stack_new_eh_context {
-    /* 0x00 */ char pad0[0x20];
-};                                                  /* size = 0x20 */
-M2C_UNK __terminate(void);                        /* extern */
-s8 *malloc(M2C_UNK);                              /* extern */
-M2C_UNK memset(s8 *, M2C_UNK, M2C_UNK);           /* extern */
-s8 *new_eh_context(void) {
-    s8 *temp_v0;
-    temp_v0 = malloc(0x18);
-    if (temp_v0 == NULL) {
+void __terminate(void);
+void *malloc(u32 size);
+void *memset(void *destination, s32 value, u32 size);
+EHCONTEXTBLOCK *new_eh_context(void) {
+    EHCONTEXTBLOCK *block;
+    block = (EHCONTEXTBLOCK *)malloc(0x18);
+    if (block == 0) {
         __terminate();
     }
-    memset(temp_v0, 0, 0x18);
-    M2C_FIELD(temp_v0, s8 **, 4) = (s8 *) (temp_v0 + 0x10);
-    return temp_v0;
+    memset(block, 0, 0x18);
+    block->context.dynamicHandlerChain = block->handlerChain;
+    return block;
 }
 }

@@ -1,8 +1,9 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "swview.h"
 
-M2C_UNK UpdateSwFog();                              /* extern */
+void UpdateSwFog(struct SWVIEW *psw);
 
-void func_0020F2F8(void *arg0, f32 fparg0) {
-    M2C_FIELD(arg0, f32 *, 0x3E20) = fparg0;
-    UpdateSwFog();
+void func_0020F2F8(struct SWVIEW *psw, f32 scale) {
+    psw->scaleFog = scale;
+    UpdateSwFog(psw);
 }

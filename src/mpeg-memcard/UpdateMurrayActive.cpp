@@ -1,8 +1,14 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // UpdateMurrayActive: per-frame state update of Murray's active states.
 #include "murray.h"
-struct JOY { char pad0[0x1C]; float uStick; char pad1[0x30 - 0x20]; unsigned grfbtn; };
-struct JMP_1B4AA0 { char pad0[4]; int state; char pad1[0x2DC - 0x2C8]; int cjump; };
+#include "joy.h"
+/* The player's jump part (InitJmp, at 0x2C0 of the player); only the words this update reads. */
+struct JMP {
+    u8 unknown_0x0[0x4];
+    s32 state;
+    u8 unknown_0x8[0x14];
+    s32 cjump;
+};
 
 extern "C" {
 extern float g_2dded0;
@@ -50,18 +56,18 @@ void UpdateMurrayActive(MURRAY *pmurray)
             if (g_2dded0 - pmurray->tJump > 0.1f) {
                 switch (pmurray->state) {
                 case 5:
-                    SetJmpState(((char *)pmurray + 0x2C0), 16, 0, 0);
+                    SetJmpState(pmurray->PvJmp(), 16, 0, 0);
                     break;
                 case 12:
                     if (pmurray->field_0x1840 == 3)
-                        SetJmpState(((char *)pmurray + 0x2C0), 11, 0, 0);
+                        SetJmpState(pmurray->PvJmp(), 11, 0, 0);
                     break;
                 case 13:
                     if (pmurray->attachKind != 1 && pmurray->attachKind != 12)
-                        SetJmpState(((char *)pmurray + 0x2C0), 0, 0, 0);
+                        SetJmpState(pmurray->PvJmp(), 0, 0, 0);
                     break;
                 default:
-                    SetJmpState(((char *)pmurray + 0x2C0), 0, 0, 0);
+                    SetJmpState(pmurray->PvJmp(), 0, 0, 0);
                     break;
                 }
             }
@@ -73,7 +79,7 @@ void UpdateMurrayActive(MURRAY *pmurray)
             if (!(pmurray->pjoy->grfbtn & 8) && FJtInFocusRange(pmurray, 0)) {
                 SetMurrayState(pmurray, 9);
             } else if (FButtonPressedWithin(pmurray->pjoy, 0x40, 0.1f)) {
-                SetJmpState(((char *)pmurray + 0x2C0), 1, 0, 0);
+                SetJmpState(pmurray->PvJmp(), 1, 0, 0);
             } else if (GrfbtnVjoyPressedWithin(pmurray->pjoy, 0x400, 0.15f) &&
                        pmurray->FCanUseGadget(3)) {
                 ClearVjoyPresses(pmurray->pjoy, 0x400);
@@ -83,7 +89,7 @@ void UpdateMurrayActive(MURRAY *pmurray)
                 StartMurrayAttackB(pmurray);
             } else if (!FMurrayTryGrabGuard(pmurray)) {
                 if (FButtonPressedWithin(pmurray->pjoy, 0x20, 0.2f)) {
-                    if (!FAttachGroundTarget(((char *)pmurray + 0x4C0), 0xF8FA, 0) && pmurray->field_0x13EC) {
+                    if (!FAttachGroundTarget(pmurray->PvAttach(), 0xF8FA, 0) && pmurray->field_0x13EC) {
                         pmurray->field_0x144C = 0;
                         SetMurrayState(pmurray, 4);
                     }
@@ -104,14 +110,14 @@ void UpdateMurrayActive(MURRAY *pmurray)
             }
             break;
         case 2: {
-            UpdateJmpBodyState(((char *)pmurray + 0x2C0));
-            switch (((JMP_1B4AA0 *)((char *)pmurray + 0x2C0))->state) {
+            UpdateJmpBodyState(pmurray->PvJmp());
+            switch (((JMP *)((char *)pmurray + 0x2C0))->state) {
             case 0: case 11: case 15: case 16:
                 break;
             default:
                 if (GrfbtnVjoyPressedWithin(pmurray->pjoy, 0x90, D_002C08DC) &&
                     pmurray->FCanUseGadget(2)) {
-                    int cjump = ((JMP_1B4AA0 *)((char *)pmurray + 0x2C0))->cjump;
+                    int cjump = ((JMP *)((char *)pmurray + 0x2C0))->cjump;
                     if (cjump < 6) {
                         if (cjump > 0 && !FJtLandsWithin(pmurray, D_002C08E0)) {
                             ClearVjoyPresses(pmurray->pjoy, 0x90);
@@ -125,7 +131,7 @@ void UpdateMurrayActive(MURRAY *pmurray)
             break;
         }
         case 13:
-            UpdateAttachInput(((char *)pmurray + 0x4C0));
+            UpdateAttachInput(pmurray->PvAttach());
             break;
         case 14:
             UpdateZap(((char *)pmurray + 0xDF0));
@@ -159,7 +165,7 @@ void UpdateMurrayActive(MURRAY *pmurray)
             CarryThrow_Update(((char *)pmurray + 0x1910));
             break;
         case 20:
-            UpdateJtActivePipe(((char *)pmurray + 0xF50));
+            UpdateJtActivePipe(pmurray->PvPipe());
             break;
         case 17:
             if (pmurray->field_0x1030 && FAsegaGone(pmurray->field_0x1030))
@@ -169,7 +175,7 @@ void UpdateMurrayActive(MURRAY *pmurray)
             break;
         case 21:
             if (FButtonPressedWithin(pmurray->pjoy, 0x40, 0.0f))
-                SetJmpState(((char *)pmurray + 0x2C0), 13, 0, 0);
+                SetJmpState(pmurray->PvJmp(), 13, 0, 0);
             else if (!(pmurray->pjoy->grfbtn & GrfbtnJtGadget(pmurray, 0x10)))
                 SetMurrayState(pmurray, 0);
             break;

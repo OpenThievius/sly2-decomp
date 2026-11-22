@@ -1,6 +1,5 @@
-#include "m2c_macros.h"
-
-M2C_UNK Menu_Reset();                               /* extern */
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+void Menu_Reset(void);
 
 void MemcardMenu_Reset(void) {
     Menu_Reset();

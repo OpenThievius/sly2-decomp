@@ -1,16 +1,13 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "slotso.h"
 extern "C" {
-void ApplyAsegToHandle(M2C_UNK, M2C_UNK, M2C_UNK, s32, f32, f32); /* extern */
-void RemoveSoLoHierarchy();                      /* extern */
+/* handle is the address of an ACT pointer: the animation act is an ASEGA (HandleSlotSoMessage compares message acts with it) */
+void ApplyAsegToHandle(struct ASEG *paseg, int paloRoot, int grfapl, struct ACT **handle, float tLocal, float svtLocal);
+void RemoveSoLoHierarchy(SO *pso);
 
-void func_001B0C68(s32 arg0) {
-    RemoveSoLoHierarchy();
-    ApplyAsegToHandle(0, 0, 0, 0x1C4 + arg0, 0, 0);
+void func_001B0C68(SLOTSO *pso) {
+    RemoveSoLoHierarchy(pso);
+    ApplyAsegToHandle(0, 0, 0, &pso->pactAnim, 0, 0);
 }
 
 }

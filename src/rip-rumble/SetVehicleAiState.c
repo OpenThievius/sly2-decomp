@@ -1,10 +1,10 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "vehicle.h"
+#include "clock.h"
 
-extern f32 g_2dded0;
-
-void SetVehicleAiState(void *arg0, s32 arg1) {
-    if (arg1 != M2C_FIELD(arg0, s32 *, 0x188)) {
-        M2C_FIELD(arg0, s32 *, 0x188) = arg1;
-        M2C_FIELD(arg0, f32 *, 0x18C) = (f32) g_2dded0;
+void SetVehicleAiState(struct VEHICLE *vehicle, s32 aiState) {
+    if (aiState != vehicle->aiState) {
+        vehicle->aiState = aiState;
+        vehicle->tAiState = g_2dded0.t;
     }
 }

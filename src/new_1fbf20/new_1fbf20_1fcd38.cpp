@@ -9,37 +9,7 @@
 #include "bis.h"
 #include "alloc.h"
 
-struct CLQ { float a; float b; float c; };
-
-struct SND {
-    int unk0;
-    int unk4;
-    char pad0[4];
-    int vtable;
-    int unk10;
-    char pad1[8];
-    char heapA[0x18];
-    char heapB[0x18];
-    char dl[0xC];
-    int unk58;
-    char pad2[12];
-    int unk68;
-    char pad3[20];
-    CLQ fitA;
-    char pad4[4];
-    CLQ fitB;
-    char pad5[104];
-    int unk104;
-    char pad6[12];
-    CLQ clqA;
-    CLQ clqB;
-    CLQ clqC;
-    char pad7[200];
-    int unk200;
-    char pad8[4];
-    int words[8];
-    int unk228;
-};
+#include "sndsystem.h"
 
 extern "C" char D_002CA510[];
 
@@ -49,45 +19,45 @@ extern "C" const float RO_FLT_002A83C0[2];
 
 extern "C" void CreateSlotheapSwAlign(void *, int, int, int);
 
-extern "C" void InitDl__FP2DLi(void *, int);
+extern "C" void InitDl__FP2DLi(DL *, int);
 
 extern "C" void FitClq__FffffP3CLQ(float, float, float, float, CLQ *);
 
 // Two choices. CLQ is three floats (no `*(float *)&b` pun). The rodata tables RO_FLT_002A83B8/C0 are `const`, as they are in retail's
 // rodata: that makes their loads independent of the `c = 0.25f` store, so the scheduler puts the store after the three argument loads. The
 // clqA/clqB/clqC pointer locals are needed (every access through psnd-> scores 42).
-extern "C" SND *func_001FCD38(SND *psnd)
+extern "C" SNDSYSTEM *func_001FCD38(SNDSYSTEM *psnd)
 {
-    psnd->unk0 = 0;
-    psnd->unk4 = 0;
-    psnd->vtable = (sptr)D_002CA510;
-    CreateSlotheapSwAlign(psnd->heapA, 0x70, 0x80, 0x10);
-    CreateSlotheapSwAlign(psnd->heapB, 0x3C0, 0x10, 0x10);
-    psnd->unk200 = 0;
+    psnd->field_0x0 = 0;
+    psnd->field_0x4 = 0;
+    psnd->vtable = D_002CA510;
+    CreateSlotheapSwAlign(&psnd->heapAmb, 0x70, 0x80, 0x10);
+    CreateSlotheapSwAlign(&psnd->heapStreamAmb, 0x3C0, 0x10, 0x10);
+    psnd->field_0x200 = 0;
     int *word = psnd->words;
     int count = 7;
     do { *word++ = 0; } while (--count != -1);
-    psnd->unk228 = 0;
-    InitDl__FP2DLi(psnd->dl, 0x38);
+    psnd->field_0x228 = 0;
+    InitDl__FP2DLi(&psnd->dl, 0x38);
     CLQ *clqC = &psnd->clqC;
     CLQ *clqB = &psnd->clqB;
     CLQ *clqA = &psnd->clqA;
-    psnd->clqC.a = 1.0f;
-    psnd->unk68 = 3;
-    psnd->unk10 = 0;
-    psnd->unk104 = 0;
-    clqC->b = 0.0f;
-    clqC->c = 0.25f;
-    psnd->clqB.a = 1.0f;
-    clqB->b = 0.0f;
-    clqB->c = 0.25f;
-    psnd->clqA.a = 3.0f;
-    clqA->b = 0.0f;
-    clqA->c = 0.25f;
-    float seed = clqA->b;
+    psnd->clqC.g0 = 1.0f;
+    psnd->field_0x68 = 3;
+    psnd->field_0x10 = 0;
+    psnd->field_0x104 = 0;
+    clqC->g1 = 0.0f;
+    clqC->g2 = 0.25f;
+    psnd->clqB.g0 = 1.0f;
+    clqB->g1 = 0.0f;
+    clqB->g2 = 0.25f;
+    psnd->clqA.g0 = 3.0f;
+    clqA->g1 = 0.0f;
+    clqA->g2 = 0.25f;
+    float seed = clqA->g1;
     FitClq__FffffP3CLQ(seed, RO_FLT_002A83B8[1], 0.5f, RO_FLT_002A83B8[0], &psnd->fitA);
     FitClq__FffffP3CLQ(seed, RO_FLT_002A83C0[1], 0.5f, RO_FLT_002A83C0[0], &psnd->fitB);
-    psnd->unk58 = 0;
+    psnd->field_0x58 = 0;
     return psnd;
 }
 
@@ -99,19 +69,17 @@ extern "C" long TickReadCount(void *);
 
 extern "C" char g_2dded0[];
 
-struct SNDMGR { char pad[0x13C]; float grid[8][4]; float f1BC; float mix[4]; char pad2[0x20]; long t1F0; long t1F8; };
-
-extern "C" SNDMGR B_003DD040;
+extern "C" SNDSYSTEM B_003DD040;
 
 void InitSndSystem()
 {
     snd_StartSoundSystem(2);
     func_00233048(0x524B5553, 0L, 0L, 0L, 0L, 0L, 0L);
-    B_003DD040.f1BC = 1.0f;
+    B_003DD040.field_0x1BC = 1.0f;
     int i; int j; for (i = 0; i < 4; i++) { B_003DD040.mix[i] = 1.0f; for (j = 7; j >= 0; j--) B_003DD040.grid[j][i] = 1.0f; }
     long t = TickReadCount(g_2dded0);
-    B_003DD040.t1F0 = t;
-    B_003DD040.t1F8 = t;
+    B_003DD040.now = t;
+    B_003DD040.prev = t;
 }
 
 extern "C" void func_001FCF70(int arg0, long arg1) {
@@ -126,47 +94,53 @@ extern "C" void func_001FCF88(int arg0, long arg1) {
     *(int *)(target + 0xA0) = 0;
 }
 
-struct REC { char pad[0x40]; int id; REC *next; };
-
-struct MGR { char pad[0xEC]; REC *first; };
-
-extern "C" REC *func_001FCFA0(MGR *pmgr, int id)
+extern "C" SNDENT *func_001FCFA0(SNDSYSTEM *psnd, int id)
 {
-    for (REC *rec = pmgr->first; rec != 0; rec = rec->next) {
+    for (SNDENT *ent = psnd->ents; ent != 0; ent = ent->next) {
+        if (ent->id == id) return ent;
+    }
+    return 0;
+}
+
+extern "C" SNDENT *func_001FCFA0_1FCFD0(SNDSYSTEM *, int);
+
+extern "C" float FFindLevel(SNDSYSTEM *psnd, int id)
+{
+    SNDENT *ent = func_001FCFA0_1FCFD0(psnd, id);
+    if (ent == 0) return 0.0f;
+    return ent->level;
+}
+
+extern "C" SNDREC *func_001FCFF8(SNDSYSTEM *psnd, int id)
+{
+    for (SNDREC *rec = psnd->recs; rec != 0; rec = rec->next) {
         if (rec->id == id) return rec;
     }
     return 0;
 }
 
-struct REC_1FCFD0 { char pad[0x50]; float dt; };
-
-struct MGR;
-
-extern "C" REC_1FCFD0 *func_001FCFA0_1FCFD0(MGR *, int);
-
-extern "C" float FFindLevel(MGR *pmgr, int id)
-{
-    REC_1FCFD0 *rec = func_001FCFA0_1FCFD0(pmgr, id);
-    if (rec == 0) return 0.0f;
-    return rec->dt;
-}
-
-struct MGR_1FCFF8 { char pad[0xF0]; REC *first; };
-
-extern "C" REC *func_001FCFF8(MGR_1FCFF8 *pmgr, int id)
-{
-    for (REC *rec = pmgr->first; rec != 0; rec = rec->next) {
-        if (rec->id == id) return rec;
-    }
-    return 0;
-}
-
-extern "C" int func_001FD028(char *arg0, int arg1) {
-    if (arg1 < 0 || arg1 >= *(int *)(arg0 + 0x18)) {
+extern "C" int func_001FD028(SNDSYSTEM *psnd, int imap) {
+    if (imap < 0 || imap >= psnd->nmap) {
         return 0;
     }
-    int index = ((int *)*(char **)(arg0 + 0x100))[arg1];
-    return index >= 0 ? *(int *)(arg0 + 0xFC) + index * 4 : 0;
+    int ibank = psnd->map[imap];
+    return ibank >= 0 ? (int)(psnd->banks + ibank) : 0;
+}
+
+extern "C" s32 func_001FD070(SNDSYSTEM *psnd, s32 *pbank) {
+    return pbank - psnd->banks;
+}
+
+// the stream kind (0 the stream object itself, 1 a listed record, 2 other) of a stream object id: InitStreamAmb picks the volume with it
+extern "C" int func_001FD080(SNDSYSTEM *psnd, int target) {
+    SNDREC *rec = psnd->recs;
+    while (rec != 0) {
+        if ((sptr)rec == target) {
+            return 1;
+        }
+        rec = rec->next;
+    }
+    return ((sptr)psnd->amb ^ target) == 0 ? 0 : 2;
 }
 
 extern "C" {
@@ -185,25 +159,6 @@ typedef struct SndManager {
     char pad108[0x120];
     s32 field_0x228;
 } SndManager;
-
-s32 func_001FD070(SndManager *self, s32 arg1) {
-    return (s32)(arg1 - self->field_0xFC) >> 2;
-}
-}
-
-struct Node { char pad0[0x44]; Node *next; };
-
-struct Owner { char pad0[0xF0]; Node *first; int last; };
-
-extern "C" int func_001FD080(Owner *owner, int target) {
-    Node *node = owner->first;
-    while (node != 0) {
-        if ((sptr)node == target) {
-            return 1;
-        }
-        node = node->next;
-    }
-    return (owner->last ^ target) == 0 ? 0 : 2;
 }
 
 extern "C" int D_002C3C40[];
@@ -214,41 +169,7 @@ extern "C" int func_001FD0C0(void *pmgr, unsigned index)
     return D_002C3C40[index];
 }
 
-struct B8 { char b[8]; };
-
-struct OIDB { B8 q[8]; };
-
 struct OIDV { int pad0[2]; int w8; char pad[0x38 - 0xC]; int w38; int w3C; };
-
-struct ENT {
-    OIDB oid;
-    int ref40;
-    ENT *next;
-    int ref48;
-    int f4C;
-    float f50;
-    int count;
-    void *data;
-};
-
-struct SNDOBJ {
-    char pad0[0x18];
-    int nmap;
-    char pad1[0xA8 - 0x1C];
-    OIDB oid;
-    int bank;
-    ENT *ents;
-    REC *recs;
-    void *amb;
-    int nbank;
-    int *banks;
-    int *map;
-    char pad2[0x1D0 - 0x104];
-    int nstream;
-    int streams[6];
-    char pad3[0x228 - 0x1EC];
-    char ambTarget[1];
-};
 
 extern "C" void CBinaryInputStream_Read_thunk(CBinaryInputStream *, int, void *);
 
@@ -289,7 +210,7 @@ static inline int OidEqual(const OIDV *a, const OIDV *b)
     return (a->w8 ^ a->w38) == (b->w8 ^ b->w38);
 }
 
-extern "C" void LoadSndFromBrx(SNDOBJ *snd, CBinaryInputStream *stream)
+extern "C" void LoadSndFromBrx(SNDSYSTEM *snd, CBinaryInputStream *stream)
 {
     OIDB oid;
     ALLOCREQ req;
@@ -322,7 +243,7 @@ extern "C" void LoadSndFromBrx(SNDOBJ *snd, CBinaryInputStream *stream)
         snd->amb = header;
         func_00118458(stream, header);
         void *amb = NewStreamAmb(snd->amb, 4);
-        func_00259B48(snd->ambTarget, amb);
+        func_00259B48(&snd->field_0x228, amb);
     }
     memset(snd->streams, -1, 0x18);
     for (int istream = 0; istream < snd->nstream; istream++) {
@@ -334,11 +255,11 @@ extern "C" void LoadSndFromBrx(SNDOBJ *snd, CBinaryInputStream *stream)
         pick = (stream->U8Read() ^ B_002E1E54) == 0 ? itrack : pick;
     }
     int cent = stream->S32Read();
-    ENT *aent = (ENT *)AllocClear(&req, cent * 0x5C);
+    SNDENT *aent = (SNDENT *)AllocClear(&req, cent * 0x5C);
     int entIndex;
     for (entIndex = 0; entIndex < cent; entIndex++) {
-        ENT *ent = aent + entIndex;
-        ent->ref40 = stream->S16Read();
+        SNDENT *ent = aent + entIndex;
+        ent->id = stream->S16Read();
         ent->ref48 = stream->S16Read();
         for (int index = 0; index < ntrack; index++) {
             func_00118458(stream, &tmp);
@@ -347,7 +268,7 @@ extern "C" void LoadSndFromBrx(SNDOBJ *snd, CBinaryInputStream *stream)
             if (index == pick) {
                 ent->oid = tmp;
                 ent->f4C = a;
-                ent->f50 = f;
+                ent->level = f;
             }
         }
         ent->count = stream->S32Read();
@@ -357,7 +278,7 @@ extern "C" void LoadSndFromBrx(SNDOBJ *snd, CBinaryInputStream *stream)
         snd->ents = ent;
     }
     int nrec = stream->S32Read();
-    REC *rec = (REC *)AllocClear(&req, nrec * 0x48);
+    SNDREC *rec = (SNDREC *)AllocClear(&req, nrec * 0x48);
     if (nrec > 0) {
         do {
             nrec--;
@@ -444,39 +365,37 @@ extern "C" QW g_2a2dd0;
 
 extern "C" char B_004435F0;
 
-#define F(type, off) (*(type *)((char *)snd + (off)))
-
-void ResetSnd(void *snd)
+extern "C" void ResetSnd(SNDSYSTEM *psnd)
 {
     snd_StopAllStreams();
     func_00233048_1FD700(0x524B5553, 10, 0, 0, 0, 0, 0);
     while (snd_FlushSoundCommands() != 0) {
     }
-    F(int, 0x14) = 0;
-    F(int, 0x18) = -1;
-    F(int, 0x1D0) = 0;
-    F(int, 0x5C) = 0;
-    F(int, 0x60) = 0;
-    F(int, 0x138) = 0;
-    F(int, 0xEC) = 0;
-    F(int, 0xF0) = 0;
-    F(int, 0xF4) = 0;
-    F(int, 0xF8) = 0;
-    F(int, 0xFC) = 0;
-    F(int, 0x100) = 0;
-    ReplaceHitFx(0, g_2a2dd0, 0, (char *)snd + 0x74);
-    memset((char *)snd + 0x108, 0, 0xC);
+    psnd->field_0x14 = 0;
+    psnd->nmap = -1;
+    psnd->nstream = 0;
+    psnd->field_0x5C = 0;
+    psnd->field_0x60 = 0;
+    psnd->field_0x138 = 0;
+    psnd->ents = 0;
+    psnd->recs = 0;
+    psnd->amb = 0;
+    psnd->nbank = 0;
+    psnd->banks = 0;
+    psnd->map = 0;
+    ReplaceHitFx(0, g_2a2dd0, 0, &psnd->field_0x74);
+    memset(psnd->unknown_0x108, 0, 0xC);
     func_00227788(&B_004435F0);
-    func_00259B48((char *)snd + 0x200, 0);
-    F(int, 0x204) = 0;
-    memset((char *)snd + 0x208, 0, 0x20);
-    func_00259B48((char *)snd + 0x228, 0);
-    memset((char *)snd + 0x22C, 0, 0x18);
-    F(int, 0x68) = 3;
-    ResetSlotheap((char *)snd + 0x1C);
-    ResetSlotheap((char *)snd + 0x34);
-    ClearDl__FP2DL((char *)snd + 0x4C);
-    ResetSndbankVolumeFactors_1FD700(snd);
+    func_00259B48(&psnd->field_0x200, 0);
+    psnd->field_0x204 = 0;
+    memset(psnd->words, 0, 0x20);
+    func_00259B48(&psnd->field_0x228, 0);
+    memset(psnd->unknown_0x22C, 0, 0x18);
+    psnd->field_0x68 = 3;
+    ResetSlotheap(&psnd->heapAmb);
+    ResetSlotheap(&psnd->heapStreamAmb);
+    ClearDl__FP2DL(&psnd->dl);
+    ResetSndbankVolumeFactors_1FD700(psnd);
 }
 
 struct SMP { float a; float b; float c; };

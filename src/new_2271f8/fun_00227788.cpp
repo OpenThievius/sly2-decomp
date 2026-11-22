@@ -1,19 +1,12 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "subtitle.h"
+
 extern "C" {
-#include "types.h"
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
+Color4 func_002275B8(int colorKind);
 
-struct Bytes4_227788 {
-    char value[4];
-};
-
-void func_002275B8(void *, s32);
-
-void func_00227788(s8 *arg0) {
-    char sp[0x10];
-
-    M2C_FIELD(arg0, s32 *, 0) = -1;
-    func_002275B8(sp, -1);
-    *(struct Bytes4_227788 *) (arg0 + 4) = *(struct Bytes4_227788 *) sp;
-    M2C_FIELD(arg0, s32 *, 8) = 0;
+void func_00227788(SUBTITLE *psubtitle) {
+    psubtitle->sid = -1;
+    psubtitle->color = func_002275B8(-1);
+    psubtitle->grf = 0;
 }
 }

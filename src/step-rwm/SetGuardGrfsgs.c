@@ -1,8 +1,9 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "guardview.h"
 
-M2C_UNK func_001F1900();                            /* extern */
+void func_001F1900(struct STEPGUARDVIEW *);
 
-void SetGuardGrfsgs(void *arg0, s64 arg1) {
-    M2C_FIELD(arg0, s64 *, 0x2C0) = arg1;
-    func_001F1900();
+void SetGuardGrfsgs(struct STEPGUARDVIEW *pguard, u64 grfsgs) {
+    pguard->grfsgs = grfsgs;
+    func_001F1900(pguard);
 }

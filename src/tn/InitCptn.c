@@ -1,10 +1,11 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "cplcy.h"
 
-M2C_UNK InitCplcy();                                /* extern */
-extern M2C_UNK D_002DB858;
+void *InitCplcy(void *);                            /* extern */
+extern void *D_002DB858[18];                        /* the policy's vtable */
 
-void *InitCptn(void *arg0) {
-    InitCplcy();
-    M2C_FIELD(arg0, M2C_UNK **, 0xC) = &D_002DB858;
-    return arg0;
+struct CPTN *InitCptn(struct CPTN *cptn) {
+    InitCplcy(cptn);
+    cptn->vtable = D_002DB858;
+    return cptn;
 }

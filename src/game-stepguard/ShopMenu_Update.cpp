@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "cref.h"
-struct SHOP { char pad0[0x10]; void *dev; char pad14[0x1C]; int dialog; char pad34[0xC]; int mode; };
-struct GADGET { int pad0; int pad4; int price; char pad[0x14]; };
+#include "shopmenu.h"
 struct COINBAG { int amount; int b; int c; };
 extern "C" {
 int FJoyButtonPressed(void *, int);
@@ -22,12 +21,12 @@ CRef func_001D8B20(const CRef &, const char *, const char *, char *, int);
 int sprintf(char *, const char *, ...);
 extern char B_002DEB30[];
 extern char B_003DD490[];
-extern GADGET D_002BCD00[];
+extern GADGETDEF D_002BCD00[];
 extern COINBAG D_002C3288[];
 extern const char RO_002A79A0[];
 extern const char RO_002A79D0[];
 extern const char RO_002A79D8[];
-void ShopMenu_Update(SHOP *menu)
+void ShopMenu_Update(SHOPMENU *menu)
 {
     Menu_Update();
     if (menu->mode == -1)
@@ -42,7 +41,7 @@ void ShopMenu_Update(SHOP *menu)
     switch (menu->mode) {
     case 0:
         if (FJoyButtonPressed(menu->dev, 0x40)) {
-            int selected = *(int *)((char *)menu + 0x254);
+            int selected = menu->idGadget;
             if (selected == -1) {
                 SetEmitterUnpositioned(NewEmitter(0x36), 0);
             } else {
@@ -51,7 +50,7 @@ void ShopMenu_Update(SHOP *menu)
                 if (menu->dialog == 0) {
                     Menu_SetDialog(menu, -1, -1);
                     SetGameCoins(B_002DEB30, coins - price);
-                    SetGadgetAcquired(*(int *)((char *)menu + 0x254), 1);
+                    SetGadgetAcquired(menu->idGadget, 1);
                     ShopMenu_BuildList(menu);
                     SetEmitterUnpositioned(NewEmitter(0x29), 0);
                     func_0019F0A8(B_003DD490);
@@ -65,7 +64,7 @@ void ShopMenu_Update(SHOP *menu)
         break;
     case 1:
         if (FJoyButtonPressed(menu->dev, 0x40)) {
-            int slot = *(int *)((char *)menu + 0x258);
+            int slot = menu->idLoot;
             if (slot == -1) {
                 SetEmitterUnpositioned(NewEmitter(0x36), 0);
             } else {
@@ -76,7 +75,7 @@ void ShopMenu_Update(SHOP *menu)
                 ref = func_001D8A38(RO_002A79D0, RO_002A79D8, name, 0);
                 if (ref.m_tag.m_n > 0) {
                     func_001D8B20(CRef(ref.m_tag.m_n - 1, TAGK_S32), RO_002A79D0, RO_002A79D8, name, 0);
-                    SetGameCoins(B_002DEB30, GetGameCoins(B_002DEB30) + D_002C3288[*(int *)((char *)menu + 0x258)].amount);
+                    SetGameCoins(B_002DEB30, GetGameCoins(B_002DEB30) + D_002C3288[menu->idLoot].amount);
                     ShopMenu_BuildList(menu);
                     SetEmitterUnpositioned(NewEmitter(0x29), 0);
                 }

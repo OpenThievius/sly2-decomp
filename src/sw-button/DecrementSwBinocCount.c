@@ -1,5 +1,6 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "swview.h"
 
-void DecrementSwBinocCount(void *arg0) {
-    M2C_FIELD(arg0, s32 *, 0x3D84) = (s32) (M2C_FIELD(arg0, s32 *, 0x3D84) - 1);
+void DecrementSwBinocCount(struct SWVIEW *psw) {
+    psw->cbinoc = psw->cbinoc - 1;
 }

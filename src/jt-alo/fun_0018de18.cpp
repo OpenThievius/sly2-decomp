@@ -1,16 +1,19 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-extern "C" {
-void StartAttach(s8 *, s32, s32, s32);
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "jt.h"
 
-void func_0018DE18(s8 *arg0, s32 arg1) {
-    if (arg1 != 0) {
-        *(s32 *)(arg0 + 0x9C0) = 1;
-        StartAttach(arg0 + 0x4C0, 6, arg1, 0);
-    } else if (*(s32 *)(arg0 + 0x4C8) == 6) {
-        s8 *temp_v0 = *(s8 **)(arg0 + 0xC);
-        ((void (*)(s8 *, s32))*(void **)(temp_v0 + 0x2C4))(arg0 + *(s16 *)(temp_v0 + 0x2C0), 0);
+/* JT's word at 0x9C0, which func_0018DE18 sets when it attaches (one reader, not a method of the class): a view of JT */
+struct JTATTACHVIEW {
+    u8 unknown_0x0[0x9C0];
+    /* 0x9C0 */ s32 field_0x9C0;
+};
+
+extern "C" void StartAttach(void *, int, LO *, int);
+
+extern "C" void func_0018DE18(JT *pjt, LO *plo) {
+    if (plo != 0) {
+        ((JTATTACHVIEW *)pjt)->field_0x9C0 = 1;
+        StartAttach(pjt->PvAttach(), 6, plo, 0);
+    } else if (pjt->attachKind == 6) {
+        pjt->SetMode(0);
     }
-}
 }

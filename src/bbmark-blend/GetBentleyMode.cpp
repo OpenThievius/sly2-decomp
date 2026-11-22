@@ -1,6 +1,8 @@
-int GetBentleyMode(char *pjt)
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "bentley.h"
+int GetBentleyMode(BENTLEY *pbentley)
 {
-    switch (*(int *)(pjt + 0x13D0)) {
+    switch (pbentley->state) {
     case 0: return 0;
     case 2: return 1;
     case 3: return 2;

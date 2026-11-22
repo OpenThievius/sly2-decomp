@@ -12,35 +12,44 @@
 #include "lo.h"
 #include "jt.h"
 
-struct ITEM { char pad[0x10]; int value; };
+/* a record of the sequence's step list (0x50 bytes, PjsgeAllocJsg): the kind, whether it is asynchronous, then the arguments the
+   AddSeqRecord function stored: a word each, an integer or a float according to the kind */
+struct JSGE {
+    s32 jsgek;
+    s32 fAsync;
+    u8 unknown_0x8[0x8];
+    union {
+        s32 n;
+        f32 f;
+    } arg[16];
+};
 
 struct JSG;
 
-extern "C" ITEM *PjsgeAllocJsg(JSG *, int, int);
+extern "C" JSGE *PjsgeAllocJsg(JSG *, int, int);
 
-extern "C" void AddJsgContext(JSG *jsg, int value)
+extern "C" void AddJsgContext(JSG *jsg, int n0)
 {
-    ITEM *item = PjsgeAllocJsg(jsg, 0, 1);
-    item->value = value;
+    JSGE *record = PjsgeAllocJsg(jsg, 0, 1);
+    record->arg[0].n = n0;
 }
 
-extern "C" void* PjsgeAllocJsg_1E02C0(void*, int, int);
 
-extern "C" void* AddSeqRecordEndThread(void* a) { return PjsgeAllocJsg_1E02C0(a, 1, 1); }
-
-extern "C" void AddSeqRecordDestroyThread(JSG *jsg, int value)
+extern "C" void AddSeqRecordEndThread(JSG *jsg)
 {
-    ITEM *item = PjsgeAllocJsg(jsg, 2, 1);
-    item->value = value;
+    PjsgeAllocJsg(jsg, 1, 1);
+}
+
+extern "C" void AddSeqRecordDestroyThread(JSG *jsg, int n0)
+{
+    JSGE *record = PjsgeAllocJsg(jsg, 2, 1);
+    record->arg[0].n = n0;
 }
 
 #include "cref.h"
 
-struct JSGE { char pad[0x10]; int coid; int aoid[4]; };
-
 extern "C" CRef func_002013D8(CRef *, int, int, unsigned *, int *);
 
-extern "C" JSGE *PjsgeAllocJsg_1E0310(JSG *, int, int);
 
 extern "C" void *CopyAb__FPvT0Ui_1E0310(void *, void *, unsigned);
 
@@ -49,22 +58,20 @@ extern "C" void AddSeqRecordSync(JSG *pjsg, CRef *prefOids)
     int aoid[8];
     unsigned coid;
     CRef refResult = func_002013D8(prefOids, 6, 8, &coid, aoid);
-    JSGE *pjsge = PjsgeAllocJsg_1E0310(pjsg, 3, 0);
+    JSGE *pjsge = PjsgeAllocJsg(pjsg, 3, 0);
     if (coid > 4)
         coid = 4;
     unsigned n = coid;
-    pjsge->coid = n;
-    CopyAb__FPvT0Ui_1E0310(&pjsge->aoid[0], aoid, n << 2);
+    pjsge->arg[0].n = n;
+    CopyAb__FPvT0Ui_1E0310(&pjsge->arg[1], aoid, n << 2);
 }
 
-extern "C" s8 *PjsgeAllocJsg_1E03A0(void *, s32, s32);
 
-extern "C" void AddSeqRecordWait(void *arg0, s32 arg1, s32 arg2) {
-    s8 *temp_v0;
-
-    temp_v0 = PjsgeAllocJsg_1E03A0(arg0, 4, 0);
-    *(s32 *)(temp_v0 + 0x10) = arg1;
-    *(s32 *)(temp_v0 + 0x14) = arg2;
+extern "C" void AddSeqRecordWait(JSG *jsg, int n0, int n1)
+{
+    JSGE *record = PjsgeAllocJsg(jsg, 4, 0);
+    record->arg[0].n = n0;
+    record->arg[1].n = n1;
 }
 
 struct JsgRecord {
@@ -82,469 +89,452 @@ struct JsgRecord {
     s32 field_0x20;
 };
 
-extern "C" JsgRecord *PjsgeAllocJsg_1E03E0(s32 arg0, s32 arg1, s32 arg2);
 
-extern "C" void AddSeqRecordSignalSequence(s32 arg0, s32 arg1, s32 arg2) {
-    JsgRecord *record = PjsgeAllocJsg_1E03E0(arg0, 5, 1);
-    record->field_0x10 = arg1;
-    record->field_0x14 = arg2;
-}
-
-extern "C" void AddSeqRecordUntriggerSequence(JSG *jsg, int value)
+extern "C" void AddSeqRecordSignalSequence(JSG *jsg, s32 n0, s32 n1)
 {
-    ITEM *item = PjsgeAllocJsg(jsg, 6, 1);
-    item->value = value;
+    JSGE *record = PjsgeAllocJsg(jsg, 5, 1);
+    record->arg[0].n = n0;
+    record->arg[1].n = n1;
 }
 
-extern "C" void *PjsgeAllocJsg_1E0450(void *, int, int);
-
-extern "C" void AddSeqRecordSetPlayer(void *jsg, int value)
+extern "C" void AddSeqRecordUntriggerSequence(JSG *jsg, int n0)
 {
-    *(int *)((char *)PjsgeAllocJsg_1E0450(jsg, 7, 1) + 0x10) = value;
+    JSGE *record = PjsgeAllocJsg(jsg, 6, 1);
+    record->arg[0].n = n0;
 }
 
-extern "C" void *PjsgeAllocJsg_1E0480(void *, int, int);
 
-extern "C" void AddSeqRecordSetActor(void *jsg, int value)
+extern "C" void AddSeqRecordSetPlayer(JSG *jsg, int n0)
 {
-    *(int *)((char *)PjsgeAllocJsg_1E0480(jsg, 8, 1) + 0x10) = value;
+    JSGE *record = PjsgeAllocJsg(jsg, 7, 1);
+    record->arg[0].n = n0;
 }
 
-extern "C" void *PjsgeAllocJsg_1E04B0(void *, int, int);
 
-extern "C" void AddSeqRecordCallSplice(void *jsg, int value)
+extern "C" void AddSeqRecordSetActor(JSG *jsg, int n0)
 {
-    *(int *)((char *)PjsgeAllocJsg_1E04B0(jsg, 9, 1) + 0x10) = value;
+    JSGE *record = PjsgeAllocJsg(jsg, 8, 1);
+    record->arg[0].n = n0;
 }
 
-extern "C" JsgRecord *PjsgeAllocJsg_1E04E0(s32 arg0, s32 arg1, s32 arg2);
 
-extern "C" void AddSeqRecordCallAnimation(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
-    JsgRecord *record = PjsgeAllocJsg_1E04E0(arg0, 0xA, arg3);
-    record->field_0x10 = arg1;
-    record->field_0x14 = arg2;
-    record->field_0x18 = arg4;
-}
-
-extern "C" char *PjsgeAllocJsg_1E0530(int arg0, int arg1, int arg2);
-
-extern "C" void AddSeqRecordCallSequence(int arg0, int arg1, int arg2, int arg3)
+extern "C" void AddSeqRecordCallSplice(JSG *jsg, int n0)
 {
-    char *temp_v0;
-
-    temp_v0 = PjsgeAllocJsg_1E0530(arg0, 0xB, arg3);
-    *(int *)(temp_v0 + 0x10) = arg1;
-    *(int *)(temp_v0 + 0x14) = arg2;
+    JSGE *record = PjsgeAllocJsg(jsg, 9, 1);
+    record->arg[0].n = n0;
 }
 
-extern "C" void *PjsgeAllocJsg_1E0570(void *, int, int);
 
-extern "C" void AddSeqRecordSetContext(void *jsg, int value)
+extern "C" void AddSeqRecordCallAnimation(JSG *jsg, s32 n0, s32 n1, s32 fAsync, s32 n2)
 {
-    *(int *)((char *)PjsgeAllocJsg_1E0570(jsg, 12, 1) + 0x10) = value;
+    JSGE *record = PjsgeAllocJsg(jsg, 0xA, fAsync);
+    record->arg[0].n = n0;
+    record->arg[1].n = n1;
+    record->arg[2].n = n2;
 }
 
-extern "C" char *PjsgeAllocJsg_1E05A0(void *self, int type, int flag);
 
-extern "C" void AddSeqRecordSetSmGoal(void *self, int arg1, int arg2, int arg3, int flag, int arg5) {
-    char *jsg = PjsgeAllocJsg_1E05A0(self, 0xD, flag);
-    *(int *)(jsg + 0x10) = arg1;
-    *(int *)(jsg + 0x14) = arg2;
-    *(int *)(jsg + 0x18) = arg3;
-    *(int *)(jsg + 0x1C) = arg5;
-    if (arg5 != 0) {
-        *(int *)(jsg + 4) = 1;
+extern "C" void AddSeqRecordCallSequence(JSG *jsg, int n0, int n1, int fAsync)
+{
+    JSGE *record = PjsgeAllocJsg(jsg, 0xB, fAsync);
+    record->arg[0].n = n0;
+    record->arg[1].n = n1;
+}
+
+
+extern "C" void AddSeqRecordSetContext(JSG *jsg, int n0)
+{
+    JSGE *record = PjsgeAllocJsg(jsg, 12, 1);
+    record->arg[0].n = n0;
+}
+
+
+extern "C" void AddSeqRecordSetSmGoal(JSG *jsg, int n0, int n1, int n2, int fAsync, int n3)
+{
+    JSGE *record = PjsgeAllocJsg(jsg, 0xD, fAsync);
+    record->arg[0].n = n0;
+    record->arg[1].n = n1;
+    record->arg[2].n = n2;
+    record->arg[3].n = n3;
+    if (n3 != 0) {
+        record->fAsync = 1;
     }
 }
 
-extern "C" JsgRecord *PjsgeAllocJsg_1E0610(s32 arg0, s32 arg1, s32 arg2);
 
-extern "C" void AddSeqRecordShowSwf(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
-    JsgRecord *record = PjsgeAllocJsg_1E0610(arg0, 0xE, arg3);
-    record->field_0x10 = arg1;
-    record->field_0x14 = arg2;
-}
-
-extern "C" void *PjsgeAllocJsg_1E0650(void *, int, int);
-
-extern "C" void AddSeqRecordHideSwf(void *jsg, int value)
+extern "C" void AddSeqRecordShowSwf(JSG *jsg, s32 n0, s32 n1, s32 fAsync)
 {
-    *(int *)((char *)PjsgeAllocJsg_1E0650(jsg, 15, 1) + 0x10) = value;
+    JSGE *record = PjsgeAllocJsg(jsg, 0xE, fAsync);
+    record->arg[0].n = n0;
+    record->arg[1].n = n1;
 }
 
-extern "C" void *PjsgeAllocJsg_1E0680(void *, int, int);
 
-extern "C" void AddSeqRecordSetClockSpeed(void *jsg, float value)
+extern "C" void AddSeqRecordHideSwf(JSG *jsg, int n0)
 {
-    *(float *)((char *)PjsgeAllocJsg_1E0680(jsg, 16, 1) + 0x10) = value;
+    JSGE *record = PjsgeAllocJsg(jsg, 15, 1);
+    record->arg[0].n = n0;
 }
 
-extern "C" char *PjsgeAllocJsg_1E06B0(void *, int, int);
 
-extern "C" void AddSeqRecordAddTaskRequest(void *self, int first, int second) {
-    char *record = PjsgeAllocJsg_1E06B0(self, 0x11, 1);
-    *(int *)(record + 0x10) = first;
-    *(int *)(record + 0x14) = second;
-}
-
-extern "C" char *PjsgeAllocJsg_1E06F0(void *pool, int kind, int flag);
-
-extern "C" void AddSeqRecordHandsOff(void *pool, int arg1, int arg2) {
-    char *record = PjsgeAllocJsg_1E06F0(pool, 0x12, 1);
-    *(int *)(record + 0x10) = arg1;
-    *(int *)(record + 0x14) = arg2;
-}
-
-extern "C" void *PjsgeAllocJsg_1E0730(void *, int, int);
-
-extern "C" void AddSeqRecordLabel(void *jsg, int value)
+extern "C" void AddSeqRecordSetClockSpeed(JSG *jsg, float g0)
 {
-    *(int *)((char *)PjsgeAllocJsg_1E0730(jsg, 19, 1) + 0x10) = value;
+    JSGE *record = PjsgeAllocJsg(jsg, 16, 1);
+    record->arg[0].f = g0;
 }
 
-extern "C" void *PjsgeAllocJsg_1E0760(void *, int, int);
 
-extern "C" void AddSeqRecordSeek(void *jsg, int value)
+extern "C" void AddSeqRecordAddTaskRequest(JSG *jsg, int n0, int n1)
 {
-    *(int *)((char *)PjsgeAllocJsg_1E0760(jsg, 20, 1) + 0x10) = value;
+    JSGE *record = PjsgeAllocJsg(jsg, 0x11, 1);
+    record->arg[0].n = n0;
+    record->arg[1].n = n1;
 }
 
-extern "C" void *PjsgeAllocJsg_1E0790(void *, int, int);
+
+extern "C" void AddSeqRecordHandsOff(JSG *jsg, int n0, int n1)
+{
+    JSGE *record = PjsgeAllocJsg(jsg, 0x12, 1);
+    record->arg[0].n = n0;
+    record->arg[1].n = n1;
+}
+
+
+extern "C" void AddSeqRecordLabel(JSG *jsg, int n0)
+{
+    JSGE *record = PjsgeAllocJsg(jsg, 19, 1);
+    record->arg[0].n = n0;
+}
+
+
+extern "C" void AddSeqRecordSeek(JSG *jsg, int n0)
+{
+    JSGE *record = PjsgeAllocJsg(jsg, 20, 1);
+    record->arg[0].n = n0;
+}
+
 
 struct JSGREC_1E0790 { char pad[0x10]; int nAt10; int nAt14; };
 
-extern "C" void func_001E0790(void *pJsg, int nAt10, int nAt14)
+extern "C" void func_001E0790(JSG *jsg, int n0, int n1)
 {
-    struct JSGREC_1E0790 *pRec = (struct JSGREC_1E0790 *)PjsgeAllocJsg_1E0790(pJsg, 0x15, 1);
-    pRec->nAt10 = nAt10;
-    pRec->nAt14 = nAt14;
+    JSGE *record = PjsgeAllocJsg(jsg, 0x15, 1);
+    record->arg[0].n = n0;
+    record->arg[1].n = n1;
 }
 
-extern "C" JsgRecord *PjsgeAllocJsg_1E07D0(s32 arg0, s32 arg1, s32 arg2);
 
-extern "C" void AddSeqRecordCut(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
-    JsgRecord *record = PjsgeAllocJsg_1E07D0(arg0, 0x16, 1);
-    record->field_0x10 = arg1;
-    record->field_0x14 = arg2;
-    record->field_0x18 = arg3;
-}
-
-extern "C" void* PjsgeAllocJsg_1E0820(void*, int, int);
-
-extern "C" void* AddSeqRecordCutCamera(void* a) { return PjsgeAllocJsg_1E0820(a, 23, 1); }
-
-extern "C" char *PjsgeAllocJsg_1E0840(int arg0, int arg1, int arg2);
-
-extern "C" void AddSeqRecordSetTunnel(int arg0, int arg1, int arg2) {
-    char *record = PjsgeAllocJsg_1E0840(arg0, 0x18, 1);
-    *(int *)(record + 0x10) = arg1;
-    *(int *)(record + 0x14) = arg2;
-}
-
-extern "C" char *PjsgeAllocJsg_1E0880(void *, s32, s32);
-
-extern "C" void AddSeqRecordSetFocus(void *arg0, s32 arg1, s32 arg2) {
-    char *record;
-    record = PjsgeAllocJsg_1E0880(arg0, 0x19, 1);
-    *(s32 *)(record + 0x10) = arg1;
-    *(s32 *)(record + 0x14) = arg2;
-}
-
-extern "C" char *PjsgeAllocJsg_1E08C0(void *, int);
-
-extern "C" void AddSeqRecordClimb(void *self, int first, int unused, int third, float amount) {
-    char *record = PjsgeAllocJsg_1E08C0(self, 0x1A);
-    *(int *)(record + 0x10) = first;
-    *(float *)(record + 0x14) = amount;
-    *(int *)(record + 0x18) = third;
-}
-
-extern "C" void *PjsgeAllocJsg_1E0910(void *, int, int);
-
-extern "C" void AddSeqRecordUnhide(void *jsg, int value)
+extern "C" void AddSeqRecordCut(JSG *jsg, s32 n0, s32 n1, s32 n2)
 {
-    *(int *)((char *)PjsgeAllocJsg_1E0910(jsg, 27, 0) + 0x10) = value;
+    JSGE *record = PjsgeAllocJsg(jsg, 0x16, 1);
+    record->arg[0].n = n0;
+    record->arg[1].n = n1;
+    record->arg[2].n = n2;
 }
 
-extern "C" char *PjsgeAllocJsg_1E0940(void *, int, int);
 
-extern "C" void AddSeqRecordDamage(void *arg0, int arg1, int arg2, int arg3, int arg4)
+extern "C" void AddSeqRecordCutCamera(JSG *jsg)
 {
-    char *block;
-    block = PjsgeAllocJsg_1E0940(arg0, 0x1C, arg3);
-    *(int *)(block + 0x10) = arg1;
-    *(int *)(block + 0x14) = arg2;
-    *(int *)(block + 0x18) = arg4;
+    PjsgeAllocJsg(jsg, 23, 1);
 }
 
-extern "C" JsgRecord *PjsgeAllocJsg_1E0990(s32 arg0, s32 arg1, s32 arg2);
 
-extern "C" void AddSeqRecordReach(s32 arg0, s32 arg1, s32 arg2) {
-    JsgRecord *record = PjsgeAllocJsg_1E0990(arg0, 0x1D, 0);
-    record->field_0x10 = arg1;
-    record->field_0x14 = arg2;
+extern "C" void AddSeqRecordSetTunnel(JSG *jsg, int n0, int n1)
+{
+    JSGE *record = PjsgeAllocJsg(jsg, 0x18, 1);
+    record->arg[0].n = n0;
+    record->arg[1].n = n1;
+}
+
+
+extern "C" void AddSeqRecordSetFocus(JSG *jsg, int n0, int n1)
+{
+    JSGE *record = PjsgeAllocJsg(jsg, 0x19, 1);
+    record->arg[0].n = n0;
+    record->arg[1].n = n1;
+}
+
+
+extern "C" void AddSeqRecordClimb(JSG *jsg, int n0, int fAsync, int n2, float g1)
+{
+    JSGE *record = PjsgeAllocJsg(jsg, 0x1A, fAsync);
+    record->arg[0].n = n0;
+    record->arg[1].f = g1;
+    record->arg[2].n = n2;
+}
+
+
+extern "C" void AddSeqRecordUnhide(JSG *jsg, int n0)
+{
+    JSGE *record = PjsgeAllocJsg(jsg, 27, 0);
+    record->arg[0].n = n0;
+}
+
+
+extern "C" void AddSeqRecordDamage(JSG *jsg, int n0, int n1, int fAsync, int n2)
+{
+    JSGE *record = PjsgeAllocJsg(jsg, 0x1C, fAsync);
+    record->arg[0].n = n0;
+    record->arg[1].n = n1;
+    record->arg[2].n = n2;
+}
+
+
+extern "C" void AddSeqRecordReach(JSG *jsg, s32 n0, s32 n1)
+{
+    JSGE *record = PjsgeAllocJsg(jsg, 0x1D, 0);
+    record->arg[0].n = n0;
+    record->arg[1].n = n1;
 }
 
 struct SEQRECORD_1E09D0 { char pad0[0x10]; int iA; int iB; int iC; };
 
-extern "C" void *PjsgeAllocJsg_1E09D0(void *, int, int);
 
-extern "C" void AddSeqRecordToss(void *pOwner, int iA, int iB, int iC)
+extern "C" void AddSeqRecordToss(JSG *jsg, int n0, int n1, int n2)
 {
-    SEQRECORD_1E09D0 *pRecord = (SEQRECORD_1E09D0 *)PjsgeAllocJsg_1E09D0(pOwner, 0x1E, 0);
-    pRecord->iA = iA;
-    pRecord->iB = iB;
-    pRecord->iC = iC;
+    JSGE *record = PjsgeAllocJsg(jsg, 0x1E, 0);
+    record->arg[0].n = n0;
+    record->arg[1].n = n1;
+    record->arg[2].n = n2;
 }
 
-extern "C" s8 *PjsgeAllocJsg_1E0A20(void *, s32, s32);
 
-extern "C" void func_001E0A20(void *arg0, s32 arg1, s32 arg2) {
-    s8 *temp_v0;
-
-    temp_v0 = PjsgeAllocJsg_1E0A20(arg0, 0x1F, 0);
-    *(s32 *)(temp_v0 + 0x10) = arg1;
-    *(s32 *)(temp_v0 + 0x14) = arg2;
-}
-
-extern "C" JsgRecord *PjsgeAllocJsg_1E0A60(s32 arg0, s32 arg1, s32 arg2);
-
-extern "C" void func_001E0A60(s32 arg0, s32 arg1, s32 arg2) {
-    JsgRecord *record = PjsgeAllocJsg_1E0A60(arg0, 0x20, 0);
-    record->field_0x10 = arg1;
-    record->field_0x14 = arg2;
-}
-
-extern "C" char *PjsgeAllocJsg_1E0AA0(void *, int, int);
-
-extern "C" void SetMethod__4CRefP7CMethod(void *self, int first, int second) {
-    char *record = PjsgeAllocJsg_1E0AA0(self, 0x21, 0);
-    *(int *)(record + 0x10) = first;
-    *(int *)(record + 0x14) = second;
-}
-
-extern "C" JsgRecord *PjsgeAllocJsg_1E0AE0(s32 arg0, s32 arg1, s32 arg2);
-
-extern "C" void AddSeqRecordCatch(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
-    JsgRecord *record = PjsgeAllocJsg_1E0AE0(arg0, 0x22, 0);
-    record->field_0x10 = arg1;
-    record->field_0x14 = arg2;
-    record->field_0x18 = arg3;
-    record->field_0x1C = arg4;
-}
-
-extern "C" JsgRecord *PjsgeAllocJsg_1E0B40(s32 arg0, s32 arg1, s32 arg2);
-
-extern "C" void AddSeqRecordPause(s32 arg0, s32 arg1, s32 arg2, f32 seconds) {
-    JsgRecord *record = PjsgeAllocJsg_1E0B40(arg0, 0x23, 0);
-    record->float_0x10 = seconds;
-    record->field_0x14 = arg1;
-    record->field_0x18 = arg2;
-}
-
-extern "C" char *PjsgeAllocJsg_1E0B90(void *, int);
-
-extern "C" void func_001E0B90(void *jsg, int a, int unused, int b, int c, float x, float y)
+extern "C" void func_001E0A20(JSG *jsg, int n0, int n1)
 {
-    char *node = PjsgeAllocJsg_1E0B90(jsg, 0x24);
-    *(int *)(node + 0x10) = a;
-    *(float *)(node + 0x14) = x;
-    *(float *)(node + 0x18) = y;
-    *(int *)(node + 0x1C) = b;
-    *(int *)(node + 0x20) = c;
-    *(int *)(node + 0x24) = 1;
+    JSGE *record = PjsgeAllocJsg(jsg, 0x1F, 0);
+    record->arg[0].n = n0;
+    record->arg[1].n = n1;
 }
 
-extern "C" char *PjsgeAllocJsg_1E0C08(void *, int);
 
-extern "C" void func_001E0C08(void *jsg, int a, int unused, int b, int c, float x, float y)
+extern "C" void func_001E0A60(JSG *jsg, s32 n0, s32 n1)
 {
-    char *node = PjsgeAllocJsg_1E0C08(jsg, 0x24);
-    *(int *)(node + 0x10) = a;
-    *(float *)(node + 0x14) = x;
-    *(float *)(node + 0x18) = y;
-    *(int *)(node + 0x1C) = b;
-    *(int *)(node + 0x20) = c;
-    *(int *)(node + 0x24) = 0;
+    JSGE *record = PjsgeAllocJsg(jsg, 0x20, 0);
+    record->arg[0].n = n0;
+    record->arg[1].n = n1;
 }
 
-extern "C" void* PjsgeAllocJsg_1E0C78(void*, int, int);
 
-extern "C" void* func_001E0C78(void* a) { return PjsgeAllocJsg_1E0C78(a, 37, 1); }
+extern "C" void SetMethod__4CRefP7CMethod(JSG *jsg, int n0, int n1)
+{
+    JSGE *record = PjsgeAllocJsg(jsg, 0x21, 0);
+    record->arg[0].n = n0;
+    record->arg[1].n = n1;
+}
 
-extern "C" void* PjsgeAllocJsg_1E0C98(void*, int, int);
 
-extern "C" void* func_001E0C98(void* a) { return PjsgeAllocJsg_1E0C98(a, 38, 1); }
+extern "C" void AddSeqRecordCatch(JSG *jsg, s32 n0, s32 n1, s32 n2, s32 n3)
+{
+    JSGE *record = PjsgeAllocJsg(jsg, 0x22, 0);
+    record->arg[0].n = n0;
+    record->arg[1].n = n1;
+    record->arg[2].n = n2;
+    record->arg[3].n = n3;
+}
+
+
+extern "C" void AddSeqRecordPause(JSG *jsg, s32 n1, s32 n2, f32 g0)
+{
+    JSGE *record = PjsgeAllocJsg(jsg, 0x23, 0);
+    record->arg[0].f = g0;
+    record->arg[1].n = n1;
+    record->arg[2].n = n2;
+}
+
+
+extern "C" void func_001E0B90(JSG *jsg, int n0, int fAsync, int n3, int n4, float g1, float g2)
+{
+    JSGE *record = PjsgeAllocJsg(jsg, 0x24, fAsync);
+    record->arg[0].n = n0;
+    record->arg[1].f = g1;
+    record->arg[2].f = g2;
+    record->arg[3].n = n3;
+    record->arg[4].n = n4;
+    record->arg[5].n = 1;
+}
+
+
+extern "C" void func_001E0C08(JSG *jsg, int n0, int fAsync, int n3, int n4, float g1, float g2)
+{
+    JSGE *record = PjsgeAllocJsg(jsg, 0x24, fAsync);
+    record->arg[0].n = n0;
+    record->arg[1].f = g1;
+    record->arg[2].f = g2;
+    record->arg[3].n = n3;
+    record->arg[4].n = n4;
+    record->arg[5].n = 0;
+}
+
+
+extern "C" void func_001E0C78(JSG *jsg)
+{
+    PjsgeAllocJsg(jsg, 37, 1);
+}
+
+
+extern "C" void func_001E0C98(JSG *jsg)
+{
+    PjsgeAllocJsg(jsg, 38, 1);
+}
 
 #define FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
 
-extern "C" s8 *PjsgeAllocJsg_1E0CB8(int, int, int);
 
-extern "C" void func_001E0CB8(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, float value)
+extern "C" void func_001E0CB8(JSG *jsg, int n0, int n1, int n2, int n4, int n5, float g3)
 {
-    s8 *record = PjsgeAllocJsg_1E0CB8(arg0, 0x27, 0);
-FIELD(record, int *, 0x10) = arg1;
-FIELD(record, int *, 0x14) = arg2;
-FIELD(record, int *, 0x18) = arg3;
-FIELD(record, float *, 0x1C) = value;
-FIELD(record, int *, 0x20) = arg4;
-FIELD(record, int *, 0x24) = arg5;
+    JSGE *record = PjsgeAllocJsg(jsg, 0x27, 0);
+    record->arg[0].n = n0;
+    record->arg[1].n = n1;
+    record->arg[2].n = n2;
+    record->arg[3].f = g3;
+    record->arg[4].n = n4;
+    record->arg[5].n = n5;
 }
 
-extern "C" s8 *PjsgeAllocJsg_1E0D38(int, int, int);
 
-extern "C" void func_001E0D38(int arg0, int arg1, float value0, int arg2, float value1, int arg3, int arg4)
+extern "C" void func_001E0D38(JSG *jsg, int n0, float g1, int n2, float g3, int n4, int n5)
 {
-    s8 *record = PjsgeAllocJsg_1E0D38(arg0, 0x28, 0);
-    FIELD(record, int *, 0x10) = arg1;
-    FIELD(record, float *, 0x14) = value0;
-    FIELD(record, int *, 0x18) = arg2;
-    FIELD(record, float *, 0x1C) = value1;
-    FIELD(record, int *, 0x20) = arg3;
-    FIELD(record, int *, 0x24) = arg4;
+    JSGE *record = PjsgeAllocJsg(jsg, 0x28, 0);
+    record->arg[0].n = n0;
+    record->arg[1].f = g1;
+    record->arg[2].n = n2;
+    record->arg[3].f = g3;
+    record->arg[4].n = n4;
+    record->arg[5].n = n5;
 }
 
-extern "C" char *PjsgeAllocJsg_1E0DB8(void *, int);
 
-extern "C" void AddSeqRecordCrawl(void *self, int first, int unused, int third, float amountA, float amountB) {
-    char *record = PjsgeAllocJsg_1E0DB8(self, 0x29);
-    *(int *)(record + 0x10) = first;
-    *(float *)(record + 0x14) = amountA;
-    *(float *)(record + 0x18) = amountB;
-    *(int *)(record + 0x1C) = third;
-}
-
-extern "C" JsgRecord *PjsgeAllocJsg_1E0E18(s32 arg0, s32 arg1, s32 arg2);
-
-extern "C" void AddSeqRecordJump(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5) {
-    JsgRecord *record = PjsgeAllocJsg_1E0E18(arg0, 0x2A, arg4);
-    record->field_0x10 = arg1;
-    record->field_0x14 = arg2;
-    record->field_0x18 = arg3;
-    record->field_0x1C = arg5;
-}
-
-extern "C" char *PjsgeAllocJsg_1E0E78(void *, int);
-
-extern "C" void func_001E0E78(void *self, int first, int unused, int third, float amountA, float amountB) {
-    char *record = PjsgeAllocJsg_1E0E78(self, 0x2B);
-    *(int *)(record + 0x10) = first;
-    *(float *)(record + 0x14) = amountA;
-    *(float *)(record + 0x18) = amountB;
-    *(int *)(record + 0x1C) = third;
-}
-
-extern "C" void* PjsgeAllocJsg_1E0ED8(void*, int, int);
-
-void AddJsgKind2C(void* pjsg, int nFirst, int fAsync, float gFirst)
+extern "C" void AddSeqRecordCrawl(JSG *jsg, int n0, int fAsync, int n3, float g1, float g2)
 {
-    void* pjsge = PjsgeAllocJsg_1E0ED8(pjsg, 0x2C, fAsync);
-    *(int*)((char*)pjsge + 0x10) = nFirst;
-    *(float*)((char*)pjsge + 0x14) = gFirst;
+    JSGE *record = PjsgeAllocJsg(jsg, 0x29, fAsync);
+    record->arg[0].n = n0;
+    record->arg[1].f = g1;
+    record->arg[2].f = g2;
+    record->arg[3].n = n3;
 }
 
-extern "C" void* PjsgeAllocJsg_1E0F18(void* pjsg, int kind, int fAsync);
 
-void AddSeqRecordRemoveObject(void* pjsg, int nFirst, int fAsync, float gFirst)
+extern "C" void AddSeqRecordJump(JSG *jsg, s32 n0, s32 n1, s32 n2, s32 fAsync, s32 n3)
 {
-    void* pjsge = PjsgeAllocJsg_1E0F18(pjsg, 0x2D, fAsync);
-    int* p = (int*)pjsge;
-    *(int*)((char*)p + 0x10) = nFirst;
-    *(float*)((char*)p + 0x14) = gFirst;
+    JSGE *record = PjsgeAllocJsg(jsg, 0x2A, fAsync);
+    record->arg[0].n = n0;
+    record->arg[1].n = n1;
+    record->arg[2].n = n2;
+    record->arg[3].n = n3;
 }
 
-extern "C" JsgRecord *PjsgeAllocJsg_1E0F58(s32 arg0, s32 arg1, s32 arg2);
 
-extern "C" void AddSeqRecordAddGeom(s32 arg0, s32 arg1, s32 arg2) {
-    JsgRecord *record = PjsgeAllocJsg_1E0F58(arg0, 0x2E, 1);
-    record->field_0x10 = arg1;
-    record->field_0x14 = arg2;
-}
-
-extern "C" char *PjsgeAllocJsg_1E0F98(int arg0, int arg1, int arg2);
-
-extern "C" void AddSeqRecordRemoveGeom(int arg0, int arg1, int arg2)
+extern "C" void func_001E0E78(JSG *jsg, int n0, int fAsync, int n3, float g1, float g2)
 {
-    char *temp_v0;
-
-    temp_v0 = PjsgeAllocJsg_1E0F98(arg0, 0x2F, 1);
-    *(int *)(temp_v0 + 0x10) = arg1;
-    *(int *)(temp_v0 + 0x14) = arg2;
+    JSGE *record = PjsgeAllocJsg(jsg, 0x2B, fAsync);
+    record->arg[0].n = n0;
+    record->arg[1].f = g1;
+    record->arg[2].f = g2;
+    record->arg[3].n = n3;
 }
 
-extern "C" char *PjsgeAllocJsg_1E0FD8(void *, int, int);
 
-extern "C" void AddSeqRecordAddPhys(void *self, int first, int second) {
-    char *record = PjsgeAllocJsg_1E0FD8(self, 0x30, 1);
-    *(int *)(record + 0x10) = first;
-    *(int *)(record + 0x14) = second;
-}
-
-extern "C" char *PjsgeAllocJsg_1E1018(void *pool, int kind, int flag);
-
-extern "C" void AddSeqRecordRemovePhys(void *pool, int arg1, int arg2) {
-    char *record = PjsgeAllocJsg_1E1018(pool, 0x31, 1);
-    *(int *)(record + 0x10) = arg1;
-    *(int *)(record + 0x14) = arg2;
-}
-
-extern "C" void *PjsgeAllocJsg_1E1058(void *, int);
-
-extern "C" void AddSeqRecordJolt(void *jsg, int value)
+void AddJsgKind2C(JSG *jsg, int n0, int fAsync, float g1)
 {
-    *(int *)((char *)PjsgeAllocJsg_1E1058(jsg, 50) + 0x10) = value;
+    JSGE *record = PjsgeAllocJsg(jsg, 0x2C, fAsync);
+    record->arg[0].n = n0;
+    record->arg[1].f = g1;
 }
 
-extern "C" JsgRecord *PjsgeAllocJsg_1E1088(s32 arg0, s32 arg1);
 
-extern "C" void func_001E1088(s32 arg0, s32 arg1, f32 seconds) {
-    JsgRecord *record = PjsgeAllocJsg_1E1088(arg0, 0x33);
-    record->float_0x10 = seconds;
-    record->field_0x14 = arg1;
+void AddSeqRecordRemoveObject(JSG *jsg, int n0, int fAsync, float g1)
+{
+    JSGE *record = PjsgeAllocJsg(jsg, 0x2D, fAsync);
+    record->arg[0].n = n0;
+    record->arg[1].f = g1;
 }
 
-extern "C" JsgRecord *PjsgeAllocJsg_1E10C8(s32 arg0, s32 arg1, s32 arg2);
 
-extern "C" void AddSeqRecordExplode(s32 arg0, s32 arg1, s32 arg2, s32 arg3, f32 scale) {
-    JsgRecord *record = PjsgeAllocJsg_1E10C8(arg0, 0x34, 1);
-    record->field_0x10 = arg1;
-    record->field_0x14 = arg2;
-    record->field_0x18 = arg3;
-    record->float_0x1C = scale;
+extern "C" void AddSeqRecordAddGeom(JSG *jsg, s32 n0, s32 n1)
+{
+    JSGE *record = PjsgeAllocJsg(jsg, 0x2E, 1);
+    record->arg[0].n = n0;
+    record->arg[1].n = n1;
 }
 
-extern "C" char *PjsgeAllocJsg_1E1128(void *, int, int);
 
-extern "C" void AddSeqRecordSetEyes(char *jsg, int arg1, int arg2, float fparg0) {
-    char *temp_v0;
+extern "C" void AddSeqRecordRemoveGeom(JSG *jsg, int n0, int n1)
+{
+    JSGE *record = PjsgeAllocJsg(jsg, 0x2F, 1);
+    record->arg[0].n = n0;
+    record->arg[1].n = n1;
+}
 
-    temp_v0 = PjsgeAllocJsg_1E1128(jsg, 0x35, 1);
-    *(int *)(temp_v0 + 0x10) = arg1;
-    *(int *)(temp_v0 + 0x14) = arg2;
-    *(float *)(temp_v0 + 0x18) = fparg0;
+
+extern "C" void AddSeqRecordAddPhys(JSG *jsg, int n0, int n1)
+{
+    JSGE *record = PjsgeAllocJsg(jsg, 0x30, 1);
+    record->arg[0].n = n0;
+    record->arg[1].n = n1;
+}
+
+
+extern "C" void AddSeqRecordRemovePhys(JSG *jsg, int n0, int n1)
+{
+    JSGE *record = PjsgeAllocJsg(jsg, 0x31, 1);
+    record->arg[0].n = n0;
+    record->arg[1].n = n1;
+}
+
+
+extern "C" void AddSeqRecordJolt(JSG *jsg, int n0, int fAsync)
+{
+    JSGE *record = PjsgeAllocJsg(jsg, 50, fAsync);
+    record->arg[0].n = n0;
+}
+
+
+extern "C" void func_001E1088(JSG *jsg, s32 n1, f32 g0, int fAsync)
+{
+    JSGE *record = PjsgeAllocJsg(jsg, 0x33, fAsync);
+    record->arg[0].f = g0;
+    record->arg[1].n = n1;
+}
+
+
+extern "C" void AddSeqRecordExplode(JSG *jsg, s32 n0, s32 n1, s32 n2, f32 g3)
+{
+    JSGE *record = PjsgeAllocJsg(jsg, 0x34, 1);
+    record->arg[0].n = n0;
+    record->arg[1].n = n1;
+    record->arg[2].n = n2;
+    record->arg[3].f = g3;
+}
+
+
+extern "C" void AddSeqRecordSetEyes(JSG *jsg, int n0, int n1, float g2)
+{
+    JSGE *record = PjsgeAllocJsg(jsg, 0x35, 1);
+    record->arg[0].n = n0;
+    record->arg[1].n = n1;
+    record->arg[2].f = g2;
 }
 
 struct JSGE_1E1178 { char pad[0x10]; int n[4]; float g[3]; };
 
-extern "C" JSGE_1E1178 *PjsgeAllocJsg_1E1178(JSG *, int, int);
 
-extern "C" void AddSeqRecordSoundEffect(JSG *pjsg, int a, int b, int c, int d, float g0, float g1, float g2)
+extern "C" void AddSeqRecordSoundEffect(JSG *jsg, int n0, int n1, int n2, int n3, float g4, float g5, float g6)
 {
-    JSGE_1E1178 *e = PjsgeAllocJsg_1E1178(pjsg, 0x36, 1);
-e->n[0] = a;
-e->n[1] = b;
-e->n[2] = c;
-e->n[3] = d;
-e->g[0] = g0;
-e->g[1] = g1;
-e->g[2] = g2;
+    JSGE *record = PjsgeAllocJsg(jsg, 0x36, 1);
+    record->arg[0].n = n0;
+    record->arg[1].n = n1;
+    record->arg[2].n = n2;
+    record->arg[3].n = n3;
+    record->arg[4].f = g4;
+    record->arg[5].f = g5;
+    record->arg[6].f = g6;
 }
 
-extern "C" void *PjsgeAllocJsg_1E1208(void *, int, int);
 
-extern "C" void AddSeqRecordStopSoundEffect(void *jsg, int value)
+extern "C" void AddSeqRecordStopSoundEffect(JSG *jsg, int n0)
 {
-    *(int *)((char *)PjsgeAllocJsg_1E1208(jsg, 55, 1) + 0x10) = value;
+    JSGE *record = PjsgeAllocJsg(jsg, 55, 1);
+    record->arg[0].n = n0;
 }
 
 struct JSGE_1E1238 { char pad[0x10]; QW position; float radiansX, radiansY, radiansZ, pad2; float field_0x30; char pad3[0xC]; float field_0x40; int field_0x44; };
@@ -575,39 +565,40 @@ void AddSeqRecordEndConfrontCamera(JSG *pjsg, QW position, QW degrees, int field
     pjsge->radiansZ = LaneZInGeneralRegister(degrees) * 0.017453294f;
 }
 
-extern "C" void *PjsgeAllocJsg_1E1388(void *, int, int);
 
-extern "C" void AddSeqRecordRevokeConfrontCamera(void *jsg, int value)
+extern "C" void AddSeqRecordRevokeConfrontCamera(JSG *jsg, int n0)
 {
-    *(int *)((char *)PjsgeAllocJsg_1E1388(jsg, 58, 1) + 0x10) = value;
+    JSGE *record = PjsgeAllocJsg(jsg, 58, 1);
+    record->arg[0].n = n0;
 }
 
-extern "C" void *PjsgeAllocJsg_1E13B8(void *, int, int);
 
-extern "C" void AddSeqRecordShowBinoc(void *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
-    char *record = (char *)PjsgeAllocJsg_1E13B8(arg0, 0x3B, arg4);
-
-    *(s32 *)(record + 0x10) = arg1;
-    *(s32 *)(record + 0x14) = arg2;
-    *(s32 *)(record + 0x18) = arg3;
+extern "C" void AddSeqRecordShowBinoc(JSG *jsg, s32 n0, s32 n1, s32 n2, s32 fAsync)
+{
+    JSGE *record = PjsgeAllocJsg(jsg, 0x3B, fAsync);
+    record->arg[0].n = n0;
+    record->arg[1].n = n1;
+    record->arg[2].n = n2;
 }
 
-extern "C" void* PjsgeAllocJsg_1E1408(void*, int, int);
 
-extern "C" void* AddSeqRecordHideBinoc(void* a, int b) { return PjsgeAllocJsg_1E1408(a, 60, b); }
-
-extern "C" void *PjsgeAllocJsg_1E1428(void *, int);
-
-extern "C" void AddSeqRecordBinocAnchor(void *jsg, int value)
+extern "C" void AddSeqRecordHideBinoc(JSG *jsg, int fAsync)
 {
-    *(int *)((char *)PjsgeAllocJsg_1E1428(jsg, 61) + 0x10) = value;
+    PjsgeAllocJsg(jsg, 60, fAsync);
 }
 
-extern "C" void *PjsgeAllocJsg_1E1458(void *, int);
 
-extern "C" void AddSeqRecordBinocFocus(void *jsg, int value)
+extern "C" void AddSeqRecordBinocAnchor(JSG *jsg, int n0, int fAsync)
 {
-    *(int *)((char *)PjsgeAllocJsg_1E1458(jsg, 62) + 0x10) = value;
+    JSGE *record = PjsgeAllocJsg(jsg, 61, fAsync);
+    record->arg[0].n = n0;
+}
+
+
+extern "C" void AddSeqRecordBinocFocus(JSG *jsg, int n0, int fAsync)
+{
+    JSGE *record = PjsgeAllocJsg(jsg, 62, fAsync);
+    record->arg[0].n = n0;
 }
 
 struct JSGE_1E1488 { char pad[0x10]; QW pos; float rot[3]; char pad2[4]; float extra; };
@@ -625,221 +616,217 @@ extern "C" void AddSeqRecordBinocPos(JSG *jsg, QW pos, QW rot, float extra)
     item->rot[2] = z;
 }
 
-extern "C" void *PjsgeAllocJsg_1E1510(void *, int, int);
 
-extern "C" void AddSeqRecordBinocZoom(void *jsg, int flag, float value)
+extern "C" void AddSeqRecordBinocZoom(JSG *jsg, int fAsync, float g0)
 {
-    *(float *)((char *)PjsgeAllocJsg_1E1510(jsg, 64, flag) + 0x10) = value;
+    JSGE *record = PjsgeAllocJsg(jsg, 64, fAsync);
+    record->arg[0].f = g0;
 }
 
-extern "C" void* PjsgeAllocJsg_1E1540(void*, int, int);
 
-extern "C" void* AddSeqRecordBinocCut(void* a) { return PjsgeAllocJsg_1E1540(a, 65, 1); }
-
-extern "C" char *PjsgeAllocJsg_1E1560(int, int, int);
-
-extern "C" void AddSeqRecordWaitForButton(int first, int arg1, int arg2)
+extern "C" void AddSeqRecordBinocCut(JSG *jsg)
 {
-    char *record = PjsgeAllocJsg_1E1560(first, 0x42, 0);
-    if (arg1 == -1) {
-        arg1 = 0x40;
+    PjsgeAllocJsg(jsg, 65, 1);
+}
+
+
+extern "C" void AddSeqRecordWaitForButton(JSG *jsg, int n0, int n1)
+{
+    JSGE *record = PjsgeAllocJsg(jsg, 0x42, 0);
+    if (n0 == -1) {
+        n0 = 0x40;
     }
-    *(int *)(record + 0x14) = arg2;
-    *(int *)(record + 0x10) = arg1;
+    record->arg[1].n = n1;
+    record->arg[0].n = n0;
 }
 
-extern "C" void *PjsgeAllocJsg_1E15B0(void *, int, int);
 
 struct JSGREC_1E15B0 { char pad[0x10]; int nAt10; int nAt14; };
 
-extern "C" void func_001E15B0(void *pJsg, int nAt10, int nAt14)
+extern "C" void func_001E15B0(JSG *jsg, int n0, int n1)
 {
-    struct JSGREC_1E15B0 *pRec = (struct JSGREC_1E15B0 *)PjsgeAllocJsg_1E15B0(pJsg, 0x43, 0);
-    pRec->nAt10 = nAt10;
-    pRec->nAt14 = nAt14;
+    JSGE *record = PjsgeAllocJsg(jsg, 0x43, 0);
+    record->arg[0].n = n0;
+    record->arg[1].n = n1;
 }
 
-extern "C" void* PjsgeAllocJsg_1E15F0(void*, int, int);
 
-extern "C" void* func_001E15F0(void* a) { return PjsgeAllocJsg_1E15F0(a, 68, 0); }
-
-extern "C" char *PjsgeAllocJsg_1E1610(int arg0, int arg1, int arg2);
-
-extern "C" void AddSeqRecordVoice(int arg0, int arg1, int arg2, int arg3) {
-    char *record = PjsgeAllocJsg_1E1610(arg0, 0x45, arg3);
-    *(int *)(record + 0x10) = arg1;
-    *(int *)(record + 0x14) = arg2;
-}
-
-extern "C" void* PjsgeAllocJsg_1E1650(void*, int, int);
-
-extern "C" void* func_001E1650(void* a) { return PjsgeAllocJsg_1E1650(a, 70, 1); }
-
-extern "C" JsgRecord *PjsgeAllocJsg_1E1670(s32 arg0, s32 arg1, s32 arg2);
-
-extern "C" void AddSeqRecordGesture(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
-    JsgRecord *record = PjsgeAllocJsg_1E1670(arg0, 0x47, 1);
-    record->field_0x10 = arg1;
-    record->field_0x14 = arg2;
-    record->field_0x18 = arg3;
-}
-
-s8 *PjsgeAllocJsg_1E16C0(s32, s32, s32);
-
-void AddSeqRecordEndGesture(s32 arg0, s32 arg1, s32 arg2, s32 arg3)
+extern "C" void func_001E15F0(JSG *jsg)
 {
-    s8 *temp = PjsgeAllocJsg_1E16C0(arg0, 0x48, 1);
-    *(s32 *)(temp + 0x10) = arg1;
-    *(s32 *)(temp + 0x14) = arg2;
-    *(s32 *)(temp + 0x18) = arg3;
+    PjsgeAllocJsg(jsg, 68, 0);
 }
 
-extern "C" void *PjsgeAllocJsg_1E1710(void *, int, int);
 
-extern "C" void AddSeqRecordSetDanceState(void *jsg, int value)
+extern "C" void AddSeqRecordVoice(JSG *jsg, int n0, int n1, int fAsync)
 {
-    *(int *)((char *)PjsgeAllocJsg_1E1710(jsg, 73, 1) + 0x10) = value;
+    JSGE *record = PjsgeAllocJsg(jsg, 0x45, fAsync);
+    record->arg[0].n = n0;
+    record->arg[1].n = n1;
 }
 
-extern "C" JsgRecord *PjsgeAllocJsg_1E1740(s32 arg0, s32 arg1, s32 arg2);
 
-extern "C" void AddSeqRecordDanceMove(s32 arg0, s32 arg1, s32 arg2, s32 arg3, f32 seconds) {
-    JsgRecord *record = PjsgeAllocJsg_1E1740(arg0, 0x4A, 0);
-    record->float_0x10 = seconds;
-    record->field_0x14 = arg1;
-    record->field_0x18 = arg2;
-    record->field_0x1C = arg3;
-}
-
-extern "C" char *PjsgeAllocJsg_1E17A0(void *, s32, s32);
-
-extern "C" void AddSeqRecordDanceInterlude(void *arg0, s32 arg1, s32 arg2) {
-    char *record;
-    record = PjsgeAllocJsg_1E17A0(arg0, 0x4B, 1);
-    *(s32 *)(record + 0x10) = arg1;
-    *(s32 *)(record + 0x14) = arg2;
-}
-
-extern "C" void *PjsgeAllocJsg_1E17E0(void *, int, int);
-
-extern "C" void AddSeqRecordApplyMusic(void *jsg, int value)
+extern "C" void func_001E1650(JSG *jsg)
 {
-    *(int *)((char *)PjsgeAllocJsg_1E17E0(jsg, 76, 1) + 0x10) = value;
+    PjsgeAllocJsg(jsg, 70, 1);
 }
 
-extern "C" void *PjsgeAllocJsg_1E1810(void *, int, int);
 
-extern "C" void AddSeqRecordRetractMusic(void *jsg, int value)
+extern "C" void AddSeqRecordGesture(JSG *jsg, s32 n0, s32 n1, s32 n2)
 {
-    *(int *)((char *)PjsgeAllocJsg_1E1810(jsg, 77, 1) + 0x10) = value;
+    JSGE *record = PjsgeAllocJsg(jsg, 0x47, 1);
+    record->arg[0].n = n0;
+    record->arg[1].n = n1;
+    record->arg[2].n = n2;
 }
 
-extern "C" void *PjsgeAllocJsg_1E1840(void *, int, int);
 
-extern "C" void AddSeqRecordWaitForMusic(void *jsg, float value)
+void AddSeqRecordEndGesture(JSG *jsg, s32 n0, s32 n1, s32 n2)
 {
-    *(float *)((char *)PjsgeAllocJsg_1E1840(jsg, 78, 0) + 0x10) = value;
+    JSGE *record = PjsgeAllocJsg(jsg, 0x48, 1);
+    record->arg[0].n = n0;
+    record->arg[1].n = n1;
+    record->arg[2].n = n2;
 }
 
-extern "C" JsgRecord *PjsgeAllocJsg_1E1870(s32 arg0, s32 arg1, s32 arg2);
 
-extern "C" void AddSeqRecordLift(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5, s32 arg6) {
-    JsgRecord *record = PjsgeAllocJsg_1E1870(arg0, 0x4F, arg6);
-    record->field_0x14 = arg1;
-    record->field_0x1C = arg2;
-    record->field_0x18 = arg3;
-    record->field_0x20 = arg4;
-    record->field_0x10 = arg5;
-}
-
-extern "C" void *PjsgeAllocJsg_1E18E0(void *, int, int);
-
-extern "C" void AddSeqRecordTakeOutBomb(void *jsg, int value)
+extern "C" void AddSeqRecordSetDanceState(JSG *jsg, int n0)
 {
-    *(int *)((char *)PjsgeAllocJsg_1E18E0(jsg, 80, 0) + 0x10) = value;
+    JSGE *record = PjsgeAllocJsg(jsg, 73, 1);
+    record->arg[0].n = n0;
 }
 
-extern "C" void *PjsgeAllocJsg_1E1910(void *, int, int);
 
-extern "C" void AddSeqRecordDropBomb(void *jsg, int value)
+extern "C" void AddSeqRecordDanceMove(JSG *jsg, s32 n1, s32 n2, s32 n3, f32 g0)
 {
-    *(int *)((char *)PjsgeAllocJsg_1E1910(jsg, 81, 0) + 0x10) = value;
+    JSGE *record = PjsgeAllocJsg(jsg, 0x4A, 0);
+    record->arg[0].f = g0;
+    record->arg[1].n = n1;
+    record->arg[2].n = n2;
+    record->arg[3].n = n3;
 }
 
-extern "C" void *PjsgeAllocJsg_1E1940(void *, int, int);
 
-extern "C" void AddSeqRecordWaitForVoice(void *jsg, float value)
+extern "C" void AddSeqRecordDanceInterlude(JSG *jsg, int n0, int n1)
 {
-    *(float *)((char *)PjsgeAllocJsg_1E1940(jsg, 82, 0) + 0x10) = value;
+    JSGE *record = PjsgeAllocJsg(jsg, 0x4B, 1);
+    record->arg[0].n = n0;
+    record->arg[1].n = n1;
 }
 
-extern "C" void* PjsgeAllocJsg_1E1970(void*, int, int);
 
-void AddJsgKind2C_1E1970(void* pjsg, int nFirst, int fAsync, float gFirst)
+extern "C" void AddSeqRecordApplyMusic(JSG *jsg, int n0)
 {
-    void* pjsge = PjsgeAllocJsg_1E1970(pjsg, 0x53, fAsync);
-    *(int*)((char*)pjsge + 0x10) = nFirst;
-    *(float*)((char*)pjsge + 0x14) = gFirst;
+    JSGE *record = PjsgeAllocJsg(jsg, 76, 1);
+    record->arg[0].n = n0;
 }
 
-extern "C" void *PjsgeAllocJsg_1E19B0(void *, int, int);
 
-extern "C" void AddSeqRecordHideBrief(void *jsg, int value)
+extern "C" void AddSeqRecordRetractMusic(JSG *jsg, int n0)
 {
-    *(int *)((char *)PjsgeAllocJsg_1E19B0(jsg, 84, 1) + 0x10) = value;
+    JSGE *record = PjsgeAllocJsg(jsg, 77, 1);
+    record->arg[0].n = n0;
 }
 
-extern "C" s8 *PjsgeAllocJsg_1E19E0(void *, s32, s32);
 
-extern "C" void AddSeqRecordPlayGuardScript(void *arg0, s32 arg1, s32 arg2, s32 arg3) {
-    s8 *temp_v0;
-
-    temp_v0 = PjsgeAllocJsg_1E19E0(arg0, 0x55, arg3);
-    *(s32 *)(temp_v0 + 0x10) = arg1;
-    *(s32 *)(temp_v0 + 0x14) = arg2;
-}
-
-extern "C" JsgRecord *PjsgeAllocJsg_1E1A20(s32 arg0, s32 arg1, s32 arg2);
-
-extern "C" void AddSeqRecordRetractGuardScript(s32 arg0, s32 arg1, s32 arg2) {
-    JsgRecord *record = PjsgeAllocJsg_1E1A20(arg0, 0x56, 1);
-    record->field_0x10 = arg1;
-    record->field_0x14 = arg2;
-}
-
-extern "C" void *PjsgeAllocJsg_1E1A60(void *, int, int);
-
-extern "C" void func_001E1A60(void *jsg, int value)
+extern "C" void AddSeqRecordWaitForMusic(JSG *jsg, float g0)
 {
-    *(int *)((char *)PjsgeAllocJsg_1E1A60(jsg, 87, 1) + 0x10) = value;
+    JSGE *record = PjsgeAllocJsg(jsg, 78, 0);
+    record->arg[0].f = g0;
 }
 
-extern "C" JsgRecord *PjsgeAllocJsg_1E1A90(s32 arg0, s32 arg1, s32 arg2);
 
-extern "C" void func_001E1A90(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
-    JsgRecord *record = PjsgeAllocJsg_1E1A90(arg0, 0x58, arg3);
-    record->field_0x10 = arg1;
-    record->field_0x14 = arg2;
-}
-
-extern "C" char *PjsgeAllocJsg_1E1AD0(int arg0, int arg1, int arg2);
-
-extern "C" void func_001E1AD0(int arg0, int arg1, int arg2, int arg3)
+extern "C" void AddSeqRecordLift(JSG *jsg, s32 n1, s32 n3, s32 n2, s32 n4, s32 n0, s32 fAsync)
 {
-    char *temp_v0;
-
-    temp_v0 = PjsgeAllocJsg_1E1AD0(arg0, 0x59, arg3);
-    *(int *)(temp_v0 + 0x10) = arg1;
-    *(int *)(temp_v0 + 0x14) = arg2;
+    JSGE *record = PjsgeAllocJsg(jsg, 0x4F, fAsync);
+    record->arg[1].n = n1;
+    record->arg[3].n = n3;
+    record->arg[2].n = n2;
+    record->arg[4].n = n4;
+    record->arg[0].n = n0;
 }
 
-extern "C" JsgRecord *PjsgeAllocJsg_1E1B10(s32 arg0, s32 arg1, s32 arg2);
 
-extern "C" void func_001E1B10(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
-    JsgRecord *record = PjsgeAllocJsg_1E1B10(arg0, 0x5A, arg3);
-    record->field_0x10 = arg1;
-    record->field_0x14 = arg2;
-    record->field_0x18 = 0;
+extern "C" void AddSeqRecordTakeOutBomb(JSG *jsg, int n0)
+{
+    JSGE *record = PjsgeAllocJsg(jsg, 80, 0);
+    record->arg[0].n = n0;
+}
+
+
+extern "C" void AddSeqRecordDropBomb(JSG *jsg, int n0)
+{
+    JSGE *record = PjsgeAllocJsg(jsg, 81, 0);
+    record->arg[0].n = n0;
+}
+
+
+extern "C" void AddSeqRecordWaitForVoice(JSG *jsg, float g0)
+{
+    JSGE *record = PjsgeAllocJsg(jsg, 82, 0);
+    record->arg[0].f = g0;
+}
+
+
+void AddJsgKind2C_1E1970(JSG *jsg, int n0, int fAsync, float g1)
+{
+    JSGE *record = PjsgeAllocJsg(jsg, 0x53, fAsync);
+    record->arg[0].n = n0;
+    record->arg[1].f = g1;
+}
+
+
+extern "C" void AddSeqRecordHideBrief(JSG *jsg, int n0)
+{
+    JSGE *record = PjsgeAllocJsg(jsg, 84, 1);
+    record->arg[0].n = n0;
+}
+
+
+extern "C" void AddSeqRecordPlayGuardScript(JSG *jsg, int n0, int n1, int fAsync)
+{
+    JSGE *record = PjsgeAllocJsg(jsg, 0x55, fAsync);
+    record->arg[0].n = n0;
+    record->arg[1].n = n1;
+}
+
+
+extern "C" void AddSeqRecordRetractGuardScript(JSG *jsg, s32 n0, s32 n1)
+{
+    JSGE *record = PjsgeAllocJsg(jsg, 0x56, 1);
+    record->arg[0].n = n0;
+    record->arg[1].n = n1;
+}
+
+
+extern "C" void func_001E1A60(JSG *jsg, int n0)
+{
+    JSGE *record = PjsgeAllocJsg(jsg, 87, 1);
+    record->arg[0].n = n0;
+}
+
+
+extern "C" void func_001E1A90(JSG *jsg, s32 n0, s32 n1, s32 fAsync)
+{
+    JSGE *record = PjsgeAllocJsg(jsg, 0x58, fAsync);
+    record->arg[0].n = n0;
+    record->arg[1].n = n1;
+}
+
+
+extern "C" void func_001E1AD0(JSG *jsg, int n0, int n1, int fAsync)
+{
+    JSGE *record = PjsgeAllocJsg(jsg, 0x59, fAsync);
+    record->arg[0].n = n0;
+    record->arg[1].n = n1;
+}
+
+
+extern "C" void func_001E1B10(JSG *jsg, s32 n0, s32 n1, s32 fAsync)
+{
+    JSGE *record = PjsgeAllocJsg(jsg, 0x5A, fAsync);
+    record->arg[0].n = n0;
+    record->arg[1].n = n1;
+    record->arg[2].n = 0;
 }
 
 extern "C" {
@@ -984,7 +971,9 @@ struct SEQNODE {
     float sCrv78;   /* 0x78 */
     float sCrv7C;   /* 0x7C */
     float tCam;     /* 0x80 */
-    char pad84[0x9C - 0x84];
+    u8 unknown_0x84[0xC];
+    int field_0x90; /* StopSeqnodeCameraMove stores its argument */
+    u8 unknown_0x94[0x8];
     int fCamMove;   /* 0x9C */
     LO *pjtBinoc;   /* 0xA0 */
     int cattach;    /* 0xA4 */
@@ -3078,20 +3067,20 @@ void GetSeqnodeObjectPosRad(SEQNODE_1E4D40 *pseqnode, LO *plo, QW *ppos, f32 *pr
 extern "C" {
 void func_00143DE8(LO *target, SEQNODE *owner);
 
-void SetSeqnodeDrive(SEQNODE *node, REC *arg1, LO *arg2) {
+void SetSeqnodeDrive(SEQNODE *node, REC *precDrive, LO *ploDrive) {
     LO *current;
 
-    if (arg1 != node->precDrive) {
-        node->precDrive = arg1;
+    if (precDrive != node->precDrive) {
+        node->precDrive = precDrive;
     }
     current = node->ploDrive;
-    if (arg2 != current) {
+    if (ploDrive != current) {
         if (current != 0) {
             func_00143DE8(current, 0);
         }
-        node->ploDrive = arg2;
-        if (arg2 != 0) {
-            func_00143DE8(arg2, node);
+        node->ploDrive = ploDrive;
+        if (ploDrive != 0) {
+            func_00143DE8(ploDrive, node);
         }
     }
 }
@@ -3269,26 +3258,17 @@ void func_001E53D8(struct Seqnode *node) {
 }
 }
 
-extern "C" void UnsubscribeLoObject(char *subscriber, char *owner);
+extern "C" void UnsubscribeLoObject(LO *subscriber, SEQNODE *owner);
 
 extern "C" void ReleaseSeqnodeSma(SEQNODE *pseqnode) {
-    char *arg0 = (char *)pseqnode;
-    char *sma;
-    char *object;
-    char *vtable;
-    s16 thisOffset;
-    void (*releaseFunction)(char *);
+    LO *sma;
 
-    sma = *(char **)(arg0 + 0x58);
+    sma = pseqnode->psma;
     if (sma != 0) {
-        UnsubscribeLoObject(sma, arg0);
-        object = *(char **)(arg0 + 0x58);
-        vtable = *(char **)(object + 0xC);
-        thisOffset = *(s16 *)(vtable + 0x10);
-        releaseFunction = *(void (**)(char *))(vtable + 0x14);
-        releaseFunction(object + thisOffset);
-        *(char **)(arg0 + 0x58) = 0;
-        *(s32 *)(arg0 + 0x5C) = 0;
+        UnsubscribeLoObject(sma, pseqnode);
+        pseqnode->psma->Slot2();
+        pseqnode->psma = 0;
+        pseqnode->fSmaCur = 0;
     }
 }
 
@@ -3445,10 +3425,9 @@ extern CM B_002DDF40;
 
 extern "C" void StopSeqnodeCameraMove(SEQNODE *pseqnode, int arg1)
 {
-    char *arg0 = (char *)pseqnode;
-    *(int *)(arg0 + 0x90) = arg1;
+    pseqnode->field_0x90 = arg1;
     pseqnode->fCamMove = 0;
-    RevokeCmPolicy(&B_002DDF40, 2, 0xA, (char *)&B_002DDF40 + 0x500, 0, arg0 + 0x84);
+    RevokeCmPolicy(&B_002DDF40, 2, 0xA, (char *)&B_002DDF40 + 0x500, 0, pseqnode->unknown_0x84);
 }
 
 struct SVT_1E5AE0 { char pad0[8]; short d8; short i8; void (*fn8)(char *); };
@@ -3543,10 +3522,10 @@ extern s32 B_00452148;
 
 extern s32 B_00452170;
 
-void StaticInitSlotheaps_1e5c28(s32 arg0, s32 arg1) {
+void StaticInitSlotheaps_1e5c28(s32 fInitialize, s32 priority) {
     s32 count;
 
-    if ((arg1 == 0xFFFF) && (arg0 != 0)) {
+    if ((priority == 0xFFFF) && (fInitialize != 0)) {
         count = B_002DD2E0 + 1;
         B_002DD2E0 = count;
         if (count == 1) {

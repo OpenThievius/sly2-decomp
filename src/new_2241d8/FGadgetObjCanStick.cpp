@@ -1,12 +1,10 @@
-#include "m2c_macros.h"
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "gadgetobj.h"
 
-s32 FGadgetObjCanStick(void *arg0) {
-    s32 temp_v0;
-
-    temp_v0 = M2C_FIELD(arg0, s32 *, 0x15C);
-    switch (temp_v0) {
+int FGadgetObjCanStick(GADGETOBJ *pgadget) {
+    switch (pgadget->gadget) {
     case 4:
-        return M2C_FIELD(arg0, s32 *, 0x150) == 1;
+        return pgadget->state == 1;
     default:
         return 0;
     case 5:

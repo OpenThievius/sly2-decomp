@@ -1,24 +1,22 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "bootq.h"
+struct MOVIE;
+struct LEVEL;
 extern "C" {
-void AddBootQueueCardCheck(s8 *);              /* extern */
-M2C_UNK AddBootQueueLevel(s8 *, M2C_UNK *, M2C_UNK, M2C_UNK); /* extern */
-M2C_UNK AddBootQueueMovie(s8 *, M2C_UNK *);               /* extern */
-void RunNextBootQueueEntry(s8 *);              /* extern */
-extern M2C_UNK RO_002A3868;
-extern M2C_UNK RO_002A38A8;
+void AddBootQueueCardCheck(BOOTQ *);
+void AddBootQueueLevel(BOOTQ *, LEVEL *, s32, s32);
+void AddBootQueueMovie(BOOTQ *, MOVIE *);
+void RunNextBootQueueEntry(BOOTQ *);
+extern MOVIE RO_002A3868;
+extern LEVEL RO_002A38A8;
 
-void StartBootQueue(s8 *arg0) {
-    M2C_FIELD(arg0, s32 *, 0) = 0;
-    M2C_FIELD(arg0, s32 *, 0x1C4) = 0;
-    AddBootQueueMovie(arg0, &RO_002A3868);
-    AddBootQueueCardCheck(arg0);
-    AddBootQueueLevel(arg0, &RO_002A38A8, 0x189, 1);
-    RunNextBootQueueEntry(arg0);
+void StartBootQueue(BOOTQ *pbootq) {
+    pbootq->cEntry = 0;
+    pbootq->iEntryNext = 0;
+    AddBootQueueMovie(pbootq, &RO_002A3868);
+    AddBootQueueCardCheck(pbootq);
+    AddBootQueueLevel(pbootq, &RO_002A38A8, 0x189, 1);
+    RunNextBootQueueEntry(pbootq);
 }
 
 }

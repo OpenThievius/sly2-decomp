@@ -1,18 +1,20 @@
-extern "C" {
-/* SPDX-License-Identifier: GPL-3.0-or-later */
+// SPDX-License-Identifier: GPL-3.0-or-later
 #include "types.h"
+#include "acr.h"
 
-s32 func_0012C0E0(char *arg0, f32 fparg0) {
+extern "C" {
+
+s32 func_0012C0E0(ACRAXIS *pacr, f32 time) {
     f32 *elements;
     s32 count;
     s32 index;
 
     index = 1;
-    count = *(s32 *)(arg0 + 4) - 1;
+    count = pacr->ckey - 1;
     if (index < count) {
-        elements = *(f32 **)(arg0 + 8);
+        elements = pacr->atime;
         while (index < count) {
-            if (fparg0 < elements[index]) {
+            if (time < elements[index]) {
                 break;
             }
             index += 1;

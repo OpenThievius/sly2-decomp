@@ -1,24 +1,17 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 #include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
+#include "guard.h"
 extern "C" {
-s32 PentryFindSensorLo(s8 *);
-void SetSensorEntryState(s8 *, s32, M2C_UNK);
-void memmove(s32, s32, s32);
+SENSORENTRY *PentryFindSensorLo(SENSOR *, LO *);
+void SetSensorEntryState(SENSOR *, SENSORENTRY *, s32);
+void memmove(void *, void *, s32);
 
-void RemoveSensorLo(s8 *arg0) {
-    s32 temp_v0;
-    s32 temp_v0_2;
-
-    temp_v0 = PentryFindSensorLo(arg0);
-    if (temp_v0 != 0) {
-        SetSensorEntryState(arg0, temp_v0, 0);
-        temp_v0_2 = M2C_FIELD(arg0, s32 *, 0xFC) - 1;
-        M2C_FIELD(arg0, s32 *, 0xFC) = temp_v0_2;
-        memmove(temp_v0, temp_v0 + 0x10, ((sptr) ((arg0 + ((temp_v0_2 * 0x10) + 0x100)) - temp_v0) >> 4) * 0x10);
+void RemoveSensorLo(SENSOR *sensor, LO *plo) {
+    SENSORENTRY *entry = PentryFindSensorLo(sensor, plo);
+    if (entry != 0) {
+        SetSensorEntryState(sensor, entry, 0);
+        sensor->centry = sensor->centry - 1;
+        memmove(entry, entry + 1, (sensor->aentry + sensor->centry - entry) * sizeof(SENSORENTRY));
     }
 }
 

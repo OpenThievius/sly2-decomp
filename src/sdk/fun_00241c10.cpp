@@ -1,25 +1,18 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later */
 #include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
 extern "C" {
-struct _m2c_stack_func_00241C10 {
-    /* 0x00 */ char pad0[0x40];
-};                                                  /* size = 0x40 */
-s32 func_00239450();                                /* extern */
-M2C_UNK func_002394A0();                            /* extern */
-M2C_UNK func_0023ADA8(M2C_UNK, M2C_UNK *, M2C_UNK); /* extern */
+s32 func_00239450();
+void func_002394A0();
+void func_0023ADA8(int, void (*)(void), int);
 extern s32 D_002C6764;
 extern s32 D_002C6788;
-extern M2C_UNK func_00241BB8;
+void func_00241BB8(void);
 s32 func_00241C10(void) {
-    s32 temp_s0;
+    s32 interrupts;
     D_002C6764 = 1;
-    temp_s0 = func_00239450();
-    func_0023ADA8(0x80000012, &func_00241BB8, 0);
-    if (temp_s0 != 0) {
+    interrupts = func_00239450();
+    func_0023ADA8(0x80000012, func_00241BB8, 0);
+    if (interrupts != 0) {
         func_002394A0();
     }
     D_002C6764 = 0;

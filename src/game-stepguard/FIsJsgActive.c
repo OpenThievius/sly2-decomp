@@ -1,5 +1,6 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "jsg.h"
 
-s32 FIsJsgActive(void *arg0) {
-    return M2C_FIELD(arg0, s32 *, 0x74);
+s32 FIsJsgActive(struct JSG *jsg) {
+    return jsg->fRunning;
 }

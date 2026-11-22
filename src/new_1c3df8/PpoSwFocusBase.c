@@ -1,5 +1,6 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "swview.h"
 
-s32 PpoSwFocusBase(void *arg0) {
-    return M2C_FIELD(arg0, s32 *, 0x3EFC);
+struct PO *PpoSwFocusBase(struct SWVIEW *psw) {
+    return psw->ppoFocusBase;
 }

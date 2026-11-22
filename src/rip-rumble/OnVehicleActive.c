@@ -1,13 +1,14 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "vehicle.h"
 
-M2C_UNK OnPoActive();                               /* extern */
-M2C_UNK SetVehicleState(void *, M2C_UNK);           /* extern */
+void OnPoActive(struct VEHICLE *vehicle, s32 fActive);
+void SetVehicleState(struct VEHICLE *vehicle, s32 state);
 
-void OnVehicleActive(void *arg0, s32 arg1) {
-    OnPoActive();
-    if (arg1 != 0) {
-        SetVehicleState(arg0, 2);
-    } else if (M2C_FIELD(arg0, s32 *, 0x180) == 2) {
-        SetVehicleState(arg0, 0);
+void OnVehicleActive(struct VEHICLE *vehicle, s32 fActive) {
+    OnPoActive(vehicle, fActive);
+    if (fActive != 0) {
+        SetVehicleState(vehicle, 2);
+    } else if (vehicle->state == 2) {
+        SetVehicleState(vehicle, 0);
     }
 }

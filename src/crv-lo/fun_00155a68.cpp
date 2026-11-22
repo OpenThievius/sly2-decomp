@@ -1,15 +1,19 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "goalpost.h"
 extern "C" {
-#include "types.h"
-s128 PosLoWorld(s32);
-s32 func_00227C90(s32, s128);
+QW PosLoWorld(LO *);
+int func_00227C90(LO *, QW);
 
-s32 func_00155A68(char *arg0) {
-    s32 *obj;
-    obj = *(s32 **)(arg0 + 0x38);
-    if (func_00227C90(obj[3], PosLoWorld(*(s32 *)(arg0 + 0x4C))) != 0
-        || (obj = *(s32 **)(arg0 + 0x38), func_00227C90(obj[7], PosLoWorld(*(s32 *)(arg0 + 0x4C))) == 0)) {
-        return (*(s32 **)(arg0 + 0x38))[1];
+/* PloPostSide */
+LO *func_00155A68(GOALPOSTWATCH *pgoal)
+{
+    POSTPAIR *ppost;
+
+    ppost = pgoal->ppost;
+    if (func_00227C90(ppost->pvolumeA, PosLoWorld(pgoal->ploTarget)) != 0
+        || (ppost = pgoal->ppost, func_00227C90(ppost->pvolumeB, PosLoWorld(pgoal->ploTarget)) == 0)) {
+        return pgoal->ppost->ploA;
     }
-    return (*(s32 **)(arg0 + 0x38))[5];
+    return pgoal->ppost->ploB;
 }
 }

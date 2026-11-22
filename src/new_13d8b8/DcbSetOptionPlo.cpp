@@ -1,16 +1,15 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "swfind.h"
+
+/* a Dcb option that names a world object: where to store it and which object id to look up */
+struct DCBOPTION {
+    /* 0x00 */ s32 oid;
+    /* 0x04 */ s32 offset;
+};
+
 extern "C" {
-struct _m2c_stack_DcbSetOptionPlo {
-    /* 0x00 */ char pad0[0x30];
-};                                                  /* size = 0x30 */
-s32 PloFindSwObject_thunk(M2C_UNK *, M2C_UNK, s32, s32); /* extern */
-extern M2C_UNK B_003DD490;
-void DcbSetOptionPlo(s32 arg0, s8 *arg1) {
-    *(s32 *)(arg0 + M2C_FIELD(arg1, s32 *, 4)) = PloFindSwObject_thunk(&B_003DD490, 4, M2C_FIELD(arg1, s32 *, 0), arg0);
+extern SW B_003DD490; /* the world */
+void DcbSetOptionPlo(LO *plo, DCBOPTION *poption) {
+    *(LO **)((char *)plo + poption->offset) = PloFindSwObject_thunk(&B_003DD490, 4, poption->oid, plo);
 }
 }

@@ -1,21 +1,18 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
-extern "C" {
-M2C_UNK AddDmaEnd__4DMAS(s8 *);                     /* extern */
-M2C_UNK AddPrimEnd__4GIFS(s8 *);                    /* extern */
-M2C_UNK AddPrimPack__4GIFSiiUl(s8 *, M2C_UNK, M2C_UNK, M2C_UNK); /* extern */
-M2C_UNK Detach__4DMASPiPP2QW(s8 *, s32, s32);       /* extern */
-M2C_UNK PackAD__4GIFSll(s8 *, M2C_UNK, M2C_UNK);        /* extern */
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "frm.h"
 
-void FinalizeFrameGifs__FP4GIFSPiPP2QW(s8 *arg0, s32 arg1, s32 arg2) {
-    AddPrimPack__4GIFSiiUl(arg0, 0, 1, 0xE);
-    PackAD__4GIFSll(arg0, 0x61, 0);
-    AddPrimEnd__4GIFS(arg0);
-    AddDmaEnd__4DMAS(arg0);
-    Detach__4DMASPiPP2QW(arg0, arg1, arg2);
+extern "C" {
+void AddDmaEnd__4DMAS(GIFS *);
+void AddPrimEnd__4GIFS(GIFS *);
+void AddPrimPack__4GIFSiiUl(GIFS *, int, int, unsigned long);
+void Detach__4DMASPiPP2QW(GIFS *, int *, QW **);
+void PackAD__4GIFSll(GIFS *, long, long);
+
+void FinalizeFrameGifs__FP4GIFSPiPP2QW(GIFS *gifs, int *pcqw, QW **ppqw) {
+    AddPrimPack__4GIFSiiUl(gifs, 0, 1, 0xE);
+    PackAD__4GIFSll(gifs, 0x61, 0);
+    AddPrimEnd__4GIFS(gifs);
+    AddDmaEnd__4DMAS(gifs);
+    Detach__4DMASPiPP2QW(gifs, pcqw, ppqw);
 }
 }

@@ -1,35 +1,24 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
-struct PadRequest_243930 {
-    s32 command;
-    s32 port;
-    s32 slot;
-    u8 data[8];
-    s32 result;
-};
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "pad.h"
 extern "C" {
-s32 func_00243458(s32, s32, s32);
-s32 sceSifCallRpc(void *, s32, s32, void *, s32, void *, s32, void *, void *);
-extern char B_00450580[];
-extern PadRequest_243930 B_004507C0;
-s32 scePadSetActAlign(s32 arg0, s32 arg1, u8 *arg2) {
-    PadRequest_243930 *request = &B_004507C0;
+s32 func_00243458(s32 port, s32 slot, s32 state);
+s32 sceSifCallRpc(PADCLIENT *client, s32 command, s32 mode, void *send, s32 sendSize, void *receive, s32 receiveSize, void *endFunction, void *endData);
+extern PADCLIENT B_00450580[];
+extern PADREQUEST B_004507C0;
+s32 scePadSetActAlign(s32 port, s32 slot, u8 *data) {
+    PADREQUEST *request = &B_004507C0;
     s32 index;
     request->command = 8;
-    request->port = arg0;
-    request->slot = arg1;
+    request->port = port;
+    request->slot = slot;
     for (index = 0; index < 6; index++) {
-        request->data[index] = arg2[index];
+        request->arguments.bytes[index] = data[index];
     }
     if (sceSifCallRpc(B_00450580, 1, 0, request, 0x80, request, 0x80, 0, 0) < 0) {
         return 0;
     }
     if (request->result == 1) {
-        func_00243458(arg0, arg1, 2);
+        func_00243458(port, slot, 2);
     }
     return request->result;
 }

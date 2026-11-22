@@ -1,24 +1,36 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "types.h"
 
-s32 PloFindSwObject_thunk(M2C_UNK *, M2C_UNK, s32, s32); /* extern */
-M2C_UNK RequestTaskState(s32, s32, s32);            /* extern */
-extern M2C_UNK B_003DD490;
+struct JOB;
+struct LO;
+struct SW;
+struct TASK;
 
-void ApplyTaskStateRequests(s32 arg0, s32 arg1, void *arg2, s32 arg3) {
-    s32 temp_v0;
-    s32 var_s1;
-    void *var_s0;
+/* an entry of a job's table of task state requests, 8 bytes */
+struct TASKSTATEREQUEST {
+    /* 0x0 */ s32 oid;   /* the task's object id, searched with grffso 0x105 */
+    /* 0x4 */ s32 state; /* the state RequestTaskState asks for */
+};
 
-    if (arg1 > 0) {
-        var_s0 = arg2;
-        var_s1 = arg1;
+struct LO *PloFindSwObject_thunk(struct SW *psw, s32 grffso, s32 oid, struct LO *ploContext);
+void RequestTaskState(struct TASK *ptask, s32 state, struct JOB *pjob);
+extern struct SW B_003DD490;
+
+void ApplyTaskStateRequests(void *unused, s32 crequest, struct TASKSTATEREQUEST *arequest, struct JOB *pjob) {
+    struct TASK *ptask;
+    s32 remaining;
+    struct TASKSTATEREQUEST *prequest;
+
+    if (crequest > 0) {
+        prequest = arequest;
+        remaining = crequest;
         do {
-            temp_v0 = PloFindSwObject_thunk(&B_003DD490, 0x105, M2C_FIELD(var_s0, s32 *, 0), arg3);
-            if (temp_v0 != 0) {
-                RequestTaskState(temp_v0, M2C_FIELD(var_s0, s32 *, 4), arg3);
+            ptask = (struct TASK *)PloFindSwObject_thunk(&B_003DD490, 0x105, prequest->oid, (struct LO *)pjob);
+            if (ptask != 0) {
+                RequestTaskState(ptask, prequest->state, pjob);
             }
-            var_s1 -= 1;
-            var_s0 += 8;
-        } while (var_s1 != 0);
+            remaining -= 1;
+            prequest += 1;
+        } while (remaining != 0);
     }
 }

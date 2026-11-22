@@ -1,9 +1,10 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "button.h"
 
-M2C_UNK LoadBtn(s32, s32);                          /* extern */
-M2C_UNK CSo_LoadFromBrx();                            /* extern */
+void LoadBtn(struct BTN *, struct BUTTON *);
+void CSo_LoadFromBrx();
 
-void LoadButtonFromBrx(s32 arg0) {
+void LoadButtonFromBrx(struct BUTTON *pbutton) {
     CSo_LoadFromBrx();
-    LoadBtn(arg0 + 0x150, arg0);
+    LoadBtn(&pbutton->btn, pbutton);
 }

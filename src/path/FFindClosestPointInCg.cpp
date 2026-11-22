@@ -1,18 +1,19 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-#include "types.h"
+#include "cg.h"
 
 extern "C" {
-s32 PcgtPointInCgSafe(void *arg0, s32 arg1, QW point);
-QW PosClosestOnCgt(s32 cgt, QW point);
+/* retail's call leaves its fourth word (the flags) as it finds it: PcgtPointInCgSafe takes (CG *, CGE *, QW, int) */
+void *PcgtPointInCgSafe(CG *pcg, CGE *pcgeFirst, QW point);
+QW PosClosestOnCgt(void *pcgt, QW point);
 
-s32 FFindClosestPointInCg(char *arg0, QW point, QW *arg2) {
-    s32 found;
+int FFindClosestPointInCg(CG *pcg, QW point, QW *ppos) {
+    void *pcgt;
 
-    found = PcgtPointInCgSafe(arg0, *(s32 *)(arg0 + 0x14), point);
-    if (found == 0) {
+    pcgt = PcgtPointInCgSafe(pcg, pcg->acge, point);
+    if (pcgt == 0) {
         return 0;
     }
-    *arg2 = PosClosestOnCgt(found, point);
+    *ppos = PosClosestOnCgt(pcgt, point);
     return 1;
 }
 }

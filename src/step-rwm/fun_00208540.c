@@ -1,24 +1,25 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "guardview.h"
 
-M2C_UNK AddAlertGuard(s32, void *);                 /* extern */
-s32 PalertEnsure(s32);                              /* extern */
-M2C_UNK RemoveAlertGuard(s32, void *);              /* extern */
+void AddAlertGuard(struct ALERT *, struct STEPGUARDVIEW *);
+struct ALERT *PalertEnsure(struct BASIC *);
+void RemoveAlertGuard(struct ALERT *, struct STEPGUARDVIEW *);
 
-void func_00208540(void *arg0, s32 arg1) {
-    s32 temp_v0;
-    s32 temp_v0_2;
+void func_00208540(struct STEPGUARDVIEW *pguard, struct BASIC *pbasicAlert) {
+    struct BASIC *pbasicOld;
+    struct ALERT *palert;
 
-    temp_v0 = M2C_FIELD(arg0, s32 *, 0x38C);
-    if (arg1 != temp_v0) {
-        if (temp_v0 != 0) {
-            RemoveAlertGuard(M2C_FIELD(arg0, s32 *, 0x3CC), arg0);
-            M2C_FIELD(arg0, s32 *, 0x3CC) = 0;
+    pbasicOld = pguard->pbasicAlert;
+    if (pbasicAlert != pbasicOld) {
+        if (pbasicOld != 0) {
+            RemoveAlertGuard(pguard->palert, pguard);
+            pguard->palert = 0;
         }
-        M2C_FIELD(arg0, s32 *, 0x38C) = arg1;
-        if (arg1 != 0) {
-            temp_v0_2 = PalertEnsure(arg1);
-            M2C_FIELD(arg0, s32 *, 0x3CC) = temp_v0_2;
-            AddAlertGuard(temp_v0_2, arg0);
+        pguard->pbasicAlert = pbasicAlert;
+        if (pbasicAlert != 0) {
+            palert = PalertEnsure(pbasicAlert);
+            pguard->palert = palert;
+            AddAlertGuard(palert, pguard);
         }
     }
 }

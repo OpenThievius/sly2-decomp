@@ -1,21 +1,23 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "goals.h"
+#include "sly2.h"
 
-s32 FGoalAnimDone(s32);                             /* extern */
-M2C_UNK func_0017B750(void *, M2C_UNK);             /* extern */
-M2C_UNK func_001EEF98();                            /* extern */
-s32 func_001EF0A8(void *);                          /* extern */
+s32 FGoalAnimDone(void *pgoal);
+void func_0017B750(struct GOAL *pgoal, s32 state);
+void func_001EEF98(struct GOAL *pgoal);
+s32 func_001EF0A8(struct GOAL *pgoal);
 
-void func_0017B620(void *arg0) {
-    s32 temp_s1;
+void func_0017B620(struct GOALSTAND *pgoal) {
+    s32 statePrevious;
 
-    func_001EEF98();
+    func_001EEF98((struct GOAL *)pgoal);
 loop_1:
-    if (func_001EF0A8(arg0) == 0) {
-        temp_s1 = M2C_FIELD(arg0, s32 *, 0x30);
-        if ((temp_s1 == 0) && (FGoalAnimDone(M2C_FIELD(arg0, s32 *, 0x18)) != 0)) {
-            func_0017B750(arg0, -1);
+    if (func_001EF0A8((struct GOAL *)pgoal) == 0) {
+        statePrevious = pgoal->state;
+        if ((statePrevious == 0) && (FGoalAnimDone(pgoal->pgoalChild) != 0)) {
+            func_0017B750((struct GOAL *)pgoal, -1);
         }
-        if (temp_s1 != M2C_FIELD(arg0, s32 *, 0x30)) {
+        if (statePrevious != pgoal->state) {
             goto loop_1;
         }
     }

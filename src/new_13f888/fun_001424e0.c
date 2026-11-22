@@ -1,15 +1,14 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "jtview.h"
 
-M2C_UNK StartAttach(void *, s32, s32, s32);      /* extern */
+void StartAttach(void *pvAttach, s32 kind, s32 ptarget, s32 pmember);
 
-void func_001424E0(void *arg0, s32 arg1, s32 arg2, s32 arg3) {
-    s32 var_a1;
-
-    var_a1 = arg1;
-    if (var_a1 == 0) {
-        var_a1 = M2C_FIELD(arg0, s32 *, 0x9C8);
+void func_001424E0(struct JTVIEW *pjt, s32 request, s32 ptarget, s32 sidDefault) {
+    s32 field_0x9CC = request;
+    if (field_0x9CC == 0) {
+        field_0x9CC = pjt->field_0x9C8;
     }
-    M2C_FIELD(arg0, s32 *, 0x9CC) = var_a1;
-    StartAttach(arg0 + 0x4C0, 0xC, arg2, 0);
-    M2C_FIELD(arg0, s32 *, 0x1318) = arg3;
+    pjt->field_0x9CC = field_0x9CC;
+    StartAttach(pjt->attach, 0xC, ptarget, 0);
+    pjt->sidDefault = sidDefault;
 }

@@ -1,6 +1,7 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
 #include "murray.h"
-int FInvulnerableJt(void *, int);
+extern "C" int FInvulnerableJt(JT *, int);
 extern "C" int func_00194640(void *, int);
 int FInvulnerableMurray(MURRAY *pmurray, int grftak)
 {
@@ -12,7 +13,7 @@ int FInvulnerableMurray(MURRAY *pmurray, int grftak)
     case 15:
         return 1;
     case 13:
-        if (func_00194640((char *)pmurray + 0x4c0, grftak) != 0)
+        if (func_00194640(pmurray->PvAttach(), grftak) != 0)
             return 1;
         break;
     }

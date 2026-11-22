@@ -1,16 +1,19 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "subtitle.h"
 
-s32 PchzStringFromId(M2C_UNK *, s32);               /* extern */
-M2C_UNK strcpy(s8 *, s32);                          /* extern */
-extern M2C_UNK B_003DD490;
+struct SW;
+extern struct SW B_003DD490;
 
-void func_002277D0(s32 *arg0, s8 *arg1) {
-    s32 temp_v1;
+char *PchzStringFromId(struct SW *psw, s32 id);
+char *strcpy(char *, const char *);
 
-    temp_v1 = *arg0;
-    if (temp_v1 == -1) {
-        *arg1 = 0;
+void func_002277D0(struct SUBTITLE *psubtitle, char *pchDestination) {
+    s32 sid;
+
+    sid = psubtitle->sid;
+    if (sid == -1) {
+        *pchDestination = 0;
         return;
     }
-    strcpy(arg1, PchzStringFromId(&B_003DD490, temp_v1));
+    strcpy(pchDestination, PchzStringFromId(&B_003DD490, sid));
 }

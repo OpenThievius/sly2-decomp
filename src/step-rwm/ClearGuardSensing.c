@@ -1,12 +1,13 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "guardview.h"
 
-M2C_UNK ClearGuardClassFilters(void *);             /* extern */
-M2C_UNK ClearGuardIgnoredClasses();                 /* extern */
+void ClearGuardClassFilters(struct STEPGUARDVIEW *);
+void ClearGuardIgnoredClasses(struct STEPGUARDVIEW *);
 
-void ClearGuardSensing(void *arg0) {
-    M2C_FIELD(M2C_FIELD(arg0, void **, 0xF64), s32 *, 0xFC) = 0;
-    M2C_FIELD(arg0, s32 *, 0x394) = 0;
-    M2C_FIELD(arg0, s32 *, 0x3A4) = 0;
-    ClearGuardIgnoredClasses();
-    ClearGuardClassFilters(arg0);
+void ClearGuardSensing(struct STEPGUARDVIEW *pguard) {
+    pguard->psensor->centry = 0;
+    pguard->cgroup = 0;
+    pguard->csensed = 0;
+    ClearGuardIgnoredClasses(pguard);
+    ClearGuardClassFilters(pguard);
 }

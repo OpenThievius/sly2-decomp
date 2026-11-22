@@ -27,9 +27,11 @@ struct CLASSINFO;
 struct RO;
 struct SCOPE;
 struct GRFENTRY;
+struct CFrame;
 
 struct BASIC {
-    u8 unknown_0x0[0x4];
+    /* 0x0 */ struct CFrame *pframe;    /* the object's frame pointer (a CFramePtr): ApplyAseg copies it from the ASEG to its ASEGA
+                                          (CFramePtr_Assign), Asega_Release clears it, PostLoLoad (LO slot 15) asks it for binding 1 */
     /* 0x4 */ struct CSidebag *psidebag; /* reader: RefGetOption (0x200BA0) calls its FFindBinding; RefSetOption, RefAddOption and
                                             RefEnsureOption (retail names P5BASIC) pass it to the CSidebag binding functions */
     u8 unknown_0x8[0x4];
@@ -45,7 +47,12 @@ struct BASIC {
 /* A search scope, 0x28 bytes: AllocSwBuffers allocates the world's default (SW::pscopeDefault) at that size, sets words 0x0 and
    0x8 to -1 and initialises a list at 0x18; an LO points at its own (LO::pscope), which PloFindSwObject takes in its place. */
 struct SCOPE {
-    u8 unknown_0x0[0x24];
+    /* 0x0 */ s32 field_0x0;           /* AllocSwBuffers sets it to -1 on the world's default scope */
+    u8 unknown_0x4[0x4];
+    /* 0x8 */ s32 field_0x8;           /* AllocSwBuffers sets it to -1 */
+    u8 unknown_0xC[0xC];
+    /* 0x18 */ u8 sl[0xC];             /* a list (sl.h's SL, not included here: several sources declare their own) that
+                                          AllocSwBuffers starts with InitSl (item size 0x14) */
     /* 0x24 */ s32 field_0x24;         /* InitCloneSets sets it to 1 on each clone's scope */
 };
 
@@ -57,7 +64,7 @@ struct LO : BASIC {
                                            Carry_Attach pass a pointer second */
     virtual void AddHierarchy();        /* 11: AddLoHierarchy, AddSoLoHierarchy */
     virtual void RemoveHierarchy();     /* 12: RemoveLoHierarchy */
-    virtual void Slot13(int arg1, struct SO *arg2);              /* 13: func_001A5B80 */
+    virtual void Slot13(struct LO *plo, struct SO *psoOldParent); /* 13: func_001A5B80; SetLoParent passes the object and its old parent */
     virtual void LoadFromBrx();         /* 14: LoadLoFromBrx, CSo_LoadFromBrx */
     virtual void PostLoad();            /* 15: PostLoLoad, PostSoLoad */
     virtual void Update();              /* 16: UpdateLo, UpdateSo */
@@ -73,7 +80,8 @@ struct LO : BASIC {
                                            InitCloneSets pass MakeCloneId's result and 1 */
     virtual void Slot26(void *pv);      /* 26: func_001CB4E0, func_001CB518 (SO); func_001CB518 calls it on each child */
     virtual void Slot27(void *pv);      /* 27: func_001CB5C8, func_001CB5D0 (SO); func_001CB5D0 calls it on each child */
-    virtual void CReturnZero();         /* 28: CReturnZeroLo */
+    virtual int CReturnZero(struct LO ***papalo); /* 28: CReturnZeroLo returns 0 (no children); AddLo, RemoveLo and SetLoParent pass the
+                                           address of a child array pointer and loop over the returned count */
     virtual void TranslateToPos(QW pos); /* 29: TranslateSoToPos (SO); func_001B0D90 passes a quadword */
     virtual void Slot30(void *pv);
     virtual struct MATRIX4 *PmatWorld(); /* 31: LO_PmatWorld, PmatWorldSo; Carry_Attach copies four quadwords from it */
@@ -87,9 +95,9 @@ struct LO : BASIC {
     virtual void SetPosMatFromXf();     /* 39: SetLoPosMatFromXf */
     virtual void CloneVirtual();        /* 40: CloneLoVirtual */
     virtual void Slot41(struct SO *psoSource); /* 41: CloneAloHierarchy passes the source object (an SO) */
-    virtual void Slot42();
-    virtual void FReturnFalse();        /* 43: FReturnFalseLo */
-    virtual void Slot44();
+    virtual void Slot42(float value);   /* 42: func_001F3118 (SO) stores it in field_0x38 and passes it to each child's slot 42 */
+    virtual unsigned FReturnFalse(int ipart); /* 43: FReturnFalseLo; func_00130010 passes a part index and keeps the unsigned the ALO override returns */
+    virtual void Slot44(int ipart);     /* 44: ApplyAseg calls it on each part's object with the part index */
     virtual void Slot45();
     virtual void Slot46();
     virtual void SetGrfField(u32 grf);  /* 47: SetLoGrfField; func_001F2FE0 passes a mask to each child */
@@ -98,14 +106,16 @@ struct LO : BASIC {
     /* 0x10 */ struct SO *psoParent;   /* InitSo, FFilterSensorSight (followed up to the root) */
     /* 0x14 */ s32 proot;              /* FFilterSensorSight (compared as an id), PoxaAllocSw (a list entry) */
     /* 0x18 */ s32 oid; /* the object id: FLoHasOid, PostMurrayLoad (Murray slot 15) and others */
-    u8 unknown_0x1C[0x8];
+    u8 unknown_0x1C[0x4];
+    /* 0x20 */ struct LO *ploNextCid;  /* the next object of the same class id: the link of SW::aslCid's lists (Sw_Construct's InitSl
+                                       ibSle 0x20); func_002102A0 walks them */
     /* 0x24 */ struct LO *ploNext;     /* the next child of the same parent: func_001CB518, func_001CB5D0, func_001F3CC8. The parent's
                                        list has ibDle 0x24 (InitSo), but this is not declared as a DLE: its prev would be 0x28,
                                        and retail reads grfo there as 64 bits (ld 0x28 in RecalcSoLocked, func_001C4BD8) */
     /* 0x28 */ u64 grfo;               /* RecalcSoLocked, func_001C4BD8, UpdateRip */
-    u8 unknown_0x30[0x4];
+    /* 0x30 */ f32 tUpdate;            /* UpdateLo (slot 16) runs HandleSpliceEvent 1 once the clock has passed it */
     /* 0x34 */ struct DCB *pdcb;       /* the object's callback table (PdcbAllocSw's result): func_001A5D98 runs its pfn(plo, pv). DCB is declared by its users */
-    u8 unknown_0x38[0x4];
+    /* 0x38 */ f32 field_0x38;         /* func_001F3118 (SO slot 42): set to its argument, compared with each child's */
     /* 0x3C */ struct SCOPE *pscope;   /* what PloFindSwObject searches when this object is the context: RefOpFindObject,
                                        func_001241E8, func_00124578, RefOpFindNearestObject; InitCloneSets sets its 0x24 */
     /* 0x40: flags until AddSwGrfEntry enters the object in the world's table (include/sw.h), then its entry, which keeps the
@@ -125,15 +135,19 @@ struct LO : BASIC {
 #define SLY2_SIZE_CHECK(type, size) typedef char check_##type##_size[(sizeof(type) == (size)) ? 1 : -1]
 SLY2_SIZE_CHECK(BASIC, 0x10);
 SLY2_SIZE_CHECK(LO, 0x50);
+SLY2_OFFSET_CHECK(BASIC, pframe, 0x0);
 SLY2_OFFSET_CHECK(BASIC, psidebag, 0x4);
 SLY2_OFFSET_CHECK(LO, psoParent, 0x10);
 SLY2_OFFSET_CHECK(LO, proot, 0x14);
 SLY2_OFFSET_CHECK(LO, pdcb, 0x34);
 SLY2_OFFSET_CHECK(LO, oid, 0x18);
+SLY2_OFFSET_CHECK(LO, ploNextCid, 0x20);
 SLY2_OFFSET_CHECK(LO, ploNext, 0x24);
+SLY2_OFFSET_CHECK(LO, tUpdate, 0x30);
 SLY2_OFFSET_CHECK(LO, grfo, 0x28);
 SLY2_OFFSET_CHECK(LO, pscope, 0x3C);
 SLY2_OFFSET_CHECK(LO, pgrfentry, 0x40);
 SLY2_SIZE_CHECK(SCOPE, 0x28);
+SLY2_OFFSET_CHECK(SCOPE, sl, 0x18);
 #endif
 #endif

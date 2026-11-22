@@ -1,29 +1,29 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
-extern "C" void PrimeSlotheap(void *);
-extern "C" void func_0020E338(void *);
-extern "C" void func_0020E2B0(void *);
-extern "C" void ClearSwRootFrameFlag(void *);
-extern "C" void InitCloneSets(void *);
-extern "C" void InitSwHudBlots(void *);
-extern "C" void InitSwHitFxParms(void *);
-extern "C" void func_001A3260(void *);
-extern "C" void func_001C10C8(void *);
-extern "C" void func_00210940(void *);
-extern "C" void FindTargetIndicatorTemplate(void *);
+#include "sw.h"
+extern "C" void PrimeSlotheap(SLOTHEAP *);
+extern "C" void func_0020E338(SW *);
+extern "C" void func_0020E2B0(SW *);
+extern "C" void ClearSwRootFrameFlag(SW *);
+extern "C" void InitCloneSets(SW *);
+extern "C" void InitSwHudBlots(SW *);
+extern "C" void InitSwHitFxParms(SW *);
+extern "C" void func_001A3260(SW *);
+extern "C" void func_001C10C8(SW *);
+extern "C" void func_00210940(SW *);
+extern "C" void FindTargetIndicatorTemplate(SW *);
 extern "C" void ShutdownSplice__Fv(void *);
-extern "C" void UpdateSwCallbacks(void *);
-extern "C" void BuildPzgraphAdjacency(void *);
+extern "C" void UpdateSwCallbacks(SW *);
+extern "C" void BuildPzgraphAdjacency(PZGRAPH *);
 extern "C" void func_0014D470(void *);
 extern "C" void bevy_camera_follow_activity(void *, int, int);
 extern "C" char B_003D9E70[], B_002DDF40[], B_002DEB30[];
-struct VT { char pad[0x78]; short delta; short index; void (*fn)(void *); };
-struct OBJ { int a, b, c; VT *vt; };
-void func_0020E740(char *sw)
+void func_0020E740(SW *sw)
 {
-    PrimeSlotheap(sw + 0x403C);
-    PrimeSlotheap(sw + 0x4054);
-    PrimeSlotheap(sw + 0x4070);
-    PrimeSlotheap(sw + 0x4088);
+    PrimeSlotheap(&sw->slotheapRipg);
+    PrimeSlotheap(&sw->slotheapRip);
+    PrimeSlotheap(&sw->slotheapBlipg);
+    PrimeSlotheap(&sw->slotheapBlip);
     func_0020E338(sw);
     func_0020E2B0(sw);
     ClearSwRootFrameFlag(sw);
@@ -37,24 +37,24 @@ void func_0020E740(char *sw)
     ShutdownSplice__Fv(B_003D9E70);
     for (;;) {
         UpdateSwCallbacks(sw);
-        OBJ **end = *(OBJ ***)(sw + 0x39E4);
-        OBJ **begin = *(OBJ ***)(sw + 0x39E0);
+        LO **end = sw->pploPostLoadEnd;
+        LO **begin = sw->pploPostLoadBegin;
         if (end == begin)
             break;
-        OBJ **current = begin;
+        LO **current = begin;
         if (current < end) {
             do {
-                OBJ *object = *current++;
-                object->vt->fn((char *)object + object->vt->delta);
-            } while (current < *(OBJ ***)(sw + 0x39E4));
+                LO *plo = *current++;
+                plo->PostLoad();
+            } while (current < sw->pploPostLoadEnd);
         }
-        *(int *)(sw + 0x39E4) = *(int *)(sw + 0x39E0);
+        sw->pploPostLoadEnd = sw->pploPostLoadBegin;
     }
-    *(int *)(sw + 0x39E4) = 0;
-    *(int *)(sw + 0x39E0) = 0;
-    *(int *)(sw + 0x39D8) = 0;
-    *(int *)(sw + 0x39D0) = 0;
-    BuildPzgraphAdjacency(*(void **)(sw + 0x45CC));
+    sw->pploPostLoadEnd = 0;
+    sw->pploPostLoadBegin = 0;
+    sw->aoptset = 0;
+    sw->adcb = 0;
+    BuildPzgraphAdjacency(sw->ppzgraph);
     func_0014D470(B_002DDF40);
     bevy_camera_follow_activity(B_002DEB30, 4, 0);
 }

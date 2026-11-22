@@ -3,7 +3,7 @@
 struct CFrame;
 extern "C" {
 void CRef_SetS32(CRef *, int);
-void CRef_SetF32(CRef *, float);
+void SetF32__4CReff(CRef *, float);
 }
 extern "C" CRef RefOpAbs(int carg, CRef *aref, CFrame *pframe)
 {
@@ -16,7 +16,7 @@ extern "C" CRef RefOpAbs(int carg, CRef *aref, CFrame *pframe)
         if (gAbs < 0.0f) {
             gAbs = -gAbs;
         }
-        CRef_SetF32(&refAbs, gAbs);
+        SetF32__4CReff(&refAbs, gAbs);
     }
     return refAbs;
 }

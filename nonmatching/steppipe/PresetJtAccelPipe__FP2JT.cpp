@@ -3,8 +3,8 @@
 #include "ps2inline.h"
 #include "sly2.h"
 #include "jt.h"
+#include "matrix3q.h"
 
-struct MATRIX3Q { QW row[3]; };
 struct JTPIPE {
     /* 0x0 */ JT *pjt;
     /* 0x4 */ int state;

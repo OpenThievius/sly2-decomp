@@ -1,9 +1,10 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "pzo_hide.h"
 
-M2C_UNK func_0017F138();                            /* extern */
-M2C_UNK func_0017F408(s32, M2C_UNK, s32);           /* extern */
+void func_0017F138(struct GRAB *);
+void func_0017F408(struct GRAB *, s32, struct ANIMENTRY *);
 
-void func_00181440(s32 arg0) {
-    func_0017F138();
-    func_0017F408(arg0, 3, arg0 + 0x1D0);
+void func_00181440(struct GRAB *grab) {
+    func_0017F138(grab);
+    func_0017F408(grab, 3, grab->aentry);
 }

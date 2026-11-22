@@ -1,5 +1,6 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "vehicle.h"
 
-s32 func_001D4D00(s32 arg0, s32 arg1) {
-    return M2C_FIELD(((arg1 * 0xC) + arg0), s32 *, 0x574);
+s32 func_001D4D00(struct VEHICLE *vehicle, s32 index) {
+    return vehicle->aammo[index].cammo;
 }

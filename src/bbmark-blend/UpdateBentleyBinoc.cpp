@@ -1,24 +1,23 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "bentley.h"
+#include "joy.h"
+/* the binoculars part InitJt starts at 0xF00 (JT::PvBinoc()): its own functions take its address, their layout is local to them */
+struct BINOC;
 extern "C" {
-s32 FButtonPressedWithin(s32, M2C_UNK, f32);    /* extern */
-M2C_UNK StopBinoc(s8 *);                          /* extern */
-void UpdateBinoc(s8 *);                        /* extern */
-s32 bevy_player_p15_binoc_active();                 /* extern */
+s32 FButtonPressedWithin(JOY *, s32, f32);
+void StopBinoc(BINOC *);
+void UpdateBinoc(BINOC *);
+s32 bevy_player_p15_binoc_active(BENTLEY *);
 
-void UpdateBentleyBinoc(s8 *arg0) {
-    s8 *temp_s1;
+void UpdateBentleyBinoc(BENTLEY *pbentley) {
+    BINOC *pbinoc;
 
-    if (bevy_player_p15_binoc_active() != 0) {
-        temp_s1 = arg0 + 0xF00;
-        if ((M2C_FIELD(arg0, s32 *, 0xF04) == 1) && (M2C_FIELD(arg0, s32 *, 0xF20) == 0) && (FButtonPressedWithin(M2C_FIELD(arg0, s32 *, 0x150), 0x4F0, 0.25f) != 0)) {
-            StopBinoc(temp_s1);
+    if (bevy_player_p15_binoc_active(pbentley) != 0) {
+        pbinoc = (BINOC *)pbentley->PvBinoc();
+        if ((pbentley->binocState == 1) && (pbentley->binocPhase == 0) && (FButtonPressedWithin(pbentley->pjoy, 0x4F0, 0.25f) != 0)) {
+            StopBinoc(pbinoc);
         }
-        UpdateBinoc(temp_s1);
+        UpdateBinoc(pbinoc);
     }
 }
 

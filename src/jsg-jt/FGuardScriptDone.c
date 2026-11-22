@@ -1,5 +1,6 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "guardscriptbeh.h"
 
-s32 FGuardScriptDone(void *arg0) {
-    return M2C_FIELD(arg0, s32 *, 0x38) == 0;
+s32 FGuardScriptDone(struct GUARDSCRIPTBEH *beh) {
+    return beh->pcmd == 0;
 }

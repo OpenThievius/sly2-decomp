@@ -1,20 +1,14 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "so.h"
+#include "oxa.h"
 extern "C" {
-struct _m2c_stack_SetSoNoXpsAll {
-    /* 0x00 */ char pad0[0x10];
-};                                                  /* size = 0x10 */
-M2C_UNK DiscardSoXps(s8 *, s32, s8 *);       /* extern */
-void SetSoNoXpsAll(s8 *arg0, s32 arg1) {
-    s8 *xps = M2C_FIELD(arg0, s8 **, 0xEC);
-    if (xps != NULL) {
-        s64 flag = arg1 & 1;
-        M2C_FIELD(xps, s64 *, 0x70) = (M2C_FIELD(xps, s64 *, 0x70) & ~4L) | (flag << 2);
-        DiscardSoXps(arg0, arg1, xps);
+void DiscardSoXps(SO *);
+void SetSoNoXpsAll(SO *pso, s32 fNoXps) {
+    OXA *poxa = pso->poxa;
+    if (poxa != 0) {
+        u64 fBit = fNoXps & 1;
+        poxa->grf = (poxa->grf & ~4UL) | (fBit << 2);
+        DiscardSoXps(pso);
     }
 }
 }

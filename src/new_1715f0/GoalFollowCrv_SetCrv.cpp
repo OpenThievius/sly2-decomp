@@ -1,31 +1,28 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "stepguard.h"
+#include "goals.h"
 #include "sly2.h"
-struct Crv { char pad0[0xE4]; int closed; };
-#include "goal.h"
-struct GOAL_178D90 : GOAL {
-    Crv *crv;
-    float s;
-    int reverse;
-    int open;
-    char pad_40[0x4];
-    float end;
-    float sHint;
+/* the curve this goal follows: only its closed flag is read here */
+struct CRV {
+    u8 unknown_0x0[0xE4];
+    /* 0xE4 */ s32 closed;
 };
 extern "C" char B_003DD020;
-extern "C" QW PosLoWorld(void *);
-extern "C" void FindCrvClosestPointFromS(Crv *, QW, void *, int, int, int, float *, float);
-extern "C" void FindCrvClosestPointAll(Crv *, QW, void *, int, int, int, float *);
-extern "C" float SMinCrv(Crv *);
-extern "C" float SMaxCrv(Crv *);
-extern "C" void GetPathPosFromS(Crv *, void *, int, float);
-extern "C" void GoalFollowCrv_SetCrv(GOAL_178D90 *goal, Crv *crv, int reverse)
+extern "C" QW PosLoWorld(LO *plo);
+extern "C" void FindCrvClosestPointFromS(CRV *, QW, void *, int, int, int, float *, float);
+extern "C" void FindCrvClosestPointAll(CRV *, QW, void *, int, int, int, float *);
+extern "C" float SMinCrv(CRV *);
+extern "C" float SMaxCrv(CRV *);
+extern "C" void GetPathPosFromS(CRV *, void *, int, float);
+extern "C" void GoalFollowCrv_SetCrv(GOALFOLLOWCRV *goal, CRV *crv, int reverse)
 {
     goal->reverse = reverse;
-    goal->crv = crv;
+    goal->pcrv = crv;
     if (goal->sHint >= 0.0f) {
-        FindCrvClosestPointFromS(crv, PosLoWorld(((void *)goal->pstep)), &B_003DD020, 0, 0, 0, &goal->s, goal->sHint);
+        FindCrvClosestPointFromS(crv, PosLoWorld(goal->pstep), &B_003DD020, 0, 0, 0, &goal->s, goal->sHint);
         goal->sHint = -1.0f;
     } else {
-        FindCrvClosestPointAll(crv, PosLoWorld(((void *)goal->pstep)), &B_003DD020, 0, 0, 0, &goal->s);
+        FindCrvClosestPointAll(crv, PosLoWorld(goal->pstep), &B_003DD020, 0, 0, 0, &goal->s);
     }
     if (crv->closed != 0) {
         goal->open = 0;
@@ -33,8 +30,8 @@ extern "C" void GoalFollowCrv_SetCrv(GOAL_178D90 *goal, Crv *crv, int reverse)
     }
     goal->open = 1;
     if (goal->reverse != 0)
-        goal->end = SMinCrv(crv);
+        goal->sEnd = SMinCrv(crv);
     else
-        goal->end = SMaxCrv(crv);
-    GetPathPosFromS(crv, (char *)goal + 0xB0, 0, goal->end);
+        goal->sEnd = SMaxCrv(crv);
+    GetPathPosFromS(crv, &goal->posEnd, 0, goal->sEnd);
 }

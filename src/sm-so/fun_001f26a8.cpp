@@ -1,20 +1,13 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "so.h"
 extern "C" {
-struct _m2c_stack_func_001F26A8 {
-    /* 0x00 */ char pad0[0x30];
-};                                                  /* size = 0x30 */
-s32 FIsBasicDerivedFrom(s8 *, M2C_UNK);           /* extern */
-M2C_UNK func_001F2500();                            /* extern */
-void func_001F26A8(s8 *arg0) {
-    func_001F2500();
-    for (s8 *child = M2C_FIELD(arg0, s8 **, 0x64); child != M2C_FIELD(arg0, s8 **, 0x70); child = M2C_FIELD(child, s8 **, 0x24)) {
-        if (FIsBasicDerivedFrom(child, 0x30) != 0) {
-            func_001F26A8(child);
+int FIsBasicDerivedFrom(void *, int);
+void func_001F2500(SO *);
+void func_001F26A8(SO *pso) {
+    func_001F2500(pso);
+    for (LO *plo = (LO *)pso->dlChild.head; plo != pso->ploChildEnd; plo = plo->ploNext) {
+        if (FIsBasicDerivedFrom(plo, 0x30) != 0) {
+            func_001F26A8((SO *)plo);
         }
     }
 }

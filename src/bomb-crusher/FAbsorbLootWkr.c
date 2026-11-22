@@ -1,12 +1,18 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "types.h"
 
-s32 FAbsorbSoWkr();                                 /* extern */
-M2C_UNK SetLootState(void *, M2C_UNK);              /* extern */
+struct LOOT_13C368 {
+    u8 unknown_0x0[0x184];
+    s32 state;
+};
 
-s32 FAbsorbLootWkr(void *arg0) {
-    if ((FAbsorbSoWkr() == 0) || (M2C_FIELD(arg0, s32 *, 0x184) != 5)) {
+s32 FAbsorbSoWkr();
+void SetLootState(struct LOOT_13C368 *, s32);
+
+s32 FAbsorbLootWkr(struct LOOT_13C368 *loot) {
+    if ((FAbsorbSoWkr() == 0) || (loot->state != 5)) {
         return 0;
     }
-    SetLootState(arg0, 0);
+    SetLootState(loot, 0);
     return 1;
 }

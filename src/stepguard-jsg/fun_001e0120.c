@@ -1,5 +1,6 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "jsg.h"
 
-void func_001E0120(void *arg0) {
-    M2C_FIELD(arg0, s32 *, 0x84) = 0;
+void func_001E0120(struct JSG *jsg) {
+    jsg->csignal = 0;
 }

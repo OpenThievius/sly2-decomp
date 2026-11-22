@@ -1,11 +1,13 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "light.h"
 extern "C" {
-#include "types.h"
-void RebuildLight(void *);
-void func_001A3B38(void *);
-void SetLightKind(void *arg0, s32 arg1)
+void RebuildLight(LIGHT *light);
+void func_001A3B38(LIGHT *light);
+
+void SetLightKind(LIGHT *light, s32 mode)
 {
-    func_001A3B38(arg0);
-    *(s32 *)((char *)arg0 + 0xE0) = arg1;
-    RebuildLight(arg0);
+    func_001A3B38(light);
+    light->mode = mode;
+    RebuildLight(light);
 }
 }

@@ -1,22 +1,16 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "so.h"
+#include "geom.h"
 extern "C" {
-struct _m2c_stack_func_001F2AD0 {
-    /* 0x00 */ char pad0[0x10];
-};                                                  /* size = 0x10 */
-M2C_UNK RemoveSoGeomFromOxa(s8 *);
-void func_001F2AD0(s8 *arg0, s8 *arg1) {
+void RemoveSoGeomFromOxa(SO *, GEOM *);
+void func_001F2AD0(SO *pso, GEOM *pgeom) {
     u64 flag = 1UL << 50;
-    u64 grf = M2C_FIELD(arg1, u64 *, 0x10);
+    u64 grf = pgeom->grf;
     if (!(grf & flag)) {
-        M2C_FIELD(arg1, u64 *, 0x10) = grf | flag;
-        s64 bit = (M2C_FIELD(arg0, u64 *, 0x28) >> 0x3C) & 1;
+        pgeom->grf = grf | flag;
+        s64 bit = (pso->grfo >> 0x3C) & 1;
         if (bit) {
-            RemoveSoGeomFromOxa(arg0);
+            RemoveSoGeomFromOxa(pso, pgeom);
         }
     }
 }

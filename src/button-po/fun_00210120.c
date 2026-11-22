@@ -1,9 +1,10 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "swview.h"
 
-s32 func_00210120(void *arg0) {
-    s32 temp_v1;
+struct OPTSET *func_00210120(struct SWVIEW *psw) {
+    s32 ioptset;
 
-    temp_v1 = M2C_FIELD(arg0, s32 *, 0x39DC);
-    M2C_FIELD(arg0, s32 *, 0x39DC) = (s32) (temp_v1 + 1);
-    return M2C_FIELD(arg0, s32 *, 0x39D8) + (temp_v1 * 0xC);
+    ioptset = psw->coptset;
+    psw->coptset = ioptset + 1;
+    return psw->aoptset + ioptset;
 }

@@ -1,7 +1,8 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "guardview.h"
 
-M2C_UNK FIsSgsInGrfsgs(s64);                        /* extern */
+s32 FIsSgsInGrfsgs(s64, s32);                       /* extern */
 
-void FIsGuardInSgs(void *arg0) {
-    FIsSgsInGrfsgs(M2C_FIELD(arg0, s64 *, 0x2C0));
+s32 FIsGuardInSgs(struct STEPGUARDVIEW *pguard, s32 sgs) {
+    return FIsSgsInGrfsgs(pguard->grfsgs, sgs);
 }

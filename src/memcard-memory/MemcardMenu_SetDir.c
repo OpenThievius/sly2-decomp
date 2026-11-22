@@ -1,10 +1,11 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "memcardmenu.h"
 
 extern f32 g_2ddf0c;
 
-void MemcardMenu_SetDir(void *arg0, s32 arg1) {
-    if (arg1 != M2C_FIELD(arg0, s32 *, 0x28)) {
-        M2C_FIELD(arg0, s32 *, 0x28) = arg1;
-        M2C_FIELD(arg0, f32 *, 0x2C) = (f32) g_2ddf0c;
+void MemcardMenu_SetDir(MEMCARDMENU *pmenu, s32 dir) {
+    if (dir != pmenu->dir) {
+        pmenu->dir = dir;
+        pmenu->tDir = g_2ddf0c;
     }
 }

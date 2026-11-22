@@ -1,27 +1,23 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "asega.h"
+#include "sw.h"
+
 extern "C" {
-M2C_UNK Basic_FreeSubscribers(s8 *);              /* extern */
-M2C_UNK CFramePtr_Assign(s8 *, M2C_UNK);                  /* extern */
-M2C_UNK FreeSlotheapPv(M2C_UNK *, s8 *);          /* extern */
-M2C_UNK SidebagPtr_Assign(s8 *, M2C_UNK);         /* extern */
-extern M2C_UNK B_003E1224;
+void Basic_FreeSubscribers(ASEGA *);
+void CFramePtr_Assign(void *, void *);
+void FreeSlotheapPv(SLOTHEAP *, void *);
+void SidebagPtr_Assign(void *, void *);
+extern SLOTHEAP B_003E1224;
 
-void Asega_Release(s8 *arg0) {
-    s32 temp_v0;
-
-    temp_v0 = M2C_FIELD(arg0, s32 *, 0x10) - 1;
-    M2C_FIELD(arg0, s32 *, 0x10) = temp_v0;
-    if (temp_v0 <= 0) {
-        CFramePtr_Assign(arg0, 0);
-        SidebagPtr_Assign(arg0 + 4, 0);
-        Basic_FreeSubscribers(arg0);
-        FreeSlotheapPv(&B_003E1224, arg0);
+void Asega_Release(ASEGA *pasega)
+{
+    s32 cref = pasega->cref - 1;
+    pasega->cref = cref;
+    if (cref <= 0) {
+        CFramePtr_Assign(pasega, 0);
+        SidebagPtr_Assign(&pasega->psidebag, 0);
+        Basic_FreeSubscribers(pasega);
+        FreeSlotheapPv(&B_003E1224, pasega);
     }
 }
-
 }

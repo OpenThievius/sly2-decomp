@@ -1,30 +1,26 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later */
 #include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
 extern "C" {
-struct _m2c_stack_func_0023F240 {};                 /* size 0x0 */
-u8 *func_0023F240(u8 *arg0, s32 *arg1) {
-    s32 var_a2;
-    s32 var_a3;
-    u8 *var_a0;
-    u8 temp_v1;
-    u8 temp_v1_2;
-    temp_v1 = *arg0;
-    var_a3 = 0;
-    var_a0 = arg0 + 1;
-    var_a2 = temp_v1 & 0x7F;
-    if (temp_v1 & 0x80) {
+/* reads an unsigned LEB128 number at bytes into *value and returns the address after it */
+u8 *func_0023F240(u8 *bytes, s32 *value) {
+    s32 result;
+    s32 shift;
+    u8 *cursor;
+    u8 byte;
+    u8 nextByte;
+    byte = *bytes;
+    shift = 0;
+    cursor = bytes + 1;
+    result = byte & 0x7F;
+    if (byte & 0x80) {
         do {
-            temp_v1_2 = *var_a0;
-            var_a3 += 7;
-            var_a0 += 1;
-            var_a2 |= (temp_v1_2 & 0x7F) << var_a3;
-        } while (temp_v1_2 & 0x80);
+            nextByte = *cursor;
+            shift += 7;
+            cursor += 1;
+            result |= (nextByte & 0x7F) << shift;
+        } while (nextByte & 0x80);
     }
-    *arg1 = var_a2;
-    return var_a0;
+    *value = result;
+    return cursor;
 }
 }

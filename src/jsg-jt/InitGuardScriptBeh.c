@@ -1,9 +1,10 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "guardscriptbeh.h"
 
-M2C_UNK AddGuardSgs(s32, M2C_UNK);                  /* extern */
-M2C_UNK func_001EEF68();                            /* extern */
+void AddGuardSgs(struct STEPGUARD *pguard, s32 sgs);
+void func_001EEF68(struct GUARDSCRIPTBEH *beh);
 
-void InitGuardScriptBeh(void *arg0) {
-    func_001EEF68();
-    AddGuardSgs(M2C_FIELD(arg0, s32 *, 0x10), 0x21);
+void InitGuardScriptBeh(struct GUARDSCRIPTBEH *beh) {
+    func_001EEF68(beh);
+    AddGuardSgs(beh->pguard, 0x21);
 }

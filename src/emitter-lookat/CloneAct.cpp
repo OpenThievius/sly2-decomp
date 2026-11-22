@@ -1,24 +1,17 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "lookat.h"
+#include "sw.h"
 extern "C" {
-struct _m2c_stack_CloneAct {
-    /* 0x00 */ char pad0[0x10];
-};                                                  /* size = 0x10 */
+void CopyAb__FPvT0Ui(void *pvDest, void *pvSource, unsigned int cb);
+extern SLOTHEAP B_003E123C; /* a slot heap (0x18 bytes, before B_003E1254): its slot size */
 
-M2C_UNK CopyAb__FPvT0Ui(s32, s8 *, s32);          /* extern */
-extern s32 B_003E123C;
-
-void CloneAct(s8 *arg0, s8 *arg1, s32 arg2, s32 arg3) {
-    M2C_FIELD(arg0, s32 *, 0) = (s32) M2C_FIELD(arg1, s32 *, 0);
-    M2C_FIELD(arg0, s32 *, 0xC) = (s32) M2C_FIELD(arg1, s32 *, 0xC);
-    M2C_FIELD(arg0, s32 *, 0x14) = (s32) M2C_FIELD(arg1, s32 *, 0x14);
-    M2C_FIELD(arg0, s32 *, 4) = arg2;
-    M2C_FIELD(arg0, s32 *, 8) = arg3;
-    CopyAb__FPvT0Ui((sptr)(arg0 + 0x1C), arg1 + 0x1C, B_003E123C - 0x1C);
+void CloneAct(LOOKAT *plookatDest, LOOKAT *plookatSource, ALO *palo, XF *pxf) {
+    plookatDest->lookatk = plookatSource->lookatk;
+    plookatDest->priority = plookatSource->priority;
+    plookatDest->xfkind = plookatSource->xfkind;
+    plookatDest->palo = palo;
+    plookatDest->pxf = pxf;
+    CopyAb__FPvT0Ui((char *)plookatDest + 0x1C, (char *)plookatSource + 0x1C, B_003E123C.cb - 0x1C);
 }
 
 }

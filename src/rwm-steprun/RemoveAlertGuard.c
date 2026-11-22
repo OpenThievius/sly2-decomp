@@ -1,18 +1,19 @@
-#include "m2c_macros.h"
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "guard.h"
 
-M2C_UNK CopyAb__FPvT0Ui(void *, void *, s32);       /* extern */
-s32 IndexOfAlertGuard();                            /* extern */
+void CopyAb__FPvT0Ui(void *pvDest, void *pvSource, u32 cb);
+s32 IndexOfAlertGuard(void);
 
-void RemoveAlertGuard(void *arg0) {
-    s32 temp_v0;
-    s32 temp_v0_2;
-    s32 temp_v1;
-    void *temp_a0;
+void RemoveAlertGuard(struct ALERT *palert) {
+    s32 index;
+    s32 cguardNew;
+    s32 cMoved;
+    struct STEPGUARD **ppguard;
 
-    temp_v0 = IndexOfAlertGuard();
-    temp_v1 = M2C_FIELD(arg0, s32 *, 0x28) - 1;
-    temp_a0 = arg0 + ((temp_v0 * 4) + 0x2C);
-    temp_v0_2 = temp_v1 - temp_v0;
-    M2C_FIELD(arg0, s32 *, 0x28) = temp_v1;
-    CopyAb__FPvT0Ui(temp_a0, temp_a0 + 4, temp_v0_2 * 4);
+    index = IndexOfAlertGuard();
+    cguardNew = palert->cguard - 1;
+    ppguard = &palert->apguard[index];
+    cMoved = cguardNew - index;
+    palert->cguard = cguardNew;
+    CopyAb__FPvT0Ui(ppguard, ppguard + 1, cMoved * 4);
 }

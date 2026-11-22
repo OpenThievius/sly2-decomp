@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
 struct VT { char pad[0x60]; short delta; short index; int (*fn)(void *); };
 struct OBJ { char pad[0xC]; VT *vptr; };
@@ -12,7 +13,7 @@ int GrfGuardCustomXps(STEPGUARD *pguard)
     unsigned long mask = GrfsgsFromSgs(0x12) | GrfsgsFromSgs(0x13) | GrfsgsFromSgs(0x16);
     if (pguard->grfsgs & mask)
         return 0;
-    OBJ *pobj = (OBJ *)pguard->field_0xFD0;
+    OBJ *pobj = (OBJ *)pguard->heading.field_0x0;
     if (pobj != 0)
         return pobj->vptr->fn((char *)pobj + pobj->vptr->delta);
     return func_002040F8(pguard);

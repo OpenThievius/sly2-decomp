@@ -1,25 +1,20 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "sohit.h"
+#include "sw.h"
 extern "C" {
-struct Bytes8 { u8 b[8]; };
-void InitSo();
-extern s128 D_002BE7D0;
-extern Bytes8 D_002BE7E0;
-struct Obj17F090 { char pad0[0x40]; s32 flags; char pad44[0x13C]; s32 state; char pad184[0x1C]; s128 vec; Bytes8 bytes; };
-void func_0017F090(Obj17F090 *self) {
-    InitSo();
-    self->state = 0xA;
-    self->vec = D_002BE7D0;
-    self->bytes = D_002BE7E0;
-    s32 flags = self->flags;
-    if ((flags ^ 1) & 1) {
-        *(s32 *)flags = (s32) (*(s32 *)flags | 2);
+void InitSo(SOHIT *pso);
+extern QW D_002BE7D0;
+extern SOHITBYTES8 D_002BE7E0;
+
+void func_0017F090(SOHIT *pso) {
+    InitSo(pso);
+    pso->hpMax = 0xA;
+    pso->vecKnock = D_002BE7D0;
+    pso->field_0x1B0 = D_002BE7E0;
+    if (!(pso->grfSw & 1)) {
+        pso->pgrfentry->grf |= 2;
     } else {
-        self->flags = flags | 2;
+        pso->grfSw |= 2;
     }
 }
 }

@@ -1,34 +1,26 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-#include "sly2.h"
-struct VT { char pad[0x40]; short delta; short index; void (*fn)(void *); };
-struct GOALANIM { char pad[0xC]; VT *vt; char pad2[0x28]; int field38; int field3C; };
 #include "stepguard.h"
-#include "goal.h"
-struct GOAL_17B750 : GOAL {
-    int state;
-    float time;
-    int field38;
-};
-extern float g_2dded0;
-extern "C" void Goal_Pop(void *);
-extern "C" GOALANIM *func_00205438(STEPGUARD *, int);
-void func_0017B750(GOAL_17B750 *goal, int state)
+#include "goals.h"
+#include "sly2.h"
+#include "clock.h"
+extern "C" void Goal_Pop(GOAL **);
+extern "C" GOAL *func_00205438(STEPGUARD *, int);
+void func_0017B750(GOALSTAND *pgoal, int state)
 {
-    if (state == goal->state)
+    if (state == pgoal->state)
         return;
-    Goal_Pop((char *)goal + 0x18);
-    if (goal->state == 0) {
-        ((STEPGUARD *)goal->pstep)->field_0xF60 = 0;
-        goal->state = state;
+    Goal_Pop(&pgoal->pgoalChild);
+    if (pgoal->state == 0) {
+        ((STEPGUARD *)pgoal->pstep)->field_0xF60 = 0;
+        pgoal->state = state;
     } else
-        goal->state = state;
-    goal->time = g_2dded0;
+        pgoal->state = state;
+    pgoal->tState = g_2dded0.t;
     if (state == 0) {
-        GOALANIM *anim = func_00205438(((STEPGUARD *)goal->pstep), 0x9D);
-        VT *vt = anim->vt;
-        anim->field3C = 0x11;
-        anim->field38 = goal->field38;
-        vt->fn((char *)anim + vt->delta);
-        ((STEPGUARD *)goal->pstep)->field_0xF60 = 1;
+        GOALANIM *panim = (GOALANIM *)func_00205438((STEPGUARD *)pgoal->pstep, 0x9D);
+        panim->sgs = 0x11;
+        panim->ptarget = pgoal->ptarget;
+        panim->Activate();
+        ((STEPGUARD *)pgoal->pstep)->field_0xF60 = 1;
     }
 }

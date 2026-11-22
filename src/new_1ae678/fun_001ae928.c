@@ -1,10 +1,13 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "pausemenu.h"
 
-s32 PloFindSwObject_thunk(M2C_UNK *, M2C_UNK, M2C_UNK, M2C_UNK); /* extern */
-extern M2C_UNK B_003DD490;
+struct LO;
+struct SW;
+struct LO *PloFindSwObject_thunk(struct SW *psw, s32 grffso, s32 oid, struct LO *ploContext);
+extern struct SW B_003DD490;
 
-void func_001AE928(void *arg0) {
-    M2C_FIELD(arg0, s32 *, 0x20) = PloFindSwObject_thunk(&B_003DD490, 0x405, 0x370, 0);
-    M2C_FIELD(arg0, s32 *, 0x1EC) = -1;
-    M2C_FIELD(arg0, s32 *, 0x1E8) = 0;
+void func_001AE928(PAUSEMENU *pmenu) {
+    pmenu->pblot = (PAUSEBLOT *)PloFindSwObject_thunk(&B_003DD490, 0x405, 0x370, 0);
+    pmenu->depthNext = -1;
+    pmenu->state = 0;
 }

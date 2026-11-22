@@ -1,19 +1,19 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 #include "cref.h"
-struct ITEM { int index; int b; };
-struct SHOP { char pad0[0x40]; int mode; int pad44; int count; ITEM items[0x41]; };
+#include "shopmenu.h"
 extern "C" {
 int FGadgetAcquired(int);
 int FGadgetOnSale(int);
-void ShopMenu_Select(SHOP *, int);
+void ShopMenu_Select(SHOPMENU *, int);
 CRef func_001D8A38(const char *, const char *, char *, int);
 int sprintf(char *, const char *, ...);
 extern const char RO_002A79A0[];
 extern const char RO_002A79D0[];
 extern const char RO_002A79D8[];
-void ShopMenu_BuildList(SHOP *menu)
+void ShopMenu_BuildList(SHOPMENU *menu)
 {
     for (int clear = 0; clear < menu->count; clear++)
-        menu->items[clear].index = -1;
+        menu->arow[clear].id = -1;
     int mode = menu->mode;
     menu->count = 0;
     switch (mode) {
@@ -24,7 +24,7 @@ void ShopMenu_BuildList(SHOP *menu)
                 unsigned int count = menu->count;
                 if (count >= 0x41)
                     break;
-                menu->items[count].index = index;
+                menu->arow[count].id = index;
                 menu->count = count + 1;
             }
             index++;
@@ -43,12 +43,12 @@ void ShopMenu_BuildList(SHOP *menu)
             unsigned int count = menu->count;
             if (count >= 0x41)
                 break;
-            menu->items[count].index = index;
+            menu->arow[count].id = index;
             menu->count = count + 1;
         }
         break;
     }
     }
-    ShopMenu_Select(menu, *(int *)((char *)menu + 0x24C));
+    ShopMenu_Select(menu, menu->isel);
 }
 }

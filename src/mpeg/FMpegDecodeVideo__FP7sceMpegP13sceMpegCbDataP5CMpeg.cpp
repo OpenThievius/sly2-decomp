@@ -1,30 +1,25 @@
-#include "types.h"
-struct sceMpeg; struct sceMpegCbData;
-struct CMpeg { char pad[0x174]; int cbUsed; };
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "cmpeg.h"
 extern "C" int CMpeg_CbDemuxed(CMpeg *, int);
 extern "C" void *memset(void *, int, unsigned);
-extern "C" void CbFill__10CByteQueueiPUc(void *, int, void *);
-extern "C" void FreeDrain__10CByteQueuei(void *, int);
-extern "C" void CbDrain__10CByteQueueiP12CQueueOutput(void *, int, void *);
-extern "C" void Update__10CMpegAudio(void *);
 extern char D_002D4220[];
 
-int FMpegDecodeVideo__FP7sceMpegP13sceMpegCbDataP5CMpeg(sceMpeg *, sceMpegCbData *, CMpeg *pmpeg)
+extern "C" int FMpegDecodeVideo__FP7sceMpegP13sceMpegCbDataP5CMpeg(sceMpeg *, sceMpegCbData *, CMpeg *pmpeg)
 {
     int work[16];
 
-    while (pmpeg->cbUsed <= 0xfff) {
+    while (pmpeg->qVideo.cbData <= 0xfff) {
         int result = CMpeg_CbDemuxed(pmpeg, 1);
         if (result == 2) {
             memset(work, 0, 0x40);
-            CbFill__10CByteQueueiPUc((char *)pmpeg + 0x160, 0x40 - (pmpeg->cbUsed % 0x20), work);
+            pmpeg->qVideo.CbFill(0x40 - (pmpeg->qVideo.cbData % 0x20), (u8 *)work);
             break;
         }
         if (result == 1)
-            Update__10CMpegAudio((char *)pmpeg + 0x180);
+            pmpeg->audio.Update();
     }
     work[0] = (sptr)D_002D4220;
-    FreeDrain__10CByteQueuei((char *)pmpeg + 0x160, 0);
-    CbDrain__10CByteQueueiP12CQueueOutput((char *)pmpeg + 0x160, 0, work);
+    pmpeg->qVideo.FreeDrain(0);
+    pmpeg->qVideo.CbDrain(0, (CQueueOutput *)work);
     return 1;
 }

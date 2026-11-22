@@ -1,91 +1,83 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "stepguard.h"
+#include "goals.h"
 #include "sly2.h"
 #include "ps2inline.h"
 #include "vu0inline.h"
-struct VT { char pad[0x40]; short delta; short index; void (*fn)(void *); };
-struct OBJ { char pad[0xC]; VT *vptr; };
-struct TARGET { int a[4]; QW pos; };
-struct BEH { char pad0[0x10]; void *pactor; char pad1[0x18 - 0x14]; char sub[0x18]; int state; float tState; };
 extern "C" {
-void Goal_Pop(void *);
-OBJ *func_00205438(void *, int);
-QW PosLoWorld(void *);
-QW func_00172760(void *);
-void func_00172560(void *);
-void func_001728B0(void *);
-void func_00172F10(void *);
-void func_00209818(void *, float);
+void Goal_Pop(GOAL **ppgoal);
+GOAL *func_00205438(STEPGUARD *pguard, int classId);
+QW PosLoWorld(LO *plo);
+QW func_00172760(GOALSEARCH *goal);
+void func_00172560(GOALSEARCH *goal);
+void func_001728B0(GOALSEARCH *goal);
+void func_00172F10(GOALSEARCH *goal);
+void func_00209818(void *pactor, float angle);
 float atan2f(float, float);
-void func_002562A8(TARGET *);
-void SetGoalTarget(void *, TARGET *);
-void SetSearchGoal(void *, void *);
+void func_002562A8(GOALTARGET *);
+void SetGoalTarget(GOAL *, GOALTARGET *);
+void SetSearchGoal(GOALSEARCH *, GOAL *);
 }
 extern "C" float g_2dded0[];
 extern "C" const float RO_FLT_002A5398;
-extern "C" void SetSearchState(BEH *beh, int newState)
+extern "C" void SetSearchState(GOALSEARCH *goal, int newState)
 {
-    if (newState == beh->state)
+    if (newState == goal->state)
         return;
-    Goal_Pop(&beh->sub);
-    beh->state = newState;
-    beh->tState = g_2dded0[0];
+    Goal_Pop(&goal->pgoalChild);
+    goal->state = newState;
+    goal->tState = g_2dded0[0];
     switch (newState) {
     case 0: {
-        OBJ *idle = func_00205438(beh->pactor, 0x9D);
-        *(int *)((char *)idle + 0x3C) = 0xC;
-        VT *vtable = idle->vptr;
-        vtable->fn((char *)idle + vtable->delta);
+        GOALANIM *idle = (GOALANIM *)func_00205438(GOAL_GUARD(goal), 0x9D);
+        idle->sgs = 0xC;
+        idle->Activate();
         break;
     }
     case 1: {
-        OBJ *go = func_00205438(beh->pactor, 0xBA);
-        *(int *)((char *)go + 0xC0) = 1;
-        QW pos = func_00172760(beh);
-        TARGET t;
+        GOALGOTO *go = (GOALGOTO *)func_00205438(GOAL_GUARD(goal), 0xBA);
+        go->fLink = 1;
+        QW pos = func_00172760(goal);
+        GOALTARGET t;
         func_002562A8(&t);
         t.pos = pos;
         SetGoalTarget(go, &t);
-        VT *vtable = go->vptr;
-        vtable->fn((char *)go + vtable->delta);
-        *(float *)((char *)beh + 0x38) = RO_FLT_002A5398;
+        go->Activate();
+        goal->field_0x38 = RO_FLT_002A5398;
         break;
     }
     case 2: {
-        QW goalPos = func_00172760(beh);
-        QW pos = PosLoWorld(beh->pactor);
+        QW goalPos = func_00172760(goal);
+        QW pos = PosLoWorld(goal->pstep);
         QW difference = VectorSub(goalPos, pos);
-        char *actor = (char *)beh->pactor + 0xFD0;
+        GUARDHEADING *pheading = &GOAL_GUARD(goal)->heading;
         float angle = atan2f(LaneYInGeneralRegister(difference), LaneX(difference));
-        func_00209818(actor, angle);
-        OBJ *alert = func_00205438(beh->pactor, 0x9E);
-        VT *vtable = alert->vptr;
-        vtable->fn((char *)alert + vtable->delta);
-        func_00172560(beh);
+        func_00209818(pheading, angle);
+        GOAL *alert = func_00205438(GOAL_GUARD(goal), 0x9E);
+        alert->Activate();
+        func_00172560(goal);
         break;
     }
     case 3: {
-        OBJ *go = func_00205438(beh->pactor, 0xBA);
-        *(int *)((char *)go + 0xC0) = 1;
-        func_001728B0(beh);
-        func_00172F10(beh);
-        VT *vtable = go->vptr;
-        vtable->fn((char *)go + vtable->delta);
+        GOALGOTO *go = (GOALGOTO *)func_00205438(GOAL_GUARD(goal), 0xBA);
+        go->fLink = 1;
+        func_001728B0(goal);
+        func_00172F10(goal);
+        go->Activate();
         break;
     }
     case 4: {
-        OBJ *idle = func_00205438(beh->pactor, 0x9D);
-        *(int *)((char *)idle + 0x3C) = 0xE;
-        VT *vtable = idle->vptr;
-        vtable->fn((char *)idle + vtable->delta);
-        SetSearchGoal(beh, 0);
-        *(int *)((char *)beh + 0x48) = 0;
+        GOALANIM *idle = (GOALANIM *)func_00205438(GOAL_GUARD(goal), 0x9D);
+        idle->sgs = 0xE;
+        idle->Activate();
+        SetSearchGoal(goal, 0);
+        goal->fChanged = 0;
         break;
     }
     case 5: {
-        OBJ *alert = func_00205438(beh->pactor, 0x9E);
-        *(int *)((char *)alert + 0x3C) = 1;
-        VT *vtable = alert->vptr;
-        vtable->fn((char *)alert + vtable->delta);
+        GOALANIM *alert = (GOALANIM *)func_00205438(GOAL_GUARD(goal), 0x9E);
+        alert->sgs = 1;
+        alert->Activate();
         break;
     }
     }

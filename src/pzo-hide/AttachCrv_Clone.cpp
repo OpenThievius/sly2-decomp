@@ -1,18 +1,11 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
-extern "C" {
-struct _m2c_stack_AttachCrv_Clone {
-    /* 0x00 */ char pad0[0x30];
-};                                                  /* size = 0x30 */
-struct Saved { char bytes[8]; };
-void CloneCrv(void *);
-void AttachCrv_Clone(int arg0) {
-    Saved saved = *(Saved *)((char *)arg0 + 0x1b4);
-    CloneCrv((void *)arg0);
-    *(Saved *)((char *)arg0 + 0x1b4) = saved;
-}
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "pzo_hide.h"
+
+extern "C" void CloneCrv(void *);
+
+extern "C" void AttachCrv_Clone(ATTACHCRV *attach)
+{
+    BYTES8 kept = attach->kept;
+    CloneCrv(attach);
+    attach->kept = kept;
 }

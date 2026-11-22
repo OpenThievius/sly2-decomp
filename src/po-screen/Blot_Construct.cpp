@@ -1,17 +1,19 @@
-struct Blot { int word0; int word4; char pad8[4]; void *vtable; char pad10[0x7C - 0x10]; int word7C; char pad80[0xCC - 0x80]; int slots[10]; };
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "blot.h"
+
 extern "C" {
-void InitSl(void *, int);
+void InitSl(SL *, s32);
 extern char D_002DAF30;
 
-Blot *Blot_Construct(Blot *blot) {
+BLOTVIEW *Blot_Construct(BLOTVIEW *blot) {
     blot->vtable = &D_002DAF30;
-    blot->word7C = -1;
+    blot->cur = -1;
     unsigned index = 0;
-    blot->word0 = 0;
-    blot->word4 = 0;
+    blot->field_0x0 = 0;
+    blot->field_0x4 = 0;
     for (; index < 10U; index++)
-        blot->slots[index] = -1;
-    InitSl((char *)blot + 0xFC, 0x68);
+        blot->alabel[index] = -1;
+    InitSl(&blot->sl, 0x68);
     return blot;
 }
 }

@@ -1,5 +1,6 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "goals.h"
 
-s32 FGoalAnimDone(void *arg0) {
-    return M2C_FIELD(arg0, s32 *, 0x30) == 1;
+s32 FGoalAnimDone(struct GOALANIM *goal) {
+    return goal->state == 1;
 }

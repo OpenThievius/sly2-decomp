@@ -1,29 +1,32 @@
-#include "m2c_macros.h"
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "goals.h"
+#include "so.h"
+#include "phys.h"
+
+struct PATHZONE;
+struct LINK { /* the region link of a PHYS: only the zone is read here */
+    u8 unknown_0x0[0x10];
+    /* 0x10 */ struct PATHZONE *pzone;
+};
+
 extern "C" {
+int FIsBasicDerivedFrom(LO *plo, int index);
+QW PosLoWorld(LO *plo);
+PATHZONE *PpathzoneFindPos(QW pos, int flag);
 
-s32 FIsBasicDerivedFrom(void *, M2C_UNK);           /* extern */
-s128 PosLoWorld(void *);                         /* extern */
-s32 PpathzoneFindPos(s128, M2C_UNK);             /* extern */
-
-s32 GoalPartnerFollow_PpathzoneTarget(void *arg0) {
-    s32 var_v0;
-    void *temp_a0;
-    void *var_v1;
-
-    if (FIsBasicDerivedFrom(M2C_FIELD(arg0, void **, 0x30), 0x30) != 0) {
-        temp_a0 = M2C_FIELD(M2C_FIELD(arg0, void **, 0x30), void **, 0xE8);
-        var_v1 = NULL;
-        if (temp_a0 != NULL) {
-            var_v1 = M2C_FIELD(temp_a0, void **, 0xDC);
+PATHZONE *GoalPartnerFollow_PpathzoneTarget(GOALPARTNERFOLLOW *pgoal)
+{
+    if (FIsBasicDerivedFrom(pgoal->ploLeader, 0x30) != 0) {
+        PHYS *pphys = ((SO *)pgoal->ploLeader)->pphys;
+        LINK *plink = 0;
+        if (pphys != 0) {
+            plink = pphys->plink;
         }
-        var_v0 = 0;
-        if (var_v1 != NULL) {
-            return M2C_FIELD(var_v1, s32 *, 0x10);
+        if (plink != 0) {
+            return plink->pzone;
         }
-        /* Duplicate return node #6. Try simplifying control flow for better match */
-        return var_v0;
+        return 0;
     }
-    var_v0 = PpathzoneFindPos(PosLoWorld(M2C_FIELD(arg0, void **, 0x30)), 1);
-    return var_v0;
+    return PpathzoneFindPos(PosLoWorld(pgoal->ploLeader), 1);
 }
 }

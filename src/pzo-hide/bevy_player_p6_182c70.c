@@ -1,15 +1,16 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "pzo_hide.h"
 
-M2C_UNK func_001A6CA8(s32, M2C_UNK);                /* extern */
+void func_001A6CA8(void *, s32);
 
-void bevy_player_p6_182c70(void *arg0) {
-    s16 temp_a1;
-    void *temp_v1;
+void bevy_player_p6_182c70(struct MEMBER *member) {
+    const struct MEMBERVT *vt;
+    s16 delta;
 
-    M2C_FIELD(arg0, s32 *, 0x14) = -1;
-    M2C_FIELD(arg0, f32 *, 8) = 3.4028235e38f;
-    temp_v1 = M2C_FIELD(arg0, void **, 0x20);
-    M2C_FIELD(arg0, s32 *, 0x1C) = 7;
-    temp_a1 = M2C_FIELD(temp_v1, s16 *, 0x30);
-    func_001A6CA8(M2C_FIELD(temp_v1, s32 (**)(void *, s16), 0x34)(arg0 + temp_a1, temp_a1), 3);
+    member->field_0x14 = -1;
+    member->field_0x8 = 3.4028235e38f;
+    vt = member->vt;
+    member->field_0x1C = 7;
+    delta = vt->delta;
+    func_001A6CA8(vt->fn((char *)member + delta), 3);
 }

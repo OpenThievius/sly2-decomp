@@ -11,13 +11,13 @@ void BindJtStepAseg(SLY *self) {
     int state = self->jts;
     switch (state) {
     case 7:
-        result = PasegAttachBase((char *)self + 0x4C0, &local);
+        result = PasegAttachBase(self->PvAttach(), &local);
         break;
     case 4:
-        result = bevy_player_p7_damage_1a23f8((char *)self + 0xDF0, &local);
+        result = bevy_player_p7_damage_1a23f8(self->PvZap(), &local);
         break;
     case 2:
-        result = func_0019C870((char *)self + 0x2C0, &local);
+        result = func_0019C870(self->PvJmp(), &local);
         break;
     case 21:
     case 22:

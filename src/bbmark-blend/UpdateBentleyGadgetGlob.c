@@ -1,16 +1,17 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "bentleyview.h"
 
-s32 FIsPoSwFocusBase(s32);                          /* extern */
-s32 GrfbtnJtGadget(s32, M2C_UNK);                   /* extern */
-M2C_UNK func_00141E70();                            /* extern */
-M2C_UNK func_001F6978(s32, M2C_UNK);                /* extern */
-M2C_UNK func_001F69F8(s32, M2C_UNK);                /* extern */
+s32 FIsPoSwFocusBase(void *ppo);
+u32 GrfbtnJtGadget(void *pbentley, s32 gadget);
+void func_00141E70(void);
+void func_001F6978(void *pso, s32 oid);
+void func_001F69F8(void *pso, s32 oid);
 
-void UpdateBentleyGadgetGlob(s32 arg0) {
+void UpdateBentleyGadgetGlob(struct BENTLEYVIEW *pbentley) {
     func_00141E70();
-    if ((FIsPoSwFocusBase(arg0) != 0) && (GrfbtnJtGadget(arg0, 0xC) != 0)) {
-        func_001F6978(arg0, 0x24D);
+    if ((FIsPoSwFocusBase(pbentley) != 0) && (GrfbtnJtGadget(pbentley, 0xC) != 0)) {
+        func_001F6978(pbentley, 0x24D);
         return;
     }
-    func_001F69F8(arg0, 0x24D);
+    func_001F69F8(pbentley, 0x24D);
 }

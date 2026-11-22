@@ -1,13 +1,13 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "stepguard.h"
+#include "goals.h"
 extern "C" {
-s32 FIsGuardInSgs(s8 *, s32);
-s8 *func_00205458(s8 *, s32);
+s32 FIsGuardInSgs(STEPGUARD *, s32);
+GOAL *func_00205458(STEPGUARD *, s32);
 
-s32 CHitClingingGuard(s8 *arg0) {
-    if (FIsGuardInSgs(arg0, 0x17) != 0) {
-        return *(s32 *)(func_00205458(arg0, 0xB1) + 0x58);
+s32 CHitClingingGuard(STEPGUARD *pguard) {
+    if (FIsGuardInSgs(pguard, 0x17) != 0) {
+        return ((GOALGRAB *)func_00205458(pguard, 0xB1))->chit;
     }
     return 0;
 }

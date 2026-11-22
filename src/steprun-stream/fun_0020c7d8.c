@@ -1,5 +1,6 @@
-#include "m2c_macros.h"
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "guard.h"
 
-void func_0020C7D8(void *arg0) {
-    M2C_FIELD(arg0, s32 *, 0xC0) = 0;
+void func_0020C7D8(struct AIMSTATE *paim) {
+    paim->panimref = 0;
 }

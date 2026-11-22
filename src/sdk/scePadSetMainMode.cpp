@@ -1,33 +1,21 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
-struct PadRequest_2437B8 {
-    s32 command;
-    s32 port;
-    s32 slot;
-    s32 arg2;
-    s32 arg3;
-    s32 result;
-};
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "pad.h"
 extern "C" {
-s32 func_00243458(s32, s32, s32);
-s32 sceSifCallRpc(void *, s32, s32, void *, s32, void *, s32, void *, void *);
-extern char B_00450580[];
-extern PadRequest_2437B8 B_004507C0;
-s32 scePadSetMainMode(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
-    B_004507C0.arg2 = arg2;
-    B_004507C0.arg3 = arg3;
+s32 func_00243458(s32 port, s32 slot, s32 state);
+s32 sceSifCallRpc(PADCLIENT *client, s32 command, s32 mode, void *send, s32 sendSize, void *receive, s32 receiveSize, void *endFunction, void *endData);
+extern PADCLIENT B_00450580[];
+extern PADREQUEST B_004507C0;
+s32 scePadSetMainMode(s32 port, s32 slot, s32 argument0, s32 argument1) {
+    B_004507C0.arguments.main.argument0 = argument0;
+    B_004507C0.arguments.main.argument1 = argument1;
     B_004507C0.command = 6;
-    B_004507C0.port = arg0;
-    B_004507C0.slot = arg1;
+    B_004507C0.port = port;
+    B_004507C0.slot = slot;
     if (sceSifCallRpc(B_00450580, 1, 0, &B_004507C0, 0x80, &B_004507C0, 0x80, 0, 0) < 0) {
         return 0;
     }
     if (B_004507C0.result == 1) {
-        func_00243458(arg0, arg1, 2);
+        func_00243458(port, slot, 2);
     }
     return B_004507C0.result;
 }

@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "murray.h"
+#include "carry.h"
 extern "C" int bevy_player_p15_binoc_active(MURRAY *pmurray);
 extern "C" int FJmpAllowsGadget(void *pjmp, int gadget);
 extern "C" int FAttachAllowsGadget(void *pattach, int gadget);
@@ -41,7 +42,7 @@ five:
     if (gadget == 3)
         goto one;
     if (gadget == 0x13) {
-        if (FIsBasicDerivedFrom(*(void **)((char *)pmurray->ploCarried + 0x180), 0x38))
+        if (FIsBasicDerivedFrom(((CARRY *)pmurray->ploCarried)->pso, 0x38))
             return 1;
     }
     return 0;

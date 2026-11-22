@@ -1,13 +1,14 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "guardview.h"
 
-M2C_UNK GoalStack_Clear(s32);                       /* extern */
-M2C_UNK RemoveSoLoHierarchy();                      /* extern */
-M2C_UNK RetractAsegaHandle(s32);                    /* extern */
-M2C_UNK func_00208540(s32, M2C_UNK);                /* extern */
+void GoalStack_Clear(struct GOALSTACK *);
+void RemoveSoLoHierarchy(struct STEPGUARDVIEW *);
+void RetractAsegaHandle(struct ASEGA **);
+void func_00208540(struct STEPGUARDVIEW *, struct BASIC *);
 
-void func_002064D8(s32 arg0) {
-    RemoveSoLoHierarchy();
-    func_00208540(arg0, 0);
-    GoalStack_Clear(arg0 + 0x26C);
-    RetractAsegaHandle(arg0 + 0x34C);
+void func_002064D8(struct STEPGUARDVIEW *pguard) {
+    RemoveSoLoHierarchy(pguard);
+    func_00208540(pguard, 0);
+    GoalStack_Clear(&pguard->goalstack);
+    RetractAsegaHandle(&pguard->pasega);
 }

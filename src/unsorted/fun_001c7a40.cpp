@@ -1,10 +1,15 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "types.h"
 // 0x1C7A40 GetCoinLootDefId
-int func_001C7A40(void *a0)
+struct LOOTHOLDER {
+    u8 unknown_0x0[0x244];
+    s32 *pdefId;
+};
+int func_001C7A40(LOOTHOLDER *holder)
 {
-    int v0 = -1;
-    int **pp = (int **)((char *)a0 + 0x244);
-    if (*pp != 0) {
-        v0 = **pp;
+    int defId = -1;
+    if (holder->pdefId != 0) {
+        defId = *holder->pdefId;
     }
-    return v0;
+    return defId;
 }

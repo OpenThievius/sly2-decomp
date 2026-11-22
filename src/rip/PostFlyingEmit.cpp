@@ -1,15 +1,18 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "rip.h"
 extern "C" {
-void func_001CE9B8();
+void func_001CE9B8(RIP *rip, EMITB *emitb);
 
-void PostFlyingEmit(void *arg0, void *arg1) {
-    func_001CE9B8();
-    M2C_FIELD(arg0, s32 *, 0xF0) = (s32) M2C_FIELD(M2C_FIELD(arg1, void **, 8), s32 *, 0xC);
-    M2C_FIELD(arg0, s32 *, 0xF4) = (s32) M2C_FIELD(arg1, s32 *, 0xF0);
+/* a FLYING RIP keeps what its emitter gave it after the RIP */
+struct FLYING : RIP {
+    s32 field_0xF0; /* PostFlyingEmit: the emitter's info word at 0xC */
+    s32 field_0xF4; /* PostFlyingEmit: the emitter's word at 0xF0 */
+};
+
+void PostFlyingEmit(FLYING *flying, EMITB *emitb) {
+    func_001CE9B8(flying, emitb);
+    flying->field_0xF0 = emitb->pinfo->field_0xC;
+    flying->field_0xF4 = emitb->params.payload;
 }
 
 }

@@ -1,8 +1,10 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "script.h"
 extern "C" {
-char *PcmdAllocScript(int, int, int);
-void AddScriptRun(int arg0, int arg1, int arg2, int arg3) {
-    char *command = (char *)PcmdAllocScript(arg0, 6, arg1);
-    *(int *)(command + 8) = arg2;
-    *(int *)(command + 0xC) = arg3;
+void *PcmdAllocScript(SCRIPT *, int, int);
+void AddScriptRun(SCRIPT *script, int oid, int field_0x8, int field_0xC) {
+    PCMDRUN *command = (PCMDRUN *)PcmdAllocScript(script, 6, oid);
+    command->field_0x8 = field_0x8;
+    command->field_0xC = field_0xC;
 }
 }

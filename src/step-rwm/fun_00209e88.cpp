@@ -1,19 +1,13 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "stepguard.h"
+#include "goals.h"
 extern "C" {
-struct _m2c_stack_func_00209E88 {
-    /* 0x00 */ char pad0[0x20];
-};                                                  /* size = 0x20 */
-s32 FIsGuardInSgs(...);                    /* extern */
-M2C_UNK func_0017A8C8(s32, M2C_UNK);                /* extern */
-s32 func_00205458(s32, M2C_UNK);                    /* extern */
-void func_00209E88(s32 arg0) {
-    if ((FIsGuardInSgs(arg0, 0x16) != 0) || (FIsGuardInSgs(arg0, 0x12) != 0)) {
-        func_0017A8C8(func_00205458(arg0, 0xB0), 1);
+s32 FIsGuardInSgs(STEPGUARD *, s32);
+void func_0017A8C8(GOAL *, s32);
+GOAL *func_00205458(STEPGUARD *, s32);
+void func_00209E88(STEPGUARD *pguard) {
+    if ((FIsGuardInSgs(pguard, 0x16) != 0) || (FIsGuardInSgs(pguard, 0x12) != 0)) {
+        func_0017A8C8(func_00205458(pguard, 0xB0), 1);
     }
 }
 }

@@ -1,12 +1,13 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "pzo_hide.h"
 
-s32 FIsBasicDerivedFrom(s32, M2C_UNK);              /* extern */
-M2C_UNK StartMurrayLift(s32, s32);                  /* extern */
-M2C_UNK func_00184130();                            /* extern */
+int FIsBasicDerivedFrom(void *, int);
+void StartMurrayLift(void *, struct LIFTPT *);
+void func_00184130(struct LIFTPT *, void *);
 
-void LiftPt_OnGrab(s32 arg0, s32 arg1) {
-    func_00184130();
-    if (FIsBasicDerivedFrom(arg1, 0x36) != 0) {
-        StartMurrayLift(arg1, arg0);
+void LiftPt_OnGrab(struct LIFTPT *lift, void *pmurray) {
+    func_00184130(lift, pmurray);
+    if (FIsBasicDerivedFrom(pmurray, 0x36) != 0) {
+        StartMurrayLift(pmurray, lift);
     }
 }

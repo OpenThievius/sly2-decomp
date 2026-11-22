@@ -10,6 +10,11 @@
 #include "phys.h"
 #include "ps2inline.h"
 #include "vu0inline.h"
+#include "clock.h"
+#include "joy.h"
+#include "murray.h"
+#include "jmp.h"
+#include "xf.h"
 
 INCLUDE_ASM(0X195FB8);
 
@@ -19,18 +24,8 @@ INCLUDE_ASM(0X196AA8);
 
 INCLUDE_ASM(0X196DF8);
 
-struct Handle { char pad0[0x1C]; float tStart; char pad20[0x40 - 0x20]; float tEnd; };
-
-struct Owner { char pad0[0x18]; float angle; char pad1c[0x60 - 0x1C]; char pad60[0]; };
-
-struct Range { char pad[0x18]; float angle; };
-
-struct Actor { char pad0[0x60]; Owner *pdirSource; char pad64[0x150 - 0x64]; Range *prange; char pad154[0x1030 - 0x154]; Handle *phandle; };
-
-struct Jmp {
-    Actor *pactor; char pad4[4]; int index; char pad0c[0x1C - 0xC]; int mode; char pad20[0x30 - 0x20]; int started;
-    char pad34[0x120 - 0x34]; void *aseg120[5]; void *aseg134[5];
-};
+/* what JT::field_0x1030 points at, as StartJmpDirectionAseg reads it: the start and end of the animation to apply */
+struct HANDLE { u8 unknown_0x0[0x1C]; float tStart; u8 unknown_0x20[0x40 - 0x20]; float tEnd; };
 
 extern "C" float atan2f(float, float);
 
@@ -40,38 +35,38 @@ extern "C" void RetractSmaRef(void *);
 
 extern "C" void ApplyAsegToHandle(void *, void *, int, void *, float, float);
 
-extern "C" void StartJmpDirectionAseg(Jmp *pthis)
+extern "C" void StartJmpDirectionAseg(JMP *pthis)
 {
-    pthis->started = 1;
-    float angle = atan2f(((float *)pthis->pactor->pdirSource)[0x44 / 4], ((float *)pthis->pactor->pdirSource)[0x40 / 4]);
-    float diff = RadNormalize__Ff_197370(pthis->pactor->prange->angle - angle);
+    pthis->fStarted = 1;
+    float angle = atan2f(pthis->pjt->pxfRoot->matWorld.mat[0][1], pthis->pjt->pxfRoot->matWorld.mat[0][0]);
+    float diff = RadNormalize__Ff_197370(pthis->pjt->pjoy->radStick - angle);
     float absDiff = diff < 0.0f ? -diff : diff;
     if (absDiff < 1.0995574f) {
-        pthis->index = 3;
+        pthis->field_0x8 = 3;
     } else if (2.0420351f < absDiff) {
-        pthis->index = 4;
+        pthis->field_0x8 = 4;
     } else if (0.0f < diff) {
-        pthis->index = 2;
+        pthis->field_0x8 = 2;
     } else {
-        pthis->index = 1;
+        pthis->field_0x8 = 1;
     }
-    int mode = pthis->mode;
-    Handle *phandle = pthis->pactor->phandle;
+    int mode = pthis->state;
+    HANDLE *phandle = (HANDLE *)pthis->pjt->field_0x1030;
     void *paseg;
     if (mode == 2)
-        paseg = pthis->aseg134[pthis->index];
+        paseg = pthis->apasegB[pthis->field_0x8];
     else
-        paseg = pthis->aseg120[pthis->index];
+        paseg = pthis->apasegA[pthis->field_0x8];
     if (paseg == 0) {
         if (mode == 2)
-            paseg = pthis->aseg134[0];
+            paseg = pthis->apasegB[0];
         else
-            paseg = pthis->aseg120[0];
+            paseg = pthis->apasegA[0];
         if (paseg == 0)
-            paseg = pthis->aseg120[0];
+            paseg = pthis->apasegA[0];
     }
-    RetractSmaRef((char *)pthis->pactor + 0x1034);
-    ApplyAsegToHandle(paseg, pthis->pactor, 1, (char *)pthis->pactor + 0x1030, phandle->tStart, phandle->tEnd);
+    RetractSmaRef(&pthis->pjt->field_0x1034);
+    ApplyAsegToHandle(paseg, pthis->pjt, 1, &pthis->pjt->field_0x1030, phandle->tStart, phandle->tEnd);
 }
 
 struct Node { int value; Node *next; };
@@ -91,63 +86,8 @@ union VU_SCALE { QW q; VECTOR v; };
 
 union VU_VECTOR { QW q; VECTOR v; };
 
-struct CLOCK { float t; float dt; };
-
-struct JOY { char pad0[0x1C]; float uStick; char pad20[0x30 - 0x20]; u32 grfbtn; };
-
-struct XFL { char pad0[0xA0]; void *pxf; char padA4[4]; float tLand; char padAC[0xB8 - 0xAC]; float dz; };
-
-struct ASEGA { char pad0[0x28]; u64 grfo; char pad30[0x10C - 0x30]; s32 field_0x10C; char pad110[0x124 - 0x110]; s32 field_0x124; char pad128[0x17C - 0x128]; s32 kind; };
-
-struct EDGEHOST { char pad0[0xEC]; void *poxa; };
-
-struct EDGESO { void *pxf; EDGEHOST *phost; };
-
-struct EDGEEND { EDGESO *pso; char pad4[0xC]; QW pos; char pad20[0x20]; };
-
-struct EDGE { EDGEEND aend[2]; char pad80[0x9C - 0x80]; s32 field_0x9C; s32 field_0xA0; s32 field_0xA4; };
-
-struct ACTVAL { char pad0[0x1C]; float tGoal; char pad20[0x10]; QW pos; };
-
-struct LANDING { LO *plo; s32 field_0x4; s32 field_0x8; };
-
-struct Jmp;
-
-struct JMP {
-    JT *pjt;
-    s32 kind;
-    s32 field_0x8;
-    ASEGA *pasega;
-    char pad10[4];
-    f32 field_0x14;
-    char pad18[4];
-    s32 state;
-    float tState;
-    s32 field_0x24;
-    s32 field_0x28;
-    s32 pending;
-    s32 fStarted;
-    char pad34[0xC];
-    s32 field_0x40;
-    char pad44[0xC8 - 0x44];
-    EDGESO *psoEdge;
-    char padcc[4];
-    QW posEdge;
-    QW dirEdge;
-    char padf0[0x10];
-    s32 field_0x100;
-    s32 field_0x104;
-    char pad108[0x134 - 0x108];
-    void *paseg;
-    char pad138[0x1D0 - 0x138];
-    LANDING landing;
-    char pad1dc[0x1F0 - 0x1DC];
-    ACTVAL *pactval;
-};
-
+/* a field of JT or its subclasses that no header declares yet (one reader each: 0x1010, 0x18F0, 0x18C4, 0xF5C, 0xF60, 0x1F18) */
 #define JT_FIELD(pjt, type, offset) (*(type *)((char *)(pjt) + (offset)))
-
-extern "C" CLOCK g_2dded0;
 
 extern "C" float D_002BF818;
 
@@ -163,7 +103,7 @@ extern "C" QW g_2a2dd0;
 
 extern "C" JT *g_2e1e40;
 
-extern "C" char *g_2f7900;
+extern "C" MURRAY *g_2f7900;
 
 extern "C" QW PosLoWorld(void *);
 
@@ -185,9 +125,7 @@ extern "C" int FGadgetAcquired(int);
 
 extern "C" void SpendJtGadgetPower(JT *, int);
 
-extern "C" void SetJmpBodyState(JMP *, int, ASEGA *);
-
-extern "C" void StartJmpDirectionAseg(struct Jmp *);
+extern "C" void SetJmpBodyState(JMP *, int, JMPASEGA *);
 
 extern "C" void bevy_player_p14_jts8_enter(JMP *);
 
@@ -248,8 +186,8 @@ extern "C" void UpdateJmpBodyState(JMP *pjmp)
 
     posWorld.q = PosLoWorld(pjmp->pjt);
     vel.q = pjmp->pjt->GetVelocityVec();
-    JOY *pjoy = JT_FIELD(pjmp->pjt, JOY *, 0x150);
-    if (JT_FIELD(pjmp->pjt, char *, 0x208) && *(float *)(JT_FIELD(pjmp->pjt, char *, 0x208) + 0x88) > 0.7f) {
+    JOY *pjoy = pjmp->pjt->pjoy;
+    if (pjmp->pjt->psoSurface && ((SURFACE *)pjmp->pjt->psoSurface)->unk88 > 0.7f) {
         fGrab = 1;
     }
 
@@ -290,14 +228,14 @@ extern "C" void UpdateJmpBodyState(JMP *pjmp)
                 }
                 SetJmpBodyState(pjmp, 1, pjmp->pasega);
             } else if (!pjmp->fStarted && pjoy->uStick > 0.5f) {
-                StartJmpDirectionAseg((Jmp *)pjmp);
+                StartJmpDirectionAseg(pjmp);
             }
             break;
         case 2:
             if (D_002BF81C < g_2dded0.t - pjmp->tState) {
                 SetJmpBodyState(pjmp, 3, pjmp->pasega);
             } else if (!pjmp->fStarted && pjoy->uStick > 0.5f) {
-                StartJmpDirectionAseg((Jmp *)pjmp);
+                StartJmpDirectionAseg(pjmp);
             }
             break;
         case 1:
@@ -309,7 +247,7 @@ extern "C" void UpdateJmpBodyState(JMP *pjmp)
         case 6:
             if (pjmp->pasega->kind == 3) {
                 SetJmpBodyState(pjmp, 4, 0);
-            } else if (JT_FIELD(pjmp->pjt, XFL *, 0x58)->tLand < g_2dded0.t) {
+            } else if (pjmp->pjt->pxfLinear->tArrive < g_2dded0.t) {
                 bevy_player_p14_jts8_enter(pjmp);
             }
             break;
@@ -321,29 +259,29 @@ extern "C" void UpdateJmpBodyState(JMP *pjmp)
         case 14:
         case 15:
         case 16:
-            if (JT_FIELD(pjmp->pjt, XFL *, 0x58)->tLand < g_2dded0.t) {
+            if (pjmp->pjt->pxfLinear->tArrive < g_2dded0.t) {
                 bevy_player_p14_jts8_enter(pjmp);
             }
             break;
         case 18:
-            if (JT_FIELD(pjmp->pjt, XFL *, 0x58)->tLand -
-                        TFindAsegLabel__FP4ASEG3OID(*(void **)(g_2f7900 + 0x1974), 0x1C7) <=
+            if (pjmp->pjt->pxfLinear->tArrive -
+                        TFindAsegLabel__FP4ASEG3OID(*(void **)((char *)g_2f7900 + 0x1974), 0x1C7) <=
                     g_2dded0.t &&
-                *(s32 *)(g_2f7900 + 0x1914) != 3) {
-                CarryThrow_SetState(g_2f7900 + 0x1910, 3);
-            } else if (JT_FIELD(pjmp->pjt, XFL *, 0x58)->tLand < g_2dded0.t) {
+                g_2f7900->stateCarry != 3) {
+                CarryThrow_SetState(g_2f7900->PvCarry(), 3);
+            } else if (pjmp->pjt->pxfLinear->tArrive < g_2dded0.t) {
                 bevy_player_p14_jts8_enter(pjmp);
             }
             break;
         case 8:
-            if (JT_FIELD(pjmp->pjt, XFL *, 0x58)->tLand < g_2dded0.t) {
+            if (pjmp->pjt->pxfLinear->tArrive < g_2dded0.t) {
                 SetJmpBodyState(pjmp, 4, pjmp->pasega);
             }
             break;
         case 5:
             if (g_2dded0.t - pjmp->tState > 0.25f && fGrab) {
                 pjmp->pjt->SetMode(0);
-            } else if (FJtStuck(pjmp->pjt, (char *)pjmp->pjt + 0x131C, pjmp->tState)) {
+            } else if (FJtStuck(pjmp->pjt, &pjmp->pjt->field_0x131C, pjmp->tState)) {
                 WarpJtToSafePoint(pjmp->pjt, 0);
             }
             break;
@@ -351,7 +289,7 @@ extern "C" void UpdateJmpBodyState(JMP *pjmp)
         case 4:
             if (fGrab) {
                 if (pjmp->kind == 0xE) {
-                    StartAttach((char *)pjmp->pjt + 0x4C0, 0xA, 0, 0);
+                    StartAttach(pjmp->pjt->PvAttach(), 0xA, 0, 0);
                 } else {
                     pjmp->pjt->SetMode(0);
                 }
@@ -366,7 +304,7 @@ extern "C" void UpdateJmpBodyState(JMP *pjmp)
                     pjmp->field_0x104 = iEdge == 0 ? pedge->field_0xA4 : pedge->field_0xA0;
                     pjmp->dirEdge = posEdge.q;
                     SetJmpBodyState(pjmp, 0x11, 0);
-                } else if (FJtStuck(pjmp->pjt, (char *)pjmp->pjt + 0x131C, pjmp->tState)) {
+                } else if (FJtStuck(pjmp->pjt, &pjmp->pjt->field_0x131C, pjmp->tState)) {
                     WarpJtToSafePoint(pjmp->pjt, 0);
                 }
             }
@@ -390,7 +328,7 @@ extern "C" void UpdateJmpBodyState(JMP *pjmp)
                     SetStepRadTargetDir(pjmp->pjt, VectorScaleX(pjmp->dirEdge, scale.q));
                     if (GrfbtnVjoyPressedWithin(pjoy, 0x400, 0.15f) && pjmp->pjt->FCanUseGadget(3)) {
                         ClearVjoyPresses(pjoy, 0x400);
-                        StartBinoc((char *)pjmp->pjt + 0xF00, 0, 0, 0);
+                        StartBinoc(pjmp->pjt->PvBinoc(), 0, 0, 0);
                     }
                 }
             }
@@ -402,7 +340,7 @@ extern "C" void UpdateJmpBodyState(JMP *pjmp)
             } else if (!(pjoy->grfbtn & (GrfbtnJtGadget(pjmp->pjt, 0x1B) | 8))) {
                 SetJmpBodyState(pjmp, 4, 0);
             } else if (pjmp->state == 0x13) {
-                void *pasega = JT_FIELD(pjmp->pjt, void *, 0x1030);
+                void *pasega = pjmp->pjt->field_0x1030;
                 if (!pasega || FAsegaGone(pasega)) {
                     SetJmpBodyState(pjmp, 0x14, 0);
                 }
@@ -430,15 +368,15 @@ extern "C" void UpdateJmpBodyState(JMP *pjmp)
                         FIsBasicDerivedFrom(pjmp->landing.plo, 0x26))) {
                 SetJmpState(pjmp, 0xB, 0, 0);
                 JtbsChooseJtLanding(pjmp, pjmp->landing.plo);
-            } else if (pjmp->field_0x28 && JT_FIELD(pjmp->pjt, XFL *, 0x58)->dz < 0.0f) {
-                ApplyAsegToHandle(pjmp->paseg, pjmp->pjt, 1, (char *)pjmp->pjt + 0x1030, 0.0f, 1.0f);
+            } else if (pjmp->field_0x28 && ((float *)&pjmp->pjt->pxfLinear->vel)[2] < 0.0f) {
+                ApplyAsegToHandle(pjmp->apasegB[0], pjmp->pjt, 1, &pjmp->pjt->field_0x1030, 0.0f, 1.0f);
                 pjmp->field_0x28 = 0;
                 pjmp->pjt->Slot35(GetJmpLaunchVelocity(pjmp, 6));
             } else if (pjmp->landing.field_0x4 || pjmp->landing.field_0x8) {
                 float dt = pjmp->pactval->tGoal - g_2dded0.t;
                 QW pos = func_0019F3F8(pjmp->pjt, &pjmp->landing, dt < 0.7f ? dt : 0.7f);
-                pos = ConvertXfPos(0, JT_FIELD(pjmp->pjt, XFL *, 0x58)->pxf, pos);
-                SetActvalGoal(pjmp->pactval, pos, pjmp->pactval->pos);
+                pos = ConvertXfPos(0, pjmp->pjt->pxfLinear->pxfParent, pos);
+                SetActvalGoal(pjmp->pactval, pos, pjmp->pactval->velGoal);
             }
             break;
         }
@@ -571,7 +509,7 @@ int FTimeJtJumpToTarget(JMP_19A400 *pjmp, QW pos, QW vJump, QW posTarget, QW vTa
 
 INCLUDE_ASM(0X19A4A0);
 
-struct LM { float gMin; float gMax; };
+/* LM: clq.h (through act.h) */
 
 extern "C" int CSolveQuadratic__FfffPf(float, float, float, float *);
 
@@ -654,7 +592,7 @@ extern "C" QW GetJmpLaunchVelocity(JMP *pjmp, int state)
             break;
         }
         JT *pjt = pjmp->pjt;
-        float height = ((float *)pjt->ppos)[2] - pjt->field_0x238 - margin;
+        float height = ((float *)pjt->ppos)[2] - pjt->vecWorld.z - margin;
         candidate = Sqrt(GMax(0.0f, (gravity + gravity) * height));
         break;
     }
@@ -840,13 +778,13 @@ INCLUDE_ASM(0X19C300);
 
 static inline void StartJmpAttach(JMP *pjmp, s32 kind, int offset)
 {
-    ASEGA *pasega = pjmp->pasega;
+    JMPASEGA *pasega = pjmp->pasega;
     StartAttach(pjmp->pjt->PvAttach(), kind, pasega, pasega ? (char *)pasega + offset : 0);
 }
 
 extern "C" void bevy_player_p14_jts8_enter(JMP *pjmp)
 {
-    ASEGA *pasega;
+    JMPASEGA *pasega;
     JT *pjt;
     switch (pjmp->state) {
     case 6:
@@ -870,7 +808,7 @@ extern "C" void bevy_player_p14_jts8_enter(JMP *pjmp)
     case 14:
         pjt = pjmp->pjt;
         pasega = pjmp->pasega;
-        JT_FIELD(pjt, ASEGA *, 0x18C4) = pasega;
+        JT_FIELD(pjt, JMPASEGA *, 0x18C4) = pasega;
         if (pasega->field_0x124 == 3) {
             SetJtState(pjt, 0x16, -1);
             return;
@@ -878,14 +816,14 @@ extern "C" void bevy_player_p14_jts8_enter(JMP *pjmp)
         SetJtState(pjt, 3, 1);
         return;
     case 15:
-        JT_FIELD(pjmp->pjt, ASEGA *, 0xF5C) = pjmp->pasega;
+        JT_FIELD(pjmp->pjt, JMPASEGA *, 0xF5C) = pjmp->pasega;
         JT_FIELD(pjmp->pjt, f32, 0xF60) = pjmp->field_0x14;
         pjt = pjmp->pjt;
         pjt->SetMode(8);
         return;
     case 16: {
         JT *pjtOwner = pjmp->pjt;
-        JT_FIELD(pjtOwner, ASEGA *, 0x1F18) = pjmp->pasega;
+        JT_FIELD(pjtOwner, JMPASEGA *, 0x1F18) = pjmp->pasega;
         SetJtState(pjtOwner, 0x15, 10);
         return;
     }

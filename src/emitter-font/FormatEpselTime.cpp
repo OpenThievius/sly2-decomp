@@ -1,19 +1,19 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 #include "cref.h"
-struct HERO { char pad[0x110]; int idx; };
-struct GLOBALS { char pad0[0x3B58]; int slots[1]; };
+#include "sw.h"
+struct TARGET { u8 unknown_0x0[0x110]; s32 iepisode; /* FormatEpselPercent, FormatEpselTime: indexes the world's per-episode save paths */ };
+extern "C" SW B_003DD490;
 extern "C" char B_003D4A60[];
-extern "C" char B_003DD490[];
 extern "C" const char RO_002A5168[];
-extern "C" CRef RefGetGameSaveValue(int, void *);
+extern "C" CRef RefGetGameSaveValue(SAVEPATH *, void *);
 extern "C" float fmodf(float, float);
 extern "C" int sprintf(char *, const char *, ...);
 
 void FormatEpselTime(char *out)
 {
-    char *base = B_003DD490;
-    HERO *hero = *(HERO **)(base + 0x4774);
+    TARGET *hero = B_003DD490.ptarget;
     if (hero) {
-        int key = ((GLOBALS *)base)->slots[hero->idx];
+        SAVEPATH *key = B_003DD490.apsavepathEpisodeDt[hero->iepisode];
         if (key) {
             float seconds = RefGetGameSaveValue(key, B_003D4A60).m_tag.m_g;
             int whole = (int)(seconds * 0.00027777778f);

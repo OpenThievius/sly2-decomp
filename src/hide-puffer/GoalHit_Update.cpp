@@ -1,11 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-#include "goal.h"
+#include "goals.h"
 #include "step.h"
 #include "sly2.h"
 /* the actor the goal steers (a STEP subclass, 0x35C past STEP's size): not LO */
 struct ACTOR : STEP { char pad[0x35C - 0x2C0]; char *p35C; };
-/* GoalHit, a GOAL subclass: two timers past GOAL's 0x30 bytes */
-struct GOALHIT : GOAL { char pad[0xB0 - 0x30]; float t0; float t1; };
 struct CMOBJ;
 extern float g_2dded0;
 extern CMOBJ B_002DDF40;
@@ -20,12 +18,12 @@ void GoalHit_Update(GOALHIT *goal)
     char *target = lo->p35C;
     *(QW *)(target + 0x20) = PosLoWorld(lo);
     float limit = g_2dded0 + 0.0001f;
-    if (goal->t0 < limit) {
-        goal->t0 = 3.402823466e+38f;
+    if (goal->tJolt < limit) {
+        goal->tJolt = 3.402823466e+38f;
         JoltCm(&B_002DDF40, 0);
     }
-    if (goal->t1 < limit) {
-        goal->t1 = 3.402823466e+38f;
+    if (goal->tLimit < limit) {
+        goal->tLimit = 3.402823466e+38f;
         func_001F7A68((ACTOR *)goal->pstep, 2);
     }
 }

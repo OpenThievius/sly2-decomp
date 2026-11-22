@@ -1,8 +1,10 @@
-#include "m2c_macros.h"
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "types.h"
 
-M2C_UNK FreeSlotheapPv(M2C_UNK *, s32);             /* extern */
-extern M2C_UNK B_003DD074;
+struct SLOTHEAP;
+void FreeSlotheapPv(struct SLOTHEAP *pslotheap, void *pv);
+extern struct SLOTHEAP B_003DD074; /* the stream emitters' slot heap (0x3C0-byte slots; the sound system's heapStreamAmb) */
 
-void FreeStreamAmb(s32 arg0) {
-    FreeSlotheapPv(&B_003DD074, arg0);
+void FreeStreamAmb(void *pv) {
+    FreeSlotheapPv(&B_003DD074, pv);
 }

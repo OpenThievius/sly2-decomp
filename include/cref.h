@@ -82,6 +82,7 @@ struct CRef {
        one schedules the call as retail only with that return type */
     CRef &SetS32(int n);
     CRef &SetBool(int fBool);
+    CRef &SetF32(f32 g);                /* SetF32__4CReff (0x129558): bindings that return a float (0x101B60, 0x104AF0, 0x102538, 0x1021D0) */
     CRef &SetBasic(struct BASIC *pbasic);
 };
 #else

@@ -5,44 +5,51 @@
 #include "cref.h"
 #include "types.h"
 #include "alloc.h"
-#include "m2c_macros.h"
 #include "include_asm.h"
 
 struct SAVEDATA { char b[0x5408]; };
 
-struct REC { short symid; short pad; unsigned short ib; char pad2[4]; };
+// a symbol table's entry: a hash, the name, the symbol id and the next entry of the bucket
+struct SYMENTRY { unsigned nHash; const char *pchz; int symid; SYMENTRY *next; };
 
-struct SAVEVARS { int crec; REC *arec; char symtab[1]; };
+// 53 hash buckets, then the count of unused entries and the entry array InitSymtab allocates
+struct SYMTAB { SYMENTRY *bucket[53]; int cfree; SYMENTRY *ents; };
+
+// the save variables' record of a name (the layout FFindSaveVar walks)
+struct SAVEVARREC { short symid; signed char savek; unsigned char cElement; unsigned short ib; unsigned short irecChild; unsigned short irecNext; };
+
+// the save variables: the record table and the symbol table the names resolve through (B_003E0EA8)
+struct SAVEVARS { int crec; SAVEVARREC *arec; SYMTAB symtab; };
 
 extern SAVEDATA B_003D4A60;
 
 extern "C" const char RO_STR_002A78F8[];
 
-extern "C" int SymidFindSymtab_1D84B0(void *, const char *);
+extern "C" int SymidFindSymtab_1D84B0(SYMTAB *, const char *);
 
 void SnapshotSaveData(SAVEVARS *vars, SAVEDATA *data)
 {
     *data = B_003D4A60;
     const char *name = RO_STR_002A78F8;
-    void *symtab = vars->symtab;
+    SYMTAB *symtab = &vars->symtab;
     int symid = SymidFindSymtab_1D84B0(symtab, name);
     if (symid == -1)
         return;
     for (int index = 0; index < vars->crec; index++) {
-        REC *record = (REC *)((char *)vars->arec + index * 10);
+        SAVEVARREC *record = &vars->arec[index];
         if (record->symid == symid)
-            ((char *)data)[record->ib] = 1;
+            data->b[record->ib] = 1;
     }
 }
 
-extern "C" void *PvAllocSwImpl__Fi(s32);
+extern "C" void *PvAllocSwImpl__Fi(ALLOCREQ *);
 
-extern "C" void InitSymtab(char *arg0, s32 arg1) {
-    s32 pair[2];
-    pair[0] = arg1 << 4;
-    pair[1] = 0x10;
-    *(s32 *)(arg0 + 0xD4) = arg1;
-    *(void **)(arg0 + 0xD8) = PvAllocSwImpl__Fi((sptr)pair);
+extern "C" void InitSymtab(SYMTAB *psymtab, s32 centry) {
+    ALLOCREQ request;
+    request.cb = centry << 4;
+    request.cbAlign = 0x10;
+    psymtab->cfree = centry;
+    psymtab->ents = (SYMENTRY *)PvAllocSwImpl__Fi(&request);
 }
 
 extern "C" unsigned char RO_002AA6A1[];
@@ -62,19 +69,15 @@ extern "C" int NHashPchz(unsigned char *arg0) {
     return hash;
 }
 
-struct ENT { unsigned nHash; const char *pchz; int symid; ENT *next; };
-
-struct SYMTAB { ENT *bucket[53]; int cfree; ENT *ents; };
-
 extern "C" unsigned NHashPchz_1D8690(const char *);
 
 void AddSymtabEntry(SYMTAB *t, const char *pchz, int symid)
 {
     unsigned h = NHashPchz_1D8690(pchz);
-    ENT **b = &t->bucket[h % 53u];
+    SYMENTRY **b = &t->bucket[h % 53u];
     int c = t->cfree;
     t->cfree = c - 1;
-    ENT *e = &t->ents[c - 1];
+    SYMENTRY *e = &t->ents[c - 1];
     e->pchz = pchz;
     e->symid = symid;
     e->nHash = h;
@@ -82,18 +85,14 @@ void AddSymtabEntry(SYMTAB *t, const char *pchz, int symid)
     *b = e;
 }
 
-struct SYMENTRY { int nHash; const char *pchz; int symid; SYMENTRY *next; };
-
-struct SYMTAB_1D8720 { SYMENTRY *aentry[0x35]; };
-
-extern "C" int NHashPchz_1D8720(const char *);
+extern "C" unsigned NHashPchz_1D8720(const char *);
 
 extern "C" int StricmpPchz(const char *, const char *);
 
-extern "C" int SymidFindSymtab(SYMTAB_1D8720 *psymtab, const char *pchz)
+extern "C" int SymidFindSymtab(SYMTAB *psymtab, const char *pchz)
 {
     int nHash = NHashPchz_1D8720(pchz);
-    for (SYMENTRY *entry = psymtab->aentry[(unsigned)nHash % 0x35]; entry != 0; entry = entry->next) {
+    for (SYMENTRY *entry = psymtab->bucket[(unsigned)nHash % 0x35]; entry != 0; entry = entry->next) {
         if (entry->nHash == nHash && StricmpPchz(entry->pchz, pchz) == 0)
             return entry->symid;
     }
@@ -104,15 +103,15 @@ struct SAVEPATH { int csym; unsigned short *asymid; };
 
 extern "C" void *PvAllocStackImpl__Fi(ALLOCREQ *);
 
-extern "C" int SymidFindSymtab_1D87C0(void *, const char *);
+extern "C" int SymidFindSymtab_1D87C0(SYMTAB *, const char *);
 
 extern "C" int AtoiPchz(const char *);
 
-extern "C" char B_003E0EA8[];
+extern "C" SAVEVARS B_003E0EA8;
 
-// The symbol table sits 8 bytes into the save data; the same accessor as in
+// The symbol table sits 8 bytes into the save variables; the same accessor as in
 // PpathVaultFlag and PpathClueFlag.
-static inline void *SymtabOfSave(char *save) { return save + 8; }
+static inline SYMTAB *SymtabOfSave(SAVEVARS *psavevars) { return &psavevars->symtab; }
 
 // Retail walks a null-terminated list of names passed in 8-byte argument
 // slots (variadic, so `args` steps by 8 and is reset from a saved copy for
@@ -144,7 +143,7 @@ extern "C" void BuildSavePath(const char *first, char *args, SAVEPATH *path)
     int index = 0;
     if (name != 0) {
         do {
-            int symid = SymidFindSymtab_1D87C0(SymtabOfSave(B_003E0EA8), name);
+            int symid = SymidFindSymtab_1D87C0(SymtabOfSave(&B_003E0EA8), name);
             if (symid == -1)
                 path->asymid[index] = AtoiPchz(name);
             else
@@ -158,8 +157,6 @@ extern "C" void BuildSavePath(const char *first, char *args, SAVEPATH *path)
 
 typedef void *va_list;
 
-struct SAVEPATH_1D88D0 { int csym; void *asymid; };
-
 extern "C" int CStackFrame_Construct(void *);
 
 extern "C" void CStackFrame_Destructor(void *, int);
@@ -168,9 +165,9 @@ extern "C" void *PvAllocSwImpl__Fi_1D88D0(ALLOCREQ *);
 
 extern "C" void *PvAllocSwCopyImpl__FiPv(ALLOCREQ *, void *);
 
-extern "C" void BuildSavePath_1D88D0(const char *, va_list, SAVEPATH_1D88D0 *);
+extern "C" void BuildSavePath_1D88D0(const char *, va_list, SAVEPATH *);
 
-SAVEPATH_1D88D0 *PsavepathNew(const char *first, ...)
+SAVEPATH *PsavepathNew(const char *first, ...)
 {
     char frame[16];
     CStackFrame_Construct(frame);
@@ -181,26 +178,26 @@ SAVEPATH_1D88D0 *PsavepathNew(const char *first, ...)
     preq->cb = 8;
     preq->cbAlign = 0x10;
     args = (va_list)((char *)__builtin_next_arg(first) - 56);
-    SAVEPATH_1D88D0 *path = (SAVEPATH_1D88D0 *)PvAllocSwImpl__Fi_1D88D0(preq);
+    SAVEPATH *path = (SAVEPATH *)PvAllocSwImpl__Fi_1D88D0(preq);
     BuildSavePath_1D88D0(first, args, path);
     int csym = path->csym;
-    void *old = path->asymid;
+    unsigned short *old = path->asymid;
     preq->cb = csym << 1;
     preq->cbAlign = 0x10;
-    path->asymid = PvAllocSwCopyImpl__FiPv(preq, old);
+    path->asymid = (unsigned short *)PvAllocSwCopyImpl__FiPv(preq, old);
     CStackFrame_Destructor(frame, 2);
     return path;
 }
 
-extern "C" void BuildSavePath_1D89A8(const char *, char *, void *);
+extern "C" void BuildSavePath_1D89A8(const char *, char *, SAVEPATH *);
 
-void *PsavepathNewStack(const char *first, ...)
+SAVEPATH *PsavepathNewStack(const char *first, ...)
 {
     ALLOCREQ req;
     req.cb = 8;
     req.cbAlign = 0x10;
     char *args = (char *)__builtin_next_arg(first) - 56;
-    void *path = PvAllocStackImpl__Fi(&req);
+    SAVEPATH *path = (SAVEPATH *)PvAllocStackImpl__Fi(&req);
     BuildSavePath_1D89A8(first, args, path);
     return path;
 }
@@ -213,15 +210,15 @@ public:
     ~CStackFrame();
 };
 
-extern "C" void BuildSavePath_1D8A38(const char *, char *, void *);
+extern "C" void BuildSavePath_1D8A38(const char *, char *, SAVEPATH *);
 
-extern "C" CRef RefGetSaveValue(void *, void *, void *);
+extern "C" CRef RefGetSaveValue(SAVEVARS *, SAVEPATH *, char *);
 
-extern "C" char B_003D4A60_1D8A38[];
+extern "C" SAVEDATA B_003D4A60_1D8A38;
 
-static inline CRef GetSaveValue(char *path, void *key)
+static inline CRef GetSaveValue(SAVEPATH *path, SAVEDATA *data)
 {
-    return RefGetSaveValue(B_003E0EA8, path, key);
+    return RefGetSaveValue(&B_003E0EA8, path, data->b);
 }
 
 extern "C" CRef func_001D8A38(const char *first, ...)
@@ -229,19 +226,19 @@ extern "C" CRef func_001D8A38(const char *first, ...)
     CRef ref;
     ref.m_tagk = TAGK_Nil;
     CStackFrame frame;
-    char path[16];
-    BuildSavePath_1D8A38(first, (char *)__builtin_next_arg(first) - 48, path);
-    ref = GetSaveValue(path, B_003D4A60_1D8A38);
+    SAVEPATH path;
+    BuildSavePath_1D8A38(first, (char *)__builtin_next_arg(first) - 48, &path);
+    ref = GetSaveValue(&path, &B_003D4A60_1D8A38);
     return ref;
 }
 
 extern "C" void BuildSavePath(const char *first, char *args, SAVEPATH *path);
 
-extern "C" CRef RefSetSaveValue(void *, SAVEPATH *, CRef *, SAVEDATA *);
+extern "C" CRef RefSetSaveValue(SAVEVARS *, SAVEPATH *, CRef *, SAVEDATA *);
 
 static inline CRef SetSaveValue(SAVEPATH *path, CRef *pvalue, SAVEDATA *data)
 {
-    return RefSetSaveValue(B_003E0EA8, path, pvalue, data);
+    return RefSetSaveValue(&B_003E0EA8, path, pvalue, data);
 }
 
 extern "C" CRef func_001D8B20(CRef *pvalue, const char *first, ...)
@@ -255,44 +252,40 @@ extern "C" CRef func_001D8B20(CRef *pvalue, const char *first, ...)
     return ref;
 }
 
-struct SAVEPATH_1D8C10 { char b[0x10]; };
+extern "C" SAVEDATA B_003D4A60_1D8C10;
 
-extern "C" char B_003D4A60_1D8C10[];
+extern "C" void BuildSavePath_1D8C10(const char *, void *, SAVEPATH *);
 
-extern "C" void BuildSavePath_1D8C10(const char *, void *, SAVEPATH_1D8C10 *);
-
-extern "C" void *PvFindSaveVar(char *, SAVEPATH_1D8C10 *, char *);
+extern "C" char *PvFindSaveVar(SAVEVARS *, SAVEPATH *, char *);
 
 void *PvFindSaveVarPath(const char *first, ...)
 {
     CRef ref;
     ref.m_tagk = TAGK_Nil;
     CStackFrame frame;
-    SAVEPATH_1D8C10 path;
+    SAVEPATH path;
     void *args = (void *)((char *)__builtin_next_arg(first) - 0x38);
     BuildSavePath_1D8C10(first, args, &path);
-    void *var = PvFindSaveVar(B_003E0EA8, &path, B_003D4A60_1D8C10);
+    void *var = PvFindSaveVar(&B_003E0EA8, &path, B_003D4A60_1D8C10.b);
     return var;
 }
 
-struct PATH { int csym; short *asymid; };
-
-extern "C" void *PvAllocStackImpl__Fi_1D8CC8(void *);
+extern "C" void *PvAllocStackImpl__Fi_1D8CC8(ALLOCREQ *);
 
 extern "C" void CopyAb__FPvT0Ui(void *, void *, unsigned);
 
-extern "C" PATH *PpathConcatStack(PATH *a, PATH *b)
+extern "C" SAVEPATH *PpathConcatStack(SAVEPATH *a, SAVEPATH *b)
 {
-    int req[2];
-    req[0] = 8;
-    req[1] = 0x10;
-    PATH *result = (PATH *)PvAllocStackImpl__Fi_1D8CC8(req);
+    ALLOCREQ req;
+    req.cb = 8;
+    req.cbAlign = 0x10;
+    SAVEPATH *result = (SAVEPATH *)PvAllocStackImpl__Fi_1D8CC8(&req);
     result->csym = a->csym + b->csym;
-    req[0] = result->csym * 2;
-    req[1] = 0x10;
-    result->asymid = (short *)PvAllocStackImpl__Fi_1D8CC8(req);
+    req.cb = result->csym * 2;
+    req.cbAlign = 0x10;
+    result->asymid = (unsigned short *)PvAllocStackImpl__Fi_1D8CC8(&req);
     CopyAb__FPvT0Ui(result->asymid, a->asymid, a->csym * 2);
-    CopyAb__FPvT0Ui((char *)result->asymid + a->csym * 2, b->asymid, b->csym * 2);
+    CopyAb__FPvT0Ui(result->asymid + a->csym, b->asymid, b->csym * 2);
     return result;
 }
 
@@ -300,9 +293,12 @@ INCLUDE_ASM(0X1D8D80);
 
 INCLUDE_ASM(0X1D8FF8);
 
-extern "C" {
-s32 CreateSlotheapSwAlign(s32 *, s32, s32, s32); /* extern */
+struct SLOTHEAP;
 
+extern "C" {
+void CreateSlotheapSwAlign(SLOTHEAP *pslotheap, s32 cb, s32 c, s32 cbAlign); /* extern */
+
+// the use counts of the static slot heaps below (the compiler's static-initialisation guards)
 extern s32 B_002DD2E0;
 
 extern s32 B_002DD2E4;
@@ -315,55 +311,56 @@ extern s32 B_002DD2F0;
 
 extern s32 B_002DD2F4;
 
-extern s32 B_004520A8;
+extern SLOTHEAP B_004520A8;
 
-extern s32 B_004520D0;
+extern SLOTHEAP B_004520D0;
 
-extern s32 B_004520F8;
+extern SLOTHEAP B_004520F8;
 
-extern s32 B_00452120;
+extern SLOTHEAP B_00452120;
 
-extern s32 B_00452148;
+extern SLOTHEAP B_00452148;
 
-extern s32 B_00452170;
+extern SLOTHEAP B_00452170;
 
-void StaticInitSlotheaps_1d9280(s32 arg0, s32 arg1) {
-    s32 temp_v0;
-    s32 temp_v0_2;
-    s32 temp_v0_3;
-    s32 temp_v0_4;
-    s32 temp_v0_5;
-    s32 temp_v0_6;
+// the compiler's __static_initialization_and_destruction_0 (initialize flag, priority) for this file's six static slot heaps
+void StaticInitSlotheaps_1d9280(s32 initializeP, s32 priority) {
+    s32 cuse0;
+    s32 cuse1;
+    s32 cuse2;
+    s32 cuse3;
+    s32 cuse4;
+    s32 cuse5;
 
-    if ((arg1 == 0xFFFF) && (arg0 != 0)) {
-        temp_v0 = B_002DD2E0 + 1;
-        B_002DD2E0 = temp_v0;
-        if (temp_v0 == 1) {
+    if ((priority == 0xFFFF) && (initializeP != 0)) {
+        cuse0 = B_002DD2E0 + 1;
+        B_002DD2E0 = cuse0;
+        if (cuse0 == 1) {
             CreateSlotheapSwAlign(&B_004520A8, 0x14, 0x2000, 0x10);
         }
-        temp_v0_2 = B_002DD2E4 + 1;
-        B_002DD2E4 = temp_v0_2;
-        if (temp_v0_2 == 1) {
+        cuse1 = B_002DD2E4 + 1;
+        B_002DD2E4 = cuse1;
+        if (cuse1 == 1) {
             CreateSlotheapSwAlign(&B_004520D0, 0x18, 0x800, 0x10);
         }
-        temp_v0_3 = B_002DD2E8 + 1;
-        B_002DD2E8 = temp_v0_3;
-        if (temp_v0_3 == 1) {
+        cuse2 = B_002DD2E8 + 1;
+        B_002DD2E8 = cuse2;
+        if (cuse2 == 1) {
             CreateSlotheapSwAlign(&B_004520F8, 0x28, 0x200, 0x10);
         }
-        temp_v0_4 = B_002DD2EC + 1;
-        B_002DD2EC = temp_v0_4;
-        if (temp_v0_4 == 1) {
+        cuse3 = B_002DD2EC + 1;
+        B_002DD2EC = cuse3;
+        if (cuse3 == 1) {
             CreateSlotheapSwAlign(&B_00452120, 0x1C, 0x800, 0x10);
         }
-        temp_v0_5 = B_002DD2F0 + 1;
-        B_002DD2F0 = temp_v0_5;
-        if (temp_v0_5 == 1) {
+        cuse4 = B_002DD2F0 + 1;
+        B_002DD2F0 = cuse4;
+        if (cuse4 == 1) {
             CreateSlotheapSwAlign(&B_00452148, 0xC, 0xC8, 0x10);
         }
-        temp_v0_6 = B_002DD2F4 + 1;
-        B_002DD2F4 = temp_v0_6;
-        if (temp_v0_6 == 1) {
+        cuse5 = B_002DD2F4 + 1;
+        B_002DD2F4 = cuse5;
+        if (cuse5 == 1) {
             CreateSlotheapSwAlign(&B_00452170, 0x14, 0x100, 0x10);
         }
     }

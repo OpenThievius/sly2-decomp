@@ -1,16 +1,7 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
 #include "vu0inline.h"
-
-struct MVT {
-    char pad[0x30];
-    short delta;
-    short index;
-    void *(*fn)(void *);
-};
-struct MEMBER {
-    char pad[0x20];
-    MVT *vt;
-};
+#include "pzo_hide.h"
 
 extern "C" float GRandInRange(float, float);
 extern "C" QW PosLoWorld(void *);
@@ -20,7 +11,7 @@ extern QW g_2a2dc0;
 
 extern "C" void Member_GetRandomPos(MEMBER *pmember, QW *ppos, QW *pnormal)
 {
-    void *plo = pmember->vt->fn((char *)pmember + pmember->vt->delta);
+    void *plo = pmember->Slot6();
     float azimuth = GRandInRange(-3.1415927f, 3.1415927f);
     float g = GRandInRange(-1.0f, 1.0f);
     float elevation = __builtin_fabsf(g) * g * 1.5707964f;

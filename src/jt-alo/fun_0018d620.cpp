@@ -1,6 +1,9 @@
-int func_0018D620(char *pjt)
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "sly.h"
+
+int func_0018D620(SLY *psly)
 {
-    switch (*(int *)(pjt + 0x18C8)) {
+    switch (psly->jts) {
     case 0: return 0;
     case 2: return 1;
     case 7: return 2;

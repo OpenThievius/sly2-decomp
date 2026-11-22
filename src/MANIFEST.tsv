@@ -1204,7 +1204,7 @@ address	name	size	file	whole_file	symbol
 0X1294A0	CRef_ConstructProc	32	splice-ref/CRef_ConstructProc.cpp		
 0X1294C0	CRef_ConstructBasic	84	splice-ref/CRef_ConstructBasic.cpp		
 0X129518	CRef_SetS32	64	splice-ref/CRef_SetS32.cpp		
-0X129558	CRef_SetF32	64	splice-ref/CRef_SetF32.cpp		
+0X129558	SetF32__4CReff	64	splice-ref/SetF32__4CReff.cpp		
 0X129598	CRef_SetBool	64	splice-ref/CRef_SetBool.cpp		
 0X1295D8	CRef_SetSymid	64	splice-ref/CRef_SetSymid.cpp		
 0X129618	CRef_SetBifk	64	splice-ref/CRef_SetBifk.cpp		
@@ -1714,7 +1714,7 @@ address	name	size	file	whole_file	symbol
 0X1471A0	StaticInitSwSlotheaps_thunk	32	new_144b58/new_144b58_146e18.cpp	new_144b58/new_144b58_146e18.cpp	StaticInitSwSlotheaps_thunk
 0X1471C0	InitWipe	96	new_144b58/InitWipe.cpp		
 0X147220	PostWipeLoad	84	new_144b58/PostWipeLoad.cpp		
-0X147278	UpdateWipeState	192	new_144b58/UpdateWipeState.c		
+0X147278	UpdateWipeState	192	new_144b58/UpdateWipeState.cpp		
 0X147338	HandleWipeMessage	216	new_144b58/HandleWipeMessage.cpp		
 0X147410	SetWipeState	432	new_144b58/SetWipeState_file.cpp	new_144b58/SetWipeState_file.cpp	SetWipeState
 0X1475C0	DrawWipeSetup	496	new_144b58/SetWipeState_file.cpp	new_144b58/SetWipeState_file.cpp	DrawWipeSetup
@@ -1724,7 +1724,7 @@ address	name	size	file	whole_file	symbol
 0X147E00	StaticInitSwSlotheaps_2_thunk	32	new_144b58/SetWipeState_file.cpp	new_144b58/SetWipeState_file.cpp	StaticInitSwSlotheaps_2_thunk
 0X147E20	RemoveSwRoot	100	new_144b58/RemoveSwRoot.cpp		
 0X147E88	ReinsertSwRoot	64	new_144b58/ReinsertSwRoot.cpp		
-0X147EC8	RemoveSwRootRaw	28	new_144b58/RemoveSwRootRaw.c		
+0X147EC8	RemoveSwRootRaw	28	new_144b58/RemoveSwRootRaw.cpp		
 0X147EE8	RetractSwRoot	88	actseg/RetractSwRoot.cpp		
 0X1484C8	StaticInitSwSlotheaps_3	308	new_147f40/StaticInitSwSlotheaps_3_file.c	new_147f40/StaticInitSwSlotheaps_3_file.c	StaticInitSwSlotheaps_3
 0X148600	StaticInitSwSlotheaps_3_thunk	32	new_147f40/StaticInitSwSlotheaps_3_file.c	new_147f40/StaticInitSwSlotheaps_3_file.c	StaticInitSwSlotheaps_3_thunk
@@ -2218,7 +2218,7 @@ address	name	size	file	whole_file	symbol
 0X163E88	RefuseTaskState	188	sensor-geom/RefuseTaskState.cpp		
 0X163F48	LeaveTask	204	sensor-geom/LeaveTask.cpp		
 0X164018	FIsCurrentTask	20	sensor-geom/FIsCurrentTask.c		
-0X164030	FTaskComplete	104	sensor-geom/FTaskComplete.c		
+0X164030	FTaskComplete	104	sensor-geom/FTaskComplete.cpp		
 0X164098	func_00164098	104	unsorted/fun_00164098.cpp		
 0X164100	VisitTaskInOrder	368	sensor-geom/VisitTaskInOrder.cpp		
 0X164270	RestoreTaskStateFromSave	316	sensor-geom/RestoreTaskStateFromSave.cpp		
@@ -4206,7 +4206,7 @@ address	name	size	file	whole_file	symbol
 0X1F31E0	CSo_LoadFromBrx	940	sm-so/CSo_LoadFromBrx.cpp		
 0X1F3590	func_001F3590	56	sm-so/fun_001f3590.cpp		
 0X1F35C8	SetSoMass__FP2SOf	44	so/SetSoMass__FP2SOf.c		
-0X1F36A8	PostSoLoad	52	so-po/PostSoLoad.c		
+0X1F36A8	PostSoLoad	52	so-po/PostSoLoad.cpp		
 0X1F36E0	UpdateSo	228	so-po/UpdateSo.cpp		
 0X1F37C8	func_001F37C8	160	so-po/fun_001f37c8.cpp		
 0X1F3868	func_001F3868	60	so-po/fun_001f3868.c		
@@ -4214,27 +4214,27 @@ address	name	size	file	whole_file	symbol
 0X1F3900	func_001F3900	128	so-po/fun_001f3900.cpp		
 0X1F3980	ProjectSoTransform	424	so-po/ProjectSoTransform.cpp		
 0X1F3C10	func_001F3C10	92	so-po/fun_001f3c10.cpp		
-0X1F3C70	func_001F3C70	88	so-po/fun_001f3c70.c		
+0X1F3C70	func_001F3C70	88	so-po/fun_001f3c70.cpp		
 0X1F3CC8	func_001F3CC8	308	so-po/fun_001f3cc8.cpp		
 0X1F3E00	func_001F3E00	168	so-po/fun_001f3e00.cpp		
 0X1F3EA8	func_001F3EA8	244	so-po/fun_001f3ea8.cpp		
-0X1F3FA0	PmatWorldSo	12	so-po/PmatWorldSo.c		
+0X1F3FA0	PmatWorldSo	12	so-po/PmatWorldSo.cpp		
 0X1F3FB0	func_001F3FB0	96	so-po/fun_001f3fb0.c		
 0X1F4010	func_001F4010	144	so-po/fun_001f4010.cpp		
 0X1F40A0	TranslateSoToPos	572	so-po/TranslateSoToPos.cpp		
 0X1F4440	GetSoVelocityVec	68	so-po/GetSoVelocityVec.cpp		
 0X1F4488	SetSoVelocityVec	208	so-po/SetSoVelocityVec.cpp		
-0X1F4848	func_001F4848	40	so-po/fun_001f4848.c		
-0X1F4870	func_001F4870	40	so-po/fun_001f4870.c		
+0X1F4848	func_001F4848	40	so-po/fun_001f4848.cpp		
+0X1F4870	func_001F4870	40	so-po/fun_001f4870.cpp		
 0X1F4898	func_001F4898	152	so-po/fun_001f4898.cpp		
 0X1F4930	func_001F4930	152	so-po/fun_001f4930.cpp		
 0X1F49C8	MatchSoOtherObject	180	so-po/MatchSoOtherObject.cpp		
-0X1F4B58	func_001F4B58	76	so-po/fun_001f4b58.c		
+0X1F4B58	func_001F4B58	76	so-po/fun_001f4b58.cpp		
 0X1F4BA8	func_001F4BA8	76	so-po/fun_001f4ba8.cpp		
-0X1F4BF8	func_001F4BF8	92	so-po/fun_001f4bf8.c		
+0X1F4BF8	func_001F4BF8	92	so-po/fun_001f4bf8.cpp		
 0X1F4C58	func_001F4C58	68	so-po/fun_001f4c58.cpp		
 0X1F4CA0	func_001F4CA0	172	so-po/fun_001f4ca0.cpp		
-0X1F4D50	func_001F4D50	88	so-po/fun_001f4d50.c		
+0X1F4D50	func_001F4D50	88	so-po/fun_001f4d50.cpp		
 0X1F4DA8	func_001F4DA8	128	so-po/fun_001f4da8.cpp		
 0X1F4E28	DiscardSoXps	232	so-po/DiscardSoXps.cpp		
 0X1F4F10	func_001F4F10	152	so-po/fun_001f4f10.cpp		

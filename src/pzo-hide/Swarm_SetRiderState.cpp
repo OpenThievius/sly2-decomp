@@ -1,25 +1,26 @@
-#include "sly2.h"
-extern "C" float g_2dded0;
-extern "C" char B_002DEB30[];
-extern "C" void RemoveDlEntry(void *);
-extern "C" void AppendDlEntry(void *, void *);
-extern "C" void SwarmGroup_LayoutBands(void *, void *);
-extern "C" void bevy_camera_follow_activity(void *, int, void *);
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "pzo_hide.h"
 
-void Swarm_SetRiderState(void *pswarm, void *prider, int state)
+extern "C" void RemoveDlEntry(DL *, void *);
+extern "C" void AppendDlEntry(DL *, void *);
+extern "C" void SwarmGroup_LayoutBands(SWARM *, SWARMGROUP *);
+extern "C" void bevy_camera_follow_activity(void *, int, void *);
+extern "C" char B_002DEB30[];
+
+void Swarm_SetRiderState(SWARM *swarm, SWARMRIDER *rider, int state)
 {
-    if (state != ((int *)prider)[0x24 / 4]) {
-        ((int *)prider)[0x24 / 4] = state;
-        ((float *)prider)[0x28 / 4] = g_2dded0;
+    if (state != rider->state) {
+        rider->state = state;
+        rider->tState = g_2dded0.t;
         if (state == 2) {
-            char *pgroup = (char *)((void **)prider)[0x20 / 4];
-            int count = ((int *)pgroup)[0xC / 4] - 1;
-            ((int *)pgroup)[0xC / 4] = count;
-            RemoveDlEntry(pgroup + 0x10);
-            AppendDlEntry((char *)pswarm + 0x28C, prider);
-            if (((int *)pgroup)[0xC / 4] == 0)
-                bevy_camera_follow_activity(B_002DEB30, 0x3A, pswarm);
-            SwarmGroup_LayoutBands(pswarm, pgroup);
+            SWARMGROUP *group = rider->group;
+            int alive = group->alive - 1;
+            group->alive = alive;
+            RemoveDlEntry(&group->dl, rider);
+            AppendDlEntry(&swarm->dlDead, rider);
+            if (group->alive == 0)
+                bevy_camera_follow_activity(B_002DEB30, 0x3A, swarm);
+            SwarmGroup_LayoutBands(swarm, group);
         }
     }
 }

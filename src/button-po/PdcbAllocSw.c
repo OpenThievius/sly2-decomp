@@ -1,9 +1,10 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "swview.h"
 
-s32 PdcbAllocSw(void *arg0) {
-    s32 temp_v1;
+struct DCB *PdcbAllocSw(struct SWVIEW *psw) {
+    s32 idcb;
 
-    temp_v1 = M2C_FIELD(arg0, s32 *, 0x39D4);
-    M2C_FIELD(arg0, s32 *, 0x39D4) = (s32) (temp_v1 + 1);
-    return M2C_FIELD(arg0, s32 *, 0x39D0) + (temp_v1 * 0xC);
+    idcb = psw->cdcb;
+    psw->cdcb = idcb + 1;
+    return psw->adcb + idcb;
 }

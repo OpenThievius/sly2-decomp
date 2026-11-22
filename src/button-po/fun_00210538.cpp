@@ -1,30 +1,42 @@
-#include "sly2.h"
-struct REQ { unsigned grf; void *target; float g; char pad[0x24]; void *extra; };
-struct VT { char pad[0x198]; short delta; short index; void (*fn)(void *, REQ *); };
-struct OBJ { int a, b, c; VT *vt; };
-extern "C" OBJ *PloFindSwObject_thunk(void *, int, int, int);
-void func_00210538(void *sw, int oid, int oidTarget, int oidExtra, int context, float g)
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "sw.h"
+#include "swfind.h"
+/* the request func_00210538 hands to slot 51 of the object it finds */
+struct REQ {
+    unsigned grf;
+    LO *ptarget;
+    float g;
+    u8 unknown_0xC[0x24];
+    LO *pextra;
+};
+/* the found object's class: LO's 48 virtuals, then the two slots before the one this function calls (49 and 50) */
+struct LO_REQ : LO {
+    virtual void Slot49();
+    virtual void Slot50();
+    virtual void Request(REQ *preq);
+};
+void func_00210538(SW *psw, int oid, int oidTarget, int oidExtra, LO *ploContext, float g)
 {
-    OBJ *object = PloFindSwObject_thunk(sw, 4, oid, context);
-    if (!object)
+    LO_REQ *pobject = (LO_REQ *)PloFindSwObject_thunk(psw, 4, oid, ploContext);
+    if (!pobject)
         return;
     REQ request;
     request.grf = 0;
     if (oidTarget != -1) {
-        OBJ *target = PloFindSwObject_thunk(sw, 4, oidTarget, context);
-        if (target) {
-            request.target = target;
+        LO *ptarget = PloFindSwObject_thunk(psw, 4, oidTarget, ploContext);
+        if (ptarget) {
+            request.ptarget = ptarget;
             request.grf |= 1;
         }
     }
     if (((request.grf ^ 1) & 1) != 0) {
         request.grf |= 1;
-        request.target = object;
+        request.ptarget = pobject;
     }
     if (oidExtra != -1) {
-        OBJ *extra = PloFindSwObject_thunk(sw, 4, oidExtra, context);
-        if (extra) {
-            request.extra = extra;
+        LO *pextra = PloFindSwObject_thunk(psw, 4, oidExtra, ploContext);
+        if (pextra) {
+            request.pextra = pextra;
             request.grf |= 0x20;
         }
     }
@@ -32,5 +44,5 @@ void func_00210538(void *sw, int oid, int oidTarget, int oidExtra, int context, 
         request.grf |= 0x18;
         request.g = g;
     }
-    object->vt->fn((char *)object + object->vt->delta, &request);
+    pobject->Request(&request);
 }

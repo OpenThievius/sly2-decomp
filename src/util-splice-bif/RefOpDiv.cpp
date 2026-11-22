@@ -11,7 +11,7 @@ struct VU_FLOAT { QW m_q; VU_FLOAT(float g); };
 struct VU_VECTOR { QW m_q; VU_VECTOR(const VECTOR &vector); };
 VU_VECTOR operator*(VU_FLOAT vuf, VU_VECTOR vuv);
 extern "C" {
-CRef *CRef_SetF32(CRef *pref, float g);
+CRef *SetF32__4CReff(CRef *pref, float g);
 CRef *CRef_RefClone(CRef *pref, CRef *ref, CFrame *pframe, unsigned long ulArg);
 VECTOR *__as__6VECTORG9VU_VECTOR(VECTOR *pvector, VU_VECTOR vuv);
 }
@@ -42,7 +42,7 @@ CRef RefOpDiv(int cref, CRef *aref)
     int fInteger = 0;
     switch (aref->m_tagk) {
     case TAGK_S32:
-        CRef_SetF32(&ref, (float)aref->m_tag.m_n);
+        SetF32__4CReff(&ref, (float)aref->m_tag.m_n);
         fInteger = 1;
         break;
     case TAGK_F32:

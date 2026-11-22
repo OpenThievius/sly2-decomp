@@ -1,36 +1,38 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 #include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
-extern "C" {
-s32 func_00165C28(s8 **arg0, s8 **arg1) {
-    s8 *temp_a0 = *arg0;
-    s8 *temp_a1 = *arg1;
-    s32 var_v0 = M2C_FIELD(temp_a0, s32 *, 0x104);
-    s32 var_v1 = M2C_FIELD(temp_a1, s32 *, 0x104);
-    if (var_v0 != var_v1) {
-        return var_v0 - var_v1;
+/* a task of the job menu (JobMenu_BuildList sorts an array of them with this comparator) */
+struct TASKINFO {
+    u8 unknown_0x0[0x18];
+    s32 oid;
+    u8 unknown_0x1C[0x60];
+    TASKINFO *owner;
+    u8 unknown_0x80[0x80];
+    s32 priority;
+    s32 group;
+};
+extern "C" s32 func_00165C28(TASKINFO **first, TASKINFO **second) {
+    TASKINFO *taskFirst = *first;
+    TASKINFO *taskSecond = *second;
+    s32 valueFirst = taskFirst->group;
+    s32 valueSecond = taskSecond->group;
+    if (valueFirst != valueSecond) {
+        return valueFirst - valueSecond;
     }
-    s8 *temp_v1_2 = M2C_FIELD(temp_a0, s8 **, 0x7C);
-    var_v0 = -1;
-    if (temp_v1_2 != NULL) {
-        var_v0 = M2C_FIELD(temp_v1_2, s32 *, 0x18);
+    valueFirst = -1;
+    if (taskFirst->owner != 0) {
+        valueFirst = taskFirst->owner->oid;
     }
-    s8 *temp_a2 = M2C_FIELD(temp_a1, s8 **, 0x7C);
-    var_v1 = -1;
-    if (temp_a2 != NULL) {
-        var_v1 = M2C_FIELD(temp_a2, s32 *, 0x18);
+    valueSecond = -1;
+    if (taskSecond->owner != 0) {
+        valueSecond = taskSecond->owner->oid;
     }
-    if (var_v0 != var_v1) {
-        return var_v0 - var_v1;
+    if (valueFirst != valueSecond) {
+        return valueFirst - valueSecond;
     }
-    var_v0 = M2C_FIELD(temp_a0, s32 *, 0x100);
-    var_v1 = M2C_FIELD(temp_a1, s32 *, 0x100);
-    if (var_v0 != var_v1) {
-        return var_v0 - var_v1;
+    valueFirst = taskFirst->priority;
+    valueSecond = taskSecond->priority;
+    if (valueFirst != valueSecond) {
+        return valueFirst - valueSecond;
     }
-    return M2C_FIELD(temp_a0, s32 *, 0x18) - M2C_FIELD(temp_a1, s32 *, 0x18);
-}
+    return taskFirst->oid - taskSecond->oid;
 }

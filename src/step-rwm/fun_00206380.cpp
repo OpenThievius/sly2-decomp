@@ -1,35 +1,38 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 #include "stepguard.h"
+#include "goals.h"
 #include "sly2.h"
-extern "C" int FIgnoreSoIntersection();
-extern "C" int FIsGuardInSgs(void *, int);
-extern "C" char *GoalStack_PgoalFind(void *, int);
-extern "C" int IMax(int, int);
 #include "so.h"
-int func_00206380(STEPGUARD *guard, SO *so)
+#include "oxa.h"
+extern "C" int FIgnoreSoIntersection(STEPGUARD *, SO *);
+extern "C" int FIsGuardInSgs(STEPGUARD *, int);
+extern "C" GOAL *GoalStack_PgoalFind(GOALSTACK *, int);
+extern "C" int IMax(int, int);
+int func_00206380(STEPGUARD *pguard, SO *pso)
 {
-    int r = FIgnoreSoIntersection();
-    int s;
-    int keep;
-    char *goal;
-    if (FIsGuardInSgs(guard, 7)) {
-        keep = so->FIsLocked();
-        goto chk;
+    int result = FIgnoreSoIntersection(pguard, pso);
+    int state;
+    int fKeep;
+    GOALGRAB *pgoal;
+    if (FIsGuardInSgs(pguard, 7)) {
+        fKeep = pso->FIsLocked();
+        goto check;
     }
-    if (FIsGuardInSgs(guard, 0x17)) {
-        goal = GoalStack_PgoalFind((char *)guard + 0x26C, 0xB1);
-        if (*(int *)((char *)so + 0xEC) == *(int *)(*(char **)(goal + 0x5C) + 0xEC)) {
-            s = *(int *)(goal + 0x50);
-            if (s != 0) {
-                if (s >= 0) {
-                    if (s < 6) {
-                        keep = s < 4;
-chk:
-                        if (keep) return r;
-                    } else return r;
-                } else return r;
+    if (FIsGuardInSgs(pguard, 0x17)) {
+        pgoal = (GOALGRAB *)GoalStack_PgoalFind(pguard->pgoalstack(), 0xB1);
+        if (pso->poxa == pgoal->psoHeld->poxa) {
+            state = pgoal->phase;
+            if (state != 0) {
+                if (state >= 0) {
+                    if (state < 6) {
+                        fKeep = state < 4;
+check:
+                        if (fKeep) return result;
+                    } else return result;
+                } else return result;
             }
-            r = IMax(r, 1);
+            result = IMax(result, 1);
         }
     }
-    return r;
+    return result;
 }

@@ -1,13 +1,14 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "swview.h"
 
-M2C_UNK AddGrfusr__Fi(M2C_UNK);                     /* extern */
+void AddGrfusr__Fi(s32 grfusr);                     /* extern */
 
-void IncrementSwHandsOff__FP2SW(void *arg0) {
-    s32 temp_v0;
+void IncrementSwHandsOff__FP2SW(struct SWVIEW *sw) {
+    s32 chandsoff;
 
-    temp_v0 = M2C_FIELD(arg0, s32 *, 0x3D7C) + 1;
-    M2C_FIELD(arg0, s32 *, 0x3D7C) = temp_v0;
-    if (temp_v0 == 1) {
+    chandsoff = sw->chandsOffSw + 1;
+    sw->chandsOffSw = chandsoff;
+    if (chandsoff == 1) {
         AddGrfusr__Fi(4);
     }
 }

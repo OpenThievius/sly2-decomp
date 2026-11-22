@@ -1,5 +1,6 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "guard.h"
 
-void func_00209768(void *arg0, s32 arg1) {
-    M2C_FIELD(arg0, s32 *, 0xC) = arg1;
+void func_00209768(struct GUARDHEADING *pheading, struct STEP *pstep) {
+    pheading->pstep = pstep;
 }

@@ -5,6 +5,7 @@
 #include "lo.h"
 #include "sly2.h"
 #include "m2c_macros.h"
+#include "clock.h"
 #include "so.h"
 #include "include_asm.h"
 #include "sw.h"
@@ -45,120 +46,92 @@ void func_001A5448(char *self, char **first, char **second)
     *second = &B_003DD4A0 + 0xC;
 }
 
-struct LO_1A5478 { char pad[0xC]; char *vt; LO_1A5478 *parent; void *root; char pad2[0x24 - 0x18]; LO_1A5478 *next; unsigned long grf; };
-
-struct VB8_1A5478 { char pad[0xB8]; short d; short i; void (*f)(void *); };
-
-struct VE0_1A5478 { char pad[0xE0]; short d; short i; int (*f)(void *, LO_1A5478 ***); };
-
-struct V40_1A5478 { char pad[0x40]; short d; short i; void (*f)(void *); };
-
-struct V58_1A5478 { char pad[0x58]; short d; short i; void (*f)(void *); };
-
-extern "C" int FIsLoInWorld_1A5478(LO_1A5478 *);
+extern "C" int FIsLoInWorld_1A5478(LO *);
 
 extern "C" void RemoveDlEntry_1A5478(void *, void *);
 
 extern "C" void InsertDlEntryBefore_1A5478(void *, void *, void *);
 
-extern "C" void ReinsertSwRoot_1A5478(void *, void *);
+extern "C" void ReinsertSwRoot_1A5478(void *, s32);
 
 extern "C" void func_00148300_1A5478(void *, void *);
 
 extern char B_003DD490;
 
-void AddLo(LO_1A5478 *plo)
+void AddLo(LO *plo)
 {
-    if ((plo->grf & (1UL << 56)) == 0)
+    if ((plo->grfo & (1UL << 56)) == 0)
         return;
-    plo->grf &= ~(1UL << 56);
+    plo->grfo &= ~(1UL << 56);
     char *pdl;
     char **pfirst;
-    func_001A5448((char *)plo->parent, &pdl, (char **)&pfirst);
-    if (plo == (LO_1A5478 *)*pfirst) {
-        *pfirst = (char *)plo->next;
+    func_001A5448((char *)plo->psoParent, &pdl, (char **)&pfirst);
+    if ((char *)plo == *pfirst) {
+        *pfirst = (char *)plo->ploNext;
     } else {
         RemoveDlEntry_1A5478(pdl, plo);
         InsertDlEntryBefore_1A5478(pdl, *pfirst, plo);
     }
-    if (plo->parent == 0 || ((int)(plo->parent->grf >> 60) & 1) != 0) {
-        V58_1A5478 *vta = (V58_1A5478 *)plo->vt;
-        vta->f((char *)plo + vta->d);
+    if (plo->psoParent == 0 || ((int)(plo->psoParent->grfo >> 60) & 1) != 0) {
+        plo->AddHierarchy();
     }
-    if (plo->parent == 0 && (((long)plo->grf << 8) >> 60) != 2)
-        ReinsertSwRoot_1A5478(&B_003DD490, plo->root);
-    LO_1A5478 **achild;
-    VE0_1A5478 *vtc = (VE0_1A5478 *)plo->vt;
-    int cchild = vtc->f((char *)plo + vtc->d, &achild);
+    if (plo->psoParent == 0 && (((long)plo->grfo << 8) >> 60) != 2)
+        ReinsertSwRoot_1A5478(&B_003DD490, plo->proot);
+    LO **achild;
+    int cchild = plo->CReturnZero(&achild);
     for (int ichild = 0; ichild < cchild; ichild++) {
-        LO_1A5478 *child = achild[ichild];
-        V40_1A5478 *vtk = (V40_1A5478 *)child->vt;
-        vtk->f((char *)child + vtk->d);
+        LO *child = achild[ichild];
+        child->Add();
     }
     if (FIsLoInWorld_1A5478(plo) != 0) {
-        VB8_1A5478 *vtw = (VB8_1A5478 *)plo->vt;
-        vtw->f((char *)plo + vtw->d);
-    } else if (plo->parent == 0) {
+        plo->Slot23();
+    } else if (plo->psoParent == 0) {
         func_00148300_1A5478(&B_003DD490, plo);
     }
 }
 
-struct LO_1A5630 { char pad[0xC]; char *vt; LO_1A5630 *parent; void *root; char pad2[0x28 - 0x18]; unsigned long grf; };
-
-struct VB0 { char pad[0xB0]; short d; short i; void (*f)(void *); };
-
-struct VE0 { char pad[0xE0]; short d; short i; int (*f)(void *, LO_1A5630 ***); };
-
-struct V48 { char pad[0x48]; short d; short i; void (*f)(void *); };
-
-struct V60 { char pad[0x60]; short d; short i; void (*f)(void *); };
-
-extern "C" int FIsLoInWorld_1A5630(LO_1A5630 *);
+extern "C" int FIsLoInWorld_1A5630(LO *);
 
 extern "C" void RemoveDlEntry_1A5630(void *, void *);
 
 extern "C" void AppendDlEntry(void *, void *);
 
-extern "C" void RemoveSwRoot_1A5630(void *, void *);
+extern "C" void RemoveSwRoot_1A5630(void *, s32);
 
-extern "C" void func_001A5448_1A5630(LO_1A5630 *, void **, void ***);
+extern "C" void func_001A5448_1A5630(SO *, void **, void ***);
 
 extern char B_003DD4BC_1A5630;
 
 extern char B_003DD490;
 
-void RemoveLo(LO_1A5630 *plo)
+void RemoveLo(LO *plo)
 {
-    if ((plo->grf & (1UL << 56)) != 0)
+    if ((plo->grfo & (1UL << 56)) != 0)
         return;
     if (FIsLoInWorld_1A5630(plo) != 0) {
-        VB0 *vt = (VB0 *)plo->vt;
-        vt->f((char *)plo + vt->d);
-        if (plo->parent == 0)
-            RemoveDlEntry_1A5630(&B_003DD4BC_1A5630, plo->root);
+        plo->RemoveAloHierarchy();
+        if (plo->psoParent == 0)
+            RemoveDlEntry_1A5630(&B_003DD4BC_1A5630, (void *)plo->proot);
     }
-    if (plo->parent == 0)
-        RemoveSwRoot_1A5630(&B_003DD490, plo->root);
-    unsigned long active = (plo->grf >> 60) & 1;
+    if (plo->psoParent == 0)
+        RemoveSwRoot_1A5630(&B_003DD490, plo->proot);
+    unsigned long active = (plo->grfo >> 60) & 1;
     void *pdl;
     void **pfirst;
-    func_001A5448_1A5630(plo->parent, &pdl, &pfirst);
+    func_001A5448_1A5630(plo->psoParent, &pdl, &pfirst);
     RemoveDlEntry_1A5630(pdl, plo);
     AppendDlEntry(pdl, plo);
     if (*pfirst == 0)
         *pfirst = plo;
-    plo->grf |= 1UL << 56;
-    LO_1A5630 **achild;
-    VE0 *vtc = (VE0 *)plo->vt;
-    int cchild = vtc->f((char *)plo + vtc->d, &achild);
+    plo->grfo |= 1UL << 56;
+    LO **achild;
+    int cchild = plo->CReturnZero(&achild);
     for (int ichild = 0; ichild < cchild; ichild++) {
-        LO_1A5630 *child = achild[ichild];
-        V48 *vtk = (V48 *)child->vt;
-        vtk->f((char *)child + vtk->d);
+        LO *child = achild[ichild];
+        child->Remove();
     }
     if (active) {
-        V60 *vta = (V60 *)plo->vt;
-        vta->f((char *)plo + vta->d);
+        plo->RemoveHierarchy();
     }
 }
 
@@ -177,97 +150,62 @@ extern "C" void func_001A57A8(LO *lo) {
     RemoveDlEntry_1A57A8(buf.first, lo);
 }
 
-struct Vt_1A5800 { char pad0[0x20]; short delta; short pad1; void (*fn)(char *, int, char *); };
-
-struct Obj_1A5800 { char pad0[0xC]; Vt_1A5800 *vt; char pad1[0x1C - 8]; long flags; };
-
-extern "C" void AddLoHierarchy(Obj_1A5800 *obj) {
-    obj->flags |= 0x8000L << 45;
-    obj->vt->fn((char *)obj + obj->vt->delta, 0, (char *)obj);
+extern "C" void AddLoHierarchy(LO *plo) {
+    plo->grfo |= 0x8000L << 45;
+    plo->PostMessage(0, plo);
 }
 
-struct VT { char pad[0x20]; short delta; short idx; void (*fn)(void *, int, void *); };
-
-struct LO_1A5848 { char pad[0xC]; VT *vt; char pad2[0x18]; unsigned long grf; };
-
-extern "C" void RemoveSafePointsOfLo(void *, LO_1A5848 *, void *);
+extern "C" void RemoveSafePointsOfLo(void *, LO *, void *);
 
 extern "C" char B_003DD490_1A5848[];
 
-extern "C" void RemoveLoHierarchy(LO_1A5848 *lo)
+extern "C" void RemoveLoHierarchy(LO *plo)
 {
     unsigned long mask = 0xEFFFFFFFFFFFFFFFUL;
-    unsigned long grf = lo->grf & mask;
-    lo->grf = grf;
-    if (grf & 0x800000000000000UL)
-        RemoveSafePointsOfLo(B_003DD490_1A5848, lo, 0);
-    VT *vt = lo->vt;
-    vt->fn((char *)lo + vt->delta, 1, lo);
+    unsigned long grfo = plo->grfo & mask;
+    plo->grfo = grfo;
+    if (grfo & 0x800000000000000UL)
+        RemoveSafePointsOfLo(B_003DD490_1A5848, plo, 0);
+    plo->PostMessage(1, plo);
 }
 
-struct Obj {
-    int pad[3];
-    virtual void v0();
-    virtual void v1();
-    virtual void v2();
-    virtual void v3();
-    virtual void v4();
-    virtual void v5();
-    virtual void v6();
-    virtual void v7();
-    virtual void v8();
-    virtual void Target(int, int, int);
-};
-
-void func_001A58D0(Obj *self, int passthrough, int value)
+void func_001A58D0(LO *plo, LO *ploParent, int grf)
 {
-    self->Target(passthrough, 0, value);
+    plo->SetParent(ploParent, 0, grf);
 }
 
-struct LO_1A5900 { char pad[0xC]; char *vt; LO_1A5900 *parent; LO_1A5900 **link; char pad18[0x24 - 0x18]; LO_1A5900 *next; unsigned long grf; };
-
-struct VB8 { char pad[0xB8]; short d; short i; void (*f)(void *); };
-
-struct V68 { char pad[0x68]; short d; short i; void (*f)(void *, LO_1A5900 *, LO_1A5900 *); };
-
-struct VE0_1A5900 { char pad[0xE0]; short d; short i; int (*f)(void *, LO_1A5900 ***); };
-
-struct V50 { char pad[0x50]; short d; short i; void (*f)(void *, LO_1A5900 *, int, int); };
-
-struct V58 { char pad[0x58]; short d; short i; void (*f)(void *); };
-
-extern "C" int FIsLoInWorld_1A5900(LO_1A5900 *);
+extern "C" int FIsLoInWorld_1A5900(LO *);
 
 extern "C" void InsertDlEntryBefore(void *, void *, void *);
 
 extern "C" void RemoveDlEntry_1A5900(void *, void *);
 
-extern "C" void func_00148300(void *, LO_1A5900 *);
+extern "C" void func_00148300(void *, LO *);
 
-extern "C" void func_001A5448_1A5900(LO_1A5900 *, void **, LO_1A5900 ***);
+extern "C" void func_001A5448_1A5900(LO *, void **, LO ***);
 
 extern "C" char B_003DD490_1A5900;
 
-extern "C" void SetLoParent(LO_1A5900 *plo, LO_1A5900 *parent, int arg2, int arg3);
+extern "C" void SetLoParent(LO *plo, LO *ploParent, void *pv, int grf);
 
-void SetLoParent(LO_1A5900 *plo, LO_1A5900 *parent, int arg2, int arg3) {
+void SetLoParent(LO *plo, LO *ploParent, void *pv, int grf) {
     unsigned long newActive;
-    unsigned long grf = plo->grf;
-    unsigned long wasActive = (grf >> 60) & 1;
+    unsigned long grfo = plo->grfo;
+    unsigned long wasActive = (grfo >> 60) & 1;
     void *oldList;
-    LO_1A5900 **oldFirst;
+    LO **oldFirst;
     void *newList;
-    LO_1A5900 **newFirst;
-    LO_1A5900 **children;
+    LO **newFirst;
+    LO **children;
     newActive = 0;
-    if (parent == 0 || (int)(parent->grf >> 60) & 1) {
-        if ((grf & (1UL << 56)) == 0) newActive = 1;
+    if (ploParent == 0 || (int)(ploParent->grfo >> 60) & 1) {
+        if ((grfo & (1UL << 56)) == 0) newActive = 1;
     }
-    func_001A5448_1A5900(plo->parent, &oldList, &oldFirst);
-    func_001A5448_1A5900(parent, &newList, &newFirst);
-    if ((plo->grf & (1UL << 56)) != 0) {
+    func_001A5448_1A5900(plo->psoParent, &oldList, &oldFirst);
+    func_001A5448_1A5900(ploParent, &newList, &newFirst);
+    if ((plo->grfo & (1UL << 56)) != 0) {
         if (plo == *oldFirst) {
-            *oldFirst = plo->next;
+            *oldFirst = plo->ploNext;
         }
         RemoveDlEntry_1A5900(oldList, plo);
         AppendDlEntry(newList, plo);
@@ -279,65 +217,50 @@ void SetLoParent(LO_1A5900 *plo, LO_1A5900 *parent, int arg2, int arg3) {
         InsertDlEntryBefore(newList, *newFirst, plo);
     }
     if (FIsLoInWorld_1A5900(plo) != 0) {
-        VB0 *vtable = (VB0 *)plo->vt;
-        vtable->f((char *)plo + vtable->d);
-        LO_1A5900 **link = plo->link;
+        plo->RemoveAloHierarchy();
+        LO **link = (LO **)plo->proot;
         if (*link == plo) {
             RemoveDlEntry_1A5900(&B_003DD4BC, link);
         }
     }
-    LO_1A5900 *oldParent = plo->parent;
-    plo->parent = parent;
-    V68 *vtable68 = (V68 *)plo->vt;
-    vtable68->f((char *)plo + vtable68->d, plo, oldParent);
-    VE0_1A5900 *vtableE0 = (VE0_1A5900 *)plo->vt;
-    int count = vtableE0->f((char *)plo + vtableE0->d, &children);
+    SO *psoOldParent = plo->psoParent;
+    plo->psoParent = (SO *)ploParent;
+    plo->Slot13(plo, psoOldParent);
+    int count = plo->CReturnZero(&children);
     for (int index = 0; index < count; index++) {
-        LO_1A5900 *child = children[index];
-        V50 *vtable50 = (V50 *)child->vt;
-        vtable50->f((char *)child + vtable50->d, parent, arg2, arg3);
+        LO *child = children[index];
+        child->SetParent(ploParent, pv, grf);
     }
     if (newActive != wasActive) {
         if (newActive != 0) {
-            V58 *vtable58 = (V58 *)plo->vt;
-            vtable58->f((char *)plo + vtable58->d);
+            plo->AddHierarchy();
         } else {
-            V60 *vtable60 = (V60 *)plo->vt;
-            vtable60->f((char *)plo + vtable60->d);
+            plo->RemoveHierarchy();
         }
     }
     if (FIsLoInWorld_1A5900(plo) != 0) {
-        VB8 *vtableB8 = (VB8 *)plo->vt;
-        vtableB8->f((char *)plo + vtableB8->d);
-    } else if (plo->parent == 0 && newActive != 0) {
+        plo->Slot23();
+    } else if (plo->psoParent == 0 && newActive != 0) {
         func_00148300(&B_003DD490_1A5900, plo);
     }
 }
 
-extern "C" {
-struct LOLINK {
-    char pad[0x10];
-    struct LOLINK *plolinkParent;
-    s32 field_0x14;
-};
+extern "C" void func_001A53A0(LO *);
 
-s32 func_001A53A0(void *);                      /* extern */
+extern "C" void func_001A53E0_1A5B80(LO *);
 
-s32 func_001A53E0_1A5B80();                            /* extern */
-
-void func_001A5B80(struct LOLINK *plolink, s32 arg1, s32 arg2) {
-    if (plolink->plolinkParent != NULL) {
-        if ((arg1 == (sptr)plolink) && (arg2 == 0)) {
-            func_001A53E0_1A5B80();
+extern "C" void func_001A5B80(LO *plo, LO *ploChanged, SO *psoOldParent) {
+    if (plo->psoParent != 0) {
+        if ((ploChanged == plo) && (psoOldParent == 0)) {
+            func_001A53E0_1A5B80(plo);
         }
-        plolink->field_0x14 = (s32) plolink->plolinkParent->field_0x14;
+        plo->proot = (s32) plo->psoParent->proot;
         return;
     }
-    if (arg2 != 0) {
-        plolink->field_0x14 = 0;
-        func_001A53A0(plolink);
+    if (psoOldParent != 0) {
+        plo->proot = 0;
+        func_001A53A0(plo);
     }
-}
 }
 
 extern "C" {
@@ -346,13 +269,13 @@ s32 CReturnZeroLo(void) {
 }
 }
 
-extern "C" int FIsBasicDerivedFrom(char *, int);
+extern "C" int FIsBasicDerivedFrom(BASIC *, int);
 
-char *func_001A5BF0(char *self)
+LO *func_001A5BF0(LO *plo)
 {
-    if (FIsBasicDerivedFrom(self, 0x30))
-        return self;
-    return *(char **)(self + 0x10);
+    if (FIsBasicDerivedFrom(plo, 0x30))
+        return plo;
+    return plo->psoParent;
 }
 
 extern "C" {
@@ -365,50 +288,29 @@ void LoadLoFromBrx(void) {
 
 struct CFrame { int PrefFindBinding(unsigned, int); };
 
-struct VT_1A5C48 { char pad[24]; short delta; short index; void (*fn)(void *, int, int, int, int, int); };
+void func_001A5D98(LO *plo);
 
-struct LoObj {
-    CFrame *frame;
-    char pad04[8];
-    VT_1A5C48 *vptr;
-    char pad10[0x18];
-    long flags;
-    float f30;
-    char pad34[12];
-    unsigned f40;
-};
-
-extern "C" void func_001A5D98(LoObj *);
-
-extern "C" void func_001A6CA8_1A5C48(LoObj *, int);
+extern "C" void func_001A6CA8_1A5C48(LO *, int);
 
 extern "C" const float RO_FLT_002A6A40;
 
-void PostLoLoad(LoObj *self) {
-    func_001A5D98(self);
-    VT_1A5C48 *vt = self->vptr;
-    vt->fn((char *)self + vt->delta, 0, 1, 0, 0, 0);
-    CFrame *frame = self->frame;
+void PostLoLoad(LO *plo) {
+    func_001A5D98(plo);
+    plo->HandleSpliceEvent(0, 1, 0, 0, 0);
+    CFrame *frame = plo->pframe;
     if (frame && frame->PrefFindBinding(1, 1)) {
-        if (((self->flags << 8) >> 60) == 2) func_001A6CA8_1A5C48(self, 0);
-        unsigned p = self->f40;
-        if ((p ^ 1) & 1) *(unsigned *)p |= 2;
-        else self->f40 = p | 2;
+        if ((((long)plo->grfo << 8) >> 60) == 2) func_001A6CA8_1A5C48(plo, 0);
+        unsigned p = plo->grfSw;
+        if ((p ^ 1) & 1) plo->pgrfentry->grf |= 2;
+        else plo->grfSw = p | 2;
     } else {
-        self->f30 = RO_FLT_002A6A40;
+        plo->tUpdate = RO_FLT_002A6A40;
     }
 }
 
-struct Object;
-
-struct Vtable { char pad[0x48]; short delta; short index; void (*function)(Object *); };
-
-struct Object { char pad[0xC]; Vtable *vtable; };
-
-void func_001A5D08(Object *self)
+void func_001A5D08(LO *plo)
 {
-    Vtable *vtable = self->vtable;
-    vtable->function((Object *)((char *)self + vtable->delta));
+    plo->Remove();
 }
 
 extern "C" {
@@ -443,7 +345,7 @@ extern "C" PDCB *func_001A5D58(LoFields *lo) {
     return pdcb;
 }
 
-struct DCB { void (*pfn)(LO *, void *); void *pv; DCB *pdcbNext; };
+/* DCB: dcb.h (through sw.h) */
 
 void func_001A5D98(LO *plo)
 {
@@ -463,15 +365,9 @@ void func_001A5D98(LO *plo)
     }
 }
 
-extern "C" float g_2dded0;
-
-typedef void (*UpdateLoCall_1A5E28)(void *, int, int, int, int, int);
-
-void UpdateLo(char *arg0) {
-    if (*(float *)(arg0 + 0x30) <= g_2dded0) {
-        char *child = *(char **)(arg0 + 0xC);
-        UpdateLoCall_1A5E28 call = *(UpdateLoCall_1A5E28 *)(child + 0x1C);
-        call(arg0 + *(short *)(child + 0x18), 1, 1, 0, 0, 0);
+void UpdateLo(LO *plo) {
+    if (plo->tUpdate <= g_2dded0.t) {
+        plo->HandleSpliceEvent(1, 1, 0, 0, 0);
     }
 }
 
@@ -568,24 +464,20 @@ void func_001A6148(void) {
 }
 }
 
-extern "C" {
-s32 RemoveSwGrfEntry(s32 *, s32);           /* extern */
+extern "C" void RemoveSwGrfEntry(SW *, LO *);
 
-extern s32 B_003DD490_1A6150;
+extern "C" SW B_003DD490_1A6150;
 
-void RemoveAloHierarchy(s32 arg0) {
-    RemoveSwGrfEntry(&B_003DD490_1A6150, arg0);
-}
+extern "C" void RemoveAloHierarchy(LO *plo) {
+    RemoveSwGrfEntry(&B_003DD490_1A6150, plo);
 }
 
-extern "C" {
-s32 AddSwGrfEntry(s32 *, s32);              /* extern */
+extern "C" void AddSwGrfEntry(SW *, LO *);
 
-extern s32 B_003DD490_1A6178;
+extern "C" SW B_003DD490_1A6178;
 
-void func_001A6178(s32 arg0) {
-    AddSwGrfEntry(&B_003DD490_1A6178, arg0);
-}
+extern "C" void func_001A6178(LO *plo) {
+    AddSwGrfEntry(&B_003DD490_1A6178, plo);
 }
 
 extern "C" s32 FIsLoInWorld(LO *lo) {
@@ -599,18 +491,18 @@ extern "C" s32 FIsLoInWorld(LO *lo) {
 
 extern "C" void PostScriptMessage();
 
-extern "C" void bevy_camera_follow_activity(s32 *, s32, s32);
+extern "C" void bevy_camera_follow_activity(s32 *, s32, LO *);
 
 extern "C" s32 B_002DEB30;
 
-extern "C" void HandleLoSpliceEvent(s32 arg0, s32 arg1) {
+extern "C" void HandleLoSpliceEvent(LO *plo, s32 event) {
     PostScriptMessage();
-    switch (arg1) {
+    switch (event) {
     case 5:
-        bevy_camera_follow_activity(&B_002DEB30, 0x1A, arg0);
+        bevy_camera_follow_activity(&B_002DEB30, 0x1A, plo);
         return;
     case 6:
-        bevy_camera_follow_activity(&B_002DEB30, 0x1B, arg0);
+        bevy_camera_follow_activity(&B_002DEB30, 0x1B, plo);
         break;
     }
 }
@@ -745,24 +637,24 @@ void bevy_world_loads_b5_apply_xform(LO_1A6450 *plo, const void *pmat)
 
 INCLUDE_ASM(0X1A64E8);
 
-void SetLoGrfField(char *self, unsigned bits)
+void SetLoGrfField(LO *plo, unsigned bits)
 {
-    unsigned field = *(unsigned *)(self + 0x40);
+    unsigned field = plo->grfSw;
     if (!(field & 1)) {
-        *(unsigned *)field |= bits;
+        plo->pgrfentry->grf |= bits;
         return;
     }
-    *(unsigned *)(self + 0x40) = field | bits;
+    plo->grfSw = field | bits;
 }
 
-void ClearLoGrfField(char *self, unsigned bits)
+void ClearLoGrfField(LO *plo, unsigned bits)
 {
-    unsigned field = *(unsigned *)(self + 0x40);
+    unsigned field = plo->grfSw;
     if (!(field & 1)) {
-        *(unsigned *)field &= ~bits;
+        plo->pgrfentry->grf &= ~bits;
         return;
     }
-    *(unsigned *)(self + 0x40) = field & ~bits;
+    plo->grfSw = field & ~bits;
 }
 
 struct VARB_1A6730 {

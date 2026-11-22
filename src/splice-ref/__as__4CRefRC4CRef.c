@@ -1,12 +1,13 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "cref.h"
 
-M2C_UNK CRef_AddRef(void *);                        /* extern */
-M2C_UNK CRef_Destruct(void *);                      /* extern */
+void CRef_AddRef(CRef *pref);
+void CRef_Destruct(CRef *pref);
 
-void *__as__4CRefRC4CRef(void *arg0, void *arg1) {
-    CRef_AddRef(arg1);
-    CRef_Destruct(arg0);
-    M2C_FIELD(arg0, s32 *, 0) = (s32) M2C_FIELD(arg1, s32 *, 0);
-    M2C_FIELD(arg0, s32 *, 4) = (s32) M2C_FIELD(arg1, s32 *, 4);
-    return arg0;
+CRef *__as__4CRefRC4CRef(CRef *pref, CRef *prefSource) {
+    CRef_AddRef(prefSource);
+    CRef_Destruct(pref);
+    pref->m_tagk = prefSource->m_tagk;
+    pref->m_tag.m_n = prefSource->m_tag.m_n;
+    return pref;
 }

@@ -1,7 +1,7 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+struct RTALO;
+void *func_001BEB28(struct RTALO *prtalo);
 
-M2C_UNK func_001BEB28();                            /* extern */
-
-void RtAlo_Show_thunk(void) {
-    func_001BEB28();
+void RtAlo_Show_thunk(struct RTALO *prtalo) {
+    func_001BEB28(prtalo);
 }

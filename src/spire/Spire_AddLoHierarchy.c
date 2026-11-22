@@ -1,10 +1,11 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "spire.h"
 
-M2C_UNK AddLoHierarchy();                           /* extern */
-M2C_UNK AppendDlEntry(M2C_UNK *, s32);              /* extern */
-extern M2C_UNK B_003E142C;
+void AddLoHierarchy(struct SPIRE *pspire);
+void AppendDlEntry(struct DL *, struct SPIRE *);
+extern struct DL B_003E142C;
 
-void Spire_AddLoHierarchy(s32 arg0) {
-    AddLoHierarchy();
-    AppendDlEntry(&B_003E142C, arg0);
+void Spire_AddLoHierarchy(struct SPIRE *pspire) {
+    AddLoHierarchy(pspire);
+    AppendDlEntry(&B_003E142C, pspire);
 }

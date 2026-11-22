@@ -1,22 +1,15 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "cref.h"
 extern "C" {
-struct _m2c_stack_CRef_RefCoerceS32 {
-    /* 0x00 */ char pad0[0x20];
-};                                                  /* size = 0x20 */
-M2C_UNK CRef_CopyConstruct();                       /* extern */
-s8 *CRef_RefCoerceS32(s8 *arg0, s8 *arg1) {
-    if (M2C_FIELD(arg1, s32 *, 0) == 0x15) {
+void CRef_CopyConstruct();
+CRef *CRef_RefCoerceS32(CRef *result, CRef *source) {
+    if (source->m_tagk == TAGK_S32) {
         CRef_CopyConstruct();
     } else {
-        s32 value = (s32) M2C_FIELD(arg1, f32 *, 4);
-        M2C_FIELD(arg0, s32 *, 0) = 0x15;
-        M2C_FIELD(arg0, s32 *, 4) = value;
+        s32 value = (s32) source->m_tag.m_g;
+        result->m_tagk = TAGK_S32;
+        result->m_tag.m_n = value;
     }
-    return arg0;
+    return result;
 }
 }

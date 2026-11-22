@@ -1,8 +1,9 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "light.h"
 
-M2C_UNK RebuildLight();                             /* extern */
+void RebuildLight(struct LIGHT *light);
 
-void func_001A3630(void *arg0, f32 fparg0) {
-    M2C_FIELD(arg0, f32 *, 0x154) = fparg0;
-    RebuildLight();
+void func_001A3630(struct LIGHT *light, f32 cone) {
+    light->cone = cone;
+    RebuildLight(light);
 }

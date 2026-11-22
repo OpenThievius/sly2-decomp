@@ -1,15 +1,16 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "job.h"
 
-s32 FTaskComplete(s32);                             /* extern */
+s32 FTaskComplete(struct TASK *ptask);
 
-s32 FEndTaskComplete(void *arg0) {
-    s32 temp_a0;
-    s32 var_v0;
+s32 FEndTaskComplete(struct JOB *pjob) {
+    struct TASK *ptask;
+    s32 fComplete;
 
-    temp_a0 = M2C_FIELD(arg0, s32 *, 0x68);
-    var_v0 = 0;
-    if (temp_a0 != 0) {
-        var_v0 = FTaskComplete(temp_a0) != 0;
+    ptask = pjob->ptaskEnd;
+    fComplete = 0;
+    if (ptask != 0) {
+        fComplete = FTaskComplete(ptask) != 0;
     }
-    return var_v0;
+    return fComplete;
 }

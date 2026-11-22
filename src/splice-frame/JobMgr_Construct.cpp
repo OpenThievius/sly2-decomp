@@ -1,24 +1,31 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "sly2.h"
+
+struct SAVE;
+struct DIFFICULTY;
+
+/* the job manager, 0x1C bytes (JobMgr_Construct clears it, then sets three ids to -1; our name) */
+struct JOBMGR {
+    u8 unknown_0x0[0x10];
+    /* 0x10 */ s32 field_0x10; /* JobMgr_Construct sets -1 */
+    /* 0x14 */ s32 field_0x14; /* same */
+    /* 0x18 */ s32 field_0x18; /* same */
+};
+
+void OnDifficultyGameLoad(DIFFICULTY *);
 extern "C" {
-void OnDifficultyGameLoad__FP10DIFFICULTY(M2C_UNK *);
-void ResetSaveKeepingOptions(M2C_UNK *, M2C_UNK);
-s32 memset(s8 *, M2C_UNK, M2C_UNK);
-extern M2C_UNK B_002DE578;
-extern M2C_UNK B_003D4A60;
+void ResetSaveKeepingOptions(SAVE *, s32);
+extern SAVE B_003D4A60;
+extern DIFFICULTY B_002DE578;
 extern s32 g_2e1e00;
 
-void JobMgr_Construct(s8 *arg0) {
-    memset(arg0, 0, 0x1C);
-    M2C_FIELD(arg0, s32 *, 0x10) = -1;
-    M2C_FIELD(arg0, s32 *, 0x14) = -1;
-    M2C_FIELD(arg0, s32 *, 0x18) = -1;
+void JobMgr_Construct(JOBMGR *pjobmgr) {
+    memset(pjobmgr, 0, 0x1C);
+    pjobmgr->field_0x10 = -1;
+    pjobmgr->field_0x14 = -1;
+    pjobmgr->field_0x18 = -1;
     ResetSaveKeepingOptions(&B_003D4A60, 0);
-    OnDifficultyGameLoad__FP10DIFFICULTY(&B_002DE578);
+    OnDifficultyGameLoad(&B_002DE578);
     g_2e1e00 = 0;
 }
 

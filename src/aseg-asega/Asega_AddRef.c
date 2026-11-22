@@ -1,5 +1,6 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "asega.h"
 
-void Asega_AddRef(void *arg0) {
-    M2C_FIELD(arg0, s32 *, 0x10) = (s32) (M2C_FIELD(arg0, s32 *, 0x10) + 1);
+void Asega_AddRef(struct ASEGA *pasega) {
+    pasega->cref = pasega->cref + 1;
 }

@@ -1,33 +1,59 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "types.h"
 
-M2C_UNK InitCplcy(void *);                          /* extern */
-M2C_UNK InitCplcyCamobj(void *);                    /* extern */
-M2C_UNK InitCplook(void *);                         /* extern */
-M2C_UNK InitCpman(s32);                             /* extern */
-M2C_UNK InitCptn(void *);                           /* extern */
-M2C_UNK func_00150728(void *);                      /* extern */
-M2C_UNK func_00151208(void *);                      /* extern */
-M2C_UNK func_00151610(void *);                      /* extern */
-M2C_UNK func_001518C8(void *);                      /* extern */
-extern M2C_UNK D_002CA4D0;
-extern M2C_UNK D_002CD378;
+/* A camera policy (CPLCY, 0xD0 bytes): only its vtable pointer is known here. */
+struct CPLCY {
+    u8 unknown_0x0[0xC];
+    void *vtable;
+    u8 unknown_0x10[0xC0];
+};
 
-void *CM_Construct(void *arg0) {
-    void *temp_s1;
+/* The camera manager up to its last constructed member; the members are named after the init function that runs on them. */
+struct CM {
+    s32 unknown_0x0;
+    s32 unknown_0x4;
+    u8 unknown_0x8[4];
+    void *vtable;
+    u8 unknown_0x10[0x390];
+    u8 cpman[0x10];
+    u8 cptn[0xA0];
+    u8 cplook[0x58];
+    u8 cplcyCamobj[0x18];
+    u8 unknown_0x4C0[0x40];
+    u8 unknown_0x500[0x20];
+    u8 unknown_0x520[0xD0];
+    u8 unknown_0x5F0[0x10];
+    struct CPLCY cplcy;
+};
 
-    M2C_FIELD(arg0, s32 *, 0) = 0;
-    temp_s1 = arg0 + 0x600;
-    M2C_FIELD(arg0, s32 *, 4) = 0;
-    M2C_FIELD(arg0, M2C_UNK **, 0xC) = &D_002CA4D0;
-    InitCpman(arg0 + 0x3A0);
-    InitCptn(arg0 + 0x3B0);
-    InitCplook(arg0 + 0x450);
-    InitCplcyCamobj(arg0 + 0x4A8);
-    func_00151208(arg0 + 0x4C0);
-    func_00151610(arg0 + 0x500);
-    func_00150728(arg0 + 0x520);
-    func_001518C8(arg0 + 0x5F0);
-    InitCplcy(temp_s1);
-    M2C_FIELD(temp_s1, M2C_UNK **, 0xC) = &D_002CD378;
-    return arg0;
+void InitCplcy(struct CPLCY *);                          /* extern */
+void InitCplcyCamobj(void *);                    /* extern */
+void InitCplook(void *);                         /* extern */
+void InitCpman(void *);                          /* extern */
+void InitCptn(void *);                           /* extern */
+void func_00150728(void *);                      /* extern */
+void func_00151208(void *);                      /* extern */
+void func_00151610(void *);                      /* extern */
+void func_001518C8(void *);                      /* extern */
+extern void *D_002CA4D0[];
+extern void *D_002CD378[];
+
+struct CM *CM_Construct(struct CM *pcm) {
+    struct CPLCY *pcplcy;
+
+    pcm->unknown_0x0 = 0;
+    pcplcy = &pcm->cplcy;
+    pcm->unknown_0x4 = 0;
+    pcm->vtable = D_002CA4D0;
+    InitCpman(pcm->cpman);
+    InitCptn(pcm->cptn);
+    InitCplook(pcm->cplook);
+    InitCplcyCamobj(pcm->cplcyCamobj);
+    func_00151208(pcm->unknown_0x4C0);
+    func_00151610(pcm->unknown_0x500);
+    func_00150728(pcm->unknown_0x520);
+    func_001518C8(pcm->unknown_0x5F0);
+    InitCplcy(pcplcy);
+    pcplcy->vtable = D_002CD378;
+    return pcm;
 }

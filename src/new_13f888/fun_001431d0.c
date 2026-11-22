@@ -1,16 +1,16 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "goals.h"
+#include "jtview.h"
 
-void *GoalStack_PgoalFind(s32, M2C_UNK);            /* extern */
+struct GOALGRAB *GoalStack_PgoalFind(struct GOALSTACK *pgoalstack, s32 classId);
 
-void func_001431D0(void *arg0) {
-    s32 temp_a0;
-    void *temp_v0;
-
-    temp_a0 = M2C_FIELD(arg0, s32 *, 0x10DC);
-    if (temp_a0 != 0) {
-        temp_v0 = GoalStack_PgoalFind(temp_a0 + 0x26C, 0xB1);
-        if ((temp_v0 != NULL) && (M2C_FIELD(temp_v0, s32 *, 0x5C) == arg0)) {
-            M2C_FIELD(temp_v0, s32 *, 0x60) = 0;
+void func_001431D0(struct JTVIEW *pjt) {
+    struct STEPGUARDVIEW *pguard = (struct STEPGUARDVIEW *)pjt->field_0x10DC;
+    struct GOALGRAB *pgoalGrab;
+    if (pguard != 0) {
+        pgoalGrab = GoalStack_PgoalFind(&pguard->goalstack, 0xB1);
+        if ((pgoalGrab != 0) && (pgoalGrab->psoHeld == (struct SO *)pjt)) {
+            pgoalGrab->field_0x60 = 0;
         }
     }
 }

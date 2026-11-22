@@ -1,9 +1,11 @@
-struct Packed8 { char bytes[8]; };
-extern "C" {
-void CloneXfm(char *);
-void AttachFlat_Clone(char *arg0) {
-    Packed8 saved = *(Packed8 *)(arg0 + 0x104);
-    CloneXfm(arg0);
-    *(Packed8 *)(arg0 + 0x104) = saved;
-}
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "pzo_hide.h"
+
+extern "C" void CloneXfm(void *);
+
+extern "C" void AttachFlat_Clone(ATTACHFLAT *attach)
+{
+    BYTES8 kept = attach->kept;
+    CloneXfm(attach);
+    attach->kept = kept;
 }

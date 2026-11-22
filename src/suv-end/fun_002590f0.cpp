@@ -1,22 +1,23 @@
-#include "types.h"
-struct Params { s32 size; s32 align; };
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "emitter.h"
+#include "alloc.h"
 extern "C" {
-s32 *PvAllocSwCopyImpl__FiPv(Params *, s32 *);
-s32 *func_002590F0(s8 *arg0, s32 arg1) {
-    if (arg1 == 1) {
-        *(s32 *)(arg0 + 0xE0) = arg1;
-        s32 *counter = *(s32 **)(arg0 + 0xE4);
-        s32 value = *counter;
+EMITB *PvAllocSwCopyImpl__FiPv(ALLOCREQ *, EMITB *);
+EMITB *func_002590F0(EMITTER *emitter, s32 ensk) {
+    if (ensk == 1) {
+        emitter->ensured = ensk;
+        s32 *refcount = &emitter->pemitb->cref;
+        s32 value = *refcount;
         if (value >= 2) {
-            *counter = value - 1;
-            Params params;
-            params.size = 0x100;
-            params.align = 0x10;
-            s32 *fresh = PvAllocSwCopyImpl__FiPv(&params, *(s32 **)(arg0 + 0xE4));
-            *(s32 **)(arg0 + 0xE4) = fresh;
-            *fresh = arg1;
+            *refcount = value - 1;
+            ALLOCREQ request;
+            request.cb = 0x100;
+            request.cbAlign = 0x10;
+            EMITB *fresh = PvAllocSwCopyImpl__FiPv(&request, emitter->pemitb);
+            emitter->pemitb = fresh;
+            fresh->cref = ensk;
         }
     }
-    return *(s32 **)(arg0 + 0xE4);
+    return emitter->pemitb;
 }
 }

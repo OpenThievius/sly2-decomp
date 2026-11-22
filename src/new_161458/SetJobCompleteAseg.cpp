@@ -1,8 +1,9 @@
-#include "sly2.h"
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "job.h"
 
-void SetJobCompleteAseg(int *arg0, int arg1, int arg2, int arg3)
+void SetJobCompleteAseg(JOB *pjob, int arg1, int arg2, int arg3)
 {
-    *(int *)((char *)arg0 + 0xAC) = arg1;
-    *(int *)((char *)arg0 + 0xB0) = arg2;
-    *(int *)((char *)arg0 + 0xB4) = arg3;
+    pjob->field_0xAC = arg1;
+    pjob->field_0xB0 = arg2;
+    pjob->field_0xB4 = arg3;
 }

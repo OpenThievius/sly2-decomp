@@ -1,10 +1,11 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "blipview.h"
 
-M2C_UNK AppendDlEntry(M2C_UNK *, void *);           /* extern */
-M2C_UNK RemoveDlEntry(s32, void *);                 /* extern */
-extern M2C_UNK B_002DEB00;
+void AppendDlEntry(struct DL *pdl, void *pv);
+void RemoveDlEntry(struct DL *pdl, void *pv);
+extern struct DL B_002DEB00;
 
-void RemoveBlip__FP4BLIP(void *arg0) {
-    RemoveDlEntry(M2C_FIELD(arg0, s32 *, 0x108C) + 0x448, arg0);
-    AppendDlEntry(&B_002DEB00, arg0);
+void RemoveBlip__FP4BLIP(struct BLIPVIEW *pblip) {
+    RemoveDlEntry(&pblip->pblipg->dlBlips, pblip);
+    AppendDlEntry(&B_002DEB00, pblip);
 }

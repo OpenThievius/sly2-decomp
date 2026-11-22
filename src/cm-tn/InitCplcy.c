@@ -1,8 +1,9 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "cplcy.h"
 
-extern M2C_UNK D_002CD570;
+extern void *D_002CD570[18];
 
-void *InitCplcy(void *arg0) {
-    M2C_FIELD(arg0, M2C_UNK **, 0xC) = &D_002CD570;
-    return arg0;
+struct CPLCY *InitCplcy(struct CPLCY *policy) {
+    policy->vtable = D_002CD570;
+    return policy;
 }

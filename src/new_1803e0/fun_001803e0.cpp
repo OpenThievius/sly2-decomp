@@ -1,28 +1,34 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "types.h"
 
-struct Slot {
-    char pad0[0xC];
+/* two 0x40-byte entries, each with a target object at 0xC, then a float at 0x98 */
+struct TARGETENTRY {
+    u8 unknown_0x0[0xC];
     s32 target;
-    char pad10[0x98 - 0x10];
+    u8 unknown_0x10[0x30];
+};
+
+struct TARGETPAIR {
+    TARGETENTRY entry[2];
+    u8 unknown_0x80[0x18];
     float one;
 };
 
 struct Holder {
-    char pad0[0x1CC];
+    u8 unknown_0x0[0x1CC];
     s32 flag;
 };
 
 extern "C" {
 s32 FIsBasicDerivedFrom(s32, s32);
-void func_0017F1A0(Holder *, Slot *, s32);
+void func_0017F1A0(Holder *, TARGETPAIR *, s32);
 void func_0017F5B0(Holder *, s32);
 }
 
-extern "C" void func_001803E0(Holder *holder, Slot *slots, s32 index)
+extern "C" void func_001803E0(Holder *holder, TARGETPAIR *pair, s32 index)
 {
-    func_0017F1A0(holder, slots, index);
-    s32 target = *(s32 *)((char *)slots + ((1 - index) << 6) + 0xC);
+    func_0017F1A0(holder, pair, index);
+    s32 target = pair->entry[1 - index].target;
     if (FIsBasicDerivedFrom(target, 0x47) == 0 && holder->flag != 0) {
         goto setOne;
     }
@@ -31,5 +37,5 @@ extern "C" void func_001803E0(Holder *holder, Slot *slots, s32 index)
         return;
     }
 setOne:
-    slots->one = 1.0f;
+    pair->one = 1.0f;
 }

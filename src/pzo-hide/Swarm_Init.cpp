@@ -1,24 +1,15 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
-extern "C" {
-struct _m2c_stack_Swarm_Init {
-    /* 0x00 */ char pad0[0x20];
-};                                                  /* size = 0x20 */
-M2C_UNK InitDl__FP2DLi(s8 *, M2C_UNK);            /* extern */
-M2C_UNK func_0017F090();                            /* extern */
-void Swarm_Init(s8 *arg0) {
-    s32 temp_v1;
-    func_0017F090();
-    temp_v1 = M2C_FIELD(arg0, s32 *, 0x40);
-    if ((temp_v1 ^ 1) & 1) {
-        *(s32 *)temp_v1 = (s32) (*(s32 *)temp_v1 | 8);
-    } else {
-        M2C_FIELD(arg0, s32 *, 0x40) = (s32) (temp_v1 | 8);
-    }
-    InitDl__FP2DLi(arg0 + 0x28C, 0x60);
-}
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "pzo_hide.h"
+
+extern "C" void func_0017F090(SWARM *);
+extern "C" void InitDl__FP2DLi(DL *, int);
+
+extern "C" void Swarm_Init(SWARM *swarm)
+{
+    func_0017F090(swarm);
+    if (!(swarm->grfSw & 1))
+        swarm->pgrfentry->grf |= 8;
+    else
+        swarm->grfSw |= 8;
+    InitDl__FP2DLi(&swarm->dlDead, 0x60);
 }

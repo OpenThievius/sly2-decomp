@@ -1,20 +1,15 @@
-#include "m2c_macros.h"
-extern "C" {
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "sly2.h"
+#include "cref.h"
+CRef RefSetArgsFromSplice(int cref, CRef *aref, const void *aotyp, ...);
+extern "C" void *func_001E15F0(BASIC *);
 
-M2C_UNK CRef_CopyConstruct(s32, void *);            /* extern */
-M2C_UNK CRef_Destruct(void *);                      /* extern */
-M2C_UNK RefSetArgsFromSplice__FiP4CRefP4OTYPe(void *, M2C_UNK, s32, M2C_UNK); /* extern */
-M2C_UNK SetTag__4CRef4TAGK(void *, M2C_UNK);        /* extern */
-M2C_UNK func_001E15F0(s32);                         /* extern */
+extern "C" CRef RefCallAddJsgKind44(BASIC *object, int count, CRef *args)
+{
+    RefSetArgsFromSplice(0, args, 0);
+    CRef refResult;
+    refResult.SetTag(TAGK_Void);
+    func_001E15F0(object);
+    return refResult;
+}
 
-s32 RefCallAddJsgKind44(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
-    char sp[0x10];
-    RefSetArgsFromSplice__FiP4CRefP4OTYPe(sp, 0, arg3, 0);
-    CRef_Destruct(sp);
-    SetTag__4CRef4TAGK(sp, 0x24);
-    func_001E15F0(arg1);
-    CRef_CopyConstruct(arg0, sp);
-    CRef_Destruct(sp);
-    return arg0;
-}
-}

@@ -1,18 +1,13 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "clock.h"
+#include "goalpatrol.h"
 extern "C" {
-void func_0014AE38(void *, M2C_UNK);
-void func_001EEF70();
-extern f32 g_2dded0;
-
-void func_0014A200(void *arg0) {
-    func_001EEF70();
-    func_0014AE38(arg0, 0);
-    M2C_FIELD(arg0, f32 *, 0x48) = (f32) g_2dded0;
-    M2C_FIELD(M2C_FIELD(arg0, void **, 0x10), s32 *, 0x4A4) = 0;
+void func_0014AE38(GOALPATROL *, s32);
+void func_001EEF70(GOALPATROL *);
+void func_0014A200(GOALPATROL *pgoal) {
+    func_001EEF70(pgoal);
+    func_0014AE38(pgoal, 0);
+    pgoal->tActivate = g_2dded0.t;
+    GOAL_GUARD(pgoal)->field_0x4A4 = 0;
 }
-
 }

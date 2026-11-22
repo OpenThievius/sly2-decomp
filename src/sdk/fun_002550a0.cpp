@@ -1,19 +1,14 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "gcnode.h"
 extern "C" {
-void LinkPairNode(s8 *, M2C_UNK *);                    /* extern */
-extern M2C_UNK B_002DD280;
+void LinkPairNode(GNODE *, GNODE **);
+extern GNODE *B_002DD280;
 extern s32 g_2dd598;
 
-s8 *func_002550A0(s8 *arg0) {
-    M2C_FIELD(arg0, s32 *, 0) = 0;
-    LinkPairNode(arg0, &B_002DD280);
-    M2C_FIELD(arg0, s32 *, 4) = (s32) ((M2C_FIELD(arg0, s32 *, 4) & 0x7FFFFFFF) | (g_2dd598 << 0x1F));
-    return arg0;
+GNODE *func_002550A0(GNODE *pnode) {
+    pnode->cref = 0;
+    LinkPairNode(pnode, &B_002DD280);
+    pnode->gen = g_2dd598;
+    return pnode;
 }
-
 }

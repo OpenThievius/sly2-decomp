@@ -1,9 +1,12 @@
-#include "m2c_macros.h"
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "types.h"
 
-M2C_UNK AddGuardAimOid();                           /* extern */
-M2C_UNK ResolveGuardAimObjects(s32);                /* extern */
+struct STEPGUARD;
 
-void AddGuardAimOidResolve(s32 arg0) {
-    AddGuardAimOid();
-    ResolveGuardAimObjects(arg0);
+void AddGuardAimOid(struct STEPGUARD *pguard, s32 oid);
+void ResolveGuardAimObjects(struct STEPGUARD *pguard);
+
+void AddGuardAimOidResolve(struct STEPGUARD *pguard, s32 oid) {
+    AddGuardAimOid(pguard, oid);
+    ResolveGuardAimObjects(pguard);
 }

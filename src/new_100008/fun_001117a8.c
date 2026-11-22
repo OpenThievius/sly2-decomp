@@ -1,14 +1,11 @@
-#include "m2c_macros.h"
-
-M2C_UNK ConstructGuard(void *);                     /* extern */
-void *__builtin_new(M2C_UNK);                       /* extern */
-extern M2C_UNK D_002CF520;
-
-void *func_001117A8(void) {
-    void *temp_v0;
-
-    temp_v0 = __builtin_new(0x1010);
-    ConstructGuard(temp_v0);
-    M2C_FIELD(temp_v0, M2C_UNK **, 0xC) = &D_002CF520;
-    return temp_v0;
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "factory.h"
+void *ConstructGuard(void *pguard); /* the guard's inlined constructor chain (src/sdk/ConstructGuard.cpp) */
+extern char D_002CF520[]; /* the vtable this guard class stores last */
+void *func_001117A8(void)
+{
+    NEWBASIC *pobject = (NEWBASIC *)__builtin_new(0x1010);
+    ConstructGuard(pobject);
+    pobject->pvtbl = D_002CF520;
+    return pobject;
 }

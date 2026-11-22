@@ -1,8 +1,9 @@
-#include "m2c_macros.h"
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "factory.h"
 
-s32 __builtin_new(M2C_UNK);                         /* extern */
-M2C_UNK func_00211C58(s32);                         /* extern */
+void *func_00211C58(void *);
 
-void func_00112CD0(void) {
+void func_00112CD0(void)
+{
     func_00211C58(__builtin_new(0x130));
 }

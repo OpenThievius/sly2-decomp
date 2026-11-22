@@ -1,28 +1,17 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "cref.h"
+
+struct LIST;
+
 extern "C" {
-struct _m2c_stack_func_00162050 {
-    /* 0x00 */ char pad0[0x20];
-    /* 0x20 */ M2C_UNK sp20;                        /* inferred */
-    /* 0x20 */ char pad20[0x10];
-    /* 0x30 */ s32 sp30;                            /* inferred */
-    /* 0x34 */ char pad34[0x3C];
-};                                                  /* size = 0x70 */
-M2C_UNK CRef_Destruct(void *);
-s32 GrfOfStates(s32, s8 *);                       /* extern */
-M2C_UNK func_002013D8(void *, s32, M2C_UNK, M2C_UNK, s32 *, s8 *); /* extern */
-s32 func_00162050(s32 arg0) {
-    s8 sp[0x20] __attribute__((aligned(16)));
-    s8 ref[0x10] __attribute__((aligned(16)));
-    s32 sp30;
-    s32 temp_s0;
-    func_002013D8(ref, arg0, 0x1050, 6, &sp30, sp);
-    temp_s0 = GrfOfStates(sp30, sp);
-    CRef_Destruct(ref);
-    return temp_s0;
+CRef func_002013D8(LIST *plist, int otyp, int unused, int *pcState, int *astate);
+int GrfOfStates(int cstate, int *astate);
+
+int func_00162050(LIST *plist) {
+    int astate[8];
+    int cstate;
+    CRef ref = func_002013D8(plist, 0x1050, 6, &cstate, astate);
+    return GrfOfStates(cstate, astate);
 }
+
 }

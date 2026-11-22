@@ -1,21 +1,35 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "types.h"
 
-M2C_UNK BusyMenu_Hide(M2C_UNK *);                   /* extern */
-s32 CheckCardStatus();                              /* extern */
-M2C_UNK MemcardMenu_SetState(M2C_UNK *, M2C_UNK);   /* extern */
-s32 WriteSaveSlot(void *, s32);                     /* extern */
-M2C_UNK func_001ACC38(M2C_UNK *, M2C_UNK);          /* extern */
-extern M2C_UNK B_002E6550;
-extern M2C_UNK B_002E65A0;
+#include "memcard.h"
 
-s32 func_001ABBE0(void *arg0) {
-    s32 var_s1;
+/* The memory card manager object: lives inside SAVE at 0xFD5C. */
+typedef struct B8 { char b[8]; } B8;
 
-    var_s1 = CheckCardStatus();
-    if ((var_s1 != 0) || (var_s1 = WriteSaveSlot(arg0, M2C_FIELD(arg0, s32 *, 0xFD50)), (var_s1 != 0))) {
+
+
+
+typedef struct MENU {
+    /* 0x00 */ u8 unknown_0x0[0x44];
+    /* 0x44 */ s32 phase;
+} MENU;
+
+void BusyMenu_Hide(void *);                         /* extern */
+s32 CheckCardStatus(SAVE *);                        /* extern */
+void MemcardMenu_SetState(MENU *, s32);             /* extern */
+s32 WriteSaveSlot(SAVE *, SLOT *);                  /* extern */
+void func_001ACC38(MENU *, s32);                    /* extern */
+extern MENU B_002E6550;
+extern u8 B_002E65A0[];
+
+s32 func_001ABBE0(SAVE *save) {
+    s32 error;
+
+    error = CheckCardStatus(save);
+    if ((error != 0) || (error = WriteSaveSlot(save, save->pslotCur), (error != 0))) {
         func_001ACC38(&B_002E6550, 3);
         MemcardMenu_SetState(&B_002E6550, 0x23);
-        BusyMenu_Hide(&B_002E65A0);
+        BusyMenu_Hide(B_002E65A0);
     }
-    return var_s1;
+    return error;
 }

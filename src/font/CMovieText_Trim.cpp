@@ -1,14 +1,19 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+struct CMOVIETEXT {
+    char unknown_0x0[4];
+    char *pchEnd; /* CMovieText_Trim terminates the text here after skipping its characters */
+};
 extern "C" {
-int CMovieText_ChNext(char *);
-void CMovieText_Reset(char *, int);
-void CMovieText_Trim(char *arg0, int arg1) {
-    CMovieText_Reset(arg0, 0);
-    while (CMovieText_ChNext(arg0) != 0) {
-        if (arg1 == 0) {
+int CMovieText_ChNext(CMOVIETEXT *);
+void CMovieText_Reset(CMOVIETEXT *, int);
+void CMovieText_Trim(CMOVIETEXT *text, int cch) {
+    CMovieText_Reset(text, 0);
+    while (CMovieText_ChNext(text) != 0) {
+        if (cch == 0) {
             break;
         }
-        arg1 -= 1;
+        cch -= 1;
     }
-    **(char **)(arg0 + 4) = 0;
+    *text->pchEnd = 0;
 }
 }

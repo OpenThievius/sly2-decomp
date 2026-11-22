@@ -1,19 +1,15 @@
-#include "m2c_macros.h"
-
-void *__7GLOBSET(s32);                               /* extern: GLOBSET::GLOBSET, returns its argument */
-void *__builtin_new(M2C_UNK);                       /* extern */
-extern M2C_UNK D_002CB230;
-extern M2C_UNK D_002D9978;
-
-void *func_00111728(void) {
-    void *temp_v0;
-
-    temp_v0 = __builtin_new(0x1880);
-    M2C_FIELD(temp_v0, M2C_UNK **, 0xC) = &D_002D9978;
-    M2C_FIELD(temp_v0, s32 *, 0) = 0;
-    M2C_FIELD(temp_v0, s32 *, 4) = 0;
-    __7GLOBSET(temp_v0 + 0x80);
-    M2C_FIELD(temp_v0, s32 *, 0x174) = 0;
-    M2C_FIELD(temp_v0, M2C_UNK **, 0xC) = &D_002CB230;
-    return temp_v0;
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "factory.h"
+extern char D_002D9978[]; /* SO's vtable (class 48): the first constructor of the chain stores it */
+extern char D_002CB230[]; /* the vtable this class stores last */
+void *func_00111728(void)
+{
+    NEWSO *pobject = (NEWSO *)__builtin_new(0x1880);
+    pobject->basic.pvtbl = D_002D9978;
+    pobject->basic.field_0x0 = 0;
+    pobject->basic.psidebag = 0;
+    __7GLOBSET(&pobject->globset);
+    pobject->field_0x174 = 0;
+    pobject->basic.pvtbl = D_002CB230;
+    return pobject;
 }

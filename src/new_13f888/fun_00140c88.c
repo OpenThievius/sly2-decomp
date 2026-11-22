@@ -1,22 +1,23 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "jtview.h"
 
-void *PpoSwFocusBase(M2C_UNK *);                    /* extern */
-M2C_UNK SetTnTnsOverride(s32, M2C_UNK);             /* extern */
-extern M2C_UNK B_003DD490;
+struct SW;
 
-void func_00140C88(s32 arg0, s32 arg1) {
-    s32 temp_a0;
-    void *temp_v0;
+struct JTVIEW *PpoSwFocusBase(struct SW *psw);
+void SetTnTnsOverride(struct TN *ptn, s32 value);
+extern struct SW B_003DD490;
 
-    temp_v0 = PpoSwFocusBase(&B_003DD490);
-    if (temp_v0 == arg0) {
-        temp_a0 = M2C_FIELD(temp_v0, s32 *, 0x1024);
-        if (temp_a0 != 0) {
-            SetTnTnsOverride(temp_a0, 0);
+void func_00140C88(struct JTVIEW *pjt, struct TN *ptnNew) {
+    struct JTVIEW *pjtFocus = PpoSwFocusBase(&B_003DD490);
+    struct TN *ptnOld;
+    if (pjtFocus == pjt) {
+        ptnOld = pjtFocus->ptnOverride;
+        if (ptnOld != 0) {
+            SetTnTnsOverride(ptnOld, 0);
         }
-        M2C_FIELD(temp_v0, s32 *, 0x1024) = arg1;
-        if (arg1 != 0) {
-            SetTnTnsOverride(arg1, 1);
+        pjtFocus->ptnOverride = ptnNew;
+        if (ptnNew != 0) {
+            SetTnTnsOverride(ptnNew, 1);
         }
     }
 }

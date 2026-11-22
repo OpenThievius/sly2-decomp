@@ -1,56 +1,63 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 #include "types.h"
-struct RhythmNote { s32 a; s32 b; s32 c; f32 time; s32 d; s32 flag14; s32 flag18; s32 flag1C; s32 flag20; };
-struct Rhythm {
-    char pad0[0x50]; s32 mode; char pad54[0x8]; f32 window; char pad60[0x1C0-0x60]; s32 count; RhythmNote notes[1];
+#include "clock.h"
+#include "rhythm.h"
+// local view of RHYTHM's span read here only: the judging window, the smoothing state and the miss penalty
+struct RHYTHMTIMINGVIEW {
+    u8 unknown_0x0[0x5C];
+    f32 window;
+    u8 unknown_0x60[0x22C];
+    f32 smoothState[1];   // 0x28C: the state GSmooth keeps
+    u8 unknown_0x290[0x14];
+    f32 penalty;          // 0x2A4: what AddRhythmScore gets for a missed cue
 };
-static inline f32 Second(void *base) { return ((f32 *)base)[1]; }
 extern "C" {
-void AddRhythmScore(Rhythm *, f32);
+void AddRhythmScore(RHYTHM *, f32);
 f32 GSmooth__FfffP3SMPPf(void *, s32, f32, f32, f32);
 f32 MarkClockTickRealOnly__FP5CLOCK(void *);
-void PlayDancerMove(s32, s32, s32, s32);
+void PlayDancerMove(DANCER *, s32, s32, s32);
 void UpdateLo();
-void UpdateRhythmCrowd(Rhythm *);
-void bevy_camera_follow_activity(void *, s32, Rhythm *);
+void UpdateRhythmCrowd(RHYTHM *);
+void bevy_camera_follow_activity(void *, s32, RHYTHM *);
 extern char B_002DEB30;
 extern char B_003DD040;
-extern char g_2dded0[];
-void UpdateRhythm(Rhythm *self) {
+void UpdateRhythm(RHYTHM *self) {
+    RHYTHMTIMINGVIEW *timing = (RHYTHMTIMINGVIEW *)self;
     UpdateLo();
     f32 now = MarkClockTickRealOnly__FP5CLOCK(&B_003DD040);
     switch (self->mode) {
     case 1:
-        for (s32 index = 0; index < self->count; index++) {
-            RhythmNote *note = &self->notes[index];
-            if (note->flag14 == 0 && note->time < now) {
-                PlayDancerMove(note->a, note->b, note->c, 0);
-                note->flag14 = 1;
+        for (s32 index = 0; index < self->cnote; index++) {
+            RHYTHMNOTE *note = &self->anote[index];
+            if (note->fPlayed == 0 && note->time < now) {
+                PlayDancerMove(note->pdancer, note->btn, note->oid, 0);
+                note->fPlayed = 1;
                 break;
             }
         }
         break;
     case 2:
-        for (s32 index = 0; index < self->count; index++) {
-            RhythmNote *note = &self->notes[index];
-            if (note->flag20 != 0) continue;
-            if (note->flag18 == 0 && note->time < now) {
-                *(s32 *)((char *)self + 0x230) = note->b;
+        for (s32 index = 0; index < self->cnote; index++) {
+            RHYTHMNOTE *note = &self->anote[index];
+            if (note->fDone != 0) continue;
+            if (note->fAnnounced == 0 && note->time < now) {
+                self->btnCue = note->btn;
                 bevy_camera_follow_activity(&B_002DEB30, 0x34, self);
-                note->flag18 = 1;
+                note->fAnnounced = 1;
             }
-            if (note->time + self->window < now) {
-                note->flag20 = 1;
-                if (note->flag1C == 0) {
-                    PlayDancerMove(note->a, note->b, note->c, 2);
-                    AddRhythmScore(self, *(f32 *)((char *)self + 0x2A4));
+            if (note->time + timing->window < now) {
+                note->fDone = 1;
+                if (note->fHit == 0) {
+                    PlayDancerMove(note->pdancer, note->btn, note->oid, 2);
+                    AddRhythmScore(self, timing->penalty);
                 }
                 break;
             }
         }
         break;
     }
-    f32 dt = Second(g_2dded0);
-    *(f32 *)((char *)self + 0x288) = GSmooth__FfffP3SMPPf((char *)self + 0x28C, 0, *(f32 *)((char *)self + 0x288), *(f32 *)((char *)self + 0x284), dt);
+    f32 dt = g_2dded0.dt;
+    self->smooth = GSmooth__FfffP3SMPPf(timing->smoothState, 0, self->smooth, self->mean, dt);
     UpdateRhythmCrowd(self);
 }
 }

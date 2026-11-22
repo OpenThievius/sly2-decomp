@@ -1,19 +1,23 @@
-#include "m2c_macros.h"
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "sly.h"
 
-M2C_UNK PredictLoLead();                            /* extern */
+// the 0x30-byte lead the player's goals pass (JT::PredictLead); only its kind is written here
+struct LEAD {
+    s32 kind;
+    u8 unknown_0x4[0x2C];
+};
 
-void PredictSlyLead(void *arg0, s32 *arg1) {
-    u32 temp_v1;
+extern "C" void PredictLoLead(SLY *self, LEAD *plead, float dt);
 
-    PredictLoLead();
-    temp_v1 = M2C_FIELD(arg0, u32 *, 0x18C8);
-    switch (temp_v1) {
+void PredictSlyLead(SLY *self, LEAD *plead, float dt) {
+    PredictLoLead(self, plead, dt);
+    switch (self->jts) {
     case 0:
     case 1:
     case 5:
     case 10:
     case 12:
-        *arg1 = 1;
+        plead->kind = 1;
         break;
     }
 }

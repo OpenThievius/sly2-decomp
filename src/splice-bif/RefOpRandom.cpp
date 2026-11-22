@@ -5,7 +5,7 @@ extern "C" {
 CRef CRef_RefCoerceF32(CRef *pref);
 int NRandInRange(int, int);
 float GRandInRange(float, float);
-void CRef_SetF32(CRef *, float);
+void SetF32__4CReff(CRef *, float);
 }
 extern "C" CRef RefOpRandom(int carg, CRef *aref, CFrame *pframe)
 {
@@ -16,7 +16,7 @@ extern "C" CRef RefOpRandom(int carg, CRef *aref, CFrame *pframe)
     } else {
         float gMin = CRef_RefCoerceF32(&aref[0]).m_tag.m_g;
         float gMax = CRef_RefCoerceF32(&aref[1]).m_tag.m_g;
-        CRef_SetF32(&refRandom, GRandInRange(gMin, gMax));
+        SetF32__4CReff(&refRandom, GRandInRange(gMin, gMax));
     }
     return refRandom;
 }

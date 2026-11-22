@@ -12,6 +12,7 @@ struct IKLIMB;
 struct ASEGA;
 
 struct MURRAY : JT {
+    void *PvCarry() { return (char *)this + 0x1910; } /* Murray's carry part, CarryThrow_Init's second one (JT::PvCarry is the first, at 0x11B0): InitMurray, PostMurrayLoad, GetMurrayCpdefi, HandleMurrayMessage, UpdateMurrayActive and func_001B8450 pass its address */
     u8 unknown_0x1320[0xB0];
     /* 0x13D0 */ s32 state; /* the state: InitMurray (7) sets -1; GetMurrayCpdefi (50), PresetMurrayAccel (70), FInvulnerableMurray (76), NMurrayActionCategory (85), SetMurrayAnimBase (90), FMurrayOnFoot (94), PredictMurrayLead (96) */
     u8 unknown_0x13D4[0x4];
@@ -42,7 +43,10 @@ struct MURRAY : JT {
     /* 0x1450 */ s32 field_0x1450; /* InitMurray sets -1 */
     /* 0x1454 */ f32 field_0x1454; /* SetMurrayLiftState: time of the last state change */
     /* 0x1458 */ s32 iapasegByIndex; /* InitMurray sets -1; SetMurrayAnimBase (90) indexes apasegByIndex with it in state 5 */
-    u8 unknown_0x145C[0xD4];
+    u8 unknown_0x145C[0xC8];
+    /* 0x1524 */ f32 tMashLeft; /* UpdateMurrayMash counts it down by the frame time; HandleMurrayMessage (10) sets it from the table of the mash level */
+    /* 0x1528 */ f32 field_0x1528; /* UpdateMurrayMash copies tMashLeft into it; HandleMurrayMessage (10) sets it with tMashLeft */
+    /* 0x152C */ s32 cMashLeft; /* UpdateMurrayMash counts it down and tests <= 0; HandleMurrayMessage (10) sets it from tMashLeft */
     /* 0x1530 */ struct SMA *psmaPartner; /* StartMurrayMash sets it, ReleaseMurrayObject (in the mash state, 6) reads it */
     /* 0x1534 */ s32 iMashLevel; /* StartMurrayMash; HandleMurrayMessage (5) */
     u8 unknown_0x1538[0xB8];
@@ -69,14 +73,20 @@ struct MURRAY : JT {
     /* 0x1808 */ void *field_0x1808; /* StartMurrayAttackB tests it */
     u8 unknown_0x180C[0x4];
     /* 0x1810 */ s32 field_0x1810; /* InitMurray sets -1 */
-    u8 unknown_0x1814[8];
+    u8 unknown_0x1814[4];
+    /* 0x1818 */ s32 field_0x1818; /* HandleMurrayMessage (5) sets 1 on animation event 0x240 */
     /* 0x181C */ s32 field_0x181C; /* UpdateMurrayAttack: attack latched flag */
-    u8 unknown_0x1820[0x10];
+    /* 0x1820 */ s32 fCanChain; /* HandleMurrayMessage (5) sets 1 on animation event 0x242; FMurrayAttackCanChain returns it */
+    u8 unknown_0x1824[0xC];
     /* 0x1830 */ QW field_0x1830; /* PredictMurrayLead (96) */
     /* 0x1840 */ s32 field_0x1840; /* InitMurray sets -1 */
     u8 unknown_0x1844[0xC8];
     /* 0x190C */ struct ASEGA *field_0x190C; /* StartMurrayAttackA, StartMurrayAttackB read the aseg at its +0x14 */
-    u8 unknown_0x1910[0x148];
+    u8 unknown_0x1910[0x4];
+    /* 0x1914 */ s32 stateCarry; /* in Murray's carry part at 0x1910 (state at +4, CarryThrow_SetState); func_00136530 (Bentley) tests it against 7 */
+    u8 unknown_0x1918[0x4];
+    /* 0x191C */ struct SO *psoCarry; /* in the carry part (+0xC): func_00136530 (Bentley) asks it for a transform (SO slot 32) */
+    u8 unknown_0x1920[0x138];
     /* 0x1A58 */ void *apasegState[0x16]; /* SetMurrayAnimBase (90) binds the entry state indexes; the count is the room left before apasegByIndex */
     /* 0x1AB0 */ void *apasegByIndex[3]; /* SetMurrayAnimBase (90) */
     /* 0x1ABC */ void *pasegCarry; /* SetMurrayAnimBase (90), in state 2 while carrying */
@@ -111,6 +121,8 @@ SLY2_OFFSET_CHECK(MURRAY, field_0x17FC, 0x17FC);
 SLY2_OFFSET_CHECK(MURRAY, field_0x1804, 0x1804);
 SLY2_OFFSET_CHECK(MURRAY, field_0x1808, 0x1808);
 SLY2_OFFSET_CHECK(MURRAY, field_0x190C, 0x190C);
+SLY2_OFFSET_CHECK(MURRAY, stateCarry, 0x1914);
+SLY2_OFFSET_CHECK(MURRAY, psoCarry, 0x191C);
 SLY2_OFFSET_CHECK(MURRAY, field_0x13D8, 0x13D8);
 SLY2_OFFSET_CHECK(MURRAY, field_0x13E8, 0x13E8);
 SLY2_OFFSET_CHECK(MURRAY, field_0x13EC, 0x13EC);
@@ -135,6 +147,11 @@ SLY2_OFFSET_CHECK(MURRAY, pikLimbB, 0x1614);
 SLY2_OFFSET_CHECK(MURRAY, field_0x17F4, 0x17F4);
 SLY2_OFFSET_CHECK(MURRAY, field_0x1810, 0x1810);
 SLY2_OFFSET_CHECK(MURRAY, field_0x181C, 0x181C);
+SLY2_OFFSET_CHECK(MURRAY, tMashLeft, 0x1524);
+SLY2_OFFSET_CHECK(MURRAY, field_0x1528, 0x1528);
+SLY2_OFFSET_CHECK(MURRAY, cMashLeft, 0x152C);
+SLY2_OFFSET_CHECK(MURRAY, field_0x1818, 0x1818);
+SLY2_OFFSET_CHECK(MURRAY, fCanChain, 0x1820);
 SLY2_OFFSET_CHECK(MURRAY, field_0x1830, 0x1830);
 SLY2_OFFSET_CHECK(MURRAY, field_0x1840, 0x1840);
 SLY2_OFFSET_CHECK(MURRAY, apasegState, 0x1A58);

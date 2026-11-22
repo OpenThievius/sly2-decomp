@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
 #include "jt.h"
 struct GLOBS { char pad0[0x260]; JT *pjt; char pad1[0x300 - 0x264]; int f300; };
@@ -13,10 +14,10 @@ void func_00141588(JT *pjt, VECTOR *ppos)
     *(QW *)ppos = PosLoWorld(pjt);
     float z;
     if (pjt->psoSurface != 0) {
-        z = pjt->field_0x238 + pjt->field_0x1048;
+        z = pjt->vecWorld.z + pjt->field_0x1048;
     } else {
         if (pjt->jmpState == 0x14 || B_002DDF40.f300 != 0 || B_002DDF40.pjt != pjt) {
-            ppos->z = ppos->z + (pjt->field_0x248 + pjt->field_0x1048);
+            ppos->z = ppos->z + (pjt->vecLocal.z + pjt->field_0x1048);
             return;
         }
         z = pjt->field_0x104C;

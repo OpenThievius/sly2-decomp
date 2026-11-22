@@ -2,10 +2,16 @@
 // UpdateMurrayCarry: per-frame update of Murray's carrying states.
 #include "sly2.h"
 #include "murray.h"
+#include "joy.h"
+#include "carry.h"
+#include "asega.h"
 #include "ps2inline.h"
 #include "vu0inline.h"
-struct JOY { char pad0[0x18]; float radStick; float uStick; char pad1[0x30 - 0x20]; unsigned grfbtn; };
-struct CARRIER { char pad[0x180]; LO *lo; };
+/* The word at 0x1438 of the player that the throw test reads (murray.h has it as unknown); only this function reads it. */
+struct MURRAYTHROWVIEW {
+    u8 unknown_0x0[0x1438];
+    s32 field_0x1438;
+};
 union VU_SCALE { QW q; VECTOR v; };
 
 extern "C" {
@@ -21,7 +27,7 @@ void SetRunBlendU(void *, float);
 void SetStepRadTarget(MURRAY *, float);
 void StartBinoc(void *, int, int, int);
 void UpdateRunBlendFootsteps(void *);
-QW func_00204E38(MURRAY *, void *, float);
+QW func_00204E38(MURRAY *, ASEGA *, float);
 
 void UpdateMurrayCarry(MURRAY *pmurray)
 {
@@ -31,16 +37,16 @@ void UpdateMurrayCarry(MURRAY *pmurray)
         stateStart = pmurray->iapasegByIndex;
         if (stateStart < 3) {
             if (stateStart >= 0) {
-                if (((int)(((CARRIER *)pmurray->ploCarried)->lo->grfo >> 60) & 1) == 0) {
+                if (((int)(((CARRY *)pmurray->ploCarried)->pso->grfo >> 60) & 1) == 0) {
                     DetachMurrayObject(pmurray);
                     pmurray->ploCarried = 0;
                     SetMurrayState(pmurray, 0);
                 } else if (GrfbtnVjoyPressedWithin(pmurray->pjoy, 0x40, 0.1f) && FGadgetAcquired(0x12)) {
                     ClearVjoyPresses(pmurray->pjoy, 0x40);
-                    SetJmpState(((char *)pmurray + 0x2C0), 0xF, 0, 0);
+                    SetJmpState(pmurray->PvJmp(), 0xF, 0, 0);
                 } else if (FButtonPressedWithin(pmurray->pjoy, 0xA0, 0.0f)) {
                     SetMurrayState(pmurray, 7);
-                } else if (FButtonPressedWithin(pmurray->pjoy, 0x10, 0.0f) && *(int *)((char *)pmurray + 0x1438)) {
+                } else if (FButtonPressedWithin(pmurray->pjoy, 0x10, 0.0f) && ((MURRAYTHROWVIEW *)pmurray)->field_0x1438) {
                     pmurray->field_0x143C = 0;
                     SetMurrayState(pmurray, 8);
                 } else if (GrfbtnVjoyPressedWithin(pmurray->pjoy, 0x400, 0.15f) && pmurray->FCanUseGadget(3)) {
@@ -74,8 +80,8 @@ void UpdateMurrayCarry(MURRAY *pmurray)
     case 2:
         SetStepRadTarget(pmurray, pmurray->pjoy->radStick);
         {
-            void *anim = *(void **)((char *)pmurray + 0x1030);
-            QW vel = func_00204E38(pmurray, anim, *(float *)((char *)anim + 0x1C));
+            ASEGA *anim = (ASEGA *)pmurray->field_0x1030;
+            QW vel = func_00204E38(pmurray, anim, anim->tLocal);
             scale.q = VectorFromFloat(-1.0f);
             pmurray->velGoal = VectorScaleX(vel, scale.q);
         }

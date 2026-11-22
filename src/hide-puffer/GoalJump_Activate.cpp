@@ -1,29 +1,13 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 #include "vu0inline.h"
 #include "ps2inline.h"
 #include "sly2.h"
 #include "stepguard.h"
+#include "goals.h"
 #include "goal.h"
 
 struct JT;
 struct PIPE;
-/* a 3-row matrix held as quadwords: copied with lq/sq */
-struct MATRIX3Q { QW row[3]; };
-struct JUMPER;
-struct JUMPERREF { u8 unknown_0x0[0x8]; JUMPER *pjumper; };
-struct JUMPER { u8 unknown_0x0[0x58]; LO *ploTarget; int unknown_0x5C; int unknown_0x60; };
-
-struct GOALJUMP : GOAL {
-    u8 unknown_0x30[0x10];
-    /* 0x40 */ JUMPERREF *pjumperref;
-    u8 unknown_0x44[0xC];
-    /* 0x50 */ QW posTarget;
-    /* 0x60 */ LO *ploTarget;
-    /* 0x64 */ union { PIPE *ppipe; int fFacing; };
-    /* 0x68 */ int unknown_0x68;
-    /* 0x6C */ int fMatrix;
-    /* 0x70 */ MATRIX3Q mat;
-};
-
 /* the difference of a vector read through a reference (retail keeps the minuend in memory) */
 static inline QW VectorSubFrom(const QW &first, QW second)
 {
@@ -107,28 +91,28 @@ void GoalJump_Activate(GOALJUMP *pgoal)
     func_00174950(pgoal);
     ((STEPGUARD *)pgoal->pstep)->grfsgs &= ~grfsgsAdd;
     ((STEPGUARD *)pgoal->pstep)->grfsgs |= grfsgsSaved;
-    if (pgoal->pjumperref != 0) {
+    if (pgoal->panimref != 0) {
         switch (*(int *)((u8 *)pgoal->pstep + 0xF80)) {
         case -1:
         case 0:
         case 3: {
             QW pos = pgoal->posTarget;
             QW dir = VectorSubFrom(pos, PosLoWorld(pgoal->pstep));
-            func_00209818(&((STEPGUARD *)pgoal->pstep)->field_0xFD0, atan2f(LaneYInGeneralRegister(dir), LaneX(dir)));
+            func_00209818(&((STEPGUARD *)pgoal->pstep)->heading, atan2f(LaneYInGeneralRegister(dir), LaneX(dir)));
             break;
         }
         case 2: {
             QW pos = pgoal->posTarget;
             QW dir = VectorSubFrom(pos, PosLoWorld(pgoal->pstep));
             MATRIX3Q mat = BuildOrthonormalMatrixY__FP6VECTORT0P7MATRIX3(PmatLoWorld(*(LO **)((u8 *)pgoal->pstep + 0xF84))->row[0], dir);
-            func_00209840(&((STEPGUARD *)pgoal->pstep)->field_0xFD0, &mat);
+            func_00209840(&((STEPGUARD *)pgoal->pstep)->heading, &mat);
             break;
         }
         }
-        pgoal->pjumperref->pjumper->unknown_0x60 = pgoal->unknown_0x68;
-        pgoal->pjumperref->pjumper->ploTarget = pgoal->ploTarget;
-        pgoal->pjumperref->pjumper->unknown_0x5C = pgoal->fFacing;
-        SetJumperTarget(pgoal->pjumperref->pjumper, pgoal->posTarget);
+        ((JUMPER *)pgoal->panimref->pinst)->fTrackTarget = pgoal->fTrackTarget;
+        ((JUMPER *)pgoal->panimref->pinst)->ploTarget = pgoal->ploTarget;
+        ((JUMPER *)pgoal->panimref->pinst)->fFacing = pgoal->fFacing;
+        SetJumperTarget((JUMPER *)pgoal->panimref->pinst, pgoal->posTarget);
     }
     func_001EEFC0(pgoal);
 }

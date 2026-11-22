@@ -1,17 +1,19 @@
-#include "m2c_macros.h"
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "stepguard.h"
+#include "goals.h"
+#include "sly2.h"
 extern "C" {
 
-void GoalBrain_SetCommand(s32, s8 *);     /* extern */
-M2C_UNK func_001EEF70();                            /* extern */
-extern "C" void *memset(void *, int, unsigned int);
+void GoalBrain_SetCommand(GOALBRAIN *goal, GOALCMD *pcmd);
+void func_001EEF70();
 
-void GoalBrain_Activate(s32 arg0) {
-    s8 sp[0x70] __attribute__((aligned(16)));
+void GoalBrain_Activate(GOALBRAIN *goal) {
+    GOALCMD cmd;
 
     func_001EEF70();
-    memset(sp, 0, 0x70);
-    *(s32 *)sp = 0;
-    GoalBrain_SetCommand(arg0, sp);
+    memset(&cmd, 0, 0x70);
+    cmd.type = 0;
+    GoalBrain_SetCommand(goal, &cmd);
 }
 
 }

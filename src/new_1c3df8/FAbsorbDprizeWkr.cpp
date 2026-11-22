@@ -1,13 +1,17 @@
-struct Obj1C5DF0;
-struct VT1C5DF0 { char pad[0x260]; short delta; short index; void (*fn)(void *, int); };
-struct Obj1C5DF0 { char pad[0xC]; VT1C5DF0 *vt; char pad2[0x1C8 - 0x10]; int f1c8; };
-struct Other1C5DF0 { char pad[0x44]; unsigned flags; };
-extern "C" int FAbsorbDprizeWkr(Obj1C5DF0 *obj, Other1C5DF0 *other)
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "dprize.h"
+
+/* the ZPD SO::FAbsorbWkr (slot 75) takes: only its flags are read here */
+struct ZPD {
+    u8 unknown_0x0[0x44];
+    /* 0x44 */ u32 grf;
+};
+
+extern "C" int FAbsorbDprizeWkr(DPRIZE *pdprize, ZPD *pzpd)
 {
-    if (obj->f1c8 != 0) {
-        if (other->flags & 8) {
-            VT1C5DF0 *vt = obj->vt;
-            vt->fn((char *)obj + vt->delta, 1);
+    if (pdprize->collectable != 0) {
+        if (pzpd->grf & 8) {
+            pdprize->SetDprizes(1);
             return 1;
         }
         return 0;

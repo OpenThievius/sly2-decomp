@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "cmpeg.h"
 extern "C" void snd_PauseAllSoundsInGroup(unsigned int);
 extern "C" void StopStream(void *);
 extern "C" void func_00227788(void *);
@@ -7,13 +9,11 @@ extern "C" int snd_StreamSafeCheckCDIdle(int);
 extern "C" int snd_StreamSafeCdSync(int);
 extern "C" int snd_GetMasterVolume(int);
 extern "C" void snd_SetMasterVolume(int, int);
-extern "C" void Init__10CByteQueueiPv(void *, int, void *);
 extern "C" char B_003DD040;
 extern "C" char B_004435F0;
-struct G { char pad[0x110]; int pb; };
-extern G B_002F66B0;
+extern CMpeg B_002F66B0;
 
-void Init__10CMpegAudio(char *self)
+void CMpegAudio::Init()
 {
     snd_PauseAllSoundsInGroup(0xFFFFFFFFu);
     StopStream(&B_003DD040);
@@ -23,13 +23,12 @@ void Init__10CMpegAudio(char *self)
     }
     snd_StreamSafeCheckCDIdle(1);
     snd_StreamSafeCdSync(0);
-    *(int *)(self + 0xA0) = snd_GetMasterVolume(2);
-    *(int *)(self + 0xA4) = snd_GetMasterVolume(0x10);
+    volumeMovie = snd_GetMasterVolume(2);
+    volumeMusic = snd_GetMasterVolume(0x10);
     snd_SetMasterVolume(2, 0x400);
     snd_SetMasterVolume(0x10, 0x400);
-    *(int *)(self + 0x0) = 1;
-    *(int *)(self + 0x4) = -1;
-    Init__10CByteQueueiPv(self + 0x30, 0x28, self + 0x8);
-    Init__10CByteQueueiPv(self + 0x50, 0x18000,
-                          (void *)(B_002F66B0.pb + 0x80000));
+    state = 1;
+    idStream = -1;
+    qHeader.Init(0x28, header);
+    qData.Init(0x18000, B_002F66B0.pbBuffer + 0x80000);
 }

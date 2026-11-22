@@ -1,7 +1,9 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "ambview.h"
 
-M2C_UNK snd_PauseSound(s32);                        /* extern */
+void snd_PauseSound(s32 voice);
 
-void PauseAmbVoice(void *arg0) {
-    snd_PauseSound(M2C_FIELD(arg0, s32 *, 0x40));
+void PauseAmbVoice(struct AMBVIEW *pamb)
+{
+    snd_PauseSound(pamb->voice);
 }

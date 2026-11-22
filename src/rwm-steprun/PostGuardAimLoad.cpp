@@ -1,34 +1,35 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
-struct Aim {
-    unsigned char p0[0x10]; struct Aim *pparent; int unk14; int oid; char p1[0x7C - 0x1C]; int oidA; int oidB; int oidLabel;
-    char p2[0x90 - 0x88]; QW vecRest; void *pxfA; void *pxfB; char p3[0xAC - 0xA8]; void *pguard; char animref[0x10]; void *pused;
-};
+#include "guard.h"
+#include "so.h"
+#include "xf.h"
+struct ASEG;
 extern "C" {
-void PostLoLoad(Aim *);
+void PostLoLoad(LO *);
 int FIsBasicDerivedFrom(void *, int);
-void BindAnimref(void *, void *);
-void *func_001F4C58(void *, int, int);
+void BindAnimref(ANIMREF *, STEPGUARD *);
+XF *func_001F4C58(STEPGUARD *, int, int);
 float *PeaFindAsegLabel(void *, int);
 void PredictAsegEffect(float, void *, void *, void *, void *, float, void *, int);
 }
-void PostGuardAimLoad(Aim *paim)
+void PostGuardAimLoad(AIMSTATE *paim)
 {
     PostLoLoad(paim);
-    void *pguard = paim->pparent;
+    SO *pguard = paim->psoParent;
     while (pguard != 0 && !FIsBasicDerivedFrom(pguard, 0x38))
-        pguard = ((Aim *)pguard)->pparent;
-    paim->pguard = pguard;
-    char *panim;
-    panim = paim->animref;
-    BindAnimref(panim, pguard);
+        pguard = pguard->psoParent;
+    paim->pguard = (STEPGUARD *)pguard;
+    ANIMREF *panimref;
+    panimref = &paim->animref;
+    BindAnimref(panimref, paim->pguard);
     if (paim->oid != 0x2CC)
-        paim->pused = panim;
+        paim->panimref = panimref;
     if (paim->oidA != -1) {
         QW out[4];
         paim->pxfA = func_001F4C58(paim->pguard, paim->oidA, 6);
         paim->pxfB = func_001F4C58(paim->pguard, paim->oidB, 6);
-        void *paseg = *(void **)((char *)paim->animref + 4);
-        PredictAsegEffect(*PeaFindAsegLabel(paseg, paim->oidLabel), paseg, paim->pguard, paim->pxfB, *(void **)((char *)paim->pxfA + 0xA0), 1.0f, out, 0);
+        void *paseg = paim->animref.pdata;
+        PredictAsegEffect(*PeaFindAsegLabel(paseg, paim->oidLabel), paseg, paim->pguard, paim->pxfB, paim->pxfA->pxfParent, 1.0f, out, 0);
         paim->vecRest = out[3];
     }
 }

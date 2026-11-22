@@ -1,15 +1,16 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "soview.h"
 
-M2C_UNK AdjustSoMomint__FP2SOf(f32);                /* extern */
+void AdjustSoMomint__FP2SOf(struct SOVIEW *, f32);
 
-void SetSoMass__FP2SOf(void *arg0, f32 fparg0) {
-    f32 temp_f0;
-    f32 temp_f12;
-    void *temp_v0;
+void SetSoMass__FP2SOf(struct SOVIEW *pso, f32 mass) {
+    struct PHYSVIEW *pphys;
+    f32 massOld;
+    f32 ratio;
 
-    temp_v0 = M2C_FIELD(arg0, void **, 0xE8);
-    temp_f0 = M2C_FIELD(temp_v0, f32 *, 0xD0);
-    temp_f12 = fparg0 / temp_f0;
-    M2C_FIELD(temp_v0, f32 *, 0xD0) = (f32) (temp_f0 * temp_f12);
-    AdjustSoMomint__FP2SOf(temp_f12);
+    pphys = pso->pphys;
+    massOld = pphys->field_0xD0;
+    ratio = mass / massOld;
+    pphys->field_0xD0 = (f32) (massOld * ratio);
+    AdjustSoMomint__FP2SOf(pso, ratio);
 }

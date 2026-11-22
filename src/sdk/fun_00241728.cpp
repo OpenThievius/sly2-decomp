@@ -1,23 +1,17 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later */
 #include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
+#include "dmachannel.h"
 extern "C" {
-struct _m2c_stack_func_00241728 {
-    /* 0x00 */ char pad0[0x30];
-};                                                  /* size = 0x30 */
-void func_00241368(s8 *);
+void func_00241368(DMACHANNEL *);
 s32 func_002413E0(s32);
-void func_00241728(s8 *arg0, s32 arg1) {
-    s32 temp_s1;
-    temp_s1 = func_002413E0(arg1);
-    func_00241368(arg0);
-    if (M2C_FIELD(arg0, s32 *, 0x30) != 0xFFFFFFFF) {
-        M2C_FIELD(arg0, s32 *, 0x30) = temp_s1;
+void func_00241728(DMACHANNEL *channel, s32 tagAddress) {
+    s32 translated;
+    translated = func_002413E0(tagAddress);
+    func_00241368(channel);
+    if (channel->tagAddress != 0xFFFFFFFF) {
+        channel->tagAddress = translated;
     }
-    M2C_FIELD(arg0, s32 *, 0x20) = 0;
-    M2C_FIELD(arg0, s32 *, 0) = (s32) ((M2C_FIELD(arg0, s32 *, 0) & ~0xC) | 0x105);
+    channel->quadwords = 0;
+    channel->control = (channel->control & ~0xC) | 0x105;
 }
 }

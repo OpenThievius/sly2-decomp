@@ -1,17 +1,15 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "goalpost.h"
 extern "C" {
-void AddGuardSgs(s32, M2C_UNK);
-void func_001EEF68();
+void AddGuardSgs(STEPGUARD *, s32);
+void func_001EEF68(GOALPOSTWATCH *);
 
-void func_001559B0(void *arg0) {
-    func_001EEF68();
-    AddGuardSgs(M2C_FIELD(arg0, s32 *, 0x10), 0x23);
-    M2C_FIELD(arg0, s32 *, 0x30) = -1;
-    M2C_FIELD(arg0, f32 *, 0x3C) = 3.4028235e38f;
+/* GoalPostWatch_Init */
+void func_001559B0(GOALPOSTWATCH *pgoal)
+{
+    func_001EEF68(pgoal);
+    AddGuardSgs((STEPGUARD *)pgoal->pstep, 0x23);
+    pgoal->state = -1;
+    pgoal->tLimit = 3.4028235e38f;
 }
-
 }

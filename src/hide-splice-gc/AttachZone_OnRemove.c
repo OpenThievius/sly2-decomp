@@ -1,10 +1,10 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "pzo_hide.h"
 
-M2C_UNK RemoveAloHierarchy();                       /* extern */
-M2C_UNK RemoveDlEntry(M2C_UNK *, s32);              /* extern */
-extern M2C_UNK B_003E1438;
+void RemoveAloHierarchy(struct ATTACHZONE *);
+void RemoveDlEntry(struct DL *, void *);
 
-void AttachZone_OnRemove(s32 arg0) {
-    RemoveAloHierarchy();
-    RemoveDlEntry(&B_003E1438, arg0);
+void AttachZone_OnRemove(struct ATTACHZONE *attach) {
+    RemoveAloHierarchy(attach);
+    RemoveDlEntry(&B_003E1438, attach);
 }

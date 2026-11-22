@@ -1,9 +1,10 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "mount.h"
 
-M2C_UNK Mount_SetState(s32, M2C_UNK);               /* extern */
-M2C_UNK func_0017F110();                            /* extern */
+void Mount_SetState(struct MOUNT *pmount, s32 newState);
+void func_0017F110(struct MOUNT *pmount);
 
-void Mount_Reset(s32 arg0) {
-    func_0017F110();
-    Mount_SetState(arg0, -1);
+void Mount_Reset(struct MOUNT *pmount) {
+    func_0017F110(pmount);
+    Mount_SetState(pmount, -1);
 }

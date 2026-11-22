@@ -1,24 +1,18 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "po.h"
+#include "sw.h"
+
 extern "C" {
-struct _m2c_stack_InitPo {
-    /* 0x00 */ char pad0[0x20];
-};                                                  /* size = 0x20 */
-M2C_UNK InitSo();                                   /* extern */
-void InitPo(s8 *arg0) {
-    s32 temp_a0;
-    InitSo();
-    temp_a0 = M2C_FIELD(arg0, s32 *, 0x40);
-    M2C_FIELD(arg0, s32 *, 0x15C) = 1;
-    M2C_FIELD(arg0, s8 **, 0x168) = arg0;
-    if ((temp_a0 ^ 1) & 1) {
-        *(s32 *)temp_a0 = (s32) (*(s32 *)temp_a0 | 2);
-        return;
+void InitSo(SO *pso);
+
+void InitPo(PO *ppo) {
+    InitSo(ppo);
+    ppo->magnet.field_0x0 = 1;
+    ppo->ppoSelf = ppo;
+    if (!(ppo->grfSw & 1)) {
+        ppo->pgrfentry->grf |= 2;
+    } else {
+        ppo->grfSw |= 2;
     }
-    M2C_FIELD(arg0, s32 *, 0x40) = (s32) (temp_a0 | 2);
 }
 }

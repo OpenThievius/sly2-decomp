@@ -17,7 +17,7 @@ void SetSoParent(SO *self, SO *newParent, int arg2, int arg3)
     QW pos2;
     if (arg3 & 3) {
         if ((int)(self->grfo >> 60) & 1) {
-            mat = *(MATRIX4 *)((char *)self->pxfRoot + 0x40);
+            mat = self->pxfRoot->matWorld;
         } else {
             memset(&mat, 0, 0x40);
             XF *node = self->pxfRoot;
@@ -63,17 +63,17 @@ void SetSoParent(SO *self, SO *newParent, int arg2, int arg3)
     int index = 0;
     if (self->cxf > 0) {
         do {
-            int *slot = (int *)&self->axf[index].pxfParent;
-            int rel = (*slot - rangeBase) >> 8;
+            XF **slot = &self->axf[index].pxfParent;
+            int rel = ((int)*slot - rangeBase) >> 8;
             if (rel >= 0 && rel < rangeCount)
-                *slot = value;
+                *slot = (XF *)value;
             index++;
         } while (index < self->cxf);
     }
     SetLoParent(self, newParent, arg2, arg3);
     UpdateAloXfWorld(self);
     if (arg3 & 1) {
-        self->TranslateToPos(*(QW *)&mat.mat[3][0]);
+        self->TranslateToPos(mat.row[3]);
     }
     if (arg3 & 2) {
         self->Slot30(&mat);

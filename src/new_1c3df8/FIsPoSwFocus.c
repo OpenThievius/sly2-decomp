@@ -1,8 +1,9 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "swview.h"
 
-s32 PpoSwFocus(M2C_UNK *);                          /* extern */
-extern M2C_UNK B_003DD490;
+struct PO *PpoSwFocus(struct SWVIEW *psw); /* extern */
+extern struct SWVIEW B_003DD490;
 
-s32 FIsPoSwFocus(s32 arg0) {
-    return arg0 == PpoSwFocus(&B_003DD490);
+s32 FIsPoSwFocus(struct PO *ppo) {
+    return ppo == PpoSwFocus(&B_003DD490);
 }

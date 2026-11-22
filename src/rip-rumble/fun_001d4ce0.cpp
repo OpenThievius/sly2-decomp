@@ -1,10 +1,9 @@
-// 0x1D4CE0
-void func_001D4CE0(int a0, int a1, int a2, float a3)
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "vehicle.h"
+
+void func_001D4CE0(VEHICLE *vehicle, int index, int ammoType, float bias)
 {
-    int v0 = 12;
-    int v1 = a1 * v0;
-    v1 = v1 + 0x574;
-    int v2 = a0 + v1;
-    *(int*)(v2 + 4) = a2;
-    *(float*)(v2 + 8) = a3;
+    VEHICLEAMMO *ammo = vehicle->aammo + index;
+    ammo->ammoType = ammoType;
+    ammo->bias = bias;
 }

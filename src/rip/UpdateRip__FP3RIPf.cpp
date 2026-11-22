@@ -1,34 +1,18 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
-extern "C" float g_2dded0;
-extern "C" void RemoveRip(void *);
-
-struct VT2 { char pad[0x38]; short delta; short index; void (*fn)(void *, int); };
-#include "so.h"
-struct GRP { char pad[0x150]; int kind; };
-struct RIP {
-    char pad0[8];
-    GRP *grp;
-    char pad1[0x14 - 0xC];
-    float created;
-    float lifetime;
-    char pad2[0x70 - 0x1C];
-    QW pos;
-    char pad3[0xE0 - 0x80];
-    SO *touch;
-    int unkE4;
-    int unkE8;
-    VT2 *vt;
-};
+#include "rip.h"
+#include "clock.h"
+extern "C" void RemoveRip(RIP *rip);
 
 void UpdateRip(RIP *rip, float dt)
 {
-    if (rip->lifetime < g_2dded0 - rip->created) {
+    if (rip->dtLifetime < g_2dded0.t - rip->tStart) {
         RemoveRip(rip);
         return;
     }
-    if (rip->grp->kind == 1)
+    if (rip->pripg->kind == 1)
         return;
-    SO *touch = rip->touch;
+    SO *touch = rip->psoTouch;
     if (touch == 0)
         return;
     if (touch->pphys == 0)
@@ -38,6 +22,5 @@ void UpdateRip(RIP *rip, float dt)
         if (touch->Slot73(rip->pos) != 0)
             touching = 1;
     }
-    VT2 *vt2 = rip->vt;
-    vt2->fn((char *)rip + vt2->delta, touching);
+    rip->Touch(touching);
 }

@@ -1,12 +1,10 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later */
 #include "sly2.h"
 #include "sw.h"
+#include "amb.h"
+struct COMPONENT { u8 unknown_0x0[0x20]; float gValue; };
 /* class 56 of the class table (0x1010 bytes, derived from class 51), the class FIsBasicDerivedFrom tests below; not named yet */
-struct LO_56 : LO { u8 unknown_0x50[0xF74]; char *pcomponent; };
-struct COMPONENT { char pad[0x20]; float gValue; };
-struct AMB;
-struct VTX { char pad[0x40]; short delta; short index; int (*fn)(void *); };
-struct AMBOBJ { char pad[0xC]; VTX *vt; };
+struct LO_56 : LO { u8 unknown_0x50[0xF74]; COMPONENT *pcomponent; };
 struct LM { float gMin; float gMax; };
 static inline float GLimitLm(LM *plm, float g)
 {
@@ -29,7 +27,7 @@ void SetAmbRange(AMB *, float, float);
 void SetAmbVolume(AMB *, float);
 void SetAmbPitch(AMB *, float);
 void func_001FB520(AMB *, float);
-void VirtualRefPtr_Assign(unsigned *, void *);
+void VirtualRefPtr_Assign(AMB **, AMB *);
 /*
  * Retail copies ploContext ($t2) into $a3 last, after the float arguments, and
  * reloads $a0 from $s0 before PloFindSwObject_thunk: the float parameters are
@@ -41,7 +39,7 @@ void VirtualRefPtr_Assign(unsigned *, void *);
  * stub) takes the emitter in $a0 and the pan in $f12.
  */
 void StartSwAmbSfx(SW *psw, int sfxid, int oid, int sStart, int sFull, LO *plo, float gPitch, float gPan, float uVolume, LO *ploContext, int iUnused,
-                   unsigned *ppambRef)
+                   AMB **ppambRef)
 {
     if (sfxid == -1)
         return;
@@ -51,7 +49,7 @@ void StartSwAmbSfx(SW *psw, int sfxid, int oid, int sStart, int sFull, LO *plo, 
     else
         ploFound = (LO *)PloFindSwObject_thunk(psw, 4, oid, ploContext);
     if (ploFound != 0 && FIsBasicDerivedFrom(ploFound, 0x38) != 0) {
-        COMPONENT *pcomponent = (COMPONENT *)((LO_56 *)ploFound)->pcomponent;
+        COMPONENT *pcomponent = ((LO_56 *)ploFound)->pcomponent;
         if (pcomponent != 0) {
             float gValue = pcomponent->gValue;
             float gCurve = D_FLT_002C3EA0[0] + gValue * (D_FLT_002C3EA0[1] + gValue * D_FLT_002C3EA0[2]);
@@ -65,9 +63,7 @@ void StartSwAmbSfx(SW *psw, int sfxid, int oid, int sStart, int sFull, LO *plo, 
     SetAmbVolume(pamb, uVolume);
     SetAmbPitch(pamb, gPitch);
     func_001FB520(pamb, gPan);
-    AMBOBJ *pobj = (AMBOBJ *)pamb;
-    VTX *vt = pobj->vt;
-    if (vt->fn((char *)pamb + vt->delta) == 2)
+    if (pamb->Slot8() == 2)
         VirtualRefPtr_Assign(ppambRef, pamb);
 }
 }

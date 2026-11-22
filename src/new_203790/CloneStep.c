@@ -1,9 +1,10 @@
-#include "m2c_macros.h"
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "guardview.h"
 
-M2C_UNK ClonePo();                                  /* extern */
-M2C_UNK func_001EEC68(s32, s32);                    /* extern */
+void ClonePo(void *ppo, void *ppoSource);
+void func_001EEC68(struct GOALSTACK *pgoalstack, struct STEPVIEW *pstep);
 
-void CloneStep(s32 arg0) {
-    ClonePo();
-    func_001EEC68(arg0 + 0x26C, arg0);
+void CloneStep(struct STEPVIEW *pstep, struct STEPVIEW *pstepSource) {
+    ClonePo(pstep, pstepSource);
+    func_001EEC68(&pstep->goalstack, pstep);
 }

@@ -1,32 +1,17 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
-extern "C" {
-struct _m2c_stack_RefCallSendTaskTimeLimit {
-    /* 0x00 */ char pad0[0x10];
-    /* 0x10 */ s32 sp10;                            /* inferred */
-    /* 0x14 */ s32 sp14;                            /* inferred */
-    /* 0x18 */ char pad18[0x38];
-};                                                  /* size = 0x50 */
-M2C_UNK CRef_CopyConstruct(s32, s8 *);            /* extern */
-M2C_UNK CRef_Destruct(s8 *);                      /* extern */
-M2C_UNK RefSetArgsFromSplice__FiP4CRefP4OTYPe(s8 *, M2C_UNK, s32, s32 *, s32 *); /* extern */
-M2C_UNK SendTaskTimeLimit(s32, s32);                /* extern */
-M2C_UNK SetTag__4CRef4TAGK(s8 *, M2C_UNK);        /* extern */
-s32 RefCallSendTaskTimeLimit(s32 arg0, s32 arg1, s32 unused_arg2, s32 arg3) {
-    s8 sp[0x10] __attribute__((aligned(16)));
-    s32 sp10;
-    s32 sp14;
-    sp10 = 0;
-    RefSetArgsFromSplice__FiP4CRefP4OTYPe(sp, 1, arg3, &sp10, &sp14);
-    CRef_Destruct(sp);
-    SetTag__4CRef4TAGK(sp, 0x24);
-    SendTaskTimeLimit(arg1, sp14);
-    CRef_CopyConstruct(arg0, sp);
-    CRef_Destruct(sp);
-    return arg0;
-}
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "sly2.h"
+#include "cref.h"
+CRef RefSetArgsFromSplice(int cref, CRef *aref, const void *aotyp, ...);
+struct TASK;
+extern "C" void SendTaskTimeLimit(TASK *, int);
+
+extern "C" CRef RefCallSendTaskTimeLimit(TASK *object, int count, CRef *args)
+{
+    int aotyp = 0;
+    int timeLimit;
+    RefSetArgsFromSplice(1, args, &aotyp, &timeLimit);
+    CRef refResult;
+    refResult.SetTag(TAGK_Void);
+    SendTaskTimeLimit(object, timeLimit);
+    return refResult;
 }

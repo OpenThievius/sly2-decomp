@@ -1,5 +1,6 @@
-int FUN_001f2758(void *pso)
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "so.h"
+int FUN_001f2758(SO *pso)
 {
-    unsigned long v = *(unsigned long *)((char *)pso + 0xd0);
-    return (int)(v >> 34) & 1;
+    return (int)(pso->field_0xD0 >> 34) & 1;
 }

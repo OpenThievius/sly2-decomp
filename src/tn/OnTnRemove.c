@@ -1,9 +1,10 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "tn.h"
 
-M2C_UNK RemoveAloHierarchy();                       /* extern */
-M2C_UNK SetTnTns__FP2TN3TNS(s32, M2C_UNK);          /* extern */
+void RemoveAloHierarchy(struct TN *tn);             /* extern */
+void SetTnTns__FP2TN3TNS(struct TN *tn, enum TNS tns); /* extern */
 
-void OnTnRemove(s32 arg0) {
-    RemoveAloHierarchy();
-    SetTnTns__FP2TN3TNS(arg0, 0);
+void OnTnRemove(struct TN *tn) {
+    RemoveAloHierarchy(tn);
+    SetTnTns__FP2TN3TNS(tn, TNS_OFF);
 }

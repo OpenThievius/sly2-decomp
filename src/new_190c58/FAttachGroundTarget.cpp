@@ -1,26 +1,23 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-#include "sly2.h"
-#include "sw.h"
+#include "attach.h"
 // A candidate of the world's target list (SW::atgt, 0x30 bytes) as this function reads it: word 0 an object it passes to
-// FIsBasicDerivedFrom (UpdateSwTargetList reads the same word as an object id, TGT::oid), word 1 a member, word 2 the distance (TGT::sRank).
-struct TARGET { void *plo; void *pmember; float dist; char pad[0x30 - 0xC]; };
-struct ATTACH { void *pjt; };
+// FIsBasicDerivedFrom (UpdateSwTargetList reads the same word as an object id, TGT::oid), word 1 a member index, word 2 the distance (TGT::sRank).
+struct TARGETVIEW { LO *plo; s32 imember; float dist; u8 unknown_0xC[0x30 - 0xC]; };
 extern SW B_003DD490;
-extern void *g_2e1e40;
+extern SLY *g_2e1e40; /* the player */
 extern float D_FLT_002BF660;
 extern "C" {
 int FIsBasicDerivedFrom(void *, int);
-void StartAttach(ATTACH *, int, void *, void *);
 }
 int FAttachGroundTarget(ATTACH *pattach)
 {
     int itarget = 0;
     int ctarget = B_003DD490.ctgt;
     for (; itarget < ctarget; itarget++) {
-        TARGET *ptarget = (TARGET *)&B_003DD490.atgt[itarget];
+        TARGETVIEW *ptarget = (TARGETVIEW *)&B_003DD490.atgt[itarget];
         if (ptarget->dist > D_FLT_002BF660)
             break;
-        void *plo = ptarget->plo;
+        LO *plo = ptarget->plo;
         int kind;
         if (FIsBasicDerivedFrom(plo, 0x13) || FIsBasicDerivedFrom(plo, 0xB)) {
             kind = pattach->pjt == g_2e1e40 ? 6 : 5;
@@ -36,7 +33,7 @@ int FAttachGroundTarget(ATTACH *pattach)
             kind = -1;
         }
         if (kind != -1) {
-            StartAttach(pattach, kind, plo, ptarget->pmember);
+            StartAttach(pattach, kind, plo, ptarget->imember);
             return 1;
         }
     }

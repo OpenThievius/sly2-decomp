@@ -1,11 +1,12 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "emitter.h"
 
-M2C_UNK CloneXfm();                                 /* extern */
+void CloneXfm();
 
-void CloneEmitter__FP7EMITTERT0(void *arg0) {
-    s32 *temp_v1;
+void CloneEmitter__FP7EMITTERT0(struct EMITTER *emitter) {
+    struct EMITB *emitb;
 
     CloneXfm();
-    temp_v1 = M2C_FIELD(arg0, s32 **, 0xE4);
-    *temp_v1 += 1;
+    emitb = emitter->pemitb;
+    emitb->cref += 1;
 }

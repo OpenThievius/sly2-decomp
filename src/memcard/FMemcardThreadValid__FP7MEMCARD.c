@@ -1,5 +1,8 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "types.h"
 
-s32 FMemcardThreadValid__FP7MEMCARD(void *arg0) {
-    return ~M2C_FIELD(arg0, s32 *, 4) != 0;
+#include "memcard.h"
+
+s32 FMemcardThreadValid__FP7MEMCARD(MEMCARD *card) {
+    return ~card->threadId != 0;
 }

@@ -1,18 +1,11 @@
-#include "sly2.h"
-struct GVT { short delta; short index; void (*fn)(void *, int); };
-struct GADGET { char pad0[0xC]; GVT *vt; char pad1[0x15C - 0x10]; int kind; };
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "gadgetobj.h"
 
-static inline void SetState(GADGET *pgadget, int state)
+void ReleaseGadgetObj(GADGETOBJ *pgadget)
 {
-    GVT *slot = &pgadget->vt[0x4C];
-    slot->fn((char *)pgadget + slot->delta, state);
-}
-
-void ReleaseGadgetObj(GADGET *pgadget)
-{
-    if (pgadget->kind == 0xB) {
-        SetState(pgadget, 5);
+    if (pgadget->gadget == 0xB) {
+        pgadget->SetState(5);
         return;
     }
-    SetState(pgadget, 3);
+    pgadget->SetState(3);
 }

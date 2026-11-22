@@ -1,11 +1,9 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "jtview.h"
 
-M2C_UNK Goal_Deactivate();                          /* extern */
+void Goal_Deactivate(struct GOALPARTNERATTACK *pgoal);
 
-void func_00146260(void *arg0) {
-    void *temp_a0;
-
-    Goal_Deactivate();
-    temp_a0 = M2C_FIELD(arg0, void **, 0x10);
-    M2C_FIELD(temp_a0, s32 *, 0x10E0) = (s32) (M2C_FIELD(temp_a0, s32 *, 0x10E0) & ~1);
+void func_00146260(struct GOALPARTNERATTACK *pgoal) {
+    Goal_Deactivate(pgoal);
+    GOAL_JT(pgoal)->fFocusBusy &= ~1;
 }

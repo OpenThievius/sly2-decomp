@@ -1,8 +1,9 @@
-#include "m2c_macros.h"
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "factory.h"
 
-M2C_UNK CM_Construct(s32);                          /* extern */
-s32 __builtin_new(M2C_UNK);                         /* extern */
+void *CM_Construct(void *);
 
-void func_00112DA8(void) {
+void func_00112DA8(void)
+{
     CM_Construct(__builtin_new(0x630));
 }

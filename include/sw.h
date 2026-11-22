@@ -11,6 +11,8 @@
 #define SLY2_SW_H
 #include "lo.h"
 #include "dl.h"
+#include "sl.h"
+#include "dcb.h"
 
 struct BLOCK;
 struct TIMEDCALL;
@@ -28,6 +30,13 @@ struct CB;
 struct SWNODE;
 struct PZGRAPH;
 struct SWSTRING;
+struct JOY;
+struct LIGHT;
+
+/* a 0x28-byte entry of the world's table at 0x45E8: AllocSwBuffers passes each to func_001BE398 with an initialised ZPR */
+struct ZPRENTRY {
+    u8 unknown_0x0[0x28];
+};
 
 /* A level load request (SetSwLoadRequest copies one, 0x4C bytes, into the world). func_00165280 and func_0020E180 test and set
    bits 4 and 8 of its first word; func_00165280 also writes 0x44 and 0x48. */
@@ -84,10 +93,29 @@ struct TGT {
     /* 0x20 */ QW pos;
 };
 
+/* An entry of the world's HUD blot table (0xC bytes, four of them from 0x3BA0): InitSwHudBlots fills the first word. */
+struct HUDBLOT {
+    /* 0x0 */ struct LO *plo; /* the blot object InitSwHudBlots found */
+    u8 unknown_0x4[0x8];
+};
+
 struct SW : BASIC {
-    u8 unknown_0x10[0x140];
+    u8 unknown_0x10[0x10];
+    /* 0x20 */ DL dlRoot;  /* the world's root objects: RemoveSwRoot (FFindDlEntry, RemoveDlEntry), ReinsertSwRoot (InsertDlEntryBefore), RemoveSwRootRaw (RemoveDlEntry) */
+    u8 unknown_0x2C[0x124];
     /* 0x150 */ s32 state; /* FUpdateSwDuringWipe */
-    u8 unknown_0x154[0x3894];
+    u8 unknown_0x154[0x2EE4];
+    /* 0x3038 */ SL aslCid[199]; /* one list of objects per class id, linked through LO::ploNextCid (InitSl ibSle 0x20): PdlFromSwCid,
+                                    Sw_Construct, func_002102A0 */
+    u8 unknown_0x398C[0x18];
+    /* 0x39A4 */ void *field_0x39A4; /* RetractSwRoot: set to the root it moves when null */
+    u8 unknown_0x39A8[0x28];
+    /* 0x39D0 */ struct DCB *adcb; /* the object callback pool PdcbAllocSw hands out from (12-byte entries); func_0020E740 empties it */
+    /* 0x39D4 */ s32 cdcb;         /* PdcbAllocSw: the next free entry */
+    /* 0x39D8 */ struct OPTSET *aoptset; /* the option-set pool func_00210120 hands out from (12-byte entries); func_0020E740 empties it */
+    /* 0x39DC */ s32 coptset;      /* func_00210120: the next free entry */
+    /* 0x39E0 */ struct LO **pploPostLoadBegin; /* the objects PloNew queued for their PostLoad (slot 15): func_0020E740 calls it on each */
+    /* 0x39E4 */ struct LO **pploPostLoadEnd;   /* PloNew appends at it; func_0020E740 resets it to pploPostLoadBegin after each pass */
     /* 0x39E8 */ struct BLOCK *pblockCur; /* func_001FFA40 */
     u8 unknown_0x39EC[0x4];
     /* 0x39F0 */ struct TIMEDCALL *ptimedcallFirst; /* the pending timed calls, func_00133130 */
@@ -99,7 +127,7 @@ struct SW : BASIC {
     /* 0x3B0C */ struct JOB *pjobCurrent; /* SetSwCurrentJob; func_001619A0, func_001649D0, func_0019D948 */
     /* 0x3B10 */ struct TASK *ptaskCurrent; /* SetSwCurrentTask, func_00163C28 */
     /* 0x3B14 */ struct TASK *ptaskRestart; /* SetSwRestartTask, func_00162A60 */
-    u8 unknown_0x3B18[0x4];
+    /* 0x3B18 */ struct JOB *pjobPending; /* ShutdownSwForLoad ends it and clears it; bevy_jobs_162e38 tests it */
     /* 0x3B1C */ struct SAVEPATH *psavepathDt; /* save path "dt" (CreateSwSavePaths; the paths are PsavepathNew handles, passed on as int) */
     /* 0x3B20 */ struct SAVEPATH *psavepathCcoin; /* "loot/ccoin" */
     /* 0x3B24 */ struct SAVEPATH *psavepathWidCurrent; /* "widCurrent" */
@@ -117,7 +145,9 @@ struct SW : BASIC {
     /* 0x3B54 */ struct SAVEPATH *psavepathAutosaveWarned; /* "flags/fAutosaveWarned" */
     /* 0x3B58 */ struct SAVEPATH *apsavepathEpisodeDt[9]; /* "episode/<name>/dt" per episode */
     /* 0x3B7C */ struct SAVEPATH *apsavepathEpisodePercent[9]; /* "episode/<name>/percent_complete" per episode */
-    u8 unknown_0x3BA0[0x4C];
+    /* 0x3BA0 */ HUDBLOT ahudblot[4]; /* InitSwHudBlots finds one blot object per entry (object ids D_002C3E70) and stores it in the first word */
+    u8 unknown_0x3BD0[0x18];
+    /* 0x3BE8 */ void *pfont; /* PostBlotLoad finds it once (object 0x374) when a blot needs it; func_00215AC0, func_00215BA8 read its word 0x54; func_00216BC8 */
     /* 0x3BEC */ s32 cblotActive; /* SetBlotBlots counts the blots of 16 frames or more that enter state 2 and up */
     /* 0x3BF0 */ s32 fLoadPending; /* SetSwLoadRequest sets it with the request */
     /* 0x3BF4 */ LOADREQ loadreq; /* SetSwLoadRequest copies one in whole */
@@ -143,14 +173,24 @@ struct SW : BASIC {
     /* 0x3D68 */ s32 idHitfxLast; /* func_00156548 increments it for each new hit effect */
     u8 unknown_0x3D6C[0x4];
     /* 0x3D70 */ s32 stamp; /* func_001C1968 */
-    u8 unknown_0x3D74[0x14];
+    /* 0x3D74 */ s32 pzlinkChange; /* AddPzlinkHierarchy and RemovePzlinkHierarchy (PZLINK slots 11 and 12) agree: each adds 1 and copies it to ppzgraph->stamp */
+    /* 0x3D78 */ s32 chandsOff;    /* SetHandsOff (+1; the first one calls AddGrfusr(2)), ClearHandsOff (-1; the last one calls RemoveGrfusr(2)),
+                                      FSwHandsOff (> 0) */
+    /* 0x3D7C */ s32 chandsOffSw;  /* IncrementSwHandsOff (+1; the first one calls AddGrfusr(4)), DecrementSwHandsOff (-1; the last one calls
+                                      RemoveGrfusr(4)) */
+    /* 0x3D80 */ s32 cshow; /* IncrementSwShowCount, DecrementSwShowCount: the shows in progress; the world's show object is started at 1 and stopped at 0 */
+    /* 0x3D84 */ s32 cbinoc; /* IncrementSwBinocCount, DecrementSwBinocCount, FSwBinocActive (> 0) */
     /* 0x3D88 */ DL dlAsega; /* UpdateSw walks it with UpdateAsega; Sw_Construct initialises it with ibDle 0x24 */
-    u8 unknown_0x3D94[0xA4];
+    u8 unknown_0x3D94[0x7C];
+    /* 0x3E10 */ QW hsvFog; /* SetSwFogHsv; UpdateSwFog converts it (hue, saturation and value in 0..255) */
+    /* 0x3E20 */ f32 scaleFog; /* func_0020F2F8; UpdateSwFog scales the fog colour by it / 255 */
+    /* 0x3E24 */ f32 alphaFog; /* func_0020F2D8; UpdateSwFog turns it into the fog alpha */
+    u8 unknown_0x3E28[0x10];
     /* 0x3E38 */ s32 field_0x3E38; /* AllocSwBuffers sets it when the load request has bit 0x20; UpdateCmLast, RestartAtTask test it */
     u8 unknown_0x3E3C[0x64];
     /* 0x3EA0 */ u64 gs; /* a GS register value, func_001EA9F0 */
     u8 unknown_0x3EA8[0x4];
-    /* 0x3EAC */ void *pvjoyFirst; /* a list linked at 0x84: UpdateSw calls UpdateVjoy on each; Sw_Construct's InitSl gives the link */
+    /* 0x3EAC */ struct JOY *pvjoyFirst; /* a list linked at 0x84: UpdateSw calls UpdateVjoy on each; Sw_Construct's InitSl gives the link */
     u8 unknown_0x3EB0[0x8];
     /* 0x3EB8 */ s32 clo; /* func_001C4AF8 */
     /* 0x3EBC */ struct LO *aplo[16]; /* func_001C4AF8; at most 16 (the focus follows at 0x3EFC) */
@@ -168,24 +208,34 @@ struct SW : BASIC {
     /* 0x3FFC */ DL dlHitfx; /* func_00156548 */
     /* 0x4008 */ SLOTHEAP slotheapHitfx; /* func_00156548 */
     /* 0x4020 */ struct BASIC *phitfxdef; /* func_0017A7F8 hands it to PhitfxSpawn, whose Splice binding passes a BASIC */
-    u8 unknown_0x4024[0x8];
+    u8 unknown_0x4024[0x4];
+    /* 0x4028 */ void *field_0x4028; /* GoalAnimLeap_FHandleMessage: the first argument of PhitfxSpawn, as phitfxdef (0x4020) and field_0x402C are for others */
     /* 0x402C */ s32 field_0x402C; /* ExplodeGadgetBurst passes it to PhitfxSpawn (a hit effect id/def) */
     u8 unknown_0x4030[0xC];
     /* 0x403C */ SLOTHEAP slotheapRipg; /* PripgNew */
     /* 0x4054 */ SLOTHEAP slotheapRip; /* PripNewRipg */
     /* 0x406C */ struct PRIPG *pripgCached; /* PripgNew */
     /* 0x4070 */ SLOTHEAP slotheapBlipg; /* PblipgNew */
-    u8 unknown_0x4088[0x90];
+    /* 0x4088 */ SLOTHEAP slotheapBlip; /* the blips: PblipNew allocates one; Sw_Construct creates it (0x10C0-byte slots), func_0020E740 primes it */
+    /* 0x40A0 */ SLOTHEAP slotheapBlipSp; /* the sprite data of a blip of mode 2: PblipNew allocates it, Sw_Construct creates it (0x560-byte slots) */
+    u8 unknown_0x40B8[0x60];
     /* 0x4118 */ SLOTHEAP slotheapWkr; /* ExpireSwWkrs */
     /* 0x4130 */ DL dlWkr; /* ExpireSwWkrs */
-    u8 unknown_0x413C[0x41C];
+    u8 unknown_0x413C[0x18];
+    /* 0x4154 */ struct LIGHT *aplight[0x100]; /* RemoveLightFromSw clears a light's slot, func_001A3EE8 walks them (AddLightToSw adds each) */
+    /* 0x4554 */ s32 fLightsDirty;         /* RemoveLightFromSw sets it, func_001A3EE8 clears it and rebuilds the light sets */
     /* 0x4558 */ s32 cbspnode; /* func_0013E0E0 */
     /* 0x455C */ struct BSPNODE *abspnode; /* func_0013E0E0 */
     /* 0x4560 */ s32 cregion; /* func_0013E0E0 */
     /* 0x4564 */ void *aregion; /* func_0013E0E0 (0x20-byte elements) */
-    u8 unknown_0x4568[0x64];
+    u8 unknown_0x4568[0x8];
+    /* 0x4570 */ u8 setLightsGlobal[0x20];  /* func_001A3EE8 clears it before it re-adds the lights */
+    /* 0x4590 */ u32 grfLightSlotFree[8];   /* RemoveLightFromSw sets the bit of a freed light slot */
+    u8 unknown_0x45B0[0x18];
+    /* 0x45C8 */ struct LO *ploPathzoneDefault; /* func_001C10C8 creates the default pathzone (PloNew class 0x11) and keeps it here until the graph exists */
     /* 0x45CC */ struct PZGRAPH *ppzgraph; /* AddSoLoHierarchy */
-    u8 unknown_0x45D0[0x68];
+    u8 unknown_0x45D0[0x18];
+    /* 0x45E8 */ struct ZPRENTRY azprentry[2]; /* AllocSwBuffers fills each with func_001BE398 and a fresh ZPR */
     /* 0x4638 */ void *ppool; /* func_0013CF38 */
     u8 unknown_0x463C[0x4];
     /* 0x4640 */ s32 field_0x4640; /* func_00210BE0, func_00211EC0 test it; LoadSwStringsFromBrx stores the string count */
@@ -201,20 +251,51 @@ struct SW : BASIC {
     /* 0x4754 */ f32 tL3; /* func_00140338 */
     u8 unknown_0x4758[0x4];
     /* 0x475C */ f32 sTimeScale; /* StartSwAmbSfx adds it to the pitch */
-    u8 unknown_0x4760[0x14];
+    u8 unknown_0x4760[0x4];
+    /* 0x4764 */ s32 cclueFound; /* InitSwHudBlots stores CcluesFound() */
+    /* 0x4768 */ s32 field_0x4768; /* InitSwHudBlots stores func_001C7D00()'s result */
+    u8 unknown_0x476C[0x8];
     /* 0x4774 */ struct TARGET *ptarget; /* func_0015DA88 */
     u8 unknown_0x4778[0x18];
 };
 
 #if defined(__mips__)
 SLY2_OFFSET_CHECK(SW, astring, 0x4644);
+SLY2_OFFSET_CHECK(SW, field_0x4028, 0x4028);
 SLY2_OFFSET_CHECK(SW, field_0x402C, 0x402C);
 SLY2_SIZE_CHECK(SLOTHEAP, 0x18);
 SLY2_SIZE_CHECK(LOADREQ, 0x4C);
 SLY2_SIZE_CHECK(GRFENTRY, 0x8);
 SLY2_SIZE_CHECK(TGT, 0x30);
 SLY2_SIZE_CHECK(SW, 0x4790);
+SLY2_SIZE_CHECK(HUDBLOT, 0xC);
+SLY2_OFFSET_CHECK(SW, ahudblot, 0x3BA0);
+SLY2_OFFSET_CHECK(SW, cshow, 0x3D80);
+SLY2_OFFSET_CHECK(SW, cbinoc, 0x3D84);
+SLY2_OFFSET_CHECK(SW, hsvFog, 0x3E10);
+SLY2_OFFSET_CHECK(SW, scaleFog, 0x3E20);
+SLY2_OFFSET_CHECK(SW, alphaFog, 0x3E24);
+SLY2_OFFSET_CHECK(SW, cclueFound, 0x4764);
 SLY2_OFFSET_CHECK(SW, state, 0x150);
+SLY2_OFFSET_CHECK(SW, aslCid, 0x3038);
+SLY2_OFFSET_CHECK(SW, field_0x39A4, 0x39A4);
+SLY2_OFFSET_CHECK(SW, adcb, 0x39D0);
+SLY2_OFFSET_CHECK(SW, coptset, 0x39DC);
+SLY2_OFFSET_CHECK(SW, pploPostLoadBegin, 0x39E0);
+SLY2_OFFSET_CHECK(SW, pploPostLoadEnd, 0x39E4);
+SLY2_OFFSET_CHECK(SW, pjobPending, 0x3B18);
+SLY2_OFFSET_CHECK(SW, pfont, 0x3BE8);
+SLY2_OFFSET_CHECK(SW, pzlinkChange, 0x3D74);
+SLY2_OFFSET_CHECK(SW, chandsOff, 0x3D78);
+SLY2_OFFSET_CHECK(SW, chandsOffSw, 0x3D7C);
+SLY2_OFFSET_CHECK(SW, slotheapBlip, 0x4088);
+SLY2_OFFSET_CHECK(SW, slotheapBlipSp, 0x40A0);
+SLY2_OFFSET_CHECK(SW, aplight, 0x4154);
+SLY2_OFFSET_CHECK(SW, fLightsDirty, 0x4554);
+SLY2_OFFSET_CHECK(SW, setLightsGlobal, 0x4570);
+SLY2_OFFSET_CHECK(SW, grfLightSlotFree, 0x4590);
+SLY2_OFFSET_CHECK(SW, ploPathzoneDefault, 0x45C8);
+SLY2_OFFSET_CHECK(SW, azprentry, 0x45E8);
 SLY2_OFFSET_CHECK(SW, pblockCur, 0x39E8);
 SLY2_OFFSET_CHECK(SW, fAaoxDirty, 0x3CCC);
 SLY2_OFFSET_CHECK(SW, ptimedcallFirst, 0x39F0);
@@ -259,6 +340,7 @@ SLY2_OFFSET_CHECK(SW, frameLast, 0x3D64);
 SLY2_OFFSET_CHECK(SW, idHitfxLast, 0x3D68);
 SLY2_OFFSET_CHECK(SW, stamp, 0x3D70);
 SLY2_OFFSET_CHECK(SW, field_0x3E38, 0x3E38);
+SLY2_OFFSET_CHECK(SW, dlRoot, 0x20);
 SLY2_OFFSET_CHECK(SW, dlAsega, 0x3D88);
 SLY2_OFFSET_CHECK(SW, gs, 0x3EA0);
 SLY2_OFFSET_CHECK(SW, pvjoyFirst, 0x3EAC);

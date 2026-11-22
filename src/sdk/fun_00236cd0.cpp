@@ -1,13 +1,14 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later */
 #include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
 extern "C" {
-struct _m2c_stack_func_00236CD0 {};                 /* size 0x0 */
-void func_00236CD0(s8 *arg0) {
-    M2C_FIELD(arg0, s32 *, 0x18) = 0;
-    M2C_FIELD(arg0, s32 *, 0x10) = (s32) (M2C_FIELD(arg0, s32 *, 0x10) & 0xFFFFFFFE);
+struct FLAGGEDOBJECT {
+    u8 unknown_0x0[0x10];
+    u32 flags;
+    u8 unknown_0x14[4];
+    s32 field_0x18;
+};
+void func_00236CD0(FLAGGEDOBJECT *object) {
+    object->field_0x18 = 0;
+    object->flags = object->flags & 0xFFFFFFFE;
 }
 }

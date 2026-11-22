@@ -1,31 +1,23 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "rtalo.h"
 extern "C" {
-struct _m2c_stack_func_001BEE60 {
-    /* 0x00 */ char pad0[0x40];
-};                                                  /* size = 0x40 */
+void func_00169198(void *pglobset, RTALO *prtalo);
 
-void func_00169198(s32, s8 *);
+void func_001BEE60(RTALO *prtalo) {
+    SO **ppso;
+    SO *pso;
+    s32 ichild;
 
-void func_001BEE60(s8 *arg0) {
-    s32 *var_s1;
-    s32 temp_a0;
-    s32 var_s2;
-
-    if (M2C_FIELD(arg0, s32 *, 0x128) != 0) {
-        var_s2 = 0;
-        if (M2C_FIELD(arg0, s32 *, 0xE0) > 0) {
-            var_s1 = (s32 *)(arg0 + 0xE4);
+    if (prtalo->pwindow != 0) {
+        ichild = 0;
+        if (prtalo->count > 0) {
+            ppso = prtalo->apso;
             do {
-                temp_a0 = *var_s1;
-                var_s2 += 1;
-                var_s1 += 1;
-                func_00169198(temp_a0 + 0x80, arg0);
-            } while (var_s2 < M2C_FIELD(arg0, s32 *, 0xE0));
+                pso = *ppso;
+                ichild += 1;
+                ppso += 1;
+                func_00169198(&pso->field_0x80, prtalo);
+            } while (ichild < prtalo->count);
         }
     }
 }

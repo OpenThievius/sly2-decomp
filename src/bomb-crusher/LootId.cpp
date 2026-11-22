@@ -1,9 +1,12 @@
-extern "C" int LootId(void* arg0)
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "types.h"
+#include "loot.h"
+extern "C" int LootId(LOOT *loot)
 {
-    int* temp_v1 = *(int**)((char*)arg0 + 0x158);
-    int var_v0 = -1;
-    if (temp_v1 != 0) {
-        var_v0 = *temp_v1;
+    LOOTDEF *plootdef = loot->plootdefSel;
+    int id = -1;
+    if (plootdef != 0) {
+        id = plootdef->id;
     }
-    return var_v0;
+    return id;
 }

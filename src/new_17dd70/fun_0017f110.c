@@ -1,8 +1,15 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "types.h"
 
-M2C_UNK RemoveSoLoHierarchy();                      /* extern */
+/* the part of SOHIT (sohit.h, C++ only) this function writes; same offset */
+struct SOHITVIEW {
+    u8 unknown_0x0[0x18C];
+    s32 fTouchQueued;
+};
 
-void func_0017F110(void *arg0) {
-    RemoveSoLoHierarchy();
-    M2C_FIELD(arg0, s32 *, 0x18C) = 0;
+void RemoveSoLoHierarchy(struct SOHITVIEW *pso);
+
+void func_0017F110(struct SOHITVIEW *pso) {
+    RemoveSoLoHierarchy(pso);
+    pso->fTouchQueued = 0;
 }

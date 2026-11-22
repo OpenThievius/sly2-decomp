@@ -1,9 +1,10 @@
-#include "m2c_macros.h"
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "guard.h"
 
-M2C_UNK ResetAnimref(s32, s32);                     /* extern */
+void ResetAnimref(struct ANIMREF *panimref, struct STEPGUARD *pguard);
 
-void func_0020AF38(void *arg0, s32 arg1, s32 arg2) {
-    ResetAnimref(arg0 + 0xB0, M2C_FIELD(arg0, s32 *, 0xAC));
-    M2C_FIELD(arg0, s32 *, 0xB4) = arg1;
-    M2C_FIELD(arg0, s32 *, 0xBC) = arg2;
+void func_0020AF38(struct AIMSTATE *paim, void *pdata, u32 grf) {
+    ResetAnimref(&paim->animref, paim->pguard);
+    paim->animref.pdata = pdata;
+    paim->animref.grf = grf;
 }

@@ -1,9 +1,12 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "memcard.h"
 
-M2C_UNK InitSave(M2C_UNK *, M2C_UNK, M2C_UNK);      /* extern */
-M2C_UNK JobMgr_Construct(M2C_UNK *);                /* extern */
-extern M2C_UNK B_002DEB30;
-extern M2C_UNK B_002E65E0;
+struct JOBMGR;
+
+void InitSave(SAVE *psave, s32 port, s32 slot);
+void JobMgr_Construct(struct JOBMGR *pjobmgr);
+extern struct JOBMGR B_002DEB30;
+extern SAVE B_002E65E0;
 extern s32 B_004425D8;
 
 void func_001AA978(void) {

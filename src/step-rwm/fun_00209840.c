@@ -1,12 +1,13 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "guardview.h"
 
-void func_00209840(void *arg0, void *arg1) {
-    void *temp_a0;
+void func_00209840(struct GUARDHEADING *pheading, struct MATRIX3Q *pmat) {
+    struct STEPVIEW *pstep;
 
-    if (M2C_FIELD(arg0, s32 *, 4) == 0) {
-        temp_a0 = M2C_FIELD(arg0, void **, 0xC);
-        M2C_FIELD(temp_a0, s128 *, 0x1B0) = (s128) M2C_FIELD(arg1, s128 *, 0);
-        M2C_FIELD(temp_a0, s128 *, 0x1C0) = (s128) M2C_FIELD(arg1, s128 *, 0x10);
-        M2C_FIELD(temp_a0, s128 *, 0x1D0) = (s128) M2C_FIELD(arg1, s128 *, 0x20);
+    if (pheading->fHold == 0) {
+        pstep = (struct STEPVIEW *)pheading->pstep;
+        pstep->matHeading.row[0] = pmat->row[0];
+        pstep->matHeading.row[1] = pmat->row[1];
+        pstep->matHeading.row[2] = pmat->row[2];
     }
 }

@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 struct VT { char pad[0x40]; short delta; short index; void (*fn)(void *); };
 #include "stepguard.h"
-struct GUARDTARGET { char pad[0xC]; int palo; };
 struct OBJ { char pad[0xC]; VT *vt; };
 #include "goal.h"
 struct GOAL_17C550 : GOAL {
@@ -20,7 +19,7 @@ void func_0017C550(GOAL_17C550 *pgoal, int nState)
     switch (nState) {
     case 0: {
         OBJ *pobj = func_00205438(((STEPGUARD *)pgoal->pstep), 0x9E);
-        F(pobj, 0x38, int) = ((STEPGUARD *)pgoal->pstep)->ptarget->palo;
+        F(pobj, 0x38, int) = (int)((STEPGUARD *)pgoal->pstep)->palert->palo;
         VT *vt = pobj->vt;
         vt->fn((char *)pobj + vt->delta);
         break;
@@ -29,7 +28,7 @@ void func_0017C550(GOAL_17C550 *pgoal, int nState)
         OBJ *pobj = func_00205438(((STEPGUARD *)pgoal->pstep), 0xA7);
         GoalFollowCrv_SetCrv(pobj, ((STEPGUARD *)pgoal->pstep)->pcrv, 0);
         F(pobj, 0xC0, int) = 8;
-        F(pobj, 0xC8, int) = ((STEPGUARD *)pgoal->pstep)->ptarget->palo;
+        F(pobj, 0xC8, int) = (int)((STEPGUARD *)pgoal->pstep)->palert->palo;
         VT *vt = pobj->vt;
         vt->fn((char *)pobj + vt->delta);
         break;

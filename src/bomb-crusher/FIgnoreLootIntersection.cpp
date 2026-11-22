@@ -1,11 +1,16 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "types.h"
+#include "loot.h"
 extern "C" int FIsBasicDerivedFrom(void *, int);
 extern "C" int FIgnoreSoIntersection(void *, void *);
 
-int FIgnoreLootIntersection(char *arg0, char *arg1) {
-    if (*(int *)(arg0 + 0x184) == 5) {
-        if (FIsBasicDerivedFrom(*(void **)*(char **)(arg1 + 0x14), 0x34)) {
+struct XP_13C278 { u8 unknown_0x0[0x14]; void **pplo; };
+
+int FIgnoreLootIntersection(LOOT *loot, XP_13C278 *pxp) {
+    if (loot->state == 5) {
+        if (FIsBasicDerivedFrom(*pxp->pplo, 0x34)) {
             return 3;
         }
     }
-    return FIgnoreSoIntersection(arg0, arg1);
+    return FIgnoreSoIntersection(loot, pxp);
 }

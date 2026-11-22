@@ -1,6 +1,8 @@
-extern "C" void InitXfm_thunk(void *);
-void InitSpire(void *pspire)
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "spire.h"
+extern "C" void InitXfm_thunk(SPIRE *);
+void InitSpire(SPIRE *pspire)
 {
     InitXfm_thunk(pspire);
-    *(float *)((char *)pspire + 0x108) = 3.402823466e+38f;
+    pspire->dzMax = 3.402823466e+38f;
 }

@@ -1,5 +1,6 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "rip.h"
 
-void SetRipgEmitb__FP4RIPGP5EMITB(void *arg0, void *arg1) {
-    M2C_FIELD(arg0, f32 *, 0x158) = (f32) M2C_FIELD(arg1, f32 *, 0xD4);
+void SetRipgEmitb__FP4RIPGP5EMITB(struct RIPG *ripg, struct EMITB *emitb) {
+    ripg->field_0x158 = emitb->params.field_0x14;
 }

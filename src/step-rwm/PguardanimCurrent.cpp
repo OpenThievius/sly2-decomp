@@ -1,10 +1,11 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
+#include "stepguard.h"
 
-extern "C" void* PguardanimBestMatch(void* p0, unsigned long a1);
+extern "C" GUARDANIM *PguardanimBestMatch(STEPGUARD *pguard, unsigned long grf);
 
 // 0x209BC0 PguardanimCurrent
-void* PguardanimCurrent(void* pstepguard)
+GUARDANIM *PguardanimCurrent(STEPGUARD *pstepguard)
 {
-    unsigned long arg1 = *(unsigned long*)((char*)pstepguard + 0x2C0);
-    return PguardanimBestMatch(pstepguard, arg1);
+    return PguardanimBestMatch(pstepguard, pstepguard->grfsgs);
 }

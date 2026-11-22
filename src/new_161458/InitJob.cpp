@@ -1,27 +1,20 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "job.h"
+
 extern "C" {
-struct _m2c_stack_InitJob {
-    /* 0x00 */ char pad0[0x20];
-};                                                  /* size = 0x20 */
+void InitLo(LO *plo);
+void InitSl(SLLIST *psllist, s32 ibLink);
 
-M2C_UNK InitLo();                                   /* extern */
-M2C_UNK InitSl(s32, M2C_UNK);                       /* extern */
-
-void InitJob(s8 *arg0) {
-    InitLo();
-    M2C_FIELD(arg0, f32 *, 0x9C) = 480.0f;
-    M2C_FIELD(arg0, f32 *, 0xA0) = 720.0f;
-    M2C_FIELD(arg0, s32 *, 0x6C) = -1;
-    M2C_FIELD(arg0, s32 *, 0x70) = -1;
-    M2C_FIELD(arg0, s32 *, 0xAC) = -1;
-    M2C_FIELD(arg0, s32 *, 0xB0) = -1;
-    M2C_FIELD(arg0, s32 *, 0xB4) = -1;
-    InitSl((sptr)(arg0 + 0x80), 0x84);
+void InitJob(JOB *pjob) {
+    InitLo(pjob);
+    pjob->field_0x9C = 480.0f;
+    pjob->field_0xA0 = 720.0f;
+    pjob->field_0x6C = -1;
+    pjob->field_0x70 = -1;
+    pjob->field_0xAC = -1;
+    pjob->field_0xB0 = -1;
+    pjob->field_0xB4 = -1;
+    InitSl(&pjob->sllist, 0x84);
 }
 
 }

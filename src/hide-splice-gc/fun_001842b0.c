@@ -1,12 +1,13 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "pzo_hide.h"
 
-s32 PloFindSwObject_thunk(M2C_UNK *, M2C_UNK, s32, void *); /* extern */
-M2C_UNK func_00183F50();                            /* extern */
-extern M2C_UNK B_003DD490;
+void *PloFindSwObject_thunk(void *, int, int, void *);
+void func_00183F50(struct LIFTPT *);
+extern char B_003DD490[];
 
-void func_001842B0(void *arg0) {
-    func_00183F50();
-    M2C_FIELD(arg0, s32 *, 0x188) = PloFindSwObject_thunk(&B_003DD490, 4, M2C_FIELD(arg0, s32 *, 0x184), arg0);
-    M2C_FIELD(arg0, s32 *, 0x190) = PloFindSwObject_thunk(&B_003DD490, 4, M2C_FIELD(arg0, s32 *, 0x18C), arg0);
-    M2C_FIELD(arg0, s32 *, 0x198) = PloFindSwObject_thunk(&B_003DD490, 4, M2C_FIELD(arg0, s32 *, 0x194), arg0);
+void func_001842B0(struct LIFTPT *lift) {
+    func_00183F50(lift);
+    lift->aref[0].plo = PloFindSwObject_thunk(B_003DD490, 4, lift->aref[0].oid, lift);
+    lift->aref[1].plo = PloFindSwObject_thunk(B_003DD490, 4, lift->aref[1].oid, lift);
+    lift->aref[2].plo = PloFindSwObject_thunk(B_003DD490, 4, lift->aref[2].oid, lift);
 }

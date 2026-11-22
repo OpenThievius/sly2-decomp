@@ -1,22 +1,20 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "so.h"
 extern "C" {
-struct _m2c_stack_func_001F6BC8 {};                 /* size 0x0 */
-
-struct E1F6BC8 { u8 pad[0xC]; s32 id; u8 pad2[8]; s32 value; u8 pad3[0xB0 - 0x1C]; };
-struct O1F6BC8 { u8 pad[0xE0]; s32 count; E1F6BC8 *entries; };
-void func_001F6BC8(O1F6BC8 *arg0, s32 arg1, s32 arg2) {
-    struct E { u8 pad[0xC]; s32 id; u8 pad2[8]; s32 value; u8 pad3[0xB0 - 0x1C]; };
-    for (s32 i = 0; i < arg0->count; i++) {
-        E1F6BC8 *pe = &arg0->entries[i];
-        if (pe->id == arg1) {
-            pe->value = arg2;
+/* one 0xB0-byte element of SO::ageom, as func_001F6BC8 reads it (GEOM, geom.h, does not name these words) */
+struct GEOMTAG {
+    u8 unknown_0x0[0xC];
+    /* 0xC */ s32 id;
+    u8 unknown_0x10[8];
+    /* 0x18 */ s32 value;
+    u8 unknown_0x1C[0x94];
+};
+void func_001F6BC8(SO *pso, s32 id, s32 value) {
+    for (s32 igeom = 0; igeom < pso->cgeom; igeom++) {
+        GEOMTAG *pgeom = &((GEOMTAG *)pso->ageom)[igeom];
+        if (pgeom->id == id) {
+            pgeom->value = value;
         }
     }
 }
-
 }

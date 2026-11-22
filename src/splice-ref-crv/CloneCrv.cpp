@@ -1,14 +1,15 @@
-#include "m2c_macros.h"
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "crv.h"
 extern "C" {
 
-void CloneXfm(void *);                                 /* extern */
-M2C_UNK PattachCrv(void *, M2C_UNK);                /* extern */
+void CloneXfm(LO *);
+void *PattachCrv(CRV *, s32);
 
-void CloneCrv(void *arg0) {
-    CloneXfm(arg0);
-    if (M2C_FIELD(arg0, s32 *, 0x17C) != 0) {
-        M2C_FIELD(arg0, s32 *, 0x17C) = 0;
-        PattachCrv(arg0, 0);
+void CloneCrv(CRV *crv) {
+    CloneXfm(crv);
+    if (crv->pattach != 0) {
+        crv->pattach = 0;
+        PattachCrv(crv, 0);
     }
 }
 }

@@ -1,18 +1,25 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "types.h"
 
-extern s32 B_003E1C50;
+struct EPISODEDESC {
+    u8 unknown_0x0[0x4];
+    s32 field_0x4;
+    u8 unknown_0x8[0x34];
+    s32 field_0x3C;
+};
+extern struct EPISODEDESC *B_003E1C50;
 
-void *PdescFromEpisode(s32 arg0) {
-    s32 var_v0;
-    void *temp_a0;
+struct EPISODEDESC *PdescFromEpisode(s32 episode) {
+    struct EPISODEDESC *pdesc;
+    s32 valid;
 
-    if (arg0 == -1) {
-        return NULL;
+    if (episode == -1) {
+        return 0;
     }
-    temp_a0 = B_003E1C50 + (arg0 << 6);
-    var_v0 = 0;
-    if (temp_a0 != NULL) {
-        var_v0 = M2C_FIELD(temp_a0, s32 *, 4) != M2C_FIELD(temp_a0, s32 *, 0x3C);
+    pdesc = B_003E1C50 + episode;
+    valid = 0;
+    if (pdesc != 0) {
+        valid = pdesc->field_0x4 != pdesc->field_0x3C;
     }
-    return (var_v0 == 0) ? NULL : temp_a0;
+    return (valid == 0) ? 0 : pdesc;
 }

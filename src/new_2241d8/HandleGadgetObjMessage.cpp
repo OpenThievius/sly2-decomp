@@ -1,22 +1,21 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
-struct Obj;
-struct Vtbl { char pad[0x260]; s16 adjust; s16 pad2; void (*handler)(s8 *, s32); };
-struct Obj { char pad0[0xC]; Vtbl *vtbl; char pad1[0x140]; s32 state; };
-struct Msg { char pad[4]; Obj *obj; };
-struct Obj2;
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "gadgetobj.h"
+
+/* message 4's data: the gadget object it is about, in its second word */
+struct GADGETMSG {
+    u8 unknown_0x0[0x4];
+    /* 0x4 */ GADGETOBJ *pgadget;
+};
+
 extern "C" {
-void HandleLoMessage(s32, s32, Obj *);
-void HandleGadgetObjMessage(s32 arg0, s32 arg1, Obj *arg2) {
-    HandleLoMessage(arg0, arg1, arg2);
-    if (arg1 == 4) {
-        Obj *obj = ((Msg *)arg2)->obj;
-        if ((sptr)obj == arg0 && (u32)(obj->state - 1) < 2U) {
-            obj->vtbl->handler((s8 *)obj + obj->vtbl->adjust, 3);
+void HandleLoMessage(LO *plo, int msgid, void *pv);
+
+void HandleGadgetObjMessage(GADGETOBJ *pgadget, int msgid, void *pv) {
+    HandleLoMessage(pgadget, msgid, pv);
+    if (msgid == 4) {
+        GADGETOBJ *pgadgetTarget = ((GADGETMSG *)pv)->pgadget;
+        if (pgadgetTarget == pgadget && (u32)(pgadgetTarget->state - 1) < 2U) {
+            pgadgetTarget->SetState(3);
         }
     }
 }

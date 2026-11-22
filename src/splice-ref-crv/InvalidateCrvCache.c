@@ -1,6 +1,7 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "crv.h"
 
-void InvalidateCrvCache(void *arg0) {
-    M2C_FIELD(arg0, s32 *, 0x178) = 0;
-    M2C_FIELD(arg0, s32 *, 0x148) = -1;
+void InvalidateCrvCache(struct CRV *crv) {
+    crv->field_0x178 = 0;
+    crv->field_0x148 = -1;
 }

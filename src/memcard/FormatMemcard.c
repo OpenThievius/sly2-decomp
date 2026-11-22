@@ -1,19 +1,33 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "types.h"
 
-s32 McSync(s32, s32, M2C_UNK, M2C_UNK);             /* extern */
-M2C_UNK func_001ACC38(M2C_UNK *, M2C_UNK);          /* extern */
+#include "memcard.h"
+
+/* The memory card manager object: lives inside SAVE at 0xFD5C. */
+typedef struct B8 { char b[8]; } B8;
+
+
+
+
+typedef struct MENU {
+    /* 0x00 */ u8 unknown_0x0[0x44];
+    /* 0x44 */ s32 phase;
+} MENU;
+
+s32 McSync(void *, s32, s32, s32 *);                /* extern */
+void func_001ACC38(MENU *, s32);                    /* extern */
 s32 sceMcFormat(s32, s32);                          /* extern */
-extern M2C_UNK B_002E6550;
+extern MENU B_002E6550;
 
-s32 FormatMemcard(void *arg0) {
-    s32 temp_v0;
+s32 FormatMemcard(SAVE *save) {
+    s32 error;
 
-    temp_v0 = McSync(arg0 + 0xFD5C, sceMcFormat(M2C_FIELD(arg0, s32 *, 0), M2C_FIELD(arg0, s32 *, 4)), 0x10, 0);
-    if (temp_v0 != 0) {
-        M2C_FIELD(arg0, s32 *, 0xC) = 2;
+    error = McSync(&save->mc, sceMcFormat(save->port, save->slot), 0x10, 0);
+    if (error != 0) {
+        save->cardState = 2;
         func_001ACC38(&B_002E6550, 3);
     } else {
-        M2C_FIELD(arg0, s32 *, 0xC) = 3;
+        save->cardState = 3;
     }
-    return temp_v0;
+    return error;
 }

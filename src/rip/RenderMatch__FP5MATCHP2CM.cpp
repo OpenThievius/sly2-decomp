@@ -1,10 +1,13 @@
-extern "C" float g_2dded0;
-extern "C" void RenderRip(void *, void *);
-extern "C" void RenderMatch__FP5MATCHP2CM(char *match, void *cm)
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "rip.h"
+#include "clock.h"
+struct CM;
+extern "C" void RenderRip(RIP *rip);
+extern "C" void RenderMatch__FP5MATCHP2CM(RIP *match, CM *cm)
 {
-    float limit = g_2dded0;
-    float value = *(float *)(match + 0x14);
+    float limit = g_2dded0.t;
+    float value = match->tStart;
     if (limit < value)
         return;
-    RenderRip(match, cm);
+    RenderRip(match);
 }

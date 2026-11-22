@@ -1,15 +1,17 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "goals.h"
+#include "sly2.h"
 
-s32 GoalFollowCrv_FAtEnd(s32);                      /* extern */
+s32 GoalFollowCrv_FAtEnd(struct GOAL *pgoalFollow);
 
-s32 GoalGoto_FArrived(void *arg0) {
-    s32 temp_s0;
-    s32 var_v1;
+s32 GoalGoto_FArrived(struct GOALGOTO *pgoal) {
+    s32 state;
+    s32 arrived;
 
-    temp_s0 = M2C_FIELD(arg0, s32 *, 0x30);
-    var_v1 = 0;
-    if (temp_s0 == 1) {
-        var_v1 = (GoalFollowCrv_FAtEnd(M2C_FIELD(arg0, s32 *, 0x18)) != 0) ? temp_s0 : 0;
+    state = pgoal->state;
+    arrived = 0;
+    if (state == 1) {
+        arrived = (GoalFollowCrv_FAtEnd(pgoal->pgoalChild) != 0) ? state : 0;
     }
-    return var_v1;
+    return arrived;
 }

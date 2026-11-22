@@ -1,10 +1,12 @@
-int GetStreamAmbKind(void* arg0) {
-    int v1 = *(int*)(((char*)arg0) + 0x3B8);
-    int a0 = 1;
-    int v0 = 2;
-    v1 = v1 & 4;
-    if (v1 == 0) {
-        v0 = a0;
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "streamamb.h"
+
+int GetStreamAmbKind(STREAMAMB *pamb) {
+    int kind = 1;
+    int result = 2;
+    int grfStart = pamb->grfStart & 4;
+    if (grfStart == 0) {
+        result = kind;
     }
-    return v0;
+    return result;
 }

@@ -1,20 +1,38 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "types.h"
 
-extern M2C_UNK D_002CA5C0;
+/* The stream object CBinaryInputStream_Constructor zeroes (0x34 bytes): twelve zeroed words, its vtable at 0x30. */
+struct BINARYINPUTSTREAM {
+    s32 field_0x0;
+    s32 field_0x4;
+    s32 field_0x8;
+    s32 field_0xC;
+    s32 field_0x10;
+    s32 field_0x14;
+    s32 field_0x18;
+    s32 field_0x1C;
+    s32 field_0x20;
+    s32 field_0x24;
+    s32 field_0x28;
+    s32 field_0x2C;
+    void *pvtable;
+};
 
-void *CBinaryInputStream_Constructor(void *arg0) {
-    M2C_FIELD(arg0, s32 *, 0) = 0;
-    M2C_FIELD(arg0, M2C_UNK **, 0x30) = &D_002CA5C0;
-    M2C_FIELD(arg0, s32 *, 0x10) = 0;
-    M2C_FIELD(arg0, s32 *, 4) = 0;
-    M2C_FIELD(arg0, s32 *, 0x14) = 0;
-    M2C_FIELD(arg0, s32 *, 8) = 0;
-    M2C_FIELD(arg0, s32 *, 0x18) = 0;
-    M2C_FIELD(arg0, s32 *, 0x1C) = 0;
-    M2C_FIELD(arg0, s32 *, 0xC) = 0;
-    M2C_FIELD(arg0, s32 *, 0x20) = 0;
-    M2C_FIELD(arg0, s32 *, 0x24) = 0;
-    M2C_FIELD(arg0, s32 *, 0x2C) = 0;
-    M2C_FIELD(arg0, s32 *, 0x28) = 0;
-    return arg0;
+extern void *D_002CA5C0[];
+
+struct BINARYINPUTSTREAM *CBinaryInputStream_Constructor(struct BINARYINPUTSTREAM *pbis) {
+    pbis->field_0x0 = 0;
+    pbis->pvtable = D_002CA5C0;
+    pbis->field_0x10 = 0;
+    pbis->field_0x4 = 0;
+    pbis->field_0x14 = 0;
+    pbis->field_0x8 = 0;
+    pbis->field_0x18 = 0;
+    pbis->field_0x1C = 0;
+    pbis->field_0xC = 0;
+    pbis->field_0x20 = 0;
+    pbis->field_0x24 = 0;
+    pbis->field_0x2C = 0;
+    pbis->field_0x28 = 0;
+    return pbis;
 }

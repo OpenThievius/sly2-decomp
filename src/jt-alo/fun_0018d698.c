@@ -1,18 +1,19 @@
-#include "m2c_macros.h"
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "slyview.h"
 
-M2C_UNK SubscribeLoObject(s32, s32);                /* extern */
-M2C_UNK UnsubscribeLoObject(s32, s32);              /* extern */
+void SubscribeLoObject(struct LO *plo, struct LO *ploSubscriber);
+void UnsubscribeLoObject(struct LO *plo, struct LO *ploSubscriber);
 
-void func_0018D698(s32 arg0, void *arg1, s32 arg2) {
-    s32 temp_a0;
+void func_0018D698(struct LO *ploSubscriber, struct GADGETSLOTVIEW *pslot, struct LO *plo) {
+    struct LO *ploOld;
 
-    temp_a0 = M2C_FIELD(arg1, s32 *, 8);
-    if (temp_a0 != 0) {
-        UnsubscribeLoObject(temp_a0, arg0);
-        M2C_FIELD(arg1, s32 *, 8) = 0;
+    ploOld = pslot->plo;
+    if (ploOld != 0) {
+        UnsubscribeLoObject(ploOld, ploSubscriber);
+        pslot->plo = 0;
     }
-    if (arg2 != 0) {
-        M2C_FIELD(arg1, s32 *, 8) = arg2;
-        SubscribeLoObject(arg2, arg0);
+    if (plo != 0) {
+        pslot->plo = plo;
+        SubscribeLoObject(plo, ploSubscriber);
     }
 }

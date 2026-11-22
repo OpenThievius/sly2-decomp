@@ -1,9 +1,10 @@
-#include "m2c_macros.h"
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "guard.h"
 
-M2C_UNK CloneAnimref(s32);                          /* extern */
-M2C_UNK CLo_Clone();                                  /* extern */
+void CLo_Clone(struct LO *plo, struct LO *ploBase);
+void CloneAnimref(struct ANIMREF *panimref);
 
-void CloneGuardAim(s32 arg0) {
-    CLo_Clone();
-    CloneAnimref(arg0 + 0xB0);
+void CloneGuardAim(struct AIMSTATE *paim, struct LO *ploBase) {
+    CLo_Clone((struct LO *)paim, ploBase);
+    CloneAnimref(&paim->animref);
 }

@@ -1,70 +1,80 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "stepguard.h"
+#include "stepguard.h"
+#include "goals.h"
 #include "sly2.h"
-struct VT { char pad[0x268]; short delta268; short u268; int (*fn26C)(char *); char pad2[0x2C0 - 0x270]; short delta2C0; short u2C0; int (*fn2C4)(char *); };
-struct OBJ { char pad[0xC]; VT *vt; };
-struct CMD { CMD() { memset(this, 0, 0x70); } unsigned type; int pad4[3]; int arg; float argf; char rest[0x70 - 0x18]; } __attribute__((aligned(16)));
-struct PLAYER { char pad[0xC]; VT *vt; char pad2[0x38C - 0x10]; int f38C; };
-struct GOALX { char pad0[0x30]; OBJ *target; char pad1[0x44 - 0x34]; int f44; char pad2[0x50 - 0x48]; int f50; char pad3[0x5C - 0x54]; int f5C; };
-struct BRAIN { char pad0[0x10]; PLAYER *player; int pad14; GOALX *goal; char pad1[0x30 - 0x1C]; CMD cmd; char pad2[0xA4 - 0xA0]; float retryAt; };
+#include "sw.h"
+#include "po.h"
+/* a new command starts from zero */
+struct CMD : GOALCMD {
+    CMD() { memset(this, 0, 0x70); }
+};
+struct HITFX;
+/* class 52 (the player), the one field of it this reads: the object it is looking at (a guard, or the guard its object belongs to) */
+struct JTVIEW {
+    u8 unknown_0x0[0xE20];
+    /* 0xE20 */ LO *field_0xE20;
+};
 extern "C" {
-int FGoalAnimDone(void *);
-int FGoalNoticeDone(void *);
-int FGuardScriptDone(void *);
+int FGoalAnimDone(GOALANIM *);
+int FGoalNoticeDone(GOALNOTICE *);
+int FGuardScriptDone(GOAL *);
 int FIsBasicDerivedFrom(void *, int);
-void GoalBrain_AbsorbDamage(BRAIN *, int, int);
-void GoalBrain_ChooseNextCommand(BRAIN *);
-int GoalBrain_FCmdEqual(CMD *, CMD *);
-int GoalBrain_FGotoTargetInWorld(BRAIN *);
-void GoalBrain_SetCommand(BRAIN *, CMD *);
-void HitFx_Remove(int);
-int PhitfxChooseForGuard(PLAYER *, int);
-QW PosLoWorld(void *);
-void SetSearchGoal(void *, int);
-int SpawnSwHitFx(void *, int, QW, void *);
-int func_00172550(void *);
-int func_00174898(int);
-int func_00177D20(BRAIN *);
-int func_0017A9C0(void *);
-int func_0017DE40(void *);
-int func_0017EAE8(void *);
+void GoalBrain_AbsorbDamage(GOALBRAIN *, int, int);
+void GoalBrain_ChooseNextCommand(GOALBRAIN *);
+int GoalBrain_FCmdEqual(GOALCMD *, GOALCMD *);
+int GoalBrain_FGotoTargetInWorld(GOALBRAIN *);
+void GoalBrain_SetCommand(GOALBRAIN *, GOALCMD *);
+void HitFx_Remove(HITFX *);
+HITFX *PhitfxChooseForGuard(STEPGUARD *, HITFX *);
+QW PosLoWorld(LO *);
+void SetSearchGoal(GOALSEARCH *, GOAL *);
+HITFX *SpawnSwHitFx(SW *, int, QW, STEPGUARD *);
+int func_00172550(GOALSEARCH *);
+void *func_00174898(LO *);
+int func_00177D20(GOALBRAIN *);
+int func_0017A9C0(GOAL *);
+int func_0017DE40(GOAL *);
+int func_0017EAE8(GOAL *);
 void func_001EEF98();
-int func_001EF0A8(BRAIN *);
-int func_00208B38(PLAYER *, int);
-float func_00208BB0(PLAYER *);
-extern char B_003DD490[];
+int func_001EF0A8(GOALBRAIN *);
+int func_00208B38(STEPGUARD *, LO *);
+float func_00208BB0(STEPGUARD *);
+extern SW B_003DD490;
 extern float g_2dded0;
-void GoalBrain_Update(BRAIN *self) {
+void GoalBrain_Update(GOALBRAIN *goal) {
     func_001EEF98();
-    while (func_001EF0A8(self) == 0) {
-        CMD old(self->cmd);
-        switch (self->cmd.type) {
+    while (func_001EF0A8(goal) == 0) {
+        GOALCMD old(goal->cmd);
+        switch ((u32)goal->cmd.type) {
         case 1:
         case 16:
         case 17:
         {
             CMD next;
-            if (func_00177D20(self) == 0) {
-                PLAYER *player = self->player;
-                int target = player->vt->fn2C4((char *)player + player->vt->delta2C0);
-                if (target != 0) {
-                    if (func_00208B38(self->player, target) != 0) {
+            if (func_00177D20(goal) == 0) {
+                STEPGUARD *pguard = GOAL_GUARD(goal);
+                LO *ptarget = (LO *)pguard->Slot88();
+                if (ptarget != 0) {
+                    if (func_00208B38(GOAL_GUARD(goal), ptarget) != 0) {
                         next.type = 0x12;
-                        next.arg = target;
-                        next.argf = func_00208BB0(self->player);
+                        next.args.arg = (s32)ptarget;
+                        next.args.argf = func_00208BB0(GOAL_GUARD(goal));
                     } else {
-                        next.arg = target;
+                        next.args.arg = (s32)ptarget;
                         next.type = 3;
                     }
                 } else {
-                    int fx = PhitfxChooseForGuard(self->player, 0);
-                    if (fx != 0) {
-                        next.arg = fx;
+                    HITFX *phitfx = PhitfxChooseForGuard(GOAL_GUARD(goal), 0);
+                    if (phitfx != 0) {
+                        next.args.arg = (s32)phitfx;
                         next.type = 2;
                     } else {
-                        unsigned type = self->cmd.type;
-                        if (type == 0x11 && g_2dded0 < self->retryAt) {
+                        u32 type = goal->cmd.type;
+                        if (type == 0x11 && g_2dded0 < goal->tRetry) {
                             next.type = type;
                         } else {
-                            if (GoalBrain_FGotoTargetInWorld(self) == 0)
+                            if (GoalBrain_FGotoTargetInWorld(goal) == 0)
                                 next.type = 1;
                             else
                                 next.type = 0x10;
@@ -74,39 +84,39 @@ void GoalBrain_Update(BRAIN *self) {
             } else {
                 next.type = 0xC;
             }
-            GoalBrain_SetCommand(self, &next);
+            GoalBrain_SetCommand(goal, &next);
             break;
         }
         case 2:
         {
-            if (func_00177D20(self) != 0) {
+            if (func_00177D20(goal) != 0) {
                 CMD next;
                 next.type = 0xC;
-                GoalBrain_SetCommand(self, &next);
+                GoalBrain_SetCommand(goal, &next);
             } else {
-                PLAYER *player = self->player;
-                int target = player->vt->fn2C4((char *)player + player->vt->delta2C0);
-                if (target != 0) {
+                STEPGUARD *pguard = GOAL_GUARD(goal);
+                LO *ptarget = (LO *)pguard->Slot88();
+                if (ptarget != 0) {
                     CMD next;
-                    if (func_00208B38(self->player, target) != 0) {
+                    if (func_00208B38(GOAL_GUARD(goal), ptarget) != 0) {
                         next.type = 0x12;
-                        next.arg = target;
-                        next.argf = func_00208BB0(self->player);
+                        next.args.arg = (s32)ptarget;
+                        next.args.argf = func_00208BB0(GOAL_GUARD(goal));
                     } else {
-                        next.arg = target;
+                        next.args.arg = (s32)ptarget;
                         next.type = 3;
                     }
-                    GoalBrain_SetCommand(self, &next);
+                    GoalBrain_SetCommand(goal, &next);
                 } else {
-                    GOALX *goal = self->goal;
-                    int current = goal->f44;
-                    int chosen = PhitfxChooseForGuard(self->player, current);
+                    GOALSEARCH *search = (GOALSEARCH *)goal->pgoalChild;
+                    HITFX *current = (HITFX *)search->pgoalSearch;
+                    HITFX *chosen = PhitfxChooseForGuard(GOAL_GUARD(goal), current);
                     if (chosen != current) {
-                        SetSearchGoal(goal, chosen);
-                    } else if (func_00172550(goal) != 0) {
+                        SetSearchGoal(search, (GOAL *)chosen);
+                    } else if (func_00172550(search) != 0) {
                         CMD next;
                         next.type = 1;
-                        GoalBrain_SetCommand(self, &next);
+                        GoalBrain_SetCommand(goal, &next);
                     }
                 }
             }
@@ -114,57 +124,57 @@ void GoalBrain_Update(BRAIN *self) {
         }
         case 3:
         {
-            if (func_00177D20(self) != 0) {
+            if (func_00177D20(goal) != 0) {
                 CMD next;
                 next.type = 0xC;
-                GoalBrain_SetCommand(self, &next);
-            } else if (FGoalAnimDone(self->goal) != 0) {
+                GoalBrain_SetCommand(goal, &next);
+            } else if (FGoalAnimDone((GOALANIM *)goal->pgoalChild) != 0) {
                 CMD next;
-                if (FIsBasicDerivedFrom(self->player, 0x3B) != 0) {
+                if (FIsBasicDerivedFrom(GOAL_GUARD(goal), 0x3B) != 0) {
                     next.type = 0xD;
-                    next.arg = self->cmd.arg;
+                    next.args.arg = goal->cmd.args.arg;
                 } else {
                     next.type = 4;
-                    next.arg = self->cmd.arg;
+                    next.args.arg = goal->cmd.args.arg;
                 }
-                GoalBrain_SetCommand(self, &next);
+                GoalBrain_SetCommand(goal, &next);
             }
             break;
         }
         case 5:
-            if (FGuardScriptDone(self->goal) != 0) GoalBrain_ChooseNextCommand(self);
+            if (FGuardScriptDone(goal->pgoalChild) != 0) GoalBrain_ChooseNextCommand(goal);
             break;
         case 4:
         {
-            GOALX *goal = self->goal;
-            if (func_00177D20(self) != 0) {
+            GOALNOTICE *notice = (GOALNOTICE *)goal->pgoalChild;
+            if (func_00177D20(goal) != 0) {
                 CMD next;
                 next.type = 0xC;
-                GoalBrain_SetCommand(self, &next);
-            } else if (FGoalNoticeDone(goal) == 0) {
-                PLAYER *player = self->player;
-                int target = player->vt->fn2C4((char *)player + player->vt->delta2C0);
-                if (target != self->player->f38C) {
+                GoalBrain_SetCommand(goal, &next);
+            } else if (FGoalNoticeDone(notice) == 0) {
+                STEPGUARD *pguard = GOAL_GUARD(goal);
+                LO *ptarget = (LO *)pguard->Slot88();
+                if (ptarget != GOAL_GUARD(goal)->pbasicAlert) {
                     CMD next;
-                    if (target != 0) {
-                        if (func_00208B38(self->player, target) != 0) {
+                    if (ptarget != 0) {
+                        if (func_00208B38(GOAL_GUARD(goal), ptarget) != 0) {
                             next.type = 0x12;
-                            next.arg = target;
-                            next.argf = func_00208BB0(self->player);
+                            next.args.arg = (s32)ptarget;
+                            next.args.argf = func_00208BB0(GOAL_GUARD(goal));
                         } else {
-                            next.arg = target;
+                            next.args.arg = (s32)ptarget;
                             next.type = 3;
                         }
                     } else {
                         next.type = 1;
-                        OBJ *other = goal->target;
-                        if (other != 0) {
-                            if (FIsBasicDerivedFrom(other, 0x34) != 0) {
-                                if (other->vt->fn26C((char *)other + other->vt->delta268) == 2) {
-                                    int victim = func_00174898(*(int *)((char *)other + 0xE20));
-                                    if (victim != 0) {
-                                        if (victim != (sptr)self->player) {
-                                            next.arg = victim;
+                        LO *pother = notice->ptarget;
+                        if (pother != 0) {
+                            if (FIsBasicDerivedFrom(pother, 0x34) != 0) {
+                                if (((PO *)pother)->NAlertLevel() == 2) {
+                                    void *pvictim = func_00174898(((JTVIEW *)pother)->field_0xE20);
+                                    if (pvictim != 0) {
+                                        if (pvictim != GOAL_GUARD(goal)) {
+                                            next.args.arg = (s32)pvictim;
                                             next.type = 0x11;
                                         }
                                     }
@@ -172,12 +182,12 @@ void GoalBrain_Update(BRAIN *self) {
                             }
                         }
                     }
-                    GoalBrain_SetCommand(self, &next);
+                    GoalBrain_SetCommand(goal, &next);
                 }
             } else {
                 CMD next;
                 next.type = 1;
-                GoalBrain_SetCommand(self, &next);
+                GoalBrain_SetCommand(goal, &next);
             }
             break;
         }
@@ -185,63 +195,63 @@ void GoalBrain_Update(BRAIN *self) {
         {
             CMD next;
             next.type = 1;
-            GoalBrain_SetCommand(self, &next);
+            GoalBrain_SetCommand(goal, &next);
             break;
         }
         case 12:
         {
-            if (func_00177D20(self) == 0) {
+            if (func_00177D20(goal) == 0) {
                 CMD next;
                 next.type = 1;
-                GoalBrain_SetCommand(self, &next);
+                GoalBrain_SetCommand(goal, &next);
             }
             break;
         }
         case 8:
         {
-            if (FGoalAnimDone(self->goal) != 0) {
-                int fx = SpawnSwHitFx(B_003DD490, 0, PosLoWorld(self->player), self->player);
+            if (FGoalAnimDone((GOALANIM *)goal->pgoalChild) != 0) {
+                HITFX *phitfx = SpawnSwHitFx(&B_003DD490, 0, PosLoWorld(goal->pstep), GOAL_GUARD(goal));
                 CMD next;
                 next.type = 2;
-                next.arg = fx;
-                GoalBrain_SetCommand(self, &next);
-                HitFx_Remove(fx);
+                next.args.arg = (s32)phitfx;
+                GoalBrain_SetCommand(goal, &next);
+                HitFx_Remove(phitfx);
             }
             break;
         }
         case 7:
         {
-            GOALX *goal = self->goal;
-            if (FGoalAnimDone(goal) != 0) {
-                int state = goal->f50;
-                if (state != -1) {
-                    if (state == 3) GoalBrain_ChooseNextCommand(self);
+            GOALGRAB *pb1 = (GOALGRAB *)goal->pgoalChild;
+            if (FGoalAnimDone(pb1) != 0) {
+                int phase = pb1->phase;
+                if (phase != -1) {
+                    if (phase == 3) GoalBrain_ChooseNextCommand(goal);
                 } else {
-                    GoalBrain_AbsorbDamage(self, -0x32, goal->f5C);
-                    if (self->cmd.type == 7) GoalBrain_ChooseNextCommand(self);
+                    GoalBrain_AbsorbDamage(goal, -0x32, (s32)pb1->psoHeld);
+                    if (goal->cmd.type == 7) GoalBrain_ChooseNextCommand(goal);
                 }
             }
             break;
         }
         case 6:
-            if (func_0017A9C0(self->goal) != 0) GoalBrain_ChooseNextCommand(self);
+            if (func_0017A9C0(goal->pgoalChild) != 0) GoalBrain_ChooseNextCommand(goal);
             break;
         case 9:
-            if (FGoalAnimDone(self->goal) != 0) GoalBrain_ChooseNextCommand(self);
+            if (FGoalAnimDone((GOALANIM *)goal->pgoalChild) != 0) GoalBrain_ChooseNextCommand(goal);
             break;
         case 10:
-            if (FGoalAnimDone(self->goal) != 0) GoalBrain_ChooseNextCommand(self);
+            if (FGoalAnimDone((GOALANIM *)goal->pgoalChild) != 0) GoalBrain_ChooseNextCommand(goal);
             break;
         case 19:
-            if (func_0017EAE8(self->goal) != 0) GoalBrain_ChooseNextCommand(self);
+            if (func_0017EAE8(goal->pgoalChild) != 0) GoalBrain_ChooseNextCommand(goal);
             break;
         case 18:
-            if (func_0017DE40(self->goal) != 0) GoalBrain_ChooseNextCommand(self);
+            if (func_0017DE40(goal->pgoalChild) != 0) GoalBrain_ChooseNextCommand(goal);
             break;
         default:
             break;
         }
-        if (GoalBrain_FCmdEqual(&self->cmd, &old) != 0) break;
+        if (GoalBrain_FCmdEqual(&goal->cmd, &old) != 0) break;
     }
 }
 }

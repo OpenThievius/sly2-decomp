@@ -1,17 +1,16 @@
-#include "types.h"
-extern "C" {
-void CRef_Destruct(char *);
-QW *PvAllocSlotheapImpl(void *);
-extern char B_00452188[];
-char *CRef_SetVector(char *self, QW value)
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "crefboxes.h"
+
+extern SLOTHEAP B_00452188;
+
+extern "C" CRef *CRef_SetVector(CRef *pref, QW vector)
 {
-    CRef_Destruct(self);
-    *(int *)self = 0x1A;
-    QW *vec = PvAllocSlotheapImpl(B_00452188);
-    *(int *)((char *)vec + 0x10) = 0;
-    *(QW **)(self + 4) = vec;
-    *(int *)((char *)vec + 0x10) = *(int *)((char *)vec + 0x10) + 1;
-    **(QW **)(self + 4) = value;
-    return self;
-}
+    pref->Decref();
+    pref->m_tagk = TAGK_Vector;
+    VECTORBOX *pbox = (VECTORBOX *)PvAllocSlotheapImpl(&B_00452188);
+    pbox->cref = 0;
+    pref->m_tag.m_pvector = &pbox->vector;
+    pbox->cref = pbox->cref + 1;
+    *(QW *)pref->m_tag.m_pvector = vector;
+    return pref;
 }

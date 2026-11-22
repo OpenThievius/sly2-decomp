@@ -1,14 +1,18 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
-#include "sw.h"
-struct BLIPG;
-struct VT { char pad[0x38]; short delta; short index; void (*fn)(void *); char pad2[0x18]; short delta2; short index2; void (*fn2)(void *); char pad3[0x18]; short delta3; short index3; void (*fn3)(void *); };
-struct BLIPG { int unk0; int unk4; int unk8; VT *vptr; };
+#include "blip.h"
+/* BLIPG's first words as retail's allocator writes them: BASIC's two cleared fields, then the vtable pointer (a class's constructor
+   would set it; the vtable at 0x2CB5D8 is game data, so it is stored as a pointer) */
+struct BLIPGHEAD {
+    s32 field_0x0;
+    s32 field_0x4;
+    s32 field_0x8;
+    void *pvtable;
+};
 extern char D_002CB5D8;
-void *memset(void *, int, unsigned int);
 extern "C" {
-void *PvAllocSlotheapImpl(void *);
-void *PdlFromSwCid(void *, int);
+void *PvAllocSlotheapImpl(SLOTHEAP *);
+void *PdlFromSwCid(SW *, int);
 void AppendSlEntry(void *, void *);
 }
 BLIPG *PblipgNew(SW *psw)
@@ -19,15 +23,16 @@ BLIPG *PblipgNew(SW *psw)
     }
     BLIPG *pblipg = (BLIPG *)PvAllocSlotheapImpl(&psw->slotheapBlipg);
     memset(pblipg, 0, 0x460);
-    pblipg->unk0 = 0;
-    pblipg->unk4 = 0;
-    pblipg->vptr = (VT *)&D_002CB5D8;
+    BLIPGHEAD *phead = (BLIPGHEAD *)pblipg;
+    phead->field_0x0 = 0;
+    phead->field_0x4 = 0;
+    phead->pvtable = &D_002CB5D8;
     int i = 31;
     do {
     } while (--i != -1);
     AppendSlEntry(PdlFromSwCid(psw, 0x1C), pblipg);
-    pblipg->vptr->fn((char *)pblipg + pblipg->vptr->delta);
-    pblipg->vptr->fn2((char *)pblipg + pblipg->vptr->delta2);
-    pblipg->vptr->fn3((char *)pblipg + pblipg->vptr->delta3);
+    pblipg->Init();
+    pblipg->AddHierarchy();
+    pblipg->PostLoad();
     return pblipg;
 }

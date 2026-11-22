@@ -1,40 +1,42 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "act.h"
+#include "alo.h"
+#include "alloc.h"
+#include "sw.h"
 #include "sly2.h"
 struct Bis;
-#include "alloc.h"
-struct VT { short delta; short index; void *(*fn)(void *, int); };
-struct XFREC {
-    float m[16]; char pad40[0x54];
-    int kind; int unused98; int word9C; void *pxf; int unusedA4; XFREC *pxfMirror; short limitLo; short limitHi; char padB0[0x10]; QW vecC0; char padD0[0x10]; QW vecE0; char padF0[0x10];
-};
-struct ALO { char pad0[0xC]; char *vt; char pad10[0x30]; int *pflags; char pad44[0xC]; int count; XFREC *recs; void *p58; void *p5C; void *p60; };
-struct ACT { int type; ALO *owner; XFREC *xf; int link; char pad10[4]; int arg14; void *vtable; int field1C; QW vec20; };
-struct ACTS { ACT base; };
 extern "C" {
 unsigned U8Read__18CBinaryInputStream(Bis *);
 int S8Read__18CBinaryInputStream(Bis *);
 int S16Read__18CBinaryInputStream(Bis *);
 int S32Read__18CBinaryInputStream(Bis *);
 float F32Read__18CBinaryInputStream(Bis *);
-void ReadVector__18CBinaryInputStreamP6VECTOR(Bis *, void *);
-void CBinaryInputStream_ReadMatrix4(Bis *, void *);
-void func_00117F90(Bis *, void *);
-void func_00117FB0(Bis *, void *);
+void ReadVector__18CBinaryInputStreamP6VECTOR(Bis *, VECTOR *);
+void CBinaryInputStream_ReadMatrix4(Bis *, MATRIX4 *);
+void func_00117F90(Bis *, CLQ *);
+void func_00117FB0(Bis *, LM *);
 void *PvAllocSwClearImpl__Fi(ALLOCREQ *);
 void *PvAllocAct(int);
-QW GetXfDofValue(void *, void *);
-void InsertXfAct(ALO *, XFREC *, ACT *);
+QW GetXfDofValue(XF *, XF *);
+void InsertXfAct(ALO *, XF *, ACT *);
 void LoadAloIkLimbs(ALO *, Bis *);
 void LoadXfMirrors(ALO *, Bis *);
 void func_0021C888(ALO *, Bis *);
-void func_0022C818(ALO *, XFREC *);
+void func_0022C818(ALO *, XF *);
 void UpdateAloXfWorld(ALO *);
 extern char D_002CA6A0[], D_002CA7A0[], D_002CA7E0[], D_002CA820[];
 }
-static inline void *ReadXf(ALO *palo, Bis *pbis)
+/* the two halfwords LoadAloFromBrx stores at XF 0xAC (a thousandth of the loaded scales, 1000 when the record has none): a view,
+   since this loader is their only reader and not a method of XF */
+struct XFLOADVIEW {
+    u8 unknown_0x0[0xAC];
+    /* 0xAC */ s16 limitLo;
+    /* 0xAE */ s16 limitHi;
+};
+static inline XF *ReadXf(ALO *palo, Bis *pbis)
 {
     int id = S16Read__18CBinaryInputStream(pbis);
-    VT *vt = (VT *)(palo->vt + 0x198);
-    return vt->fn((char *)palo + vt->delta, id);
+    return (XF *)palo->PxfFromRef(id);
 }
 extern "C" void LoadAloFromBrx(ALO *palo, Bis *pbis)
 {
@@ -43,128 +45,128 @@ extern "C" void LoadAloFromBrx(ALO *palo, Bis *pbis)
     int count = S16Read__18CBinaryInputStream(pbis);
     req.cb = count << 8;
     req.cbAlign = 0x10;
-    palo->count = count;
-    palo->recs = (XFREC *)PvAllocSwClearImpl__Fi(&req);
+    palo->cxf = count;
+    palo->axf = (XF *)PvAllocSwClearImpl__Fi(&req);
     {
-        ACT *actB;
-        ACT *actC;
-        ACT *actA;
-        ACT *actD;
+        ACT2 *actB;
+        ACT4 *actC;
+        ACT1 *actA;
+        ACT9 *actD;
         int hasA;
         int hasB;
         int hasC;
-        for (; index < palo->count; index++) {
-            XFREC *rec = &palo->recs[index];
-            rec->pxf = ReadXf(palo, pbis);
-            rec->kind = S16Read__18CBinaryInputStream(pbis);
-            rec->word9C = S32Read__18CBinaryInputStream(pbis);
+        for (; index < palo->cxf; index++) {
+            XF *rec = &palo->axf[index];
+            rec->pxfParent = ReadXf(palo, pbis);
+            rec->dof = S16Read__18CBinaryInputStream(pbis);
+            rec->id = S32Read__18CBinaryInputStream(pbis);
             unsigned flags = U8Read__18CBinaryInputStream(pbis);
             if (flags & 1) {
                 float scaleA = F32Read__18CBinaryInputStream(pbis);
-                rec->limitHi = 1000;
-                rec->limitLo = (int)(scaleA * 1000.0f);
+                ((XFLOADVIEW *)rec)->limitHi = 1000;
+                ((XFLOADVIEW *)rec)->limitLo = (int)(scaleA * 1000.0f);
             } else if (flags & 2) {
-                rec->limitLo = (int)(F32Read__18CBinaryInputStream(pbis) * 1000.0f);
-                rec->limitHi = (int)(F32Read__18CBinaryInputStream(pbis) * 1000.0f);
+                ((XFLOADVIEW *)rec)->limitLo = (int)(F32Read__18CBinaryInputStream(pbis) * 1000.0f);
+                ((XFLOADVIEW *)rec)->limitHi = (int)(F32Read__18CBinaryInputStream(pbis) * 1000.0f);
             } else {
-                rec->limitLo = 1000;
-                rec->limitHi = 1000;
+                ((XFLOADVIEW *)rec)->limitLo = 1000;
+                ((XFLOADVIEW *)rec)->limitHi = 1000;
             }
             hasA = flags & 4;
             if (hasA) {
-                ACT *fresh = (ACT *)PvAllocAct(0x30);
-                fresh->vtable = D_002CA820;
-                fresh->type = 1;
-                fresh->field1C = 2;
+                ACT1 *fresh = (ACT1 *)PvAllocAct(0x30);
+                fresh->act.vtable = D_002CA820;
+                fresh->act.kind = 1;
+                fresh->field_0x1C = 2;
                 actA = fresh;
-                actA->arg14 = S8Read__18CBinaryInputStream(pbis);
+                actA->act.xfk = S8Read__18CBinaryInputStream(pbis);
             }
             hasB = flags & 8;
             if (hasB) {
-                ACT *fresh = (ACT *)PvAllocAct(0x80);
-                fresh->type = 2;
-                fresh->vtable = D_002CA7E0;
+                ACT2 *fresh = (ACT2 *)PvAllocAct(0x80);
+                fresh->act.kind = 2;
+                fresh->act.vtable = D_002CA7E0;
                 actB = fresh;
-                actB->arg14 = S8Read__18CBinaryInputStream(pbis);
-                *(float *)((char *)actB + 0x60) = F32Read__18CBinaryInputStream(pbis);
-                func_00117F90(pbis, (char *)actB + 0x30);
-                func_00117FB0(pbis, (char *)actB + 0x50);
-                func_00117F90(pbis, (char *)actB + 0x40);
-                func_00117FB0(pbis, (char *)actB + 0x58);
-                *(int *)((char *)actB + 0x64) = S8Read__18CBinaryInputStream(pbis);
-                *(int *)((char *)actB + 0x68) = S8Read__18CBinaryInputStream(pbis);
-                *(int *)((char *)actB + 0x6C) = S32Read__18CBinaryInputStream(pbis);
+                actB->act.xfk = S8Read__18CBinaryInputStream(pbis);
+                actB->field_0x60 = F32Read__18CBinaryInputStream(pbis);
+                func_00117F90(pbis, &actB->clq30);
+                func_00117FB0(pbis, &actB->lm50);
+                func_00117F90(pbis, &actB->clq40);
+                func_00117FB0(pbis, &actB->lm58);
+                actB->field_0x64 = S8Read__18CBinaryInputStream(pbis);
+                actB->field_0x68 = S8Read__18CBinaryInputStream(pbis);
+                actB->field_0x6C = S32Read__18CBinaryInputStream(pbis);
             }
             hasC = flags & 0x10;
             if (hasC) {
-                ACT *fresh = (ACT *)PvAllocAct(0x28);
-                fresh->type = 4;
-                fresh->vtable = D_002CA7A0;
+                ACT4 *fresh = (ACT4 *)PvAllocAct(0x28);
+                fresh->act.kind = 4;
+                fresh->act.vtable = D_002CA7A0;
                 actC = fresh;
-                actC->arg14 = S8Read__18CBinaryInputStream(pbis);
-                *(float *)((char *)actC + 0x1C) = F32Read__18CBinaryInputStream(pbis);
-                *(float *)((char *)actC + 0x20) = F32Read__18CBinaryInputStream(pbis);
+                actC->act.xfk = S8Read__18CBinaryInputStream(pbis);
+                actC->field_0x1C = F32Read__18CBinaryInputStream(pbis);
+                actC->field_0x20 = F32Read__18CBinaryInputStream(pbis);
             }
             int hasD = flags & 0x20;
             if (hasD) {
-                ACT *fresh = (ACT *)PvAllocAct(0x30);
-                fresh->vtable = D_002CA6A0;
-                fresh->type = 9;
-                fresh->arg14 = 0x14;
+                ACT9 *fresh = (ACT9 *)PvAllocAct(0x30);
+                fresh->act.vtable = D_002CA6A0;
+                fresh->act.kind = 9;
+                fresh->act.xfk = 0x14;
                 actD = fresh;
-                ReadVector__18CBinaryInputStreamP6VECTOR(pbis, (char *)actD + 0x20);
+                ReadVector__18CBinaryInputStreamP6VECTOR(pbis, &actD->vec20);
             }
-            switch (rec->kind) {
+            switch (rec->dof) {
             case 0:
             case 13:
             case 15:
-                CBinaryInputStream_ReadMatrix4(pbis, rec);
+                CBinaryInputStream_ReadMatrix4(pbis, &rec->mat);
                 break;
             case 8:
             case 14:
-                memset(rec, 0, 0x40);
-                rec->m[15] = 1.0f;
-                rec->m[10] = 1.0f;
-                rec->m[5] = 1.0f;
-                rec->m[0] = 1.0f;
-                rec->pxfMirror = (XFREC *)ReadXf(palo, pbis);
-                rec->m[12] = -rec->pxfMirror->m[12];
-                rec->m[13] = -rec->pxfMirror->m[13];
-                rec->m[14] = -rec->pxfMirror->m[14];
+                memset(&rec->mat, 0, 0x40);
+                rec->mat.mat[3][3] = 1.0f;
+                rec->mat.mat[2][2] = 1.0f;
+                rec->mat.mat[1][1] = 1.0f;
+                rec->mat.mat[0][0] = 1.0f;
+                rec->pxfSource = ReadXf(palo, pbis);
+                rec->mat.mat[3][0] = -rec->pxfSource->mat.mat[3][0];
+                rec->mat.mat[3][1] = -rec->pxfSource->mat.mat[3][1];
+                rec->mat.mat[3][2] = -rec->pxfSource->mat.mat[3][2];
                 break;
             default:
-                CBinaryInputStream_ReadMatrix4(pbis, rec);
+                CBinaryInputStream_ReadMatrix4(pbis, &rec->mat);
                 QW dof = GetXfDofValue(rec, rec);
-                rec->vecE0 = dof;
-                rec->vecC0 = dof;
+                rec->field_0xE0 = dof;
+                rec->posGoal = dof;
                 break;
             }
             func_0022C818(palo, rec);
             if (hasA) {
-                actA->owner = palo;
-                actA->xf = rec;
-                actA->link = -1;
+                actA->act.palo = palo;
+                actA->act.pxf = rec;
+                actA->act.priority = -1;
                 actA->vec20 = GetXfDofValue(rec, rec);
-                InsertXfAct(palo, rec, actA);
+                InsertXfAct(palo, rec, &actA->act);
             }
             if (hasB) {
-                actB->owner = palo;
-                actB->xf = rec;
-                actB->link = *(int *)((char *)actB + 0x68);
+                actB->act.palo = palo;
+                actB->act.pxf = rec;
+                actB->act.priority = actB->field_0x68;
                 actB->vec20 = GetXfDofValue(rec, rec);
-                InsertXfAct(palo, rec, actB);
+                InsertXfAct(palo, rec, &actB->act);
             }
             if (hasC) {
-                actC->owner = palo;
-                actC->xf = rec;
-                actC->link = -1;
-                InsertXfAct(palo, rec, actC);
+                actC->act.palo = palo;
+                actC->act.pxf = rec;
+                actC->act.priority = -1;
+                InsertXfAct(palo, rec, &actC->act);
             }
             if (hasD) {
-                actD->owner = palo;
-                actD->xf = rec;
-                actD->link = -1;
-                InsertXfAct(palo, rec, actD);
+                actD->act.palo = palo;
+                actD->act.pxf = rec;
+                actD->act.priority = -1;
+                InsertXfAct(palo, rec, &actD->act);
             }
         }
     }
@@ -172,15 +174,16 @@ extern "C" void LoadAloFromBrx(ALO *palo, Bis *pbis)
     LoadAloIkLimbs(palo, pbis);
     LoadXfMirrors(palo, pbis);
     func_0021C888(palo, pbis);
-    palo->p58 = ReadXf(palo, pbis);
-    palo->p5C = ReadXf(palo, pbis);
-    palo->p60 = ReadXf(palo, pbis);
-    if (palo->count > 0) {
-        int *pword = palo->pflags;
-        if (((sptr)pword ^ 1) & 1) {
-            *pword &= ~0x20;
+    palo->pxfLinear = ReadXf(palo, pbis);
+    palo->pxfAngular = ReadXf(palo, pbis);
+    palo->pxfRoot = ReadXf(palo, pbis);
+    if (palo->cxf > 0) {
+        if (!(palo->grfSw & 1)) {
+            s32 grfEntry = palo->pgrfentry->grf;
+            palo->pgrfentry->grf = grfEntry & ~0x20;
             return;
         }
-        palo->pflags = (int *)((sptr)pword & ~0x20);
+        s32 grfSw = palo->grfSw;
+        palo->grfSw = grfSw & ~0x20;
     }
 }

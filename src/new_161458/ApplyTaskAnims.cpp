@@ -1,25 +1,22 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "job.h"
+
 extern "C" {
-struct _m2c_stack_ApplyTaskAnims {
-    /* 0x00 */ char pad0[0x60];
-};                                                  /* size = 0x60 */
-M2C_UNK func_00162250(s32, s32, s32, s32);          /* extern */
-void ApplyTaskAnims(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
-    s32 var_s0;
-    s32 var_s1;
-    if (arg2 > 0) {
-        var_s1 = arg3;
-        var_s0 = arg2;
+void func_00162250(JOB *pjob, ANIMREC *panim, s32 state, s32 fPlay);
+
+void ApplyTaskAnims(JOB *pjob, s32 state, s32 canim, ANIMREC *aanim, s32 fPlay) {
+    ANIMREC *panim;
+    s32 remaining;
+
+    if (canim > 0) {
+        panim = aanim;
+        remaining = canim;
         do {
-            func_00162250(arg0, var_s1, arg1, arg4);
-            var_s0 -= 1;
-            var_s1 += 0x18;
-        } while (var_s0 != 0);
+            func_00162250(pjob, panim, state, fPlay);
+            remaining -= 1;
+            panim += 1;
+        } while (remaining != 0);
     }
 }
+
 }

@@ -1,7 +1,10 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "types.h"
 
-M2C_UNK InitXfm();                                  /* extern */
+struct XFM;
 
-void InitXfm_thunk(void) {
-    InitXfm();
+void InitXfm(struct XFM *pxfm);                     /* extern */
+
+void InitXfm_thunk(struct XFM *pxfm) {
+    InitXfm(pxfm);
 }

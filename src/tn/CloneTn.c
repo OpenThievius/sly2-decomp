@@ -1,9 +1,10 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "tn.h"
 
-M2C_UNK CloneXfm();                                 /* extern */
-s32 PloCloneLo(s32, s32);                           /* extern */
+void CloneXfm(struct TN *tn, struct TN *tnSource);  /* extern */
+struct CRV *PloCloneLo(struct CRV *pcrv, struct SO *psoParent); /* extern */
 
-void CloneTn(void *arg0) {
-    CloneXfm();
-    M2C_FIELD(arg0, s32 *, 0x10C) = PloCloneLo(M2C_FIELD(arg0, s32 *, 0x10C), M2C_FIELD(arg0, s32 *, 0x10));
+void CloneTn(struct TN *tn, struct TN *tnSource) {
+    CloneXfm(tn, tnSource);
+    tn->pcrv = PloCloneLo(tn->pcrv, tn->psoParent);
 }

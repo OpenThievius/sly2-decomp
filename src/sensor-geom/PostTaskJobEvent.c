@@ -1,8 +1,10 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "job.h"
 
-M2C_UNK bevy_camera_follow_activity(M2C_UNK *, M2C_UNK, s32); /* extern */
-extern M2C_UNK B_002DEB30;
+struct CAMERAFOLLOW;
+void bevy_camera_follow_activity(struct CAMERAFOLLOW *pmanager, s32 event, struct JOB *pjob);
+extern struct CAMERAFOLLOW B_002DEB30;
 
-void PostTaskJobEvent(void *arg0) {
-    bevy_camera_follow_activity(&B_002DEB30, 0x1E, M2C_FIELD(arg0, s32 *, 0x7C));
+void PostTaskJobEvent(struct TASK *task) {
+    bevy_camera_follow_activity(&B_002DEB30, 0x1E, task->job);
 }

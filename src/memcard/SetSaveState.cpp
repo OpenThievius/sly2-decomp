@@ -1,13 +1,14 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
 #include "cref.h"
-struct MEMCARD;
-struct SLOT { char pad[0x5464]; };
-struct SAVE {
-    char pad0[8]; int state; int want; float tStamp;
-    char pad1[0x10]; SLOT aslot[3];
-    char pad2[0xFD50 - 0x24 - 3 * 0x5464];
-    SLOT *pslotCur; SLOT *pslotNewest; int pad3; char mc[1];
-};
+#include "types.h"
+
+#include "memcard.h"
+
+
+
+
+
 struct UL { long v; } __attribute__((packed));
 struct MENU { char pad[0x44]; int phase; };
 extern "C" {
@@ -24,9 +25,9 @@ void BusyMenu_Hide(void *);
 void MemcardMenu_SetState(MENU *, int);
 void CreateMemcardThread__FP7MEMCARDii(MEMCARD *, long);
 CRef RefGetGameSaveValue(void *, void *);
-void ResetSaveKeepingOptions(void *, int);
+void ResetSaveKeepingOptions(SLOT *, int);
+int CompareSaves__FP4SAVET0(MCFILEINFO *, MCFILEINFO *);
 }
-int CompareSaves(SAVE *, SAVE *);
 
 void SetSaveState(SAVE *psave, int nState)
 {
@@ -46,10 +47,10 @@ void SetSaveState(SAVE *psave, int nState)
     switch (nState) {
     case 0:
     case 1:
-        CreateMemcardThread__FP7MEMCARDii((MEMCARD *)psave->mc, g_2a6ba0.v);
+        CreateMemcardThread__FP7MEMCARDii(&psave->mc, g_2a6ba0.v);
         break;
     case 3:
-        CreateMemcardThread__FP7MEMCARDii((MEMCARD *)psave->mc, g_2a6ba8.v);
+        CreateMemcardThread__FP7MEMCARDii(&psave->mc, g_2a6ba8.v);
         break;
     case 6:
         psave->pslotNewest = &psave->aslot[0];
@@ -57,7 +58,7 @@ void SetSaveState(SAVE *psave, int nState)
             SLOT *pslot = &psave->aslot[islot];
             float dt = RefGetGameSaveValue(B_003DD490.psavepathDt, pslot).m_tag.m_g;
             if (dt != 0.0f) {
-                if (CompareSaves((SAVE *)((char *)psave->pslotNewest + 0x5408), (SAVE *)((char *)pslot + 0x5408)) < 0)
+                if (CompareSaves__FP4SAVET0(&psave->pslotNewest->info, &pslot->info) < 0)
                     psave->pslotNewest = pslot;
             } else {
                 ResetSaveKeepingOptions(pslot, 0);

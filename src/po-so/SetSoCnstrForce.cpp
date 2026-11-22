@@ -1,22 +1,25 @@
-#include "sly2.h"
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "so.h"
+#include "phys.h"
 #include "xf.h"
-struct PH { char p0[0xB0]; char vec[0x10]; int ct; };
-struct SOB { char p0[0x58]; XF *xf; XF *xf2; char p1[136]; PH *ph; };
-extern "C" void SetXfKind(SOB *, XF *, int);
-extern "C" void ConstrFromCnstr(SOB *, XF *, int, void *);
-extern "C" void RecalcSoLocked(SOB *);
-extern "C" void func_001F8668(SOB *, int);
-extern "C" void SetSoCnstrForce(SOB *so, int cnstr)
-{
-    if (so->ph) {
-        XF *xf = so->xf;
-        if (xf->pactFirst == 0) {
-            if (xf->kind != 2)
-                SetXfKind(so, xf, 1);
+
+extern "C" {
+void SetXfKind(SO *, XF *, int);
+void ConstrFromCnstr(SO *, XF *, int, void *);
+void RecalcSoLocked(SO *);
+void func_001F8668(SO *, int);
+
+void SetSoCnstrForce(SO *pso, int cnstr) {
+    if (pso->pphys) {
+        XF *pxf = pso->pxfLinear;
+        if (pxf->pactFirst == 0) {
+            if (pxf->kind != 2)
+                SetXfKind(pso, pxf, 1);
         }
-        ConstrFromCnstr(so, xf, cnstr, so->ph->vec);
-        RecalcSoLocked(so);
-        if (*(int *)((char *)so->ph + 0xC0) != 3)
-            func_001F8668(so, 0);
+        ConstrFromCnstr(pso, pxf, cnstr, &pso->pphys->cnstrForce);
+        RecalcSoLocked(pso);
+        if (pso->pphys->ctForce != 3)
+            func_001F8668(pso, 0);
     }
+}
 }

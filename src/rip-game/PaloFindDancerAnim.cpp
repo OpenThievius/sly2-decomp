@@ -1,17 +1,13 @@
-#include "types.h"
-#define NULL 0
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "dancer.h"
 extern "C" {
 extern char B_003DD490[];
-char *PloFindSwObject_thunk(char *sw, s32 kind, s32 arg2, s32 arg3);
+LO *PloFindSwObject_thunk(char *sw, s32 kind, s32 oid, DANCER *dancerContext);
 
-char *PaloFindDancerAnim(s32 arg0, s32 arg1) {
-    char *found;
-
-    found = PloFindSwObject_thunk(B_003DD490, 4, arg1, arg0);
-    if (found != NULL) {
-        char *sub = *(char **)(found + 0xC);
-        void (*callback)(char *) = *(void (**)(char *))(sub + 0x4C);
-        callback(found + *(s16 *)(sub + 0x48));
+LO *PaloFindDancerAnim(DANCER *dancer, s32 oid) {
+    LO *found = PloFindSwObject_thunk(B_003DD490, 4, oid, dancer);
+    if (found != 0) {
+        found->Remove();
     }
     return found;
 }

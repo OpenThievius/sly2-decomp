@@ -1,28 +1,29 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
-struct VSLOT { short delta; short index; void (*fn)(void *); };
-struct Obj { char pad0[0xC]; VSLOT *vtable; char pad1[0x3C - 0x10]; int mode; };
-struct Guard { char pad0[0x1B0]; QW facing[3]; };
-struct Guard2 { char pad0[0xF84]; void *crv; };
-#include "goal.h"
-struct GOAL_17D1F0 : GOAL { };
+#include "stepguard.h"
+#include "goals.h"
+// The guard's orientation, three quadword rows at STEP 0x1B0 (only this function reads it: a local view of the guard)
+struct GUARDFACING {
+    u8 unknown_0x0[0x1B0];
+    QW facing[3];
+};
 struct M3 { QW row[3]; };
 extern "C" QW g_2a2dc0;
-extern "C" void func_001EEF70(GOAL_17D1F0 *);
-extern "C" Obj *func_00205438(Guard *, int);
+extern "C" void func_001EEF70(GOAL *);
+extern "C" GOAL *func_00205438(STEPGUARD *, int);
 extern "C" QW *PmatLoWorld(void *);
 extern "C" void BuildOrthonormalMatrixY__FP6VECTORT0P7MATRIX3(M3 *, QW, QW);
-void func_0017D1F0(GOAL_17D1F0 *goal)
+void func_0017D1F0(GOAL *pgoal)
 {
     M3 mat;
-    func_001EEF70(goal);
-    Obj *obj = func_00205438(((Guard *)goal->pstep), 0x9D);
-    obj->mode = 2;
-    VSLOT *slot = &obj->vtable[8];
-    slot->fn((char *)obj + slot->delta);
-    Guard *guard = ((Guard *)goal->pstep);
-    QW *path = PmatLoWorld(*(void **)((char *)guard + 0xF84));
+    func_001EEF70(pgoal);
+    GOALANIM *panim = (GOALANIM *)func_00205438(GOAL_GUARD(pgoal), 0x9D);
+    panim->sgs = 2;
+    panim->Activate();
+    GUARDFACING *pguard = (GUARDFACING *)pgoal->pstep;
+    QW *path = PmatLoWorld(GOAL_GUARD(pgoal)->ptargetPath);
     BuildOrthonormalMatrixY__FP6VECTORT0P7MATRIX3(&mat, path[0], g_2a2dc0);
-    guard->facing[0] = mat.row[0];
-    guard->facing[1] = mat.row[1];
-    guard->facing[2] = mat.row[2];
+    pguard->facing[0] = mat.row[0];
+    pguard->facing[1] = mat.row[1];
+    pguard->facing[2] = mat.row[2];
 }

@@ -1,12 +1,14 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "goals.h"
+#include "sly2.h"
 
-M2C_UNK AddGuardSgs(s32, M2C_UNK);                  /* extern */
-M2C_UNK func_001EEF68();                            /* extern */
+void AddGuardSgs(void *pguard, s32 sgs);
+void func_001EEF68(struct GOAL *pgoal);
 
-void GoalIdle_Init(void *arg0) {
-    func_001EEF68();
-    M2C_FIELD(arg0, s32 *, 0x38) = -1;
-    M2C_FIELD(arg0, f32 *, 0x34) = 3.4028235e38f;
-    M2C_FIELD(arg0, f32 *, 0x30) = 3.4028235e38f;
-    AddGuardSgs(M2C_FIELD(arg0, s32 *, 0x10), 0x1E);
+void GoalIdle_Init(struct GOALIDLE *pgoal) {
+    func_001EEF68((struct GOAL *)pgoal);
+    pgoal->state = -1;
+    pgoal->tWaitLimit = 3.4028235e38f;
+    pgoal->tScriptLimit = 3.4028235e38f;
+    AddGuardSgs(pgoal->pstep, 0x1E);
 }

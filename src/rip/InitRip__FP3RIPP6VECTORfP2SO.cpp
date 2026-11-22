@@ -1,25 +1,21 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "rip.h"
+#include "clock.h"
 extern "C" {
-extern s128 D_002C1F50;
-extern M2C_UNK RO_002A2D00;
-extern f32 g_2dded0;
+extern QW D_002C1F50;
+extern QW RO_002A2D00[3];
 
-void InitRip__FP3RIPP6VECTORfP2SO(s8 *arg0, s128 arg1, s32 arg2, f32 fparg0) {
-    M2C_FIELD(arg0, f32 *, 0x14) = (f32) g_2dded0;
-    M2C_FIELD(arg0, f32 *, 0x18) = 1.0f;
-    M2C_FIELD(arg0, s32 *, 0xE0) = arg2;
-    M2C_FIELD(arg0, f32 *, 0x20) = fparg0;
-    M2C_FIELD(arg0, s128 *, 0x30) = (s128) D_002C1F50;
-    M2C_FIELD(arg0, s128 *, 0x80) = arg1;
-    M2C_FIELD(arg0, s128 *, 0x70) = arg1;
-    M2C_FIELD(arg0, s128 *, 0x40) = (s128) M2C_FIELD(&RO_002A2D00, s128 *, 0);
-    M2C_FIELD(arg0, s128 *, 0x50) = (s128) M2C_FIELD(&RO_002A2D00, s128 *, 0x10);
-    M2C_FIELD(arg0, s128 *, 0x60) = (s128) M2C_FIELD(&RO_002A2D00, s128 *, 0x20);
+void InitRip__FP3RIPP6VECTORfP2SO(RIP *rip, QW pos, float field_0x20, SO *psoTouch) {
+    rip->tStart = g_2dded0.t;
+    rip->dtLifetime = 1.0f;
+    rip->psoTouch = psoTouch;
+    rip->field_0x20 = field_0x20;
+    rip->field_0x30 = D_002C1F50;
+    rip->posPrev = pos;
+    rip->pos = pos;
+    rip->field_0x40 = RO_002A2D00[0];
+    rip->field_0x50 = RO_002A2D00[1];
+    rip->field_0x60 = RO_002A2D00[2];
 }
 
 }

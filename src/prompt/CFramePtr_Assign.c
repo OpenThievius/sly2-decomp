@@ -1,21 +1,23 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "types.h"
 
-M2C_UNK CFrame_DeletingDestructor(s32 *, M2C_UNK);  /* extern */
+typedef struct CFRAME { s32 refCount; } CFRAME;
+void CFrame_DeletingDestructor(CFRAME *, s32);
 
-void CFramePtr_Assign(s32 **arg0, s32 *arg1) {
-    s32 *temp_a0;
-    s32 temp_v0;
+void CFramePtr_Assign(CFRAME **pptr, CFRAME *frame) {
+    CFRAME *old;
+    s32 count;
 
-    if (arg1 != NULL) {
-        *arg1 += 1;
+    if (frame != 0) {
+        frame->refCount += 1;
     }
-    temp_a0 = *arg0;
-    if (temp_a0 != NULL) {
-        temp_v0 = *temp_a0 - 1;
-        *temp_a0 = temp_v0;
-        if (temp_v0 == 0) {
-            CFrame_DeletingDestructor(temp_a0, 3);
+    old = *pptr;
+    if (old != 0) {
+        count = old->refCount - 1;
+        old->refCount = count;
+        if (count == 0) {
+            CFrame_DeletingDestructor(old, 3);
         }
     }
-    *arg0 = arg1;
+    *pptr = frame;
 }

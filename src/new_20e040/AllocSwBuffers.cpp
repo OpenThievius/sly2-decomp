@@ -1,41 +1,44 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
+#include "sw.h"
 #include "alloc.h"
-struct ZPR { char pad[0x630]; };
+struct ZPR { u8 unknown_0x0[0x630]; };
+struct ACT;
 extern "C" void *PvAllocSwImpl__Fi(ALLOCREQ *);
 extern "C" void *PvAllocSwClearImpl__Fi(ALLOCREQ *);
 extern "C" void InitSl(void *, int);
 extern "C" void InitZpr__FP3ZPR3ZPKP2LO(ZPR *, int, int);
-extern "C" void func_001BE398(void *, ZPR *);
-extern "C" void bevy_camera_follow_activity(void *, int, int);
-extern "C" char B_002DEB30[];
-void AllocSwBuffers(char *sw)
+extern "C" void func_001BE398(ZPRENTRY *, ZPR *);
+extern "C" void bevy_camera_follow_activity(ACT *, int, void *);
+extern "C" ACT B_002DEB30;
+void AllocSwBuffers(SW *sw)
 {
     ALLOCREQ req;
     ZPR zpr;
-    void **slot = (void **)(sw + 0x3CD4);
+    OBR **slot = sw->aobr;
     for (int index = 2; index >= 0; index--) {
         req.cb = 0x4800;
         req.cbAlign = 0x10;
-        *slot++ = PvAllocSwImpl__Fi(&req);
+        *slot++ = (OBR *)PvAllocSwImpl__Fi(&req);
     }
     unsigned index = 0;
-    char *entry = sw + 0x45E8;
+    ZPRENTRY *entry = sw->azprentry;
     req.cb = 0x8000;
     req.cbAlign = 0x10;
-    *(void **)(sw + 0x3F20) = PvAllocSwClearImpl__Fi(&req);
+    sw->agrfentry = (GRFENTRY *)PvAllocSwClearImpl__Fi(&req);
     req.cb = 0x28;
     req.cbAlign = 0x10;
-    int *record = (int *)PvAllocSwClearImpl__Fi(&req);
-    *(int **)(sw + 0x3F0C) = record;
-    *record = -1;
-    (*(int **)(sw + 0x3F0C))[2] = -1;
-    InitSl(*(char **)(sw + 0x3F0C) + 0x18, 0x14);
+    SCOPE *pscope = (SCOPE *)PvAllocSwClearImpl__Fi(&req);
+    sw->pscopeDefault = pscope;
+    pscope->field_0x0 = -1;
+    sw->pscopeDefault->field_0x8 = -1;
+    InitSl(sw->pscopeDefault->sl, 0x14);
     InitZpr__FP3ZPR3ZPKP2LO(&zpr, 0x1400, 0x1800);
     for (; index < 2; index++) {
         func_001BE398(entry, &zpr);
-        entry += 0x28;
+        entry++;
     }
-    if (*(unsigned *)(sw + 0x3BF4) & 0x20)
-        *(int *)(sw + 0x3E38) = 1;
-    bevy_camera_follow_activity(B_002DEB30, 2, 0);
+    if (sw->loadreq.grf & 0x20)
+        sw->field_0x3E38 = 1;
+    bevy_camera_follow_activity(&B_002DEB30, 2, 0);
 }

@@ -1,10 +1,9 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "script.h"
 extern "C" {
-#include "types.h"
-typedef struct { u8 bytes[8]; } Bytes8_170BA0;
-char *PcmdAllocScript(void *arg0, s32 arg1, s32 arg2);
-
-void func_00170BA0(void *arg0, Bytes8_170BA0 *arg1) {
-    char *dest = PcmdAllocScript(arg0, 2, -1);
-    *(Bytes8_170BA0 *)(dest + 8) = *arg1;
+void *PcmdAllocScript(SCRIPT *, int, int);
+void func_00170BA0(SCRIPT *script, BYTES8 *payload) {
+    PCMDPAYLOAD *command = (PCMDPAYLOAD *)PcmdAllocScript(script, 2, -1);
+    command->payload = *payload;
 }
 }

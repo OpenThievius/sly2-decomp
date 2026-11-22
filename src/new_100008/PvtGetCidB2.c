@@ -1,7 +1,8 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "classinfo.h"
 
-extern M2C_UNK D_002BB8D0;
+extern CLASSINFO D_002BB8D0;
 
-M2C_UNK *PvtGetCidB2(void) {
+CLASSINFO *PvtGetCidB2(void) {
     return &D_002BB8D0;
 }

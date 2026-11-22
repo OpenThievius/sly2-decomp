@@ -4,16 +4,12 @@
 #include "sly2.h"
 #include "crfodb.h"
 #include "jt.h"
-#include "m2c_macros.h"
 #include "include_asm.h"
 
-struct Basic { char pad0[0x188]; int kind; int fAlert; int pad190; };
+/* a loot definition as Crfodb_OnGrab reads it (LOOT::plootdefSel's target; loot.h knows only its id) */
+struct LootDef { u8 unknown_0x0[0x10]; int fAllowed; int kind; };
 
-struct LootDef { char pad[0x10]; int fAllowed; int kind; };
-
-struct LOOT { char pad[0x158]; LootDef *pdef; int pguard; int pthief; };
-
-struct Guard { char pad[0x188]; int kind; int pad18C; int fAlert; LOOT *ploot; };
+struct LOOT { u8 unknown_0x0[0x158]; LootDef *pdef; int pguard; int pthief; };
 
 extern int B_003E0F9C;
 
@@ -32,7 +28,7 @@ void SetLootState(void *, int);
 void func_00184130(void *, void *);
 }
 
-extern "C" void Crfodb_OnGrab(Guard *guard, JT *jt)
+extern "C" void Crfodb_OnGrab(CRFODB *guard, JT *jt)
 {
     if (FIsBasicDerivedFrom(jt, 0x34) == 0)
         return;
@@ -141,8 +137,9 @@ int IdlootCrfodb(CRFODB *pcrfodb)
 INCLUDE_ASM(0X13D328);
 
 extern "C" {
-s32 CreateSlotheapSwAlign(s32 *, s32, s32, s32); /* extern */
+s32 CreateSlotheapSwAlign(void *pheap, s32 cbElement, s32 celement, s32 cbAlign); /* extern */
 
+/* reference counts: the first user of each slot heap creates it */
 extern s32 B_002DD2E0;
 
 extern s32 B_002DD2E4;
@@ -167,43 +164,43 @@ extern s32 B_00452148;
 
 extern s32 B_00452170;
 
-void StaticInitSlotheaps_13d400(s32 arg0, s32 arg1) {
-    s32 temp_v0;
-    s32 temp_v0_2;
-    s32 temp_v0_3;
-    s32 temp_v0_4;
-    s32 temp_v0_5;
-    s32 temp_v0_6;
+void StaticInitSlotheaps_13d400(s32 fInit, s32 grfPhase) {
+    s32 cusers0;
+    s32 cusers1;
+    s32 cusers2;
+    s32 cusers3;
+    s32 cusers4;
+    s32 cusers5;
 
-    if ((arg1 == 0xFFFF) && (arg0 != 0)) {
-        temp_v0 = B_002DD2E0 + 1;
-        B_002DD2E0 = temp_v0;
-        if (temp_v0 == 1) {
+    if ((grfPhase == 0xFFFF) && (fInit != 0)) {
+        cusers0 = B_002DD2E0 + 1;
+        B_002DD2E0 = cusers0;
+        if (cusers0 == 1) {
             CreateSlotheapSwAlign(&B_004520A8, 0x14, 0x2000, 0x10);
         }
-        temp_v0_2 = B_002DD2E4 + 1;
-        B_002DD2E4 = temp_v0_2;
-        if (temp_v0_2 == 1) {
+        cusers1 = B_002DD2E4 + 1;
+        B_002DD2E4 = cusers1;
+        if (cusers1 == 1) {
             CreateSlotheapSwAlign(&B_004520D0, 0x18, 0x800, 0x10);
         }
-        temp_v0_3 = B_002DD2E8 + 1;
-        B_002DD2E8 = temp_v0_3;
-        if (temp_v0_3 == 1) {
+        cusers2 = B_002DD2E8 + 1;
+        B_002DD2E8 = cusers2;
+        if (cusers2 == 1) {
             CreateSlotheapSwAlign(&B_004520F8, 0x28, 0x200, 0x10);
         }
-        temp_v0_4 = B_002DD2EC + 1;
-        B_002DD2EC = temp_v0_4;
-        if (temp_v0_4 == 1) {
+        cusers3 = B_002DD2EC + 1;
+        B_002DD2EC = cusers3;
+        if (cusers3 == 1) {
             CreateSlotheapSwAlign(&B_00452120, 0x1C, 0x800, 0x10);
         }
-        temp_v0_5 = B_002DD2F0 + 1;
-        B_002DD2F0 = temp_v0_5;
-        if (temp_v0_5 == 1) {
+        cusers4 = B_002DD2F0 + 1;
+        B_002DD2F0 = cusers4;
+        if (cusers4 == 1) {
             CreateSlotheapSwAlign(&B_00452148, 0xC, 0xC8, 0x10);
         }
-        temp_v0_6 = B_002DD2F4 + 1;
-        B_002DD2F4 = temp_v0_6;
-        if (temp_v0_6 == 1) {
+        cusers5 = B_002DD2F4 + 1;
+        B_002DD2F4 = cusers5;
+        if (cusers5 == 1) {
             CreateSlotheapSwAlign(&B_00452170, 0x14, 0x100, 0x10);
         }
     }

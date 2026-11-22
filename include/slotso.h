@@ -6,14 +6,25 @@
 #ifndef SLY2_SLOTSO_H
 #define SLY2_SLOTSO_H
 #include "so.h"
+#include "rows3.h"
 
 struct CRV;
 struct ACT;
+struct ASEG;
+
+/* A smoothing block (Sly 1's name for it): SetSlotSoSmp fills one from a constant and a scale. */
+struct V3 {
+    f32 x, y, z;
+};
+struct SMP {
+    /* 0x0 */ V3 v;     /* SetSlotSoSmp: the constant at D_002C0248, x and y times the scale, z over its square root */
+    /* 0xC */ f32 scale;
+};
 
 /* One of the six 0xC-byte entries at 0x17C: func_001B0B78 sets oid to -1 and def from a table of six words. */
 struct SLOTDEF {
     /* 0x0 */ s32 oid;
-    /* 0x4 */ s32 field_0x4;
+    /* 0x4 */ struct ASEG *paseg; /* ResolveSlotSoAsegs stores the resolved aseg of the handle at 0; func_001B0D08 reads it (GSpeedSlotSoAseg) */
     /* 0x8 */ s32 def;
 };
 
@@ -35,9 +46,11 @@ struct SLOTSO : SO {
     /* 0x1C8 */ void *field_0x1C8;    /* FAbsorbSlotSoWkr: an object whose slot-51 entry it calls with an event */
     /* 0x1CC */ f32 field_0x1CC;      /* func_001B0B78 sets it to 300 */
     /* 0x1D0 */ f32 field_0x1D0;      /* func_001B0B78 sets it to 1000 */
-    u8 unknown_0x1D4[0x4];
+    /* 0x1D4 */ s32 kindAngular;       /* func_001B0CA8 stores pxfAngular's kind after loading; func_001B1328 hands it back to SetXfKind */
     /* 0x1D8 */ f32 radHeading;        /* FSlotSoFacingHeading */
-    u8 unknown_0x1DC[0x44];
+    u8 unknown_0x1DC[0x4];
+    /* 0x1E0 */ ROWS3 rotation;        /* SetSlotSoHeading: the rotation LoadRotateMatrixRad builds from the heading */
+    /* 0x210 */ SMP smp;               /* SetSlotSoSmp */
     /* 0x220 */ s32 state;             /* UpdateSlotSo, FAbsorbSlotSoWkr; func_001B0B78 sets it to -1 */
     u8 unknown_0x224[0x4];
     /* 0x228 */ f32 tNext;             /* UpdateSlotSo */
@@ -56,7 +69,10 @@ SLY2_OFFSET_CHECK(SLOTSO, field_0x1CC, 0x1CC);
 SLY2_OFFSET_CHECK(SLOTSO, field_0x230, 0x230);
 SLY2_OFFSET_CHECK(SLOTSO, pactAnim, 0x1C4);
 SLY2_OFFSET_CHECK(SLOTSO, field_0x1C8, 0x1C8);
+SLY2_OFFSET_CHECK(SLOTSO, kindAngular, 0x1D4);
 SLY2_OFFSET_CHECK(SLOTSO, radHeading, 0x1D8);
+SLY2_OFFSET_CHECK(SLOTSO, rotation, 0x1E0);
+SLY2_OFFSET_CHECK(SLOTSO, smp, 0x210);
 SLY2_OFFSET_CHECK(SLOTSO, state, 0x220);
 SLY2_OFFSET_CHECK(SLOTSO, tNext, 0x228);
 SLY2_OFFSET_CHECK(SLOTSO, tFade, 0x22C);

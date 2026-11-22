@@ -1,20 +1,16 @@
-#include "m2c_macros.h"
-extern "C" {
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "sly2.h"
+#include "cref.h"
+#include "lo.h"
+CRef RefSetArgsFromSplice(int cref, CRef *aref, const void *aotyp, ...);
+extern "C" void func_00228170(LO *);
 
-M2C_UNK CRef_CopyConstruct(s32, void *);            /* extern */
-M2C_UNK CRef_Destruct(void *);                      /* extern */
-M2C_UNK RefSetArgsFromSplice__FiP4CRefP4OTYPe(void *, M2C_UNK, s32, M2C_UNK); /* extern */
-M2C_UNK SetTag__4CRef4TAGK(void *, M2C_UNK);        /* extern */
-M2C_UNK func_00228170(s32);                         /* extern */
+extern "C" CRef func_0010B760(LO *object, int count, CRef *args)
+{
+    RefSetArgsFromSplice(0, args, 0);
+    CRef refResult;
+    refResult.SetTag(TAGK_Void);
+    func_00228170(object);
+    return refResult;
+}
 
-s32 func_0010B760(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
-    char sp[0x10];
-    RefSetArgsFromSplice__FiP4CRefP4OTYPe(sp, 0, arg3, 0);
-    CRef_Destruct(sp);
-    SetTag__4CRef4TAGK(sp, 0x24);
-    func_00228170(arg1);
-    CRef_CopyConstruct(arg0, sp);
-    CRef_Destruct(sp);
-    return arg0;
-}
-}

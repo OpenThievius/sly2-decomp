@@ -1,18 +1,16 @@
-#include "m2c_macros.h"
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "factory.h"
 
-void *__7GLOBSET(s32);                               /* extern: GLOBSET::GLOBSET, returns its argument */
-void *__builtin_new(M2C_UNK);                       /* extern */
-extern M2C_UNK D_002D3FA0;
-extern M2C_UNK D_002D9978;
+extern char D_002D3FA0[];
+extern char D_002D9978[]; /* SO's vtable (class 48): the first constructor of the chain stores it */
 
-void *func_00111E98(void) {
-    void *temp_v0;
-
-    temp_v0 = __builtin_new(0x270);
-    M2C_FIELD(temp_v0, M2C_UNK **, 0xC) = &D_002D9978;
-    M2C_FIELD(temp_v0, s32 *, 0) = 0;
-    M2C_FIELD(temp_v0, s32 *, 4) = 0;
-    __7GLOBSET(temp_v0 + 0x80);
-    M2C_FIELD(temp_v0, M2C_UNK **, 0xC) = &D_002D3FA0;
-    return temp_v0;
+void *func_00111E98(void)
+{
+    NEWSO *pobject = (NEWSO *)__builtin_new(0x270);
+    pobject->basic.pvtbl = D_002D9978;
+    pobject->basic.field_0x0 = 0;
+    pobject->basic.psidebag = 0;
+    __7GLOBSET(&pobject->globset);
+    pobject->basic.pvtbl = D_002D3FA0;
+    return pobject;
 }

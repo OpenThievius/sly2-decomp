@@ -1,12 +1,13 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "guardview.h"
 
-s32 GrfsgsFromRef(s32);                             /* extern */
-void *PguardanimEnsure(s32, s32);                   /* extern */
+s32 GrfsgsFromRef(s32);
+struct GUARDANIM *PguardanimEnsure(struct STEPGUARDVIEW *, s64);
 
-void UseGuardAnimation(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
-    void *temp_v0;
+void UseGuardAnimation(struct STEPGUARDVIEW *pguard, s32 refList, void *pdata, u32 grf) {
+    struct GUARDANIM *panim;
 
-    temp_v0 = PguardanimEnsure(arg0, GrfsgsFromRef(arg1));
-    M2C_FIELD(temp_v0, s32 *, 4) = arg2;
-    M2C_FIELD(temp_v0, s32 *, 0xC) = arg3;
+    panim = PguardanimEnsure(pguard, GrfsgsFromRef(refList));
+    panim->ref.pdata = pdata;
+    panim->ref.grf = grf;
 }

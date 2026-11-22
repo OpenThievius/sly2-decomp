@@ -1,19 +1,22 @@
-#include "sly2.h"
-extern "C" void SetXfKind(void *, void *, int);
-extern "C" void WakeXf(void *xf, char *obj)
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "alo.h"
+#include "xf.h"
+
+extern "C" void SetXfKind(ALO *, XF *, int);
+extern "C" void WakeXf(ALO *palo, XF *pxf)
 {
-    switch ((short)(*(unsigned short *)(obj + 0x98) - 3)) {
+    switch ((short)((unsigned short)pxf->kind - 3)) {
     case 3: case 7:
-        SetXfKind(xf, obj, 7);
+        SetXfKind(palo, pxf, 7);
         break;
     case 9:
-        SetXfKind(xf, obj, 0xB);
+        SetXfKind(palo, pxf, 0xB);
         break;
     case 16:
-        SetXfKind(xf, obj, 0x12);
+        SetXfKind(palo, pxf, 0x12);
         break;
     case 0:
-        SetXfKind(xf, obj, 1);
+        SetXfKind(palo, pxf, 1);
         break;
     }
 }

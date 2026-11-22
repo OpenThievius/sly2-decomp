@@ -1,16 +1,17 @@
-#include "m2c_macros.h"
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "emitter.h"
 extern "C" {
 
-M2C_UNK PemitblipEnsureEmitter(s32, M2C_UNK);            /* extern */
-M2C_UNK PemitripEnsureEmitter(s32, M2C_UNK);             /* extern */
+EMITPARAMS *PemitblipEnsureEmitter(EMITTER *, s32);
+EMITPARAMS *PemitripEnsureEmitter(EMITTER *, s32);
 
-void func_002589A8(s32 arg0, s32 arg1) {
-    switch (arg1) {                                 /* irregular */
+void func_002589A8(EMITTER *emitter, s32 kind) {
+    switch (kind) {
     case 0:
-        PemitblipEnsureEmitter(arg0, 1);
+        PemitblipEnsureEmitter(emitter, 1);
         return;
     case 1:
-        PemitripEnsureEmitter(arg0, 1);
+        PemitripEnsureEmitter(emitter, 1);
         break;
     }
 }

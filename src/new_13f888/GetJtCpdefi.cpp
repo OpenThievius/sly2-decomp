@@ -2,27 +2,48 @@
 #include "sly2.h"
 #include "ps2inline.h"
 #include "vu0inline.h"
-struct VtJt_141640 { char pad0[0x110]; short d110; short i110; QW (*f114)(void *); char pad1[0x308 - 0x118]; short d308; short i308; void (*f30C)(void *, float *); };
-struct Jt_141640 {
-    char pad0[0xC]; VtJt_141640 *vt; char pad1[0x2C0 - 0x10]; char a2C0[0x1C]; int f2DC; char pad2[0x434 - 0x2E0]; int f434; char pad3[0x4C0 - 0x438];
-    char a4C0[0xC]; int f4CC; char pad4[0xDF0 - 0x4CC - 4]; char aDF0[4]; int fDF4; char pad5[0x1044 - 0xDF8]; int f1044; char pad6[0x104C - 0x1048];
-    float f104C; float f1050; char pad7[0x1060 - 0x1054]; QW f1060; QW f1070;
+#include "jt.h"
+#include "clock.h"
+
+/* the camera's focus record GetJtCpdefi fills: the focus position, then the speed scale at 0x34 */
+struct CPDEFI {
+    u8 unknown_0x0[0x10];
+    union {
+        QW pos;
+        struct {
+            f32 x;
+            f32 y;
+            f32 z;
+        };
+    };
+    u8 unknown_0x20[0x14];
+    /* 0x34 */ f32 field_0x34;
 };
-struct Out_141640 { char pad0[0x10]; float x; float y; float z; char pad1[0x34 - 0x1C]; float f34; };
-struct Out2_141640 { char pad0[0x10]; QW pos; float f18; };
-struct Cam_141640 { char pad0[0x260]; Jt_141640 *f260; char pad1[0x300 - 0x264]; int f300; };
-struct Time_141640 { float a; float dt; };
-struct Lim_141640 { float lo; float hi; };
-struct Poly_141640 { float c0; float c1; float c2; };
+/* the camera manager B_002DDF40: the player it follows and a flag */
+struct CAMMGR {
+    u8 unknown_0x0[0x260];
+    /* 0x260 */ JT *pjtFollowed;
+    u8 unknown_0x264[0x300 - 0x264];
+    /* 0x300 */ s32 field_0x300;
+};
+struct LIMITS {
+    f32 lo;
+    f32 hi;
+};
+struct POLY3 {
+    f32 c0;
+    f32 c1;
+    f32 c2;
+};
 extern "C" {
-void GetSoCpdefi__FP2SOfP6CPDEFI(void *, void *);
-QW PosLoWorld(void *);
+void GetSoCpdefi__FP2SOfP6CPDEFI(JT *, CPDEFI *);
+QW PosLoWorld(JT *);
 float GSmooth__FfffP3SMPPf(void *, int, float, float, float);
 QW PosSmooth(QW, QW, void *, int, float);
-void GetAttachCpdefi(void *, void *);
-int func_0019C8B0(void *, void *);
-int bevy_player_p7_damage_1a2160(void *, void *);
-extern Cam_141640 B_002DDF40;
+void GetAttachCpdefi(void *, CPDEFI *);
+int func_0019C8B0(void *, CPDEFI *);
+int bevy_player_p7_damage_1a2160(void *, CPDEFI *);
+extern CAMMGR B_002DDF40;
 extern char D_002BCCB8[];
 extern char D_002BCCC8[];
 extern char D_002BCCD8[];
@@ -34,10 +55,9 @@ extern float RO_002BCCA8;
 extern float RO_002BCCAC;
 extern float RO_002BCCB0;
 extern float RO_002BCCB4;
-extern Poly_141640 D_002BCCF0;
+extern POLY3 D_002BCCF0;
 extern QW g_2a2dd0;
-extern Lim_141640 g_2bbb60;
-extern Time_141640 g_2dded0;
+extern LIMITS g_2bbb60;
 static inline float GClamp(float g, float lo, float hi)
 {
     if (g < lo)
@@ -46,21 +66,22 @@ static inline float GClamp(float g, float lo, float hi)
         return hi;
     return g;
 }
-void GetJtCpdefi(Jt_141640 *jt, Out_141640 *out) {
+/* JT slot 50 (GetCpdefi) */
+void GetJtCpdefi(JT *pjt, CPDEFI *pcpdefi) {
     float sp[4];
-    GetSoCpdefi__FP2SOfP6CPDEFI(jt, out);
-    if (jt->f1044 != 0) {
-        ((Out2_141640 *)out)->pos = jt->f1060;
-        jt->f104C = *(float *)((char *)jt + 0x1068);
+    GetSoCpdefi__FP2SOfP6CPDEFI(pjt, pcpdefi);
+    if (pjt->fLook != 0) {
+        pcpdefi->pos = pjt->look;
+        pjt->field_0x104C = ((float *)&pjt->look)[2];
     } else {
-        QW pos = PosLoWorld(jt);
+        QW pos = PosLoWorld(pjt);
         float z = LaneZInGeneralRegister(pos);
-        jt->vt->f30C((char *)jt + jt->vt->d308, sp);
+        pjt->Slot97(sp);
         float lo, hi;
-        if (jt->f434 != 0) {
+        if (pjt->field_0x434 != 0) {
             lo = RO_002BCCA0;
             hi = RO_002BCCA4;
-        } else if (jt->f2DC == 0x16) {
+        } else if (pjt->jmpState == 0x16) {
             lo = RO_002BCCB0;
             hi = RO_002BCCB4;
         } else {
@@ -68,15 +89,15 @@ void GetJtCpdefi(Jt_141640 *jt, Out_141640 *out) {
             hi = RO_002BCCAC;
         }
         float value = GClamp(sp[2], z + lo, z + hi);
-        jt->f104C = value;
-        if (B_002DDF40.f300 != 0 || B_002DDF40.f260 != jt) {
-            out->z = value;
+        pjt->field_0x104C = value;
+        if (B_002DDF40.field_0x300 != 0 || B_002DDF40.pjtFollowed != pjt) {
+            pcpdefi->z = value;
         } else {
-            void *table = jt->f434 != 0 ? (void *)D_002BCCC8 : (void *)D_002BCCB8;
-            float smoothed = GSmooth__FfffP3SMPPf(table, 0, jt->f1050, jt->f104C, g_2dded0.dt);
+            void *table = pjt->field_0x434 != 0 ? (void *)D_002BCCC8 : (void *)D_002BCCB8;
+            float smoothed = GSmooth__FfffP3SMPPf(table, 0, pjt->field_0x1050, pjt->field_0x104C, g_2dded0.dt);
             float floor = z + RO_002BCC98;
             float ceiling = z + RO_002BCC9C;
-            out->z = smoothed;
+            pcpdefi->z = smoothed;
             float clamped;
             if (smoothed < floor) {
                 clamped = floor;
@@ -86,24 +107,24 @@ void GetJtCpdefi(Jt_141640 *jt, Out_141640 *out) {
                 else
                     clamped = smoothed;
             }
-            out->z = clamped;
+            pcpdefi->z = clamped;
         }
-        out->x = sp[0];
-        out->y = sp[1];
+        pcpdefi->x = sp[0];
+        pcpdefi->y = sp[1];
     }
     {
-        QW smoothed = PosSmooth(jt->f1070, g_2a2dd0, D_002BCCD8, 0, g_2dded0.dt);
-        jt->f1070 = smoothed;
-        QW sum = VectorAdd(((Out2_141640 *)out)->pos, smoothed);
-        ((Out2_141640 *)out)->pos = sum;
-        jt->f1060 = sum;
+        QW smoothed = PosSmooth(pjt->dir, g_2a2dd0, D_002BCCD8, 0, g_2dded0.dt);
+        pjt->dir = smoothed;
+        QW sum = VectorAdd(pcpdefi->pos, smoothed);
+        pcpdefi->pos = sum;
+        pjt->look = sum;
     }
-    jt->f1050 = out->z;
-    if (jt->f2DC != -1) func_0019C8B0(jt->a2C0, out);
-    if (jt->f4CC != -1) GetAttachCpdefi(jt->a4C0, out);
-    if (jt->fDF4 != -1) bevy_player_p7_damage_1a2160(jt->aDF0, out);
+    pjt->field_0x1050 = pcpdefi->z;
+    if (pjt->jmpState != -1) func_0019C8B0(pjt->PvJmp(), pcpdefi);
+    if (pjt->field_0x4CC != -1) GetAttachCpdefi(pjt->PvAttach(), pcpdefi);
+    if (pjt->zapState != -1) bevy_player_p7_damage_1a2160(pjt->PvZap(), pcpdefi);
     {
-        QW vec = jt->vt->f114((char *)jt + jt->vt->d110);
+        QW vec = pjt->Slot34();
         float length = LaneX(SqrtX(SquaredLength(vec)));
         float t = D_002BCCF0.c0 + length * (D_002BCCF0.c1 + length * D_002BCCF0.c2);
         float tLow = g_2bbb60.lo;
@@ -113,7 +134,7 @@ void GetJtCpdefi(Jt_141640 *jt, Out_141640 *out) {
         } else if (tHigh < t) {
             t = tHigh;
         }
-        out->f34 = out->f34 * t;
+        pcpdefi->field_0x34 = pcpdefi->field_0x34 * t;
     }
 }
 }

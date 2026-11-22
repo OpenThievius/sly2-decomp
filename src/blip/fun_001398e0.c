@@ -1,7 +1,8 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "blipview.h"
 
-M2C_UNK UpdateLo();                                 /* extern */
+void UpdateLo(struct BLIPGVIEW *pblipg);
 
-void func_001398E0(void) {
-    UpdateLo();
+void func_001398E0(struct BLIPGVIEW *pblipg) {
+    UpdateLo(pblipg);
 }

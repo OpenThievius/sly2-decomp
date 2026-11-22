@@ -1,23 +1,20 @@
-#include "sly2.h"
-struct ASEG;
-struct ALO;
-struct XF;
-struct ASEGCHN { int packed; };
-struct VT { char pad[0x198]; short delta; short index; XF *(*fn)(void *, int); };
-struct ALOV { char pad[0xC]; VT *vt; };
-extern "C" char B_003DD490[];
-extern "C" ALOV *PloFindSwObject_thunk(void *, int, int, void *);
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "alo.h"
+#include "asega.h"
+#include "sw.h"
+#include "xf.h"
 
-extern "C" void BindAsegChn(ASEG *paseg, ALO *paloRoot, ASEGCHN *pchn, ALOV **ppalo, XF **ppxf)
+extern "C" SO *PloFindSwObject_thunk(SW *, int, int, void *);
+extern "C" SW B_003DD490;
+
+extern "C" void BindAsegChn(ASEG *paseg, ALO *paloRoot, ASEGCHN *pchn, SO **ppso, XF **ppxf)
 {
     if (paloRoot != 0)
-        *ppalo = PloFindSwObject_thunk(B_003DD490, 1, (pchn->packed << 12) >> 12, paloRoot);
+        *ppso = PloFindSwObject_thunk(&B_003DD490, 1, (s32)(pchn->grf << 12) >> 12, paloRoot);
     else
-        *ppalo = PloFindSwObject_thunk(B_003DD490, 4, (pchn->packed << 12) >> 12, paseg);
-    if (*ppalo == 0)
+        *ppso = PloFindSwObject_thunk(&B_003DD490, 4, (s32)(pchn->grf << 12) >> 12, paseg);
+    if (*ppso == 0)
         *ppxf = 0;
-    else {
-        VT *vt = (*ppalo)->vt;
-        *ppxf = vt->fn((char *)*ppalo + vt->delta, (pchn->packed << 2) >> 22);
-    }
+    else
+        *ppxf = (XF *)(*ppso)->PxfFromRef((s32)(pchn->grf << 2) >> 22);
 }

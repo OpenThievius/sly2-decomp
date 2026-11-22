@@ -1,25 +1,18 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "mount.h"
+#include "xf.h"
 extern "C" {
-M2C_UNK SetXfKind(s8 *, s32, M2C_UNK);            /* extern */
-void func_0017F138();                            /* extern */
-M2C_UNK func_0017F408(s8 *, M2C_UNK, s8 *);     /* extern */
-M2C_UNK func_0017F770(s8 *);                      /* extern */
+void SetXfKind(SO *pso, XF *pxf, int kind);
+void func_0017F138(MOUNT *pmount);
+void func_0017F408(MOUNT *pmount, int centry, ANIMENTRY *aentry);
+void func_0017F770(MOUNT *pmount);
 
-typedef void (*Fn2)(s8 *, int);
-void Mount_PostLoad(s8 *arg0) {
-    func_0017F138();
-    s8 *vtable = M2C_FIELD(arg0, s8 **, 0xC);
-    s16 offset = M2C_FIELD(vtable, s16 *, 0x278);
-    Fn2 method = M2C_FIELD(vtable, Fn2 *, 0x27C);
-    method(arg0 + offset, 0);
-    SetXfKind(arg0, M2C_FIELD(arg0, s32 *, 0x58), 2);
-    SetXfKind(arg0, M2C_FIELD(arg0, s32 *, 0x5C), 2);
-    func_0017F770(arg0);
-    func_0017F408(arg0, 5, arg0 + 0x1C8);
+void Mount_PostLoad(MOUNT *pmount) {
+    func_0017F138(pmount);
+    pmount->SetPlayable(0);
+    SetXfKind(pmount, pmount->pxfLinear, 2);
+    SetXfKind(pmount, pmount->pxfAngular, 2);
+    func_0017F770(pmount);
+    func_0017F408(pmount, 5, pmount->aentry);
 }
 }

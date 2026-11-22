@@ -1,25 +1,21 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "step.h"
+#include "goals.h"
 extern "C" {
-void GoalStack_Init(s8 *, s8 *);
-s32 InitPo();
-void SetStepRadTarget(s8 *, f32);
-f32 SetStepSpinRatio__FP4STEPf(s8 *, f32);
-
-void InitStep(s8 *arg0) {
-    InitPo();
-    M2C_FIELD(arg0, s32 *, 0x264) = -1;
-    M2C_FIELD(arg0, f32 *, 0x260) = 1.0f;
-    M2C_FIELD(arg0, f32 *, 0x200) = 1.0f;
-    SetStepSpinRatio__FP4STEPf(arg0, 1.0f);
-    SetStepRadTarget(arg0, 0.0f);
-    M2C_FIELD(arg0, f32 *, 0x220) = 30.0f;
-    M2C_FIELD(arg0, f32 *, 0x214) = -50.0f;
-    GoalStack_Init(arg0 + 0x26C, arg0);
+void GoalStack_Init(GOALSTACK *pgoalstack, STEP *pstep);
+void InitPo(STEP *pstep);
+void SetStepRadTarget(STEP *pstep, f32 radTarget);
 }
+f32 SetStepSpinRatio(STEP *pstep, f32 ratio);
 
+extern "C" void InitStep(STEP *pstep) {
+    InitPo(pstep);
+    pstep->keyHull = -1;
+    pstep->field_0x260 = 1.0f;
+    pstep->field_0x200 = 1.0f;
+    SetStepSpinRatio(pstep, 1.0f);
+    SetStepRadTarget(pstep, 0.0f);
+    pstep->field_0x220 = 30.0f;
+    pstep->field_0x214 = -50.0f;
+    GoalStack_Init(pstep->pgoalstack(), pstep);
 }
