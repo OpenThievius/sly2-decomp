@@ -4,5 +4,5 @@
 struct CFrame;
 extern "C" CRef func_00120A20(int carg, CRef *aref, CFrame *pframe)
 {
-    return CRef(TAGK_Bool, aref->m_tagk == 0x20 || aref->m_tagk == 0x19);
+    return CRef(aref->m_tagk == 0x20 || aref->m_tagk == 0x19, TAGK_Bool);
 }

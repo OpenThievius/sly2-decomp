@@ -1,9 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "dl.h"
 struct GIFS { char pad[0x30]; };
 struct VIFS { char pad[0x30]; };
-struct QW;
-struct B8 { char b[8]; };
-struct DL { B8 a; int c; };
 struct FRM {
     int cqwGif; QW *pqwGif; char pad0[8];
     int cqwVif; QW *pqwVif; char pad1[8];

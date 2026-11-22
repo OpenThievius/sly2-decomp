@@ -36,7 +36,7 @@ struct GTARGET { int target0; int target1; int pad18[2]; QW vec2; };
 
 struct OBJ2 { char pad[8]; float value; };
 
-struct GUARD {
+struct SCRIPTRUN {
     char pad0[0xC]; VT *vt; STEPGUARD *player; char pad1[0x30 - 0x14];
     CMD *labelBase; int object; CMD *current; float timer; int done; OBJ2 *source; float value48; int flag4C;
     char animref[4]; int ref54; int pad58; int ref5C;
@@ -54,23 +54,23 @@ extern "C" int FIsBasicDerivedFrom(int, int);
 
 extern "C" CMD *PcmdFindScriptLabel(CMD *, int);
 
-extern "C" int PloFindScriptObject_1715F0(GUARD *, int);
+extern "C" int PloFindScriptObject_1715F0(SCRIPTRUN *, int);
 
 extern "C" void ResetAnimref(void *, void *);
 
 extern "C" void SetGoalTarget(void *, void *);
 
-extern "C" void TeleportGuardScript_1715F0(GUARD *, QW, float);
+extern "C" void TeleportGuardScript_1715F0(SCRIPTRUN *, QW, float);
 
-extern "C" void func_00171AF8_1715F0(GUARD *, int, void *, void *);
+extern "C" void func_00171AF8_1715F0(SCRIPTRUN *, int, void *, void *);
 
 extern "C" void func_0017CDB8(void *, int);
 
 extern "C" void func_0017D110(void *, int);
 
-extern "C" int func_001EEFC0(GUARD *);
+extern "C" int func_001EEFC0(SCRIPTRUN *);
 
-extern "C" int func_001EF038(GUARD *);
+extern "C" int func_001EF038(SCRIPTRUN *);
 
 extern "C" char *func_00205438(STEPGUARD *, int);
 
@@ -80,7 +80,7 @@ extern "C" float g_2dded0;
 
 static inline void InitGoalTarget(GTARGET *ptarget) { func_002562A8(ptarget); }
 
-extern "C" void ExecuteGuardScriptCmd(GUARD *self, CMD *cmd) {
+extern "C" void ExecuteGuardScriptCmd(SCRIPTRUN *self, CMD *cmd) {
     VECTOR position;
     GTARGET target;
     float heading;

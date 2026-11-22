@@ -1,22 +1,36 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later */
 #include "sly2.h"
+#include "ps2inline.h"
+#include "so.h"
+#include "jt.h"
 struct SM;
 struct ACTADJ;
 struct XMG;
 struct ALO;
-struct SO { char pad[0xC]; char *vt; char pad1[0x4C - 0x10]; SO *base; };
-struct JT {
-    char pad0[0xC]; char *vt; char pad1[0x208 - 0x10]; SO *surface;
-    char pad2[0x1028 - 0x20C]; SM *sm; char pad3[0x1034 - 0x102C]; void *sma;
-    char pad4[0x1514 - 0x1038]; int tight; char pad5[0x1520 - 0x1518];
-    char xmgLeft[0x100]; char xmgRight[0x100];
-    char pad6[0x19D4 - 0x1720];
-    ALO *rightBall; ALO *leftBall; ALO *rightHeel; ALO *leftHeel;
-    char pad7[0x19F0 - 0x19E4];
-    ACTADJ *leftAdj; ACTADJ *rightAdj;
+/* One reader on a guessed class: UpdateJtStand reads these words of the player (Sly's region past JT's 0x1320 bytes
+   that sly.h leaves unknown). Not in sly.h; names unproven. */
+struct JTSTANDVIEW {
+    u8 unknown_0x0[0x1514];
+    /* 0x1514 */ s32 field_0x1514;
+    u8 unknown_0x1518[0x8];
+    /* 0x1520 */ u8 xmgLeft[0x100];
+    /* 0x1620 */ u8 xmgRight[0x100];
+    u8 unknown_0x1720[0x19D4 - 0x1720];
+    /* 0x19D4 */ ALO *rightBall;
+    /* 0x19D8 */ ALO *leftBall;
+    /* 0x19DC */ ALO *rightHeel;
+    /* 0x19E0 */ ALO *leftHeel;
+    u8 unknown_0x19E4[0xC];
+    /* 0x19F0 */ ACTADJ *leftAdj;
+    /* 0x19F4 */ ACTADJ *rightAdj;
 };
+/* The surface object's word 0x4C is read as an LO (slot 34 called): one reader, not in lo.h. */
+struct SOBASEVIEW {
+    u8 unknown_0x0[0x4C];
+    /* 0x4C */ LO *base;
+};
+/* slot 92 of the player returns an int here; jt.h declares it void, so the call stays by hand. */
 struct VT0 { short delta; short index; int (*fn)(void *); };
-struct VT1 { short delta; short index; QW (*fn)(void *); };
 extern "C" {
 extern float g_2dded4;
 int func_001430C8(JT *);
@@ -30,27 +44,26 @@ int FMatchJtXmg(JT *, void *, void *);
 void RebuildJtXmg(JT *, ALO *, float, ALO *, ACTADJ *, XMG *);
 void UpdateJtStand(JT *jt)
 {
-    SetSmaMask(jt->sma, func_001430C8(jt));
-    VT0 *vt0 = (VT0 *)(jt->vt + 0x2E0);
-    if (vt0->fn((char *)jt + vt0->delta) == 0 && jt->surface) {
-        SO *base = jt->surface->base;
-        VT1 *vt1 = (VT1 *)(base->vt + 0x110);
+    JTSTANDVIEW *view = (JTSTANDVIEW *)jt;
+    SetSmaMask(jt->field_0x1034, func_001430C8(jt));
+    VT0 *vt0 = (VT0 *)(*(char **)((char *)jt + 0xC) + 0x2E0);
+    if (vt0->fn((char *)jt + vt0->delta) == 0 && jt->psoSurface) {
+        LO *base = ((SOBASEVIEW *)jt->psoSurface)->base;
         union { QW q; float f[4]; } angular;
-        angular.q = vt1->fn((char *)base + vt1->delta);
+        angular.q = base->Slot34();
         angular.f[2] = GLimitAbs__Fff(angular.f[2], 10.0f);
-        float rad = *(float *)((char *)jt + 0x1A8);
-        SetStepRadTarget(jt, rad + angular.f[2] * g_2dded4);
+        SetStepRadTarget(jt, jt->radHeading + angular.f[2] * g_2dded4);
     }
-    if (jt->leftAdj) {
-        XMG *left = (XMG *)jt->xmgLeft;
-        XMG *right = (XMG *)jt->xmgRight;
-        RebuildJtXmg(jt, jt->leftBall, 5.0f, jt->leftHeel, jt->leftAdj, left);
-        RebuildJtXmg(jt, jt->rightBall, 5.0f, jt->rightHeel, jt->rightAdj, right);
-        if (FMatchJtXmg(jt, left, jt->leftAdj) == 0 || FMatchJtXmg(jt, right, jt->rightAdj) == 0) {
-            if (jt->tight == 0 && jt->sm) {
-                if (IsmsFindSmOptional__FP2SM3OID(jt->sm, 0x17C) >= 0)
-                    SeekSma(jt->sma, 0x17C);
-                jt->tight = 1;
+    if (view->leftAdj) {
+        XMG *left = (XMG *)view->xmgLeft;
+        XMG *right = (XMG *)view->xmgRight;
+        RebuildJtXmg(jt, view->leftBall, 5.0f, view->leftHeel, view->leftAdj, left);
+        RebuildJtXmg(jt, view->rightBall, 5.0f, view->rightHeel, view->rightAdj, right);
+        if (FMatchJtXmg(jt, left, view->leftAdj) == 0 || FMatchJtXmg(jt, right, view->rightAdj) == 0) {
+            if (view->field_0x1514 == 0 && jt->psm) {
+                if (IsmsFindSmOptional__FP2SM3OID(jt->psm, 0x17C) >= 0)
+                    SeekSma(jt->field_0x1034, 0x17C);
+                view->field_0x1514 = 1;
             }
         }
     }

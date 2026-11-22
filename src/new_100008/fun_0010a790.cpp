@@ -1,23 +1,19 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
-struct CRef { int tagk; int pad[3]; };
+#include "cref.h"
+CRef RefSetArgsFromSplice(int cref, CRef *aref, const void *aotyp, ...);
 struct BASIC;
-struct B8 { char b[8]; int w; };
-extern "C" void RefSetArgsFromSplice__FiP4CRefP4OTYPe(CRef *, int, CRef *, const int *, ...);
-extern "C" void CRef_Destruct(CRef *);
-extern "C" void SetTag__4CRef4TAGK(CRef *, int);
-extern "C" CRef *CRef_CopyConstruct(CRef *, CRef *);
+struct AOT { char b[8]; int w; };
 extern "C" void func_00141968(BASIC *, QW, float, float);
-extern const B8 RO_002A3EA0;
-
-CRef *func_0010A790(CRef *result, BASIC *object, int count, CRef *args)
+extern const AOT RO_002A3EA0;
+CRef func_0010A790(BASIC *object, int count, CRef *args)
 {
-    struct L { B8 aotyp; int pad; QW q; CRef ref; float x; float y; } l;
-    l.aotyp = RO_002A3EA0;
-    RefSetArgsFromSplice__FiP4CRefP4OTYPe(&l.ref, 3, args, (const int *)&l.aotyp, &l.q, &l.x, &l.y);
-    CRef_Destruct(&l.ref);
-    SetTag__4CRef4TAGK(&l.ref, 0x24);
-    func_00141968(object, l.q, l.x, l.y);
-    CRef_CopyConstruct(result, &l.ref);
-    CRef_Destruct(&l.ref);
-    return result;
+    AOT aotyp = RO_002A3EA0;
+    VECTOR q;
+    float x, y;
+    RefSetArgsFromSplice(3, args, &aotyp, &q, &x, &y);
+    CRef refResult;
+    refResult.SetTag(TAGK_Void);
+    func_00141968(object, *(QW *)&q, x, y);
+    return refResult;
 }

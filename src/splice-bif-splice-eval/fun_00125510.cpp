@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Score 1 = link only: the copy constructor call goes to 0x1291A8, named CRef_CopyConstruct in symbol_addrs; __4CRefRC4CRef is not mapped there.
-struct CRef { int tagk; int n; CRef(int nNew, int tagkNew) { tagk = tagkNew; n = nNew; } CRef(const CRef &) __asm__("CRef_CopyConstruct"); ~CRef(); };
+#include "sly2.h"
+#include "cref.h"
 struct CFrame {
     char pad0[8];
     int cpframeParent;
@@ -18,10 +18,10 @@ extern "C" CRef func_00125510(int carg, CRef *aref, CFrame *pframe)
             if (pframeCur == 0 || pframeCur->cpframeParent != 1)
                 goto fail;
         }
-        CRef *pref = pframeCur->pframeParent->PrefFindBinding(aref[0].n, 1);
+        CRef *pref = pframeCur->pframeParent->PrefFindBinding(aref[0].m_tag.m_n, 1);
         if (pref != 0)
             return *pref;
     }
 fail:
-    return CRef(0x86, 0x19);
+    return CRef(0x86, TAGK_Bifk);
 }

@@ -30,7 +30,7 @@ struct JT : STEP {
     virtual void Slot89();
     virtual void Slot90();
     virtual void Slot91();
-    virtual void Slot92();
+    virtual int Slot92(); /* 92: UpdateJtStand tests the result */
     virtual void Slot93();              /* 93: func_00140EB0; ZapContinue calls it without arguments */
     virtual void Slot94();
     virtual void SetFocus(int prioNear, struct STEPGUARD *pguardNear, int prioBest, struct STEPGUARD *pguardBest); /* 95: SetJtFocus; UpdateJtFocus */

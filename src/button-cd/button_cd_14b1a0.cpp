@@ -20,16 +20,15 @@ void func_0014B1A0(STEPGUARD *self)
 }
 
 extern "C" {
-typedef struct GUARD {
-    char pad0[0x1010];
-    s32 field_0x1010;
-} GUARD;
+struct PLOGUARD : STEPGUARD {
+    s32 field_0x1010; /* PloNew result: func_0014B1D8 (the only reader seen) */
+};
 
 s32 PloNew(s32, s32, s32, s32);
 
 void PostGuardLoad();
 
-void func_0014B1D8(GUARD *guard) {
+void func_0014B1D8(PLOGUARD *guard) {
     PostGuardLoad();
     guard->field_0x1010 = PloNew(3, 0, 0x62B, -1);
 }

@@ -1,13 +1,14 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
-struct LOOT { char pad[0x15C]; void *pguard; };
-struct GUARD { char pad[0x194]; LOOT *ploot; };
+#include "loot.h"
+#include "crfodb.h"
 #include "sw.h"
 extern "C" SW B_003DD490;
-int IdlootCrfodb(GUARD *);
+int IdlootCrfodb(CRFODB *);
 LOOT *PloLeaseCloneObject(void *, int);
 void SelectLootDef(LOOT *, int);
 void SetLootState(LOOT *, int);
-void Crfodb_SpawnLoot(GUARD *pguard)
+void Crfodb_SpawnLoot(CRFODB *pguard)
 {
     SW *psw;
     if (pguard->ploot == 0) {

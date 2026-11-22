@@ -77,5 +77,5 @@ extern "C" CRef bevy_splice_bif_ref_equal(CRef *refA, CRef *refB)
             break;
         }
     }
-    return CRef(TAGK_Bool, f);
+    return CRef(f, TAGK_Bool);
 }

@@ -75,7 +75,7 @@ void ShopMenu_Update(SHOP *menu)
                 sprintf(name, RO_002A79A0, slot);
                 ref = func_001D8A38(RO_002A79D0, RO_002A79D8, name, 0);
                 if (ref.m_tag.m_n > 0) {
-                    func_001D8B20(CRef(TAGK_S32, ref.m_tag.m_n - 1), RO_002A79D0, RO_002A79D8, name, 0);
+                    func_001D8B20(CRef(ref.m_tag.m_n - 1, TAGK_S32), RO_002A79D0, RO_002A79D8, name, 0);
                     SetGameCoins(B_002DEB30, GetGameCoins(B_002DEB30) + D_002C3288[*(int *)((char *)menu + 0x258)].amount);
                     ShopMenu_BuildList(menu);
                     SetEmitterUnpositioned(NewEmitter(0x29), 0);

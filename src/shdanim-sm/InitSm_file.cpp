@@ -75,7 +75,8 @@ struct SM_1F01B8 : BASIC { int fld; };
 
 struct VT { char pad[8]; short d8; short i8; void (*f8)(char *); short d10; short i10; void (*f10)(char *); short d18; short i18; void (*f18)(char *, int, int, int, int, int); };
 
-struct SMA { char pad[0xC]; VT *vt; };
+struct ALO;
+struct SMA { char pad[0xC]; VT *vt; char pad1[4]; SMA *next; char pad2[0x10]; ALO *palo; };
 
 struct SMAHEAP { int dl[3]; int heap; };
 
@@ -161,14 +162,12 @@ SMA* PsmaApplySmEx(SM* psm, ALO* paloRoot, int oidInitial, int grfapl, unsigned 
 
 struct LINK { char pad[0x14]; LINK *next; };
 
-struct SM_1F03C8 { char pad[0x68]; struct STEP *first; };
+struct SM_1F03C8 { char pad[0x68]; struct SMA *first; };
 
-struct STEP { char pad[0x14]; STEP *next; char pad2[0x10]; ALO *palo; };
-
-STEP *PsmaFindSm__FP2SMP3ALO(SM_1F03C8 *psm, ALO *palo)
+SMA *PsmaFindSm__FP2SMP3ALO(SM_1F03C8 *psm, ALO *palo)
 {
     VECTOR vector;
-    for (STEP *step = psm->first; step; step = step->next)
+    for (SMA *step = psm->first; step; step = step->next)
         if (step->palo == palo) return step;
     return 0;
 }

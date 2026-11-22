@@ -14,9 +14,7 @@ struct STEP : PO {
     virtual void Slot85();              /* 85: func_002040F8, func_00143C78 (JT) */
     virtual int FLethalHit();           /* 86: func_00205D08, JT_FLethalHit */
     virtual void Slot87(int arg);       /* 87: func_00205D10; func_001B81B8 (Murray) calls it with a flag on the held object */
-    u8 unknown_0x180[0x4];
-    /* 0x184 */ s32 idLootDefault; /* IdlootCrfodb: the loot id a guard carries by default */
-    u8 unknown_0x188[0x8];
+    u8 unknown_0x180[0x10];
     /* 0x190 */ QW velGoal; /* SetMurrayCarryState, func_001B5D30 (two readers) */
     u8 unknown_0x1A0[0x4];
     /* 0x1A4 */ s32 fLock; /* func_001750E0 */
@@ -62,7 +60,6 @@ SLY2_OFFSET_CHECK(STEP, field_0x260, 0x260);
 SLY2_OFFSET_CHECK(STEP, pasegDefault, 0x268);
 SLY2_OFFSET_CHECK(STEP, field_0x270, 0x270);
 SLY2_OFFSET_CHECK(STEP, field_0x1F4, 0x1F4);
-SLY2_OFFSET_CHECK(STEP, idLootDefault, 0x184);
 SLY2_OFFSET_CHECK(STEP, fLock, 0x1A4);
 SLY2_OFFSET_CHECK(STEP, pcrv, 0x294);
 #endif

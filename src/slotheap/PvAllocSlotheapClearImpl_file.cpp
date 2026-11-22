@@ -8,11 +8,11 @@
 
 struct VT_116918 { char pad[8]; short delta; short unused; void *(*fn)(void *, int, int); };
 
-struct SLOTHEAP { VT_116918 *vt; };
+struct ALLOCATOR { VT_116918 *vt; };
 
 extern "C" void *memset(void *, int, unsigned int);
 
-extern "C" void *PvAllocSlotheapClearImpl__FP8SLOTHEAP(SLOTHEAP *heap, int size, int extra) {
+extern "C" void *PvAllocSlotheapClearImpl__FP8SLOTHEAP(ALLOCATOR *heap, int size, int extra) {
     VT_116918 *vt = heap->vt;
     short delta = vt->delta;
     void *result = vt->fn((char *)heap + delta, size, extra);
