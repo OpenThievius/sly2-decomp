@@ -1,13 +1,11 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
-struct VTE { short delta; short index; void *fn; };
-struct VTBASIC { char pad0[0x100]; VTE getRef; char pad108[0x118 - 0x108]; VTE setXf; };
-struct BASIC { char pad0[0xC]; VTBASIC *vt; };
-struct XFH { char pad[0x98]; short flags98; char pad9a[6]; int xfA0; };
-struct SOB { char pad0[0xC]; VTBASIC *vt; char pad10[0x18]; unsigned long flags; char pad30[0x28]; XFH *xf58; XFH *xf5C; };
+#include "so.h"
+#include "xf.h"
 struct REFB { int id; int a; int b; char pad[0x94]; QW q; char pada[0x1C]; float f; };
 struct PEA { char pad[0x14]; int aseg; };
 struct PEAH { char pad[0x14]; void *aseg; char pad18[4]; float time; char pad20[0x20]; float dur; };
-struct CARRY { char pad[0x180]; SOB *so; char pad184[0xC]; BASIC *a190; char pad194[4]; BASIC *a198; };
+struct CARRY { char pad[0x180]; SO *so; char pad184[0xC]; LO *a190; char pad194[4]; LO *a198; };
 struct MURRAY {
     char pad0[0x60]; int xf60;
     char pad64[0x1030 - 0x64]; PEAH *peah;
@@ -59,11 +57,11 @@ void SetMurrayLiftState(MURRAY *self, int state)
         self->f1448 = 0;
         break;
     case 1: {
-        SOB *so;
-        if (self->pcarry && (so = self->pcarry->so, ((int)(so->flags >> 60) & 1))) {
+        SO *so;
+        if (self->pcarry && (so = self->pcarry->so, ((int)(so->grfo >> 60) & 1))) {
             SetSoCnstrForce(so, 0);
-            self->f1404 = so->xf58->flags98;
-            self->f1408 = so->xf5C->flags98;
+            self->f1404 = so->pxfLinear->kind;
+            self->f1408 = so->pxfAngular->kind;
             func_001A58D0(so, 0, 0xF);
             SetSoNoXpsAll(so, 1);
             float *label = PeaFindAsegLabel(self->peah->aseg, 0x1C7);
@@ -74,19 +72,17 @@ void SetMurrayLiftState(MURRAY *self, int state)
             func_001B72B0(self, 0, sp, &sp[4], &sp[5]);
             if (FIsBasicDerivedFrom(so, 0x38)) PostGuardStunCommand(so, self);
             CalcMurrayThrow(self, sp[5], label, &t, &sp[6], &sp[7]);
-            self->f13FC = func_0012DE58(so, so->xf58, 5, sp[5], sp[7], Now(&g_2dded0) + t);
-            VTE *vte = &so->vt->setXf;
-            void *obj = (char *)so + vte->delta;
-            ((void (*)(void *, QW))vte->fn)(obj, ConvertXfVec(so->xf58->xfA0, 0, sp[6]));
-            self->f1400 = func_0012DC18(so, so->xf5C, 5, 7, 2, sp[4]);
+            self->f13FC = func_0012DE58(so, so->pxfLinear, 5, sp[5], sp[7], Now(&g_2dded0) + t);
+            so->Slot35(ConvertXfVec((int)so->pxfLinear->pxfParent, 0, sp[6]));
+            self->f1400 = func_0012DC18(so, so->pxfAngular, 5, 7, 2, sp[4]);
         } else {
             goto detach;
         }
         break;
     }
     case 2: {
-        SOB *so;
-        if (self->pcarry == 0 || (so = self->pcarry->so, ((int)(so->flags >> 60) & 1) == 0)) {
+        SO *so;
+        if (self->pcarry == 0 || (so = self->pcarry->so, ((int)(so->grfo >> 60) & 1) == 0)) {
 detach:
             DetachMurrayObject(self);
             self->pcarry = 0;
@@ -96,24 +92,22 @@ detach:
             func_001A58D0(so, held, 0xF);
             SetSoNoXpsAll(so, 1);
             func_001B72B0(self, ((int *)held)[0x60 / 4], &RO_002A2D30, &sp[1], &sp[0]);
-            self->f13F8 = func_0012DC18(so, so->xf5C, 5, 7, 2, sp[1]);
-            self->f13F4 = func_0012DC18(so, so->xf58, 5, 7, 2, sp[0]);
-            BASIC *a190 = self->pcarry->a190;
+            self->f13F8 = func_0012DC18(so, so->pxfAngular, 5, 7, 2, sp[1]);
+            self->f13F4 = func_0012DC18(so, so->pxfLinear, 5, 7, 2, sp[0]);
+            LO *a190 = self->pcarry->a190;
             if (a190) {
                 REFB *ref = self->pref1610;
-                VTE *vte = &a190->vt->getRef;
-                ref->id = ((int (*)(void *, QW *))vte->fn)((char *)a190 + vte->delta, &sp[2]);
+                ref->id = (int)a190->Slot32(&sp[2]);
                 ref->q = sp[5];
                 ref->f = RO_002C0A3C;
                 self->f1618 = func_0012DD28(self, ref->a, 5, ref);
                 self->f161C = func_0012DD28(self, ref->b, 5, ref);
                 self->f1604 = func_0012DDB0(self, self->f15F4, 5, 5, ref->id, &sp[2]);
             }
-            BASIC *a198 = self->pcarry->a198;
+            LO *a198 = self->pcarry->a198;
             if (a198) {
                 REFB *ref = self->pref1614;
-                VTE *vte = &a198->vt->getRef;
-                ref->id = ((int (*)(void *, QW *))vte->fn)((char *)a198 + vte->delta, &sp[2]);
+                ref->id = (int)a198->Slot32(&sp[2]);
                 ref->q = sp[5];
                 ref->f = RO_002C0A40;
                 self->f1620 = func_0012DD28(self, ref->a, 5, ref);

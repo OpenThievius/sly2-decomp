@@ -1,8 +1,9 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
 struct VT { char pad[0x18]; short delta; short index; void (*fn)(void *, int, int, int, int, int); };
 struct CM { char pad[1]; };
 struct CPLCY { char pad[1]; };
-struct SO { char pad[1]; };
+#include "so.h"
 enum TNS { TNS_X };
 enum CPP { CPP_NONE = -1, CPP_X };
 struct TN { char pad0[0xC]; VT *vptr; char pad10[0xD0]; SO *so; char pade4[0x44]; int pri; char pad12c[8]; int tns; float tTns; };

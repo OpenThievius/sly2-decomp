@@ -1,8 +1,9 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
+#include "lo.h"
 struct REF { int tagk; void *pv; int pad[2]; };
 struct ROW { QW q; };
 struct MAT3 { union { QW aq[3]; int an[12]; }; };
-struct BASIC { virtual void V0(); };
 struct HMETHOD;
 struct METHOD { int cref; int pad4; BASIC *pbasic; int f0C; int f10; };
 typedef int (BASIC::*PMFI)();

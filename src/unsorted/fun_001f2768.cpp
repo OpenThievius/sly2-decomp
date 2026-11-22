@@ -1,8 +1,6 @@
-struct SO {
-    char pad[0xD0];
-    unsigned long flags;
-};
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "so.h"
 extern "C" void func_001F2768(SO *so, int flag)
 {
-    so->flags = (so->flags & ~0x400000000UL) | ((unsigned long)(flag & 1) << 34);
+    so->field_0xD0 = (so->field_0xD0 & ~0x400000000UL) | ((unsigned long)(flag & 1) << 34);
 }

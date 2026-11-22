@@ -20,7 +20,9 @@ struct PHYS {
     /* 0xA0 */ s32 ctTorque;  /* 3 when the torque is locked (FIsSoLocked, func_001F3590, SolveSw) */
     u8 unknown_0xA4[0x1C];
     /* 0xC0 */ s32 ctForce;   /* 3 when the force is locked */
-    u8 unknown_0xC4[0x18];
+    u8 unknown_0xC4[0xC];
+    /* 0xD0 */ f32 field_0xD0;  /* reader: CSo_LoadFromBrx (read from the brx stream into the freshly allocated block) */
+    u8 unknown_0xD4[0x8];
     /* 0xDC */ struct LINK *plink; /* the region link: UpdateSo, TranslateSoToPos, func_001F37C8, the Add/Remove hierarchy pair */
 };
 
@@ -29,5 +31,6 @@ SLY2_OFFSET_CHECK(PHYS, angular, 0x70);
 SLY2_OFFSET_CHECK(PHYS, dvGravity, 0x80);
 SLY2_OFFSET_CHECK(PHYS, ctTorque, 0xA0);
 SLY2_OFFSET_CHECK(PHYS, ctForce, 0xC0);
+SLY2_OFFSET_CHECK(PHYS, field_0xD0, 0xD0);
 SLY2_OFFSET_CHECK(PHYS, plink, 0xDC);
 #endif

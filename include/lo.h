@@ -23,6 +23,8 @@
 #include "types.h"
 
 struct SO;
+struct CLASSINFO;
+struct RO;
 struct SCOPE;
 struct GRFENTRY;
 
@@ -33,8 +35,8 @@ struct BASIC {
     virtual void Slot2();               /*  2: func_00132B08 */
     virtual void HandleSpliceEvent(int event, int argument0, int argument1, int argument2, int argument3); /*  3: HandleLoSpliceEvent (LO); SetHbskHbsks passes five words */
     virtual void PostMessage(int msgid, void *pv); /*  4: PostLoMessage (LO *, int, void *); UpdateWater passes a message id and its data */
-    virtual void HandleMessage();       /*  5: HandleLoMessage */
-    virtual void Slot6();               /*  6: func_00113A30 (LO), func_00113D10 (SO) */
+    virtual void HandleMessage(int msgid, void *pv);       /*  5: HandleLoMessage; ReleaseRip passes 8 and the RIP */
+    virtual struct CLASSINFO *Slot6();  /*  6: func_00113A30 (LO), func_00113D10 (SO); PeopidFind returns its result (cid at +4) */
 };
 
 /* A search scope, 0x28 bytes: AllocSwBuffers allocates the world's default (SW::pscopeDefault) at that size, sets words 0x0 and
@@ -59,7 +61,7 @@ struct LO : BASIC {
     virtual void ProjectTransform();    /* 17: func_001A5E80, ProjectSoTransform */
     virtual void UpdateXfWorldHierarchy(); /* 18: func_0022FBD8, UpdateAloXfWorldHierarchy; called without arguments (TranslateSoToPos) */
     virtual void Slot19();
-    virtual void Slot20();
+    virtual void Slot20(void *pcm, float uAlpha, float uAlphaOther, struct RO *pro); /* 20: called on each child by func_001F3CC8 (render) */
     virtual void Slot21();
     virtual void RemoveAloHierarchy();  /* 22: RemoveAloHierarchy */
     virtual void Slot23();
@@ -81,14 +83,14 @@ struct LO : BASIC {
     virtual void SetPosMatFromLo(struct LO *plo);     /* 38: SetLoPosMatFromLo */
     virtual void SetPosMatFromXf();     /* 39: SetLoPosMatFromXf */
     virtual void CloneVirtual();        /* 40: CloneLoVirtual */
-    virtual void Slot41();
+    virtual void Slot41(struct SO *psoSource); /* 41: CloneAloHierarchy passes the source object (an SO) */
     virtual void Slot42();
     virtual void FReturnFalse();        /* 43: FReturnFalseLo */
     virtual void Slot44();
     virtual void Slot45();
     virtual void Slot46();
-    virtual void SetGrfField();         /* 47: SetLoGrfField */
-    virtual void ClearGrfField();       /* 48: ClearLoGrfField */
+    virtual void SetGrfField(u32 grf);  /* 47: SetLoGrfField; func_001F2FE0 passes a mask to each child */
+    virtual void ClearGrfField(u32 grf); /* 48: ClearLoGrfField; func_001F3078 passes a mask to each child */
 
     /* 0x10 */ struct SO *psoParent;   /* InitSo, FFilterSensorSight (followed up to the root) */
     /* 0x14 */ s32 proot;              /* FFilterSensorSight (compared as an id), PoxaAllocSw (a list entry) */
