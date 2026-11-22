@@ -17,6 +17,7 @@ struct STEPGUARD;
 struct LOOT;
 struct SM;
 struct GADGETSTATE;
+struct SEQNODE;
 
 /* One of the player's three gadget slots: LoadJtGadgetSlots fills gadget from the level data, three 0xC-byte entries. */
 struct GADGETSLOT {
@@ -27,7 +28,7 @@ struct GADGETSLOT {
 struct JT : STEP {
     virtual void SetMode(int mode);     /* 88: SetBentleyMode (Bentley); func_0023C820 in Sly's vtable, as are 89 to 92, 94 and 103.
                                            JT_StartPose, StartAttach, FAbsorbHbskWkr pass one int */
-    virtual void Slot89();
+    virtual int Slot89();               /* 89: JT_FPosing tests the result against 5 and 6 */
     virtual void Slot90();
     virtual void Slot91();
     virtual int Slot92(); /* 92: UpdateJtStand tests the result */
@@ -35,7 +36,7 @@ struct JT : STEP {
     virtual void Slot94();
     virtual void SetFocus(int prioNear, struct STEPGUARD *pguardNear, int prioBest, struct STEPGUARD *pguardBest); /* 95: SetJtFocus; UpdateJtFocus */
     virtual void PredictLead(float dt, struct LEAD *plead); /* 96: PredictLoLead; GoalAnimLeap_SetState passes a 0x30-byte LEAD */
-    virtual void Slot97();              /* 97: func_00141588 */
+    virtual void Slot97(float *ppos);   /* 97: func_00141588; GetJtCpdefi passes a four-float output */
     virtual void Slot98();              /* 98: func_001409B8 */
     virtual int FCanUseGadget(int gadget); /* 99: func_00141C00, FBentleyCanUseGadget; UpdateLookRig */
     virtual void UseGadget(int gadget); /* 100: func_00141D38, UseBentleyGadget; SetJtGadgetSlotState */
@@ -49,13 +50,22 @@ struct JT : STEP {
     void *PvJmp() { return (char *)this + 0x2C0; }
     void *PvAttach() { return (char *)this + 0x4C0; }
     void *PvPipe() { return (char *)this + 0xF50; }
+    void *PvPart9E0() { return (char *)this + 0x9E0; }   /* InitJt starts func_0019F3E8's part here */
+    void *PvZap() { return (char *)this + 0xDF0; }       /* InitJtZap's part */
+    void *PvBinoc() { return (char *)this + 0xF00; }     /* the binoculars */
+    void *PvAttachCarry() { return (char *)this + 0x900; } /* in the attachment: func_001CD308 and func_001CC9A8 take it (its object is pcarried, 0x9A0) */
+    void *PvVjoy() { return (char *)this + 0xFD0; }      /* the virtual joystick InitJt starts with func_00144638: UpdateJt passes it to
+                                                           func_00144640 and func_001449C8, GoalFollowCrvVjoy steers it (func_001448F0) */
+    void *PvCarry() { return (char *)this + 0x11B0; }    /* CarryThrow_Init's part */
     u8 unknown_0x2C0[0x4];
     /* 0x2C4 */ s32 field_0x2C4; /* in the JMP: SetMurrayMode (Murray slot 88) */
     u8 unknown_0x2C8[0x14];
     /* 0x2DC */ s32 jmpState; /* the jump state, in the JMP InitJt starts at 0x2C0: FInvulnerableJt (slot 76), func_00143C78 (85), func_00141588 (97) */
     u8 unknown_0x2E0[0xF8];
     /* 0x3D8 */ f32 field_0x3D8; /* InitBentley (Bentley slot 7) sets -70 */
-    u8 unknown_0x3DC[0xEC];
+    u8 unknown_0x3DC[0x58];
+    /* 0x434 */ s32 field_0x434; /* GetJtCpdefi (JT slot 50) */
+    u8 unknown_0x438[0x90];
     /* 0x4C8 */ s32 attachKind; /* in the attachment InitJt starts at 0x4C0: func_00143C78 (85); func_00211420, UpdateSndMix */
     /* 0x4CC */ s32 field_0x4CC; /* func_0018A428 (Sly slot 50) */
     u8 unknown_0x4D0[0x50];
@@ -66,12 +76,15 @@ struct JT : STEP {
     /* 0x9BC */ s32 field_0x9BC; /* UseSlyGadget (Sly slot 100) */
     u8 unknown_0x9C0[0x4];
     /* 0x9C4 */ void *ptemplateTargetIndicator; /* UpdateSwTargetList spawns an indicator from it for a new candidate */
-    u8 unknown_0x9C8[0x42C];
+    u8 unknown_0x9C8[0x1C];
+    /* 0x9E4 */ s32 field_0x9E4; /* in the part InitJt starts at 0x9E0: JT_TranslateToPos (STEP slot 29) clears it */
+    u8 unknown_0x9E8[0x40C];
     /* 0xDF4 */ s32 zapState; /* in the zap state InitJt starts at 0xDF0: UpdateJt (16), func_00143C78 (85) */
     u8 unknown_0xDF8[0x4];
     /* 0xDFC */ s32 field_0xDFC; /* JT_FLethalHit (86) */
-    u8 unknown_0xE00[0xFC];
-    /* 0xEFC */ s32 field_0xEFC; /* UpdateJt (16) */
+    /* 0xE00 */ s32 *pnHealth; /* SetJtHealth stores into it; bevy_player_p18_gadget_refill points it into the save variables; bevy_player_p18_gadget_144268 reads it (field_0xDFC is the maximum) */
+    u8 unknown_0xE04[0xF8];
+    /* 0xEFC */ void *pasegaHandle; /* UpdateJt (16) releases it once gone; RetractAsegaHandle and ReleaseAsegaHandle take its address */
     u8 unknown_0xF00[0x1C];
     /* 0xF1C */ struct SO *field_0xF1C; /* func_001B81B8 (Murray slot 87) sets it to the held object */
     /* 0xF20 */ s32 binocPhase; /* in the binoculars InitJt starts at 0xF00: FInvulnerableJt (76); BindTextBinocReadout */
@@ -95,11 +108,12 @@ struct JT : STEP {
     /* 0x1044 */ s32 fLook; /* func_001E5000: set while the seqnode's look target steers it (guess: reader is certain JT, class 0x34 test) */
     /* 0x1048 */ f32 field_0x1048; /* InitJt sets 125; func_00141588 */
     /* 0x104C */ f32 field_0x104C; /* func_00141588 */
-    u8 unknown_0x1050[0x10];
+    /* 0x1050 */ f32 field_0x1050; /* GetJtCpdefi (JT slot 50) */
+    u8 unknown_0x1054[0xC];
     /* 0x1060 */ QW look; /* func_001E5000 */
     /* 0x1070 */ QW dir; /* func_001E5000 */
     /* 0x1080 */ f32 field_0x1080; /* GetMurrayCpdefi (Murray slot 50) */
-    u8 unknown_0x1084[0x4];
+    /* 0x1084 */ struct SEQNODE *pseqnode; /* UpdateJt (JT slot 16) passes it to UpdateSeqnodeVjoy when the goal stack is empty; bevy_player_p4_144068 tests it */
     /* 0x1088 */ struct GADGETSTATE *field_0x1088; /* SetMurrayLiftState (guess: one reader) */
     u8 unknown_0x108C[0xC];
     /* 0x1098 */ f32 field_0x1098; /* InitMurray and InitBentley set -100 */
@@ -116,18 +130,23 @@ struct JT : STEP {
     u8 unknown_0x10CC[0x8];
     /* 0x10D4 */ f32 field_0x10D4; /* InitJt sets 1 */
     /* 0x10D8 */ f32 field_0x10D8; /* InitJt sets 1 */
-    /* 0x10DC */ s32 field_0x10DC; /* bevy_player_input_from_pad_cm */
+    /* 0x10DC */ sptr field_0x10DC; /* a STEPGUARD address: SetJtFocus (JT slot 95) stores pguardNear in it; bevy_player_input_from_pad_cm; func_001431D0 takes its goal stack */
     /* 0x10E0 */ s32 fFocusBusy; /* UpdateJtFocus (which calls slot 95, so holds a JT) */
     /* 0x10E4 */ s32 focusKind; /* InitJt sets -1; UpdateBinocHud */
-    u8 unknown_0x10E8[0x4];
+    /* 0x10E8 */ struct STEPGUARD *pguardBest; /* SetJtFocus (JT slot 95) stores pguardBest in it */
     /* 0x10EC */ s32 focusMode; /* InitJt sets -1; UpdateBinocHud, UpdateSndMix */
     /* 0x10F0 */ s32 field_0x10F0; /* InitJt sets 1 */
-    u8 unknown_0x10F4[0x44];
+    u8 unknown_0x10F4[0x4];
+    /* 0x10F8 */ struct LO *ploLook; /* SetJtLookTarget sets it; func_001430C8 reads its world position (two readers) */
+    /* 0x10FC */ s32 kindLook; /* SetJtLookTarget sets it; func_001430C8 switches on it */
+    u8 unknown_0x1100[0x38];
     /* 0x1138 */ f32 field_0x1138; /* InitJt sets 1.5 */
     /* 0x113C */ f32 field_0x113C; /* InitJt sets 2.5 */
     /* 0x1140 */ f32 field_0x1140; /* InitJt sets 3 */
     /* 0x1144 */ f32 field_0x1144; /* InitJt sets 5 */
-    u8 unknown_0x1148[0x38];
+    /* 0x1148 */ s32 fGlance; /* func_00142868 sets it; ScheduleJtGlance picks the delay range by it; SetJtLookTarget sets it */
+    /* 0x114C */ f32 tGlance; /* func_00142868 sets FLT_MAX; ScheduleJtGlance sets the next time; SetJtLookTarget tests for FLT_MAX */
+    u8 unknown_0x1150[0x30];
     /* 0x1180 */ GADGETSLOT aslot[3]; /* LoadJtGadgetSlots (called by PostJtLoad, slot 15; calls slot 103) */
     u8 unknown_0x11A4[0x4];
     /* 0x11A8 */ struct LOOT *plootHeld; /* GiveJtLoot, DropJtLoot, DeliverJtLoot, Crfodb_OnGrab; level_loaded (class 52 objects) */
@@ -135,11 +154,12 @@ struct JT : STEP {
     /* 0x11B4 */ s32 field_0x11B4; /* in the carry state InitJt starts at 0x11B0: UseSlyGadget (Sly slot 100) */
     u8 unknown_0x11B8[0x138];
     /* 0x12F0 */ s32 fGadgetsAllowed; /* InitJt sets 1; FAttachAllowsGadget, FJmpAllowsGadget test it */
-    u8 unknown_0x12F4[0x8];
+    /* 0x12F4 */ s32 field_0x12F4; /* JT_RetainSmKinds (slot 83) counts up, JT_ReleaseSmKinds (84) down */
+    u8 unknown_0x12F8[0x4];
     /* 0x12FC */ s32 *pnPower; /* SetJtPower, which reads nPowerMax next to it */
     /* 0x1300 */ s32 nPowerMax; /* InitJt sets 100; SetJtPower */
     /* 0x1304 */ f32 field_0x1304; /* InitJt sets -60; SpendJtGadgetPower */
-    u8 unknown_0x1308[0x4];
+    /* 0x1308 */ f32 powerFraction; /* DrainJtPower accumulates the fraction of a power point; bevy_player_p18_gadget_refill clears it */
     /* 0x130C */ s32 field_0x130C; /* UseSlyGadget (Sly slot 100) */
     /* 0x1310 */ s32 field_0x1310; /* bevy_player_input_from_pad_cm */
     /* 0x1314 */ s32 field_0x1314; /* bevy_player_input_from_pad_cm */
@@ -149,6 +169,18 @@ struct JT : STEP {
 
 #if defined(__mips__)
 SLY2_SIZE_CHECK(GADGETSLOT, 0xC);
+SLY2_OFFSET_CHECK(JT, field_0x434, 0x434);
+SLY2_OFFSET_CHECK(JT, pnHealth, 0xE00);
+SLY2_OFFSET_CHECK(JT, powerFraction, 0x1308);
+SLY2_OFFSET_CHECK(JT, field_0x12F4, 0x12F4);
+SLY2_OFFSET_CHECK(JT, field_0x9E4, 0x9E4);
+SLY2_OFFSET_CHECK(JT, field_0x1050, 0x1050);
+SLY2_OFFSET_CHECK(JT, pseqnode, 0x1084);
+SLY2_OFFSET_CHECK(JT, pguardBest, 0x10E8);
+SLY2_OFFSET_CHECK(JT, ploLook, 0x10F8);
+SLY2_OFFSET_CHECK(JT, kindLook, 0x10FC);
+SLY2_OFFSET_CHECK(JT, fGlance, 0x1148);
+SLY2_OFFSET_CHECK(JT, tGlance, 0x114C);
 SLY2_SIZE_CHECK(JT, 0x1320);
 SLY2_OFFSET_CHECK(JT, field_0x2C4, 0x2C4);
 SLY2_OFFSET_CHECK(JT, jmpState, 0x2DC);
@@ -161,7 +193,7 @@ SLY2_OFFSET_CHECK(JT, field_0x9BC, 0x9BC);
 SLY2_OFFSET_CHECK(JT, ptemplateTargetIndicator, 0x9C4);
 SLY2_OFFSET_CHECK(JT, zapState, 0xDF4);
 SLY2_OFFSET_CHECK(JT, field_0xDFC, 0xDFC);
-SLY2_OFFSET_CHECK(JT, field_0xEFC, 0xEFC);
+SLY2_OFFSET_CHECK(JT, pasegaHandle, 0xEFC);
 SLY2_OFFSET_CHECK(JT, binocPhase, 0xF20);
 SLY2_OFFSET_CHECK(JT, field_0xF3C, 0xF3C);
 SLY2_OFFSET_CHECK(JT, field_0xF50, 0xF50);

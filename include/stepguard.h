@@ -143,10 +143,7 @@ struct STEPGUARD : STEP {
     /* 0x1000 */ s32 field_0x1000; /* func_0020B590 */
     u8 unknown_0x1004[0xC];
 
-    /* the goal stack lives inside STEP's bytes at 0x26C (GOALSTACK, goals.h): GoalStack_Clear, GoalStack_PgoalFind, GoalStack_Update
-       and GoalStack_HandleMessage take its address. STEP declares those bytes as unknown and field_0x270 (UpdateJt), so the stack is
-       reached through this accessor until STEP holds it. */
-    struct GOALSTACK *pgoalstack() { return (struct GOALSTACK *)((char *)this + 0x26C); }
+    /* the goal stack: STEP::pgoalstack() (step.h) */
 };
 
 #if defined(__mips__)

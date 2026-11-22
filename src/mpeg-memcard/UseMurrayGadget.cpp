@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 #include "murray.h"
 #include "sly2.h"
 extern "C" {
@@ -25,7 +26,7 @@ extern "C" void UseMurrayGadget(MURRAY *pmurray, int gadget)
     case 0xF:
         pmurray->field_0x9BC = gadget;
         pmurray->field_0x130C = pmurray->field_0x1AC4;
-        StartAttach((char *)pmurray + 0x4C0, 0xB, 0, 0);
+        StartAttach(pmurray->PvAttach(), 0xB, 0, 0);
         return;
     case 0x13:
         SpendJtGadgetPower(pmurray, gadget);
@@ -39,7 +40,7 @@ extern "C" void UseMurrayGadget(MURRAY *pmurray, int gadget)
         return;
     case 0x15:
         pmurray->field_0x9BC = 0x15;
-        StartAttach((char *)pmurray + 0x4C0, 0xB, *(void **)((char *)pmurray + 0x10DC), 0);
+        StartAttach(pmurray->PvAttach(), 0xB, (void *)pmurray->field_0x10DC, 0);
         return;
     case 0x10:
         SetMurrayState(pmurray, 0x15);

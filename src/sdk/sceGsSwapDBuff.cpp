@@ -1,23 +1,27 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later */
 #include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
+struct GSDISPENV {
+    u8 unknown_0x0[0x28];
+};
+struct GSDRAWENV {
+    u8 unknown_0x0[0xF0];
+};
+/* Two display environments (0x28 bytes each), then two drawing environments (0xF0 bytes each). */
+struct GSDBUFF {
+    GSDISPENV disp[2];
+    GSDRAWENV draw[2];
+};
 extern "C" {
-struct _m2c_stack_sceGsSwapDBuff {
-    /* 0x00 */ char pad0[0x30];
-};                                                  /* size = 0x30 */
-M2C_UNK sceGsPutDispEnv(s32);                       /* extern */
-M2C_UNK sceGsPutDrawEnv(s32);                       /* extern */
-void sceGsSwapDBuff(s32 arg0, s32 arg1) {
-    s32 temp_s0;
-    temp_s0 = arg1 & 1;
-    sceGsPutDispEnv((temp_s0 * 0x28) + arg0);
-    if (temp_s0 != 0) {
-        sceGsPutDrawEnv(arg0 + 0x140);
+void sceGsPutDispEnv(GSDISPENV *env);
+void sceGsPutDrawEnv(GSDRAWENV *env);
+void sceGsSwapDBuff(GSDBUFF *buffers, s32 index) {
+    s32 side;
+    side = index & 1;
+    sceGsPutDispEnv(&buffers->disp[side]);
+    if (side != 0) {
+        sceGsPutDrawEnv(&buffers->draw[1]);
         return;
     }
-    sceGsPutDrawEnv(arg0 + 0x50);
+    sceGsPutDrawEnv(&buffers->draw[0]);
 }
 }

@@ -1,17 +1,13 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later */
 #include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
+#include "pad.h"
 extern "C" {
 void func_00234F48(char *, char *);
-extern char B_004505D0[];
-char *func_00243270(s32 arg0, s32 arg1) {
-    char *buffer = *(char **)(B_004505D0 + (arg0 * 0x70 + arg1 * 0x1C));
-    func_00234F48(buffer, buffer + 0xFF);
-    s32 *words = (s32 *)buffer;
-    s32 index = words[0x16] < words[0x36];
-    return buffer + (index << 7);
+extern PADPORT B_004505D0[];
+PADFRAME *func_00243270(s32 port, s32 slot) {
+    PADFRAME *frames = B_004505D0[port].slot[slot].frames;
+    func_00234F48((char *)frames, (char *)frames + 0xFF);
+    s32 second = frames[0].counter < frames[1].counter;
+    return frames + second;
 }
 }

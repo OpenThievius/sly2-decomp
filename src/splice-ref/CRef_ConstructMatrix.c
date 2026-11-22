@@ -1,21 +1,16 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "crefboxes.h"
 
-void *PvAllocSlotheapImpl(M2C_UNK *);               /* extern */
-extern M2C_UNK B_004521A0;
+extern struct SLOTHEAP B_004521A0;
 
-void *CRef_ConstructMatrix(void *arg0, void *arg1) {
-    void *temp_a1;
-    void *temp_v0;
+CRef *CRef_ConstructMatrix(CRef *pref, struct MATRIX4 *pmatrix) {
+    struct MATRIXBOX *pbox;
 
-    M2C_FIELD(arg0, s32 *, 0) = 0x1B;
-    temp_v0 = PvAllocSlotheapImpl(&B_004521A0);
-    M2C_FIELD(temp_v0, s32 *, 0x40) = 0;
-    M2C_FIELD(arg0, void **, 4) = temp_v0;
-    M2C_FIELD(temp_v0, s32 *, 0x40) = (s32) (M2C_FIELD(temp_v0, s32 *, 0x40) + 1);
-    temp_a1 = M2C_FIELD(arg0, void **, 4);
-    M2C_FIELD(temp_a1, s128 *, 0) = (s128) M2C_FIELD(arg1, s128 *, 0);
-    M2C_FIELD(temp_a1, s128 *, 0x10) = (s128) M2C_FIELD(arg1, s128 *, 0x10);
-    M2C_FIELD(temp_a1, s128 *, 0x20) = (s128) M2C_FIELD(arg1, s128 *, 0x20);
-    M2C_FIELD(temp_a1, s128 *, 0x30) = (s128) M2C_FIELD(arg1, s128 *, 0x30);
-    return arg0;
+    pref->m_tagk = TAGK_Matrix;
+    pbox = PvAllocSlotheapImpl(&B_004521A0);
+    pbox->cref = 0;
+    pref->m_tag.m_pmatrix = &pbox->matrix;
+    pbox->cref = pbox->cref + 1;
+    *pref->m_tag.m_pmatrix = *pmatrix;
+    return pref;
 }

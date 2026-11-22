@@ -1,27 +1,21 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later */
 #include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
+#include "mpeg.h"
 extern "C" {
-struct _m2c_stack_func_0024B590 {
-    /* 0x00 */ char pad0[0x20];
-};                                                  /* size = 0x20 */
-M2C_UNK func_0024AC10(s8 *);                      /* extern */
-s32 func_0024B590(s8 *arg0) {
-    s8 *temp_s0;
-    temp_s0 = M2C_FIELD(arg0, s8 **, 0x40);
-    M2C_FIELD(temp_s0, s32 *, 0x878) = 0;
-    M2C_FIELD(temp_s0, s32 *, 0) = 0;
-    M2C_FIELD(temp_s0, s32 *, 4) = 0;
-    M2C_FIELD(temp_s0, s32 *, 8) = 0;
-    M2C_FIELD(arg0, s32 *, 8) = 0;
-    M2C_FIELD(temp_s0, s32 *, 0xC0) = 0;
-    M2C_FIELD(temp_s0, s32 *, 0x98) = -1;
-    func_0024AC10(temp_s0);
-    M2C_FIELD(temp_s0, s32 *, 0x128) = 0;
-    M2C_FIELD(temp_s0, s32 *, 0x858) = 0;
+void func_0024AC10(MPEGDEC *);
+s32 func_0024B590(MPEGHANDLE *handle) {
+    MPEGDEC *decoder;
+    decoder = handle->state;
+    decoder->field_0x878 = 0;
+    decoder->done = 0;
+    decoder->field_0x4 = 0;
+    decoder->field_0x8 = 0;
+    handle->field_0x8 = 0;
+    decoder->field_0xC0 = 0;
+    decoder->field_0x98 = -1;
+    func_0024AC10(decoder);
+    decoder->field_0x128 = 0;
+    decoder->field_0x858 = 0;
     *(s32 *)0x10002010 = (*(s32 *)0x10002010 & 0xFF7FFFFF) | 0x800000;
     return 1;
 }

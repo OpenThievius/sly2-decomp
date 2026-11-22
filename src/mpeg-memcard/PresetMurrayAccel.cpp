@@ -17,10 +17,10 @@ void PresetMurrayAccel(MURRAY *self) {
     }
     switch (self->state) {
     case 2:
-        bevy_player_p18_gadget_glide_force((char *)self + 0x2C0);
+        bevy_player_p18_gadget_glide_force(self->PvJmp());
         return;
     case 13:
-        PresetJtAccelHide((JT *)((char *)self + 0x4C0));
+        PresetJtAccelHide((JT *)self->PvAttach());
         return;
     case 14:
         PresetJtAccelZap((char *)self + 0xDF0);
@@ -29,7 +29,7 @@ void PresetMurrayAccel(MURRAY *self) {
         func_001B6CC0(self);
         return;
     case 20:
-        PresetJtAccelPipe((JT *)((char *)self + 0xF50));
+        PresetJtAccelPipe((JT *)self->PvPipe());
         return;
     }
 }

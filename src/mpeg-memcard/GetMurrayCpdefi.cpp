@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 #include "murray.h"
 extern "C" const float g_2dded0;
 extern "C" void GetJtCpdefi(MURRAY *, unsigned *);
@@ -25,7 +26,7 @@ void GetMurrayCpdefi(MURRAY *murray, unsigned *flags)
         func_00220388((char *)murray + 0x1910, flags);
         break;
     case 20:
-        func_0019EA00((char *)murray + 0xF50, flags);
+        func_0019EA00(murray->PvPipe(), flags);
         break;
     }
 }

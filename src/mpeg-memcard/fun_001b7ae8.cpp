@@ -1,5 +1,7 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
 #include "murray.h"
+#include "carry.h"
 extern const QW D_002C09D0;
 extern const QW g_2a2dd0;
 extern "C" void DetachMurrayObject(MURRAY *);
@@ -11,7 +13,7 @@ extern "C" void func_001F7A68(LO *, int);
 extern "C" void func_001B7AE8(MURRAY *murray)
 {
     DetachMurrayObject(murray);
-    LO *lo = *(LO **)((char *)murray->ploCarried + 0x180);
+    LO *lo = ((CARRY *)murray->ploCarried)->pso;
     murray->ploCarried = 0;
     unsigned long inWorld = (lo->grfo >> 60) & 1; if (inWorld) {
         if (FIsBasicDerivedFrom(lo, 0x38))

@@ -1,21 +1,17 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "wipe.h"
+#include "soproperty.h"
+
 extern "C" {
-void PostSoLoad();
-void SetSoProperties(s8 *, M2C_UNK, M2C_UNK *);
-extern M2C_UNK D_002BD380;
+void PostSoLoad(SO *pso);
+void SetSoProperties(SO *pso, int count, const SOPROPERTY *aproperty);
+/* the wipe's two property entries (flags, key, offset: 0x158 and 0x15C), defined in src/data as words */
+extern unsigned int D_002BD380[6];
 
-void PostWipeLoad(s8 *arg0) {
-    s8 *temp_v1;
-
-    PostSoLoad();
-    SetSoProperties(arg0, 2, &D_002BD380);
-    temp_v1 = M2C_FIELD(arg0, s8 **, 0xC);
-    M2C_FIELD(arg0, s32 *, 0x150) = -1;
-    M2C_FIELD(temp_v1, M2C_UNK (**)(s8 *), 0x4C)(arg0 + M2C_FIELD(temp_v1, s16 *, 0x48));
+void PostWipeLoad(WIPE *pwipe) {
+    PostSoLoad(pwipe);
+    SetSoProperties(pwipe, 2, (const SOPROPERTY *)D_002BD380);
+    pwipe->wipes = -1;
+    pwipe->Remove();
 }
-
 }

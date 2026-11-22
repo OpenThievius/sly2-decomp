@@ -1,12 +1,7 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "mpeg.h"
 extern "C" {
-struct _m2c_stack_func_0024B910 {};                 /* size 0x0 */
-void func_0024B910(s8 *arg0) {
-    M2C_FIELD(arg0, s32 *, 0xC) = (s32) M2C_FIELD(arg0, s32 *, 8);
+void func_0024B910(MPEGWORKAREA *area) {
+    area->start = area->used;
 }
 }

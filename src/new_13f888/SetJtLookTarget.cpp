@@ -1,15 +1,16 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "jt.h"
 
-M2C_UNK ReleaseJtLookHold(void *);                  /* extern */
+void ReleaseJtLookHold(JT *pjt);
 
-void SetJtLookTarget(void *arg0, s32 arg1, s32 arg2) {
-    if ((arg2 != M2C_FIELD(arg0, s32 *, 0x10F8)) || (arg1 != M2C_FIELD(arg0, s32 *, 0x10FC))) {
-        M2C_FIELD(arg0, s32 *, 0x10FC) = arg1;
-        M2C_FIELD(arg0, s32 *, 0x10F8) = arg2;
-        if (arg2 != 0) {
-            if (M2C_FIELD(arg0, f32 *, 0x114C) != 3.4028235e38f) {
-                M2C_FIELD(arg0, s32 *, 0x1148) = 1;
-                ReleaseJtLookHold(arg0);
+void SetJtLookTarget(JT *pjt, int kind, LO *plo) {
+    if ((plo != pjt->ploLook) || (kind != pjt->kindLook)) {
+        pjt->kindLook = kind;
+        pjt->ploLook = plo;
+        if (plo != 0) {
+            if (pjt->tGlance != 3.4028235e38f) {
+                pjt->fGlance = 1;
+                ReleaseJtLookHold(pjt);
             }
         }
     }

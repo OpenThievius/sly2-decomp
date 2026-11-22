@@ -7,6 +7,8 @@
 #define SLY2_STEP_H
 #include "po.h"
 
+struct GOALSTACK;
+
 struct STEP : PO {
     virtual void Slot82();              /* 82: func_00205008, func_00140C30 (JT) */
     virtual void RetainSmKinds(int n1, int n2);       /* 83: RetainAloSmKinds, JT_RetainSmKinds */
@@ -43,6 +45,10 @@ struct STEP : PO {
     u8 unknown_0x274[0x20];
     /* 0x294 */ void *pcrv; /* func_0017C550, GoalGoto_SetState */
     u8 unknown_0x298[0x28];
+    /* the goal stack (GOALSTACK, goals.h) lives in STEP's bytes at 0x26C (its count is field_0x270): GoalStack_Clear, GoalStack_PgoalFind,
+       GoalStack_Update and GoalStack_HandleMessage take its address, for a guard (OnGuardAdd, UpdateGuard) and for the player (UpdateJt,
+       func_00141928). STEP declares those bytes as unknown, so the stack is reached through this accessor. */
+    struct GOALSTACK *pgoalstack() { return (struct GOALSTACK *)((char *)this + 0x26C); }
 };
 
 #if defined(__mips__)

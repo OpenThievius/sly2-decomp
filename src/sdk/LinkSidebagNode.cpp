@@ -1,5 +1,6 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later */
 #include "sly2.h"
+#include "gcnode.h"
 extern "C" {
 extern unsigned B_002DD2C4;
 extern unsigned B_00452138[];
@@ -20,7 +21,6 @@ static inline void LocateGcNode(unsigned pnode, unsigned *pinode, unsigned *pich
     *pichunk = 0;
 }
 
-struct GNODE { int cref; unsigned prevIndex : 13; unsigned prevChunk : 2; unsigned unused : 1; unsigned nextIndex : 13; unsigned nextChunk : 2; unsigned gen : 1; };
 
 extern "C" void LinkSidebagNode(void *pnode, unsigned *ppnodeHead)
 {

@@ -1,9 +1,10 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "jtview.h"
 
-M2C_UNK GoalFollowCrv_Activate();                   /* extern */
-M2C_UNK func_001448F0(s32, s128);                   /* extern */
+void GoalFollowCrv_Activate(struct GOALFOLLOWCRVVJOY *pgoal);
+void func_001448F0(u8 *pvjoy, QW posGoal);
 
-void GoalFollowCrvVjoy_Activate(void *arg0) {
-    GoalFollowCrv_Activate();
-    func_001448F0(M2C_FIELD(arg0, s32 *, 0x10) + 0xFD0, M2C_FIELD(arg0, s128 *, 0x80));
+void GoalFollowCrvVjoy_Activate(struct GOALFOLLOWCRVVJOY *pgoal) {
+    GoalFollowCrv_Activate(pgoal);
+    func_001448F0(GOAL_JT(pgoal)->vjoy, pgoal->posGoal);
 }

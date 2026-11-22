@@ -1,25 +1,16 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
-extern "C" {
-void CRef_Destruct(s8 *);                            /* extern */
-s128 *PvAllocSlotheapImpl(M2C_UNK *);               /* extern */
-extern M2C_UNK B_00452188;
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "crefboxes.h"
 
-s8 *CRef_SetVectorPtr(s8 *arg0, s128 *arg1) {
-    s128 *temp_v0;
+extern SLOTHEAP B_00452188;
 
-    CRef_Destruct(arg0);
-    M2C_FIELD(arg0, s32 *, 0) = 0x1A;
-    temp_v0 = PvAllocSlotheapImpl(&B_00452188);
-    M2C_FIELD(temp_v0, s32 *, 0x10) = 0;
-    M2C_FIELD(arg0, s128 **, 4) = temp_v0;
-    M2C_FIELD(temp_v0, s32 *, 0x10) = (s32) (M2C_FIELD(temp_v0, s32 *, 0x10) + 1);
-    *M2C_FIELD(arg0, s128 **, 4) = *arg1;
-    return arg0;
-}
-
+extern "C" CRef *CRef_SetVectorPtr(CRef *pref, VECTOR *pvector)
+{
+    pref->Decref();
+    pref->m_tagk = TAGK_Vector;
+    VECTORBOX *pbox = (VECTORBOX *)PvAllocSlotheapImpl(&B_00452188);
+    pbox->cref = 0;
+    pref->m_tag.m_pvector = &pbox->vector;
+    pbox->cref = pbox->cref + 1;
+    *pref->m_tag.m_pvector = *pvector;
+    return pref;
 }

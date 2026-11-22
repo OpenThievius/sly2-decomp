@@ -1,5 +1,6 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "jtview.h"
 
-s32 func_001424D0(void *arg0) {
-    return M2C_FIELD(arg0, s32 *, 0x4C8) != 9;
+s32 func_001424D0(struct JTVIEW *pjt) {
+    return pjt->attachKind != 9;
 }

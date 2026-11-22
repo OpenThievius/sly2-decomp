@@ -1,21 +1,24 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "job.h"
 
-M2C_UNK ActivateJobOfTask(void *);                  /* extern */
-M2C_UNK BeginJobComplete(void *);                   /* extern */
-s32 FJobRunning();                                  /* extern */
-M2C_UNK SetSwRestartTask(M2C_UNK *, void *);        /* extern */
-extern M2C_UNK B_003DD490;
+struct SW;
 
-void NotifyJobTaskState(void *arg0, void *arg1) {
-    if (FJobRunning() != 0) {
-        if (arg1 == M2C_FIELD(arg0, s32 *, 0x64)) {
-            ActivateJobOfTask(arg0);
+void ActivateJobOfTask(struct JOB *pjob);
+void BeginJobComplete(struct JOB *pjob);
+s32 FJobRunning(struct JOB *pjob);
+void SetSwRestartTask(struct SW *psw, struct TASK *ptask);
+extern struct SW B_003DD490;
+
+void NotifyJobTaskState(struct JOB *pjob, struct TASK *ptask) {
+    if (FJobRunning(pjob) != 0) {
+        if (ptask == pjob->ptaskStart) {
+            ActivateJobOfTask(pjob);
         }
-        if (arg1 == M2C_FIELD(arg0, s32 *, 0x68)) {
-            BeginJobComplete(arg0);
+        if (ptask == pjob->ptaskEnd) {
+            BeginJobComplete(pjob);
         }
-        if (M2C_FIELD(arg1, s32 *, 0xB8) != -1) {
-            SetSwRestartTask(&B_003DD490, arg1);
+        if (ptask->field_0xB8 != -1) {
+            SetSwRestartTask(&B_003DD490, ptask);
         }
     }
 }

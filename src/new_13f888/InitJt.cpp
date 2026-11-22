@@ -1,6 +1,7 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later */
 #include "jt.h"
 extern "C" {
-void InitStep(void *);
+void InitStep(STEP *pstep);
 void InitJmp(void *, void *);
 void InitAttach(void *, void *);
 void func_0019F3E8(void *, void *);
@@ -9,21 +10,21 @@ void bevy_player_p15_binoc_default(void *, void *);
 void CarryThrow_Init(void *, void *);
 void InitJtPipe(void *, void *);
 void func_00144638(void *, void *);
-void SetAloInteract(void *, int, int);
+void SetAloInteract(JT *, int, int);
 }
 // The `0x12F0 = 0x10F0 = 1` chain is two plain stores: 0x10F0 before the 0x10D4/0x10D8 float chain, 0x12F0 after the 0x1144 store. The
 // scheduler keeps a store that needs no constant register last in source order, which puts 0x10F0 before 0x10D8 as in retail.
 void InitJt(JT *pjt)
 {
     InitStep(pjt);
-    InitJmp((char *)pjt + 0x2C0, pjt);
-    InitAttach((char *)pjt + 0x4C0, pjt);
-    func_0019F3E8((char *)pjt + 0x9E0, pjt);
-    InitJtZap((char *)pjt + 0xDF0, pjt);
-    bevy_player_p15_binoc_default((char *)pjt + 0xF00, pjt);
-    CarryThrow_Init((char *)pjt + 0x11B0, pjt);
-    InitJtPipe((char *)pjt + 0xF50, pjt);
-    func_00144638((char *)pjt + 0xFD0, pjt);
+    InitJmp(pjt->PvJmp(), pjt);
+    InitAttach(pjt->PvAttach(), pjt);
+    func_0019F3E8(pjt->PvPart9E0(), pjt);
+    InitJtZap(pjt->PvZap(), pjt);
+    bevy_player_p15_binoc_default(pjt->PvBinoc(), pjt);
+    CarryThrow_Init(pjt->PvCarry(), pjt);
+    InitJtPipe(pjt->PvPipe(), pjt);
+    func_00144638(pjt->PvVjoy(), pjt);
     pjt->field_0x103C = 20.0f;
     pjt->field_0x1048 = 125.0f;
     pjt->field_0x10F0 = 1;

@@ -27,7 +27,7 @@ struct STEPVIEW {
 /* the C slice of STEPGUARD */
 struct STEPGUARDVIEW {
     u8 unknown_0x0[0x26C];
-    /* 0x26C */ struct GOALSTACK goalstack; /* STEPGUARD::pgoalstack() */
+    /* 0x26C */ struct GOALSTACK goalstack; /* STEP::pgoalstack() */
     u8 unknown_0x274[0x2C0 - 0x274];
     /* 0x2C0 */ u64 grfsgs;
     u8 unknown_0x2C8[0x338 - 0x2C8];

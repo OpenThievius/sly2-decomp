@@ -1,11 +1,20 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "types.h"
 
-extern M2C_UNK D_002CBE50;
+/* a growable array of object pointers: AppendPloarray (cploMax, cplo, aplo) */
+struct PLOARRAY {
+    /* 0x0 */ void *field_0x0;      /* InitPloarray sets retail's 0x2CBE50 */
+    /* 0x4 */ s32 cploMax;
+    /* 0x8 */ s32 cplo;
+    /* 0xC */ s32 *aplo;
+};
 
-void *InitPloarray(void *arg0) {
-    M2C_FIELD(arg0, s32 *, 4) = 0;
-    M2C_FIELD(arg0, M2C_UNK **, 0) = &D_002CBE50;
-    M2C_FIELD(arg0, s32 *, 8) = 0;
-    M2C_FIELD(arg0, s32 *, 0xC) = 0;
-    return arg0;
+extern char D_002CBE50[];
+
+struct PLOARRAY *InitPloarray(struct PLOARRAY *pploarray) {
+    pploarray->cploMax = 0;
+    pploarray->field_0x0 = D_002CBE50;
+    pploarray->cplo = 0;
+    pploarray->aplo = 0;
+    return pploarray;
 }

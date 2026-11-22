@@ -1,9 +1,10 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "jtview.h"
 
-M2C_UNK func_00145B18(s32, M2C_UNK);                /* extern */
-M2C_UNK func_001EEF70();                            /* extern */
+void func_001EEF70(struct GOALPARTNERFOLLOW *pgoal);
+void func_00145B18(struct GOALPARTNERFOLLOW *pgoal, s32 state);
 
-void func_00145080(s32 arg0) {
-    func_001EEF70();
-    func_00145B18(arg0, 0);
+void func_00145080(struct GOALPARTNERFOLLOW *pgoal) {
+    func_001EEF70(pgoal);
+    func_00145B18(pgoal, 0);
 }

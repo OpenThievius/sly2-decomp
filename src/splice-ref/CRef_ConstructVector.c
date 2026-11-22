@@ -1,16 +1,16 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "crefboxes.h"
 
-s128 *PvAllocSlotheapImpl(M2C_UNK *);               /* extern */
-extern M2C_UNK B_00452188;
+extern struct SLOTHEAP B_00452188;
 
-void *CRef_ConstructVector(void *arg0, s128 *arg1) {
-    s128 *temp_v0;
+CRef *CRef_ConstructVector(CRef *pref, struct VECTOR *pvector) {
+    struct VECTORBOX *pbox;
 
-    M2C_FIELD(arg0, s32 *, 0) = 0x1A;
-    temp_v0 = PvAllocSlotheapImpl(&B_00452188);
-    M2C_FIELD(temp_v0, s32 *, 0x10) = 0;
-    M2C_FIELD(arg0, s128 **, 4) = temp_v0;
-    M2C_FIELD(temp_v0, s32 *, 0x10) = (s32) (M2C_FIELD(temp_v0, s32 *, 0x10) + 1);
-    *M2C_FIELD(arg0, s128 **, 4) = *arg1;
-    return arg0;
+    pref->m_tagk = TAGK_Vector;
+    pbox = PvAllocSlotheapImpl(&B_00452188);
+    pbox->cref = 0;
+    pref->m_tag.m_pvector = &pbox->vector;
+    pbox->cref = pbox->cref + 1;
+    *pref->m_tag.m_pvector = *pvector;
+    return pref;
 }

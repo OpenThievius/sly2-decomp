@@ -9,6 +9,7 @@
 #include "lo.h"
 
 struct STEP;
+struct JOY;
 
 struct GOAL : BASIC {
     virtual void Init();                /*  7: func_001EEF68 (empty); GoalBrain_Init */
@@ -18,7 +19,7 @@ struct GOAL : BASIC {
     virtual void Slot11();              /* 11: func_001EEFB8 (empty) */
     virtual void Slot12();              /* 12: func_001EEFA0 */
     virtual int FHandleMessage(int arg1, int arg2);      /* 13: Goal_FHandleMessage; GoalStack_HandleMessage calls it with two ints */
-    virtual void FillVjoy();            /* 14: Goal_FillVjoy */
+    virtual void FillVjoy(struct JOY *pjoy); /* 14: Goal_FillVjoy; UpdateJt calls the top goal's with the player's controller */
     /* 0x10 */ struct STEP *pstep;      /* the actor: Goal_FillVjoy (14) reads its heading (STEP 0x1A8), func_001EEFA0 (12) its 0x204 */
     u8 unknown_0x14[0x4];
     /* 0x18 */ struct GOAL *pgoalChild; /* Goal_Deactivate (9) pops it; GoalGotoPos_SetPos and others read it */

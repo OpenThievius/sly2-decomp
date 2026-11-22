@@ -1,15 +1,15 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later */
 #include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
 extern "C" {
-struct _m2c_stack_func_00236E30 {
-    /* 0x00 */ char pad0[0x10];
-};                                                  /* size = 0x10 */
-s32 func_0023AFE8(M2C_UNK, s8 *, M2C_UNK, s32, s32, s32); /* extern */
-s32 func_00236E30(s8 * unused_arg0, s8 * unused_arg1, s8 * unused_arg2, s8 *arg3) {
-    return (func_0023AFE8(0x80000008, arg3, 0x40, M2C_FIELD(arg3, s32 *, 0x24), M2C_FIELD(arg3, s32 *, 0x28), M2C_FIELD(arg3, s32 *, 0x2C)) != 0) ? 0 : 0x800;
+/* a request: its three trailing arguments sit at 0x24 */
+struct REQUEST_236E30 {
+    u8 unknown_0x0[0x24];
+    s32 argument0;
+    s32 argument1;
+    s32 argument2;
+};
+extern int func_0023AFE8(unsigned int, void *, int, int, int, int);
+s32 func_00236E30(void *unused_first, void *unused_second, void *unused_third, REQUEST_236E30 *request) {
+    return (func_0023AFE8(0x80000008, request, 0x40, request->argument0, request->argument1, request->argument2) != 0) ? 0 : 0x800;
 }
 }

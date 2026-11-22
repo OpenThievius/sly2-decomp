@@ -1,10 +1,11 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "types.h"
 
-M2C_UNK InitSo();                                   /* extern */
-M2C_UNK SetAloInteract(s32, M2C_UNK, M2C_UNK);      /* extern */
+void InitSo();
+void SetAloInteract(void *, s32, s32);
 
-void InitStgSwitch(s32 arg0) {
+void InitStgSwitch(void *pstgswitch) {
     InitSo();
-    SetAloInteract(arg0, 0x03FFFFFF, 8);
-    SetAloInteract(arg0, 0x80001, 0);
+    SetAloInteract(pstgswitch, 0x03FFFFFF, 8);
+    SetAloInteract(pstgswitch, 0x80001, 0);
 }

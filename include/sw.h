@@ -85,7 +85,9 @@ struct TGT {
 };
 
 struct SW : BASIC {
-    u8 unknown_0x10[0x140];
+    u8 unknown_0x10[0x10];
+    /* 0x20 */ DL dlRoot;  /* the world's root objects: RemoveSwRoot (FFindDlEntry, RemoveDlEntry), ReinsertSwRoot (InsertDlEntryBefore), RemoveSwRootRaw (RemoveDlEntry) */
+    u8 unknown_0x2C[0x124];
     /* 0x150 */ s32 state; /* FUpdateSwDuringWipe */
     u8 unknown_0x154[0x3894];
     /* 0x39E8 */ struct BLOCK *pblockCur; /* func_001FFA40 */
@@ -261,6 +263,7 @@ SLY2_OFFSET_CHECK(SW, frameLast, 0x3D64);
 SLY2_OFFSET_CHECK(SW, idHitfxLast, 0x3D68);
 SLY2_OFFSET_CHECK(SW, stamp, 0x3D70);
 SLY2_OFFSET_CHECK(SW, field_0x3E38, 0x3E38);
+SLY2_OFFSET_CHECK(SW, dlRoot, 0x20);
 SLY2_OFFSET_CHECK(SW, dlAsega, 0x3D88);
 SLY2_OFFSET_CHECK(SW, gs, 0x3EA0);
 SLY2_OFFSET_CHECK(SW, pvjoyFirst, 0x3EAC);

@@ -1,11 +1,14 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
 #include "ps2inline.h"
-struct VT1F0 { char pad[0x1F0]; short delta; short index; int (*fn)(char *); };
-struct VT108 { char pad[0x108]; short delta; short index; QW (*fn)(char *); };
-struct XPSIDE { char pad[0xC]; void *plo; char pad1[0x40 - 0x10]; };
-struct XP { XPSIDE side[2]; char pad[0x80 - 0x80]; QW normal; float nz; };
-struct LOBJ { char pad[0xC]; VT1F0 *vt; };
-struct MUR { char pad[0xC]; VT108 *vt; };
+#include "murray.h"
+struct XPSIDE { u8 unknown_0x0[0xC]; SO *pso; u8 unknown_0x10[0x30]; };
+struct XP { XPSIDE side[2]; VECTOR normal; };
+/* The word of the player at 0x1908 that this function sets (murray.h has it inside an unknown span). */
+struct MURRAYXPVIEW {
+    u8 unknown_0x0[0x1908];
+    s32 field_0x1908;
+};
 extern "C" {
 extern float D_002C0A38;
 extern float D_002C3C60[];
@@ -17,41 +20,40 @@ void *CloneMqList(void *, void *);
 void PrependMqList(void *, void *, void *);
 QW GCosAngle(QW, QW);
 }
-#define F(type, base, off) (*(type *)((char *)(base) + (off)))
 
-extern "C" void AdjustMurrayNewXp(MUR *m, XP *pxp, int iside)
+extern "C" void AdjustMurrayNewXp(MURRAY *m, XP *pxp, int iside)
 {
     AdjustStepNewXp(m, pxp, iside);
-    switch (F(int, m, 0x13D0)) {
+    switch (m->state) {
     case 0xE:
         AdjustJtZapNewXp((char *)m + 0xDF0, pxp, iside);
         break;
     case 0xC: {
-        int charges = F(int, m, 0x1840);
+        int charges = m->field_0x1840;
         if (charges != 1) break;
-        LOBJ *pother = (LOBJ *)pxp->side[1 - iside].plo;
-        if (pother->vt->fn((char *)pother + pother->vt->delta) != 0) {
-            float v = F(float, pxp, 0x88);
+        SO *pother = pxp->side[1 - iside].pso;
+        if (pother->FIsLocked() != 0) {
+            float v = pxp->normal.z;
             if (v < 0.7f) {
-                QW velocity = m->vt->fn((char *)m + m->vt->delta);
-                QW cosine = GCosAngle(velocity, pxp->normal);
+                QW velocity = m->GetVelocityVec();
+                QW cosine = GCosAngle(velocity, *(QW *)&pxp->normal);
                 int hit = LaneX(cosine) < D_002C0A38;
                 if (hit)
-                    F(int, m, 0x1908) = charges;
+                    ((MURRAYXPVIEW *)m)->field_0x1908 = charges;
             }
         }
         break;
     }
     case 3:
-        if (F(int, m, 0x13D8) == 1) {
-            if (0.7f < D_002C3C60[iside] * F(float, pxp, 0x88)) {
+        if (m->field_0x13D8 == 1) {
+            if (0.7f < D_002C3C60[iside] * pxp->normal.z) {
                 void *pmq = CloneMqList(B_003DD490, pxp);
-                PrependMqList(B_003DD490, pmq, (char *)m + 0x13E4);
+                PrependMqList(B_003DD490, pmq, &m->field_0x13E4);
             }
         }
         break;
     case 0x14:
-        func_0019E9C8((char *)m + 0xF50, pxp, iside);
+        func_0019E9C8(m->PvPipe(), pxp, iside);
         break;
     }
 }

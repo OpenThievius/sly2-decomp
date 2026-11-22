@@ -1,20 +1,13 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
-extern "C" {
-s8 *CRef_ConstructBasic(s8 *arg0, s8 *arg1) {
-    if (arg1 != NULL) {
-        s8 *vtable = *(s8 **)(arg1 + 0xC);
-        s16 offset = *(s16 *)(vtable + 8);
-        void (*method)(s8 *) = *(void (**)(s8 *))(vtable + 0xC);
-        method(arg1 + offset);
-    }
-    *(s8 **)(arg0 + 4) = arg1;
-    *(s32 *)arg0 = 0x21;
-    return arg0;
-}
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "lo.h"
+#include "cref.h"
 
+extern "C" CRef *CRef_ConstructBasic(CRef *pref, BASIC *pbasic)
+{
+    if (pbasic != 0) {
+        pbasic->OnAdd();
+    }
+    pref->m_tag.m_pbasic = pbasic;
+    pref->m_tagk = TAGK_Basic;
+    return pref;
 }

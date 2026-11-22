@@ -1,12 +1,13 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "jtview.h"
 
-M2C_UNK GoalStack_Clear(s32);                       /* extern */
-M2C_UNK RemoveSoLoHierarchy();                      /* extern */
-M2C_UNK RetractAsegaHandle(s32);                    /* extern */
+void GoalStack_Clear(struct GOALSTACK *pgoalstack);
+void RemoveSoLoHierarchy(struct JTVIEW *pjt);
+void RetractAsegaHandle(void **ppvHandle);
 
-void func_00141928(s32 arg0) {
-    RemoveSoLoHierarchy();
-    RetractAsegaHandle(arg0 + 0xEFC);
-    RetractAsegaHandle(arg0 + 0xF14);
-    GoalStack_Clear(arg0 + 0x26C);
+void func_00141928(struct JTVIEW *pjt) {
+    RemoveSoLoHierarchy(pjt);
+    RetractAsegaHandle(&pjt->pasegaHandle);
+    RetractAsegaHandle(&pjt->pasegaHandle2);
+    GoalStack_Clear(&pjt->goalstack);
 }

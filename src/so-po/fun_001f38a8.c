@@ -1,15 +1,14 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "geom.h"
 
-M2C_UNK TransformGeom(void *, void *, void *);      /* extern */
-M2C_UNK func_001F4BF8(s32);                         /* extern */
+void TransformGeom(struct MATRIX4 *pmatWorld, u8 *pblock78, u8 *pblock90);
+void func_001F4BF8(struct SO *pso);
 
-void func_001F38A8(void *arg0) {
-    void *temp_a0;
-
-    temp_a0 = M2C_FIELD(arg0, void **, 0);
-    if (M2C_FIELD(arg0, s32 *, 0xA8) != M2C_FIELD(temp_a0, s32 *, 0xA4)) {
-        TransformGeom(temp_a0 + 0x40, arg0 + 0x78, arg0 + 0x90);
-        M2C_FIELD(arg0, s32 *, 0xA8) = (s32) M2C_FIELD(M2C_FIELD(arg0, void **, 0), s32 *, 0xA4);
-        func_001F4BF8(M2C_FIELD(arg0, s32 *, 4));
+void func_001F38A8(struct GEOM *pgeom) {
+    struct XF *pxf = pgeom->pxf;
+    if (pgeom->generationBound != pxf->generation) {
+        TransformGeom(&pxf->matWorld, pgeom->field_0x78, pgeom->field_0x90);
+        pgeom->generationBound = pgeom->pxf->generation;
+        func_001F4BF8(pgeom->pso);
     }
 }

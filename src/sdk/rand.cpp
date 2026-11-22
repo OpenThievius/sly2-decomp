@@ -1,16 +1,11 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "libcstate.h"
 extern "C" {
-struct _m2c_stack_rand {};                          /* size 0x0 */
-extern s8 *D_002C49D4;
+extern LIBCSTATE *D_002C49D4;
 s32 rand(void) {
-    s32 temp_v1;
-    temp_v1 = (M2C_FIELD(D_002C49D4, s32 *, 0x58) * 0x41C64E6D) + 0x3039;
-    M2C_FIELD(D_002C49D4, s32 *, 0x58) = temp_v1;
-    return temp_v1 & 0x7FFFFFFF;
+    s32 next;
+    next = (D_002C49D4->randomSeed * 0x41C64E6D) + 0x3039;
+    D_002C49D4->randomSeed = next;
+    return next & 0x7FFFFFFF;
 }
 }

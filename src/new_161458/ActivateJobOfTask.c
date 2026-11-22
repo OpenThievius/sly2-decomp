@@ -1,23 +1,31 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "types.h"
 
-M2C_UNK DropJtLoot(s32);                            /* extern */
-s32 FIsBasicDerivedFrom(s32, M2C_UNK);              /* extern */
-s32 FIsCurrentJob();                                /* extern */
-s32 PpoSwFocusBase(M2C_UNK *);                      /* extern */
-M2C_UNK SetCurrentJob(s32);                         /* extern */
-M2C_UNK bevy_camera_follow_activity(M2C_UNK *, M2C_UNK, s32); /* extern */
-extern M2C_UNK B_002DEB30;
-extern M2C_UNK B_003DD490;
+struct BASIC;
+struct CAMERAFOLLOW;
+struct JOB;
+struct JT;
+struct PO;
+struct SW;
 
-void ActivateJobOfTask(s32 arg0) {
-    s32 temp_v0;
+void DropJtLoot(struct JT *pjt);
+s32 FIsBasicDerivedFrom(struct BASIC *pbasic, s32 index);
+s32 FIsCurrentJob(struct JOB *pjob);
+struct PO *PpoSwFocusBase(struct SW *psw);
+void SetCurrentJob(struct JOB *pjob);
+void bevy_camera_follow_activity(struct CAMERAFOLLOW *pmanager, s32 event, struct JOB *pjob);
+extern struct CAMERAFOLLOW B_002DEB30;
+extern struct SW B_003DD490;
 
-    if (FIsCurrentJob() == 0) {
-        bevy_camera_follow_activity(&B_002DEB30, 0x1C, arg0);
-        temp_v0 = PpoSwFocusBase(&B_003DD490);
-        if ((temp_v0 != 0) && (FIsBasicDerivedFrom(temp_v0, 0x34) != 0)) {
-            DropJtLoot(temp_v0);
+void ActivateJobOfTask(struct JOB *pjob) {
+    struct PO *ppoFocus;
+
+    if (FIsCurrentJob(pjob) == 0) {
+        bevy_camera_follow_activity(&B_002DEB30, 0x1C, pjob);
+        ppoFocus = PpoSwFocusBase(&B_003DD490);
+        if ((ppoFocus != 0) && (FIsBasicDerivedFrom((struct BASIC *)ppoFocus, 0x34) != 0)) {
+            DropJtLoot((struct JT *)ppoFocus);
         }
-        SetCurrentJob(arg0);
+        SetCurrentJob(pjob);
     }
 }

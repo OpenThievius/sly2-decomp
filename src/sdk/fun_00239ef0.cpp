@@ -1,26 +1,24 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later */
 #include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
 extern "C" {
-struct _m2c_stack_func_00239EF0 {};                 /* size 0x0 */
-extern s8 *D_002C5A48;
-s8 *func_00239EF0(s8 *arg0) {
-    s8 **temp_v0;
-    s8 *temp_v1;
-    temp_v0 = M2C_FIELD(arg0, s8 ***, 4);
-    temp_v1 = M2C_FIELD(arg0, s8 **, 0);
-    if (temp_v0 != NULL) {
-        *temp_v0 = temp_v1;
+/* an entry of the alarm list: the next entry, and the address of the pointer that points here (the head or the previous entry's next) */
+struct ALARMLISTNODE {
+    ALARMLISTNODE *next;
+    ALARMLISTNODE **link;
+};
+extern ALARMLISTNODE *D_002C5A48;
+ALARMLISTNODE *func_00239EF0(ALARMLISTNODE *node) {
+    ALARMLISTNODE *next = node->next;
+    ALARMLISTNODE **link = node->link;
+    if (link != 0) {
+        *link = next;
     } else {
-        D_002C5A48 = temp_v1;
+        D_002C5A48 = next;
     }
-    if (temp_v1 != NULL) {
-        M2C_FIELD(temp_v1, s8 ***, 4) = (s8 **) M2C_FIELD(arg0, s8 ***, 4);
+    if (next != 0) {
+        next->link = node->link;
     }
-    M2C_FIELD(arg0, s8 ***, 4) = NULL;
-    return temp_v1;
+    node->link = 0;
+    return next;
 }
 }

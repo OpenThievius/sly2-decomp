@@ -1,5 +1,6 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "jtview.h"
 
-void ReleaseJtLookHold(void *arg0) {
-    M2C_FIELD(arg0, s32 *, 0x1100) = 0;
+void ReleaseJtLookHold(struct JTVIEW *pjt) {
+    pjt->fLookHold = 0;
 }

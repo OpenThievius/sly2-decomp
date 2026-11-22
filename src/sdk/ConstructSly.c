@@ -1,17 +1,27 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "types.h"
+#include "globset.h"
+#include "factory.h"
 
-void *__7GLOBSET(void *);                            /* extern: GLOBSET::GLOBSET, returns its argument */
-extern M2C_UNK D_002D2E98;
-extern M2C_UNK D_002D9978;
+/* SLY's constructor chain: SO's part, then the two words at 0x2044 */
+typedef struct NEWSLY {
+    NEWSO so;
+    u8 unknown_0x178[0x2044 - 0x178];
+    s32 field_0x2044;
+    s32 field_0x2048;
+} NEWSLY;
 
-void *ConstructSly(void *arg0) {
-    M2C_FIELD(arg0, s32 *, 0) = 0;
-    M2C_FIELD(arg0, s32 *, 4) = 0;
-    M2C_FIELD(arg0, M2C_UNK **, 0xC) = &D_002D9978;
-    __7GLOBSET(arg0 + 0x80);
-    M2C_FIELD(arg0, s32 *, 0x174) = 0;
-    M2C_FIELD(arg0, M2C_UNK **, 0xC) = &D_002D2E98;
-    M2C_FIELD(arg0, s32 *, 0x2044) = 0;
-    M2C_FIELD(arg0, s32 *, 0x2048) = 0;
-    return arg0;
+extern u8 D_002D2E98; /* SLY's vtable */
+extern u8 D_002D9978; /* SO's vtable */
+
+NEWSLY *ConstructSly(NEWSLY *sly) {
+    sly->so.basic.field_0x0 = 0;
+    sly->so.basic.psidebag = 0;
+    sly->so.basic.pvtbl = &D_002D9978;
+    __7GLOBSET(&sly->so.globset);
+    sly->so.field_0x174 = 0;
+    sly->so.basic.pvtbl = &D_002D2E98;
+    sly->field_0x2044 = 0;
+    sly->field_0x2048 = 0;
+    return sly;
 }

@@ -1,40 +1,36 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "mpeg.h"
 void func_00254898(u32);
 void func_00254910(u32);
-void func_00254A70(s8 *arg0) {
-    u32 flags;
-    s32 sourceAddress;
-    s32 sourceCount;
-    s32 total;
-    s32 destinationAddress;
-    s32 destinationCount;
-    s32 mode;
-    flags = M2C_FIELD(arg0, u32 *, 0x1C);
-    mode = flags & 0x7F;
-    sourceAddress = M2C_FIELD(arg0, s32 *, 0);
-    total = ((flags >> 0x10) & 3) + ((flags >> 8) & 0xF);
-    destinationAddress = M2C_FIELD(arg0, s32 *, 0x10);
-    destinationCount = M2C_FIELD(arg0, s32 *, 8) + total;
-    sourceCount = sourceAddress - total * 0x10;
-    if (destinationAddress != 0 && M2C_FIELD(arg0, s32 *, 0x14) != 0) {
-        *(volatile s32 *)0x1000B010 = destinationAddress;
-        *(volatile s32 *)0x1000B020 = M2C_FIELD(arg0, s32 *, 0x14);
-        func_00254898(M2C_FIELD(arg0, u32 *, 0x18) | 0x100);
+void func_00254A70(IPUSTATE *state) {
+    u32 bitPosition;
+    s32 toAddressWord;
+    s32 toAddress;
+    s32 toCount;
+    s32 fifoQuadwords;
+    s32 fromAddress;
+    s32 bits;
+    bitPosition = state->bitPosition;
+    bits = bitPosition & 0x7F;
+    toAddressWord = state->toIpuAddress;
+    fifoQuadwords = ((bitPosition >> 0x10) & 3) + ((bitPosition >> 8) & 0xF);
+    fromAddress = state->fromIpuAddress;
+    toCount = state->toIpuCount + fifoQuadwords;
+    toAddress = toAddressWord - fifoQuadwords * 0x10;
+    if (fromAddress != 0 && state->fromIpuCount != 0) {
+        *(volatile s32 *)0x1000B010 = fromAddress;
+        *(volatile s32 *)0x1000B020 = state->fromIpuCount;
+        func_00254898(state->fromIpuControl | 0x100);
     }
     while (*(volatile s32 *)0x10002010 < 0) {
     }
-    *(volatile s32 *)0x10002000 = mode;
+    *(volatile s32 *)0x10002000 = bits;
     while (*(volatile s32 *)0x10002010 < 0) {
     }
-    if (sourceCount != 0 && destinationCount != 0) {
-        *(volatile s32 *)0x1000B410 = sourceCount;
-        *(volatile s32 *)0x1000B430 = M2C_FIELD(arg0, s32 *, 4);
-        *(volatile s32 *)0x1000B420 = destinationCount;
-        func_00254910(M2C_FIELD(arg0, u32 *, 0xC) | 0x100);
+    if (toAddress != 0 && toCount != 0) {
+        *(volatile s32 *)0x1000B410 = toAddress;
+        *(volatile s32 *)0x1000B430 = state->toIpuTag;
+        *(volatile s32 *)0x1000B420 = toCount;
+        func_00254910(state->toIpuControl | 0x100);
     }
 }

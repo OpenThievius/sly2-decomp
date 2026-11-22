@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 #include "murray.h"
 extern "C" void *PasegAttachBase(void *, int *);
 extern "C" void *bevy_player_p7_damage_1a23f8(void *, int *);
@@ -10,16 +11,16 @@ void SetMurrayAnimBase(MURRAY *self)
     void *paseg;
     switch (self->state) {
     case 0xD:
-        paseg = PasegAttachBase((char *)self + 0x4C0, &secondary);
+        paseg = PasegAttachBase(self->PvAttach(), &secondary);
         break;
     case 0xE:
         paseg = bevy_player_p7_damage_1a23f8((char *)self + 0xDF0, &secondary);
         break;
     case 2:
         if (self->ploCarried != 0)
-            paseg = *(void **)((char *)self + 0x1ABC);
+            paseg = self->pasegCarry;
         else
-            paseg = func_0019C870((char *)self + 0x2C0, &secondary);
+            paseg = func_0019C870(self->PvJmp(), &secondary);
         break;
     case 5:
         paseg = self->apasegByIndex[self->iapasegByIndex];

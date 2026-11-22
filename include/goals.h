@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later */
-/* The goals of a guard: the subclasses of GOAL (include/goal.h, class 155, 0x30 bytes) that a guard's goal stack holds, and the
-   records they share (GOALSTACK, GOALTARGET, ROUTE, the brain's GOALCMD). One definition for C and C++: in C++ each class derives
+/* The goals of a guard and of the player's partners: the subclasses of GOAL (include/goal.h, class 155, 0x30 bytes) that a goal
+   stack holds (a guard's, or a JT's: GoalFollowCrvVjoy and the partner goals at the end), and the records they share (GOALSTACK, GOALTARGET, ROUTE, the brain's GOALCMD). One definition for C and C++: in C++ each class derives
    from its parent (GOAL, or GOALANIM, GOALHIT, GOALFOLLOWCRV); in C (goal.h is C++ only) the same layout is written flat, the
    parents' fields repeated through their *_FIELDS macros after GOAL_FIELDS, GOAL's 0x30 bytes.
 
@@ -25,11 +25,18 @@ struct STEPGUARD;
 struct CRV;
 struct PIPE;
 struct PZLINK;
+struct JOY;
 
 /* The actor of a guard's goal: every goal here belongs to a STEPGUARD */
 #define GOAL_GUARD(goal) ((struct STEPGUARD *)(goal)->pstep)
+/* The actor of a player's goal (GoalFollowCrvVjoy, the partner goals): a JT (jt.h; in C its view JTVIEW, jtview.h) */
+#ifdef __cplusplus
+#define GOAL_JT(goal) ((struct JT *)(goal)->pstep)
+#else
+#define GOAL_JT(goal) ((struct JTVIEW *)(goal)->pstep)
+#endif
 
-/* The goal stack, embedded in STEP at 0x26C (STEPGUARD::pgoalstack()): GoalStack_Push, GoalStack_PgoalFind, GoalStack_Clear */
+/* The goal stack, embedded in STEP at 0x26C (STEP::pgoalstack()): GoalStack_Push, GoalStack_PgoalFind, GoalStack_Clear */
 struct GOALSTACK {
     u8 unknown_0x0[0x4];
     /* 0x4 */ s32 count;                /* GoalStack_PgoalFind loops over it, GoalStack_Clear tests it */
@@ -172,7 +179,10 @@ GOAL_CLASS(GOALNOTICE, GOAL, GOALNOTICE_FIELDS)
     /* 0x50 */ f32 tState;          /* GoalFollowCrv_SetState */ \
     u8 unknown_0x54[0x10]; \
     /* 0x64 */ f32 field_0x64;      /* GoalFollowRoute_SetState sets 10.0 */ \
-    u8 unknown_0x68[0x48]; \
+    u8 unknown_0x68[0x18]; \
+    /* 0x80 */ QW posGoal;          /* the point it steers at: GoalFollowCrv_Activate, GoalFollowCrv_Update; GoalFollowCrvVjoy's Activate and
+                                       Update hand it to func_001448F0 */ \
+    u8 unknown_0x90[0x20]; \
     /* 0xB0 */ QW posEnd;           /* GoalFollowCrv_SetCrv: GetPathPosFromS writes the end's position */
 GOAL_CLASS(GOALFOLLOWCRV, GOAL, GOALFOLLOWCRV_FIELDS)
 #ifndef __cplusplus
@@ -190,6 +200,16 @@ GOAL_CLASS(GOALFOLLOWCRV, GOAL, GOALFOLLOWCRV_FIELDS)
     /* 0xE0 */ f32 tStuck;          /* GoalFollowCrvAnim_SetState */ \
     u8 unknown_0xE4[0xC];
 GOAL_CLASS(GOALFOLLOWCRVANIM, GOALFOLLOWCRV, GOALFOLLOWCRVANIM_FIELDS)
+
+/* 0xA8 (168) GoalFollowCrvVjoy, 0xE0 bytes: a GoalFollowCrv run by a player (a JT: GOAL_JT), which steers the player's virtual joystick
+   (JT::PvVjoy()) along the curve. Init func_00144B28, Activate GoalFollowCrvVjoy_Activate, Update GoalFollowCrvVjoy_Update, FillVjoy
+   GoalFollowCrvVjoy_FillVjoy. GoalPartnerFollow_SetState (state 0) gets it by class id and sets the three fields below. */
+#define GOALFOLLOWCRVVJOY_FIELDS \
+    /* 0xC0 */ struct JOY *pjoy;    /* the leader's controller: GoalPartnerFollow_SetState */ \
+    /* 0xC4 */ s32 kind;            /* GoalPartnerFollow_SetState sets 8 */ \
+    /* 0xC8 */ f32 tDelay;          /* GoalPartnerFollow_SetState: a random 0.1 to 0.3 */ \
+    u8 unknown_0xCC[0x14];
+GOAL_CLASS(GOALFOLLOWCRVVJOY, GOALFOLLOWCRV, GOALFOLLOWCRVVJOY_FIELDS)
 
 /* 0xAA (170) GoalIdle, 0x50 bytes: GoalIdle_Init, _Activate, _Deactivate, _Update, _SetState (all four agree on every field) */
 #define GOALIDLE_FIELDS \
@@ -263,7 +283,8 @@ GOAL_CLASS(GOALB0, GOAL, GOALB0_FIELDS)
     /* 0x58 */ s32 chit;            /* GoalAnimLeap_FHandleMessage counts the hits; CHitClingingGuard returns it */ \
     /* 0x5C */ struct SO *psoHeld;  /* GoalBrain_SetCommand (command 7) sets it; func_00206380 compares its poxa; func_00208E70;
                                        GoalGrab_Activate hands it to func_00154038 */ \
-    u8 unknown_0x60[0x10];
+    /* 0x60 */ s32 field_0x60;      /* func_001431D0 clears it (a function that gets the goal by class id) */ \
+    u8 unknown_0x64[0xC];
 GOAL_CLASS(GOALGRAB, GOALANIM, GOALGRAB_FIELDS)
 
 /* 0xB2 (178), 0x50 bytes, no recovered name: Init func_0017B808, Activate func_0017B840, Deactivate func_0017B870, Update
@@ -361,6 +382,29 @@ GOAL_CLASS(GOALSNAPTOPOINT, GOAL, GOALSNAPTOPOINT_FIELDS)
     u8 unknown_0x3C[0x24];
 GOAL_CLASS(GOALFOLLOWCURVE, GOAL, GOALFOLLOWCURVE_FIELDS)
 
+/* 0xC2 (194) GoalPartnerFollow, 0xA0 bytes: a partner (a JT: GOAL_JT) follows the leader. Init GoalPartnerFollow_Init, Activate
+   func_00145080, Deactivate func_001450B0, Update GoalPartnerFollow_Update; GoalPartnerFollow_SetState (func_00145B18) */
+#define GOALPARTNERFOLLOW_FIELDS \
+    /* 0x30 */ struct LO *ploLeader; /* the leader it follows: GoalPartnerFollow_PpathzoneTarget, GoalPartnerFollow_SetState */ \
+    u8 unknown_0x34[0x2C]; \
+    /* 0x60 */ s32 state;           /* GoalPartnerFollow_SetState; Activate sets 0, Deactivate -1 through it */ \
+    /* 0x64 */ f32 tState;          /* GoalPartnerFollow_SetState: the time of the change */ \
+    u8 unknown_0x68[0x18]; \
+    /* 0x80 */ QW posWarp;          /* GoalPartnerFollow_SetState (state 1) passes it to WarpJtToPoint */ \
+    /* 0x90 */ struct LO *ploTarget; /* GoalPartnerFollow_SetState (state 2) hands it to the attack goal it starts */ \
+    u8 unknown_0x94[0xC];
+GOAL_CLASS(GOALPARTNERFOLLOW, GOAL, GOALPARTNERFOLLOW_FIELDS)
+
+/* 0xC3 (195) GoalPartnerAttackMurray, 0xC4 (196) GoalPartnerAttackBentley, 0xC5 (197) GoalPartnerAttackSly: three classes of 0x40 bytes
+   with the same layout and the same shape of methods (Init, Activate, Deactivate func_00145D68/func_00146260/func_00146758, Update,
+   FillVjoy, SetState func_00146158/func_00146650, FIdle). GoalPartnerFollow_SetState starts the one of the partner's class. */
+#define GOALPARTNERATTACK_FIELDS \
+    /* 0x30 */ s32 state;           /* the SetState methods; the FIdle methods test -1 */ \
+    /* 0x34 */ f32 tState;          /* the SetState methods */ \
+    /* 0x38 */ struct LO *ploTarget; /* GoalPartnerFollow_SetState sets it before Activate */ \
+    u8 unknown_0x3C[0x4];
+GOAL_CLASS(GOALPARTNERATTACK, GOAL, GOALPARTNERATTACK_FIELDS)
+
 #ifdef __cplusplus
 #if defined(__mips__)
 SLY2_SIZE_CHECK(GOALBRAIN, 0xB0);
@@ -386,6 +430,13 @@ SLY2_SIZE_CHECK(GOALFLEE, 0x50);
 SLY2_SIZE_CHECK(GOALFOLLOWROUTE, 0x50);
 SLY2_SIZE_CHECK(GOALSNAPTOPOINT, 0x50);
 SLY2_SIZE_CHECK(GOALFOLLOWCURVE, 0x60);
+SLY2_SIZE_CHECK(GOALFOLLOWCRVVJOY, 0xE0);
+SLY2_SIZE_CHECK(GOALPARTNERFOLLOW, 0xA0);
+SLY2_SIZE_CHECK(GOALPARTNERATTACK, 0x40);
+SLY2_OFFSET_CHECK(GOALFOLLOWCRV, posGoal, 0x80);
+SLY2_OFFSET_CHECK(GOALFOLLOWCRVVJOY, pjoy, 0xC0);
+SLY2_OFFSET_CHECK(GOALPARTNERFOLLOW, posWarp, 0x80);
+SLY2_OFFSET_CHECK(GOALPARTNERATTACK, ploTarget, 0x38);
 SLY2_OFFSET_CHECK(GOALHIT, args, 0x50);
 SLY2_OFFSET_CHECK(GOALHIT, tJolt, 0xB0);
 SLY2_OFFSET_CHECK(GOALGRAB, psoHeld, 0x5C);

@@ -1,50 +1,46 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
-int func_00252148(s8 *, int);
-void func_002542B8(s8 *);
-void func_002544C0(s8 *, int);
-void func_00253D20(s8 *arg0) {
-    int delta;
-    int flag;
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "mpeg.h"
+int func_00252148(MPEGDEC *, int);
+void func_002542B8(MPEGDEC *);
+void func_002544C0(MPEGDEC *, int);
+void func_00253D20(MPEGDEC *decoder) {
+    int temporalReference;
+    int firstAfterGroup;
     int previous;
-    int total;
-    delta = func_00252148(arg0, 10);
-    M2C_FIELD(arg0, s32 *, 0x160) = func_00252148(arg0, 3);
-    func_00252148(arg0, 0x10);
-    if ((u32) (M2C_FIELD(arg0, s32 *, 0x160) - 2) < 2U) {
-        M2C_FIELD(arg0, s32 *, 0x164) = func_00252148(arg0, 1);
-        M2C_FIELD(arg0, s32 *, 0x168) = func_00252148(arg0, 3);
+    int pictureIndex;
+    temporalReference = func_00252148(decoder, 10);
+    decoder->pictureCodingType = func_00252148(decoder, 3);
+    func_00252148(decoder, 0x10);
+    if ((u32) (decoder->pictureCodingType - 2) < 2U) {
+        decoder->fullPelForward = func_00252148(decoder, 1);
+        decoder->forwardCode = func_00252148(decoder, 3);
     }
-    if (M2C_FIELD(arg0, s32 *, 0x160) == 3) {
-        M2C_FIELD(arg0, s32 *, 0x16C) = func_00252148(arg0, 1);
-        M2C_FIELD(arg0, s32 *, 0x170) = func_00252148(arg0, 3);
+    if (decoder->pictureCodingType == 3) {
+        decoder->fullPelBackward = func_00252148(decoder, 1);
+        decoder->backwardCode = func_00252148(decoder, 3);
     }
-    while (func_00252148(arg0, 1) != 0) {
-        func_002544C0(arg0, 8);
+    while (func_00252148(decoder, 1) != 0) {
+        func_002544C0(decoder, 8);
     }
-    func_002542B8(arg0);
-    flag = 0;
+    func_002542B8(decoder);
+    firstAfterGroup = 0;
     previous = 0;
-    if (M2C_FIELD(arg0, s32 *, 0x160) != 3 && delta != 0) {
-        if (delta < 0) {
-            flag = M2C_FIELD(arg0, s32 *, 0x864) == 0;
+    if (decoder->pictureCodingType != 3 && temporalReference != 0) {
+        if (temporalReference < 0) {
+            firstAfterGroup = decoder->newGop == 0;
         }
-        M2C_FIELD(arg0, s32 *, 0x864) = 0;
-        previous = delta;
+        decoder->newGop = 0;
+        previous = temporalReference;
     }
-    total = M2C_FIELD(arg0, s32 *, 0x85C) + delta;
-    M2C_FIELD(arg0, s32 *, 0x1BC) = total;
-    if (flag != 0 && previous >= delta) {
-        M2C_FIELD(arg0, s32 *, 0x1BC) = total + 0x400;
+    pictureIndex = decoder->gopBase + temporalReference;
+    decoder->pictureIndex = pictureIndex;
+    if (firstAfterGroup != 0 && previous >= temporalReference) {
+        decoder->pictureIndex = pictureIndex + 0x400;
     }
     {
-        int current = M2C_FIELD(arg0, s32 *, 0x860);
-        int limit = M2C_FIELD(arg0, s32 *, 0x1BC);
+        int current = decoder->maxPictureIndex;
+        int limit = decoder->pictureIndex;
         if (current < limit) current = limit;
-        M2C_FIELD(arg0, s32 *, 0x860) = current;
+        decoder->maxPictureIndex = current;
     }
 }

@@ -1,12 +1,10 @@
-#include "m2c_macros.h"
-extern "C" {
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "cref.h"
 
-void CRef_Destruct(void *arg0);
-
-void *SetF32__4CReff(void *arg0, f32 fparg0) {
-    CRef_Destruct(arg0);
-    M2C_FIELD(arg0, f32 *, 4) = fparg0;
-    M2C_FIELD(arg0, s32 *, 0) = 0x16;
-    return arg0;
-}
+CRef &CRef::SetF32(f32 g)
+{
+    Decref();
+    m_tag.m_g = g;
+    m_tagk = TAGK_F32;
+    return *this;
 }
