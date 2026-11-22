@@ -1,17 +1,19 @@
-struct OBJ_165170 { char pad[0xC]; void *vt; };
-struct VT_165170 { char pad[0x18]; short delta; short unused; void (*fn)(void *, int, int, int, int **, int); };
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "job.h"
+
 extern "C" {
-int FTaskRunning(OBJ_165170 *);
-void SendTaskEvent(OBJ_165170 *task, int first, int second) {
-    int *pointers[2] __attribute__((aligned(16)));
-    int values[2];
+s32 FTaskRunning(TASK *);
+
+void SendTaskEvent(TASK *task, s32 first, s32 second) {
+    s32 *args[2];
+    s32 values[2];
+
     values[0] = first;
     values[1] = second;
     if (FTaskRunning(task)) {
-        pointers[0] = &values[0];
-        pointers[1] = &values[1];
-        VT_165170 *vt = (VT_165170 *)task->vt;
-        vt->fn((char *)task + vt->delta, 0x11, 0, 2, pointers, 0);
+        args[0] = &values[0];
+        args[1] = &values[1];
+        task->HandleSpliceEvent(0x11, 0, 2, (s32)args, 0);
     }
 }
 }

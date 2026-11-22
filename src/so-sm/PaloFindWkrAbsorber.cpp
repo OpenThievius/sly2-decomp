@@ -1,23 +1,20 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 #include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
+#include "so.h"
 extern "C" {
-s32 GrficFromAlo(s8 *, s32);                      /* extern */
+s32 GrficFromAlo(LO *, s32);
 
-s8 *PaloFindWkrAbsorber(s8 *arg0, s32 arg1) {
-    s8 *cursor;
+LO *PaloFindWkrAbsorber(LO *palo, s32 grftak) {
+    LO *current;
 
-    cursor = arg0;
-    while (cursor != NULL) {
-        if (GrficFromAlo(cursor, arg1) != 0) {
-            return cursor;
+    current = palo;
+    while (current != 0) {
+        if (GrficFromAlo(current, grftak) != 0) {
+            return current;
         }
-        cursor = M2C_FIELD(cursor, s8 **, 0x10);
+        current = current->psoParent;
     }
-    return NULL;
+    return 0;
 }
 
 }

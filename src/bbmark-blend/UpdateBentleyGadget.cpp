@@ -29,7 +29,7 @@ void UpdateBentleyGadget(BENTLEY *pbentley)
                     ReleaseBentleyGadget(pbentley);
                     SetJmpState(pbentley->PvJmp(), 0xB, 0, 0);
                 } else if (kind == 4 || !FVjoyButtonHeld(pbentley->pjoy, GrfbtnJtGadget(pbentley, pbentley->pslotActive->gadget) | 0x10)) {
-                    pgadget->vt->fn((char *)pgadget + pgadget->vt->delta, 1);
+                    pgadget->SetState(1);
                     ReleaseBentleyGadget(pbentley);
                     SetJmpState(pbentley->PvJmp(), 0xB, 0, 0);
                 } else {

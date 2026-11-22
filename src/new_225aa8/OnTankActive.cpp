@@ -1,23 +1,24 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "tank.h"
+#include "cm.h"
+
+/* B_002DDF40's policy slot past acplcy[2] (CM, include/cm.h, stops there): a local view, read here only */
+struct CMTANKVIEW : CM {
+    CPLCY cplcyTank;
+};
+
+void SetCmPolicy(CM *pcm, CPP cpp, CPLCY *pcplcy, SO *pso, void *pv);
+void RevokeCmPolicy(CM *pcm, int grf, CPP cpp, CPLCY *pcplcy, SO *pso, void *pv);
+
 extern "C" {
-struct _m2c_stack_OnTankActive {
-    /* 0x00 */ char pad0[0x30];
-};                                                  /* size = 0x30 */
-M2C_UNK OnPoActive();                               /* extern */
-M2C_UNK RevokeCmPolicy__FP2CMi3CPPP5CPLCYP2SOPv(M2C_UNK *, M2C_UNK, M2C_UNK, s8 *, s32, M2C_UNK); /* extern */
-M2C_UNK SetCmPolicy__FP2CM3CPPP5CPLCYP2SOPv(M2C_UNK *, M2C_UNK, s8 *, s32, M2C_UNK); /* extern */
-extern M2C_UNK B_002DDF40;
-void OnTankActive(s32 arg0, s32 arg1) {
-    OnPoActive();
-    if (arg1 != 0) {
-        SetCmPolicy__FP2CM3CPPP5CPLCYP2SOPv(&B_002DDF40, 9, (s8 *)&B_002DDF40 + 0x5F0, arg0, 0);
+void OnPoActive(PO *ppo, int fActive);
+
+void OnTankActive(TANK *ptank, int fActive) {
+    OnPoActive(ptank, fActive);
+    if (fActive != 0) {
+        SetCmPolicy(&B_002DDF40, CPP_TANK, &((CMTANKVIEW *)&B_002DDF40)->cplcyTank, ptank, 0);
         return;
     }
-    RevokeCmPolicy__FP2CMi3CPPP5CPLCYP2SOPv(&B_002DDF40, 0xF, 9, (s8 *)&B_002DDF40 + 0x5F0, arg0, 0);
+    RevokeCmPolicy(&B_002DDF40, 0xF, CPP_TANK, &((CMTANKVIEW *)&B_002DDF40)->cplcyTank, ptank, 0);
 }
 }

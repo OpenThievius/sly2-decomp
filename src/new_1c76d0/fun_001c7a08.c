@@ -1,5 +1,6 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "coin.h"
 
-void func_001C7A08(void *arg0) {
-    M2C_FIELD(arg0, s32 *, 0x244) = 0;
+void func_001C7A08(struct COIN *coin) {
+    coin->cur = 0;
 }

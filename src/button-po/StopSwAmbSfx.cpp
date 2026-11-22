@@ -1,11 +1,14 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "sw.h"
+#include "amb.h"
 extern "C" {
-extern int StopAmb(void *, float); extern int VirtualRefPtr_Assign(void **, int);
-void StopSwAmbSfx(int arg0, int arg1, int arg2, void **arg3) {
-    void *obj = *arg3;
-    if (obj != 0 && (arg1 == -1 || *(int *)((char *)obj + 0x60) == arg1)) {
-        StopAmb(obj, 0.0f);
-        VirtualRefPtr_Assign(arg3, 0);
+void StopAmb(AMB *pamb, float seconds);
+void VirtualRefPtr_Assign(AMB **ppamb, AMB *pamb);
+void StopSwAmbSfx(SW *psw, int sfxid, int iUnused, AMB **ppambRef) {
+    AMB *pamb = *ppambRef;
+    if (pamb != 0 && (sfxid == -1 || pamb->sfxid == sfxid)) {
+        StopAmb(pamb, 0.0f);
+        VirtualRefPtr_Assign(ppambRef, 0);
     }
 }
-
 }

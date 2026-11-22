@@ -24,7 +24,7 @@ int FAbsorbHbskWkr(HBSK *phbsk, WKR *pwkr)
             SetHbskHbsks(phbsk, 3);
             void *args[2];
             args[0] = pwkr;
-            args[1] = &pwkr->field_0xC;
+            args[1] = &pwkr->grftak;
             phbsk->HandleSpliceEvent(0xB, 0, 2, (int)args, 0);
         }
     }

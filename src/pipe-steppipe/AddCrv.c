@@ -1,10 +1,12 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "crv.h"
+#include "dl.h"
 
-M2C_UNK AppendDlEntry(M2C_UNK *, s32);              /* extern */
-M2C_UNK func_001A6178();                            /* extern */
-extern M2C_UNK B_003E13C0;
+void func_001A6178(struct CRV *crv);
+void AppendDlEntry(struct DL *, void *);
+extern struct DL B_003E13C0;
 
-void AddCrv(s32 arg0) {
-    func_001A6178();
-    AppendDlEntry(&B_003E13C0, arg0);
+void AddCrv(struct CRV *crv) {
+    func_001A6178(crv);
+    AppendDlEntry(&B_003E13C0, crv);
 }

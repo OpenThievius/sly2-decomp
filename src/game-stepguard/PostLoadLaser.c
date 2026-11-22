@@ -1,13 +1,15 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "types.h"
 
-M2C_UNK BuildLaserBeams(s32);                       /* extern */
-M2C_UNK ClipLaserBeams(s32, M2C_UNK);               /* extern */
-M2C_UNK PostSoLoad();                               /* extern */
-M2C_UNK func_001DEDB0(s32);                         /* extern */
+struct LASER;
+void BuildLaserBeams(struct LASER *);
+void ClipLaserBeams(struct LASER *, int);
+void PostSoLoad();
+void func_001DEDB0(struct LASER *);
 
-void PostLoadLaser(s32 arg0) {
+void PostLoadLaser(struct LASER *laser) {
     PostSoLoad();
-    BuildLaserBeams(arg0);
-    func_001DEDB0(arg0);
-    ClipLaserBeams(arg0, 0);
+    BuildLaserBeams(laser);
+    func_001DEDB0(laser);
+    ClipLaserBeams(laser, 0);
 }

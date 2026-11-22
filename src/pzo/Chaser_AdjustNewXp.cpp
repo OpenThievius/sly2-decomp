@@ -1,24 +1,30 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "sohit.h"
+
+/* the contact record of a new touch: one XPSIDE per party, 0x40 bytes each (Swarm_AdjustNewXp reads the same layout) */
+struct XPSIDE {
+    u8 unknown_0x0[0x8];
+    /* 0x8 */ s32 field_0x8; /* compared with g_2dfb80 */
+    u8 unknown_0xC[0x34];
+};
+struct XP {
+    XPSIDE side[2];
+};
+
 extern "C" {
-void func_0017F1A0(s8 *);
-void func_0017F5B0(s8 *, s32);
+void func_0017F1A0(SOHIT *);
+void func_0017F5B0(SOHIT *, void *);
 extern s32 g_2dfb80;
 
-void Chaser_AdjustNewXp(s8 *arg0, s32 arg1, s32 arg2) {
-    s32 temp_a1;
+void Chaser_AdjustNewXp(SOHIT *chaser, XP *pxp, s32 iside) {
+    s32 other;
 
-    func_0017F1A0(arg0);
-    if (M2C_FIELD(arg0, s32 *, 0x188) != 0) {
-        temp_a1 = M2C_FIELD((arg1 + ((1 - arg2) << 6)), s32 *, 8);
-        if (temp_a1 == g_2dfb80) {
-            func_0017F5B0(arg0, temp_a1);
+    func_0017F1A0(chaser);
+    if (chaser->dhp != 0) {
+        other = pxp->side[1 - iside].field_0x8;
+        if (other == g_2dfb80) {
+            func_0017F5B0(chaser, (void *)other);
         }
     }
 }
-
 }

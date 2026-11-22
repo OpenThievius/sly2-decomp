@@ -1,29 +1,30 @@
-#include "sly2.h"
-struct AMB { char pad0[0xC]; void *vtable; char pad10[0x50]; int record; char pad64[0xC]; float vol[6]; char pada0[0x3B8 - 0x88]; int start; };
-extern "C" void InitAmbBase(AMB *);
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "streamamb.h"
+#include "sndsystem.h"
+struct AMBVPTR { u8 unknown_0x0[0xC]; void *vptr; };
+extern "C" AMB *InitAmbBase(AMB *);
 extern "C" void SetAmbGrf(AMB *, int, int);
 extern "C" void PauseAmb(AMB *);
 extern "C" int func_001FD080(void *, int);
-struct Tbl { char pad[0x58]; int flag; char pad2[0x100]; float vol[16]; };
-extern Tbl B_003DD040;
-extern char D_002D9BE0[];
+extern SNDSYSTEM B_003DD040;
+extern char D_002D9BE0[]; /* the vtable of the stream emitter class */
 
-extern "C" AMB *InitStreamAmb(AMB *amb, int record, int start)
+extern "C" STREAMAMB *InitStreamAmb(STREAMAMB *amb, int record, int start)
 {
     InitAmbBase(amb);
-    amb->record = record;
-    amb->vtable = D_002D9BE0;
-    amb->start = start;
+    amb->sfxid = record;
+    ((AMBVPTR *)amb)->vptr = D_002D9BE0;
+    amb->grfStart = start;
     for (int slot = 5; slot >= 0; --slot) {
         amb->vol[slot] = 1.0f;
     }
     SetAmbGrf(amb, 0x801, 0x801);
-    Tbl *tbl = &B_003DD040;
-    int kind = func_001FD080(tbl, amb->record);
-    if (*(float *)((char *)tbl + 0x15C + (kind << 2)) == 0.0f) {
+    SNDSYSTEM *psnd = &B_003DD040;
+    int kind = func_001FD080(psnd, amb->sfxid);
+    if (*(psnd->grid[2] + kind) == 0.0f) {
         PauseAmb(amb);
     }
-    if (tbl->flag) {
+    if (psnd->field_0x58) {
         PauseAmb(amb);
     }
     return amb;

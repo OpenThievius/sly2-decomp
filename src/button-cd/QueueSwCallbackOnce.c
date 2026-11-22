@@ -1,4 +1,5 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "swview.h"
 
 /* The switch message key: an 8-byte struct of halfwords, passed by value in one 64-bit register. */
 typedef struct SwKey {
@@ -14,14 +15,14 @@ typedef struct SwKey {
 } SwKey;
 
 /* Queued callback entry (QueueSwCallback fills it: fn at 0, key at 4, arg at 0xC; next link at 0x10). */
-typedef struct SwCallback {
+struct CB {
     int fn;
     SwKey key;
     int arg;
-    struct SwCallback *next;
-} SwCallback;
+    struct CB *next;
+};
 
-void QueueSwCallback(char *self, int fn, SwKey key, int arg);
+void QueueSwCallback(struct SWVIEW *psw, int fn, SwKey key, int arg);
 
 /*
  * Retail spills the key register to its stack home (sd $a2,0($sp)), reads key.id and key.detail.part.sub as halfwords and
@@ -30,11 +31,11 @@ void QueueSwCallback(char *self, int fn, SwKey key, int arg);
  * slot (score 4); passing it as the 8-byte struct it is (a BLKmode argument, loaded by move_block_to_reg) keeps the load
  * out of the slot, as retail has it. C, not C++: in C++ the by-value struct argument is first copied to a temporary.
  */
-void QueueSwCallbackOnce(char *self, int fn, SwKey key, int arg)
+void QueueSwCallbackOnce(struct SWVIEW *psw, int fn, SwKey key, int arg)
 {
-    SwCallback *callback;
+    struct CB *callback;
 
-    for (callback = *(SwCallback **)(self + 0x3CA8); callback != 0; callback = callback->next) {
+    for (callback = psw->pcbFirst; callback != 0; callback = callback->next) {
         if (callback->fn == fn && callback->key.id == key.id) {
             if ((callback->key.id != -1 && callback->key.detail.part.sub == key.detail.part.sub)
                     || callback->key.detail.whole == key.detail.whole) {
@@ -44,5 +45,5 @@ void QueueSwCallbackOnce(char *self, int fn, SwKey key, int arg)
             }
         }
     }
-    QueueSwCallback(self, fn, key, arg);
+    QueueSwCallback(psw, fn, key, arg);
 }

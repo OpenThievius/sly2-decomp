@@ -1,5 +1,7 @@
-void CTextBox_SetSize(void *arg0, float dx, float dy)
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "ctextbox.h"
+extern "C" void CTextBox_SetSize(CTextBox *ptextbox, float dx, float dy)
 {
-    *(float *)((unsigned char *)arg0 + 0x8) = dx;
-    *(float *)((unsigned char *)arg0 + 0xC) = dy;
+    ptextbox->dx = dx;
+    ptextbox->dy = dy;
 }

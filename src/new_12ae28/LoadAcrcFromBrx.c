@@ -1,7 +1,11 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "types.h"
+#include "acrc.h"
 
-M2C_UNK CBinaryInputStream_Read_thunk(s32, M2C_UNK, s32); /* extern */
+struct CBinaryInputStream;
 
-void LoadAcrcFromBrx(s32 arg0, s32 arg1) {
-    CBinaryInputStream_Read_thunk(arg1, 0xC, arg0 + 4);
+void CBinaryInputStream_Read_thunk(struct CBinaryInputStream *pbis, int size, void *destination); /* extern */
+
+void LoadAcrcFromBrx(struct ACRC *pacrc, struct CBinaryInputStream *pbis) {
+    CBinaryInputStream_Read_thunk(pbis, 0xC, pacrc->pos);
 }

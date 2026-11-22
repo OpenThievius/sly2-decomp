@@ -1,23 +1,18 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "sly.h"
+#include "soproperty.h"
 extern "C" {
-void LoadStepFromBrx();
-void SetSoProperties(s8 *, M2C_UNK, M2C_UNK *);
-extern M2C_UNK D_002BE990;
+void LoadStepFromBrx(STEP *step);
+void SetSoProperties(SO *so, s32 count, SOPROPERTY *properties);
+extern SOPROPERTY D_002BE990[173];
 
-void LoadSlyFromBrx(s8 *arg0) {
-    s8 *temp_v0;
-
-    LoadStepFromBrx();
-    temp_v0 = arg0 + 0x240;
-    M2C_FIELD(arg0, s32 *, 0x240) = 0;
-    M2C_FIELD(temp_v0, s32 *, 4) = 0;
-    M2C_FIELD(temp_v0, f32 *, 8) = -75.0f;
-    SetSoProperties(arg0, 0xAD, &D_002BE990);
+void LoadSlyFromBrx(SLY *sly) {
+    LoadStepFromBrx(sly);
+    VECTOR *vec = &sly->vecLocal;
+    vec->x = 0.0f;
+    vec->y = 0.0f;
+    vec->z = -75.0f;
+    SetSoProperties(sly, 0xAD, D_002BE990);
 }
 
 }

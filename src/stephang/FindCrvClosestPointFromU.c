@@ -1,10 +1,11 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "crv.h"
 
-M2C_UNK FindCrvcClosestPointFromU();                /* extern */
-M2C_UNK FindCrvlClosestPointFromU();                /* extern */
+void FindCrvcClosestPointFromU();                   /* extern */
+void FindCrvlClosestPointFromU();                   /* extern */
 
-void FindCrvClosestPointFromU(void *arg0) {
-    if (M2C_FIELD(arg0, s32 *, 0xE0) == 0) {
+void FindCrvClosestPointFromU(struct CRV *pcrv) {
+    if (pcrv->crvk == 0) {
         FindCrvlClosestPointFromU();
         return;
     }

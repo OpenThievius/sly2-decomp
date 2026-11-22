@@ -1,28 +1,19 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "gadgetobj.h"
+
 extern "C" {
-s32 FIgnoreSoIntersection();                        /* extern */
-s32 FIsBasicDerivedFrom(s32, M2C_UNK);              /* extern */
-s32 IMax(s32, M2C_UNK);                             /* extern */
+int FIgnoreSoIntersection(SO *pso, SO *psoOther);
+int FIsBasicDerivedFrom(void *pbasic, int cid);
+int IMax(int, int);
 
-s32 FIgnoreGadgetObjIntersection(s8 *arg0, s32 arg1) {
-    s32 temp_v1;
-    s32 var_s0;
-    s32 var_v0;
-
-    var_s0 = FIgnoreSoIntersection();
-    temp_v1 = M2C_FIELD(arg0, s32 *, 0x150);
-    if ((temp_v1 == 0) || (var_v0 = var_s0, (temp_v1 == 4))) {
-        if (FIsBasicDerivedFrom(arg1, 0x34) != 0) {
-            var_s0 = IMax(var_s0, 1);
+int FIgnoreGadgetObjIntersection(GADGETOBJ *pgadget, SO *psoOther) {
+    int fIgnore = FIgnoreSoIntersection(pgadget, psoOther);
+    int state = pgadget->state;
+    if ((state == 0) || (state == 4)) {
+        if (FIsBasicDerivedFrom(psoOther, 0x34) != 0) {
+            fIgnore = IMax(fIgnore, 1);
         }
-        var_v0 = var_s0;
     }
-    return var_v0;
+    return fIgnore;
 }
-
 }

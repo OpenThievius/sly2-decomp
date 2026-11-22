@@ -15,7 +15,10 @@ struct LIGHT : LO {
     /* 0xE4 */ s32 generation;           /* func_001A3460 raises it to the XF's generation and rebuilds */
     u8 unknown_0xE8[0x8];
     /* 0xF0 */ VECTOR hsv;               /* RebuildLight, SetLightHighlightColor */
-    u8 unknown_0x100[0x50];
+    u8 unknown_0x100[0x18];
+    /* 0x118 */ s32 index;               /* the light's slot in SW::aplight: RemoveLightFromSw clears it and stores -1 */
+    u8 unknown_0x11C[0x4];
+    /* 0x120 */ s32 block[12];           /* the 0x30-byte block RebuildLight fills (its first word is the mode) and func_001A4AD8 copies to the packet */
     /* 0x150 */ float strength;          /* RebuildLight, func_001A3610 */
     /* 0x154 */ float cone;              /* RebuildLight, func_001A3630 */
     u8 unknown_0x158[0x4];

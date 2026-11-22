@@ -208,7 +208,9 @@ GOAL_CLASS(GOALFOLLOWCRVANIM, GOALFOLLOWCRV, GOALFOLLOWCRVANIM_FIELDS)
     /* 0xC0 */ struct JOY *pjoy;    /* the leader's controller: GoalPartnerFollow_SetState */ \
     /* 0xC4 */ s32 kind;            /* GoalPartnerFollow_SetState sets 8 */ \
     /* 0xC8 */ f32 tDelay;          /* GoalPartnerFollow_SetState: a random 0.1 to 0.3 */ \
-    u8 unknown_0xCC[0x14];
+    u8 unknown_0xCC[0x4]; \
+    /* 0xD0 */ f32 field_0xD0;      /* GoalFollowCrvVjoy_Init (func_00144B28, a method of the class) sets 1.0 */ \
+    u8 unknown_0xD4[0xC];
 GOAL_CLASS(GOALFOLLOWCRVVJOY, GOALFOLLOWCRV, GOALFOLLOWCRVVJOY_FIELDS)
 
 /* 0xAA (170) GoalIdle, 0x50 bytes: GoalIdle_Init, _Activate, _Deactivate, _Update, _SetState (all four agree on every field) */

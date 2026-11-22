@@ -1,7 +1,8 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "alo.h"
 
-M2C_UNK PxfFromRef(s32, s32, M2C_UNK);              /* extern */
+void PxfFromRef(int, struct SO *, void *);
 
-void FUN_0012a860(void *arg0, s32 arg1) {
-    PxfFromRef(arg1, M2C_FIELD(arg0, s32 *, 0x10), 0);
+void FUN_0012a860(struct ALO *palo, int id) {
+    PxfFromRef(id, palo->psoParent, 0);
 }

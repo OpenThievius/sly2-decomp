@@ -1,23 +1,24 @@
-struct ATTACH { int pjt; char pad4[0x68 - 4]; int ptn; char pad6C[0x440 - 0x6C]; };
-extern "C" int PloNew(int, int, int, int);
-extern "C" void SetTnTnsOverride(int, int);
-extern "C" void ResetJtDynamicTunnel__FP2JT(ATTACH *);
-extern "C" void BuildPlainBlend(int, void *, void *);
-extern "C" void PostStepLoadRun__FP4STEPP5BLRUNPP6ASEGBL(void *);
-extern "C" void EnsureAsegBlendDynamic(int, int, int, void *, int, int, int, void *);
-extern "C" void func_001CC5E8(void *, int, int);
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "attach.h"
+extern "C" LO *PloNew(int cid, SO *paloParent, int oid, int isplice);
+extern "C" void SetTnTnsOverride(TN *ptn, int value);
+extern "C" void ResetJtDynamicTunnel__FP2JT(JT *);
+extern "C" void BuildPlainBlend(SLY *pjt, u8 *pblend, QW *pvec);
+extern "C" void PostStepLoadRun__FP4STEPP5BLRUNPP6ASEGBL(u8 *prun);
+extern "C" void EnsureAsegBlendDynamic(SLY *pjt, int, int, u8 *pasegblA, int, int, int, u8 *pasegblB);
+extern "C" void func_001CC5E8(u8 *pcarry, SLY *pjt, void **ppvField);
 
 void LoadAttach(ATTACH *attach)
 {
-    int tn = PloNew(0xF, 0, 0x148, -1);
+    TN *tn = (TN *)PloNew(0xF, 0, 0x148, -1);
     attach->ptn = tn;
     SetTnTnsOverride(tn, 0);
-    ResetJtDynamicTunnel__FP2JT(attach);
-    BuildPlainBlend(attach->pjt, (char *)attach + 0x70, (char *)attach + 0x170);
-    BuildPlainBlend(attach->pjt, (char *)attach + 0x330, (char *)attach + 0x430);
-    PostStepLoadRun__FP4STEPP5BLRUNPP6ASEGBL((char *)attach + 0x180);
-    PostStepLoadRun__FP4STEPP5BLRUNPP6ASEGBL((char *)attach + 0x240);
-    EnsureAsegBlendDynamic(attach->pjt, 0xC, 3, (char *)attach + 0x2F0, 0, 0, 0, (char *)attach + 0x314);
-    int jt = attach->pjt;
-    func_001CC5E8((char *)attach + 0x440, jt, jt + 0x1030);
+    ResetJtDynamicTunnel__FP2JT((JT *)attach);
+    BuildPlainBlend(attach->pjt, attach->blendA, &attach->vecBlendA);
+    BuildPlainBlend(attach->pjt, attach->blendB, &attach->vecBlendB);
+    PostStepLoadRun__FP4STEPP5BLRUNPP6ASEGBL(attach->runA);
+    PostStepLoadRun__FP4STEPP5BLRUNPP6ASEGBL(attach->runB);
+    EnsureAsegBlendDynamic(attach->pjt, 0xC, 3, attach->asegblA, 0, 0, 0, attach->asegblB);
+    SLY *pjt = attach->pjt;
+    func_001CC5E8(attach->carry, pjt, &pjt->field_0x1030);
 }

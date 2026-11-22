@@ -1,18 +1,17 @@
-#include "types.h"
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "job.h"
 
 extern "C" {
-s32 FTaskRunning(s8 *);
+s32 FTaskRunning(TASK *);
 
-void SendTaskTimeLimit(s8 *arg0, s32 arg1) {
-    s32 timeLimitBlock[2];
-    s8 *temp_v1;
+void SendTaskTimeLimit(TASK *task, s32 timeLimit) {
+    s32 limit;
+    s32 *args[1];
 
-    timeLimitBlock[0] = arg1;
-    if (FTaskRunning(arg0) != 0) {
-        timeLimitBlock[1] = (sptr)timeLimitBlock;
-        temp_v1 = *(s8 **)(arg0 + 0xC);
-        (*(void (**)(s8 *, s32, s32, s32, s32 *, s32))(temp_v1 + 0x1C))(arg0 + *(s16 *)(temp_v1 + 0x18), 0x17, 0, 1, &timeLimitBlock[1], 0);
+    limit = timeLimit;
+    if (FTaskRunning(task) != 0) {
+        args[0] = &limit;
+        task->HandleSpliceEvent(0x17, 0, 1, (s32)args, 0);
     }
 }
-
 }

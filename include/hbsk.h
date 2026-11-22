@@ -10,6 +10,7 @@
 #define SLY2_HBSK_H
 #include "pzo_hide.h"
 #include "dl.h"
+#include "wkr.h"
 
 struct JT;
 
@@ -33,10 +34,5 @@ struct HBSK {
 };
 #endif
 
-/* the weapon record FAbsorbSoWkr takes (SO slot 75's argument): FAbsorbHbskWkr reads its flags and hands its words at 0x0 and 0xC on */
-struct WKR {
-    u8 unknown_0x0[0xC];
-    u8 field_0xC[0x38];
-    /* 0x44 */ u32 flags;
-};
+/* WKR, the weapon record FAbsorbHbskWkr takes: wkr.h */
 #endif

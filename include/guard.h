@@ -7,6 +7,7 @@
 #ifndef SLY2_GUARD_H
 #define SLY2_GUARD_H
 #include "types.h"
+#include "matrix3q.h"
 #ifdef __cplusplus
 #include "lo.h"
 #endif
@@ -22,7 +23,10 @@ struct LO;
    frees the block of kinds 2 and 3. StartAnimref takes the same four words (kind, pv, pinst, n). */
 struct ANIMREF {
     /* 0x0 */ s32 kind;    /* BindAnimref, ResetAnimref, CloneAnimref; func_00174EA0, func_001751F0, GoalHit_Activate test 2 */
-    /* 0x4 */ void *pdata; /* ResetAnimref, UseGuardAnimation, func_00207D98; GoalAnimLeap_FHandleMessage passes it to PeaFindAsegLabel */
+    union {
+        /* 0x4 */ void *pdata; /* ResetAnimref, UseGuardAnimation, func_00207D98; GoalAnimLeap_FHandleMessage passes it to PeaFindAsegLabel */
+        /* 0x4 */ s32 oid;     /* before BindAnimref: the object id it hands to PloFindSwObject_thunk; ResetAnimref stores -1 here */
+    };
     /* 0x8 */ void *pinst; /* the playing instance: GoalAnimLeap_FHandleMessage seeks it (SeekAsega); for kind 2 the JUMPER
                               (GoalHit_Activate, func_00175258 and func_001751F0 steer it) */
     /* 0xC */ u32 grf;     /* UseGuardAnimation stores its fourth argument, func_00207D98 clears it; GoalAnimLeap_FHandleMessage
@@ -72,18 +76,14 @@ struct GUARDANIM {
     u8 unknown_0x18[0x8];
 };
 
-/* a rotation matrix held as three quadword rows (copied with lq/sq): func_00209840 copies one into the actor's heading,
-   GoalJump_Activate builds one in its goal */
-struct MATRIX3Q {
-    QW row[3];
-};
+/* MATRIX3Q: matrix3q.h */
 
 /* a guard's heading controller, 0x10 bytes embedded at STEPGUARD 0xFD0. While fHold is 0 it applies the guard's heading to its
    STEP (func_00209818 sets the target radian, func_00209840 copies a rotation matrix in) */
 struct GUARDHEADING {
     /* 0x0 */ void *field_0x0;    /* GrfGuardCustomXps (85) reads it */
     /* 0x4 */ s32 fHold;          /* func_002097C8 sets 1, func_002097D8 clears it; func_00209818 and func_00209840 act only at 0 */
-    u8 unknown_0x8[0x4];
+    /* 0x8 */ s32 field_0x8;      /* func_00209778 clears it (with the two words before it) */
     /* 0xC */ struct STEP *pstep; /* func_00209768 and func_00209770 set it (CloneGuard passes the guard); func_00209818, func_00209840 */
 };
 

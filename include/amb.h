@@ -20,7 +20,7 @@ struct AMBBASE {
     virtual void Slot5();
     virtual void Slot6();
     virtual void Slot7();
-    virtual void Slot8();
+    virtual int Slot8();                /*  8: StartSwAmbSfx compares its result with 2 */
     virtual void Slot9();
     virtual void Slot10();
     virtual void Slot11();
@@ -42,13 +42,14 @@ struct AMB : AMBBASE {
     /* 0x40 */ s32 voice;               /* OnAmbVoiceStarted sets it; ContinueAmbVoice, PauseAmbVoice, StopSound pass it to the sound driver */
     /* 0x44 */ f32 volAudible;          /* InitAmbBase sets 1.0; StartAmb (x 1024); UpdateAmbPositional */
     /* 0x48 */ f32 fadeSeconds;         /* StopSound: above 0 the stop fades out over it (x 240); StopAmb sets it */
-    u8 unknown_0x4C[2];
+    /* 0x4C */ u16 cRef;               /* AMB_AddRef (slot 1) increments it, AMB_Release (slot 2) decrements it and destroys the emitter at 0; StreamAmb_AddRef/StreamAmb_Release do the same on the stream class's slots */
     /* 0x4E */ s16 cPause;              /* PauseAmb */
     /* 0x50 */ u16 grf;                 /* SetAmbGrf; StartAmb, UpdateAmb */
     /* 0x52 */ s16 fPending;            /* OnAmbVoiceStarted clears it; StartAmb sets it, UpdateAmb */
     u8 unknown_0x54[0xC];
     /* 0x60 */ s32 sfxid;               /* InitAmb sets it; StartAmb */
-    u8 unknown_0x64[0xC];
+    u8 unknown_0x64[4];
+    /* 0x68 */ u64 played;              /* func_001FC878 adds the elapsed clock ticks while the emitter is unpaused and its start flag is clear */
 };
 
 #if defined(__mips__)

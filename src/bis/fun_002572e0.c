@@ -1,21 +1,30 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "types.h"
 
-M2C_UNK CFrame_DeletingDestructor(s32 *, M2C_UNK);  /* extern */
-M2C_UNK __builtin_delete(s32 **);                   /* extern */
+struct CFRAME {
+    s32 refs;
+};
+struct CFRAMEPTR {
+    struct CFRAME *pframe;
+};
 
-void func_002572E0(s32 **arg0, s32 arg1) {
-    s32 *temp_a0;
-    s32 temp_v0;
+void CFrame_DeletingDestructor(struct CFRAME *pframe, s32 flags);
+void __builtin_delete(void *pv);
 
-    temp_a0 = *arg0;
-    if (temp_a0 != NULL) {
-        temp_v0 = *temp_a0 - 1;
-        *temp_a0 = temp_v0;
-        if (temp_v0 == 0) {
-            CFrame_DeletingDestructor(temp_a0, 3);
+/* CFramePtr destructor: drops the reference, deleting the frame at zero and the pointer itself when bit 0 of flags is set. */
+void func_002572E0(struct CFRAMEPTR *pframeptr, s32 flags) {
+    struct CFRAME *pframe;
+    s32 refs;
+
+    pframe = pframeptr->pframe;
+    if (pframe != 0) {
+        refs = pframe->refs - 1;
+        pframe->refs = refs;
+        if (refs == 0) {
+            CFrame_DeletingDestructor(pframe, 3);
         }
     }
-    if (arg1 & 1) {
-        __builtin_delete(arg0);
+    if (flags & 1) {
+        __builtin_delete(pframeptr);
     }
 }

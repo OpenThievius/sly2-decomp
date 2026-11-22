@@ -1,7 +1,8 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+struct SLOTHEAP;
 
-M2C_UNK PvAllocSlotheapImpl(M2C_UNK *);             /* extern */
-extern M2C_UNK B_003E123C;
+void *PvAllocSlotheapImpl(struct SLOTHEAP *);
+extern struct SLOTHEAP B_003E123C;
 
 void PvAllocAct(void) {
     PvAllocSlotheapImpl(&B_003E123C);

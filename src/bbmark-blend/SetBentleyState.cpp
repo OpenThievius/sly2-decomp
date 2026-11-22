@@ -106,7 +106,7 @@ extern "C" void SetBentleyState(BENTLEY *pbentley, int state)
     case 6: {
         GADGETOBJ *pgadget = (GADGETOBJ *)pbentley->ploGadget;
         if (pgadget != 0) {
-            pgadget->vt->fn((char *)pgadget + pgadget->vt->delta, 1);
+            pgadget->SetState(1);
             ReleaseBentleyGadget(pbentley);
         }
         SetBentleyGadgetAnim(pbentley, -1);

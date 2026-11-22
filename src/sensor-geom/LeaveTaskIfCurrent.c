@@ -1,10 +1,11 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "job.h"
 
-s32 FIsCurrentTask();                               /* extern */
-M2C_UNK LeaveTask(s32);                             /* extern */
+s32 FIsCurrentTask(struct TASK *task);
+void LeaveTask(struct TASK *task);
 
-void LeaveTaskIfCurrent(s32 arg0) {
-    if (FIsCurrentTask() != 0) {
-        LeaveTask(arg0);
+void LeaveTaskIfCurrent(struct TASK *task) {
+    if (FIsCurrentTask(task) != 0) {
+        LeaveTask(task);
     }
 }

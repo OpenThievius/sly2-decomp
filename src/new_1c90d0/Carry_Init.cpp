@@ -1,8 +1,8 @@
-#include "sly2.h"
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "carrypart.h"
 
-void Carry_Init(struct _carry* pcarry)
+void Carry_Init(CARRYPART *pcarry)
 {
-    int v0 = -1;
-    *(int*)((char*)pcarry + 0xA4) = v0;
-    *(int*)((char*)pcarry + 0x90) = v0;
+    pcarry->state = -1;
+    pcarry->field_0x90 = -1;
 }

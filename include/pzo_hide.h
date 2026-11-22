@@ -10,6 +10,7 @@
 #include "dl.h"
 #include "clock.h"
 #include "bytes8.h"
+#include "rsmg.h"
 #ifdef __cplusplus
 #include "sohit.h"
 #endif
@@ -116,13 +117,7 @@ struct ANIMENTRY {
     /* 0xC */ u32 flags;
 };
 
-/* a rule state machine record (FAddRsmg fills them, TriggerRsmg runs them; four ids, 0x10 bytes) */
-struct RSMG {
-    s32 oidRoot;
-    s32 oidSM;
-    s32 oidTriggerGoal;
-    s32 oidUntriggerGoal;
-};
+/* RSMG, a rule state machine record: rsmg.h */
 
 /* GRAB (class 75 by Grab_Init's role, guessed from state 1 handing an anchor to the player: decomp_names.md), a SOHIT (0x1C0 bytes,
    sohit.h): its fields from 0x1C0. In C (the C files of this module) SOHIT does not exist: the same fields follow 0x1C0 bytes of unknown. Readers: Grab_Reset (func_00181598),
@@ -149,6 +144,7 @@ struct GRAB : SOHIT {
 /* CHASER, a SOHIT (Chaser_SetState, Chaser_SetStateDistanceRanges, Chaser_SetStateAngleRanges, Chaser_FTakeHit are its methods). Per state
    (five) an animation entry at 0x220 and a range record at 0x270 whose two halves the two setters fill: the 8-byte pairs are passed by pointer
    and copied whole, their type is not known. */
+struct CRV;
 struct CHASERRANGE {
     s32 fDistance;          /* 0x0: Chaser_SetStateDistanceRanges sets it to 1 */
     s32 fAngle;             /* 0x4: Chaser_SetStateAngleRanges sets it to 1 */
@@ -161,11 +157,23 @@ struct CHASERRANGE {
 struct CHASER : SOHIT {
     /* 0x1C0 */ s32 state;   /* Chaser_SetState (-1 before the first); Chaser_FTakeHit */
     /* 0x1C4 */ f32 tState;  /* Chaser_SetState: the clock at the change */
-    u8 unknown_0x1C8[0x48];
+    u8 unknown_0x1C8[0x10];
+    /* 0x1D8 */ struct CRV *pcrv; /* Chaser_PostLoad: PcrvNew(0x2C9, 0x10) */
+    u8 unknown_0x1DC[0x34];
     /* 0x210 */ s32 field_0x210[3]; /* Chaser_SetState clears these three words for states 0 to 2 and 4 (a vector, probably) */
     u8 unknown_0x21C[4];
     /* 0x220 */ ANIMENTRY aentry[5];  /* Chaser_SetState plays the entry of the new state; Chaser_SetStateAnim */
     /* 0x270 */ CHASERRANGE arange[5];
+    /* 0x338 */ f32 field_0x338;    /* Chaser_Init sets 250.0 */
+    u8 unknown_0x33C[0x4];
+    /* 0x340 */ f32 field_0x340;    /* Chaser_Init sets 1.0 */
+    u8 unknown_0x344[0xC];
+    /* 0x350 */ f32 field_0x350;    /* Chaser_Init sets 1.0 */
+    u8 unknown_0x354[0x10];
+    /* 0x364 */ f32 field_0x364;    /* Chaser_Init sets 1.0 */
+    u8 unknown_0x368[0x8];
+    /* 0x370 */ f32 field_0x370;    /* Chaser_Init sets -FLT_MAX */
+    /* 0x374 */ f32 field_0x374;    /* Chaser_Init sets FLT_MAX */
 };
 
 /* a Swarm rider (0x64+ bytes; the swarm keeps them in its groups' lists and its dead list, linked through the DLE at 0x60) */

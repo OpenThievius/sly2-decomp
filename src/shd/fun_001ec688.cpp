@@ -1,18 +1,13 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "vifunpacktable.h"
+
 extern "C" {
-M2C_UNK AddVifUnpack__4VIFS3UPKiPvi(s32, M2C_UNK, s32, s32, s32);
+void AddVifUnpack__4VIFS3UPKiPvi(void *pvifs, s32 cqw, s32 count, void *pdata, s32 iqw);
 
-s32 func_001EC688(s8 *arg0, s32 arg1, s32 arg2, s32 arg3) {
-    s8 *temp_s0;
-
-    temp_s0 = (s8 *)(M2C_FIELD(arg0, s32 *, 0x20) + (arg1 * 8));
-    AddVifUnpack__4VIFS3UPKiPvi(arg3, 0xC, M2C_FIELD(temp_s0, s32 *, 0), M2C_FIELD(temp_s0, s32 *, 4), arg2);
-    return M2C_FIELD(temp_s0, s32 *, 0);
+s32 func_001EC688(VIFUNPACKTABLE *table, s32 index, s32 iqw, void *pvifs) {
+    VIFUNPACKENTRY *entry = &table->aentry[index];
+    AddVifUnpack__4VIFS3UPKiPvi(pvifs, 0xC, entry->count, entry->pdata, iqw);
+    return entry->count;
 }
 
 }

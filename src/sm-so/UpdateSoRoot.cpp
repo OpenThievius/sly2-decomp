@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 #include "so.h"
 extern "C" void RemoveSoGeomsFromOxa(SO *);
 extern "C" void AddSoGeomsToOxa(SO *);
@@ -10,7 +11,7 @@ void UpdateSoRoot(SO *pso, SO *psoStop, SO *psoOther)
     func_001A5B80(pso, (sptr)psoStop, psoOther);
     LO *plo;
     for (plo = (LO *)pso->dlChild.head; plo; plo = plo->ploNext)
-        plo->Slot13((sptr)psoStop, psoOther);
+        plo->Slot13(psoStop, psoOther);
     if (pso->cgeom != 0) {
         plo = pso;
         if (!(pso->grfo & FLAG)) {

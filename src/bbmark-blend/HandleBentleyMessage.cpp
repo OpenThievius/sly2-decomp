@@ -21,7 +21,7 @@ extern "C" void HandleBentleyMessage(BENTLEY *pbentley, int msgid, int *pv)
                     LockLeaseOfPlo(pbentley->pslotActive->ppool, plo);
                     ((GADGETOBJ *)pbentley->ploGadget)->gadget = pbentley->pslotActive->gadget;
                     GADGETOBJ *pgadget = (GADGETOBJ *)pbentley->ploGadget;
-                    pgadget->vt->fn((char *)pgadget + pgadget->vt->delta, 0);
+                    pgadget->SetState(0);
                 }
             } else if (pv[0] == pbentley->field_0x16CC) {
                 if (pv[2] == 0x243)

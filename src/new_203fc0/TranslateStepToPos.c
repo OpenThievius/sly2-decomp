@@ -1,9 +1,10 @@
-#include "m2c_macros.h"
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "guardview.h"
 
-s128 ConvertAloPos(void *, M2C_UNK, s128);          /* extern */
-M2C_UNK TranslateSoToPos();                         /* extern */
+QW ConvertAloPos(struct STEPVIEW *paloFrom, struct STEPVIEW *paloTo, QW pos);
+void TranslateSoToPos();                            /* extern */
 
-void TranslateStepToPos(void *arg0) {
+void TranslateStepToPos(struct STEPVIEW *pstep) {
     TranslateSoToPos();
-    M2C_FIELD(arg0, s128 *, 0x230) = ConvertAloPos(arg0, 0, M2C_FIELD(arg0, s128 *, 0x240));
+    pstep->posWorld = ConvertAloPos(pstep, 0, pstep->posLocal);
 }

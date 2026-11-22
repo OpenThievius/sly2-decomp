@@ -1,15 +1,15 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "script.h"
+struct SLOTHEAP;
 
-M2C_UNK AppendSlEntry(s32, void *);                 /* extern */
-void *PvAllocSlotheapImpl(M2C_UNK *);               /* extern */
-extern M2C_UNK B_003E1548;
+void AppendSlEntry(struct SL *sl, void *entry);
+void *PvAllocSlotheapImpl(struct SLOTHEAP *slotheap);
+extern struct SLOTHEAP B_003E1548;
 
-void *PcmdAllocScript(s32 arg0, s32 arg1, s32 arg2) {
-    void *temp_v0;
-
-    temp_v0 = PvAllocSlotheapImpl(&B_003E1548);
-    M2C_FIELD(temp_v0, s32 *, 0) = arg1;
-    M2C_FIELD(temp_v0, s32 *, 4) = arg2;
-    AppendSlEntry(arg0 + 0x50, temp_v0);
-    return temp_v0;
+void *PcmdAllocScript(struct SCRIPT *script, s32 type, s32 oid) {
+    struct PCMD *command = (struct PCMD *)PvAllocSlotheapImpl(&B_003E1548);
+    command->type = type;
+    command->oid = oid;
+    AppendSlEntry(&script->slPcmd, command);
+    return command;
 }

@@ -1,9 +1,10 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "types.h"
 
-M2C_UNK UpdateGrfjoytFromGrfusr__Fv();              /* extern */
+void UpdateGrfjoytFromGrfusr__Fv(void);
 extern s32 B_002DFBC4;
 
-void AddGrfusr__Fi(s32 arg0) {
-    B_002DFBC4 |= arg0;
+void AddGrfusr__Fi(s32 grfusr) {
+    B_002DFBC4 |= grfusr;
     UpdateGrfjoytFromGrfusr__Fv();
 }

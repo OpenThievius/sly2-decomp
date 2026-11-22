@@ -1,11 +1,8 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
-struct VEntry { short delta; short index; void (*fn)(void *, int); };
-struct EPSEL {
-    char pad0[0xC]; VEntry *vptr; char pad2[0x60]; int a70; int a74; int a78; char pad1[0x94]; int episode; int episodeNext;
-    int pad3; int mode; int sub; float tmode;
-};
+#include "epsel.h"
 extern char B_002E65E0;
-extern float g_2ddf0c;
+extern "C" float g_2ddf0c;
 extern "C" void TryAutosave(char *, int);
 extern "C" void SetEpselHint(EPSEL *, int);
 extern "C" void SetTimerTimers__FP5TIMER6TIMERS(EPSEL *, int);
@@ -35,17 +32,17 @@ extern "C" void SetEpselMode(EPSEL *pepsel, int mode, int sub)
         SetEpselHint(pepsel, -1);
         SetEpselHint(pepsel, 0);
     }
-    pepsel->a74 = -1;
-    pepsel->a70 = -1;
-    pepsel->a78 = -1;
+    pepsel->field_0x74 = -1;
+    pepsel->field_0x70 = -1;
+    pepsel->field_0x78 = -1;
     SetTimerTimers__FP5TIMER6TIMERS(pepsel, 1);
     SetBlotBlots(pepsel, 1);
     pepsel->mode = mode;
     pepsel->sub = sub;
-    pepsel->tmode = *(float *)&g_2ddf0c;
+    pepsel->tMode = *(float *)&g_2ddf0c;
     int label = LabelFromEpselMode(pepsel);
     if (label != -1) {
-        VEntry *entry = &pepsel->vptr[49];
-        entry->fn((char *)pepsel + entry->delta, label);
+        PAUSEBLOTVT *vt = pepsel->vt;
+        vt->pfnSelect((char *)pepsel + vt->deltaSelect, label);
     }
 }

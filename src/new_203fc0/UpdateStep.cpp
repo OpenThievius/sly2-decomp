@@ -1,37 +1,25 @@
-struct VT { char pad[0xF8]; short delta; short index; float *(*fn)(void *); };
-struct Step {
-    char pad0[0xC];
-    VT *vt;
-    char pad1[0x180 - 0x10];
-    float uTarget;
-    char pad2[0x1A4 - 0x184];
-    int mode;
-    float radTarget;
-    char pad3[0x208 - 0x1AC];
-    int pxp;
-    float tBase;
-};
-extern "C" void UpdateSo(Step *);
-void UpdateStepPhys__FP4STEP(Step *);
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "step.h"
+#include "clock.h"
+#include "sly2.h"
+extern "C" void UpdateSo(STEP *);
+void UpdateStepPhys(STEP *);
 extern "C" float atan2f(float, float);
-float RadNormalize__Ff(float);
+float RadNormalize(float);
 extern "C" float D_002C3C80[3];
 extern "C" float g_2bbb60[2];
-extern "C" float g_2dded0;
 
-void UpdateStep(Step *step)
+void UpdateStep(STEP *pstep)
 {
-    UpdateSo(step);
-    UpdateStepPhys__FP4STEP(step);
-    int mode = step->mode;
+    UpdateSo(pstep);
+    UpdateStepPhys(pstep);
+    int mode = pstep->fLock;
     switch (mode) {
     case 0: {
-        VT *vt1 = step->vt;
-        float *rowY = vt1->fn((char *)step + vt1->delta);
-        VT *vt2 = step->vt;
-        float *rowX = vt2->fn((char *)step + vt2->delta);
-        float radCurrent = atan2f(rowY[1], rowX[0]);
-        float dradHeading = RadNormalize__Ff(step->radTarget - radCurrent);
+        MATRIX4 *pmatForY = pstep->PmatWorld();
+        MATRIX4 *pmatForX = pstep->PmatWorld();
+        float radCurrent = atan2f(pmatForY->mat[0][1], pmatForX->mat[0][0]);
+        float dradHeading = RadNormalize(pstep->radHeading - radCurrent);
         float gAbs = dradHeading < 0.0f ? -dradHeading : dradHeading;
         float uRun = D_002C3C80[0] + gAbs * (D_002C3C80[1] + gAbs * D_002C3C80[2]);
         float uMin = g_2bbb60[0];
@@ -40,16 +28,16 @@ void UpdateStep(Step *step)
             uRun = uMin;
         else if (uMax < uRun)
             uRun = uMax;
-        step->uTarget = uRun;
+        pstep->uTarget = uRun;
         break;
     }
     case 1:
     case -1: {
         float one = 1.0f;
-        step->uTarget = one;
+        pstep->uTarget = one;
         break;
     }
     }
-    if (step->pxp != 0)
-        step->tBase = g_2dded0;
+    if (pstep->psoSurface != 0)
+        pstep->tJump = g_2dded0.t;
 }

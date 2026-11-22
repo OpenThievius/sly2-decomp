@@ -1,33 +1,22 @@
-struct Task211F90 { char pad[0x54]; int state; };
-struct Slot211F90 { Task211F90 *task; int pad; };
-struct VT211F90 { char pad[0x188]; short delta; short index; void (*fnSeek)(char *, int); short delta2; short index2; void (*fnDone)(char *); };
-struct Blot211F90 {
-    char pad0[0xC]; VT211F90 *vt;
-    char pad10[0x100];
-    int countB;
-    char pad114[4];
-    Slot211F90 slotsB[15];
-    char pad190[4];
-    int countA;
-    char pad198[4];
-    Slot211F90 slotsA[1];
-};
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "blot.h"
+
 extern "C" {
-int FBlotLabelPlaying(void *, int);
-int FTaskComplete(void *);
-void UpdateBlotMovie(void *);
-int sprintf(char *, const char *, ...);
+s32 FBlotLabelPlaying(BLOT *, s32);
+s32 FTaskComplete(TASK *);
+void UpdateBlotMovie(BLOT *);
+s32 sprintf(char *, const char *, ...);
 extern char D_002C3EC0[];
 extern const char RO_002A8AA0[];
 
-void JobBlot_Update(Blot211F90 *blot) {
-    int completeB = 0;
-    int completeA = 0;
-    int playing = 0;
-    int index;
+void JobBlot_Update(JOBBLOT *blot) {
+    s32 completeB = 0;
+    s32 completeA = 0;
+    s32 playing = 0;
+    s32 index;
     UpdateBlotMovie(blot);
-    for (index = 0; index < blot->countA; index++) {
-        Task211F90 *task = blot->slotsA[index].task;
+    for (index = 0; index < blot->ctaskA; index++) {
+        TASK *task = blot->ataskA[index].ptask;
         if (task != 0) {
             if (task->state == 1) {
                 playing++;
@@ -37,8 +26,8 @@ void JobBlot_Update(Blot211F90 *blot) {
             }
         }
     }
-    for (index = 0; index < blot->countB; index++) {
-        Task211F90 *task = blot->slotsB[index].task;
+    for (index = 0; index < blot->ctaskB; index++) {
+        TASK *task = blot->ataskB[index].ptask;
         if (task != 0) {
             if (task->state == 1) {
                 playing++;
@@ -49,15 +38,15 @@ void JobBlot_Update(Blot211F90 *blot) {
     }
     if (FBlotLabelPlaying(blot, 0x314) != 0) {
         sprintf(D_002C3EC0, RO_002A8AA0, completeA);
-        sprintf(D_002C3EC0 + 0x30, RO_002A8AA0, blot->countA);
-        sprintf(D_002C3EC0 + 0x60, RO_002A8AA0, blot->countA - completeA);
+        sprintf(D_002C3EC0 + 0x30, RO_002A8AA0, blot->ctaskA);
+        sprintf(D_002C3EC0 + 0x60, RO_002A8AA0, blot->ctaskA - completeA);
     }
-    if (completeB == blot->countA + blot->countB || playing == 0) {
-        blot->vt->fnDone((char *)blot + blot->vt->delta2);
+    if (completeB == blot->ctaskA + blot->ctaskB || playing == 0) {
+        blot->Hide();
         return;
     }
     if (playing > 0) {
-        blot->vt->fnSeek((char *)blot + blot->vt->delta, -1);
+        blot->Select(-1);
     }
 }
 }

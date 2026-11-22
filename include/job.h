@@ -11,10 +11,38 @@
 
 struct JOB;
 
-/* A task: the job that runs it at 0x7C. */
+struct ANIMREC;
+struct LO;
+
+/* A task: an LO (retail's vtable at 0xC, 0x50 bytes of LO) that a job runs (job at 0x7C). Fields from the functions of the
+   0x1637E8 module (FTaskRunning, AddTaskAnim, EnterTask, LeaveTask, FTaskComplete, SendTask*), which are methods of the task or
+   agree with each other; the path blocks (0xC8, 0xD0, 0xD8) are the 8-byte values RefGetGameSaveValue takes. */
+#ifdef __cplusplus
+struct TASK : LO {
+#else
 struct TASK {
-    u8 unknown_0x0[0xB8];
-    /* 0xB8 */ s32 field_0xB8; /* NotifyJobTaskState compares it with -1 before SetSwRestartTask */
+    u8 unknown_0x0[0x50];
+#endif
+    /* 0x50 */ s32 field_0x50;      /* FTaskRunning: a task with it set is not running; AddTaskAnim adds nothing then */
+    /* 0x54 */ s32 state;           /* FTaskComplete: -1 = not set (then the save value, if any), 2 and up = complete */
+    u8 unknown_0x58[0x4];
+    /* 0x5C */ s32 labelId;         /* EnterTask shows the HUD label (ShowHudLabel), LeaveTask clears it */
+    /* 0x60 */ s32 labelFlag;       /* EnterTask, LeaveTask: the label is only used when set */
+    /* 0x64 */ s32 cEnter;          /* EnterTask counts */
+    u8 unknown_0x68[0x14];
+    /* 0x7C */ struct JOB *job;     /* EnterTask, RefuseTaskState (virtual calls on it), PostTaskJobEvent */
+    u8 unknown_0x80[0x28];
+    /* 0xA8 */ s32 ctoggle;         /* EnterTask, LeaveTask pass ctoggle and atoggle to ApplyTaskToggles */
+    /* 0xAC */ void *atoggle;
+    /* 0xB0 */ s32 canim;           /* AddTaskAnim (limit 0x20), EnterTask, LeaveTask pass canim and aanim to ApplyTaskAnims */
+    /* 0xB4 */ struct ANIMREC *aanim;
+    /* 0xB8 */ s32 oidSpawn;        /* EnterTask: when not -1 the task is the world's restart task (NotifyJobTaskState reads it) */
+    u8 unknown_0xBC[0x8];
+    /* 0xC4 */ struct LO *plo;      /* EnterTask: the warp it starts (Warp_Start) after marking its entry */
+    u8 unknown_0xC8[0x10];
+    /* 0xD8 */ s32 pathSave[2];    /* FTaskComplete: its first word non-zero means a path into the game save */
+    u8 unknown_0xE0[0x14];
+    /* 0xF4 */ s32 field_0xF4;      /* FTaskRunning: 2 and 3 are not running; EnterTask and LeaveTask pass it to ApplyTaskAnims */
 };
 
 /* One animation request of a job's table (0x18 bytes); names from func_00162250, which reads them. */

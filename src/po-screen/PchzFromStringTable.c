@@ -1,29 +1,38 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "types.h"
 
-extern M2C_UNK RO_002A8A98;
+struct STRINGENTRY {
+    s32 id;
+    char *pch;
+};
+struct STRINGTABLE {
+    s32 count;
+    struct STRINGENTRY *entries;
+};
+extern char RO_002A8A98[];
 
-M2C_UNK *PchzFromStringTable(void *arg0, s32 arg1) {
-    M2C_UNK *var_v0;
-    s32 temp_a2;
-    s32 var_v1;
-    void *var_a0;
+char *PchzFromStringTable(struct STRINGTABLE *table, s32 id) {
+    char *result;
+    s32 count;
+    s32 index;
+    struct STRINGENTRY *entry;
 
-    temp_a2 = M2C_FIELD(arg0, s32 *, 0);
-    var_v1 = 0;
-    if (temp_a2 > 0) {
-        var_a0 = M2C_FIELD(arg0, void **, 4);
-loop_2:
-        var_v1 += 1;
-        if ((arg1 != M2C_FIELD(var_a0, s32 *, 0)) || (var_v0 = M2C_FIELD(var_a0, M2C_UNK **, 4), (var_v0 == NULL))) {
-            var_a0 += 8;
-            if (var_v1 >= temp_a2) {
-                goto block_5;
+    count = table->count;
+    index = 0;
+    if (count > 0) {
+        entry = table->entries;
+    next:
+        index += 1;
+        if ((id != entry->id) || (result = entry->pch, (result == 0))) {
+            entry += 1;
+            if (index >= count) {
+                goto notfound;
             }
-            goto loop_2;
+            goto next;
         }
     } else {
-block_5:
-        var_v0 = &RO_002A8A98;
+    notfound:
+        result = RO_002A8A98;
     }
-    return var_v0;
+    return result;
 }

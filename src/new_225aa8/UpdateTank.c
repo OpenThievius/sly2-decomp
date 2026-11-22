@@ -1,13 +1,15 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+struct TANK;
 
-M2C_UNK UpdateSo();                                 /* extern */
-M2C_UNK UpdateTankAim(s32);                         /* extern */
-M2C_UNK UpdateTankFire(s32);                        /* extern */
-M2C_UNK UpdateTankFov(s32);                         /* extern */
+/* SO::Update (UpdateSo) runs on the tank itself, then its own aim, field of view and fire */
+void UpdateSo(struct TANK *ptank);
+void UpdateTankAim(struct TANK *ptank);
+void UpdateTankFire(struct TANK *ptank);
+void UpdateTankFov(struct TANK *ptank);
 
-void UpdateTank(s32 arg0) {
-    UpdateSo();
-    UpdateTankAim(arg0);
-    UpdateTankFov(arg0);
-    UpdateTankFire(arg0);
+void UpdateTank(struct TANK *ptank) {
+    UpdateSo(ptank);
+    UpdateTankAim(ptank);
+    UpdateTankFov(ptank);
+    UpdateTankFire(ptank);
 }

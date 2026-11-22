@@ -1,7 +1,14 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "types.h"
 
-f32 F32Read__18CBinaryInputStream(s32);             /* extern */
+/* the object whose vtable is D_002CA8A0 (src/data/ac.cpp); this function is its slot 3 and reads the float from a stream */
+struct AC {
+    u8 unknown_0x0[4];
+    f32 field_0x4;
+};
 
-void func_0012CC68(void *arg0, s32 arg1) {
-    M2C_FIELD(arg0, f32 *, 4) = F32Read__18CBinaryInputStream(arg1);
+f32 F32Read__18CBinaryInputStream(void *stream);
+
+void func_0012CC68(struct AC *object, void *stream) {
+    object->field_0x4 = F32Read__18CBinaryInputStream(stream);
 }

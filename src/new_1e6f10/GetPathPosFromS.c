@@ -1,8 +1,10 @@
-#include "m2c_macros.h"
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "sly2.h"
 
-M2C_UNK EvaluateCrvFromU(s32, s32, s32, f32);       /* extern */
-f32 UFromCrvS();                                    /* extern */
+struct CRV;
+f32 UFromCrvS(struct CRV *pcrv, f32 s);
+void EvaluateCrvFromU(struct CRV *pcrv, f32 u, QW *ppos, QW *pnormTangent);
 
-void GetPathPosFromS(s32 arg0, s32 arg1, s32 arg2) {
-    EvaluateCrvFromU(arg0, arg1, arg2, UFromCrvS());
+void GetPathPosFromS(struct CRV *pcrv, QW *ppos, QW *pnormTangent, f32 s) {
+    EvaluateCrvFromU(pcrv, UFromCrvS(pcrv, s), ppos, pnormTangent);
 }

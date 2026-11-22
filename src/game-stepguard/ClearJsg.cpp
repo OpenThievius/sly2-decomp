@@ -1,11 +1,14 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // 0x1DFFE0 FUN_001dffe0
-extern "C" void StopJsg(void*);
-extern "C" void AddJsgContext(void*, int);
+#include "jsg.h"
 
-void ClearJsg(void* pjsg)
+extern "C" void StopJsg(JSG *);
+extern "C" void AddJsgContext(JSG *, int);
+
+void ClearJsg(JSG *pjsg)
 {
     StopJsg(pjsg);
-    *(int*)((unsigned char*)pjsg + 0x50) = 0;
+    pjsg->phase = 0;
     AddJsgContext(pjsg, -1);
-    *(int*)((unsigned char*)pjsg + 0x7C) = 1;
+    pjsg->fPendingCut = 1;
 }

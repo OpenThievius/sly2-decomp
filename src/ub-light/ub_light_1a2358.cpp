@@ -114,7 +114,7 @@ int bevy_player_p7_damage_1a23c0(JTZAP *pzap)
     if (pzap->state != -1) {
         return *pzap->phealth <= 0 ? 2 : 1;
     }
-    return pzap->field_0x90 == 1;
+    return pzap->flash == 1;
 }
 
 struct OBJ { u8 unknown_0x0[4]; int index; u8 unknown_0x8[0xCC]; int slots[1]; };

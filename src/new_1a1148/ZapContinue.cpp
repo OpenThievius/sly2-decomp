@@ -1,14 +1,14 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
-struct B8 { char b[8]; };
+#include "jtzap.h"
+
 struct PMF { short delta; short index; void (*fn)(void *); };
-#include "jt.h"
-struct ZAP { JT *pjt; int state; char pad[0x14]; B8 continuation; char pad2[0x30 - 0x24]; SO *psoSource; };
-extern "C" void WarpZapToSafePoint(ZAP *);
+extern "C" void WarpZapToSafePoint(JTZAP *);
 extern "C" void SetJmpState(void *, int, int, int);
 
-extern "C" void ZapContinue(ZAP *zap)
+extern "C" void ZapContinue(JTZAP *zap)
 {
-    B8 saved;
+    BYTES8 saved;
     saved = zap->continuation;
     memset(&zap->continuation, 0, 8);
     PMF *pmf = (PMF *)&saved;
@@ -21,9 +21,9 @@ extern "C" void ZapContinue(ZAP *zap)
         pjt->Slot93();
         return;
     }
-    if (zap->psoSource != 0 && (zap->psoSource->grfso & 0x200000000UL) != 0) {
+    if (zap->ptarget != 0 && (zap->ptarget->grfso & 0x200000000UL) != 0) {
         WarpZapToSafePoint(zap);
         return;
     }
-    SetJmpState((char *)zap->pjt + 0x2C0, 0xB, 0, 0);
+    SetJmpState(zap->pjt->PvJmp(), 0xB, 0, 0);
 }

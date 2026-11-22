@@ -1,12 +1,14 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "types.h"
 
-M2C_UNK StartBootQueue(M2C_UNK *);                  /* extern */
-M2C_UNK bevy_camera_follow_activity(M2C_UNK *, M2C_UNK, M2C_UNK); /* extern */
-M2C_UNK func_001A2C20(M2C_UNK);                     /* extern */
-M2C_UNK func_001A2DA0(s32);                         /* extern */
-s32 sceScfGetLanguage();                            /* extern */
-extern M2C_UNK B_002DEB30;
-extern M2C_UNK B_002E1E88;
+struct BQ;
+int sceScfGetLanguage();
+void bevy_camera_follow_activity(void *, int, void *);
+void func_001A2C20(int);
+void func_001A2DA0(int);
+void StartBootQueue(struct BQ *);
+extern char B_002DEB30;
+extern struct BQ B_002E1E88;
 
 void func_001613A8(void) {
     func_001A2C20(0);

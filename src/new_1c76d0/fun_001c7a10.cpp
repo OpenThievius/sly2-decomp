@@ -1,10 +1,12 @@
-struct Slots { char pad[0x1C]; unsigned count; int items[3]; };
-extern "C" void func_001C7A10(char *self, int value)
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "coin.h"
+
+extern "C" void func_001C7A10(COIN *coin, int meshShown)
 {
-    Slots *slots = *(Slots **)(self + 0x244);
-    unsigned n = slots->count;
-    if (n < 3) {
-        slots->items[n] = value;
-        slots->count = n + 1;
+    COINLOOTDEF *ploot = coin->cur;
+    unsigned cmesh = ploot->cmesh;
+    if (cmesh < 3) {
+        ploot->ameshShown[cmesh] = meshShown;
+        ploot->cmesh = cmesh + 1;
     }
 }

@@ -1,18 +1,14 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "pathzone.h"
+
 extern "C" {
-M2C_UNK InitDl__FP2DLi(s8 *, M2C_UNK);            /* extern */
-M2C_UNK InitXfm(s8 *);                                  /* extern */
+void InitDl__FP2DLi(DL *pdl, int ibDle);
+void InitXfm(void *pxfm);
 
-void InitPathzone(s8 *arg0) {
-    InitXfm(arg0);
-    M2C_FIELD(arg0, s32 *, 0x110) = -1;
-    InitDl__FP2DLi(arg0 + 0x118, 0x60);
-    M2C_FIELD(arg0, s32 *, 0x124) = -1;
+void InitPathzone(PATHZONE *ppathzone) {
+    InitXfm(ppathzone);
+    ppathzone->field_0x110 = -1;
+    InitDl__FP2DLi(&ppathzone->dlItem, 0x60);
+    ppathzone->ipathzone = -1;
 }
-
 }

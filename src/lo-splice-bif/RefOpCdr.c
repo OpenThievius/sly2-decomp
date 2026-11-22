@@ -1,16 +1,25 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "cref.h"
 
-M2C_UNK CRef_ConstructPair(s32, s32);               /* extern */
-M2C_UNK SetTag__4CRef4TAGK(s32, s32);                /* extern */
+/* timedcall.h's CPair (C++ only): a reference count, a CRef and the next pair of the list. */
+struct CPair {
+    /* 0x00 */ s32 cref;
+    u8 unknown_0x4[0x4];
+    /* 0x08 */ struct CRef ref;
+    /* 0x10 */ struct CPair *next;
+};
 
-s32 RefOpCdr(s32 arg0, s32 arg1, void *arg2) {
-    s32 temp_a1;
+struct CRef *CRef_ConstructPair(struct CRef *pref, struct CPair *ppair);
+void SetTag__4CRef4TAGK(struct CRef *pref, enum TAGK tagk);
 
-    temp_a1 = M2C_FIELD(M2C_FIELD(arg2, void **, 4), s32 *, 0x10);
-    if (temp_a1 == 0) {
-        SetTag__4CRef4TAGK(arg0, 0);
+struct CRef *RefOpCdr(struct CRef *pref, s32 carg, struct CRef *aref) {
+    struct CPair *pnext;
+
+    pnext = aref->m_tag.m_ppair->next;
+    if (pnext == 0) {
+        SetTag__4CRef4TAGK(pref, 0);
     } else {
-        CRef_ConstructPair(arg0, temp_a1);
+        CRef_ConstructPair(pref, pnext);
     }
-    return arg0;
+    return pref;
 }

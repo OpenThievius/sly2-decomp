@@ -1,15 +1,17 @@
-struct VT_1C7778 { char pad[0x260]; short delta; short unused; void (*fn)(void *, int); };
-struct OBJ_1C7778 { char pad0[0xC]; VT_1C7778 *vt; char pad1[0x150 - 0x10]; int state; char pad2[0x238 - 0x154]; float timer; };
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "coin.h"
+#include "clock.h"
+
 extern "C" {
-void UpdateDprize();
-extern float g_2dded4;
-void UpdateCoin(OBJ_1C7778 *obj)
+void UpdateDprize(DPRIZE *pdprize, float dt);
+
+void UpdateCoin(COIN *coin, float dt)
 {
-    UpdateDprize();
-    if (obj->state == 0) {
-        obj->timer = obj->timer - g_2dded4;
-        if (obj->timer <= 0.0f)
-            obj->vt->fn((char *)obj + obj->vt->delta, 5);
+    UpdateDprize(coin, dt);
+    if (coin->dprizes == 0) {
+        coin->wait = coin->wait - g_2dded0.dt;
+        if (coin->wait <= 0.0f)
+            coin->SetDprizes(5);
     }
 }
 }

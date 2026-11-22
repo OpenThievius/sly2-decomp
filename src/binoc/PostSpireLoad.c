@@ -1,14 +1,17 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "spire.h"
 
-M2C_UNK PostLoLoad();                               /* extern */
-M2C_UNK SetTnTns__FP2TN3TNS(s32, M2C_UNK);          /* extern */
+enum TNS { TNS_X };
 
-void PostSpireLoad(void *arg0) {
-    s32 temp_a0;
+void PostLoLoad(struct SPIRE *pspire);
+void SetTnTns__FP2TN3TNS(struct TN *ptn, enum TNS tns);
 
-    PostLoLoad();
-    temp_a0 = M2C_FIELD(arg0, s32 *, 0x110);
-    if (temp_a0 != 0) {
-        SetTnTns__FP2TN3TNS(temp_a0, 0);
+void PostSpireLoad(struct SPIRE *pspire) {
+    struct TN *ptn;
+
+    PostLoLoad(pspire);
+    ptn = pspire->ptn;
+    if (ptn != 0) {
+        SetTnTns__FP2TN3TNS(ptn, TNS_X);
     }
 }

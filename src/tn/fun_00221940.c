@@ -1,5 +1,6 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "tn.h"
 
-void func_00221940(void *arg0) {
-    M2C_FIELD(arg0, s32 *, 0x118) = 0;
+void func_00221940(struct TN *tn) {
+    tn->pstepCurrent = 0;
 }

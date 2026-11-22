@@ -9,6 +9,7 @@
 #ifndef SLY2_DPRIZE_H
 #define SLY2_DPRIZE_H
 #include "sly2.h"
+#include "rows3.h"
 #include "so.h"
 #include "asega.h"
 #include "sma.h"
@@ -44,9 +45,7 @@ struct OIDPLO {
     /* 0x4 */ struct LO *plo;
 };
 
-struct ROWS3 {
-    VECTOR row[3];
-};
+/* ROWS3: rows3.h */
 
 /* the HUD-spot ripple (a RIP of type 9, made by PripNewRipg; rip.h): a view of it as the two functions that start one see it, with
    the subclass's words past RIP's 0xF0 bytes. The RIP class keeps its vtable pointer at 0xEC (ConstructRipOfType stores it); slot 1 (entry at offset 8: delta, index, function) takes the position the

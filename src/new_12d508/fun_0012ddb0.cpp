@@ -1,16 +1,22 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-#include "sly2.h"
-struct ALO; struct XF;
-struct MAT { QW row[4]; };
-struct ACT { char pad[0x1C]; XF *pxfTarget; int unk0x20[4]; MAT mat; };
-extern "C" ACT *PactNewForXf(int, ALO *, XF *, int, int);
+#include "act.h"
+#include "xf.h"
+
+/* an act that holds its transform relative to another one (kind 6; func_0012DEF0 reads it) */
+struct ACTREL {
+    ACT act;
+    /* 0x1C */ XF *pxfTarget;
+    /* 0x20 */ MATRIX4 mat;
+};
+
+extern "C" ACT *PactNewForXf(int kind, ALO *palo, XF *pxf, int priority, int xfk);
 extern "C" void InsertXfAct(ALO *, XF *, ACT *);
 
-ACT *func_0012DDB0(ALO *palo, XF *pxf, int priority, int xfk, XF *pxfTarget, MAT *pmat)
+ACTREL *func_0012DDB0(ALO *palo, XF *pxf, int priority, int xfk, XF *pxfTarget, MATRIX4 *pmat)
 {
-    ACT *pact = PactNewForXf(6, palo, pxf, priority, xfk);
+    ACTREL *pact = (ACTREL *)PactNewForXf(6, palo, pxf, priority, xfk);
     pact->pxfTarget = pxfTarget;
-    *(MAT *)((char *)pact + 0x20) = *pmat;
-    InsertXfAct(palo, pxf, pact);
+    pact->mat = *pmat;
+    InsertXfAct(palo, pxf, &pact->act);
     return pact;
 }

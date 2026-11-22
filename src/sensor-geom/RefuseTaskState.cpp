@@ -1,27 +1,31 @@
-#include "sly2.h"
-struct VT { char pad[0x18]; short delta; short index; void (*fn)(void *, int, int, int, void *, int); };
-struct JOB;
-struct TASK { char pad0[0xC]; VT *vt; char pad1[0x7C - 0x10]; JOB *job; };
-struct JOB { char pad0[0xC]; VT *vt; };
-struct EVT { char pad[8]; int arg; };
-extern EVT B_002DEB30;
-extern "C" int FTaskRunning(TASK *);
-extern "C" int FJobRunning(JOB *);
-extern "C" void bevy_camera_follow_activity(void *, int, void *);
-void RefuseTaskState(TASK *task, int state)
-{
-    int local = state;
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "job.h"
+
+/* the camera's follow manager: bevy_camera_follow_activity reads the argument of the event at 0x8 */
+struct CAMERAFOLLOW {
+    u8 unknown_0x0[0x8];
+    /* 0x8 */ s32 arg;
+};
+extern "C" {
+s32 FTaskRunning(TASK *);
+s32 FJobRunning(JOB *);
+void bevy_camera_follow_activity(CAMERAFOLLOW *, s32, LO *);
+extern CAMERAFOLLOW B_002DEB30;
+}
+
+void RefuseTaskState(TASK *task, s32 state) {
+    s32 local;
     void *args[1];
+
+    local = state;
     args[0] = &local;
     if (FTaskRunning(task)) {
         B_002DEB30.arg = local;
         bevy_camera_follow_activity(&B_002DEB30, 0x27, task);
-        VT *vt = task->vt;
-        vt->fn((char *)task + vt->delta, 0x12, 0, 1, args, 0);
+        task->HandleSpliceEvent(0x12, 0, 1, (s32)args, 0);
     }
     JOB *job = task->job;
     if (job != 0 && FJobRunning(job)) {
-        VT *vt = task->job->vt;
-        vt->fn((char *)task->job + vt->delta, 0x12, 0, 1, args, 0);
+        task->job->HandleSpliceEvent(0x12, 0, 1, (s32)args, 0);
     }
 }

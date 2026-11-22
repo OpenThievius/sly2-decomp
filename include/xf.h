@@ -38,12 +38,15 @@ struct XF {
     union {
         f32 tArrive;
         struct XFMIRROR *pxfmirror;
+        struct XF *pxfSource;       /* LoadAloFromBrx: kinds 8 and 14 keep the transform they mirror (its position negated) */
     };
-    u8 unknown_0xAC[0x4];
+    u8 unknown_0xAC[0x4];              /* LoadAloFromBrx stores two halfwords here (its local view XFLOADVIEW): one reader, not a method of XF */
     /* 0xB0 */ QW vel;                 /* func_001F4898, func_001F4930, ProjectSoTransform, GetActvalPositionGoal */
     /* 0xC0 */ QW posGoal;             /* GetActPositionGoal, func_0012DFE0, func_001C8918 */
     /* 0xD0 */ QW velGoal;             /* GetActPositionGoal, func_001C8918 (a tangent there) */
-    u8 unknown_0xE0[0x10];
+    /* 0xE0 */ QW field_0xE0;          /* LoadAloFromBrx (set to the first goal), SnapAsega (a bezier control point after velGoal); the acr
+                                          functions (func_0012B738, func_0012BBD0, func_0012C768) store a key's position here and compare
+                                          posGoal with it */
     /* 0xF0 */ s32 accel[3];           /* ProjectSoTransform clears it for a dynamic kind (reached through SO::pxfLinear) */
 };
 typedef struct XF XF;

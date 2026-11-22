@@ -1,10 +1,11 @@
-#include "m2c_macros.h"
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "memcardmenu.h"
 
-s32 MemcardMenu_KindOfState(void *arg0) {
-    s32 temp_v0;
+extern "C" s32 MemcardMenu_KindOfState(MEMCARDMENU *pmenu) {
+    s32 state;
 
-    temp_v0 = M2C_FIELD(arg0, s32 *, 0x40);
-    switch (temp_v0) {
+    state = pmenu->state;
+    switch (state) {
     case 17:
     case 20:
     case 23:

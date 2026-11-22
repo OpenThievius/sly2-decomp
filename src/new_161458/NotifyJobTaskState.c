@@ -17,7 +17,7 @@ void NotifyJobTaskState(struct JOB *pjob, struct TASK *ptask) {
         if (ptask == pjob->ptaskEnd) {
             BeginJobComplete(pjob);
         }
-        if (ptask->field_0xB8 != -1) {
+        if (ptask->oidSpawn != -1) {
             SetSwRestartTask(&B_003DD490, ptask);
         }
     }

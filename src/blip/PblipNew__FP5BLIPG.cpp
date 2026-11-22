@@ -1,23 +1,22 @@
-#include "sly2.h"
-struct BLIPG;
-struct BLIP { char pad[0x1088]; void *psp; BLIPG *pblipg; };
-extern "C" void *PvAllocSlotheapImpl(void *);
-extern "C" void FreeSlotheapPv(void *, void *);
-extern "C" void AppendDlEntry(void *, void *);
-extern "C" BLIP *PblipNew__FP5BLIPG(char *psw, char *pblipg)
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "blip.h"
+extern "C" void *PvAllocSlotheapImpl(SLOTHEAP *);
+extern "C" void FreeSlotheapPv(SLOTHEAP *, void *);
+extern "C" void AppendDlEntry(DL *, void *);
+extern "C" BLIP *PblipNew__FP5BLIPG(SW *psw, BLIPG *pblipg)
 {
-    BLIP *pblip = (BLIP *)PvAllocSlotheapImpl(psw + 0x4088);
+    BLIP *pblip = (BLIP *)PvAllocSlotheapImpl(&psw->slotheapBlip);
     if (pblip == 0)
         return 0;
-    if (*(int *)(pblipg + 0x160) == 2) {
-        void *psp = PvAllocSlotheapImpl(psw + 0x40A0);
+    if (pblipg->mode == 2) {
+        void *psp = PvAllocSlotheapImpl(&psw->slotheapBlipSp);
         pblip->psp = psp;
         if (psp == 0) {
-            FreeSlotheapPv(psw + 0x4088, pblip);
+            FreeSlotheapPv(&psw->slotheapBlip, pblip);
             return 0;
         }
     }
-    pblip->pblipg = (BLIPG *)pblipg;
-    AppendDlEntry(pblipg + 0x448, pblip);
+    pblip->pblipg = pblipg;
+    AppendDlEntry(&pblipg->dlBlips, pblip);
     return pblip;
 }

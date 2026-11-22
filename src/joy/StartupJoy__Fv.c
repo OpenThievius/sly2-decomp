@@ -1,11 +1,13 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "joy.h"
 
-M2C_UNK InitCodes(M2C_UNK *);                       /* extern */
-M2C_UNK InitJoy(M2C_UNK *, M2C_UNK, M2C_UNK);       /* extern */
-M2C_UNK UpdateGrfjoytFromGrfusr__Fv();              /* extern */
-M2C_UNK scePadInit(M2C_UNK);                        /* extern */
-extern M2C_UNK B_002DDEC0;
-extern M2C_UNK B_002DFC00;
+struct CODELIST;
+void InitCodes(struct CODELIST *codes);
+void InitJoy(struct JOY *joy, s32 port, s32 slot);
+void UpdateGrfjoytFromGrfusr__Fv(void);
+s32 scePadInit(s32 mode);
+extern struct CODELIST B_002DDEC0;
+extern struct JOY B_002DFC00;
 
 void StartupJoy__Fv(void) {
     UpdateGrfjoytFromGrfusr__Fv();

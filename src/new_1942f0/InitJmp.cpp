@@ -1,24 +1,20 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "jmp.h"
 extern "C" {
-extern s128 D_002BF740;
+extern QW D_002BF740;
 
-void InitJmp(s8 *arg0, s32 arg1) {
-    M2C_FIELD(arg0, s32 *, 0) = arg1;
-    M2C_FIELD(arg0, s32 *, 4) = -1;
-    M2C_FIELD(arg0, s32 *, 0x1C) = -1;
-    M2C_FIELD(arg0, s128 *, 0xF0) = (s128) D_002BF740;
-    M2C_FIELD(arg0, f32 *, 0x108) = -60.0f;
-    M2C_FIELD(arg0, f32 *, 0x10C) = -50.0f;
-    M2C_FIELD(arg0, f32 *, 0x114) = 50.0f;
-    M2C_FIELD(arg0, f32 *, 0x110) = 75.0f;
-    M2C_FIELD(arg0, f32 *, 0x11C) = 75.0f;
-    M2C_FIELD(arg0, f32 *, 0x118) = -150.0f;
-    M2C_FIELD(arg0, f32 *, 0x164) = 1.0f;
+void InitJmp(JMP *pjmp, JT *pjt) {
+    pjmp->pjt = pjt;
+    pjmp->kind = -1;
+    pjmp->state = -1;
+    pjmp->vecF0 = D_002BF740;
+    pjmp->field_0x108 = -60.0f;
+    pjmp->field_0x10C = -50.0f;
+    pjmp->field_0x114 = 50.0f;
+    pjmp->field_0x110 = 75.0f;
+    pjmp->field_0x11C = 75.0f;
+    pjmp->field_0x118 = -150.0f;
+    pjmp->field_0x164 = 1.0f;
 }
 
 }

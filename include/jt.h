@@ -70,7 +70,9 @@ struct JT : STEP {
     u8 unknown_0x438[0x90];
     /* 0x4C8 */ s32 attachKind; /* in the attachment InitJt starts at 0x4C0: func_00143C78 (85); func_00211420, UpdateSndMix */
     /* 0x4CC */ s32 field_0x4CC; /* func_0018A428 (Sly slot 50) */
-    u8 unknown_0x4D0[0x50];
+    u8 unknown_0x4D0[0x4];
+    /* 0x4D4 */ struct ATTACHEDOBJ *field_0x4D4; /* in the attachment: AdjustSlyNewXp (Sly slot 55) tests its word at 0x1BC; the object's class is not recovered */
+    u8 unknown_0x4D8[0x48];
     /* 0x520 */ void *field_0x520; /* BindJtStepAseg (Sly slot 90) */
     u8 unknown_0x524[0x47C];
     /* 0x9A0 */ struct SO *pcarried; /* in the attachment: func_00211420, after testing the object is class 52 */
@@ -93,7 +95,8 @@ struct JT : STEP {
     u8 unknown_0xF08[0x14];
     /* 0xF1C */ struct SO *field_0xF1C; /* func_001B81B8 (Murray slot 87) sets it to the held object */
     /* 0xF20 */ s32 binocPhase; /* in the binoculars InitJt starts at 0xF00: FInvulnerableJt (76); BindTextBinocReadout */
-    u8 unknown_0xF24[0x18];
+    u8 unknown_0xF24[0x14];
+    /* 0xF38 */ struct GADGETLIST *pgadgetlist; /* func_00211148, func_002111F0: the list of gadgets whose names and string ids the menu shows */
     /* 0xF3C */ f32 field_0xF3C; /* BindTextBinocReadout, which reads binocPhase too */
     u8 unknown_0xF40[0x10];
     /* 0xF50 */ s32 field_0xF50; /* in the pipe state InitJt starts at 0xF50: func_00141588 (97); func_0018A428 */

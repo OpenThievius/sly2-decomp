@@ -1,11 +1,12 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "suv.h"
 
-M2C_UNK CloneXfm();                                 /* extern */
+void CloneXfm(struct SUV *suv, struct SUV *suvSource); /* extern */
 
-void CloneSuv(void *arg0) {
-    s32 *temp_v1;
+void CloneSuv(struct SUV *suv, struct SUV *suvSource) {
+    s32 *pcshare;
 
-    CloneXfm();
-    temp_v1 = M2C_FIELD(arg0, s32 **, 0xE4);
-    *temp_v1 += 1;
+    CloneXfm(suv, suvSource);
+    pcshare = suv->pcshare;
+    *pcshare += 1;
 }

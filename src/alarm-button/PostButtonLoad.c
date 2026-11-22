@@ -1,11 +1,12 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "button.h"
 
-M2C_UNK PostBtnLoad(s32);                           /* extern */
-M2C_UNK PostSoLoad();                               /* extern */
-M2C_UNK SetButtonButtons(s32, M2C_UNK);             /* extern */
+void PostBtnLoad(struct BTN *);
+void PostSoLoad();
+void SetButtonButtons(struct BUTTON *, int);
 
-void PostButtonLoad(s32 arg0) {
+void PostButtonLoad(struct BUTTON *pbutton) {
     PostSoLoad();
-    PostBtnLoad(arg0 + 0x150);
-    SetButtonButtons(arg0, 0);
+    PostBtnLoad(&pbutton->btn);
+    SetButtonButtons(pbutton, 0);
 }

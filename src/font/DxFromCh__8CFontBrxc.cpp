@@ -1,11 +1,14 @@
-extern "C" void *PglyffFromCh__8CFontBrxc(char *, unsigned char);
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "cfont.h"
 
-float DxFromCh__8CFontBrxc(char *arg0, unsigned char arg1) {
-    char *temp_v0;
+extern "C" GLYPH *PglyffFromCh__8CFontBrxc(CFONT *, unsigned char);
 
-    temp_v0 = (char *)PglyffFromCh__8CFontBrxc(arg0, arg1);
-    if (temp_v0 != 0) {
-        return (float)(*(unsigned short *)(temp_v0 + 0x6) + 1) * *(float *)(arg0 + 0x10);
+float DxFromCh__8CFontBrxc(CFONT *font, unsigned char character) {
+    GLYPH *glyph;
+
+    glyph = PglyffFromCh__8CFontBrxc(font, character);
+    if (glyph != 0) {
+        return (float)(glyph->width + 1) * font->scaleX;
     }
-    return *(float *)(arg0 + 0x10) * (float)*(int *)(arg0 + 0x8);
+    return font->scaleX * (float)font->dxSpace;
 }

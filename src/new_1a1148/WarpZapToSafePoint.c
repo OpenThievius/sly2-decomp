@@ -1,7 +1,12 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "types.h"
 
-M2C_UNK WarpJtToSafePoint(s32, M2C_UNK);            /* extern */
+struct JT;
+struct SAFEPT;
 
-void WarpZapToSafePoint(s32 *arg0) {
-    WarpJtToSafePoint(*arg0, 0);
+void WarpJtToSafePoint(struct JT *pjt, struct SAFEPT *psafept);
+
+/* the zap part's first word is its JT (jtzap.h's JTZAP, C++ only) */
+void WarpZapToSafePoint(struct JT **ppjt) {
+    WarpJtToSafePoint(*ppjt, 0);
 }

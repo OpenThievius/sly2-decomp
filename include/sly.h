@@ -7,6 +7,11 @@
 #include "jt.h"
 
 struct PART;
+/* the object AddJtHangBodyReaction pushes its reaction into: +4 is the body it passes to AddSoAcceleration */
+struct HANGBODY {
+    u8 unknown_0x0[0x4];
+    /* 0x4 */ struct SO *pso;
+};
 struct TARGET;
 struct ASEG;
 struct ASEGBL;
@@ -23,6 +28,11 @@ struct SWEEP {
 };
 
 struct SLY : JT {
+    /* The parts InitSly starts in place (their layouts are local to the part's own functions): InitSly passes each its own address,
+       AdjustSlyNewXp passes the one at 0x1FF0 on (func_001374E0) */
+    void *PvPart1320() { return (char *)this + 0x1320; }
+    void *PvPart1C30() { return (char *)this + 0x1C30; }
+    void *PvPart1FF0() { return (char *)this + 0x1FF0; }
     u8 unknown_0x1320[0x1B0];
     /* 0x14D0 */ void *field_0x14D0; /* bevy_player_input_from_pad_cm */
     /* 0x14D4 */ struct ASEG *apasegHide[2]; /* SetJtJtcs (states 10, 11) */
@@ -42,14 +52,19 @@ struct SLY : JT {
     /* 0x18C8 */ s32 jts; /* the state: NSlyActionCategory (85), FAllowBinocSly (94), BindJtStepAseg (90), JT_FInvulnerable (76), func_0018A428 (50) */
     u8 unknown_0x18CC[0x4];
     /* 0x18D0 */ s32 field_0x18D0; /* bevy_player_input_from_pad_cm */
-    u8 unknown_0x18D4[0x4];
+    /* 0x18D4 */ f32 field_0x18D4; /* AdjustSlyNewXp (slot 55) compares the clock with it in state 5 */
     /* 0x18D8 */ s32 jtcs; /* SetJtJtcs */
     /* 0x18DC */ f32 tJtcs; /* SetJtJtcs */
     /* 0x18E0 */ struct ASEGA *pasegaJtcs; /* SetJtJtcs: ApplyAsegToHandle's handle */
     /* 0x18E4 */ s32 field_0x18E4;
     u8 unknown_0x18E8[0x4];
     /* 0x18EC */ s32 field_0x18EC;
-    u8 unknown_0x18F0[0xB0];
+    u8 unknown_0x18F0[0x10];
+    /* 0x1900 */ struct HANGBODY *phangbody; /* AddJtHangBodyReaction (slot 105) */
+    u8 unknown_0x1904[0x2C];
+    /* 0x1930 */ QW accelHang;               /* AddJtHangBodyReaction: AddSoAcceleration's vector */
+    /* 0x1940 */ QW accelAngularHang;        /* AddJtHangBodyReaction: AddSoAngularAcceleration's vector */
+    u8 unknown_0x1950[0x50];
     /* 0x19A0 */ struct PART *apartHide[3]; /* SetSlyHide (87) */
     /* 0x19AC */ f32 rBounds; /* UpdateJtBounds */
     /* 0x19B0 */ f32 tJtcsNext; /* SetJtJtcs */
@@ -70,7 +85,15 @@ struct SLY : JT {
     /* 0x1D1C */ void *field_0x1D1C; /* bevy_player_input_from_pad_cm */
     u8 unknown_0x1D20[0xC];
     /* 0x1D2C */ s32 field_0x1D2C; /* bevy_player_input_from_pad_cm */
-    u8 unknown_0x1D30[0x2B0];
+    u8 unknown_0x1D30[0x280];
+    /* 0x1FB0 */ s32 field_0x1FB0; /* InitSly (slot 7) sets 0x1A; four records of 0xC bytes follow, their first word set by it */
+    u8 unknown_0x1FB4[0x8];
+    /* 0x1FBC */ s32 field_0x1FBC; /* InitSly sets 0x25 */
+    u8 unknown_0x1FC0[0x8];
+    /* 0x1FC8 */ s32 field_0x1FC8; /* InitSly sets 0x26 */
+    u8 unknown_0x1FCC[0x8];
+    /* 0x1FD4 */ s32 field_0x1FD4; /* InitSly sets 0x29 */
+    u8 unknown_0x1FD8[0x8];
     /* 0x1FE0 */ s32 field_0x1FE0; /* UseSlyGadget (100) */
     /* 0x1FE4 */ s32 field_0x1FE4; /* UseSlyGadget (100) */
     u8 unknown_0x1FE8[0x2C];
@@ -97,6 +120,9 @@ SLY2_OFFSET_CHECK(SLY, ptarget, 0x18C0);
 SLY2_OFFSET_CHECK(SLY, jts, 0x18C8);
 SLY2_OFFSET_CHECK(SLY, apartHide, 0x19A0);
 SLY2_OFFSET_CHECK(SLY, rBounds, 0x19AC);
+SLY2_OFFSET_CHECK(SLY, phangbody, 0x1900);
+SLY2_OFFSET_CHECK(SLY, accelHang, 0x1930);
+SLY2_OFFSET_CHECK(SLY, accelAngularHang, 0x1940);
 SLY2_OFFSET_CHECK(SLY, field_0x1AA4, 0x1AA4);
 SLY2_OFFSET_CHECK(SLY, field_0x1FE0, 0x1FE0);
 SLY2_OFFSET_CHECK(SLY, field_0x1FE4, 0x1FE4);

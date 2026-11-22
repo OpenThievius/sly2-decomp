@@ -1,9 +1,10 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "script.h"
 
-M2C_UNK PostLoLoad();                               /* extern */
-M2C_UNK ResolveScriptObjects(s32);                  /* extern */
+void PostLoLoad(struct SCRIPT *script);
+void ResolveScriptObjects(struct SCRIPT *script);
 
-void PostLoadScript(s32 arg0) {
-    PostLoLoad();
-    ResolveScriptObjects(arg0);
+void PostLoadScript(struct SCRIPT *script) {
+    PostLoLoad(script);
+    ResolveScriptObjects(script);
 }

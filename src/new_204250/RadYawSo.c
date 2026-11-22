@@ -1,10 +1,11 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "soview.h"
+#include "xf.h"
 
-M2C_UNK atan2f(f32, f32);                           /* extern */
+float atan2f(float, float);
 
-void RadYawSo(void *arg0) {
-    void *temp_v0;
+float RadYawSo(struct SOVIEW *pso) {
+    struct XF *pxf = pso->pxfRoot;
 
-    temp_v0 = M2C_FIELD(arg0, void **, 0x60);
-    atan2f(M2C_FIELD(temp_v0, f32 *, 0x44), M2C_FIELD(temp_v0, f32 *, 0x40));
+    return atan2f(pxf->matWorld.mat[0][1], pxf->matWorld.mat[0][0]);
 }

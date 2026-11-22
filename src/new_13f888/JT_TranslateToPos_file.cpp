@@ -49,7 +49,7 @@ QW PosLoWorld(void *);
 
 extern "C" int FJtLandsWithin(JT *pjt, float t)
 {
-    float z = pjt->field_0x248;
+    float z = pjt->vecLocal.z;
     float vz = LaneZInGeneralRegister((pjt->GetVelocityVec()));
     float half = t * 0.5f;
     float dz = t * vz;

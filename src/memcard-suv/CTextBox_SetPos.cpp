@@ -1,6 +1,8 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // 0x258438 CTextBox::SetPos
-void CTextBox_SetPos(void *arg0, float fparg0, float fparg1)
+#include "ctextbox.h"
+extern "C" void CTextBox_SetPos(CTextBox *ptextbox, float x, float y)
 {
-    *(float *)((char *)arg0 + 0) = fparg0;
-    *(float *)((char *)arg0 + 4) = fparg1;
+    ptextbox->x = x;
+    ptextbox->y = y;
 }

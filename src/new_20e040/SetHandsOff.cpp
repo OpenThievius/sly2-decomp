@@ -1,20 +1,22 @@
-#include "m2c_macros.h"
-extern "C" {
-M2C_UNK AddGrfusr__Fi(M2C_UNK);
-M2C_UNK IncrementSwBinocCount(s8 *);
-M2C_UNK IncrementSwShowCount(s8 *);
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "sw.h"
 
-void SetHandsOff(s8 *arg0, s32 arg1) {
-    s32 count = *(s32 *)(arg0 + 0x3D78) + 1;
-    *(s32 *)(arg0 + 0x3D78) = count;
-    if (count == 1) {
+extern "C" {
+void AddGrfusr__Fi(int grfusr);
+void IncrementSwBinocCount(SW *psw);
+void IncrementSwShowCount(SW *psw);
+
+void SetHandsOff(SW *psw, int grf) {
+    int chandsOff = psw->chandsOff + 1;
+    psw->chandsOff = chandsOff;
+    if (chandsOff == 1) {
         AddGrfusr__Fi(2);
     }
-    if (arg1 & 1) {
-        IncrementSwShowCount(arg0);
+    if (grf & 1) {
+        IncrementSwShowCount(psw);
     }
-    if (arg1 & 2) {
-        IncrementSwBinocCount(arg0);
+    if (grf & 2) {
+        IncrementSwBinocCount(psw);
     }
 }
 }

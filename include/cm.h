@@ -6,7 +6,10 @@
 #include "types.h"
 
 struct CPLCY {
-    u8 unknown_0x0[0xD0];
+    /* 0x0 */ s32 active; /* DeactivateCplcy clears it (ActivateCplcy stores its argument) */
+    /* 0x4 */ f32 savedField_0x24; /* DeactivateCplcy copies it back to CM::field_0x24 (ActivateCplcy saves it) */
+    /* 0x8 */ f32 savedNearClip; /* DeactivateCplcy hands it to SetCmNearClip (ActivateCplcy saves the camera manager's) */
+    u8 unknown_0xC[0xC4];
 };
 
 struct CM {

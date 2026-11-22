@@ -1,8 +1,11 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "types.h"
 
-M2C_UNK PoxaAllocSw(M2C_UNK *, s32);                /* extern */
-extern M2C_UNK B_003DD490;
+struct SW;
+struct SO;
+void *PoxaAllocSw(struct SW *, struct SO *);
+extern struct SW B_003DD490;
 
-void PoxaAllocSo(s32 arg0) {
-    PoxaAllocSw(&B_003DD490, arg0);
+void PoxaAllocSo(struct SO *pso) {
+    PoxaAllocSw(&B_003DD490, pso);
 }

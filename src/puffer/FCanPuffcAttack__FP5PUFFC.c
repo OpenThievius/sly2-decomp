@@ -1,7 +1,8 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "types.h"
 
-extern M2C_UNK D_002BB948;
+extern void *D_002BB948[5];
 
-M2C_UNK *FCanPuffcAttack__FP5PUFFC(void) {
-    return &D_002BB948;
+void **FCanPuffcAttack__FP5PUFFC(void) {
+    return D_002BB948;
 }

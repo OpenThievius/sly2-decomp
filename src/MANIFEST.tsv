@@ -2218,7 +2218,7 @@ address	name	size	file	whole_file	symbol
 0X163E88	RefuseTaskState	188	sensor-geom/RefuseTaskState.cpp		
 0X163F48	LeaveTask	204	sensor-geom/LeaveTask.cpp		
 0X164018	FIsCurrentTask	20	sensor-geom/FIsCurrentTask.c		
-0X164030	FTaskComplete	104	sensor-geom/FTaskComplete.c		
+0X164030	FTaskComplete	104	sensor-geom/FTaskComplete.cpp		
 0X164098	func_00164098	104	unsorted/fun_00164098.cpp		
 0X164100	VisitTaskInOrder	368	sensor-geom/VisitTaskInOrder.cpp		
 0X164270	RestoreTaskStateFromSave	316	sensor-geom/RestoreTaskStateFromSave.cpp		

@@ -1,7 +1,9 @@
-extern "C" void InitXfm(void *);
-extern "C" void InitCrv(void *crv)
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "crv.h"
+extern "C" void InitXfm(LO *);
+extern "C" void InitCrv(CRV *crv)
 {
     InitXfm(crv);
-    *(int *)((char *)crv + 0x148) = -1;
-    *(int *)((char *)crv + 0x178) = 1;
+    crv->field_0x148 = -1;
+    crv->field_0x178 = 1;
 }

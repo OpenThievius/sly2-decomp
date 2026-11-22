@@ -1,22 +1,26 @@
-extern "C" {
-void DecrementSwBinocCount(char *);
-void DecrementSwShowCount(char *);
-void RemoveGrfusr__Fi(int);
-void func_00187E08(void *, int);
-extern char B_002DFC00;
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "sw.h"
+#include "joy.h"
 
-void ClearHandsOff(char *arg0, int arg1) {
-    int count = *(int *)(arg0 + 0x3D78) - 1;
-    *(int *)(arg0 + 0x3D78) = count;
-    if (count == 0) {
+extern "C" {
+void DecrementSwBinocCount(SW *psw);
+void DecrementSwShowCount(SW *psw);
+void RemoveGrfusr__Fi(int grfusr);
+void func_00187E08(JOY *pjoy, int grfbtn);
+extern JOY B_002DFC00;
+
+void ClearHandsOff(SW *psw, int grf) {
+    int chandsOff = psw->chandsOff - 1;
+    psw->chandsOff = chandsOff;
+    if (chandsOff == 0) {
         RemoveGrfusr__Fi(2);
         func_00187E08(&B_002DFC00, 8);
     }
-    if (arg1 & 1) {
-        DecrementSwShowCount(arg0);
+    if (grf & 1) {
+        DecrementSwShowCount(psw);
     }
-    if (arg1 & 2) {
-        DecrementSwBinocCount(arg0);
+    if (grf & 2) {
+        DecrementSwBinocCount(psw);
     }
 }
 }

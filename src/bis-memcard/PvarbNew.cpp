@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
 #include "sw.h"
+#include "sidebag.h"
 extern "C" {
 void *PvAllocSlotheapImpl(SLOTHEAP *);
 void FreeSlotheapPv(SLOTHEAP *, void *);
@@ -21,10 +22,10 @@ void *PvarbNew(void)
             B_004520C0[B_002DD294++] = chunk;
         }
     }
-    char *p = (char *)PvAllocSlotheapImpl(&B_004520D0);
-    InitVarbNode(p);
-    *(int *)(p + 0xC) = -1;
-    *(int *)(p + 0x14) = 0;
-    return p;
+    VARB *pvarb = (VARB *)PvAllocSlotheapImpl(&B_004520D0);
+    InitVarbNode(pvarb);
+    pvarb->ref.m_tagk = TAGK_Nil;
+    pvarb->pvarbNext = 0;
+    return pvarb;
 }
 }

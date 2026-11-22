@@ -1,15 +1,17 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "amb.h"
 extern "C" {
-extern void BASIC_Destruct(char *, int);
-extern int FreeAmb(char *);
+extern void BASIC_Destruct(AMB *, int);
+extern int FreeAmb(AMB *);
 
-void AMB_Release(char *arg0) {
-    int temp_v0;
+void AMB_Release(AMB *pamb) {
+    int cRef;
 
-    temp_v0 = *(unsigned short *)(arg0 + 0x4C) - 1;
-    *(unsigned short *)(arg0 + 0x4C) = temp_v0;
-    if (((temp_v0 << 0x10) == 0) && (arg0 != 0)) {
-        BASIC_Destruct(arg0, 0);
-        FreeAmb(arg0);
+    cRef = pamb->cRef - 1;
+    pamb->cRef = cRef;
+    if (((cRef << 0x10) == 0) && (pamb != 0)) {
+        BASIC_Destruct(pamb, 0);
+        FreeAmb(pamb);
     }
 }
 }

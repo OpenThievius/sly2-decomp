@@ -1,8 +1,7 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
-struct VT { char pad[0x18]; short delta; short index; void (*fn)(void *, float, float, QW *, QW *); };
-struct CURVE { VT *vt; };
-struct CHN { char p0[4]; CURVE *curve; };
-struct ASEGA { char p0[0x14]; void *seg; char p1[0x40 - 0x18]; float rate; };
+#include "asega.h"
+#include "chn.h"
 extern QW g_2a2dd0;
 extern "C" int FAsegaGone(ASEGA *);
 extern "C" CHN *PchnFindAseg(void *, void *, int, int);
@@ -12,10 +11,9 @@ extern "C" QW func_00204ED8(float t, void *plo, ASEGA *asega)
     if (asega) {
         if (FAsegaGone(asega))
             return vel;
-        CHN *chn = PchnFindAseg(asega->seg, plo, 6, 1);
+        CHN *chn = PchnFindAseg(asega->paseg, plo, 6, 1);
         if (chn) {
-            CURVE *curve = chn->curve;
-            curve->vt->fn((char *)curve + curve->vt->delta, t, asega->rate, 0, &vel);
+            chn->curve->Eval(t, asega->svtLocal, 0, &vel);
         }
     }
     return vel;

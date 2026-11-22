@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-#include "types.h"
+#include "gadgetobj.h"
 
 extern "C" {
-void func_001A58D0(void *arg0, s32 arg1, s32 arg2, f32 fparg3);
-QW PosLoWorld(void *arg0);
-void ExplodeGadgetBurst(void *arg0, s32 arg1, s32 arg2, QW arg3, f32 fparg0);
+void func_001A58D0(LO *plo, LO *ploParent, int grf);
+QW PosLoWorld(LO *plo);
+void ExplodeGadgetBurst(GADGETOBJ *pgadget, int word1, int word2, QW origin, float radius);
 
-void DetonateGadgetObj(void *arg0, f32 fparg0) {
+void DetonateGadgetObj(GADGETOBJ *pgadget, float radius) {
     QW position;
 
-    func_001A58D0(arg0, 0, 1, fparg0);
-    position = PosLoWorld(arg0);
-    ExplodeGadgetBurst(arg0, *(s32 *)((char *)arg0 + 0x174), *(s32 *)((char *)arg0 + 0x178), position, fparg0);
+    func_001A58D0(pgadget, 0, 1);
+    position = PosLoWorld(pgadget);
+    ExplodeGadgetBurst(pgadget, pgadget->field_0x174, pgadget->field_0x178, position, radius);
 }
 }

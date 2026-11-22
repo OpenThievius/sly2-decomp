@@ -1,23 +1,17 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "tn.h"
+#include "sw.h"
 extern "C" {
-struct _m2c_stack_UpdateTn__FP2TNf {
-    /* 0x00 */ char pad0[0x20];
-};                                                  /* size = 0x20 */
-struct Bytes8 { s64 v; } __attribute__((packed));
+struct PMF8 { u64 value; } __attribute__((packed)); /* a pointer to member function: 8 bytes, read whole (CancelSwCallbacks's PMF) */
 
-void QueueSwCallback(M2C_UNK *, s8 *, s64, M2C_UNK);
-void UpdateLo();
-extern M2C_UNK B_003DD490;
-extern Bytes8 RO_002A96F0;
-void UpdateTn__FP2TNf(s8 *arg0) {
-    UpdateLo();
-    if (M2C_FIELD(arg0, s32 *, 0x13C) != 0) {
-        QueueSwCallback(&B_003DD490, arg0, RO_002A96F0.v, 0);
+void QueueSwCallback(SW *, TN *, u64, s32);
+void UpdateLo(LO *);
+extern SW B_003DD490;
+extern const PMF8 RO_002A96F0;
+void UpdateTn__FP2TNf(TN *tn) {
+    UpdateLo(tn);
+    if (tn->tnsOverride != 0) {
+        QueueSwCallback(&B_003DD490, tn, RO_002A96F0.value, 0);
     }
 }
 }

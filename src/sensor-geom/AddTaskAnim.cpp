@@ -1,24 +1,23 @@
-#include "types.h"
-#define NULL 0
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "job.h"
+
 extern "C" {
-
-void AddTaskAnim(char *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5, s32 arg6) {
+void AddTaskAnim(TASK *task, s32 nState, s32 oid, s32 oidSel, s32 oidAnim, s32 fGated, s32 nLevelRow) {
     s32 count;
-    s32 *entry;
+    ANIMREC *entry;
 
-    if (*(s32 *)(arg0 + 0x50) == 0) {
-        count = *(s32 *)(arg0 + 0xB0);
+    if (task->field_0x50 == 0) {
+        count = task->canim;
         if (count < 0x20) {
-            *(s32 *)(arg0 + 0xB0) = count + 1;
-            entry = (s32 *)(*(char **)(arg0 + 0xB4) + count * 0x18);
-            entry[0] = arg1;
-            entry[1] = arg2;
-            entry[2] = arg3;
-            entry[3] = arg4;
-            entry[4] = arg5;
-            entry[5] = arg6;
+            task->canim = count + 1;
+            entry = &task->aanim[count];
+            entry->nState = nState;
+            entry->oid = oid;
+            entry->oidSel = oidSel;
+            entry->oidAnim = oidAnim;
+            entry->fGated = fGated;
+            entry->nLevelRow = nLevelRow;
         }
     }
 }
-
 }

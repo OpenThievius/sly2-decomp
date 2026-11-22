@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-#include "dl.h"
-struct VT { char pad[0x10]; short delta; short index; void (*fn)(void *); };
-struct FRM { char pad[0x34]; DL dlA; DL dlB; };
-struct ENTRY { char pad[0xC]; VT *vptr; char pad2[0x1088 - 0x10]; void *extra; };
+#include "lo.h"
+#include "frm.h"
 extern char B_003E1518, B_003E1530;
 extern "C" {
 void ClearDl__FP2DL(DL *);
@@ -12,26 +10,26 @@ void RemoveDlEntry(DL *, void *);
 }
 extern "C" void ClearPendingFrame__FP3FRM(FRM *frm)
 {
-    if (!FIsDlEmpty__FP2DL(&frm->dlA)) {
+    if (!FIsDlEmpty__FP2DL(&frm->dlBlipg)) {
         DLI iter;
-        PushDli(&iter, &frm->dlA);
-        for (ENTRY *entry = (ENTRY *)PvStep(&iter); entry; entry = (ENTRY *)PvStep(&iter)) {
-            RemoveDlEntry(&frm->dlA, entry);
-            entry->vptr->fn((char *)entry + entry->vptr->delta);
+        PushDli(&iter, &frm->dlBlipg);
+        for (BASIC *entry = (BASIC *)PvStep(&iter); entry; entry = (BASIC *)PvStep(&iter)) {
+            RemoveDlEntry(&frm->dlBlipg, entry);
+            entry->Slot2();
         }
-        ClearDl__FP2DL(&frm->dlA);
+        ClearDl__FP2DL(&frm->dlBlipg);
         PopDli(&iter);
     }
-    if (!FIsDlEmpty__FP2DL(&frm->dlB)) {
+    if (!FIsDlEmpty__FP2DL(&frm->dlBlip)) {
         DLI iter;
-        PushDli(&iter, &frm->dlB);
-        for (ENTRY *entry = (ENTRY *)PvStep(&iter); entry; entry = (ENTRY *)PvStep(&iter)) {
+        PushDli(&iter, &frm->dlBlip);
+        for (FRMBLIP *entry = (FRMBLIP *)PvStep(&iter); entry; entry = (FRMBLIP *)PvStep(&iter)) {
             if (entry->extra)
                 FreeSlotheapPv(&B_003E1530, entry->extra);
-            RemoveDlEntry(&frm->dlB, entry);
+            RemoveDlEntry(&frm->dlBlip, entry);
             FreeSlotheapPv(&B_003E1518, entry);
         }
-        ClearDl__FP2DL(&frm->dlB);
+        ClearDl__FP2DL(&frm->dlBlip);
         PopDli(&iter);
     }
 }

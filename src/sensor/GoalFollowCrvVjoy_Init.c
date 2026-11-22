@@ -1,8 +1,9 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "goals.h"
 
-M2C_UNK GoalFollowCrv_Init();                       /* extern */
+void GoalFollowCrv_Init(struct GOALFOLLOWCRVVJOY *);
 
-void GoalFollowCrvVjoy_Init(void *arg0) {
-    GoalFollowCrv_Init();
-    M2C_FIELD(arg0, f32 *, 0xD0) = 1.0f;
+void GoalFollowCrvVjoy_Init(struct GOALFOLLOWCRVVJOY *pgoal) {
+    GoalFollowCrv_Init(pgoal);
+    pgoal->field_0xD0 = 1.0f;
 }

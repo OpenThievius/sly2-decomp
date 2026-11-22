@@ -1,12 +1,14 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "shopmenu.h"
 extern "C" {
 int NEpisodeBest(void);
-extern char D_002BCD00[];
+extern GADGETDEF D_002BCD00[];
 
 int FGadgetOnSale(int index) {
-    char *entry = D_002BCD00 + (index << 5);
-    if (*(int *)(entry + 0x10) == -1) {
+    GADGETDEF *gadget = &D_002BCD00[index];
+    if (gadget->episodeMin == -1) {
         return 0;
     }
-    return NEpisodeBest() >= *(int *)(entry + 0x10);
+    return NEpisodeBest() >= gadget->episodeMin;
 }
 }

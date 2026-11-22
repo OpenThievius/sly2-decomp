@@ -1,51 +1,47 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "cfont.h"
+
 extern "C" {
-struct _m2c_stack_SetupDraw__8CFontBrxP8CTextBoxP4GIFS {
-    /* 0x00 */ char pad0[0x70];
-};                                                  /* size = 0x70 */
-M2C_UNK AddPrimList__4GIFSiUl(s32, M2C_UNK, unsigned long); /* extern */
-M2C_UNK AddPrimPack__4GIFSiiUl(s32, M2C_UNK, M2C_UNK, M2C_UNK); /* extern */
-s32 FEnsureLoaded__8CFontBrxP4GIFS(s8 *, s32);    /* extern */
-M2C_UNK PackAD__4GIFSll(s32, M2C_UNK, s64);         /* extern */
-void SetupDraw__8CFontBrxP8CTextBoxP4GIFS(s8 *arg0, s8 *arg1, s32 arg2) {
-    f32 temp_f2;
-    f32 temp_f3;
-    s32 temp_s0_2;
-    s32 temp_s1;
-    s32 temp_s3;
-    s32 temp_s0;
-    s64 temp_s2;
-    s64 var_a2;
-    if (arg1 != NULL) {
-        temp_f2 = M2C_FIELD(arg1, f32 *, 0);
-        temp_f3 = M2C_FIELD(arg1, f32 *, 4);
-        temp_s3 = (s32) (temp_f2 * 0.8f);
-        temp_s0 = (s32) ((temp_f2 + (M2C_FIELD(arg1, f32 *, 8) * 512.0f)) * 0.0015625f) - 1;
-        temp_s1 = (s32) (temp_f3 * 0.45454547f);
-        temp_s2 = (s32) ((temp_f3 + M2C_FIELD(arg1, f32 *, 0xC)) * 0.45454547f) - 1;
-        AddPrimPack__4GIFSiiUl(arg2, 0, 1, 0xE);
-        PackAD__4GIFSll(arg2, 0x40, temp_s3 | ((s64) temp_s0 << 0x10) | ((s64) temp_s1 << 0x20) | (temp_s2 << 0x30));
+void AddPrimList__4GIFSiUl(GIFS *, int, unsigned long);
+void AddPrimPack__4GIFSiiUl(GIFS *, int, int, int);
+int FEnsureLoaded__8CFontBrxP4GIFS(CFONT *, GIFS *);
+void PackAD__4GIFSll(GIFS *, int, s64);
+
+void SetupDraw__8CFontBrxP8CTextBoxP4GIFS(CFONT *font, CTextBox *textBox, GIFS *gifs) {
+    f32 left;
+    f32 top;
+    s32 x0;
+    s32 x1;
+    s32 y0;
+    s64 y1;
+    s32 fLoaded;
+    s64 test;
+
+    if (textBox != 0) {
+        left = textBox->x;
+        top = textBox->y;
+        x0 = (s32) (left * 0.8f);
+        x1 = (s32) ((left + (textBox->dx * 512.0f)) * 0.0015625f) - 1;
+        y0 = (s32) (top * 0.45454547f);
+        y1 = (s32) ((top + textBox->dy) * 0.45454547f) - 1;
+        AddPrimPack__4GIFSiiUl(gifs, 0, 1, 0xE);
+        PackAD__4GIFSll(gifs, 0x40, x0 | ((s64) x1 << 0x10) | ((s64) y0 << 0x20) | (y1 << 0x30));
     }
-    temp_s0_2 = FEnsureLoaded__8CFontBrxP4GIFS(arg0, arg2);
-    AddPrimPack__4GIFSiiUl(arg2, 6, 1, 0xE);
-    if (temp_s0_2 != 0) {
-        PackAD__4GIFSll(arg2, 0x3F, 0);
+    fLoaded = FEnsureLoaded__8CFontBrxP4GIFS(font, gifs);
+    AddPrimPack__4GIFSiiUl(gifs, 6, 1, 0xE);
+    if (fLoaded != 0) {
+        PackAD__4GIFSll(gifs, 0x3F, 0);
     }
-    var_a2 = 0x31001;
-    if (M2C_FIELD(arg0, s32 *, 0x3C) != 0) {
-        var_a2 = M2C_FIELD(arg0, s64 *, 0x40);
+    test = 0x31001;
+    if (font->fTest != 0) {
+        test = font->test;
     }
-    PackAD__4GIFSll(arg2, 0x47, var_a2);
-    PackAD__4GIFSll(arg2, 0x42, 0x44);
-    PackAD__4GIFSll(arg2, 6, M2C_FIELD(arg0, s64 *, 0x50));
-    PackAD__4GIFSll(arg2, 0x14, 0x60);
-    PackAD__4GIFSll(arg2, 8, 5);
-    PackAD__4GIFSll(arg2, 0, 0x1D6);
-    AddPrimList__4GIFSiUl(arg2, 5, 0x43431);
+    PackAD__4GIFSll(gifs, 0x47, test);
+    PackAD__4GIFSll(gifs, 0x42, 0x44);
+    PackAD__4GIFSll(gifs, 6, font->tex0);
+    PackAD__4GIFSll(gifs, 0x14, 0x60);
+    PackAD__4GIFSll(gifs, 8, 5);
+    PackAD__4GIFSll(gifs, 0, 0x1D6);
+    AddPrimList__4GIFSiUl(gifs, 5, 0x43431);
 }
 }

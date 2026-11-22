@@ -1,7 +1,7 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "button.h"
 
-M2C_UNK FAddAshOid(s32);                            /* extern */
-
-void AddBtnOffAseg(s32 arg0) {
-    FAddAshOid(arg0 + 0x48);
+/* oid and nArg go straight through to FAddAshOid: retail's wrapper leaves $a1 and $a2 alone */
+void AddBtnOffAseg(struct BTN *pbtn, s32 oid, s32 nArg) {
+    FAddAshOid(&pbtn->ashOff, oid, nArg);
 }

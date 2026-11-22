@@ -5,6 +5,7 @@
 #include "alloc.h"
 #include "types.h"
 #include "sw.h"
+#include "pathzone.h"
 #include "include_asm.h"
 #include "vu0inline.h"
 #include "ps2inline.h"
@@ -19,23 +20,19 @@ extern "C" void *PvAllocSwClearImpl__Fi_1C0EC0(ALLOCREQ_1C0EC0 *);
 
 extern "C" int U32Read__18CBinaryInputStream_1C0EC0(int);
 
-extern "C" void LoadSwPzgraphFromBrx(char *self, int stream) {
+extern "C" void LoadSwPzgraphFromBrx(SW *psw, int stream) {
     ALLOCREQ_1C0EC0 req;
     int count = U32Read__18CBinaryInputStream_1C0EC0(stream);
     if (count != 0) {
         req.size = 0x30;
         req.align = 0x10;
         void *graph = PvAllocSwClearImpl__Fi_1C0EC0(&req);
-        *(void **)(self + 0x45CC) = graph;
+        psw->ppzgraph = (PZGRAPH *)graph;
         LoadPzgraphFromBrx_1C0EC0(graph, count, stream);
     }
 }
 
 struct CBIS;
-
-struct PZENTRY { QW *ppos; short iA; short iB; };
-
-struct PZGRAPH { int cent; PZENTRY *aent; int cvec; QW *avec; int cint; int *aint; int *aintClear; };
 
 extern "C" void *PvAllocSwImpl__Fi_1C0F30(ALLOCREQ *);
 
@@ -54,19 +51,19 @@ extern "C" void LoadPzgraphFromBrx(PZGRAPH *pzg, int cent, CBIS *pcbis)
     ALLOCREQ req;
     pzg->cent = cent;
     pzg->cvec = U32Read__18CBinaryInputStream_1C0F30(pcbis);
-    pzg->cint = U32Read__18CBinaryInputStream_1C0F30(pcbis);
+    pzg->cpathzone = U32Read__18CBinaryInputStream_1C0F30(pcbis);
     req.cb = pzg->cent * 8;
     req.cbAlign = 0x10;
     pzg->aent = (PZENTRY *)PvAllocSwImpl__Fi_1C0F30(&req);
     req.cb = pzg->cvec * 16;
     req.cbAlign = 0x10;
     pzg->avec = (QW *)PvAllocSwImpl__Fi_1C0F30(&req);
-    req.cb = pzg->cint * 4;
+    req.cb = pzg->cpathzone * 4;
     req.cbAlign = 0x10;
-    pzg->aintClear = (int *)PvAllocSwClearImpl__Fi_1C0F30(&req);
-    req.cb = pzg->cint * 4;
+    pzg->appathzone = (PATHZONE **)PvAllocSwClearImpl__Fi_1C0F30(&req);
+    req.cb = pzg->cpathzone * 4;
     req.cbAlign = 0x10;
-    pzg->aint = (int *)PvAllocSwImpl__Fi_1C0F30(&req);
+    pzg->aoidPathzone = (int *)PvAllocSwImpl__Fi_1C0F30(&req);
     for (int ient = 0; ient < pzg->cent; ient++) {
         PZENTRY *pent = &pzg->aent[ient];
         pent->ppos = pzg->avec + U16Read__18CBinaryInputStream_1C0F30(pcbis);
@@ -75,44 +72,38 @@ extern "C" void LoadPzgraphFromBrx(PZGRAPH *pzg, int cent, CBIS *pcbis)
     }
     for (int ivec = 0; ivec < pzg->cvec; ivec++)
         CBinaryInputStream_ReadVector4(pcbis, &pzg->avec[ivec]);
-    for (int iint = 0; iint < pzg->cint; iint++)
-        pzg->aint[iint] = S32Read__18CBinaryInputStream_1C0F30(pcbis);
+    for (int iint = 0; iint < pzg->cpathzone; iint++)
+        pzg->aoidPathzone[iint] = S32Read__18CBinaryInputStream_1C0F30(pcbis);
 }
 
 struct ALLOCREQ_1C10C8 { int cb; int cbAlign; };
 
-struct PLOHOLDER_1C10C8 { char pad[0x45C8]; int plo; int pzgraph; };
+extern "C" LO *PloNew(int, int, int, int);
 
-extern "C" int PloNew(int, int, int, int);
+extern "C" void SetupDefaultPathzone(LO *);
 
-extern "C" void SetupDefaultPathzone(int);
+extern "C" PZGRAPH *PvAllocSwClearImpl__Fi_1C10C8(ALLOCREQ_1C10C8 *);
 
-extern "C" int PvAllocSwClearImpl__Fi_1C10C8(ALLOCREQ_1C10C8 *);
+extern "C" void HookupPzgraph_1C10C8(PZGRAPH *);
 
-extern "C" void HookupPzgraph_1C10C8(int);
-
-extern "C" void func_001C10C8(PLOHOLDER_1C10C8 *self)
+extern "C" void func_001C10C8(SW *self)
 {
-    if (self->pzgraph == 0) {
-        self->plo = PloNew(0x11, 0, 0x2CA, -1);
-        SetupDefaultPathzone(self->plo);
+    if (self->ppzgraph == 0) {
+        self->ploPathzoneDefault = PloNew(0x11, 0, 0x2CA, -1);
+        SetupDefaultPathzone(self->ploPathzoneDefault);
         ALLOCREQ_1C10C8 req;
         req.cb = 0x30;
         req.cbAlign = 0x10;
-        self->pzgraph = PvAllocSwClearImpl__Fi_1C10C8(&req);
+        self->ppzgraph = PvAllocSwClearImpl__Fi_1C10C8(&req);
     }
-    HookupPzgraph_1C10C8(self->pzgraph);
+    HookupPzgraph_1C10C8(self->ppzgraph);
 }
-
-struct LO_1C1138 { char pad[0x124]; int ipathzone; char pad2[0x150 - 0x128]; int ipzlink; };
-
-struct PZGRAPH_1C1138 { char pad[0x10]; int cpathzone; int *aoidPathzone; LO_1C1138 **appathzone; int pad2; int cplink; LO_1C1138 **applink; int pad3; int fHookedUp; };
 
 extern "C" char B_003DD490[];
 
-extern "C" LO_1C1138 *PloFindSwObject_thunk(void *, int, int, LO_1C1138 *);
+extern "C" LO *PloFindSwObject_thunk(void *, int, int, LO *);
 
-extern "C" int CploFindSwObjectsByClass(void *, int, int, LO_1C1138 *, int, LO_1C1138 **);
+extern "C" int CploFindSwObjectsByClass(void *, int, int, LO *, int, LO **);
 
 extern "C" void *PvAllocSwCopyImpl__FiPv_1C1138(ALLOCREQ *, void *);
 
@@ -124,13 +115,13 @@ static inline int MinInt(int first, int second) { return (first < second) ? firs
 // bound, so the cplink store comes right after the clamp and before the request is filled. The
 // request pointer lives in s4 across the first loop (sw via sp and via s4): the same `preq = &req`
 // form as the other PvAllocSwCopyImpl callers (src/button-cd/fun_0014a008.cpp).
-void HookupPzgraph(PZGRAPH_1C1138 *pgraph)
+void HookupPzgraph(PZGRAPH *pgraph)
 {
-    LO_1C1138 *aplo[0x400];
+    LO *aplo[0x400];
     ALLOCREQ req;
     int ipathzone;
     for (ipathzone = 0; ipathzone < pgraph->cpathzone; ipathzone++) {
-        LO_1C1138 *ppathzone = PloFindSwObject_thunk(B_003DD490, 5, pgraph->aoidPathzone[ipathzone], 0);
+        PATHZONE *ppathzone = (PATHZONE *)PloFindSwObject_thunk(B_003DD490, 5, pgraph->aoidPathzone[ipathzone], 0);
         ppathzone->ipathzone = ipathzone;
         pgraph->appathzone[ipathzone] = ppathzone;
     }
@@ -140,20 +131,12 @@ void HookupPzgraph(PZGRAPH_1C1138 *pgraph)
     ALLOCREQ *preq = &req;
     preq->cb = cplink << 2;
     preq->cbAlign = 0x10;
-    pgraph->applink = (LO_1C1138 **)PvAllocSwCopyImpl__FiPv_1C1138(preq, aplo);
+    pgraph->applink = (PZLINK **)PvAllocSwCopyImpl__FiPv_1C1138(preq, aplo);
     int iplink;
     for (iplink = 0; iplink < pgraph->cplink; iplink++)
         pgraph->applink[iplink]->ipzlink = iplink;
     pgraph->fHookedUp = 1;
 }
-
-struct NODE { char pad[0x124]; int index; };
-
-struct ITEM { char pad[0x124]; NODE *pnode; int flag; };
-
-struct ADJ { int count; int *aitem; };
-
-struct PZG { char pad[0x10]; int cnode; char pad2[8]; ADJ *aadj; int citem; ITEM **aitem; };
 
 extern "C" void *CStackFrame_Construct(void *);
 
@@ -177,27 +160,27 @@ static inline void *PvAllocSw(ALLOCREQ *preq, int cb)
     return PvAllocSwImpl__Fi_1C1260(preq);
 }
 
-extern "C" void BuildPzgraphAdjacency(PZG *pzg)
+extern "C" void BuildPzgraphAdjacency(PZGRAPH *pzg)
 {
     char frame[16];
     CStackFrame_Construct(frame);
     ALLOCREQ req;
-    int *acount = (int *)PvAllocStackClear(&req, pzg->cnode * 4);
-    for (int i = 0; i < pzg->citem; i++) {
-        ITEM *item = pzg->aitem[i];
-        if (item->pnode != 0 && item->flag != 0)
-            acount[item->pnode->index]++;
+    int *acount = (int *)PvAllocStackClear(&req, pzg->cpathzone * 4);
+    for (int i = 0; i < pzg->cplink; i++) {
+        PZLINK *plink = pzg->applink[i];
+        if (plink->ppathzoneA != 0 && plink->ppathzoneB != 0)
+            acount[plink->ppathzoneA->ipathzone]++;
     }
-    pzg->aadj = (ADJ *)PvAllocSw(&req, pzg->cnode * 8);
-    for (int j = 0; j < pzg->cnode; j++) {
-        ADJ *adj = &pzg->aadj[j];
+    pzg->aadj = (PZADJ *)PvAllocSw(&req, pzg->cpathzone * 8);
+    for (int j = 0; j < pzg->cpathzone; j++) {
+        PZADJ *adj = &pzg->aadj[j];
         adj->count = 0;
         adj->aitem = (int *)PvAllocSw(&req, acount[j] * 4);
     }
-    for (int k = 0; k < pzg->citem; k++) {
-        ITEM *item = pzg->aitem[k];
-        if (item->pnode != 0 && item->flag != 0) {
-            ADJ *adj = &pzg->aadj[item->pnode->index];
+    for (int k = 0; k < pzg->cplink; k++) {
+        PZLINK *plink = pzg->applink[k];
+        if (plink->ppathzoneA != 0 && plink->ppathzoneB != 0) {
+            PZADJ *adj = &pzg->aadj[plink->ppathzoneA->ipathzone];
             int n = adj->count;
             adj->aitem[n] = k;
             adj->count = n + 1;
@@ -206,43 +189,26 @@ extern "C" void BuildPzgraphAdjacency(PZG *pzg)
     CStackFrame_Destructor(frame, 2);
 }
 
-struct PATHZONE {
-    char pad[0x100];
-    s32 field_0x100;
-};
+extern "C" void ResetPathzoneQuery(PATHZONE *pzone, PATHQUERY *pquery) {
+    s32 cepLast;
+    s32 cepLastY;
 
-struct PATHZONEQUERY {
-    char pad[0x20];
-    s32 field_0x20;
-    s32 field_0x24;
-    s32 field_0x28;
-    s32 field_0x2C;
-    s32 field_0x30;
-};
-
-extern "C" void ResetPathzoneQuery(PATHZONE *arg0, PATHZONEQUERY *arg1) {
-    s32 temp_v0;
-    s32 temp_v1;
-
-    memset(arg1, 0, 0x40);
-    temp_v1 = arg0->field_0x100 - 2;
-    arg1->field_0x28 = temp_v1;
-    arg1->field_0x24 = temp_v1;
-    temp_v0 = arg0->field_0x100 - 2;
-    arg1->field_0x20 = -1;
-    arg1->field_0x30 = temp_v0;
-    arg1->field_0x2C = temp_v0;
+    memset(pquery, 0, 0x40);
+    cepLast = pzone->cep - 2;
+    pquery->iepMaxX = cepLast;
+    pquery->iepMinX = cepLast;
+    cepLastY = pzone->cep - 2;
+    pquery->stamp = -1;
+    pquery->iepMaxY = cepLastY;
+    pquery->iepMinY = cepLastY;
 }
 
-struct SAPEP;
-struct SAPEP_1C14A8 { float g; unsigned short fMin; unsigned short islot; };
-extern "C" int IepSweepPathzoneCursor(SAPEP *aepFile, float g, int iep, unsigned *agrf, int fMinSigned)
+extern "C" int IepSweepPathzoneCursor(PZEP *aep, float g, int iep, unsigned *agrf, int fMinSigned)
 {
-    SAPEP_1C14A8 *aep = (SAPEP_1C14A8 *)aepFile;
     unsigned fMin = fMinSigned;
     if (g <= aep[iep].g) {
         for (;;) {
-            SAPEP_1C14A8 *cur = &aep[iep];
+            PZEP *cur = &aep[iep];
             if (aep[iep].g < g)
                 break;
             if (cur->fMin == fMin) {
@@ -260,7 +226,7 @@ extern "C" int IepSweepPathzoneCursor(SAPEP *aepFile, float g, int iep, unsigned
     } else {
     iep++;
     for (;;) {
-        SAPEP_1C14A8 *cur = &aep[iep];
+        PZEP *cur = &aep[iep];
         if (g < aep[iep].g)
             break;
         if (cur->fMin == fMin) {
@@ -279,11 +245,9 @@ extern "C" int IepSweepPathzoneCursor(SAPEP *aepFile, float g, int iep, unsigned
     return iep;
 }
 
-struct SAPEP { float g; int islot; };
+extern "C" int IepSweepPathzoneCursor(PZEP *, float, int, unsigned *, int);
 
-extern "C" int IepSweepPathzoneCursor(SAPEP *, float, int, unsigned *, int);
-
-extern "C" void SweepPathzoneAxis(float gMin, float gMax, SAPEP *aep, int *piepMin, int *piepMax, unsigned *agrf)
+extern "C" void SweepPathzoneAxis(float gMin, float gMax, PZEP *aep, int *piepMin, int *piepMax, unsigned *agrf)
 {
     int iepMin = *piepMin;
     int iepMax = *piepMax;
@@ -298,51 +262,31 @@ extern "C" void SweepPathzoneAxis(float gMin, float gMax, SAPEP *aep, int *piepM
     *piepMax = iepMax;
 }
 
-extern "C" void ResetPathzoneQuery(PATHZONE *arg0, PATHZONEQUERY *arg1);
+extern "C" void ResetPathzoneQuery(PATHZONE *pzone, PATHQUERY *pquery);
 
-extern "C" void SweepPathzoneAxis(float gMin, float gMax, SAPEP *aep, int *piepMin, int *piepMax, unsigned *agrf);
+extern "C" void SweepPathzoneAxis(float gMin, float gMax, PZEP *aep, int *piepMin, int *piepMax, unsigned *agrf);
 
-struct Pathzone {
-    char pad0[0xF8];
-    int cobstacle;
-    int cslot;
-    int cep;
-    void *aepX;
-    void *aepY;
-    void **aslot;
-    char pad1[0x114 - 0x110];
-    int stamp;
-};
-
-struct SapQuery_1C1700 {
-    unsigned agrfX[4];
-    unsigned agrfY[4];
-    int stamp;
-    int iepMinX, iepMaxX, iepMinY, iepMaxY;
-    char pad[0xC];
-};
-
-extern "C" int CobstacleFindPathzoneBox(Pathzone *pathzone, void *pquery, QW posA, QW posB, int cobstacleMax, void **apobstacle)
+extern "C" int CobstacleFindPathzoneBox(PATHZONE *pathzone, PATHQUERY *pquery, QW posA, QW posB, int cobstacleMax, OBSTACLE **apobstacle)
 {
-    struct { SapQuery_1C1700 queryLocal; unsigned agrfBoth[4]; QW grfBoth; } l;
+    struct { PATHQUERY queryLocal; unsigned agrfBoth[4]; QW grfBoth; } l;
     if (pathzone->cep == 0)
         return 0;
     if (pquery == 0) {
         l.queryLocal.stamp = -1;
         pquery = &l.queryLocal;
     }
-    if (((SapQuery_1C1700 *)pquery)->stamp != pathzone->stamp)
-        ResetPathzoneQuery((PATHZONE *)pathzone, (PATHZONEQUERY *)pquery);
+    if (pquery->stamp != pathzone->stamp)
+        ResetPathzoneQuery(pathzone, pquery);
     QW mins = VectorMiniXyz(posA, posB);
     QW maxes = VectorMaxXyz(posA, posB);
-    SweepPathzoneAxis(LaneX(mins), LaneX(maxes), (SAPEP *)pathzone->aepX, &((SapQuery_1C1700 *)pquery)->iepMinX, &((SapQuery_1C1700 *)pquery)->iepMaxX, ((SapQuery_1C1700 *)pquery)->agrfX);
-    SweepPathzoneAxis(LaneYInGeneralRegister(mins), LaneYInGeneralRegister(maxes), (SAPEP *)pathzone->aepY, &((SapQuery_1C1700 *)pquery)->iepMinY, &((SapQuery_1C1700 *)pquery)->iepMaxY, ((SapQuery_1C1700 *)pquery)->agrfY);
-    QW anded = QuadAnd(*(QW *)((SapQuery_1C1700 *)pquery)->agrfX, *(QW *)((SapQuery_1C1700 *)pquery)->agrfY);
+    SweepPathzoneAxis(LaneX(mins), LaneX(maxes), pathzone->aepX, &pquery->iepMinX, &pquery->iepMaxX, pquery->agrfX);
+    SweepPathzoneAxis(LaneYInGeneralRegister(mins), LaneYInGeneralRegister(maxes), pathzone->aepY, &pquery->iepMinY, &pquery->iepMaxY, pquery->agrfY);
+    QW anded = QuadAnd(*(QW *)pquery->agrfX, *(QW *)pquery->agrfY);
     l.grfBoth = anded;
     *(QW *)l.agrfBoth = anded;
     int islot = 0;
     int cobstacle = 0;
-    void **pout = apobstacle;
+    OBSTACLE **pout = apobstacle;
     for (; islot < pathzone->cslot; islot++) {
         unsigned word = l.agrfBoth[islot / 32];
         int mask = 1 << (islot % 32);
@@ -353,15 +297,13 @@ extern "C" int CobstacleFindPathzoneBox(Pathzone *pathzone, void *pquery, QW pos
         *pout++ = pathzone->aslot[islot];
         cobstacle++;
     }
-    ((SapQuery_1C1700 *)pquery)->stamp = pathzone->stamp;
+    pquery->stamp = pathzone->stamp;
     return cobstacle;
 }
 
-struct SAPEP_1C18B8 { int pad; unsigned short fMin; unsigned short islot; };
-
 void CopyAb(void *, void *, unsigned int);
 
-extern "C" void RemovePathzoneEndpoints(int cep, SAPEP_1C18B8 *aep, unsigned int islot, int iepMin)
+extern "C" void RemovePathzoneEndpoints(int cep, PZEP *aep, unsigned int islot, int iepMin)
 {
     int iepMax;
     for (int iep = 0; iep < cep; iep++) {
@@ -374,34 +316,22 @@ extern "C" void RemovePathzoneEndpoints(int cep, SAPEP_1C18B8 *aep, unsigned int
             }
         }
     }
-    SAPEP_1C18B8 *dstA = &aep[iepMin];
+    PZEP *dstA = &aep[iepMin];
     CopyAb(dstA, dstA + 1, (iepMax - iepMin - 1) * 8);
-    SAPEP_1C18B8 *srcB = &aep[iepMax];
+    PZEP *srcB = &aep[iepMax];
     CopyAb(srcB - 1, srcB + 1, (cep - iepMax - 1) * 8);
 }
 
-extern "C" void RemovePathzoneEndpoints_1C1968(int, void *, int);
+extern "C" void RemovePathzoneEndpoints_1C1968(int, PZEP *, int);
 
 extern SW B_003DD490_sw;
 
 static inline int NextStamp(SW *sw) { return ++sw->stamp; }
 
-struct PZ {
-    char pad0[0xF8];
-    int cobstacle;
-    int cslot;
-    int cep;
-    void *aepX;
-    void *aepY;
-    int *aslot;
-    int unk110;
-    int stamp;
-};
-
-void RemovePathzoneObstacle(PZ *pz, int obstacle)
+void RemovePathzoneObstacle(PATHZONE *pz, OBSTACLE *pobstacle)
 {
     int islot = 0;
-    while (islot < pz->cslot && pz->aslot[islot] != obstacle)
+    while (islot < pz->cslot && pz->aslot[islot] != pobstacle)
         islot++;
     pz->aslot[islot] = 0;
     RemovePathzoneEndpoints_1C1968(pz->cep, pz->aepX, islot);
@@ -413,26 +343,16 @@ void RemovePathzoneObstacle(PZ *pz, int obstacle)
 
 INCLUDE_ASM(0X1C1A38);
 
-struct Obstacle { char pad0[0x1A0]; QW posMin; QW posMax; char pad1[0x1DC - 0x1C0]; void *pathzone; };
-
-struct Sw { char pad[0x3D70]; int stamp; };
-
-extern Sw B_003DD490_1C1BA0;
-
-extern "C" int CobstacleFindPathzoneBox(Pathzone *, void *, QW, QW, int, void **);
-
-extern "C" int func_001BD8A8(Obstacle *, void *);
-
-extern "C" void MergeObstacles(int, void **);
-
-extern "C" void GrowPathzoneSlots_1C1BA0(Pathzone *);
-
-extern "C" void InsertPathzoneEndpoints(int, void *, int, float, float);
-
-extern "C" void AddPathzoneObstacle(Pathzone *pathzone, Obstacle *obstacle)
+extern SW B_003DD490_1C1BA0;
+extern "C" int CobstacleFindPathzoneBox(PATHZONE *, PATHQUERY *, QW, QW, int, OBSTACLE **);
+extern "C" int func_001BD8A8(OBSTACLE *, OBSTACLE *);
+extern "C" void MergeObstacles(int, OBSTACLE **);
+extern "C" void GrowPathzoneSlots_1C1BA0(PATHZONE *);
+extern "C" void InsertPathzoneEndpoints(int, PZEP *, int, float, float);
+extern "C" void AddPathzoneObstacle(PATHZONE *pathzone, OBSTACLE *obstacle)
 {
-    void *apobstacle[32];
-    void *pair[2];
+    OBSTACLE *apobstacle[32];
+    OBSTACLE *pair[2];
     int cobstacle = CobstacleFindPathzoneBox(pathzone, 0, obstacle->posMin, obstacle->posMax, 0x20, apobstacle);
     for (int iobstacle = 0; iobstacle < cobstacle; iobstacle++) {
         if (func_001BD8A8(obstacle, apobstacle[iobstacle])) {
@@ -451,14 +371,10 @@ extern "C" void AddPathzoneObstacle(Pathzone *pathzone, Obstacle *obstacle)
     pathzone->aslot[islot] = obstacle;
     InsertPathzoneEndpoints(pathzone->cep, pathzone->aepX, islot, ((float *)&obstacle->posMin)[0], ((float *)&obstacle->posMax)[0]);
     InsertPathzoneEndpoints(pathzone->cep, pathzone->aepY, islot, ((float *)&obstacle->posMin)[1], ((float *)&obstacle->posMax)[1]);
-    obstacle->pathzone = pathzone;
+    obstacle->ppathzone = pathzone;
     pathzone->cep += 2;
     pathzone->stamp = ++B_003DD490_1C1BA0.stamp;
 }
-
-struct EP { float g; short fMin; short islot; };
-
-struct PZ_1C1D20 { char pad[0xFC]; int cslot; int cep; EP *aepX; EP *aepY; int *aslot; };
 
 extern "C" void *PvAllocSwImpl__Fi_1C1D20(ALLOCREQ *);
 
@@ -471,7 +387,7 @@ extern "C" void *memset_1C1D20(void *, int, unsigned int);
 // (its test folds into the default jump). The memset loads pz->cslot into $a2, forms the address first as shift + base
 // (addu $a0,$a0,$s0) and shifts the size in the delay slot: that takes the size in its own unsigned local and the address
 // as integer arithmetic; `aslot + cslotOld` gives addu with the operands swapped.
-extern "C" void GrowPathzoneSlots(PZ_1C1D20 *pz)
+extern "C" void GrowPathzoneSlots(PATHZONE *pz)
 {
     int cslotNew;
     switch (pz->cslot) {
@@ -480,20 +396,20 @@ extern "C" void GrowPathzoneSlots(PZ_1C1D20 *pz)
     case 0x80: break;
     }
     ALLOCREQ req;
-    req.cb = (cslotNew * 2 + 2) * sizeof(EP);
+    req.cb = (cslotNew * 2 + 2) * sizeof(PZEP);
     req.cbAlign = 0x10;
-    EP *aepX = (EP *)PvAllocSwImpl__Fi_1C1D20(&req);
-    req.cb = (cslotNew * 2 + 2) * sizeof(EP);
+    PZEP *aepX = (PZEP *)PvAllocSwImpl__Fi_1C1D20(&req);
+    req.cb = (cslotNew * 2 + 2) * sizeof(PZEP);
     req.cbAlign = 0x10;
-    EP *aepY = (EP *)PvAllocSwImpl__Fi_1C1D20(&req);
-    req.cb = cslotNew * sizeof(int);
+    PZEP *aepY = (PZEP *)PvAllocSwImpl__Fi_1C1D20(&req);
+    req.cb = cslotNew * sizeof(OBSTACLE *);
     req.cbAlign = 0x10;
-    int *aslot = (int *)PvAllocSwImpl__Fi_1C1D20(&req);
-    CopyAb__FPvT0Ui_1C1D20(aepX, pz->aepX, pz->cep * sizeof(EP));
-    CopyAb__FPvT0Ui_1C1D20(aepY, pz->aepY, pz->cep * sizeof(EP));
-    CopyAb__FPvT0Ui_1C1D20(aslot, pz->aslot, pz->cslot * sizeof(int));
+    OBSTACLE **aslot = (OBSTACLE **)PvAllocSwImpl__Fi_1C1D20(&req);
+    CopyAb__FPvT0Ui_1C1D20(aepX, pz->aepX, pz->cep * sizeof(PZEP));
+    CopyAb__FPvT0Ui_1C1D20(aepY, pz->aepY, pz->cep * sizeof(PZEP));
+    CopyAb__FPvT0Ui_1C1D20(aslot, pz->aslot, pz->cslot * sizeof(OBSTACLE *));
     int cslotOld = pz->cslot;
-    unsigned int cb = (cslotNew - cslotOld) * sizeof(int);
+    unsigned int cb = (cslotNew - cslotOld) * sizeof(OBSTACLE *);
     memset_1C1D20((void *)((cslotOld << 2) + (sptr)aslot), 0, cb);
     pz->aepY = aepY;
     pz->aslot = aslot;
@@ -516,15 +432,13 @@ extern "C" void GrowPathzoneSlots(PZ_1C1D20 *pz)
     }
 }
 
-struct TGT_1C1EC0 { void *crv; void *plo; int pad8[2]; QW vec; };
-
 extern "C" char B_003DD020[];
 
 extern "C" void FindCrvClosestPointAll(void *, int, char *, QW *, int, int, int);
 
 extern "C" QW PosLoWorld(void *);
 
-extern "C" QW func_001C1EC0(TGT_1C1EC0 *target, int arg1) {
+extern "C" QW func_001C1EC0(TARGETSLOT *target, int arg1) {
     QW result;
     if (target->crv) {
         FindCrvClosestPointAll(target->crv, arg1, B_003DD020, &result, 0, 0, 0);
@@ -536,21 +450,19 @@ extern "C" QW func_001C1EC0(TGT_1C1EC0 *target, int arg1) {
     return result;
 }
 
-struct Target_1C1F28 { void *path; void *alo; char pad8[8]; QW fixed; };
-
 extern "C" float SMaxCrv(void *);
 
 extern "C" void GetPathPosFromS(void *, QW *, int, float);
 
-extern "C" QW func_001C1F28(Target_1C1F28 *target)
+extern "C" QW func_001C1F28(TARGETSLOT *target)
 {
     QW pos;
-    if (target->path) {
-        GetPathPosFromS(target->path, &pos, 0, SMaxCrv(target->path) * 0.5f);
-    } else if (target->alo) {
-        pos = PosLoWorld(target->alo);
+    if (target->crv) {
+        GetPathPosFromS(target->crv, &pos, 0, SMaxCrv(target->crv) * 0.5f);
+    } else if (target->plo) {
+        pos = PosLoWorld(target->plo);
     } else {
-        pos = target->fixed;
+        pos = target->vec;
     }
     return pos;
 }
@@ -559,88 +471,76 @@ INCLUDE_ASM(0X1C1FA0);
 
 extern "C" void InitLo(void *);
 
-extern "C" void InitPzlink(char *self)
+extern "C" void InitPzlink(PZLINK *plink)
 {
-    InitLo(self);
-    *(int *)(self + 0x120) = -1;
-    *(int *)(self + 0x150) = -1;
+    InitLo(plink);
+    plink->field_0x120 = -1;
+    plink->ipzlink = -1;
 }
 
-struct World { char pad[0x3D74]; int counter; char pad2[0x45CC - 0x3D78]; char *current; };
-
-extern "C" World B_003DD490_1C2078;
+extern "C" SW B_003DD490_1C2078;
 
 extern "C" void AddLoHierarchy(void);
 
 extern "C" void AddPzlinkHierarchy(void)
 {
     AddLoHierarchy();
-    int next = B_003DD490_1C2078.counter + 1;
-    B_003DD490_1C2078.counter = next;
-    *(int *)(B_003DD490_1C2078.current + 0x28) = next;
+    int next = B_003DD490_1C2078.pzlinkChange + 1;
+    B_003DD490_1C2078.pzlinkChange = next;
+    B_003DD490_1C2078.ppzgraph->stamp = next;
 }
 
-extern "C" World B_003DD490_1C20B0;
+extern "C" SW B_003DD490_1C20B0;
 
 extern "C" void RemoveLoHierarchy(void);
 
 extern "C" void RemovePzlinkHierarchy(void)
 {
     RemoveLoHierarchy();
-    int next = B_003DD490_1C20B0.counter + 1;
-    B_003DD490_1C20B0.counter = next;
-    *(int *)(B_003DD490_1C20B0.current + 0x28) = next;
+    int next = B_003DD490_1C20B0.pzlinkChange + 1;
+    B_003DD490_1C20B0.pzlinkChange = next;
+    B_003DD490_1C20B0.ppzgraph->stamp = next;
 }
 
-#define NULL 0
+extern "C" s32 FIsBasicDerivedFrom(void *object, s32 kind);
 
-extern "C" s32 FIsBasicDerivedFrom(s32 object, s32 kind);
-
-extern "C" void func_001C20E8(char *arg0, s32 arg1) {
+extern "C" void func_001C20E8(PZLINK *plink, void *pobject) {
     u32 count;
-    char *slot;
-
-    count = *(u32 *)(arg0 + 0x50);
+    TARGETSLOT *slot;
+    count = plink->ctarget;
     if (count < 6) {
-        *(u32 *)(arg0 + 0x50) = count + 1;
-        slot = arg0 + ((count << 5) + 0x60);
-        if (FIsBasicDerivedFrom(arg1, 0xA)) {
-            *(s32 *)slot = arg1;
+        plink->ctarget = count + 1;
+        slot = &plink->atarget[count];
+        if (FIsBasicDerivedFrom(pobject, 0xA)) {
+            slot->crv = pobject;
         } else {
-            *(s32 *)(slot + 4) = arg1;
+            slot->plo = pobject;
         }
     }
 }
 
-struct Item { QW value; QW pad; };
-
-struct Q { char pad[0x50]; unsigned count; char pad2[0x1C]; Item items[6]; };
-
-void func_001C2148(Q *self, QW value) {
-    unsigned n = self->count;
+void func_001C2148(PZLINK *plink, QW value) {
+    unsigned n = plink->ctarget;
     if (n < 6) {
-        Item *slot = &self->items[n];
-        self->count = n + 1;
-        slot->value = value;
+        TARGETSLOT *slot = &plink->atarget[n];
+        plink->ctarget = n + 1;
+        slot->vec = value;
     }
 }
 
-struct PZLINK_1C2170 { char pad[0x50]; int index; char pad2[0x124 - 0x54]; void *pathzoneA; void *pathzoneB; char pad3[4]; QW posA; QW posB; };
+extern "C" void PostLoLoad(PZLINK *);
+extern "C" PATHZONE *PpathzoneFindPos(QW, int);
+extern "C" QW func_001C1F28_1C2170(TARGETSLOT *);
 
-extern "C" void PostLoLoad(PZLINK_1C2170 *);
-
-extern "C" void *PpathzoneFindPos(QW, int);
-
-extern "C" QW func_001C1F28_1C2170(void *);
-
-extern "C" void PostPzlinkLoad(PZLINK_1C2170 *link) {
+extern "C" void PostPzlinkLoad(PZLINK *link) {
     PostLoLoad(link);
-    QW pos = func_001C1F28_1C2170((char *)link + 0x60);
+    QW pos = func_001C1F28_1C2170(&link->atarget[0]);
     link->posA = pos;
-    link->pathzoneA = PpathzoneFindPos(pos, 0);
-    pos = func_001C1F28_1C2170((char *)((link->index << 5) + (sptr)link + 0x40));
+    link->ppathzoneA = PpathzoneFindPos(pos, 0);
+    TARGETSLOT *ptargetLast = &link->atarget[link->ctarget] - 1; // retail adds the scaled count to the link first
+    pos = func_001C1F28_1C2170(ptargetLast);
     link->posB = pos;
-    link->pathzoneB = PpathzoneFindPos(pos, 0);
+    link->ppathzoneB = PpathzoneFindPos(pos, 0);
 }
 
 INCLUDE_ASM(0X1C21D8);
@@ -674,43 +574,43 @@ extern s32 B_00452148;
 
 extern s32 B_00452170;
 
-void StaticInitSlotheaps_1c27c8(s32 arg0, s32 arg1) {
-    s32 temp_v0;
-    s32 temp_v0_2;
-    s32 temp_v0_3;
-    s32 temp_v0_4;
-    s32 temp_v0_5;
-    s32 temp_v0_6;
+void StaticInitSlotheaps_1c27c8(s32 initialize_p, s32 priority) {
+    s32 refcount0;
+    s32 refcount1;
+    s32 refcount2;
+    s32 refcount3;
+    s32 refcount4;
+    s32 refcount5;
 
-    if ((arg1 == 0xFFFF) && (arg0 != 0)) {
-        temp_v0 = B_002DD2E0 + 1;
-        B_002DD2E0 = temp_v0;
-        if (temp_v0 == 1) {
+    if ((priority == 0xFFFF) && (initialize_p != 0)) {
+        refcount0 = B_002DD2E0 + 1;
+        B_002DD2E0 = refcount0;
+        if (refcount0 == 1) {
             CreateSlotheapSwAlign(&B_004520A8, 0x14, 0x2000, 0x10);
         }
-        temp_v0_2 = B_002DD2E4 + 1;
-        B_002DD2E4 = temp_v0_2;
-        if (temp_v0_2 == 1) {
+        refcount1 = B_002DD2E4 + 1;
+        B_002DD2E4 = refcount1;
+        if (refcount1 == 1) {
             CreateSlotheapSwAlign(&B_004520D0, 0x18, 0x800, 0x10);
         }
-        temp_v0_3 = B_002DD2E8 + 1;
-        B_002DD2E8 = temp_v0_3;
-        if (temp_v0_3 == 1) {
+        refcount2 = B_002DD2E8 + 1;
+        B_002DD2E8 = refcount2;
+        if (refcount2 == 1) {
             CreateSlotheapSwAlign(&B_004520F8, 0x28, 0x200, 0x10);
         }
-        temp_v0_4 = B_002DD2EC + 1;
-        B_002DD2EC = temp_v0_4;
-        if (temp_v0_4 == 1) {
+        refcount3 = B_002DD2EC + 1;
+        B_002DD2EC = refcount3;
+        if (refcount3 == 1) {
             CreateSlotheapSwAlign(&B_00452120, 0x1C, 0x800, 0x10);
         }
-        temp_v0_5 = B_002DD2F0 + 1;
-        B_002DD2F0 = temp_v0_5;
-        if (temp_v0_5 == 1) {
+        refcount4 = B_002DD2F0 + 1;
+        B_002DD2F0 = refcount4;
+        if (refcount4 == 1) {
             CreateSlotheapSwAlign(&B_00452148, 0xC, 0xC8, 0x10);
         }
-        temp_v0_6 = B_002DD2F4 + 1;
-        B_002DD2F4 = temp_v0_6;
-        if (temp_v0_6 == 1) {
+        refcount5 = B_002DD2F4 + 1;
+        B_002DD2F4 = refcount5;
+        if (refcount5 == 1) {
             CreateSlotheapSwAlign(&B_00452170, 0x14, 0x100, 0x10);
         }
     }

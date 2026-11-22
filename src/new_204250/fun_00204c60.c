@@ -1,13 +1,15 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "guardview.h"
+#include "soview.h"
 
-M2C_UNK func_001F5988();                            /* extern */
+void func_001F5988(void *pso, void *psoDiscarded);
 
-void func_00204C60(void *arg0, s32 arg1) {
-    void *temp_v0;
+void func_00204C60(struct STEPVIEW *pstep, struct SO *psoDiscarded) {
+    struct SOVIEW *psoSurface;
 
-    func_001F5988();
-    temp_v0 = M2C_FIELD(arg0, void **, 0x208);
-    if ((temp_v0 != NULL) && (M2C_FIELD(temp_v0, s32 *, 0x48) == arg1)) {
-        M2C_FIELD(arg0, void **, 0x208) = NULL;
+    func_001F5988(pstep, psoDiscarded);
+    psoSurface = (struct SOVIEW *)pstep->psoSurface;
+    if ((psoSurface != 0) && (psoSurface->field_0x48 == (s32)psoDiscarded)) {
+        pstep->psoSurface = 0;
     }
 }

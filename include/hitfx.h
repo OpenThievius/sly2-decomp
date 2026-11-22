@@ -23,7 +23,12 @@ struct HITFX {
 #endif
     /* 0x10 */ s32 cRef;        /* HitFx_AddRef, HitFx_Release */
     /* 0x14 */ struct HITFXDEF *pdef; /* HitFx_CheckExpiry, HitFx_GIntensity */
-    u8 unknown_0x18[0x34];
+    u8 unknown_0x18[0x2C];
+    /* 0x44 */ struct LO *source; /* func_00208BE0 (guard slot 89) and PhitfxChooseForGuard (they agree): the object that caused it; the key of the guard's SENSOR entry */
+    u8 unknown_0x48[0x4];
     /* 0x4C */ f32 tStart;      /* HitFx_CheckExpiry, HitFx_GIntensity */
+    u8 unknown_0x50[0x4];
+    /* 0x54 */ s32 level;       /* func_00208BE0 compares it with the guard's field_0xE68, PhitfxChooseForGuard tests 4 */
+    /* 0x58 */ struct HITFX *pnext; /* PhitfxChooseForGuard walks the live list (B_003E148C) through it */
 };
 #endif

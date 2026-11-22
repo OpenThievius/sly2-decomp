@@ -1,9 +1,10 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "script.h"
 
-M2C_UNK InitLo();                                   /* extern */
-M2C_UNK InitSl(s32, M2C_UNK);                       /* extern */
+void InitLo(struct SCRIPT *script);
+void InitSl(struct SL *sl, s32 ibSle);
 
-void InitScript(s32 arg0) {
-    InitLo();
-    InitSl(arg0 + 0x50, 0x18);
+void InitScript(struct SCRIPT *script) {
+    InitLo(script);
+    InitSl(&script->slPcmd, 0x18);
 }

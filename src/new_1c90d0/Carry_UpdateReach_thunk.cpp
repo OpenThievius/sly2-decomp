@@ -1,7 +1,8 @@
-#include "m2c_macros.h"
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "carrypart.h"
 
-M2C_UNK func_001CC2E8(s32);                         /* extern */
+extern "C" void func_001CC2E8(CARRYPART *pcarry);
 
-void Carry_UpdateReach_thunk(s32 arg0, s32 arg1) {
-    func_001CC2E8(arg1);
+void Carry_UpdateReach_thunk(void *unused, CARRYPART *pcarry) {
+    func_001CC2E8(pcarry);
 }

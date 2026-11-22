@@ -19,7 +19,7 @@ extern "C" void func_0012B520(XFSOURCE *psrc, XF *pxf)
     pxf->ptMax = &pxf->tMax;
     pxf->tMin = 0;
     *(VECTOR3 *)&pxf->posGoal = psrc->pos;
-    *(QW *)pxf->unknown_0xE0 = pxf->posGoal;
+    pxf->field_0xE0 = pxf->posGoal;
     pvelGoal[2] = 0;
     pvelGoal[1] = 0;
     pvelGoal[0] = 0;

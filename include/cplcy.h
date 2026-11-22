@@ -20,11 +20,22 @@ struct CM {
 
 /* C view of cm.h's CPLCY (0xD0 bytes) */
 struct CPLCY {
-    u8 unknown_0x0[0xC];
+    /* 0x0 */ s32 active; /* DeactivateCplcy clears it (ActivateCplcy stores its argument) */
+    /* 0x4 */ f32 savedField_0x24; /* DeactivateCplcy copies it back to CM::field_0x24 (ActivateCplcy saves it) */
+    /* 0x8 */ f32 savedNearClip; /* DeactivateCplcy hands it to SetCmNearClip (ActivateCplcy saves the camera manager's) */
     /* 0xC */ void *vtable; /* InitCplcy sets it; func_00151208, func_00151610, func_001518C8, InitCpman set their own */
     u8 unknown_0x10[0xC0];
 };
 #endif
+
+/* CPTN, the tunnel's camera policy: InitCptn (the vtable), DeactivateCptn and bevy_camera_follow_new (the destructor) read the tunnel and its
+   steering function at 0x10 and 0x14 */
+struct CPTN {
+    u8 unknown_0x0[0xC];
+    /* 0xC */ void **vtable;
+    /* 0x10 */ struct TN *ptn;
+    /* 0x14 */ struct TNFN *ptnfn;
+};
 
 struct CPLOOK {
     u8 unknown_0x0[0xC];

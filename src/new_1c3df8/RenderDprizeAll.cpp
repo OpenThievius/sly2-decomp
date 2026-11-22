@@ -11,11 +11,6 @@ struct CHNENTRY {
     u8 unknown_0x0[0x4];
     /* 0x4 */ CHN *pchn;
 };
-/* the animation handle's two values the scale is asked for (asega.h declares tLocal, 0x1C): only this function reads 0x40 */
-struct ASEGAVIEW : ASEGA {
-    u8 unknown_0x20[0x20];
-    /* 0x40 */ f32 field_0x40;
-};
 /* retail's 0x90-byte frame buffer (the layout and copy of the matched RenderLoot): the scales at 0, a copy of the matrix at 0x10,
    the matrix built from them at 0x50 */
 struct RENDERFRAME {
@@ -37,11 +32,11 @@ extern "C" void RenderDprizeAll(DPRIZE *pdprize)
     RENDERFRAME frame;
     if (pdprize->dprizes != 2) {
         SMA *psma = pdprize->psma;
-        ASEGAVIEW *pasega;
-        if (psma != 0 && (pasega = (ASEGAVIEW *)psma->pasega) != 0) {
+        ASEGA *pasega;
+        if (psma != 0 && (pasega = psma->pasega) != 0) {
             CHNENTRY *pentry = PchnFindAseg(pasega->paseg, pdprize, 0xC, 1);
             if (pentry != 0) {
-                pentry->pchn->GetScale(frame.scale, 0, pasega->tLocal, pasega->field_0x40);
+                pentry->pchn->GetScale(frame.scale, 0, pasega->tLocal, pasega->svtLocal);
                 MATRIX4 *pmat = &frame.matBuilt;
                 QW pos = PosLoWorld(pdprize);
                 LoadMatrixFromPosRotScale(pmat, pos, PmatLoWorld(pdprize), frame.scale);

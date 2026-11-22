@@ -1,5 +1,8 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // 0x1F7588 FAbsorbSoWkr
-int FAbsorbSoWkr(void* arg1, void* arg2)
+#include "so.h"
+#include "wkr.h"
+int FAbsorbSoWkr(SO *, WKR *wkr)
 {
-    return *(int*)((unsigned char*)arg2 + 0x44) != 0;
+    return wkr->flags != 0;
 }

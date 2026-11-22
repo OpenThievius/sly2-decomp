@@ -11,17 +11,29 @@
 #include "goals.h"
 
 struct ASEGA;
+struct JOY;
 struct BASIC;
 struct SO;
 
 /* the C slice of STEP */
 struct STEPVIEW {
-    u8 unknown_0x0[0x1B0];
+    u8 unknown_0x0[0x10];
+    /* 0x10 */ struct SO *psoParent;        /* LO::psoParent: LoadStepFromBrx converts a position out of its frame */
+    u8 unknown_0x14[0x13C];
+    /* 0x150 */ struct JOY *pjoy;           /* PO::pjoy: RotateStepToMat sets its stick angle */
+    u8 unknown_0x154[0x54];
+    /* 0x1A8 */ f32 radHeading;             /* STEP::radHeading: RotateStepToMat copies it into the controller */
+    u8 unknown_0x1AC[0x4];
     /* 0x1B0 */ struct MATRIX3Q matHeading; /* func_00209840 (GUARDHEADING's method) copies a rotation into it; STEP declares these bytes
                                                as unknown */
     u8 unknown_0x1E0[0x24];
-    /* 0x204 */ s32 field_0x204;            /* STEP::field_0x204: func_00203FA0 sets it */
+    /* 0x204 */ s32 field_0x204;            /* STEP::field_0x204: func_00203FA0 sets it, func_002040F8 tests it */
     /* 0x208 */ struct SO *psoSurface;      /* STEP::psoSurface: func_00203FA0 clears it when field_0x204 becomes set */
+    u8 unknown_0x20C[0x24];
+    /* 0x230 */ QW posWorld;                /* STEP::posWorld: TranslateStepToPos stores posLocal converted to world space */
+    /* 0x240 */ QW posLocal;                /* STEP::posLocal: LoadStepFromBrx stores it, TranslateStepToPos reads it */
+    u8 unknown_0x250[0x1C];
+    /* 0x26C */ struct GOALSTACK goalstack; /* STEP::pgoalstack(): CloneStep gives the clone its own stack */
 };
 
 /* the C slice of STEPGUARD */

@@ -5,20 +5,41 @@
 #include "sly2.h"
 #include "sw.h"
 #include "so.h"
-#include "m2c_macros.h"
+#include "oxa.h"
 #include "include_asm.h"
 #include "vu0inline.h"
 #include "ps2inline.h"
 
-extern "C" void FreeSlotheapPv(s32, s8 *);
+struct GEOM {
+    u8 unknown_0x0[0x18];
+    s32 grftak; /* MarkSoCustomContacts: the take flags, passed to PaloFindWkrAbsorber */
+};
 
-extern "C" void FreeSwMqList__FP2SWP2MQ(s32 arg0, s8 *arg1) {
-    s8 *cursor = arg1;
+/* one side of a contact pair: the shape and the object it belongs to */
+struct MQSIDE {
+    GEOM *pgeom;
+    u8 unknown_0x4[0x8];
+    SO *pso;
+    u8 unknown_0x10[0x30];
+};
+
+/* a contact between two objects, 0xC0 bytes (CloneMqList copies it): the lists are linked through next */
+struct MQ {
+    MQSIDE side[2];
+    u8 unknown_0x80[0x2C];
+    MQ *next;
+    u8 unknown_0xB0[0x10];
+} __attribute__((aligned(16)));
+
+extern "C" void FreeSlotheapPv(SLOTHEAP *, void *);
+
+extern "C" void FreeSwMqList__FP2SWP2MQ(SW *psw, MQ *pmq) {
+    MQ *cursor = pmq;
 
     if (cursor != 0) {
         do {
-            s8 *next = *(s8 **)(cursor + 0xAC);
-            FreeSlotheapPv(arg0 + 0x3D40, cursor);
+            MQ *next = cursor->next;
+            FreeSlotheapPv(&psw->slotheapMq, cursor);
             cursor = next;
         } while (cursor != 0);
     }
@@ -26,19 +47,9 @@ extern "C" void FreeSwMqList__FP2SWP2MQ(s32 arg0, s8 *arg1) {
 
 INCLUDE_ASM(0X1A7E60);
 
-struct VT_1A7FC0 {
-    char pad[0x1C0];
-    short delta0; short index0; void (*fn0)(void *, void *, int);
-    short delta1; short index1; void (*fn1)(void *, void *, int);
-};
+struct XPD { int unknown_0x0; void *pxf; int unknown_0x8; SO *pso; QW pos; QW unknown_0x20; QW vel; };
 
-struct SO_1A7FC0 { char pad[0xC]; VT_1A7FC0 *vt; };
-
-struct XPD { int unk0; void *pxf; int unk8; SO_1A7FC0 *pso; QW pos; QW unk20; QW vel; };
-
-struct XP { XPD xpd[2]; QW pad80[3]; QW velRel; };
-
-struct SW;
+struct XP { XPD xpd[2]; QW unknown_0x80[3]; QW velRel; };
 
 extern "C" QW VelocityXfAtPos(void *, int, QW);
 
@@ -51,18 +62,17 @@ void RecalcSwXpMovement(SW *psw, int cpxp, XP **apxp) {
         do {
             if (pxpd->pxf) {
                 pxpd->vel = VelocityXfAtPos(pxpd->pxf, 0, pxpd->pos);
-                SO_1A7FC0 *pso = pxpd->pso;
-                pso->vt->fn0((char *)pso + pso->vt->delta0, pxp, ixpd);
+                pxpd->pso->Slot56(pxp, ixpd);
             }
             ixpd++;
             pxpd++;
         } while (ixpd < 2);
         ixpd = 0;
         pxpd = pxp->xpd;
-        SO_1A7FC0 **ppso = &pxpd->pso;
+        SO **ppso = &pxpd->pso;
         do {
-            SO_1A7FC0 *pso = *ppso;
-            if (pso) pso->vt->fn1((char *)pso + pso->vt->delta1, pxp, ixpd);
+            SO *pso = *ppso;
+            if (pso) pso->Slot57(pxp, ixpd);
             ixpd++;
             ppso += 0x10;
         } while (ixpd < 2);
@@ -119,21 +129,17 @@ INCLUDE_ASM(0X1A9C40);
 
 INCLUDE_ASM(0X1A9D38);
 
-struct MQ_1A9FE0 { char pad[0xAC]; struct MQ_1A9FE0 *pNext; };
-
-extern "C" void PrependMqList(void *unused, struct MQ_1A9FE0 *pList, struct MQ_1A9FE0 **ppHead)
+extern "C" void PrependMqList(void *unused, MQ *pList, MQ **ppHead)
 {
     if (pList != 0) {
-        struct MQ_1A9FE0 *pTail = pList;
-        while (pTail->pNext != 0) {
-            pTail = pTail->pNext;
+        MQ *pTail = pList;
+        while (pTail->next != 0) {
+            pTail = pTail->next;
         }
-        pTail->pNext = *ppHead;
+        pTail->next = *ppHead;
         *ppHead = pList;
     }
 }
-
-struct MQ { char pad[0xAC]; MQ *next; char pad2[0x10]; } __attribute__((aligned(16)));
 
 extern "C" void *PvAllocSlotheapImpl(SLOTHEAP *);
 
@@ -153,57 +159,33 @@ MQ *CloneMqList(SW *psw, MQ *src)
     return head;
 }
 
-struct MQ_1AA0B0;
+extern "C" int PaloFindWkrAbsorber(SO *, int);
 
-struct PXP { MQ_1AA0B0 *pgeom0; char pad[0x60 - 4]; };
-
-struct MQ_1AA0B0 {
-    MQ_1AA0B0 *pgeomXp0;
-    char pad4[8];
-    void *pso0;
-    char pad10[0x40 - 0x10];
-    void *pso1;
-    char pad44[0xAC - 0x44];
-    MQ_1AA0B0 *pmqNext;
-    char padB0[0xC0 - 0xB0];
-} __attribute__((aligned(16)));
-
-struct GEOM { char pad[0x18]; int grftak; };
-
-struct OXA { char pad[0x60]; SO *pso; char pad2[0x6C - 0x64]; MQ_1AA0B0 *pmqAbsorbed; };
-
-extern "C" void *PaloFindWkrAbsorber(void *, int);
-
-extern "C" void *PvAllocSlotheapImpl_1AA0B0(void *);
-
-extern "C" void PrependMqList_1AA0B0(void *, MQ_1AA0B0 *, void *);
-
-extern "C" void MarkSoCustomContacts(char *psw, OXA *poxaRoot, OXA *poxaOwner, GEOM *pgeom, int cbsp, void *absp, void *pbspLast, void *ppxpFirst)
+extern "C" void MarkSoCustomContacts(SW *psw, OXA *poxaRoot, OXA *poxaOwner, GEOM *pgeom, int cbsp, void *absp, void *pbspLast, MQ **ppmqHead)
 {
-    MQ_1AA0B0 *pmqLocal = 0;
-    void *ptarget = ppxpFirst;
+    MQ *pmqLocal = 0;
+    MQ **ptarget = ppmqHead;
     if (pgeom->grftak) ptarget = &pmqLocal;
-    SO *pso = poxaRoot->pso;
+    SO *pso = poxaRoot->owner;
     pso->Slot60(pgeom, cbsp, absp, pbspLast, ptarget);
     if (pmqLocal == 0) return;
-    for (MQ_1AA0B0 *pmq = pmqLocal; pmq != 0; pmq = pmq->pmqNext) {
-        int other = (GEOM *)pmq->pgeomXp0 != pgeom;
-        char *pside = (char *)pmq + ((1 - other) << 6);
-        void *pso = *(void **)(pside + 0xC);
-        if (PaloFindWkrAbsorber(pso, pgeom->grftak)) {
-            MQ_1AA0B0 *pclone = (MQ_1AA0B0 *)PvAllocSlotheapImpl_1AA0B0(psw + 0x3D40);
+    for (MQ *pmq = pmqLocal; pmq != 0; pmq = pmq->next) {
+        int other = pmq->side[0].pgeom != pgeom;
+        SO *psoOther = pmq->side[1 - other].pso;
+        if (PaloFindWkrAbsorber(psoOther, pgeom->grftak)) {
+            MQ *pclone = (MQ *)PvAllocSlotheapImpl(&psw->slotheapMq);
             *pclone = *pmq;
-            pclone->pmqNext = poxaOwner->pmqAbsorbed;
-            poxaOwner->pmqAbsorbed = pclone;
+            pclone->next = poxaOwner->pcontact;
+            poxaOwner->pcontact = pclone;
         }
     }
-    PrependMqList_1AA0B0(psw, pmqLocal, ppxpFirst);
+    PrependMqList(psw, pmqLocal, ppmqHead);
 }
 
 INCLUDE_ASM(0X1AA1D8);
 
 extern "C" {
-s32 CreateSlotheapSwAlign(s32 *, s32, s32, s32); /* extern */
+s32 CreateSlotheapSwAlign(s32 *, s32, s32, s32);
 
 extern s32 B_002DD2E0;
 
@@ -229,43 +211,43 @@ extern s32 B_00452148;
 
 extern s32 B_00452170;
 
-void StaticInitMark(s32 arg0, s32 arg1) {
-    s32 temp_v0;
-    s32 temp_v0_2;
-    s32 temp_v0_3;
-    s32 temp_v0_4;
-    s32 temp_v0_5;
-    s32 temp_v0_6;
+void StaticInitMark(s32 fInitialize, s32 priority) {
+    s32 cinit0;
+    s32 cinit1;
+    s32 cinit2;
+    s32 cinit3;
+    s32 cinit4;
+    s32 cinit5;
 
-    if ((arg1 == 0xFFFF) && (arg0 != 0)) {
-        temp_v0 = B_002DD2E0 + 1;
-        B_002DD2E0 = temp_v0;
-        if (temp_v0 == 1) {
+    if ((priority == 0xFFFF) && (fInitialize != 0)) {
+        cinit0 = B_002DD2E0 + 1;
+        B_002DD2E0 = cinit0;
+        if (cinit0 == 1) {
             CreateSlotheapSwAlign(&B_004520A8, 0x14, 0x2000, 0x10);
         }
-        temp_v0_2 = B_002DD2E4 + 1;
-        B_002DD2E4 = temp_v0_2;
-        if (temp_v0_2 == 1) {
+        cinit1 = B_002DD2E4 + 1;
+        B_002DD2E4 = cinit1;
+        if (cinit1 == 1) {
             CreateSlotheapSwAlign(&B_004520D0, 0x18, 0x800, 0x10);
         }
-        temp_v0_3 = B_002DD2E8 + 1;
-        B_002DD2E8 = temp_v0_3;
-        if (temp_v0_3 == 1) {
+        cinit2 = B_002DD2E8 + 1;
+        B_002DD2E8 = cinit2;
+        if (cinit2 == 1) {
             CreateSlotheapSwAlign(&B_004520F8, 0x28, 0x200, 0x10);
         }
-        temp_v0_4 = B_002DD2EC + 1;
-        B_002DD2EC = temp_v0_4;
-        if (temp_v0_4 == 1) {
+        cinit3 = B_002DD2EC + 1;
+        B_002DD2EC = cinit3;
+        if (cinit3 == 1) {
             CreateSlotheapSwAlign(&B_00452120, 0x1C, 0x800, 0x10);
         }
-        temp_v0_5 = B_002DD2F0 + 1;
-        B_002DD2F0 = temp_v0_5;
-        if (temp_v0_5 == 1) {
+        cinit4 = B_002DD2F0 + 1;
+        B_002DD2F0 = cinit4;
+        if (cinit4 == 1) {
             CreateSlotheapSwAlign(&B_00452148, 0xC, 0xC8, 0x10);
         }
-        temp_v0_6 = B_002DD2F4 + 1;
-        B_002DD2F4 = temp_v0_6;
-        if (temp_v0_6 == 1) {
+        cinit5 = B_002DD2F4 + 1;
+        B_002DD2F4 = cinit5;
+        if (cinit5 == 1) {
             CreateSlotheapSwAlign(&B_00452170, 0x14, 0x100, 0x10);
         }
     }
@@ -273,7 +255,7 @@ void StaticInitMark(s32 arg0, s32 arg1) {
 }
 
 extern "C" {
-s32 StaticInitMark_1AA958(s32, s32);           /* extern */
+s32 StaticInitMark_1AA958(s32, s32);
 
 void GlobalCtorMark(void) {
     StaticInitMark_1AA958(1, 0xFFFF);

@@ -1,8 +1,9 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+struct SLOTHEAP;
 
-M2C_UNK FreeSlotheapPv(M2C_UNK *, s32);             /* extern */
-extern M2C_UNK B_003E123C;
+void FreeSlotheapPv(struct SLOTHEAP *, void *);
+extern struct SLOTHEAP B_003E123C;
 
-void FreeAct(s32 arg0) {
-    FreeSlotheapPv(&B_003E123C, arg0);
+void FreeAct(void *pact) {
+    FreeSlotheapPv(&B_003E123C, pact);
 }

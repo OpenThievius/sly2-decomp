@@ -1,30 +1,24 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "pzo_hide.h"
+#include "so.h"
+#include "xf.h"
+#include "crv.h"
 extern "C" {
-s32 PcrvNew(M2C_UNK, M2C_UNK);                      /* extern */
-M2C_UNK SetXfKind(s8 *, s32, M2C_UNK);            /* extern */
-M2C_UNK func_0017F138();                            /* extern */
-M2C_UNK func_0017F408(s8 *, M2C_UNK, s8 *);     /* extern */
+CRV *PcrvNew(s32 oid, s32 ccv);                      /* extern */
+void SetXfKind(SO *pso, XF *pxf, s32 kind);          /* extern */
+void func_0017F138(CHASER *pchaser);                 /* extern */
+void func_0017F408(LO *ploContext, s32 centry, ANIMENTRY *aentry); /* extern */
 
-void Chaser_PostLoad(s8 *arg0) {
-    s32 temp_a1;
-    s32 temp_a1_2;
-
-    func_0017F138();
-    M2C_FIELD(arg0, s32 *, 0x1D8) = PcrvNew(0x2C9, 0x10);
-    temp_a1 = M2C_FIELD(arg0, s32 *, 0x58);
-    if (temp_a1 != 0) {
-        SetXfKind(arg0, temp_a1, 2);
+void Chaser_PostLoad(CHASER *pchaser) {
+    func_0017F138(pchaser);
+    pchaser->pcrv = PcrvNew(0x2C9, 0x10);
+    if (pchaser->pxfLinear != 0) {
+        SetXfKind(pchaser, pchaser->pxfLinear, 2);
     }
-    temp_a1_2 = M2C_FIELD(arg0, s32 *, 0x5C);
-    if (temp_a1_2 != 0) {
-        SetXfKind(arg0, temp_a1_2, 2);
+    if (pchaser->pxfAngular != 0) {
+        SetXfKind(pchaser, pchaser->pxfAngular, 2);
     }
-    func_0017F408(arg0, 5, arg0 + 0x220);
+    func_0017F408(pchaser, 5, pchaser->aentry);
 }
 
 }

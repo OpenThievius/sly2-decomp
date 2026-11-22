@@ -1,17 +1,11 @@
-#include "types.h"
-struct Obj { char pad0[0xC]; char *vt; };
-struct KP {
-    char pad00[0xC]; char *vt; char pad0[0x180 - 0x10];
-    int state; float tState; char pad1[8];
-    Obj *obj; int cnt; char pad2[4]; int jsg; char pad3[4];
-    int stream; char pad4[0x1F4 - 0x1A8];
-    int streamB; int pad5; int streamA; int gadget; int pad6[2];
-    int jsgTable[8];
-};
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "keypad.h"
+#include "clock.h"
+
 extern "C" {
 void StopStream(void *);
 void StopJsg(int);
-void StartJsg(int, Obj *);
+void StartJsg(int, PO *);
 int StartStream(void *, int, int);
 void SetGadgetAcquired(int, int);
 void IncrementSwBinocCount(void *);
@@ -21,10 +15,9 @@ void DecrementSwShowCount(void *);
 void func_001C8918(void *, int);
 extern char B_003DD040;
 extern char B_003DD490;
-extern float g_2dded0[];
 }
-#define VCALL(o) ((void (*)(char *, int))(*(void **)((o)->vt + 0x27C)))((char *)(o) + *(short *)((o)->vt + 0x278), 1)
-void func_001C8730(KP *self, int state)
+
+void func_001C8730(KEYPAD *self, int state)
 {
     if (state == self->state) return;
     if (self->stream != 0) {
@@ -42,11 +35,11 @@ void func_001C8730(KP *self, int state)
         if (self->streamA != 0) self->stream = StartStream(&B_003DD040, self->streamA, 1);
         break;
     case 0:
-        if (self->obj != 0) IncrementSwBinocCount(&B_003DD490);
+        if (self->ppoUser != 0) IncrementSwBinocCount(&B_003DD490);
         break;
     }
     self->state = state;
-    self->tState = g_2dded0[0];
+    self->tState = g_2dded0.t;
     switch (state) {
     case -1:
         return;
@@ -57,17 +50,17 @@ void func_001C8730(KP *self, int state)
         if (self->streamB != 0) self->stream = StartStream(&B_003DD040, self->streamB, 0);
         break;
     case 1:
-        VCALL(self);
+        self->SetPlayable(1);
         break;
     case 0:
     case 5:
-        if (self->obj != 0) {
-            VCALL(self->obj);
-            self->obj = 0;
+        if (self->ppoUser != 0) {
+            self->ppoUser->SetPlayable(1);
+            self->ppoUser = 0;
             DecrementSwBinocCount(&B_003DD490);
         }
         break;
     }
-    self->jsg = self->jsgTable[self->state];
-    if (self->jsg != 0) StartJsg(self->jsg, self->obj);
+    self->jsg = self->ajsg[self->state];
+    if (self->jsg != 0) StartJsg(self->jsg, self->ppoUser);
 }

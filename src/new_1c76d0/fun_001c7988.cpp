@@ -1,31 +1,21 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "coin.h"
+
 extern "C" {
-struct _m2c_stack_func_001C7988 {
-    /* 0x00 */ char pad0[0x40];
-};                                                  /* size = 0x40 */
+void func_001C7A08(COIN *coin);
 
-M2C_UNK func_001C7A08();                            /* extern */
-
-void func_001C7988(s8 *arg0, s32 arg1, s32 arg2) {
-    s32 temp_v1;
-    s8 *temp_v0;
-
-    func_001C7A08();
-    temp_v1 = M2C_FIELD(arg0, s32 *, 0x23C);
-    if (temp_v1 < 0x20) {
-        M2C_FIELD(arg0, s32 *, 0x23C) = (s32) (temp_v1 + 1);
-        temp_v0 = (s8 *)(M2C_FIELD(arg0, s32 *, 0x240) + (temp_v1 * 0x2C));
-        M2C_FIELD(arg0, s8 **, 0x244) = temp_v0;
-        M2C_FIELD(temp_v0, s32 *, 4) = arg2;
-        M2C_FIELD(temp_v0, s32 *, 0x1C) = 0;
-        M2C_FIELD(temp_v0, s32 *, 0x14) = -1;
-        M2C_FIELD(temp_v0, s32 *, 0x18) = -1;
-        M2C_FIELD(temp_v0, s32 *, 0) = arg1;
+void func_001C7988(COIN *coin, s32 id, s32 lootkc) {
+    func_001C7A08(coin);
+    s32 iloot = coin->cloot;
+    if (iloot < 0x20) {
+        coin->cloot = iloot + 1;
+        COINLOOTDEF *ploot = &coin->aloot[iloot];
+        coin->cur = ploot;
+        ploot->lootkc = lootkc;
+        ploot->cmesh = 0;
+        ploot->field_0x14 = -1;
+        ploot->field_0x18 = -1;
+        ploot->id = id;
     }
 }
 

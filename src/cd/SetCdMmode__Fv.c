@@ -1,6 +1,7 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "types.h"
 
-M2C_UNK sceCdMmode(M2C_UNK);                        /* extern */
+int sceCdMmode(int mode);
 extern s32 g_2bd4c4;
 
 void SetCdMmode__Fv(void) {

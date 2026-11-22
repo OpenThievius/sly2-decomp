@@ -1,18 +1,14 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "gcnode.h"
 extern "C" {
-void LinkSidebagNode(s8 *, M2C_UNK *);         /* extern */
-M2C_UNK UnlinkSidebagNode();                        /* extern */
-extern M2C_UNK B_002DD2CC;
+void LinkSidebagNode(GNODE *, unsigned *);
+void UnlinkSidebagNode(GNODE *);
+extern unsigned B_002DD2CC;
 
-void func_00258178(s8 *arg0) {
-    UnlinkSidebagNode();
-    LinkSidebagNode(arg0, &B_002DD2CC);
-    M2C_FIELD(arg0, s32 *, 4) = (s32) (M2C_FIELD(arg0, s32 *, 4) | 0x8000);
+void func_00258178(GNODE *pnode) {
+    UnlinkSidebagNode(pnode);
+    LinkSidebagNode(pnode, &B_002DD2CC);
+    pnode->unused = 1;
 }
 
 }

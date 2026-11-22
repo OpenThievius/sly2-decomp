@@ -1,9 +1,11 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "types.h"
 
-M2C_UNK CSo_Clone();                                  /* extern */
-M2C_UNK InferExpl(s32, s32);                        /* extern */
+struct BOMB;
+void CSo_Clone(struct BOMB *bomb);
+void InferExpl(struct BOMB *bomb, struct BOMB *owner);
 
-void LoadBombFromBrx(s32 arg0) {
-    CSo_Clone();
-    InferExpl(arg0, arg0);
+void LoadBombFromBrx(struct BOMB *bomb) {
+    CSo_Clone(bomb);
+    InferExpl(bomb, bomb);
 }

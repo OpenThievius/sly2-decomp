@@ -24,7 +24,7 @@ struct GUARDACT { s32 oid; s32 unk4; s32 nArg; s32 unkC; };
 
 struct STEPGUARD : STEP {
     virtual void *Slot88();             /* 88: func_002082D0; GoalBrain_ChooseNextCommand uses its result */
-    virtual void Slot89();              /* 89: func_00208BE0 */
+    virtual int Slot89(struct HITFX *phitfx); /* 89: func_00208BE0 (it takes a hit effect, which PhitfxChooseForGuard hands it) */
     /* 0x2C0 */ u64 grfsgs; /* GrfGuardCustomXps (85); NGuardAlertLevel (77), func_001F1900 */
     u8 unknown_0x2C8[0x4];
     /* 0x2CC */ WORDPAIR field_0x2CC; /* ExecuteGuardScriptCmd */
@@ -63,9 +63,9 @@ struct STEPGUARD : STEP {
     /* 0x398 */ s32 agroup[3]; /* UpdateGuardSensor draft */
     /* 0x3A4 */ s32 csensed; /* UpdateGuardSensor draft */
     /* 0x3A8 */ s32 cignoredClass; /* ClearGuardIgnoredClasses */
-    u8 unknown_0x3AC[0x3C0 - 0x3AC];
+    /* 0x3AC */ s32 aignoredClass[5]; /* RemoveGuardIgnoredClass, func_002089F0 (they agree: the list after cignoredClass; five words up to cclassFilter) */
     /* 0x3C0 */ s32 cclassFilter; /* ClearGuardClassFilters */
-    u8 unknown_0x3C4[0x3CC - 0x3C4];
+    /* 0x3C4 */ s32 aclassFilter[2]; /* RemoveGuardClassFilter, AddGuardClassFilter (they agree; AddGuardClassFilter stops at two) */
     /* 0x3CC */ struct ALERT *palert; /* func_00208540: PalertEnsure's result (the UpdateGuardSensor draft called it ptarget) */
     /* 0x3D0 */ s32 blocked; /* func_0020A298 */
     u8 unknown_0x3D4[0x3F4 - 0x3D4];
@@ -91,7 +91,9 @@ struct STEPGUARD : STEP {
     /* 0x8D0 */ ANIMREF aarefA[26]; /* BindGuardAnimrefs, CloneGuardAnimrefs (two readers agree) */
     /* 0xA70 */ ANIMREF aarefB[26]; /* the same; func_001796D0 points a GoalHit at one of them */
     /* 0xC10 */ ANIMREF aarefC[26]; /* the same */
-    u8 unknown_0xDB0[0xB4];
+    /* 0xDB0 */ JUMPER jumper; /* StartAnimref: the pinst of a kind-2 ANIMREF (StartJumpAnim clears 0x70 bytes of it and calls InitJumper on it) */
+    /* 0xE20 */ u8 diranim[0x40]; /* StartAnimref: the pinst of a kind-3 ANIMREF (StartDirAnim clears 0x40 bytes of it: its DIRANIM) */
+    u8 unknown_0xE60[0x4];
     /* 0xE64 */ s32 sensing; /* func_00208D70 */
     /* 0xE68 */ s32 field_0xE68; /* func_00208BE0 (89) */
     /* 0xE6C */ f32 field_0xE6C; /* func_00172560 (GoalSearch; it also reads field_0xE78 of the same guard): GRandInRange's minimum */

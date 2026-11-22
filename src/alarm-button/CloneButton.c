@@ -1,8 +1,9 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "button.h"
 
-M2C_UNK CSo_Clone();                                  /* extern */
+void CSo_Clone();
 
-void CloneButton(void *arg0) {
+void CloneButton(struct BUTTON *pbutton) {
     CSo_Clone();
-    M2C_FIELD(arg0, void **, 0x150) = arg0;
+    pbutton->btn.pbutton = pbutton;
 }

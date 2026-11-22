@@ -1,15 +1,17 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "keypad.h"
+#include "soproperty.h"
 
-s32 FVaultOpen();                                   /* extern */
-M2C_UNK PostSoLoad();                               /* extern */
-M2C_UNK SetSoProperties(void *, M2C_UNK, M2C_UNK *); /* extern */
-M2C_UNK func_001C8730(void *, M2C_UNK);             /* extern */
-s32 func_001F4C58(void *, M2C_UNK, M2C_UNK);        /* extern */
-extern M2C_UNK D_002C0EC8;
+s32 FVaultOpen(void);
+void PostSoLoad(struct KEYPAD *pkeypad);
+void SetSoProperties(struct KEYPAD *pkeypad, s32 cprop, const SOPROPERTY *aprop);
+void func_001C8730(struct KEYPAD *pkeypad, s32 state);
+struct XF *func_001F4C58(struct KEYPAD *pkeypad, s32 oid, s32 kind);
+extern SOPROPERTY D_002C0EC8[24];
 
-void func_001C82F0(void *arg0) {
-    PostSoLoad();
-    SetSoProperties(arg0, 0x18, &D_002C0EC8);
-    M2C_FIELD(arg0, s32 *, 0x204) = func_001F4C58(arg0, 0x645, 1);
-    func_001C8730(arg0, (FVaultOpen() == 0) ? 0 : 5);
+void func_001C82F0(struct KEYPAD *pkeypad) {
+    PostSoLoad(pkeypad);
+    SetSoProperties(pkeypad, 0x18, D_002C0EC8);
+    pkeypad->pxf = func_001F4C58(pkeypad, 0x645, 1);
+    func_001C8730(pkeypad, (FVaultOpen() == 0) ? 0 : 5);
 }

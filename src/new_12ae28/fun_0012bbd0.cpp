@@ -1,13 +1,8 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
-struct V3_12BBD0 { float x; float y; float z; };
-struct KEY_12BBD0 { V3_12BBD0 a; float t; QW q0; V3_12BBD0 b; float u; QW q1; };
-struct KEYS_12BBD0 { char pad[8]; char *entries; };
-struct STATE_12BBD0 {
-    char pad0[0x80]; float t0; float t1; float *pcur; char pad8c[0x9A - 0x8C]; short flag;
-    char pad9c[0xC0 - 0x9C]; V3_12BBD0 a; float pada; QW q0; V3_12BBD0 b; float padb; QW q1;
-};
+#include "acr.h"
 extern "C" {
-int func_0012BB70(float);
+int func_0012BB70(ACRBL *, float);
 int FFloatsNear__Ffff(float, float, float);
 }
 extern QW g_2a2dd0;
@@ -18,24 +13,24 @@ static inline int Near3(QW p, QW q)
     return Near(LaneX(p), LaneX(q)) && Near(LaneYInGeneralRegister(p), LaneYInGeneralRegister(q)) &&
            Near(LaneZInGeneralRegister(p), LaneZInGeneralRegister(q));
 }
-extern "C" void func_0012BBD0(KEYS_12BBD0 *keys, STATE_12BBD0 *state)
+extern "C" void func_0012BBD0(ACRBL *pacrb, XF *pxf)
 {
-    int index = func_0012BB70(*state->pcur);
-    state->t0 = *(float *)(keys->entries + (index * 0x20) - 0x14);
-    state->a = *(V3_12BBD0 *)(keys->entries + (index * 0x20) - 0x20);
-    state->q0 = *(QW *)(keys->entries + (index * 0x20) - 0x10);
-    state->t1 = *(float *)(keys->entries + (index * 0x20) + 0xC);
-    state->b = *(V3_12BBD0 *)(keys->entries + (index * 0x20));
-    state->q1 = *(QW *)(keys->entries + (index * 0x20) + 0x10);
+    int index = func_0012BB70(pacrb, *pxf->ptMin);
+    pxf->tMin = pacrb->akey[index - 1].t;
+    *(VECTOR3 *)&pxf->posGoal = pacrb->akey[index - 1].pos;
+    pxf->velGoal = pacrb->akey[index - 1].tan;
+    pxf->tMax = pacrb->akey[index].t;
+    *(VECTOR3 *)&pxf->field_0xE0 = pacrb->akey[index].pos;
+    *(QW *)pxf->accel = pacrb->akey[index].tan;
     int ok = 0;
 
-    int same = Near3(*(QW *)&state->a, *(QW *)&state->b);
+    int same = Near3(pxf->posGoal, pxf->field_0xE0);
     if (same) {
-        int second = Near3(g_2a2dd0, state->q0);
+        int second = Near3(g_2a2dd0, pxf->velGoal);
         if (second) {
-            int third = Near3(g_2a2dd0, state->q1);
+            int third = Near3(g_2a2dd0, *(QW *)pxf->accel);
             ok = third;
         }
     }
-    state->flag = ok ? 2 : 1;
+    pxf->sub = ok ? 2 : 1;
 }

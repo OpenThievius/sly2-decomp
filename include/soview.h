@@ -28,10 +28,13 @@ struct PHYSVIEW {
 struct SOVIEW {
     u8 unknown_0x0[0xC];
     /* 0xC */ const struct SOVT *vt;                 /* the vtable pointer */
-    u8 unknown_0x10[0x48];
+    u8 unknown_0x10[0x38];
+    /* 0x48 */ s32 field_0x48;                      /* func_00204C60 compares it with the object a STEP discards xps for */
+    u8 unknown_0x4C[0xC];
     /* 0x58 */ struct XF *pxfLinear;                 /* SO::pxfLinear */
     /* 0x5C */ struct XF *pxfAngular;                /* SO::pxfAngular */
-    u8 unknown_0x60[0x88];
+    /* 0x60 */ struct XF *pxfRoot;                   /* SO::pxfRoot: RadYawSo reads its world matrix */
+    u8 unknown_0x64[0x84];
     /* 0xE8 */ struct PHYSVIEW *pphys;               /* SO::pphys */
     /* 0xEC */ struct OXA *poxa;                     /* SO::poxa */
 };
