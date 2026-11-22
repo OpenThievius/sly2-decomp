@@ -1,5 +1,6 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "guardview.h"
 
-void ClearGuardClassFilters(void *arg0) {
-    M2C_FIELD(arg0, s32 *, 0x3C0) = 0;
+void ClearGuardClassFilters(struct STEPGUARDVIEW *pguard) {
+    pguard->cclassFilter = 0;
 }

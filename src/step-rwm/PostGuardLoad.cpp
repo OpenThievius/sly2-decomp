@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
 struct UL { unsigned long v; } __attribute__((packed));
 #include "stepguard.h"
@@ -33,10 +34,10 @@ void PostGuardLoad(STEPGUARD *guard)
     BindGuardAnimrefs(guard);
     ResolveGuardAimObjects(guard);
     void *hurt = __builtin_new(0x10);
-    guard->field_0x498 = hurt;
+    guard->pfallcheck = (FALLCHECK *)hurt;
     func_0020CE28(hurt, guard);
     void *damage = __builtin_new(0x14);
-    guard->field_0x49C = damage;
+    guard->pdamage = (GUARDDAMAGE *)damage;
     func_0020D1B0(damage, guard);
     if (guard->pscope->field_0x24 == 0)
         QueueSwCallback(B_003DD490, guard, RO_002A8608.v, 0);

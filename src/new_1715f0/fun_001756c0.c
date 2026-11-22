@@ -1,21 +1,26 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "goals.h"
 
-s32 Goal_FHandleMessage(void *, s32, void *);       /* extern */
-s32 func_00174898(s32);                             /* extern */
+/* message 0xB: the object (a guard's target) the message reports */
+struct MSGHIT {
+    u8 unknown_0x0[0x4];
+    /* 0x4 */ struct LO *pobj;
+};
 
-s32 func_001756C0(void *arg0, s32 arg1, void *arg2) {
-    s32 temp_a0;
+s32 Goal_FHandleMessage(struct GOALREACT *goal, s32 msgid, void *pv);
+void *func_00174898(struct LO *plo);
 
-    if (arg1 == 0xB) {
-        temp_a0 = M2C_FIELD(arg2, s32 *, 4);
-        if (temp_a0 == M2C_FIELD(arg0, s32 *, 0x30)) {
-            if (func_00174898(temp_a0) == M2C_FIELD(arg0, s32 *, 0x10)) {
-                M2C_FIELD(arg0, s32 *, 0x40) = 1;
+s32 func_001756C0(struct GOALREACT *goal, s32 msgid, struct MSGHIT *pmsg) {
+    struct LO *pobj;
+
+    if (msgid == 0xB) {
+        pobj = pmsg->pobj;
+        if (pobj == goal->ptarget) {
+            if (func_00174898(pobj) == goal->pstep) {
+                goal->fHit = 1;
                 return 1;
             }
-            goto block_5;
         }
     }
-block_5:
-    return Goal_FHandleMessage(arg0, arg1, arg2);
+    return Goal_FHandleMessage(goal, msgid, pmsg);
 }

@@ -1,60 +1,51 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
 #include "vu0inline.h"
 #include "ps2inline.h"
-struct VT { char pad[0x40]; short delta; short index; void (*fn)(void *); };
-struct OBJ { char pad[0xC]; VT *vptr; };
-#include "goal.h"
-struct CRVHOLDER { char pad_0[0xE8]; int mode; char pad_ec[0x8]; QW *points; };
-struct CRVSTEP { char pad_0[0x294]; CRVHOLDER *pcrv; };
-struct CTX { char pad_0[0x120]; int kind; };
-struct GOAL_17E6B0 : GOAL {
-    CTX *pctx;
-    int index;
-    int state;
-    float tState;
-    float tEnd;
-};
+#include "step.h"
+#include "clock.h"
+#include "stepguard.h"
+#include "goals.h"
+/* the curve the guard walks (STEP::pcrv): mode, and a pointer to its control points */
+struct CRVHOLDER { u8 unknown_0x0[0xE8]; s32 mode; u8 unknown_0xEC[0x8]; QW *points; };
 extern "C" {
-void Goal_Pop(void *);
-OBJ *func_00205438(void *, int);
-QW PosLoWorld(void *);
-QW func_001C1EC0(void *, QW);
-void MeasureCrv(void *);
-void GoalFollowCrv_SetCrv(void *, void *, int);
-void func_0017E628(void *);
+void Goal_Pop(GOAL **);
+GOAL *func_00205438(STEP *, int);
+QW PosLoWorld(STEP *);
+QW func_001C1EC0(GOALTARGET *, QW);
+void MeasureCrv(CRVHOLDER *);
+void GoalFollowCrv_SetCrv(GOALFOLLOWCRV *, CRVHOLDER *, int);
+void func_0017E628(GOALFOLLOWROUTE *);
 }
-extern float g_2dded0;
 extern float g_2be7b0;
 extern float g_2be7b4;
-extern "C" void func_0017E6B0(GOAL_17E6B0 *pgoal, int newState)
+extern "C" void func_0017E6B0(GOALFOLLOWROUTE *pgoal, int newState)
 {
     if (newState == pgoal->state)
         return;
-    Goal_Pop(&((void *)pgoal->pgoalChild));
+    Goal_Pop(&pgoal->pgoalChild);
     pgoal->state = newState;
-    pgoal->tState = *(float *)&g_2dded0;
+    pgoal->tState = g_2dded0.t;
     switch (newState) {
     case 0:
-        switch (pgoal->pctx->kind) {
+        switch (pgoal->proute->kind) {
         case 0: {
-            OBJ *pfollow = func_00205438(pgoal->pstep, 0xA7);
-            CRVSTEP *pcrvstep = (CRVSTEP *)pgoal->pstep;
-            CRVHOLDER *pcrv = pcrvstep->pcrv;
-            QW pos = PosLoWorld(pcrvstep);
-            QW goal = func_001C1EC0((char *)pgoal->pctx + (pgoal->index * 32 + 0x60), pos);
+            GOALFOLLOWCRVANIM *pfollow = (GOALFOLLOWCRVANIM *)func_00205438(pgoal->pstep, 0xA7);
+            CRVHOLDER *pcrv = (CRVHOLDER *)pgoal->pstep->pcrv;
+            QW pos = PosLoWorld(pgoal->pstep);
+            QW goal = func_001C1EC0(&pgoal->proute->awaypoint[pgoal->index], pos);
             float distance = LaneX(SqrtX(SquaredLengthXy(VectorSub(pos, goal))));
             float scaled = distance / g_2be7b0;
             float clamped = scaled < g_2be7b4 ? g_2be7b4 : scaled;
-            pgoal->tEnd = g_2dded0 + clamped;
+            pgoal->tEnd = g_2dded0.t + clamped;
             pcrv->mode = 2;
             pcrv->points[0] = pos;
             pcrv->points[1] = goal;
             MeasureCrv(pcrv);
-            *(int *)((char *)pfollow + 0x40) = 1;
-            *(float *)((char *)pfollow + 0x64) = 10.0f;
+            pfollow->field_0x40 = 1;
+            pfollow->field_0x64 = 10.0f;
             GoalFollowCrv_SetCrv(pfollow, pcrv, 0);
-            VT *vtable = pfollow->vptr;
-            vtable->fn((char *)pfollow + vtable->delta);
+            pfollow->Activate();
             break;
         }
         case 1:
@@ -63,12 +54,10 @@ extern "C" void func_0017E6B0(GOAL_17E6B0 *pgoal, int newState)
         }
         break;
     case 1: {
-        OBJ *pgoto = func_00205438(pgoal->pstep, 0xBF);
-        char *psrc = (char *)(pgoal->index * 32 + (sptr)pgoal->pctx);
-        VT *vtable = pgoto->vptr;
-        *(QW *)((char *)pgoto + 0x30) = *(QW *)(psrc + 0x60);
-        *(QW *)((char *)pgoto + 0x40) = *(QW *)(psrc + 0x70);
-        vtable->fn((char *)pgoto + vtable->delta);
+        GOALSNAPTOPOINT *pgoto = (GOALSNAPTOPOINT *)func_00205438(pgoal->pstep, 0xBF);
+        ROUTE *pslot = (ROUTE *)(pgoal->index * sizeof(GOALTARGET) + (sptr)pgoal->proute); /* the index first: retail adds the scaled index to the route, then loads at +0x60 */
+        pgoto->target = pslot->awaypoint[0];
+        pgoto->Activate();
         break;
     }
     }

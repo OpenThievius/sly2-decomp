@@ -1,9 +1,11 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "goals.h"
+#include "sly2.h"
 
-M2C_UNK Goal_Deactivate();                          /* extern */
-M2C_UNK func_0017B750(s32, M2C_UNK);                /* extern */
+void Goal_Deactivate(struct GOAL *pgoal);
+void func_0017B750(struct GOAL *pgoal, s32 state);
 
-void func_0017B5F0(s32 arg0) {
-    Goal_Deactivate();
-    func_0017B750(arg0, -1);
+void func_0017B5F0(struct GOAL *pgoal) {
+    Goal_Deactivate(pgoal);
+    func_0017B750(pgoal, -1);
 }

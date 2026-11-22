@@ -1,13 +1,14 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "mount.h"
 
-M2C_UNK func_0017F090();                            /* extern */
-M2C_UNK func_0017F3E0(void *, M2C_UNK, s32);        /* extern */
-extern void *g_2dfb80;
+void func_0017F090(struct MOUNT *pmount);
+void func_0017F3E0(void *pobject, s32 centry, struct ANIMENTRY *aentry);
+extern struct MOUNT *g_2dfb80;
 
-void Mount_Init(void *arg0) {
-    func_0017F090();
-    func_0017F3E0(arg0, 5, arg0 + 0x1C8);
-    M2C_FIELD(arg0, s32 *, 0x1C0) = -1;
-    g_2dfb80 = arg0;
-    M2C_FIELD(arg0, s32 *, 0x2A8) = -1;
+void Mount_Init(struct MOUNT *pmount) {
+    func_0017F090(pmount);
+    func_0017F3E0(pmount, 5, pmount->aentry);
+    pmount->state = -1;
+    g_2dfb80 = pmount;
+    pmount->field_0x2A8 = -1;
 }

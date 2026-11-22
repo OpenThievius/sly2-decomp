@@ -1,6 +1,10 @@
-int func_0017B578(void *arg0)
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "stepguard.h"
+#include "goals.h"
+#include "sly2.h"
+int func_0017B578(GOALGRAB *pgoal)
 {
-    int v1 = *(int *)((char *)arg0 + 0x50);
-    if (v1 == 3) { return 7; }
+    int kind = pgoal->phase;
+    if (kind == 3) { return 7; }
     return 1;
 }

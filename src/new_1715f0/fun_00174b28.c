@@ -1,11 +1,12 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "goals.h"
 
-M2C_UNK GoalAnim_SetState(void *, M2C_UNK);         /* extern */
-M2C_UNK Goal_Deactivate();                          /* extern */
-M2C_UNK RemoveGuardSgs(s32, s32);                   /* extern */
+void GoalAnim_SetState(struct GOALANIM *goal, s32 state);
+void Goal_Deactivate(void);
+void RemoveGuardSgs(struct STEPGUARD *pguard, s32 sgs);
 
-void func_00174B28(void *arg0) {
+void func_00174B28(struct GOALANIM *goal) {
     Goal_Deactivate();
-    GoalAnim_SetState(arg0, 1);
-    RemoveGuardSgs(M2C_FIELD(arg0, s32 *, 0x10), M2C_FIELD(arg0, s32 *, 0x3C));
+    GoalAnim_SetState(goal, 1);
+    RemoveGuardSgs(GOAL_GUARD(goal), goal->sgs);
 }

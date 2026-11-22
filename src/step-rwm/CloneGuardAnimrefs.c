@@ -1,22 +1,23 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "guardview.h"
 
-M2C_UNK CloneAnimref(void *);                       /* extern */
-M2C_UNK CloneAnimrefArray(void *, void *);          /* extern */
+void CloneAnimref(struct ANIMREF *);
+void CloneAnimrefArray(struct STEPGUARDVIEW *, struct ANIMREF *);
 
-void CloneGuardAnimrefs(void *arg0) {
-    s32 var_s2;
-    void *var_s0;
+void CloneGuardAnimrefs(struct STEPGUARDVIEW *pguard) {
+    s32 ianim;
+    struct GUARDANIM *panim;
 
-    var_s2 = 0;
-    if (M2C_FIELD(arg0, s32 *, 0x4C0) > 0) {
-        var_s0 = arg0 + 0x4D0;
+    ianim = 0;
+    if (pguard->canim > 0) {
+        panim = pguard->aanim;
         do {
-            var_s2 += 1;
-            CloneAnimref(var_s0);
-            var_s0 += 0x20;
-        } while (var_s2 < M2C_FIELD(arg0, s32 *, 0x4C0));
+            ianim += 1;
+            CloneAnimref(&panim->ref);
+            panim += 1;
+        } while (ianim < pguard->canim);
     }
-    CloneAnimrefArray(arg0, arg0 + 0xC10);
-    CloneAnimrefArray(arg0, arg0 + 0x8D0);
-    CloneAnimrefArray(arg0, arg0 + 0xA70);
+    CloneAnimrefArray(pguard, pguard->aarefC);
+    CloneAnimrefArray(pguard, pguard->aarefA);
+    CloneAnimrefArray(pguard, pguard->aarefB);
 }

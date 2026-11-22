@@ -1,11 +1,12 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "goals.h"
 
-M2C_UNK GoalNotice_SetState(void *, M2C_UNK);       /* extern */
-M2C_UNK func_001EEF70();                            /* extern */
-M2C_UNK func_00208540(s32, s32);                    /* extern */
+void GoalNotice_SetState(struct GOALNOTICE *goal, s32 state);
+void func_001EEF70(void);
+void func_00208540(struct STEPGUARD *pguard, struct LO *ptarget);
 
-void func_00175790(void *arg0) {
+void func_00175790(struct GOALNOTICE *goal) {
     func_001EEF70();
-    GoalNotice_SetState(arg0, 3);
-    func_00208540(M2C_FIELD(arg0, s32 *, 0x10), M2C_FIELD(arg0, s32 *, 0x30));
+    GoalNotice_SetState(goal, 3);
+    func_00208540(GOAL_GUARD(goal), goal->ptarget);
 }

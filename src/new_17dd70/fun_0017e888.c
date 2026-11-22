@@ -1,9 +1,10 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "goals.h"
 
-M2C_UNK AddGuardSgs(s32, M2C_UNK);                  /* extern */
-M2C_UNK func_001EEF68();                            /* extern */
+void func_001EEF68(struct GOALSNAPTOPOINT *pgoal);
+void AddGuardSgs(struct STEPGUARD *pguard, s32 sgs);
 
-void func_0017E888(void *arg0) {
-    func_001EEF68();
-    AddGuardSgs(M2C_FIELD(arg0, s32 *, 0x10), 0x2D);
+void func_0017E888(struct GOALSNAPTOPOINT *pgoal) {
+    func_001EEF68(pgoal);
+    AddGuardSgs(pgoal->pstep, 0x2D);
 }

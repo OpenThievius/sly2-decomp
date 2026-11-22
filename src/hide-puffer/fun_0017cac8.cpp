@@ -1,17 +1,16 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "stepguard.h"
+#include "goals.h"
+#include "sly2.h"
 extern "C" {
-void AddGuardSgs(s32, M2C_UNK);
-void func_001EEF68();
+void AddGuardSgs(STEPGUARD *pguard, int sgs);
+void func_001EEF68(GOAL *pgoal);
 
-void func_0017CAC8(void *arg0) {
-    func_001EEF68();
-    M2C_FIELD(arg0, s32 *, 0x30) = -1;
-    M2C_FIELD(arg0, f32 *, 0x38) = 1.0f;
-    AddGuardSgs(M2C_FIELD(arg0, s32 *, 0x10), 0x1B);
+void func_0017CAC8(GOALB8 *pgoal) {
+    func_001EEF68(pgoal);
+    pgoal->state = -1;
+    pgoal->field_0x38 = 1.0f;
+    AddGuardSgs((STEPGUARD *)pgoal->pstep, 0x1B);
 }
 
 }

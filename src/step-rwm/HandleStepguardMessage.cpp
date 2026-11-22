@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
 #include "stepguard.h"
-struct PO_SOURCE { char pad[0x184]; int unk184; };
-struct MSGARGS { PO_SOURCE *psource; void *ptarget; };
-struct GUARDDAMAGE { char pad[0xC]; void *field0C; };
+#include "goals.h"
+struct HITSOURCE { u8 unknown_0x0[0x184]; int field_0x184; };
+struct MSGARGS { HITSOURCE *psource; void *ptarget; };
 extern "C" void HandlePoMessage(STEPGUARD *, int, MSGARGS *);
-extern "C" void SetGuardDamageSource(GUARDDAMAGE *, PO_SOURCE *);
-extern "C" void GoalStack_HandleMessage(void *, int, MSGARGS *);
+extern "C" void SetGuardDamageSource(GUARDDAMAGE *, HITSOURCE *);
+extern "C" void GoalStack_HandleMessage(GOALSTACK *, int, MSGARGS *);
 
 void HandleStepguardMessage(STEPGUARD *pstepguard, int msg, MSGARGS *pargs)
 {
@@ -14,20 +14,20 @@ void HandleStepguardMessage(STEPGUARD *pstepguard, int msg, MSGARGS *pargs)
     switch (msg) {
     case 4: {
         if (pargs->ptarget == pstepguard) {
-            PO_SOURCE *psource = pargs->psource;
-            if (psource->unk184 != 0)
-                SetGuardDamageSource((GUARDDAMAGE *)pstepguard->field_0x49C, psource);
+            HITSOURCE *psource = pargs->psource;
+            if (psource->field_0x184 != 0)
+                SetGuardDamageSource(pstepguard->pdamage, psource);
         }
         break;
     }
     case 5: {
         if (pargs->ptarget == pstepguard) {
-            GUARDDAMAGE *pguard = (GUARDDAMAGE *)pstepguard->field_0x49C;
-            if ((void *)pargs->psource == pguard->field0C)
-                SetGuardDamageSource(pguard, 0);
+            GUARDDAMAGE *pdamage = pstepguard->pdamage;
+            if ((void *)pargs->psource == pdamage->psource)
+                SetGuardDamageSource(pdamage, 0);
         }
         break;
     }
     }
-    GoalStack_HandleMessage((char *)pstepguard + 0x26C, msg, pargs);
+    GoalStack_HandleMessage(pstepguard->pgoalstack(), msg, pargs);
 }

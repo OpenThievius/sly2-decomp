@@ -1,11 +1,12 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "goals.h"
 
-M2C_UNK func_0017E278(void *, M2C_UNK);             /* extern */
-M2C_UNK func_001EEF70();                            /* extern */
-M2C_UNK func_00208540(s32, s32);                    /* extern */
+void func_001EEF70(struct GOALFLEE *pgoal);
+void func_0017E278(struct GOALFLEE *pgoal, s32 newState);
+void func_00208540(struct STEPGUARD *pguard, struct LO *ptarget);
 
-void func_0017DDA8(void *arg0) {
-    func_001EEF70();
-    func_0017E278(arg0, 0);
-    func_00208540(M2C_FIELD(arg0, s32 *, 0x10), M2C_FIELD(arg0, s32 *, 0x38));
+void func_0017DDA8(struct GOALFLEE *pgoal) {
+    func_001EEF70(pgoal);
+    func_0017E278(pgoal, 0);
+    func_00208540(pgoal->pstep, pgoal->ptarget);
 }

@@ -1,26 +1,23 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "stepguard.h"
+#include "goals.h"
 extern "C" {
-void RemoveGuardIgnoredClass(s32, s32);
-extern s32 D_002C3D10;
+void RemoveGuardIgnoredClass(STEPGUARD *, s32);
+extern s32 D_002C3D10[5];
 
-void func_00206E50(s32 arg0) {
-    s32 *var_s1;
-    s32 temp_a1;
-    u32 var_s0;
+void func_00206E50(STEPGUARD *pguard) {
+    s32 *pcid;
+    s32 cid;
+    u32 icid;
 
-    var_s0 = 0;
-    var_s1 = &D_002C3D10;
+    icid = 0;
+    pcid = D_002C3D10;
     do {
-        temp_a1 = *var_s1;
-        var_s0 += 1;
-        var_s1 += 1;
-        RemoveGuardIgnoredClass(arg0, temp_a1);
-    } while (var_s0 < 5U);
+        cid = *pcid;
+        icid += 1;
+        pcid += 1;
+        RemoveGuardIgnoredClass(pguard, cid);
+    } while (icid < 5U);
 }
 
 }

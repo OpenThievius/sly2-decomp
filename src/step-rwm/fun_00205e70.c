@@ -1,7 +1,8 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "types.h"
 
-s32 PloNew(M2C_UNK, M2C_UNK, M2C_UNK, M2C_UNK);     /* extern */
-extern s32 B_003DD48C;
+struct LO *PloNew(s32, struct SO *, s32, s32);
+extern struct LO *B_003DD48C;
 
 void func_00205E70(void) {
     if (B_003DD48C == 0) {

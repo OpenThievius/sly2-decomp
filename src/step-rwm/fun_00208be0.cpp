@@ -1,5 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
-struct SENSOR { char pad[0xE8]; unsigned long *volume; };
 struct VOL { char pad[0x28]; unsigned long flags; };
 #include "stepguard.h"
 struct TARGET { char pad[0x50]; int kind; };
@@ -37,7 +37,7 @@ int func_00208BE0(STEPGUARD *guard, STIM *stim)
     } else {
         return FHitFxCoversPos(stim, PosLoWorld(guard));
     }
-    VOL *volume = (VOL *)guard->psensor->volume;
+    VOL *volume = (VOL *)guard->psensor->pvolume;
     if (volume == 0) return 0;
     if (((volume->flags >> 60) & 1) == 0) return 0;
     if (func_00227C90(volume, posStim) == 0) return 0;

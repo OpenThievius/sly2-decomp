@@ -1,32 +1,36 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "pzo_hide.h"
 
-s32 FIsBasicDerivedFrom(s32, M2C_UNK);              /* extern */
-s32 PloFindSwObject_thunk(M2C_UNK *, M2C_UNK, s32, s32); /* extern */
-extern M2C_UNK B_003DD490;
+struct BASIC;
+struct LO;
+struct SW;
 
-void func_0017F408(s32 arg0, s32 arg1, void *arg2) {
-    s32 temp_a2;
-    s32 temp_v0;
-    s32 var_s2;
-    void *var_s1;
+s32 FIsBasicDerivedFrom(struct BASIC *pbasic, s32 cid);
+struct LO *PloFindSwObject_thunk(struct SW *psw, s32 grffso, s32 oid, struct LO *ploContext);
+extern struct SW B_003DD490;
 
-    if (arg1 > 0) {
-        var_s1 = arg2;
-        var_s2 = arg1;
+/* ResolveOidEntries: finds the object of each entry's oid in the world and keeps it as the animation (class 0x6D) or the SM (class 0x6F) */
+void func_0017F408(struct LO *ploContext, s32 centry, struct ANIMENTRY *aentry) {
+    struct ANIMENTRY *pentry;
+    s32 cremaining;
+    struct LO *plo;
+
+    if (centry > 0) {
+        pentry = aentry;
+        cremaining = centry;
         do {
-            temp_a2 = M2C_FIELD(var_s1, s32 *, 0);
-            if (temp_a2 != -1) {
-                temp_v0 = PloFindSwObject_thunk(&B_003DD490, 4, temp_a2, arg0);
-                if (temp_v0 != 0) {
-                    if (FIsBasicDerivedFrom(temp_v0, 0x6D) != 0) {
-                        M2C_FIELD(var_s1, s32 *, 4) = temp_v0;
-                    } else if (FIsBasicDerivedFrom(temp_v0, 0x6F) != 0) {
-                        M2C_FIELD(var_s1, s32 *, 8) = temp_v0;
+            if (pentry->oid != -1) {
+                plo = PloFindSwObject_thunk(&B_003DD490, 4, pentry->oid, ploContext);
+                if (plo != 0) {
+                    if (FIsBasicDerivedFrom((struct BASIC *)plo, 0x6D) != 0) {
+                        pentry->aseg = plo;
+                    } else if (FIsBasicDerivedFrom((struct BASIC *)plo, 0x6F) != 0) {
+                        pentry->sm = plo;
                     }
                 }
             }
-            var_s2 -= 1;
-            var_s1 += 0x10;
-        } while (var_s2 != 0);
+            cremaining -= 1;
+            pentry += 1;
+        } while (cremaining != 0);
     }
 }

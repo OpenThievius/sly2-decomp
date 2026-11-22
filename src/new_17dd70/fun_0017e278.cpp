@@ -1,47 +1,39 @@
-struct VT { char pad[0x40]; short delta; short index; void (*fn)(void *); };
-struct OBJ { char pad[0xC]; VT *vptr; };
-#include "goal.h"
-struct GOAL_17E278 : GOAL {
-    int state;
-    float tState;
-    int target;
-};
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "clock.h"
+#include "stepguard.h"
+#include "goals.h"
 extern "C" {
-void Goal_Pop(void *);
-OBJ *func_00205438(void *, int);
-void func_0017E0E0(GOAL_17E278 *);
+void Goal_Pop(GOAL **);
+GOAL *func_00205438(STEP *, int);
+void func_0017E0E0(GOALFLEE *);
 }
-extern float g_2dded0;
-extern "C" void func_0017E278(GOAL_17E278 *pgoal, int newState)
+extern "C" void func_0017E278(GOALFLEE *pgoal, int newState)
 {
     if (newState == pgoal->state)
         return;
-    Goal_Pop(&((void *)pgoal->pgoalChild));
+    Goal_Pop(&pgoal->pgoalChild);
     pgoal->state = newState;
-    pgoal->tState = *(float *)&g_2dded0;
+    pgoal->tState = g_2dded0.t;
     switch (newState) {
     case 0: {
-        OBJ *pidle = func_00205438(((void *)pgoal->pstep), 0x9D);
-        VT *vtable = pidle->vptr;
-        *(int *)((char *)pidle + 0x3C) = 0xB;
-        *(int *)((char *)pidle + 0x38) = pgoal->target;
-        vtable->fn((char *)pidle + vtable->delta);
+        GOALANIM *pidle = (GOALANIM *)func_00205438(pgoal->pstep, 0x9D);
+        pidle->sgs = 0xB;
+        pidle->ptarget = pgoal->ptarget;
+        pidle->Activate();
         break;
     }
     case 1: {
-        OBJ *pgoto = func_00205438(((void *)pgoal->pstep), 0xBA);
-        *(int *)((char *)pgoto + 0xC0) = 1;
-        *(int *)((char *)pgoto + 0x38) = 0x1C;
+        GOALGOTO *pgoto = (GOALGOTO *)func_00205438(pgoal->pstep, 0xBA);
+        pgoto->fLink = 1;
+        pgoto->field_0x38 = 0x1C;
         func_0017E0E0(pgoal);
-        VT *vtable = pgoto->vptr;
-        vtable->fn((char *)pgoto + vtable->delta);
+        pgoto->Activate();
         break;
     }
     case 2: {
-        OBJ *palert = func_00205438(((void *)pgoal->pstep), 0x9E);
-        *(int *)((char *)palert + 0x3C) = 1;
-        VT *vtable = palert->vptr;
-        vtable->fn((char *)palert + vtable->delta);
+        GOALANIM *palert = (GOALANIM *)func_00205438(pgoal->pstep, 0x9E);
+        palert->sgs = 1;
+        palert->Activate();
         break;
     }
     }

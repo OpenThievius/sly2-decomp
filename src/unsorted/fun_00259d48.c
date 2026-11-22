@@ -1,5 +1,6 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "guardview.h"
 
-void func_00259D48(void *arg0, s32 arg1) {
-    M2C_FIELD(M2C_FIELD(arg0, void **, 0xF64), s32 *, 0xEC) = arg1;
+void func_00259D48(struct STEPGUARDVIEW *guard, s32 value) {
+    guard->psensor->field_0xEC = value;
 }

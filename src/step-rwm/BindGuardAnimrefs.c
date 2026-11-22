@@ -1,22 +1,23 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "guardview.h"
 
-M2C_UNK BindAnimref(void *, void *);                /* extern */
-M2C_UNK BindAnimrefArray(void *, void *);           /* extern */
+void BindAnimref(struct ANIMREF *, struct STEPGUARDVIEW *);
+void BindAnimrefArray(struct STEPGUARDVIEW *, struct ANIMREF *);
 
-void BindGuardAnimrefs(void *arg0) {
-    s32 var_s2;
-    void *var_s1;
+void BindGuardAnimrefs(struct STEPGUARDVIEW *pguard) {
+    s32 ianim;
+    struct GUARDANIM *panim;
 
-    var_s2 = 0;
-    if (M2C_FIELD(arg0, s32 *, 0x4C0) > 0) {
-        var_s1 = arg0 + 0x4D0;
+    ianim = 0;
+    if (pguard->canim > 0) {
+        panim = pguard->aanim;
         do {
-            BindAnimref(var_s1, arg0);
-            var_s2 += 1;
-            var_s1 += 0x20;
-        } while (var_s2 < M2C_FIELD(arg0, s32 *, 0x4C0));
+            BindAnimref(&panim->ref, pguard);
+            ianim += 1;
+            panim += 1;
+        } while (ianim < pguard->canim);
     }
-    BindAnimrefArray(arg0, arg0 + 0xC10);
-    BindAnimrefArray(arg0, arg0 + 0x8D0);
-    BindAnimrefArray(arg0, arg0 + 0xA70);
+    BindAnimrefArray(pguard, pguard->aarefC);
+    BindAnimrefArray(pguard, pguard->aarefA);
+    BindAnimrefArray(pguard, pguard->aarefB);
 }

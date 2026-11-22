@@ -1,19 +1,17 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 #include "stepguard.h"
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
+#include "goals.h"
+#include "dl.h"
+#include "clock.h"
 extern "C" {
-void RemoveDlEntry(M2C_UNK *, void *);
-void func_001F3E00();
-extern M2C_UNK B_003E1444;
-extern f32 g_2dded0;
+void RemoveDlEntry(DL *, void *);
+void func_001F3E00(void *);
+extern DL B_003E1444;
 
-void RemoveStepguardHierarchy(STEPGUARD *arg0) {
-    func_001F3E00();
-    RemoveDlEntry(&B_003E1444, arg0);
-    arg0->field_0xFF8 = (f32) g_2dded0;
+void RemoveStepguardHierarchy(STEPGUARD *pguard) {
+    func_001F3E00(pguard);
+    RemoveDlEntry(&B_003E1444, pguard);
+    pguard->field_0xFF8 = g_2dded0.t;
 }
 
 }

@@ -1,30 +1,23 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "stepguard.h"
+#include "goals.h"
 extern "C" {
-void AddGuardSgs(s32, s32);
-void GoalAnim_SetState(void *, M2C_UNK);
-s32 PguardanimCurrent(s32);
+void AddGuardSgs(STEPGUARD *pguard, s32 sgs);
+void GoalAnim_SetState(GOALANIM *goal, s32 state);
+GUARDANIM *PguardanimCurrent(STEPGUARD *pguard);
 void func_001EEF70();
 
-void func_00174950(void *arg0) {
-    s32 temp_v0;
-
+void func_00174950(GOALANIM *goal) {
     func_001EEF70();
-    AddGuardSgs(M2C_FIELD(arg0, s32 *, 0x10), M2C_FIELD(arg0, s32 *, 0x3C));
-    if (M2C_FIELD(arg0, s32 *, 0x40) == 0) {
-        temp_v0 = PguardanimCurrent(M2C_FIELD(arg0, s32 *, 0x10));
-        M2C_FIELD(arg0, s32 *, 0x40) = temp_v0;
-        if (temp_v0 == 0) {
-            GoalAnim_SetState(arg0, 1);
+    AddGuardSgs(GOAL_GUARD(goal), goal->sgs);
+    if (goal->panimref == 0) {
+        goal->panimref = &PguardanimCurrent(GOAL_GUARD(goal))->ref;
+        if (goal->panimref == 0) {
+            GoalAnim_SetState(goal, 1);
             return;
         }
-        goto block_4;
     }
-block_4:
-    GoalAnim_SetState(arg0, 0);
+    GoalAnim_SetState(goal, 0);
 }
 
 }

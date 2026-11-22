@@ -1,11 +1,12 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "cplcy.h"
 
-M2C_UNK bevy_classes_k30_cam_150ef0();              /* extern */
+void bevy_classes_k30_cam_150ef0(struct K30CAM *);
 
-void func_00150E60(void *arg0, s32 arg1) {
-    M2C_FIELD(arg0, s32 *, 0x14) = arg1;
-    if (M2C_FIELD(arg0, s32 *, 0x40) != 0) {
-        bevy_classes_k30_cam_150ef0();
+void func_00150E60(struct K30CAM *camera, s32 value) {
+    camera->field_0x14 = value;
+    if (camera->active != 0) {
+        bevy_classes_k30_cam_150ef0(camera);
     }
-    M2C_FIELD(arg0, s32 *, 0x40) = 0;
+    camera->active = 0;
 }

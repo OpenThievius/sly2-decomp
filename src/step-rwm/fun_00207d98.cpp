@@ -1,26 +1,23 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "stepguard.h"
+#include "goals.h"
 extern "C" {
-s32 GrfsgsFromRef(s32);                             /* extern */
-s8 *PguardanimEnsure(s32, s32);                   /* extern */
-void func_0020BD78(s32 *);                       /* extern */
-s32 *func_0020C010(M2C_UNK);                        /* extern */
+s32 GrfsgsFromRef(s32);
+GUARDANIM *PguardanimEnsure(STEPGUARD *, s64);
+void func_0020BD78(s32 *);
+JUMPANIM *func_0020C010(s32);
 
-void func_00207D98(s32 arg0, s32 arg1, s32 arg2) {
-    s32 *temp_v0_2;
-    s8 *temp_v0;
+void func_00207D98(STEPGUARD *pguard, s32 refList, s32 idJump) {
+    JUMPANIM *pjump;
+    GUARDANIM *panim;
 
-    temp_v0 = PguardanimEnsure(arg0, GrfsgsFromRef(arg1));
-    M2C_FIELD(temp_v0, s32 *, 0) = 2;
-    temp_v0_2 = func_0020C010(0x40);
-    M2C_FIELD(temp_v0, s32 **, 4) = temp_v0_2;
-    func_0020BD78(temp_v0_2);
-    *M2C_FIELD(temp_v0, s32 **, 4) = arg2;
-    M2C_FIELD(temp_v0, s32 *, 0xC) = 0;
+    panim = PguardanimEnsure(pguard, GrfsgsFromRef(refList));
+    panim->ref.kind = 2;
+    pjump = func_0020C010(0x40);
+    panim->ref.pdata = pjump;
+    func_0020BD78(&pjump->field_0x0);
+    ((JUMPANIM *)panim->ref.pdata)->field_0x0 = idJump; /* reloaded through the slot, as retail does */
+    panim->ref.grf = 0;
 }
 
 }

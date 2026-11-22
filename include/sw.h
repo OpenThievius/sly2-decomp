@@ -168,7 +168,8 @@ struct SW : BASIC {
     /* 0x3FFC */ DL dlHitfx; /* func_00156548 */
     /* 0x4008 */ SLOTHEAP slotheapHitfx; /* func_00156548 */
     /* 0x4020 */ struct BASIC *phitfxdef; /* func_0017A7F8 hands it to PhitfxSpawn, whose Splice binding passes a BASIC */
-    u8 unknown_0x4024[0x8];
+    u8 unknown_0x4024[0x4];
+    /* 0x4028 */ void *field_0x4028; /* GoalAnimLeap_FHandleMessage: the first argument of PhitfxSpawn, as phitfxdef (0x4020) and field_0x402C are for others */
     /* 0x402C */ s32 field_0x402C; /* ExplodeGadgetBurst passes it to PhitfxSpawn (a hit effect id/def) */
     u8 unknown_0x4030[0xC];
     /* 0x403C */ SLOTHEAP slotheapRipg; /* PripgNew */
@@ -208,6 +209,7 @@ struct SW : BASIC {
 
 #if defined(__mips__)
 SLY2_OFFSET_CHECK(SW, astring, 0x4644);
+SLY2_OFFSET_CHECK(SW, field_0x4028, 0x4028);
 SLY2_OFFSET_CHECK(SW, field_0x402C, 0x402C);
 SLY2_SIZE_CHECK(SLOTHEAP, 0x18);
 SLY2_SIZE_CHECK(LOADREQ, 0x4C);

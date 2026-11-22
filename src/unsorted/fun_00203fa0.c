@@ -1,10 +1,11 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "guardview.h"
 
-void func_00203FA0(void *arg0, s32 arg1) {
-    if (M2C_FIELD(arg0, s32 *, 0x204) != arg1) {
-        M2C_FIELD(arg0, s32 *, 0x204) = arg1;
-        if (arg1 != 0) {
-            M2C_FIELD(arg0, s32 *, 0x208) = 0;
+void func_00203FA0(struct STEPVIEW *step, s32 value) {
+    if (step->field_0x204 != value) {
+        step->field_0x204 = value;
+        if (value != 0) {
+            step->psoSurface = 0;
         }
     }
 }

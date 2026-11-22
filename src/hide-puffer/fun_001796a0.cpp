@@ -1,7 +1,10 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "stepguard.h"
+#include "goals.h"
 #include "sly2.h"
-extern "C" void func_00174920(void *);
-void func_001796A0(void *pgoal)
+extern "C" void func_00174920(GOALANIM *);
+void func_001796A0(GOALANIM *pgoal)
 {
     func_00174920(pgoal);
-    *(int *)((char *)pgoal + 0x3C) = 5;
+    pgoal->sgs = 5;
 }

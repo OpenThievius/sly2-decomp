@@ -1,18 +1,16 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "goals.h"
 
-M2C_UNK func_0017E6B0(void *, M2C_UNK);             /* extern */
-M2C_UNK func_001EF038(void *);                      /* extern */
+void func_0017E6B0(struct GOALFOLLOWROUTE *pgoal, s32 newState);
+void func_001EF038(struct GOALFOLLOWROUTE *pgoal);
 
-void func_0017E580(void *arg0) {
-    s32 temp_v0;
-
-    temp_v0 = M2C_FIELD(arg0, s32 *, 0x34) + 1;
-    M2C_FIELD(arg0, s32 *, 0x34) = temp_v0;
-    if (temp_v0 < M2C_FIELD(M2C_FIELD(arg0, void **, 0x30), s32 *, 0x50)) {
-        func_0017E6B0(arg0, -1);
-        func_0017E6B0(arg0, 0);
+void func_0017E580(struct GOALFOLLOWROUTE *pgoal) {
+    pgoal->index = pgoal->index + 1;
+    if (pgoal->index < pgoal->proute->cwaypoint) {
+        func_0017E6B0(pgoal, -1);
+        func_0017E6B0(pgoal, 0);
         return;
     }
-    func_0017E6B0(arg0, -1);
-    func_001EF038(arg0);
+    func_0017E6B0(pgoal, -1);
+    func_001EF038(pgoal);
 }

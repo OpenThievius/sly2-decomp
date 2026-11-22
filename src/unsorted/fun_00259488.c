@@ -1,5 +1,14 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "types.h"
+struct GEOMENTRY {
+    u8 unknown_0x0[4];
+    s32 field_0x4;
+};
+struct GEOMOWNER {
+    u8 unknown_0x0[0xE4];
+    struct GEOMENTRY *pgeom;
+};
 
-s32 func_00259488(void *arg0) {
-    return M2C_FIELD(M2C_FIELD(arg0, void **, 0xE4), s32 *, 4);
+s32 func_00259488(struct GEOMOWNER *owner) {
+    return owner->pgeom->field_0x4;
 }

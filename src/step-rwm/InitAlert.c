@@ -1,14 +1,17 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "types.h"
+#include "dl.h"
+#include "guard.h"
 
-M2C_UNK AppendDlEntry(M2C_UNK *, void *);           /* extern */
-extern M2C_UNK B_003E145C;
+void AppendDlEntry(struct DL *, void *);
+extern struct DL B_003E145C;
 
-void *InitAlert(void *arg0, s32 arg1) {
-    M2C_FIELD(arg0, s32 *, 0xC) = arg1;
-    M2C_FIELD(arg0, f32 *, 0x14) = 1.0f;
-    M2C_FIELD(arg0, f32 *, 0x18) = 2.0f;
-    M2C_FIELD(arg0, s32 *, 0x10) = -1;
-    M2C_FIELD(arg0, s32 *, 8) = -1;
-    AppendDlEntry(&B_003E145C, arg0);
-    return arg0;
+struct ALERT *InitAlert(struct ALERT *palert, struct LO *palo) {
+    palert->palo = palo;
+    palert->field_0x14 = 1.0f;
+    palert->radCone = 2.0f;
+    palert->field_0x10 = -1;
+    palert->field_0x8 = -1;
+    AppendDlEntry(&B_003E145C, palert);
+    return palert;
 }

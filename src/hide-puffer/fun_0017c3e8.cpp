@@ -5,7 +5,6 @@
 #include "phys.h"
 struct LINK { char pad[0x10]; void *zone; };
 struct CRV { char pad[0xE8]; int count; char pad1[0xF4 - 0xEC]; QW *nodes; };
-struct GUARDTARGET { char pad0[0xC]; void *palo; char pad1[0x18 - 0x10]; float radCone; };
 #include "goal.h"
 struct GOAL_17C3E8 : GOAL {
     int state;
@@ -13,7 +12,7 @@ struct GOAL_17C3E8 : GOAL {
     float dist;
 };
 extern "C" void func_001EEF98(GOAL_17C3E8 *);
-extern "C" float GetAlertPan(GUARDTARGET *);
+extern "C" float GetAlertPan(ALERT *);
 extern "C" QW PosLoWorld(void *);
 extern "C" void DecomposeCylind(QW, float *, float *, float *);
 extern "C" float RadNormalize__Ff(float);
@@ -35,7 +34,7 @@ extern "C" void func_0017C3E8(GOAL_17C3E8 *goal)
     void *zone = 0;
     if (pz)
         zone = pz->zone;
-    GUARDTARGET *alert = jt->ptarget;
+    ALERT *alert = jt->palert;
     void *palo = alert->palo;
     float pan = GetAlertPan(alert);
     QW posAlert = PosLoWorld(palo);

@@ -1,5 +1,6 @@
-int func_001F6960(void *arg0)
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "so.h"
+int func_001F6960(SO *pso)
 {
-    long v = *(long *)((char *)arg0 + 0x148);
-    return (int)((v << 0x6) >> 32) & 0x1;
+    return (int)((pso->grfso << 6) >> 32) & 1;
 }

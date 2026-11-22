@@ -1,7 +1,8 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "guardview.h"
 
-M2C_UNK GoalStack_Push(s32);                        /* extern */
+struct GOAL *GoalStack_Push(struct GOALSTACK *, s32);
 
-void func_00205438(s32 arg0) {
-    GoalStack_Push(arg0 + 0x26C);
+struct GOAL *func_00205438(struct STEPGUARDVIEW *pguard, s32 type) {
+    return GoalStack_Push(&pguard->goalstack, type);
 }

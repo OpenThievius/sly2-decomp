@@ -1,170 +1,153 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "stepguard.h"
+#include "goals.h"
 #include "sly2.h"
-struct VT { char pad[0x40]; short delta; short unused; void (*fn)(void *); };
-struct OBJ { char pad[0xC]; VT *vt; };
-struct CMD { int type; int pad4[3]; int arg; float argf; char rest[0x70 - 0x18]; } __attribute__((aligned(16)));
-struct PAYLOAD { char bytes[0x60]; } __attribute__((aligned(16)));
-struct PLAYER { char pad0[0x4B0]; QW q4B0; char pad1[0xF68 - 0x4C0]; int f68; int pad6C; QW q70; char pad2[0x108C - 0xF80]; int f108C; };
-struct BRAIN { char pad0[0x10]; PLAYER *player; char pad1[0x18 - 0x14]; char popSlot[0x18]; CMD cmd; char pad2[0xA0 - 0xA0]; float since; float next; };
+/* a guard of class 0x3C (60, a STEPGUARD subclass): the word past STEPGUARD it holds (func_00177D70 reads it too) */
+struct GUARD3C : STEPGUARD {
+    u8 unknown_0x1010[0x7C];
+    /* 0x108C */ LO *field_0x108C;
+};
 extern "C" {
 float GRandInRange(float, float);
-int GoalBrain_FCmdEqual(CMD *, CMD *);
-void Goal_Pop(void *);
-void SetGuardScript(char *, int, int, int);
-void SetSearchGoal(char *, int);
-char *func_00205438(PLAYER *, int);
-void func_00208540(PLAYER *, int);
+int GoalBrain_FCmdEqual(GOALCMD *, GOALCMD *);
+void Goal_Pop(GOAL **ppgoal);
+void SetGuardScript(GOAL *, int, int, int);
+void SetSearchGoal(GOALSEARCH *, GOAL *);
+GOAL *func_00205438(STEPGUARD *, int);
+void func_00208540(STEPGUARD *, LO *);
 extern float D_002BE618[2];
 extern float g_2dded0;
-void GoalBrain_SetCommand(BRAIN *self, CMD *cmd) {
-    if (GoalBrain_FCmdEqual(cmd, &self->cmd) == 0) {
-        Goal_Pop(self->popSlot);
-        self->cmd = *cmd;
-        self->since = g_2dded0;
+void GoalBrain_SetCommand(GOALBRAIN *goal, GOALCMD *pcmd) {
+    if (GoalBrain_FCmdEqual(pcmd, &goal->cmd) == 0) {
+        Goal_Pop(&goal->pgoalChild);
+        goal->cmd = *pcmd;
+        goal->tCommand = g_2dded0;
         int notify = 0;
-        switch (cmd->type) {
+        switch (pcmd->type) {
         case 5: {
             notify = 1;
-            char *obj = func_00205438(self->player, 0xA9);
-            SetGuardScript(obj, cmd->arg, 1, 0);
-            VT *vt = ((OBJ *)obj)->vt;
-            vt->fn(obj + vt->delta);
+            GOAL *script = func_00205438(GOAL_GUARD(goal), 0xA9);
+            SetGuardScript(script, pcmd->args.arg, 1, 0);
+            script->Activate();
             break;
         }
         case 1: {
             notify = 1;
-            char *obj = func_00205438(self->player, 0xAA);
-            VT *vt = ((OBJ *)obj)->vt;
-            vt->fn(obj + vt->delta);
+            GOAL *idle = func_00205438(GOAL_GUARD(goal), 0xAA);
+            idle->Activate();
             break;
         }
         case 3: {
-            char *obj = func_00205438(self->player, 0x9D);
-            VT *vt = ((OBJ *)obj)->vt;
-            *(int *)(obj + 0x3C) = 0xB;
-            *(int *)(obj + 0x38) = cmd->arg;
-            vt->fn(obj + vt->delta);
+            GOALANIM *anim = (GOALANIM *)func_00205438(GOAL_GUARD(goal), 0x9D);
+            anim->sgs = 0xB;
+            anim->ptarget = (LO *)pcmd->args.arg;
+            anim->Activate();
             break;
         }
         case 4: {
-            char *obj = func_00205438(self->player, 0xA5);
-            VT *vt = ((OBJ *)obj)->vt;
-            *(int *)(obj + 0x30) = cmd->arg;
-            vt->fn(obj + vt->delta);
+            GOALNOTICE *notice = (GOALNOTICE *)func_00205438(GOAL_GUARD(goal), 0xA5);
+            notice->ptarget = (LO *)pcmd->args.arg;
+            notice->Activate();
             break;
         }
         case 2: {
             notify = 1;
-            char *obj = func_00205438(self->player, 0xAB);
-            SetSearchGoal(obj, cmd->arg);
-            VT *vt = ((OBJ *)obj)->vt;
-            vt->fn(obj + vt->delta);
+            GOALSEARCH *search = (GOALSEARCH *)func_00205438(GOAL_GUARD(goal), 0xAB);
+            SetSearchGoal(search, (GOAL *)pcmd->args.arg);
+            search->Activate();
             break;
         }
         case 9: {
-            char *obj = func_00205438(self->player, 0xA1);
-            *(PAYLOAD *)(obj + 0x50) = *(PAYLOAD *)((char *)cmd + 0x10);
-            VT *vt = ((OBJ *)obj)->vt;
-            vt->fn(obj + vt->delta);
+            GOALHIT *withArgs = (GOALHIT *)func_00205438(GOAL_GUARD(goal), 0xA1);
+            withArgs->args = pcmd->args;
+            withArgs->Activate();
             break;
         }
         case 10: {
-            char *obj = func_00205438(self->player, 0xA2);
-            *(PAYLOAD *)(obj + 0x50) = *(PAYLOAD *)((char *)cmd + 0x10);
-            VT *vt = ((OBJ *)obj)->vt;
-            vt->fn(obj + vt->delta);
+            GOALHIT *withArgs = (GOALHIT *)func_00205438(GOAL_GUARD(goal), 0xA2);
+            withArgs->args = pcmd->args;
+            withArgs->Activate();
             break;
         }
         case 11: {
-            char *obj = func_00205438(self->player, 0xA3);
-            *(PAYLOAD *)(obj + 0x50) = *(PAYLOAD *)((char *)cmd + 0x10);
-            VT *vt = ((OBJ *)obj)->vt;
-            vt->fn(obj + vt->delta);
+            GOALHIT *withArgs = (GOALHIT *)func_00205438(GOAL_GUARD(goal), 0xA3);
+            withArgs->args = pcmd->args;
+            withArgs->Activate();
             notify = 1;
             break;
         }
         case 8: {
-            char *obj = func_00205438(self->player, 0xAF);
-            VT *vt = ((OBJ *)obj)->vt;
-            vt->fn(obj + vt->delta);
+            GOAL *react = func_00205438(GOAL_GUARD(goal), 0xAF);
+            react->Activate();
             break;
         }
         case 6: {
-            char *obj = func_00205438(self->player, 0xB0);
-            VT *vt = ((OBJ *)obj)->vt;
-            *(int *)(obj + 0x3C) = self->cmd.arg;
-            vt->fn(obj + vt->delta);
+            GOALB0 *hit = (GOALB0 *)func_00205438(GOAL_GUARD(goal), 0xB0);
+            hit->phitter = (void *)goal->cmd.args.arg;
+            hit->Activate();
             break;
         }
         case 7: {
-            char *obj = func_00205438(self->player, 0xB1);
-            VT *vt = ((OBJ *)obj)->vt;
-            *(int *)(obj + 0x5C) = cmd->arg;
-            vt->fn(obj + vt->delta);
+            GOALGRAB *b1 = (GOALGRAB *)func_00205438(GOAL_GUARD(goal), 0xB1);
+            b1->psoHeld = (SO *)pcmd->args.arg;
+            b1->Activate();
             break;
         }
         case 12: {
-            char *obj = func_00205438(self->player, 0xB2);
-            VT *vt = ((OBJ *)obj)->vt;
-            vt->fn(obj + vt->delta);
+            GOAL *stunned = func_00205438(GOAL_GUARD(goal), 0xB2);
+            stunned->Activate();
             break;
         }
         case 13: {
-            char *obj = func_00205438(self->player, 0xB4);
-            VT *vt = ((OBJ *)obj)->vt;
-            *(int *)(obj + 0x38) = cmd->arg;
-            vt->fn(obj + vt->delta);
+            GOALANIM *anim = (GOALANIM *)func_00205438(GOAL_GUARD(goal), 0xB4);
+            anim->ptarget = (LO *)pcmd->args.arg;
+            anim->Activate();
             break;
         }
         case 14: {
-            char *obj = func_00205438(self->player, 0xB6);
-            VT *vt = ((OBJ *)obj)->vt;
-            *(int *)(obj + 0x38) = cmd->arg;
-            vt->fn(obj + vt->delta);
+            GOALANIM *anim = (GOALANIM *)func_00205438(GOAL_GUARD(goal), 0xB6);
+            anim->ptarget = (LO *)pcmd->args.arg;
+            anim->Activate();
             break;
         }
         case 15: {
-            char *obj = func_00205438(self->player, 0xAE);
-            VT *vt = ((OBJ *)obj)->vt;
-            *(int *)(obj + 0x38) = self->player->f108C;
-            vt->fn(obj + vt->delta);
+            GOALANIM *anim = (GOALANIM *)func_00205438(GOAL_GUARD(goal), 0xAE);
+            anim->ptarget = ((GUARD3C *)goal->pstep)->field_0x108C;
+            anim->Activate();
             break;
         }
         case 16: {
             notify = 1;
-            char *obj = func_00205438(self->player, 0xB7);
-            VT *vt = ((OBJ *)obj)->vt;
-            *(int *)(obj + 0x30) = self->player->f68;
-            *(QW *)(obj + 0x40) = self->player->q70;
-            vt->fn(obj + vt->delta);
+            GOALGOTOTARGET *b7 = (GOALGOTOTARGET *)func_00205438(GOAL_GUARD(goal), 0xB7);
+            b7->ptarget = GOAL_GUARD(goal)->ptargetGoto;
+            b7->offset = GOAL_GUARD(goal)->posGoto;
+            b7->Activate();
             break;
         }
         case 17: {
-            char *obj = func_00205438(self->player, 0x9E);
-            VT *vt = ((OBJ *)obj)->vt;
-            *(int *)(obj + 0x3C) = 0x1A;
-            *(int *)(obj + 0x38) = cmd->arg;
-            vt->fn(obj + vt->delta);
+            GOALANIM *anim = (GOALANIM *)func_00205438(GOAL_GUARD(goal), 0x9E);
+            anim->sgs = 0x1A;
+            anim->ptarget = (LO *)pcmd->args.arg;
+            anim->Activate();
             float now = g_2dded0;
-            self->next = now + GRandInRange(D_002BE618[0], D_002BE618[1]);
+            goal->tRetry = now + GRandInRange(D_002BE618[0], D_002BE618[1]);
             break;
         }
         case 18: {
-            char *obj = func_00205438(self->player, 0xBD);
-            VT *vt = ((OBJ *)obj)->vt;
-            *(int *)(obj + 0x38) = cmd->arg;
-            *(float *)(obj + 0x40) = cmd->argf;
-            vt->fn(obj + vt->delta);
+            GOALFLEE *bd = (GOALFLEE *)func_00205438(GOAL_GUARD(goal), 0xBD);
+            bd->ptarget = (LO *)pcmd->args.arg;
+            bd->field_0x40 = pcmd->args.argf;
+            bd->Activate();
             break;
         }
         case 19: {
-            char *obj = func_00205438(self->player, 0xBF);
-            VT *vt = ((OBJ *)obj)->vt;
-            *(QW *)(obj + 0x40) = self->player->q4B0;
-            vt->fn(obj + vt->delta);
+            GOALSNAPTOPOINT *bf = (GOALSNAPTOPOINT *)func_00205438(GOAL_GUARD(goal), 0xBF);
+            bf->target.pos = GOAL_GUARD(goal)->posCopy;
+            bf->Activate();
             break;
         }
         }
-        if (notify != 0) func_00208540(self->player, 0);
+        if (notify != 0) func_00208540(GOAL_GUARD(goal), 0);
     }
 }
 }

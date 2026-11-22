@@ -1,14 +1,23 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "types.h"
+struct CMDENTRY {
+    s32 kind;
+    s32 value;
+    u8 unknown_0x8[0x14];
+};
+struct CMDQUEUE {
+    u8 unknown_0x0[0x50];
+    s32 count;
+    struct CMDENTRY *entries;
+};
 
-void func_00173358(void *arg0, s32 arg1) {
-    s32 temp_a1;
-    void *temp_v1;
-
-    temp_a1 = M2C_FIELD(arg0, s32 *, 0x50);
-    if (temp_a1 < 0x80) {
-        M2C_FIELD(arg0, s32 *, 0x50) = (s32) (temp_a1 + 1);
-        temp_v1 = M2C_FIELD(arg0, s32 *, 0x54) + (temp_a1 * 0x1C);
-        M2C_FIELD(temp_v1, s32 *, 0) = 2;
-        M2C_FIELD(temp_v1, s32 *, 4) = arg1;
+void func_00173358(struct CMDQUEUE *queue, s32 value) {
+    s32 index = queue->count;
+    struct CMDENTRY *entry;
+    if (index < 0x80) {
+        queue->count = index + 1;
+        entry = &queue->entries[index];
+        entry->kind = 2;
+        entry->value = value;
     }
 }

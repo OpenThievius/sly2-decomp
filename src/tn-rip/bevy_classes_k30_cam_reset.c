@@ -1,8 +1,9 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "cplcy.h"
 
-M2C_UNK VirtualRefPtr_Assign(s32, M2C_UNK);         /* extern */
+void VirtualRefPtr_Assign(void **, void *);
 
-void bevy_classes_k30_cam_reset(s32 arg0) {
-    VirtualRefPtr_Assign(arg0 + 0xC4, 0);
-    VirtualRefPtr_Assign(arg0 + 0xC0, 0);
+void bevy_classes_k30_cam_reset(struct K30CAM *camera) {
+    VirtualRefPtr_Assign(&camera->field_0xC4, 0);
+    VirtualRefPtr_Assign(&camera->field_0xC0, 0);
 }

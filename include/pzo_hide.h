@@ -92,11 +92,10 @@ struct RSMG {
     s32 oidUntriggerGoal;
 };
 
-/* GRAB (class 75 by Grab_Init's role, guessed from state 1 handing an anchor to the player: decomp_names.md), a SOHIT: its fields from 0x1A0.
-   In C (the C files of this module) SOHIT does not exist: the same fields follow 0x1A0 bytes of unknown. Readers: Grab_Reset (func_00181598),
+/* GRAB (class 75 by Grab_Init's role, guessed from state 1 handing an anchor to the player: decomp_names.md), a SOHIT (0x1C0 bytes,
+   sohit.h): its fields from 0x1C0. In C (the C files of this module) SOHIT does not exist: the same fields follow 0x1C0 bytes of unknown. Readers: Grab_Reset (func_00181598),
    Grab_SetState (func_001815E8), Grab_FAddRsmg (func_001816E8), Grab_ReleasePlayer (func_00181728), Grab_Init, Grab_PostLoad (both methods). */
 #define GRAB_FIELDS \
-    u8 unknown_0x1A0[0x20]; \
     s32 state;                  /* 0x1C0: Grab_SetState; the same slot holds Mount's and Chaser's state */ \
     f32 tState;                 /* 0x1C4: the clock at the last state change */ \
     struct MOUNT *pmount;       /* 0x1C8: Grab_SetState, Grab_ReleasePlayer: an object it passes to Mount_SetState (a MOUNT, whose field 0x294 it sets) */ \
@@ -127,7 +126,6 @@ struct CHASERRANGE {
 };
 
 struct CHASER : SOHIT {
-    u8 unknown_0x1A0[0x20];
     /* 0x1C0 */ s32 state;   /* Chaser_SetState (-1 before the first); Chaser_FTakeHit */
     /* 0x1C4 */ f32 tState;  /* Chaser_SetState: the clock at the change */
     u8 unknown_0x1C8[0x48];
@@ -158,14 +156,14 @@ struct SWARMGROUP {
 
 /* SWARM, a SOHIT: up to four groups, a dead list */
 struct SWARM : SOHIT {
-    u8 unknown_0x1A0[0x28];
+    u8 unknown_0x1C0[0x8];
     /* 0x1C8 */ s32 cgroup;            /* Swarm_Reset */
     /* 0x1CC */ SWARMGROUP agroup[4];  /* Swarm_Reset (indexes it), Swarm_AbsorbTouch's Swarm_182AB8 agrees on 4 */
     /* 0x28C */ DL dlDead;             /* Swarm_Init: InitDl(&dlDead, 0x60); Swarm_Reset empties it; Swarm_SetRiderState appends */
 };
 #else
 struct GRAB {
-    u8 unknown_0x0[0x1A0];
+    u8 unknown_0x0[0x1C0];
     GRAB_FIELDS
 };
 #endif

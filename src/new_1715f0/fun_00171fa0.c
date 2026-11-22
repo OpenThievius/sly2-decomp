@@ -1,9 +1,10 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "goals.h"
 
-M2C_UNK SetSearchState(s32, M2C_UNK);               /* extern */
-M2C_UNK func_001EEF70();                            /* extern */
+void SetSearchState(struct GOALSEARCH *goal, s32 state);
+void func_001EEF70(void);
 
-void func_00171FA0(s32 arg0) {
+void func_00171FA0(struct GOALSEARCH *goal) {
     func_001EEF70();
-    SetSearchState(arg0, 0);
+    SetSearchState(goal, 0);
 }

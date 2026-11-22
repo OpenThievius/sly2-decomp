@@ -1,6 +1,7 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "cplcy.h"
 
-M2C_UNK UpdateCplcy();                              /* extern */
+void UpdateCplcy(void);
 
 void UpdateCplcy_thunk(void) {
     UpdateCplcy();

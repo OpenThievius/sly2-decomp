@@ -1,13 +1,22 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "goals.h"
 
-s32 func_00177D20(void *arg0) {
-    s32 var_a0;
-    void *temp_v1;
+/* two words of the guard only this function reads (one reader: a local view, not STEPGUARD members) */
+struct GUARDVIEW_177D20 {
+    u8 unknown_0x0[0xF94];
+    /* 0xF94 */ s32 field_0xF94;
+    u8 unknown_0xF98[0x10];
+    /* 0xFA8 */ s32 field_0xFA8;
+};
 
-    temp_v1 = M2C_FIELD(arg0, void **, 0x10);
-    var_a0 = 0;
-    if ((M2C_FIELD(temp_v1, s32 *, 0xFA8) != 0) || (M2C_FIELD(temp_v1, s32 *, 0xF94) != 0)) {
-        var_a0 = 1;
+s32 func_00177D20(struct GOALBRAIN *goal) {
+    struct GUARDVIEW_177D20 *pguard;
+    s32 result;
+
+    pguard = (struct GUARDVIEW_177D20 *)goal->pstep;
+    result = 0;
+    if ((pguard->field_0xFA8 != 0) || (pguard->field_0xF94 != 0)) {
+        result = 1;
     }
-    return var_a0;
+    return result;
 }

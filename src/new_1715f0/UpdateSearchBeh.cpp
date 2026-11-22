@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 #include "types.h"
 #include "ps2inline.h"
 #include "vu0inline.h"
@@ -78,7 +79,7 @@ extern "C" void UpdateSearchBeh(SEARCHBEH *pbeh)
                 SetSearchState(pbeh, 3);
             } else {
                 QW offset = VectorSub(func_00172760(pbeh), PosLoWorld(pbeh->pstep));
-                void *pxps = &((STEPGUARD *)pbeh->pstep)->field_0xFD0;
+                void *pxps = &((STEPGUARD *)pbeh->pstep)->heading;
                 func_00209818(pxps, atan2f(LaneYInGeneralRegister(offset), LaneX(offset)));
             }
             break;

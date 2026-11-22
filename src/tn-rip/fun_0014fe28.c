@@ -1,10 +1,11 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "cplcy.h"
 
-M2C_UNK SetCmFov(M2C_UNK *, f32);                   /* extern */
-extern M2C_UNK B_002DDF40;
+void SetCmFov(struct CM *, f32);
+extern struct CM B_002DDF40;
 
-void func_0014FE28(void *arg0) {
-    M2C_FIELD(arg0, s32 *, 0x20) = 0;
-    M2C_FIELD(arg0, s32 *, 0x24) = 0;
-    SetCmFov(&B_002DDF40, M2C_FIELD(arg0, f32 *, 0x2C));
+void func_0014FE28(struct CPLOOK *look) {
+    look->u = 0;
+    look->du = 0;
+    SetCmFov(&B_002DDF40, look->fovMin);
 }

@@ -1,11 +1,12 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "goals.h"
 
-M2C_UNK func_00175488(s32, M2C_UNK);                /* extern */
-M2C_UNK func_001EEF70();                            /* extern */
-M2C_UNK func_001EEFC0(s32);                         /* extern */
+void func_00175488(struct GOALREACT *goal, s32 state);
+void func_001EEF70(void);
+void func_001EEFC0(struct GOALREACT *goal);
 
-void func_00175410(s32 arg0) {
+void func_00175410(struct GOALREACT *goal) {
     func_001EEF70();
-    func_00175488(arg0, 0);
-    func_001EEFC0(arg0);
+    func_00175488(goal, 0);
+    func_001EEFC0(goal);
 }

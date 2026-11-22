@@ -1,9 +1,10 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "guard.h"
 
-M2C_UNK SetStepRadTarget(s32);                      /* extern */
+void SetStepRadTarget(struct STEP *, f32);
 
-void func_00209818(void *arg0) {
-    if (M2C_FIELD(arg0, s32 *, 4) == 0) {
-        SetStepRadTarget(M2C_FIELD(arg0, s32 *, 0xC));
+void func_00209818(struct GUARDHEADING *pheading, f32 radTarget) {
+    if (pheading->fHold == 0) {
+        SetStepRadTarget(pheading->pstep, radTarget);
     }
 }
