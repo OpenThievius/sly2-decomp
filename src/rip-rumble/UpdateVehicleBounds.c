@@ -1,20 +1,22 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "vehicle.h"
 
-s128 ConvertAloPos(void *, long, s128);
-void ExtendSoBounds(void *, s128, f32);
-void UpdateSoBounds(s8 *);
+struct SO;
+QW ConvertAloPos(struct SO *, long, QW);
+void ExtendSoBounds(struct SO *, QW, f32);
+void UpdateSoBounds(struct SO *);
 
-void UpdateVehicleBounds(void *arg0) {
+void UpdateVehicleBounds(struct VEHICLE *vehicle) {
     s32 index = 0;
-    UpdateSoBounds(arg0);
-    if (M2C_FIELD(arg0, s32 *, 0x190) > 0) {
-        char *entry = (char *)arg0 + 0x1A0;
+    UpdateSoBounds((struct SO *)vehicle);
+    if (vehicle->cwheel > 0) {
+        struct VEHICLEWHEEL *wheel = vehicle->awheel;
         do {
-            s128 pos;
+            QW pos;
             index += 1;
-            pos = ConvertAloPos(arg0, 0, M2C_FIELD(entry, s128 *, 0x50));
-            ExtendSoBounds(arg0, pos, M2C_FIELD(entry, f32 *, 0x20));
-            entry += 0x60;
-        } while (index < M2C_FIELD(arg0, s32 *, 0x190));
+            pos = ConvertAloPos((struct SO *)vehicle, 0, wheel->pos);
+            ExtendSoBounds((struct SO *)vehicle, pos, wheel->radius);
+            wheel += 1;
+        } while (index < vehicle->cwheel);
     }
 }

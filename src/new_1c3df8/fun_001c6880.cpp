@@ -1,15 +1,18 @@
-struct VT_1C6880 { char pad[0x260]; short delta; short unused; void (*fn)(void *, int); };
-struct OBJ_1C6880 { char pad0[0xC]; VT_1C6880 *vt; char pad1[0x150 - 0x10]; int state; char pad2[0x238 - 0x154]; float timer; };
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "dprize.h"
+#include "clock.h"
+
 extern "C" {
-void UpdateDprize();
-extern float g_2dded4;
-void func_001C6880(OBJ_1C6880 *obj)
+void UpdateDprize(DPRIZE *, float dt);
+
+// UpdateDprizeCharm: the same body as UpdateDprizeCoin
+void func_001C6880(DPRIZECHARM *pcharm, float dt)
 {
-    UpdateDprize();
-    if (obj->state == 0) {
-        obj->timer = obj->timer - g_2dded4;
-        if (obj->timer <= 0.0f)
-            obj->vt->fn((char *)obj + obj->vt->delta, 5);
+    UpdateDprize(pcharm, dt);
+    if (pcharm->dprizes == 0) {
+        pcharm->wait = pcharm->wait - g_2dded0.dt;
+        if (pcharm->wait <= 0.0f)
+            pcharm->SetDprizes(5);
     }
 }
 }

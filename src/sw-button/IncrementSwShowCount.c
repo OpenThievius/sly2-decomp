@@ -1,14 +1,15 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "swview.h"
 
-M2C_UNK func_001A3078(M2C_UNK *);                   /* extern */
-extern M2C_UNK B_002E1E60;
+void func_001A3078(void **pslot);
+extern void *B_002E1E60;
 
-void IncrementSwShowCount(void *arg0) {
-    s32 temp_v0;
+void IncrementSwShowCount(struct SWVIEW *psw) {
+    s32 cshow;
 
-    temp_v0 = M2C_FIELD(arg0, s32 *, 0x3D80) + 1;
-    M2C_FIELD(arg0, s32 *, 0x3D80) = temp_v0;
-    if (temp_v0 == 1) {
+    cshow = psw->cshow + 1;
+    psw->cshow = cshow;
+    if (cshow == 1) {
         func_001A3078(&B_002E1E60);
     }
 }

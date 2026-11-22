@@ -1,16 +1,15 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "goals.h"
+#include "sly2.h"
 
-M2C_UNK GoalGoto_SetState(void *, M2C_UNK);         /* extern */
-M2C_UNK Goal_Deactivate();                          /* extern */
-M2C_UNK RemoveGuardSgs(s32, s32);                   /* extern */
+void GoalGoto_SetState(struct GOALGOTO *pgoal, s32 state);
+void Goal_Deactivate(struct GOALGOTO *pgoal);
+void RemoveGuardSgs(void *pguard, s32 sgs);
 
-void GoalGoto_Deactivate(void *arg0) {
-    s32 temp_a1;
-
-    Goal_Deactivate();
-    GoalGoto_SetState(arg0, -1);
-    temp_a1 = M2C_FIELD(arg0, s32 *, 0x38);
-    if (temp_a1 != -1) {
-        RemoveGuardSgs(M2C_FIELD(arg0, s32 *, 0x10), temp_a1);
+void GoalGoto_Deactivate(struct GOALGOTO *pgoal) {
+    Goal_Deactivate(pgoal);
+    GoalGoto_SetState(pgoal, -1);
+    if (pgoal->field_0x38 != -1) {
+        RemoveGuardSgs(pgoal->pstep, pgoal->field_0x38);
     }
 }

@@ -1,9 +1,11 @@
-struct CHILD;
-struct VT_1BEAD0 { char pad0[0x48]; short delta; short index; void (*fn)(void *); };
-struct CHILD { char pad0[0xC]; VT_1BEAD0 *vt; char pad10[0x15C - 0x10]; int flagA; int flagB; };
-struct PARENT { char pad0[0x104]; int count; CHILD *items[1]; };
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "types.h"
+/* the object func_001BEAD0 adds children to and the children's vtable: classes unknown, slot 9 (0x48) is called on a new child */
+struct ROGCHILDVT { u8 unknown_0x0[0x48]; short delta; short index; void (*fn)(void *); };
+struct ROGCHILD { u8 unknown_0x0[0xC]; ROGCHILDVT *vt; u8 unknown_0x10[0x14C]; int flagA; int flagB; };
+struct ROGPARENT { u8 unknown_0x0[0x104]; int count; ROGCHILD *items[1]; };
 extern "C" {
-void func_001BEAD0(PARENT *parent, CHILD *child) {
+void func_001BEAD0(ROGPARENT *parent, ROGCHILD *child) {
     if (child) {
         int count = parent->count;
         parent->items[count] = child;

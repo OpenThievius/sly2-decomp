@@ -1,17 +1,18 @@
-#include "m2c_macros.h"
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "sly2.h"
+#include "guard.h"
 
-M2C_UNK InitJumper(void *);                         /* extern */
-M2C_UNK SetJumperState(void *, M2C_UNK);            /* extern */
-M2C_UNK memset(void *, M2C_UNK, M2C_UNK);           /* extern */
+void InitJumper(struct JUMPER *pjumper);
+void SetJumperState(struct JUMPER *pjumper, s32 state);
 
-void StartJumpAnim(void *arg0, s32 arg1, s32 arg2, void *arg3) {
-    if (M2C_FIELD(arg0, s32 *, 4) != 0) {
-        memset(arg3, 0, 0x70);
-        memset(arg3, 0, 0x70);
-        InitJumper(arg3);
-        M2C_FIELD(arg3, void **, 0x30) = arg0;
-        M2C_FIELD(arg3, s32 *, 0x34) = arg1;
-        M2C_FIELD(arg3, s32 *, 0x3C) = arg2;
-        SetJumperState(arg3, 0);
+void StartJumpAnim(struct JUMPANIM *pjumpanim, struct STEP *pso, s32 field_0x3C, struct JUMPER *pjumper) {
+    if (pjumpanim->pobject != 0) {
+        memset(pjumper, 0, 0x70);
+        memset(pjumper, 0, 0x70);
+        InitJumper(pjumper);
+        pjumper->pjumpanim = pjumpanim;
+        pjumper->pso = pso;
+        pjumper->field_0x3C = field_0x3C;
+        SetJumperState(pjumper, 0);
     }
 }

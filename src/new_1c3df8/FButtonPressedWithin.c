@@ -1,12 +1,13 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "joy.h"
 
-M2C_UNK ClearVjoyPresses(s32, s32);                 /* extern */
-s32 GrfbtnVjoyPressedWithin();                      /* extern */
+void ClearVjoyPresses(struct JOY *pjoy, s32 grfbtn); /* extern */
+s32 GrfbtnVjoyPressedWithin(struct JOY *pjoy, u32 grfbtn, f32 dt); /* extern */
 
-s32 FButtonPressedWithin(s32 arg0) {
-    s32 temp_v0;
+s32 FButtonPressedWithin(struct JOY *pjoy, u32 grfbtn, f32 dt) {
+    s32 grfbtnPressed;
 
-    temp_v0 = GrfbtnVjoyPressedWithin();
-    ClearVjoyPresses(arg0, temp_v0);
-    return temp_v0;
+    grfbtnPressed = GrfbtnVjoyPressedWithin(pjoy, grfbtn, dt);
+    ClearVjoyPresses(pjoy, grfbtnPressed);
+    return grfbtnPressed;
 }

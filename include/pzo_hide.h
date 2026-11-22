@@ -9,6 +9,7 @@
 #include "types.h"
 #include "dl.h"
 #include "clock.h"
+#include "bytes8.h"
 #ifdef __cplusplus
 #include "sohit.h"
 #endif
@@ -17,7 +18,8 @@
 struct MEMBER {
     u8 unknown_0x0[8];
     /* 0x8 */ f32 field_0x8;   /* InitCtrlBlock_182c70 (bevy_player_p6_182c70): FLT_MAX; a method of the class, so certain */
-    u8 unknown_0xC[8];
+    u8 unknown_0xC[4];
+    /* 0x10 */ s32 field_0x10; /* AttachPt_Init (1) and LiftPt_Init (-1) set it, after the base constructor */
     /* 0x14 */ s32 field_0x14; /* the same: -1 */
     u8 unknown_0x18[4];
     /* 0x1C */ s32 field_0x1C; /* the same: 7 */
@@ -39,7 +41,8 @@ struct MEMBERVT {
 struct MEMBER {
     u8 unknown_0x0[8];
     /* 0x8 */ f32 field_0x8;
-    u8 unknown_0xC[8];
+    u8 unknown_0xC[4];
+    /* 0x10 */ s32 field_0x10;
     /* 0x14 */ s32 field_0x14;
     u8 unknown_0x18[4];
     /* 0x1C */ s32 field_0x1C;
@@ -47,7 +50,6 @@ struct MEMBER {
 };
 #endif
 
-struct BYTES8 { u8 bytes[8]; }; /* AttachCrv_Clone, AttachCyl_Clone, AttachFlat_Clone keep these 8 bytes across the base clone; the type is not known */
 
 /* a curve attachment: a CRV (InitCrv, CloneCrv, SMinCrv, SMaxCrv) with a MEMBER at +0x190 */
 struct ATTACHCRV {
@@ -72,6 +74,36 @@ struct ATTACHFLAT {
     u8 unknown_0x0[0xE0];
     /* 0xE0 */ struct MEMBER member;
     /* 0x104 */ struct BYTES8 kept; /* AttachFlat_Clone */
+};
+
+/* an attach point: an XFM with a MEMBER at +0xE0 (the constructor func_00183F08 is InitXfm, the member's, then three stores; AttachPt_OnAdd and
+   AttachPt_OnRemove keep it in B_003E1414) */
+struct ATTACHPT {
+    u8 unknown_0x0[0xE0];
+    /* 0xE0 */ struct MEMBER member;
+    u8 unknown_0x104[0xC];
+    /* 0x110 */ f32 field_0x110;   /* the constructor sets 200.0 */
+};
+
+/* an object id and what PloFindSwObject finds for it (func_001842B0 fills three of them from their ids) */
+struct OIDREF {
+    s32 oid;
+    void *plo;
+};
+
+/* a lift point, an ATTACHPT (its constructor func_00184268 calls the AttachPt one; LiftPt_OnGrab hands the grabber to StartMurrayLift) */
+struct LIFTPT {
+    struct ATTACHPT attachpt;
+    u8 unknown_0x114[0x6C];
+    /* 0x180 */ s32 field_0x180;   /* func_00184380 passes it to func_001A6AF8 */
+    /* 0x184 */ struct OIDREF aref[3]; /* func_00184268 clears the ids (-1), func_001842B0 resolves them */
+    /* 0x19C */ s32 oidLast;       /* func_00184268 (-1), func_00184380 compares it with the other object's member.field_0x14 */
+};
+
+/* an attach zone: an XFM with a MEMBER at +0x130 (the constructor func_001843C0; AttachZone_OnAdd and AttachZone_OnRemove keep it in B_003E1438) */
+struct ATTACHZONE {
+    u8 unknown_0x0[0x130];
+    /* 0x130 */ struct MEMBER member;
 };
 
 /* One animation entry of a SOHIT subclass (0x10 bytes): SoHit_SetAnimEntry (func_0017F4C0) plays aseg and sm with flags; Chaser_SetStateAnim and
@@ -106,6 +138,7 @@ struct RSMG {
 
 #ifdef __cplusplus
 #include "clock.h"
+#include "bytes8.h"
 #include "mount.h"
 #include "sw.h"
 
@@ -172,4 +205,6 @@ struct GRAB {
 extern struct DL B_003E13F0; /* ATTACHCRV */
 extern struct DL B_003E13FC; /* ATTACHCYL */
 extern struct DL B_003E1408; /* ATTACHFLAT */
+extern struct DL B_003E1414; /* ATTACHPT */
+extern struct DL B_003E1438; /* ATTACHZONE */
 #endif

@@ -1,10 +1,13 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "light.h"
 
-M2C_UNK RemoveAloHierarchy();                       /* extern */
-M2C_UNK RemoveLightFromSw(M2C_UNK *, s32);          /* extern */
-extern M2C_UNK B_003DD490;
+struct SW;
+extern struct SW B_003DD490;
 
-void OnLightRemove(s32 arg0) {
-    RemoveAloHierarchy();
-    RemoveLightFromSw(&B_003DD490, arg0);
+void RemoveAloHierarchy(struct LIGHT *light);
+void RemoveLightFromSw(struct SW *psw, struct LIGHT *light);
+
+void OnLightRemove(struct LIGHT *light) {
+    RemoveAloHierarchy(light);
+    RemoveLightFromSw(&B_003DD490, light);
 }

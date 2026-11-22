@@ -1,12 +1,13 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "pzo_hide.h"
 
-M2C_UNK InitXfm();                                  /* extern */
-M2C_UNK bevy_player_p6_182c70(s32);                 /* extern */
+void InitXfm(struct ATTACHPT *);
+void bevy_player_p6_182c70(struct MEMBER *);
 
-void func_00183F08(void *arg0) {
-    InitXfm();
-    bevy_player_p6_182c70(arg0 + 0xE0);
-    M2C_FIELD(arg0, s32 *, 0xF0) = 1;
-    M2C_FIELD(arg0, f32 *, 0x110) = 200.0f;
-    M2C_FIELD(arg0, s32 *, 0xFC) = 0;
+void func_00183F08(struct ATTACHPT *attach) {
+    InitXfm(attach);
+    bevy_player_p6_182c70(&attach->member);
+    attach->member.field_0x10 = 1;
+    attach->field_0x110 = 200.0f;
+    attach->member.field_0x1C = 0;
 }

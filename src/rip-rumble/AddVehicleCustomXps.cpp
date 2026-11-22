@@ -1,23 +1,19 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
-struct VT { char pad[0x1F0]; short delta; short index; int (*fn)(void *); };
-struct OBJ { char pad[0xC]; VT *vt; };
-struct OWNER { char pad[0x60]; OBJ *so; };
-struct OWNERHOLDER { char pad[0xEC]; OWNER *owner; };
-struct GEOM { int a; OWNERHOLDER *owner; };
-struct WHEEL { char pad[8]; char *xps; char pad2[0x60 - 0xC]; };
-struct VEHICLE { char pad[0x190]; int cwheel; int pad194; int pad198; int pad19c; char wheels[1]; };
-extern "C" void func_001F5990(VEHICLE *, GEOM *, int, void *, void *);
-extern "C" void func_001D3450(VEHICLE *, void *, GEOM *, int, void *, void *, void *);
+#include "vehicle.h"
+#include "geom.h"
+#include "oxa.h"
+extern "C" void func_001F5990(VEHICLE *vehicle, GEOM *geom, int cbsp, void *absp, void *pbspLast);
+extern "C" void func_001D3450(VEHICLE *vehicle, VEHICLEWHEEL *wheel, GEOM *geom, int cbsp, void *absp, void *pbspLast, void **ppxps);
 
-void AddVehicleCustomXps(VEHICLE *vehicle, GEOM *geom, int count, void *list, void *bsp)
+void AddVehicleCustomXps(VEHICLE *vehicle, GEOM *geom, int cbsp, void *absp, void *pbspLast)
 {
-    func_001F5990(vehicle, geom, count, list, bsp);
-    OBJ *other = geom->owner->owner->so;
-    VT *vt = other->vt;
-    if (vt->fn((char *)other + vt->delta) != 0) {
+    func_001F5990(vehicle, geom, cbsp, absp, pbspLast);
+    SO *other = geom->pso->poxa->owner;
+    if (other->FIsLocked() != 0) {
         for (int index = 0; index < vehicle->cwheel; index++) {
-            char *wheel = vehicle->wheels + index * 0x60;
-            func_001D3450(vehicle, wheel, geom, count, list, bsp, wheel + 8);
+            VEHICLEWHEEL *wheel = vehicle->awheel + index;
+            func_001D3450(vehicle, wheel, geom, cbsp, absp, pbspLast, &wheel->pxps);
         }
     }
 }

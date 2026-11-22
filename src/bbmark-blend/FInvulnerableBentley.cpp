@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 #include "bentley.h"
 extern "C" int func_00194640(void *, int);
 extern "C" int FInvulnerableJt(void *, int);
@@ -9,7 +10,7 @@ extern "C" int FInvulnerableBentley(BENTLEY *pbentley, int grfjt)
             return 1;
     } else {
         result = 1;
-        if (func_00194640((char *)pbentley + 0x4C0, grfjt) != 0)
+        if (func_00194640(pbentley->PvAttach(), grfjt) != 0)
             return result;
     }
     return FInvulnerableJt(pbentley, grfjt);

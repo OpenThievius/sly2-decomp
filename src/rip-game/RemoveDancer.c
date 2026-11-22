@@ -1,9 +1,12 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "types.h"
 
-M2C_UNK PlayDancerAnim(s32, M2C_UNK, M2C_UNK);      /* extern */
-M2C_UNK RemoveSoLoHierarchy();                      /* extern */
+struct DANCER_1520C8;
 
-void RemoveDancer(s32 arg0) {
+void RemoveSoLoHierarchy();
+void PlayDancerAnim(struct DANCER_1520C8 *, void *, s32);
+
+void RemoveDancer(struct DANCER_1520C8 *dancer) {
     RemoveSoLoHierarchy();
-    PlayDancerAnim(arg0, 0, 0);
+    PlayDancerAnim(dancer, 0, 0);
 }

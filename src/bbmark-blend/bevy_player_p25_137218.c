@@ -1,14 +1,15 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "jtholder.h"
 
-M2C_UNK func_002046F0(void *, s32);                 /* extern */
+void func_002046F0(struct JTVIEW *pjt, sptr pguard);
 
-void bevy_player_p25_137218(void **arg0) {
-    s32 temp_a1;
-    void *temp_a0;
+void bevy_player_p25_137218(struct JTHOLDER *pholder) {
+    struct JTVIEW *pjt;
+    sptr pguard;
 
-    temp_a0 = *arg0;
-    temp_a1 = M2C_FIELD(temp_a0, s32 *, 0x10DC);
-    if (temp_a1 != 0) {
-        func_002046F0(temp_a0, temp_a1);
+    pjt = pholder->pjt;
+    pguard = pjt->field_0x10DC;
+    if (pguard != 0) {
+        func_002046F0(pjt, pguard);
     }
 }

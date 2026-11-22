@@ -1,15 +1,16 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "bentleyview.h"
 
-s32 FGadgetObjKept(void *);                         /* extern */
-M2C_UNK UnlockLeaseOfPlo(s32, void *);              /* extern */
-M2C_UNK func_0018D698(void *, void *, void *);      /* extern */
+s32 FGadgetObjKept(struct GADGETOBJ *pgadget);
+void UnlockLeaseOfPlo(void *ppool, void *plo);
+void func_0018D698(void *pbentley, struct BENTLEYSLOTVIEW *pslot, void *plo);
 
-void ReleaseBentleyGadget(void *arg0) {
-    if (FGadgetObjKept(M2C_FIELD(arg0, void **, 0x186C)) != 0) {
-        M2C_FIELD(M2C_FIELD(arg0, void **, 0x186C), void **, 0x16C) = arg0;
-        func_0018D698(arg0, M2C_FIELD(arg0, void **, 0x16B4), M2C_FIELD(arg0, void **, 0x186C));
+void ReleaseBentleyGadget(struct BENTLEYVIEW *pbentley) {
+    if (FGadgetObjKept(pbentley->ploGadget) != 0) {
+        pbentley->ploGadget->powner = pbentley;
+        func_0018D698(pbentley, pbentley->pslotActive, pbentley->ploGadget);
     }
-    UnlockLeaseOfPlo(M2C_FIELD(M2C_FIELD(arg0, void **, 0x16B4), s32 *, 4), M2C_FIELD(arg0, void **, 0x186C));
-    M2C_FIELD(arg0, void **, 0x186C) = NULL;
-    M2C_FIELD(arg0, void **, 0x16B4) = NULL;
+    UnlockLeaseOfPlo(pbentley->pslotActive->ppool, pbentley->ploGadget);
+    pbentley->ploGadget = 0;
+    pbentley->pslotActive = 0;
 }

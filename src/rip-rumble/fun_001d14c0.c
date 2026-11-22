@@ -1,17 +1,26 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "vehicle.h"
 
-M2C_UNK SetVehicleState(void *, M2C_UNK);           /* extern */
-M2C_UNK SnapSmaToGoal(void *, s32);                 /* extern */
-M2C_UNK UpdateVehicleHpBlot();                      /* extern */
+#include "sma.h"
 
-void func_001D14C0(void *arg0) {
-    void *temp_a0;
+/* the SMA's state machine: a pointer to the goal id at 0x54 (this function's view: one reader) */
+struct SM {
+    u8 unknown_0x0[0x54];
+    s32 *poidGoal;
+};
 
-    M2C_FIELD(arg0, s32 *, 0x560) = (s32) M2C_FIELD(arg0, s32 *, 0x55C);
-    UpdateVehicleHpBlot();
-    temp_a0 = M2C_FIELD(arg0, void **, 0x570);
-    if (temp_a0 != NULL) {
-        SnapSmaToGoal(temp_a0, *M2C_FIELD(M2C_FIELD(temp_a0, void **, 0x24), s32 **, 0x54));
+void SetVehicleState(struct VEHICLE *vehicle, s32 state);
+void SnapSmaToGoal(struct SMA *psma, s32 oidGoal);
+void UpdateVehicleHpBlot(struct VEHICLE *vehicle);
+
+void func_001D14C0(struct VEHICLE *vehicle) {
+    struct SMA *psma;
+
+    vehicle->hp = vehicle->hpMax;
+    UpdateVehicleHpBlot(vehicle);
+    psma = vehicle->psma;
+    if (psma != 0) {
+        SnapSmaToGoal(psma, *psma->psm->poidGoal);
     }
-    SetVehicleState(arg0, 0);
+    SetVehicleState(vehicle, 0);
 }

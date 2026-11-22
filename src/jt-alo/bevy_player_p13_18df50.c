@@ -1,5 +1,6 @@
-#include "m2c_macros.h"
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "slyview.h"
 
-void bevy_player_p13_18df50(void *arg0, s32 arg1) {
-    M2C_FIELD(arg0, s32 *, 0x1D30) = arg1;
+void bevy_player_p13_18df50(struct SLYVIEW *self, s32 value) {
+    self->field_0x1D30 = value;
 }

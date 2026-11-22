@@ -1,15 +1,19 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "types.h"
 
-M2C_UNK SetAmbGrf(void *, M2C_UNK, M2C_UNK);        /* extern */
+struct AMB_PAN { u8 unknown_0x0[0x14]; s32 pan; };
 
-void SetAmbPan(void *arg0, s32 arg1) {
-    s32 temp_a1;
-    s32 temp_hi;
+void SetAmbGrf(struct AMB_PAN *pamb, s32 grfMask, s32 grfValue);
 
-    temp_hi = arg1 % 360;
-    temp_a1 = (temp_hi > -1) ? temp_hi : (temp_hi + 0x168);
-    if (temp_a1 != M2C_FIELD(arg0, s32 *, 0x14)) {
-        M2C_FIELD(arg0, s32 *, 0x14) = temp_a1;
-        SetAmbGrf(arg0, 0x20, 0x20);
+void SetAmbPan(struct AMB_PAN *pamb, s32 degrees)
+{
+    s32 remainder;
+    s32 pan;
+
+    remainder = degrees % 360;
+    pan = (remainder > -1) ? remainder : (remainder + 0x168);
+    if (pan != pamb->pan) {
+        pamb->pan = pan;
+        SetAmbGrf(pamb, 0x20, 0x20);
     }
 }

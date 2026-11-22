@@ -1,20 +1,21 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "soview.h"
 
-M2C_UNK RecalcSwOxfFilterForObject(M2C_UNK *, void *); /* extern */
-void *func_001F2798();                              /* extern */
-extern M2C_UNK B_003DD490;
+void RecalcSwOxfFilterForObject(void *, struct SOVIEW *);
+struct SOVIEW *func_001F2798(struct SOVIEW *);
+extern char B_003DD490;
 
-void EnsureSoOxa(void *arg0) {
-    void *temp_v0;
-    void *temp_v1;
+void EnsureSoOxa(struct SOVIEW *pso) {
+    struct SOVIEW *psoRoot;
+    const struct SOVT *vt;
 
-    if (M2C_FIELD(arg0, s32 *, 0xEC) == 0) {
-        temp_v0 = func_001F2798();
-        if (M2C_FIELD(temp_v0, s32 *, 0xEC) == 0) {
-            temp_v1 = M2C_FIELD(temp_v0, void **, 0xC);
-            M2C_FIELD(temp_v0, s32 *, 0xEC) = M2C_FIELD(temp_v1, s32 (**)(void *), 0x1AC)(temp_v0 + M2C_FIELD(temp_v1, s16 *, 0x1A8));
-            RecalcSwOxfFilterForObject(&B_003DD490, temp_v0);
+    if (pso->poxa == 0) {
+        psoRoot = func_001F2798(pso);
+        if (psoRoot->poxa == 0) {
+            vt = psoRoot->vt;
+            psoRoot->poxa = vt->pfnPoxaAlloc((char *)psoRoot + vt->deltaPoxaAlloc);
+            RecalcSwOxfFilterForObject(&B_003DD490, psoRoot);
         }
-        M2C_FIELD(arg0, s32 *, 0xEC) = M2C_FIELD(temp_v0, s32 *, 0xEC);
+        pso->poxa = psoRoot->poxa;
     }
 }

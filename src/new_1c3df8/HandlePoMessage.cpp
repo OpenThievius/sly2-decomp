@@ -1,33 +1,22 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "po.h"
+
+struct AMB;
 extern "C" {
-struct _m2c_stack_HandlePoMessage {
-    /* 0x00 */ char pad0[0x30];
-};                                                  /* size = 0x30 */
+void HandleLoMessage(PO *ppo, int msgid, void *pv);
+void StopAmb(AMB *pamb, float uFade);
+void VirtualRefPtr_Assign(void *pref, void *pvalue);
 
-void HandleLoMessage();
-void StopAmb(s32, f32);
-void VirtualRefPtr_Assign(s32, M2C_UNK);
-
-void HandlePoMessage(s8 *arg0, s32 arg1) {
-    s32 temp_a0;
-    s32 temp_s0;
-
-    HandleLoMessage();
-    if (arg1 == 5) {
-        temp_s0 = (sptr)(arg0 + 0x174);
-        if (temp_s0 != 0) {
-            temp_a0 = M2C_FIELD(arg0, s32 *, 0x174);
-            if (temp_a0 != 0) {
-                StopAmb(temp_a0, 0);
-                VirtualRefPtr_Assign(temp_s0, 0);
+void HandlePoMessage(PO *ppo, int msgid, void *pv) {
+    HandleLoMessage(ppo, msgid, pv);
+    if (msgid == 5) {
+        if (&ppo->pamb != 0) {
+            AMB *pamb = ppo->pamb;
+            if (pamb != 0) {
+                StopAmb(pamb, 0);
+                VirtualRefPtr_Assign(&ppo->pamb, 0);
             }
         }
     }
 }
-
 }

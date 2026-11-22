@@ -18,11 +18,13 @@ struct LOOT;
 struct SM;
 struct GADGETSTATE;
 struct SEQNODE;
+struct GADGETOBJ;
 
 /* One of the player's three gadget slots: LoadJtGadgetSlots fills gadget from the level data, three 0xC-byte entries. */
 struct GADGETSLOT {
     /* 0x0 */ s32 gadget;
-    u8 unknown_0x4[0x8];
+    /* 0x4 */ void *ppool;      /* UseSlyGadget: PloLeaseCloneObject leases the gadget object from this pool (BENTLEYSLOT::ppool) */
+    /* 0x8 */ struct LO *plo;   /* UseSlyGadget tests it and attaches to it; func_0018D698 subscribes to it */
 };
 
 struct JT : STEP {
@@ -85,7 +87,10 @@ struct JT : STEP {
     /* 0xE00 */ s32 *pnHealth; /* SetJtHealth stores into it; bevy_player_p18_gadget_refill points it into the save variables; bevy_player_p18_gadget_144268 reads it (field_0xDFC is the maximum) */
     u8 unknown_0xE04[0xF8];
     /* 0xEFC */ void *pasegaHandle; /* UpdateJt (16) releases it once gone; RetractAsegaHandle and ReleaseAsegaHandle take its address */
-    u8 unknown_0xF00[0x1C];
+    u8 unknown_0xF00[0x4];
+    /* 0xF04 */ s32 binocState; /* the state of the binoculars InitJt starts at 0xF00 (PvBinoc, state at +4): StopBinoc switches on it, UpdateBinoc;
+                                UpdateBentleyBinoc; func_0018D500 (Sly slot 106) and RenderJt test 1 (in use) */
+    u8 unknown_0xF08[0x14];
     /* 0xF1C */ struct SO *field_0xF1C; /* func_001B81B8 (Murray slot 87) sets it to the held object */
     /* 0xF20 */ s32 binocPhase; /* in the binoculars InitJt starts at 0xF00: FInvulnerableJt (76); BindTextBinocReadout */
     u8 unknown_0xF24[0x18];
@@ -115,7 +120,8 @@ struct JT : STEP {
     /* 0x1080 */ f32 field_0x1080; /* GetMurrayCpdefi (Murray slot 50) */
     /* 0x1084 */ struct SEQNODE *pseqnode; /* UpdateJt (JT slot 16) passes it to UpdateSeqnodeVjoy when the goal stack is empty; bevy_player_p4_144068 tests it */
     /* 0x1088 */ struct GADGETSTATE *field_0x1088; /* SetMurrayLiftState (guess: one reader) */
-    u8 unknown_0x108C[0xC];
+    /* 0x108C */ s32 field_0x108C; /* SetBentleyState and func_00135EB0 (Bentley's slots) test it against 0 before blowing up a bomb or adding a safe point; func_001942F0 reads it too */
+    u8 unknown_0x1090[0x8];
     /* 0x1098 */ f32 field_0x1098; /* InitMurray and InitBentley set -100 */
     /* 0x109C */ f32 field_0x109C; /* InitMurray and InitBentley set 100 */
     /* 0x10A0 */ f32 field_0x10A0; /* InitMurray and InitBentley set 50 */
@@ -152,7 +158,10 @@ struct JT : STEP {
     /* 0x11A8 */ struct LOOT *plootHeld; /* GiveJtLoot, DropJtLoot, DeliverJtLoot, Crfodb_OnGrab; level_loaded (class 52 objects) */
     u8 unknown_0x11AC[0x8];
     /* 0x11B4 */ s32 field_0x11B4; /* in the carry state InitJt starts at 0x11B0: UseSlyGadget (Sly slot 100) */
-    u8 unknown_0x11B8[0x138];
+    u8 unknown_0x11B8[0x8];
+    /* 0x11C0 */ struct GADGETOBJ *pgadgetLeased; /* in the carry state InitJt starts at 0x11B0: UseSlyGadget and UseBentleyGadget (slot 100 of
+                                                    Sly and Bentley) store the gadget object they leased (gadgetobj.h) */
+    u8 unknown_0x11C4[0x12C];
     /* 0x12F0 */ s32 fGadgetsAllowed; /* InitJt sets 1; FAttachAllowsGadget, FJmpAllowsGadget test it */
     /* 0x12F4 */ s32 field_0x12F4; /* JT_RetainSmKinds (slot 83) counts up, JT_ReleaseSmKinds (84) down */
     u8 unknown_0x12F8[0x4];
@@ -172,10 +181,12 @@ SLY2_SIZE_CHECK(GADGETSLOT, 0xC);
 SLY2_OFFSET_CHECK(JT, field_0x434, 0x434);
 SLY2_OFFSET_CHECK(JT, pnHealth, 0xE00);
 SLY2_OFFSET_CHECK(JT, powerFraction, 0x1308);
+SLY2_OFFSET_CHECK(JT, pgadgetLeased, 0x11C0);
 SLY2_OFFSET_CHECK(JT, field_0x12F4, 0x12F4);
 SLY2_OFFSET_CHECK(JT, field_0x9E4, 0x9E4);
 SLY2_OFFSET_CHECK(JT, field_0x1050, 0x1050);
 SLY2_OFFSET_CHECK(JT, pseqnode, 0x1084);
+SLY2_OFFSET_CHECK(JT, field_0x108C, 0x108C);
 SLY2_OFFSET_CHECK(JT, pguardBest, 0x10E8);
 SLY2_OFFSET_CHECK(JT, ploLook, 0x10F8);
 SLY2_OFFSET_CHECK(JT, kindLook, 0x10FC);
@@ -194,6 +205,7 @@ SLY2_OFFSET_CHECK(JT, ptemplateTargetIndicator, 0x9C4);
 SLY2_OFFSET_CHECK(JT, zapState, 0xDF4);
 SLY2_OFFSET_CHECK(JT, field_0xDFC, 0xDFC);
 SLY2_OFFSET_CHECK(JT, pasegaHandle, 0xEFC);
+SLY2_OFFSET_CHECK(JT, binocState, 0xF04);
 SLY2_OFFSET_CHECK(JT, binocPhase, 0xF20);
 SLY2_OFFSET_CHECK(JT, field_0xF3C, 0xF3C);
 SLY2_OFFSET_CHECK(JT, field_0xF50, 0xF50);

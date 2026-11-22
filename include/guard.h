@@ -14,6 +14,7 @@
 struct STEP;
 struct STEPGUARD;
 struct OXA;
+struct XF;
 struct LO;
 
 /* An animation reference, 0x10 bytes: `kind` says what `pdata` points at (BindAnimref sets it: 0 a plain object, 1 an object kept
@@ -37,21 +38,31 @@ struct JUMPANIM {
     u8 unknown_0x20[0x20];
 };
 
-/* a jump in progress, the instance of a kind-2 ANIMREF. Its methods: UpdateJumper (func_0020C0E8), SetJumperTarget, SetJumperState */
+/* a jump in progress, the instance of a kind-2 ANIMREF: a BASIC (InitJumper sets its vtable at 0xC; HandleJumperMessage passes it to
+   HandleLoMessage). Its methods: UpdateJumper (func_0020C0E8), SetJumperTarget, SetJumperState */
+struct LOOKATGOAL; /* a look-at act (lookat.h): SetJumperTarget writes its target position */
+#ifdef __cplusplus
+struct JUMPER : BASIC {
+#else
 struct JUMPER {
     u8 unknown_0x0[0x10];
-    /* 0x10 */ s32 state;           /* UpdateJumper switches on it; SetJumperTarget; func_00174EA0 */
+#endif
+    /* 0x10 */ s32 state;           /* UpdateJumper switches on it; SetJumperTarget; func_00174EA0; FJumperDone tests 4 */
     /* 0x14 */ f32 tState;          /* UpdateJumper */
-    u8 unknown_0x18[0x1C];
-    /* 0x34 */ struct STEP *pso;    /* UpdateJumper: the jumping actor */
+    u8 unknown_0x18[0x18];
+    /* 0x30 */ struct JUMPANIM *pjumpanim; /* StartJumpAnim stores its first argument, the animation block it tested (certain: it also calls InitJumper and SetJumperState on this object) */
+    /* 0x34 */ struct STEP *pso;    /* UpdateJumper: the jumping actor; StartJumpAnim stores it; SetJumperTarget and EndJumperFlight read its XF */
     /* 0x38 */ void *pasega;        /* UpdateJumper */
-    u8 unknown_0x3C[0x14];
+    /* 0x3C */ s32 field_0x3C;      /* StartJumpAnim stores its third argument */
+    /* 0x40 */ QW posTarget;        /* SetJumperTarget stores its position argument while the state is 0 */
     /* 0x50 */ f32 tLand;           /* UpdateJumper */
     /* 0x54 */ f32 tLandStart;      /* UpdateJumper */
     /* 0x58 */ struct LO *ploTarget; /* GoalJump_Activate copies its goal's target */
     /* 0x5C */ s32 fFacing;         /* GoalJump_Activate copies its goal's fFacing */
-    /* 0x60 */ s32 fTrackTarget;    /* SetJumperTarget follows the target in flight while it is set, UpdateJumper tests it, func_001751F0 sets it */
+    /* 0x60 */ s32 fTrackTarget;    /* SetJumperTarget follows the target in flight while it is set, UpdateJumper tests it, func_001751F0 sets it; EndJumperFlight clears it */
     /* 0x64 */ s32 field_0x64;      /* func_001751F0 sets it */
+    /* 0x68 */ struct LOOKATGOAL *plookat; /* SetJumperTarget moves its position; EndJumperFlight frees it (func_0012E460 takes its address) */
+    u8 unknown_0x6C[0x4];
 };
 
 /* one entry of a guard's animation table (0x20 bytes): an ANIMREF and the sgs group it plays for */
@@ -85,10 +96,34 @@ struct HOME {
 
 struct FALLCHECK;
 
-/* a guard's aim state: UpdateGuard waits for its animation reference to finish */
+/* a guard's aim object (STEPGUARD::paimstate): a LO that plays an animation at a target for the guard. Its methods: the init
+   func_0020AD38 (slot 7), PostGuardAimLoad (15), CloneGuardAim (41). UpdateGuard waits for its animation reference to finish. */
+#ifdef __cplusplus
+struct AIMSTATE : LO {
+#else
 struct AIMSTATE {
-    u8 unknown_0x0[0xC0];
-    /* 0xC0 */ struct ANIMREF *panimref; /* UpdateGuard */
+    u8 unknown_0x0[0x50];
+#endif
+    /* 0x50 */ s32 field_0x50;   /* func_0020AD38 sets 0 */
+    /* 0x54 */ f32 field_0x54;   /* func_0020AD38 sets 300 */
+    /* 0x58 */ f32 field_0x58;   /* func_0020AD38 sets -5000 */
+    /* 0x5C */ f32 field_0x5C;   /* func_0020AD38 sets 5000 */
+    /* 0x60 */ f32 field_0x60;   /* func_0020AD38 sets 0.2 */
+    /* 0x64 */ f32 field_0x64;   /* func_0020AD38 sets 0.5 */
+    /* 0x68 */ f32 radLimit;     /* func_0020AD38 sets 0.17453295, ten degrees in radians */
+    /* 0x6C */ f32 field_0x6C;   /* func_0020AD38 sets a rodata float */
+    u8 unknown_0x70[0xC];
+    /* 0x7C */ s32 oidA;         /* SetGuardAimOids stores its first id, func_0020AD38 sets -1, PostGuardAimLoad resolves it (a transform of the guard) */
+    /* 0x80 */ s32 oidB;         /* SetGuardAimOids' second id (a second transform of the guard) */
+    /* 0x84 */ s32 oidLabel;     /* SetGuardAimOids' third id: PostGuardAimLoad looks it up as a label of the animation (PeaFindAsegLabel) */
+    u8 unknown_0x88[0x8];
+    /* 0x90 */ QW vecRest;       /* PostGuardAimLoad: the rest vector PredictAsegEffect computes */
+    /* 0xA0 */ struct XF *pxfA;       /* PostGuardAimLoad: the guard's transform for oidA */
+    /* 0xA4 */ struct XF *pxfB;       /* PostGuardAimLoad: the guard's transform for oidB */
+    /* 0xA8 */ s32 field_0xA8;   /* func_0020AD38 sets 1 */
+    /* 0xAC */ struct STEPGUARD *pguard; /* PostGuardAimLoad: the nearest ancestor of class 0x38; the init, func_0020AF38, func_0020AF88, func_0020AFF0 and func_0020B060 pass it to ResetAnimref and BindAnimref as the owner */
+    /* 0xB0 */ struct ANIMREF animref; /* ResetAnimref, BindAnimref, CloneAnimref take its address */
+    /* 0xC0 */ struct ANIMREF *panimref; /* UpdateGuard; PostGuardAimLoad points it at animref unless the id is 0x2CC; func_0020C7D8 clears it */
 };
 
 /* a guard's damage record: SetGuardDamageSource (0x20D460) stores the source of the last hit at 0xC */
@@ -97,9 +132,18 @@ struct GUARDDAMAGE {
     /* 0xC */ void *psource; /* HandleStepguardMessage */
 };
 
+/* one object a SENSOR watches (0x10 bytes): AddSensorLo, RemoveSensorLo, ResetSensorStates, SetSensorEntryState, PentryFindSensorLo */
+struct SENSORENTRY {
+    /* 0x0 */ struct LO *plo;   /* AddSensorLo stores the watched object, PentryFindSensorLo looks it up */
+    /* 0x4 */ s32 state;        /* SetSensorEntryState (and its event), ResetSensorStates clears it */
+    /* 0x8 */ f32 tState;       /* SetSensorEntryState and ResetSensorStates set it to the clock */
+    /* 0xC */ f32 tFirst;       /* SetSensorEntryState sets it on the first state change (state 0 to another) */
+};
+
 /* SENSOR, the sensor object a guard owns (STEPGUARD::psensor): a LO subclass (its vtable is at 0xC and CloneGuard calls its slot
-   41), size not known. OnGuardAdd (26) sets powner and poxa, ClearGuardSensing clears 0xFC; func_00259D38/48/70 are its setters and
-   getter of 0xE8 and 0xEC; func_00208BE0 (89) reads the volume at 0xE8. */
+   41), size not known. It watches up to 8 objects and keeps a state for each (AddSensorLo, RemoveSensorLo, ResetSensorStates,
+   SetSensorEntryState, PentryFindSensorLo, func_00153DE0). OnGuardAdd (26) sets powner and poxa, ClearGuardSensing clears the count;
+   func_00259D38/48/70 are its setters and getter of 0xE8 and 0xEC; func_00208BE0 (89) reads the volume at 0xE8. */
 #ifdef __cplusplus
 struct SENSOR : LO {
     u8 unknown_0x50[0x90];
@@ -112,7 +156,9 @@ struct SENSOR {
     /* 0xE8 */ void *pvolume;    /* func_00259D38 sets it; func_00208BE0 tests its grfo bit 60 and hands it to func_00227C90 */
     /* 0xEC */ s32 field_0xEC;   /* func_00259D48 sets it, func_00259D70 returns it */
     u8 unknown_0xF0[0xC];
-    /* 0xFC */ s32 field_0xFC;   /* ClearGuardSensing clears it */
+    /* 0xFC */ s32 centry;       /* the objects watched: ClearGuardSensing clears it; AddSensorLo (bounded by 8), RemoveSensorLo,
+                                    ResetSensorStates, PentryFindSensorLo, func_00153DE0 */
+    /* 0x100 */ struct SENSORENTRY aentry[8]; /* the same functions */
 };
 
 /* ALERT, the shared alarm of the guards that watch one object: 0xAC bytes (PalertEnsure allocates it), kept in the list at

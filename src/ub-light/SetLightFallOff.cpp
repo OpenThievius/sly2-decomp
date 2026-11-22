@@ -1,7 +1,9 @@
-struct Eight { char b[8]; };
-extern "C" void RebuildLight(char *);
-void SetLightFallOff(char *self, Eight *value)
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "light.h"
+struct LIGHTRANGE { float rangeA, rangeB; };
+extern "C" void RebuildLight(LIGHT *light);
+void SetLightFallOff(LIGHT *light, LIGHTRANGE *range)
 {
-    *(Eight *)(self + 0x164) = *value;
-    RebuildLight(self);
+    *(LIGHTRANGE *)&light->rangeA = *range;
+    RebuildLight(light);
 }

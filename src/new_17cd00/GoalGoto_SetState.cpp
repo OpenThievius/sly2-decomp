@@ -1,26 +1,15 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
-struct VT { char pad[0x40]; short delta; short index; void (*fn)(void *); };
-struct OBJ { char pad[0xC]; VT *vptr; };
 #include "stepguard.h"
-#include "goal.h"
-struct GOAL_17D450 : GOAL {
-    int state;
-    float tState;
-    char pad_38[0x70];
-    int face;
-    int pzlink;
-    int faceFlag;
-    int straight;
-};
-extern "C" void Goal_Pop(void *);
-extern "C" OBJ *func_00205438(STEPGUARD *, int);
-extern "C" void GoalFollowCrv_SetCrv(OBJ *, void *, int);
-extern float g_2dded0;
+#include "goals.h"
+#include "clock.h"
+extern "C" void Goal_Pop(GOAL **);
+extern "C" GOAL *func_00205438(STEPGUARD *, int);
+extern "C" void GoalFollowCrv_SetCrv(GOAL *, void *, int);
 // Retail computes the follow mode straight into $v0 with three branches (9 in the first two delay slots, 8 in
 // the last one, 9 on fall-through) and one store at the join: two stores in an if/else, which gcc merges at the
 // join without if-converting to movn. A local `mode` assigned in both arms becomes movn or a bnel store instead.
-extern "C" void GoalGoto_SetState(GOAL_17D450 *goal, int newState)
+extern "C" void GoalGoto_SetState(GOALGOTO *goal, int newState)
 {
     int previous = goal->state;
     if (newState == previous)
@@ -28,53 +17,48 @@ extern "C" void GoalGoto_SetState(GOAL_17D450 *goal, int newState)
     if (newState >= 0 && newState < 3 && previous >= 0 && previous < 3) {
         goal->state = newState;
     } else {
-        Goal_Pop(&((OBJ *)goal->pgoalChild));
+        Goal_Pop(&goal->pgoalChild);
         goal->state = newState;
     }
-    goal->tState = g_2dded0;
+    goal->tState = g_2dded0.t;
     switch (newState + 1) {
     case 0:
     case 1:
         break;
     case 5: {
-        OBJ *hold = func_00205438(((STEPGUARD *)goal->pstep), 0x9E);
-        *(int *)((char *)hold + 0x38) = *(int *)((char *)goal + 0xA8);
-        VT *vtable = hold->vptr;
-        vtable->fn((char *)hold + vtable->delta);
+        GOALANIM *hold = (GOALANIM *)func_00205438(GOAL_GUARD(goal), 0x9E);
+        hold->ptarget = goal->ptarget;
+        hold->Activate();
         break;
     }
     case 4: {
-        OBJ *route = func_00205438(((STEPGUARD *)goal->pstep), 0xBE);
-        *(int *)((char *)route + 0x30) = *(int *)((char *)goal + 0xB8);
-        VT *vtable = route->vptr;
-        vtable->fn((char *)route + vtable->delta);
+        GOALFOLLOWROUTE *route = (GOALFOLLOWROUTE *)func_00205438(GOAL_GUARD(goal), 0xBE);
+        route->proute = (ROUTE *)goal->apzlink[0];
+        route->Activate();
         break;
     }
     case 2:
     case 3: {
-        OBJ *follow = ((OBJ *)goal->pgoalChild);
+        GOALFOLLOWCRVANIM *follow = (GOALFOLLOWCRVANIM *)goal->pgoalChild;
         if (follow == 0) {
-            follow = func_00205438(((STEPGUARD *)goal->pstep), 0xA7);
-            *(int *)((char *)follow + 0xC8) = *(int *)((char *)goal + 0xA8);
-            *(int *)((char *)follow + 0x40) = *(int *)((char *)goal + 0xBC);
-            if (*(int *)((char *)goal + 0xA8) != 0 && *(int *)((char *)goal + 0xAC) == 0 && (((STEPGUARD *)goal->pstep)->grf & 4) != 0)
-                *(int *)((char *)follow + 0xC0) = 8;
+            follow = (GOALFOLLOWCRVANIM *)func_00205438(GOAL_GUARD(goal), 0xA7);
+            follow->ptarget = goal->ptarget;
+            follow->field_0x40 = goal->fStraight;
+            if (goal->ptarget != 0 && goal->field_0xAC == 0 && (GOAL_GUARD(goal)->grf & 4) != 0)
+                follow->kind = 8;
             else
-                *(int *)((char *)follow + 0xC0) = 9;
-            GoalFollowCrv_SetCrv(follow, ((STEPGUARD *)goal->pstep)->pcrv, 0);
-            VT *vtable = follow->vptr;
-            vtable->fn((char *)follow + vtable->delta);
+                follow->kind = 9;
+            GoalFollowCrv_SetCrv(follow, GOAL_GUARD(goal)->pcrv, 0);
+            follow->Activate();
             break;
         }
-        GoalFollowCrv_SetCrv(follow, ((STEPGUARD *)goal->pstep)->pcrv, 0);
+        GoalFollowCrv_SetCrv(follow, GOAL_GUARD(goal)->pcrv, 0);
         break;
     }
     case 6: {
-        OBJ *snap = func_00205438(((STEPGUARD *)goal->pstep), 0xBF);
-        *(QW *)((char *)snap + 0x30) = *(QW *)((char *)goal + 0x80);
-        *(QW *)((char *)snap + 0x40) = *(QW *)((char *)goal + 0x90);
-        VT *vtable = snap->vptr;
-        vtable->fn((char *)snap + vtable->delta);
+        GOALSNAPTOPOINT *snap = (GOALSNAPTOPOINT *)func_00205438(GOAL_GUARD(goal), 0xBF);
+        snap->target = goal->targetSnap;
+        snap->Activate();
         break;
     }
     }

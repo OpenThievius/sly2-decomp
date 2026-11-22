@@ -1,10 +1,12 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "goalb9.h"
+#include "sly2.h"
 
-M2C_UNK AddGuardSgs(s32, M2C_UNK);                  /* extern */
-M2C_UNK func_001EEF68();                            /* extern */
+void AddGuardSgs(void *pguard, s32 sgs);
+void func_001EEF68(struct GOALB9 *pgoal);
 
-void func_0017CE68(void *arg0) {
-    func_001EEF68();
-    M2C_FIELD(arg0, s32 *, 0x30) = -1;
-    AddGuardSgs(M2C_FIELD(arg0, s32 *, 0x10), 0x27);
+void func_0017CE68(struct GOALB9 *pgoal) {
+    func_001EEF68(pgoal);
+    pgoal->state = -1;
+    AddGuardSgs(pgoal->pstep, 0x27);
 }

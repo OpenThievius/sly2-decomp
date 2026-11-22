@@ -12,6 +12,16 @@ struct OXA;
 struct GEOM;
 struct RO;
 
+/* One 0x28-byte entry of SO::field_0xC0 (the object's globs): func_001F5FF8 looks one up by its key, first; func_001F69F8
+   (ShowHideLoGlob) and func_001F6A68 set flag 0x800 on one (or all) and bit 50 of its geom's word 0x10 (GEOM::grf). */
+struct GLOBENTRY {
+    /* 0x0 */ s32 oid;
+    u8 unknown_0x4[0x8];
+    /* 0xC */ s32 grf;
+    u8 unknown_0x10[0x14];
+    /* 0x24 */ struct GEOM *pgeom;
+};
+
 struct SO : LO {
     virtual void Slot49(int value);     /* 49: func_0010DAF0 passes -1 */
     virtual void GetCpdefi(struct CPDEFI *pcpdefi); /* 50: GetSoCpdefi; GetCmCpdefi, GetJtCpdefi pass the CPDEFI to fill (no override reads $f12) */
@@ -53,7 +63,7 @@ struct SO : LO {
     u8 unknown_0x81[0x37];
     /* 0xB8 */ s32 field_0xB8;        /* readers: func_001F5FF8 (count), CSo_LoadFromBrx (tested against 0) */
     u8 unknown_0xBC[0x4];
-    /* 0xC0 */ void *field_0xC0;      /* reader: func_001F5FF8 (array of 0x28-byte entries, key first) */
+    /* 0xC0 */ struct GLOBENTRY *field_0xC0; /* readers: func_001F5FF8 (array of 0x28-byte entries, key first), func_001F69F8, func_001F6A68 (the same, field_0xB8 many) */
     u8 unknown_0xC4[0x8];
     /* 0xCC */ s32 islot;              /* func_001CB518 (SO's slot 26) sets it to -1 */
     /* 0xD0 */ u64 field_0xD0;        /* reader: func_001F2768 (sets bit 34 from a flag) */

@@ -1,5 +1,6 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "sly2.h"
 
-f32 func_002599E0(void *arg0) {
-    return M2C_FIELD(arg0, f32 *, 4);
+f32 func_002599E0(struct VECTOR *pvector) {
+    return pvector->y;
 }

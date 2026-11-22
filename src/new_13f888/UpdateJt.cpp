@@ -59,7 +59,7 @@ void UpdateJt(JT *pjt, float dt)
         ReleaseAsegaHandle(&pjt->pasegaHandle);
     if (!FActiveCplcy(&B_002DE2E0)) {
         JOY *pjoy = pjt->pjoy;
-        if (pjoy->field_0x80 == 1 && GrfbtnVjoyPressedWithin(pjoy, 0x100, 0.0f)
+        if (pjoy->vjoym == 1 && GrfbtnVjoyPressedWithin(pjoy, 0x100, 0.0f)
             && (B_002DFC00.grfbtnLatest & 0x108) == 0x100) {
             ConsumeJoyButton(&B_002DFC00, 0x100);
             GadgetMenu_Open(&B_003DA0F0);

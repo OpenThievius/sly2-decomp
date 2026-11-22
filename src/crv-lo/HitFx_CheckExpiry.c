@@ -1,15 +1,17 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "hitfx.h"
+#include "clock.h"
 
-M2C_UNK HitFx_Remove();                             /* extern */
-extern f32 g_2dded0;
+void HitFx_Remove(struct HITFX *pfx);
 
-void HitFx_CheckExpiry(void *arg0) {
-    f32 temp_f2;
+void HitFx_CheckExpiry(struct HITFX *pfx)
+{
+    f32 duration;
 
-    temp_f2 = M2C_FIELD(M2C_FIELD(arg0, void **, 0x14), f32 *, 0x60);
-    if (temp_f2 >= 0.0f) {
-        if ((M2C_FIELD(arg0, f32 *, 0x4C) + temp_f2) < g_2dded0) {
-            HitFx_Remove();
+    duration = pfx->pdef->duration;
+    if (duration >= 0.0f) {
+        if ((pfx->tStart + duration) < g_2dded0.t) {
+            HitFx_Remove(pfx);
         }
     }
 }

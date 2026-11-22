@@ -1,13 +1,16 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "goalpost.h"
 
-M2C_UNK Goal_Deactivate();                          /* extern */
-M2C_UNK RemoveGuardSgs(s32, M2C_UNK);               /* extern */
-M2C_UNK func_00155788(void *, M2C_UNK);             /* extern */
-M2C_UNK func_00208540(s32, M2C_UNK);                /* extern */
+void Goal_Deactivate(struct GOALPOSTRUN *pgoal);
+void RemoveGuardSgs(struct STEPGUARD *pguard, s32 sgs);
+void func_00155788(struct GOALPOSTRUN *pgoal, s32 state);
+void func_00208540(struct STEPGUARD *pguard, struct LO *ptarget);
 
-void func_00155598(void *arg0) {
-    Goal_Deactivate();
-    func_00155788(arg0, -1);
-    RemoveGuardSgs(M2C_FIELD(arg0, s32 *, 0x10), 0x22);
-    func_00208540(M2C_FIELD(arg0, s32 *, 0x10), 0);
+/* GoalPostRun_Deactivate */
+void func_00155598(struct GOALPOSTRUN *pgoal)
+{
+    Goal_Deactivate(pgoal);
+    func_00155788(pgoal, -1);
+    RemoveGuardSgs(pgoal->pstep, 0x22);
+    func_00208540(pgoal->pstep, 0);
 }

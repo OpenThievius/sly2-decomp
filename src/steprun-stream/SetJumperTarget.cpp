@@ -1,15 +1,21 @@
-#include "types.h"
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "guard.h"
+#include "step.h"
+#include "xf.h"
+
+#include "lookat.h"
+
 extern "C" {
-s128 ConvertXfPos(int, int, s128);
-void SetJumperTarget(char *arg0, s128 arg1) {
-    int state = *(int *)(arg0 + 0x10);
+QW ConvertXfPos(int, XF *, QW);
+void SetJumperTarget(JUMPER *pjumper, QW pos) {
+    int state = pjumper->state;
     if (state == 0) {
-        *(s128 *)(arg0 + 0x40) = arg1;
+        pjumper->posTarget = pos;
     } else if (state >= 0) {
         if (state < 3) {
-            if (*(int *)(arg0 + 0x60) != 0) {
-                char *target = *(char **)(arg0 + 0x68);
-                *(s128 *)(target + 0x20) = ConvertXfPos(0, *(int *)(*(char **)(*(char **)(arg0 + 0x34) + 0x58) + 0xA0), arg1);
+            if (pjumper->fTrackTarget != 0) {
+                LOOKATGOAL *plookat = pjumper->plookat;
+                plookat->posTarget = ConvertXfPos(0, pjumper->pso->pxfLinear->pxfParent, pos);
             }
         }
     }

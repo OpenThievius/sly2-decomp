@@ -1,9 +1,10 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "vehicle.h"
 
-M2C_UNK func_001CB518();                            /* extern */
-M2C_UNK func_001D14C0(s32);                         /* extern */
+void func_001CB518(struct VEHICLE *vehicle, void *pool);
+void func_001D14C0(struct VEHICLE *vehicle);
 
-void func_001D1910(s32 arg0) {
-    func_001CB518();
-    func_001D14C0(arg0);
+void func_001D1910(struct VEHICLE *vehicle, void *pool) {
+    func_001CB518(vehicle, pool);
+    func_001D14C0(vehicle);
 }

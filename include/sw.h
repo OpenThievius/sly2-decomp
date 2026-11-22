@@ -84,6 +84,12 @@ struct TGT {
     /* 0x20 */ QW pos;
 };
 
+/* An entry of the world's HUD blot table (0xC bytes, four of them from 0x3BA0): InitSwHudBlots fills the first word. */
+struct HUDBLOT {
+    /* 0x0 */ struct LO *plo; /* the blot object InitSwHudBlots found */
+    u8 unknown_0x4[0x8];
+};
+
 struct SW : BASIC {
     u8 unknown_0x10[0x10];
     /* 0x20 */ DL dlRoot;  /* the world's root objects: RemoveSwRoot (FFindDlEntry, RemoveDlEntry), ReinsertSwRoot (InsertDlEntryBefore), RemoveSwRootRaw (RemoveDlEntry) */
@@ -119,7 +125,8 @@ struct SW : BASIC {
     /* 0x3B54 */ struct SAVEPATH *psavepathAutosaveWarned; /* "flags/fAutosaveWarned" */
     /* 0x3B58 */ struct SAVEPATH *apsavepathEpisodeDt[9]; /* "episode/<name>/dt" per episode */
     /* 0x3B7C */ struct SAVEPATH *apsavepathEpisodePercent[9]; /* "episode/<name>/percent_complete" per episode */
-    u8 unknown_0x3BA0[0x4C];
+    /* 0x3BA0 */ HUDBLOT ahudblot[4]; /* InitSwHudBlots finds one blot object per entry (object ids D_002C3E70) and stores it in the first word */
+    u8 unknown_0x3BD0[0x1C];
     /* 0x3BEC */ s32 cblotActive; /* SetBlotBlots counts the blots of 16 frames or more that enter state 2 and up */
     /* 0x3BF0 */ s32 fLoadPending; /* SetSwLoadRequest sets it with the request */
     /* 0x3BF4 */ LOADREQ loadreq; /* SetSwLoadRequest copies one in whole */
@@ -145,9 +152,15 @@ struct SW : BASIC {
     /* 0x3D68 */ s32 idHitfxLast; /* func_00156548 increments it for each new hit effect */
     u8 unknown_0x3D6C[0x4];
     /* 0x3D70 */ s32 stamp; /* func_001C1968 */
-    u8 unknown_0x3D74[0x14];
+    u8 unknown_0x3D74[0xC];
+    /* 0x3D80 */ s32 cshow; /* IncrementSwShowCount, DecrementSwShowCount: the shows in progress; the world's show object is started at 1 and stopped at 0 */
+    /* 0x3D84 */ s32 cbinoc; /* IncrementSwBinocCount, DecrementSwBinocCount, FSwBinocActive (> 0) */
     /* 0x3D88 */ DL dlAsega; /* UpdateSw walks it with UpdateAsega; Sw_Construct initialises it with ibDle 0x24 */
-    u8 unknown_0x3D94[0xA4];
+    u8 unknown_0x3D94[0x7C];
+    /* 0x3E10 */ QW hsvFog; /* SetSwFogHsv; UpdateSwFog converts it (hue, saturation and value in 0..255) */
+    /* 0x3E20 */ f32 scaleFog; /* func_0020F2F8; UpdateSwFog scales the fog colour by it / 255 */
+    /* 0x3E24 */ f32 alphaFog; /* func_0020F2D8; UpdateSwFog turns it into the fog alpha */
+    u8 unknown_0x3E28[0x10];
     /* 0x3E38 */ s32 field_0x3E38; /* AllocSwBuffers sets it when the load request has bit 0x20; UpdateCmLast, RestartAtTask test it */
     u8 unknown_0x3E3C[0x64];
     /* 0x3EA0 */ u64 gs; /* a GS register value, func_001EA9F0 */
@@ -204,7 +217,10 @@ struct SW : BASIC {
     /* 0x4754 */ f32 tL3; /* func_00140338 */
     u8 unknown_0x4758[0x4];
     /* 0x475C */ f32 sTimeScale; /* StartSwAmbSfx adds it to the pitch */
-    u8 unknown_0x4760[0x14];
+    u8 unknown_0x4760[0x4];
+    /* 0x4764 */ s32 cclueFound; /* InitSwHudBlots stores CcluesFound() */
+    /* 0x4768 */ s32 field_0x4768; /* InitSwHudBlots stores func_001C7D00()'s result */
+    u8 unknown_0x476C[0x8];
     /* 0x4774 */ struct TARGET *ptarget; /* func_0015DA88 */
     u8 unknown_0x4778[0x18];
 };
@@ -218,6 +234,14 @@ SLY2_SIZE_CHECK(LOADREQ, 0x4C);
 SLY2_SIZE_CHECK(GRFENTRY, 0x8);
 SLY2_SIZE_CHECK(TGT, 0x30);
 SLY2_SIZE_CHECK(SW, 0x4790);
+SLY2_SIZE_CHECK(HUDBLOT, 0xC);
+SLY2_OFFSET_CHECK(SW, ahudblot, 0x3BA0);
+SLY2_OFFSET_CHECK(SW, cshow, 0x3D80);
+SLY2_OFFSET_CHECK(SW, cbinoc, 0x3D84);
+SLY2_OFFSET_CHECK(SW, hsvFog, 0x3E10);
+SLY2_OFFSET_CHECK(SW, scaleFog, 0x3E20);
+SLY2_OFFSET_CHECK(SW, alphaFog, 0x3E24);
+SLY2_OFFSET_CHECK(SW, cclueFound, 0x4764);
 SLY2_OFFSET_CHECK(SW, state, 0x150);
 SLY2_OFFSET_CHECK(SW, pblockCur, 0x39E8);
 SLY2_OFFSET_CHECK(SW, fAaoxDirty, 0x3CCC);

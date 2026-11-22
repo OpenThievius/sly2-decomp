@@ -1,9 +1,11 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "types.h"
+#include "guard.h"
 
-M2C_UNK UpdateLo();                                 /* extern */
-M2C_UNK func_00153DE0(s32);                         /* extern */
+void UpdateLo(struct LO *plo);
+void func_00153DE0(struct SENSOR *psensor);
 
-void func_00153DB0(s32 arg0) {
-    UpdateLo();
-    func_00153DE0(arg0);
+void func_00153DB0(struct SENSOR *sensor) {
+    UpdateLo((struct LO *)sensor);
+    func_00153DE0(sensor);
 }

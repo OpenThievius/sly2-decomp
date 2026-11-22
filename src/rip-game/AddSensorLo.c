@@ -1,19 +1,21 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "types.h"
+#include "guard.h"
 
-s32 PentryFindSensorLo();                           /* extern */
-M2C_UNK SetSensorEntryState(void *, s32 *, M2C_UNK); /* extern */
+struct SENSORENTRY *PentryFindSensorLo(struct SENSOR *psensor, struct LO *plo);
+void SetSensorEntryState(struct SENSOR *psensor, struct SENSORENTRY *pentry, s32 state);
 
-void AddSensorLo(void *arg0, s32 arg1) {
-    s32 *temp_a1;
-    u32 temp_v1;
+void AddSensorLo(struct SENSOR *sensor, struct LO *plo) {
+    struct SENSORENTRY *entry;
+    u32 centry;
 
-    if (PentryFindSensorLo() == 0) {
-        temp_v1 = M2C_FIELD(arg0, u32 *, 0xFC);
-        if (temp_v1 < 8U) {
-            M2C_FIELD(arg0, u32 *, 0xFC) = (u32) (temp_v1 + 1);
-            temp_a1 = arg0 + ((temp_v1 * 0x10) + 0x100);
-            *temp_a1 = arg1;
-            SetSensorEntryState(arg0, temp_a1, 0);
+    if (PentryFindSensorLo(sensor, plo) == 0) {
+        centry = sensor->centry;
+        if (centry < 8U) {
+            sensor->centry = centry + 1;
+            entry = &sensor->aentry[centry];
+            entry->plo = plo;
+            SetSensorEntryState(sensor, entry, 0);
         }
     }
 }

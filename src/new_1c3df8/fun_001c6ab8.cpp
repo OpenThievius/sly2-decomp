@@ -1,21 +1,19 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
-extern "C" {
-s32 InitDprize();                               /* extern */
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "dprize.h"
 
-void func_001C6AB8(s8 *arg0) {
-    InitDprize();
-    M2C_FIELD(arg0, f32 *, 0x1D8) = 35.0f;
-    M2C_FIELD(arg0, f32 *, 0x1DC) = 35.0f;
-    M2C_FIELD(arg0, f32 *, 0x1E4) = 0.6f;
-    M2C_FIELD(arg0, f32 *, 0x1D0) = 500.0f;
-    M2C_FIELD(arg0, f32 *, 0x1D4) = 250.0f;
-    M2C_FIELD(arg0, f32 *, 0x1E0) = 0.6f;
-    M2C_FIELD(arg0, f32 *, 0x1A0) = 0.75f;
+extern "C" {
+void InitDprize(DPRIZE *);
+
+// InitDprizeKey
+void func_001C6AB8(DPRIZEKEY *pkey) {
+    InitDprize(pkey);
+    pkey->field_0x1D8 = 35.0f;
+    pkey->field_0x1DC = 35.0f;
+    pkey->field_0x1E4 = 0.6f;
+    pkey->field_0x1D0 = 500.0f;
+    pkey->field_0x1D4 = 250.0f;
+    pkey->field_0x1E0 = 0.6f;
+    pkey->field_0x1A0 = 0.75f;
 }
 
 }

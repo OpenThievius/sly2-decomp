@@ -81,7 +81,9 @@ struct SLY : JT {
     /* 0x202C */ f32 field_0x202C; /* bevy_player_input_from_pad_cm */
     u8 unknown_0x2030[0x8];
     /* 0x2038 */ void *field_0x2038; /* bevy_player_input_from_pad_cm */
-    u8 unknown_0x203C[0x10];
+    u8 unknown_0x203C[0x8];
+    /* 0x2044 */ void *pemitter; /* UseSlyGadget (100): VirtualRefPtr_Assign takes its address, with the emitter of a time gadget */
+    u8 unknown_0x2048[0x4];
     /* 0x204C */ s32 field_0x204C; /* UseSlyGadget (100) */
     u8 unknown_0x2050[0x10];
 };
@@ -99,6 +101,7 @@ SLY2_OFFSET_CHECK(SLY, field_0x1AA4, 0x1AA4);
 SLY2_OFFSET_CHECK(SLY, field_0x1FE0, 0x1FE0);
 SLY2_OFFSET_CHECK(SLY, field_0x1FE4, 0x1FE4);
 SLY2_OFFSET_CHECK(SLY, field_0x204C, 0x204C);
+SLY2_OFFSET_CHECK(SLY, pemitter, 0x2044);
 SLY2_OFFSET_CHECK(SLY, field_0x14D0, 0x14D0);
 SLY2_OFFSET_CHECK(SLY, field_0x18D0, 0x18D0);
 SLY2_OFFSET_CHECK(SLY, field_0x1BC0, 0x1BC0);

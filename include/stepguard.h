@@ -107,7 +107,8 @@ struct STEPGUARD : STEP {
     /* 0xEDC */ s32 afound[8]; /* ResolveGuardAimObjects: the objects found */
     /* 0xEFC */ s32 cfound; /* ResolveGuardAimObjects: entries in afound */
     /* 0xF00 */ struct AIMSTATE *paimstate; /* UpdateGuard (16): while it is set, UpdateGuard waits for its animref to finish */
-    /* 0xF04 */ s32 field_0xF04; /* GoalHit_Activate clears it */
+    /* 0xF04 */ f32 tCooldown; /* a clock time: GoalHit_Activate clears it; func_00175FF0 and GoalNotice_SetState compare the clock with it
+                                (lwc1), func_00155AE0 sets it to the clock plus a random wait or to FLT_MAX */
     /* 0xF08 */ struct XF *paim; /* func_0020AC28: the aim transform */
     /* 0xF0C */ void *pact; /* func_0020AC28: what func_0012DC18 returned for it; func_0012E460 gets its address */
     /* 0xF10 */ s32 field_0xF10; /* func_0020AC28: its third argument */
@@ -232,7 +233,7 @@ SLY2_OFFSET_CHECK(STEPGUARD, aarefC, 0xC10);
 SLY2_OFFSET_CHECK(STEPGUARD, field_0xE6C, 0xE6C);
 SLY2_OFFSET_CHECK(STEPGUARD, field_0xE70, 0xE70);
 SLY2_OFFSET_CHECK(STEPGUARD, paimstate, 0xF00);
-SLY2_OFFSET_CHECK(STEPGUARD, field_0xF04, 0xF04);
+SLY2_OFFSET_CHECK(STEPGUARD, tCooldown, 0xF04);
 SLY2_OFFSET_CHECK(STEPGUARD, ptargetGoto, 0xF68);
 SLY2_OFFSET_CHECK(STEPGUARD, posGoto, 0xF70);
 SLY2_OFFSET_CHECK(STEPGUARD, field_0xFC8, 0xFC8);

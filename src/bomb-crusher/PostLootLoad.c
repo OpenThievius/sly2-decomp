@@ -1,9 +1,10 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "types.h"
 
-M2C_UNK PostSoLoad();                               /* extern */
-M2C_UNK SetLootState(s32, M2C_UNK);                 /* extern */
+void PostSoLoad();
+void SetLootState(void *, s32);
 
-void PostLootLoad(s32 arg0) {
+void PostLootLoad(void *loot) {
     PostSoLoad();
-    SetLootState(arg0, 0);
+    SetLootState(loot, 0);
 }

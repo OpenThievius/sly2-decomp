@@ -1,23 +1,31 @@
-#include "m2c_macros.h"
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "types.h"
 
-void *func_001D2DD0(s32 arg0, void *arg1) {
-    f32 temp_f0;
-    f32 var_f1;
-    void *var_v0;
-    void *var_v1;
+/* a linked list of scored candidates (what owns it is not known): the entry keeps its score at 0x90 and the next entry at 0xAC */
+struct CANDIDATE {
+    u8 unknown_0x0[0x90];
+    f32 score;
+    u8 unknown_0x94[0x18];
+    CANDIDATE *pcandidateNext;
+};
+struct CANDIDATELIST {
+    u8 unknown_0x0[0x8];
+    CANDIDATE *pcandidateFirst;
+};
 
-    var_v1 = M2C_FIELD(arg1, void **, 8);
-    var_f1 = -3.4028235e38f;
-    var_v0 = NULL;
-    if (var_v1 != NULL) {
+CANDIDATE *func_001D2DD0(void *self, CANDIDATELIST *list) {
+    CANDIDATE *candidate = list->pcandidateFirst;
+    float bestScore = -3.4028235e38f;
+    CANDIDATE *best = 0;
+    if (candidate != 0) {
         do {
-            temp_f0 = M2C_FIELD(var_v1, f32 *, 0x90);
-            if (var_f1 < temp_f0) {
-                var_f1 = temp_f0;
-                var_v0 = var_v1;
+            float score = candidate->score;
+            if (bestScore < score) {
+                bestScore = score;
+                best = candidate;
             }
-            var_v1 = M2C_FIELD(var_v1, void **, 0xAC);
-        } while (var_v1 != NULL);
+            candidate = candidate->pcandidateNext;
+        } while (candidate != 0);
     }
-    return var_v0;
+    return best;
 }

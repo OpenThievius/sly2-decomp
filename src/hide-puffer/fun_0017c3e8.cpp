@@ -3,12 +3,12 @@
 #include "vu0inline.h"
 #include "stepguard.h"
 #include "phys.h"
-struct LINK { char pad[0x10]; void *zone; };
-struct CRV { char pad[0xE8]; int count; char pad1[0xF4 - 0xEC]; QW *nodes; };
+struct LINK { u8 unknown_0x0[0x10]; void *zone; };
+#include "crv.h"
 #include "goal.h"
 struct GOAL_17C3E8 : GOAL {
     int state;
-    char pad_34[0x3C];
+    u8 unknown_0x34[0x3C];
     float dist;
 };
 extern "C" void func_001EEF98(GOAL_17C3E8 *);
@@ -43,7 +43,7 @@ extern "C" void func_0017C3E8(GOAL_17C3E8 *goal)
     if (D_FLT_002BE748 < child->dist)
         goto replan;
     {
-        QW vec = VectorSub(crv->nodes[crv->count - 1], posAlert);
+        QW vec = VectorSub(crv->apos[crv->ccv - 1], posAlert);
         DecomposeCylind(vec, &angles[0], &angles[1], 0);
         float offset = RadNormalize__Ff(angles[0] - pan);
         if (alert->radCone < __builtin_fabsf(offset))

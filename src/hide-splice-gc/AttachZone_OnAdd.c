@@ -1,10 +1,10 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "pzo_hide.h"
 
-M2C_UNK AppendDlEntry(M2C_UNK *, s32);              /* extern */
-M2C_UNK func_001A6178();                            /* extern */
-extern M2C_UNK B_003E1438;
+void func_001A6178(struct ATTACHZONE *);
+void AppendDlEntry(struct DL *, void *);
 
-void AttachZone_OnAdd(s32 arg0) {
-    func_001A6178();
-    AppendDlEntry(&B_003E1438, arg0);
+void AttachZone_OnAdd(struct ATTACHZONE *attach) {
+    func_001A6178(attach);
+    AppendDlEntry(&B_003E1438, attach);
 }

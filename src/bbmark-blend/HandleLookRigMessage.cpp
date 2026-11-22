@@ -1,26 +1,23 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "lookrig.h"
 extern "C" {
-void func_00131B10(s32, void *, s32);
+void func_00131B10(s32 key, void *pjt, void *powner);
 
-void HandleLookRigMessage(void *arg0, s32 arg1, void *arg2) {
-    s32 temp_a0;
-    s32 temp_a2;
-    void *temp_a1;
+void HandleLookRigMessage(LOOKRIG *plookrig, s32 msgid, s32 *pv) {
+    s32 sender;
+    s32 messageKind;
+    JT *pjt;
 
-    if ((arg1 == 9) && (temp_a0 = M2C_FIELD(arg2, s32 *, 0), (temp_a0 == M2C_FIELD(arg0, s32 *, 0xE0)))) {
-        temp_a2 = M2C_FIELD(arg2, s32 *, 8);
-        switch (temp_a2) {                          /* irregular */
+    if ((msgid == 9) && (sender = pv[0], (sender == (s32)plookrig->phandle))) {
+        messageKind = pv[2];
+        switch (messageKind) {                      /* irregular */
         case 0x16E:
-            temp_a1 = M2C_FIELD(arg0, void **, 0);
-            func_00131B10(temp_a0, temp_a1, M2C_FIELD(temp_a1, s32 *, 0x10B8));
-            M2C_FIELD(arg0, s32 *, 0x10) = 1;
+            pjt = plookrig->pjt;
+            func_00131B10(sender, pjt, pjt->field_0x10B8);
+            plookrig->fSnap = 1;
             return;
         case 0x242:
-            M2C_FIELD(arg0, s32 *, 0xC) = 1;
+            plookrig->field_0xC = 1;
             break;
         }
     }

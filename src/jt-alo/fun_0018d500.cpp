@@ -1,12 +1,13 @@
-#include "sly2.h"
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "jt.h"
 
 extern "C" int FActiveCplcy(void *);
 extern char B_002DE2E0[];
 
-int func_0018D500(char *arg0)
+int func_0018D500(JT *pjt)
 {
     int result = 1;
-    if (*(int *)(arg0 + 0xF04) == 1) {
+    if (pjt->binocState == 1) {
         return 0;
     } else {
         if (FActiveCplcy(B_002DE2E0)) {

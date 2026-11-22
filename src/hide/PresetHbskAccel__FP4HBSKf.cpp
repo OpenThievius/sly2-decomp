@@ -1,26 +1,23 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "hbsk.h"
+#include "crefboxes.h"
+#include "sly2.h"
+
+struct ROWS3 { VECTOR row[3]; };
 extern "C" {
-struct _m2c_stack_PresetHbskAccel__FP4HBSKf {
-    /* 0x00 */ char pad0[0x50];
-};                                                  /* size = 0x50 */
-void AccelSoTowardMatSpring__FP2SOP7MATRIX3P3CLQP6VECTORT2f(s8 *, s8 *, M2C_UNK *, s128, M2C_UNK *);
-void AddSoGravityAcceleration();
-s32 PmatLoWorld(s8 *);
-void TiltMatUpright__FP7MATRIX3N20(s32, M2C_UNK, s8 *);
-extern M2C_UNK D_002BE8D0;
-extern M2C_UNK D_002BE8E0;
-extern s128 g_2a2dd0;
-void PresetHbskAccel__FP4HBSKf(s8 *arg0) {
-    s8 sp[0x30] __attribute__((aligned(16)));
-    AddSoGravityAcceleration();
-    if ((M2C_FIELD(arg0, s32 *, 0x18C) != 0) && (M2C_FIELD(arg0, s32 *, 0x17C) == 0)) {
-        TiltMatUpright__FP7MATRIX3N20(PmatLoWorld(arg0), 0, sp);
-        AccelSoTowardMatSpring__FP2SOP7MATRIX3P3CLQP6VECTORT2f(arg0, sp, &D_002BE8D0, g_2a2dd0, &D_002BE8E0);
+void AccelSoTowardMatSpring__FP2SOP7MATRIX3P3CLQP6VECTORT2f(HBSK *, ROWS3 *, CLQ *, QW, CLQ *);
+void AddSoGravityAcceleration(HBSK *);
+void *PmatLoWorld(HBSK *);
+void TiltMatUpright__FP7MATRIX3N20(void *, void *, ROWS3 *);
+extern CLQ D_002BE8D0;
+extern CLQ D_002BE8E0;
+extern QW g_2a2dd0;
+void PresetHbskAccel__FP4HBSKf(HBSK *phbsk) {
+    ROWS3 matrix;
+    AddSoGravityAcceleration(phbsk);
+    if ((phbsk->fLocked != 0) && (phbsk->hbsks == 0)) {
+        TiltMatUpright__FP7MATRIX3N20(PmatLoWorld(phbsk), 0, &matrix);
+        AccelSoTowardMatSpring__FP2SOP7MATRIX3P3CLQP6VECTORT2f(phbsk, &matrix, &D_002BE8D0, g_2a2dd0, &D_002BE8E0);
     }
 }
 }

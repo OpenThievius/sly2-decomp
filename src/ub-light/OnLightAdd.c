@@ -1,10 +1,13 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "light.h"
 
-M2C_UNK AddLightToSw(M2C_UNK *, s32);               /* extern */
-M2C_UNK func_001A6178();                            /* extern */
-extern M2C_UNK B_003DD490;
+struct SW;
+extern struct SW B_003DD490;
 
-void OnLightAdd(s32 arg0) {
-    func_001A6178();
-    AddLightToSw(&B_003DD490, arg0);
+void func_001A6178(struct LIGHT *light);
+void AddLightToSw(struct SW *psw, struct LIGHT *light);
+
+void OnLightAdd(struct LIGHT *light) {
+    func_001A6178(light);
+    AddLightToSw(&B_003DD490, light);
 }

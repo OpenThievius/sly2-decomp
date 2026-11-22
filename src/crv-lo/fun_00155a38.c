@@ -1,9 +1,12 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "goalpost.h"
 
-M2C_UNK func_00155AE0(s32, M2C_UNK);                /* extern */
-M2C_UNK func_001EEF70();                            /* extern */
+void func_00155AE0(struct GOALPOSTWATCH *pgoal, s32 state);
+void func_001EEF70(struct GOALPOSTWATCH *pgoal);
 
-void func_00155A38(s32 arg0) {
-    func_001EEF70();
-    func_00155AE0(arg0, 0);
+/* GoalPostWatch_Activate */
+void func_00155A38(struct GOALPOSTWATCH *pgoal)
+{
+    func_001EEF70(pgoal);
+    func_00155AE0(pgoal, 0);
 }

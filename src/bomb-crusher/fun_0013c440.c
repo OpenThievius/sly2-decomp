@@ -1,5 +1,11 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "types.h"
 
-void func_0013C440(void *arg0) {
-    M2C_FIELD(arg0, s32 *, 0x158) = 0;
+struct LOOT_13C440 {
+    u8 unknown_0x0[0x158];
+    void *plootdefSel;
+};
+
+void func_0013C440(struct LOOT_13C440 *loot) {
+    loot->plootdefSel = 0;
 }

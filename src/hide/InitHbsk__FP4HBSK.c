@@ -1,15 +1,16 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "hbsk.h"
 
-M2C_UNK InitSo();                                   /* extern */
-M2C_UNK SetAloInteract(void *, M2C_UNK, M2C_UNK);   /* extern */
-M2C_UNK bevy_player_p6_182c70(s32);                 /* extern */
+void InitSo(struct HBSK *phbsk);                               /* extern */
+void SetAloInteract(struct HBSK *phbsk, s32 grfInteract, s32 grfMask); /* extern */
+void bevy_player_p6_182c70(struct MEMBER *pmember);            /* extern */
 
-void InitHbsk__FP4HBSK(void *arg0) {
-    InitSo();
-    bevy_player_p6_182c70(arg0 + 0x150);
-    M2C_FIELD(arg0, s32 *, 0x17C) = 0;
-    M2C_FIELD(arg0, f32 *, 0x158) = 300.0f;
-    M2C_FIELD(arg0, s32 *, 0x18C) = 1;
-    SetAloInteract(arg0, 0x03FFFFFF, 8);
-    SetAloInteract(arg0, 0x03188001, 0);
+void InitHbsk__FP4HBSK(struct HBSK *phbsk) {
+    InitSo(phbsk);
+    bevy_player_p6_182c70(&phbsk->member);
+    phbsk->hbsks = 0;
+    phbsk->member.field_0x8 = 300.0f;
+    phbsk->fLocked = 1;
+    SetAloInteract(phbsk, 0x03FFFFFF, 8);
+    SetAloInteract(phbsk, 0x03188001, 0);
 }

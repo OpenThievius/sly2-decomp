@@ -1,17 +1,19 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "lookat.h"
+#include "xf.h"
 
-s128 GetXfDofValue(s32, s32);                       /* extern */
+QW GetXfDofValue(struct XF *pxf, struct MATRIX4 *pmat);
 
-void func_0012CF30(void *arg0, s128 *arg1, void *arg2) {
-    s32 temp_a0;
+void func_0012CF30(struct LOOKAT *plookat, QW *ppos, s32 *pvec) {
+    struct XF *pxf;
 
-    if (arg1 != NULL) {
-        temp_a0 = M2C_FIELD(arg0, s32 *, 8);
-        *arg1 = GetXfDofValue(temp_a0, temp_a0);
+    if (ppos != 0) {
+        pxf = plookat->pxf;
+        *ppos = GetXfDofValue(pxf, &pxf->mat);
     }
-    if (arg2 != NULL) {
-        M2C_FIELD(arg2, s32 *, 8) = 0;
-        M2C_FIELD(arg2, s32 *, 4) = 0;
-        M2C_FIELD(arg2, s32 *, 0) = 0;
+    if (pvec != 0) {
+        pvec[2] = 0;
+        pvec[1] = 0;
+        pvec[0] = 0;
     }
 }

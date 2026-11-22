@@ -1,9 +1,10 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "light.h"
 
-M2C_UNK PostLoLoad();                               /* extern */
-M2C_UNK RebuildLight(s32);                          /* extern */
+void PostLoLoad(struct LIGHT *light);
+void RebuildLight(struct LIGHT *light);
 
-void PostLightLoad(s32 arg0) {
-    PostLoLoad();
-    RebuildLight(arg0);
+void PostLightLoad(struct LIGHT *light) {
+    PostLoLoad(light);
+    RebuildLight(light);
 }

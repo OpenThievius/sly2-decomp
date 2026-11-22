@@ -1,5 +1,6 @@
-#include "m2c_macros.h"
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "slyview.h"
 
-void SetJtRideOffset(void *arg0, s128 arg1) {
-    M2C_FIELD(arg0, s128 *, 0x1FA0) = arg1;
+void SetJtRideOffset(struct SLYVIEW *self, s128 offset) {
+    self->rideOffset = offset;
 }

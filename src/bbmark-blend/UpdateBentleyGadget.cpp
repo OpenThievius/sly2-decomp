@@ -1,46 +1,46 @@
-struct GADGETVT136118 { char pad[0x260]; short delta; short index; void (*fn)(void *, int); };
-struct GADGET136118 { char pad0[0xC]; GADGETVT136118 *vt; char pad1[0x148]; int kind; char pad2[0x44]; int stickArg; };
-struct BENTLEY136118;
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "bentley.h"
+#include "clock.h"
+#include "gadgetobj.h"
+#include "joy.h"
 extern "C" {
-extern float g_2dded0;
-int FAsegaGone(int);
-int FVjoyButtonHeld(int, int);
-int GrfbtnJtGadget(BENTLEY136118 *, int);
-void ReleaseBentleyGadget(BENTLEY136118 *);
-void SetBentleyGadgetAnim(BENTLEY136118 *, int);
+int FAsegaGone(void *);
+int FVjoyButtonHeld(JOY *, int);
+int GrfbtnJtGadget(BENTLEY *, int);
+void ReleaseBentleyGadget(BENTLEY *);
+void SetBentleyGadgetAnim(BENTLEY *, int);
 void SetJmpState(void *, int, int, int);
-void StickGadgetObj(GADGET136118 *, int);
+void StickGadgetObj(GADGETOBJ *, int);
 }
-#define FIELD136118(type, offset) (*(type *)((char *)pbentley + (offset)))
-void UpdateBentleyGadget(BENTLEY136118 *pbentley)
+void UpdateBentleyGadget(BENTLEY *pbentley)
 {
     int state;
     for (;;) {
-        state = FIELD136118(int, 0x16B0);
+        state = pbentley->field_0x16B0;
         if (state == 0) {
-            if (FAsegaGone(FIELD136118(int, 0x1030)))
+            if (FAsegaGone(pbentley->field_0x1030))
                 SetBentleyGadgetAnim(pbentley, 1);
         } else if (state >= 0) {
             if (state < 3) {
-                GADGET136118 *pgadget = FIELD136118(GADGET136118 *, 0x186C);
-                int kind = pgadget->kind;
+                GADGETOBJ *pgadget = (GADGETOBJ *)pbentley->ploGadget;
+                int kind = pgadget->field_0x158;
                 if (kind == 2) {
-                    StickGadgetObj(pgadget, pgadget->stickArg);
+                    StickGadgetObj(pgadget, pgadget->field_0x1A0);
                     ReleaseBentleyGadget(pbentley);
-                    SetJmpState((char *)pbentley + 0x2C0, 0xB, 0, 0);
-                } else if (kind == 4 || !FVjoyButtonHeld(FIELD136118(int, 0x150), GrfbtnJtGadget(pbentley, *FIELD136118(int *, 0x16B4)) | 0x10)) {
+                    SetJmpState(pbentley->PvJmp(), 0xB, 0, 0);
+                } else if (kind == 4 || !FVjoyButtonHeld(pbentley->pjoy, GrfbtnJtGadget(pbentley, pbentley->pslotActive->gadget) | 0x10)) {
                     pgadget->vt->fn((char *)pgadget + pgadget->vt->delta, 1);
                     ReleaseBentleyGadget(pbentley);
-                    SetJmpState((char *)pbentley + 0x2C0, 0xB, 0, 0);
+                    SetJmpState(pbentley->PvJmp(), 0xB, 0, 0);
                 } else {
-                    if (g_2dded0 - FIELD136118(float, 0x20C) > 0.1f)
+                    if (g_2dded0.t - pbentley->tJump > 0.1f)
                         SetBentleyGadgetAnim(pbentley, 2);
                     else
                         SetBentleyGadgetAnim(pbentley, 1);
                 }
             }
         }
-        if (FIELD136118(int, 0x16B0) == state || FIELD136118(int, 0x13D0) != 6)
+        if (pbentley->field_0x16B0 == state || pbentley->state != 6)
             break;
     }
 }

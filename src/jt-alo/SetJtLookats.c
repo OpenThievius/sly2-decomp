@@ -1,47 +1,48 @@
-#include "m2c_macros.h"
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "slyview.h"
 
-M2C_UNK AddLookat(s32);                             /* extern */
-M2C_UNK RemoveLookat(s32);                          /* extern */
+void AddLookat(void *plookat);
+void RemoveLookat(void *plookat);
 
-void SetJtLookats(void *arg0, s32 arg1) {
-    s32 temp_a0;
+void SetJtLookats(struct SLYVIEW *self, s32 grfLookat) {
+    void *plookat;
 
-    temp_a0 = M2C_FIELD(arg0, s32 *, 0x19E4);
-    if (temp_a0 != 0) {
-        if (arg1 & 1) {
-            AddLookat(temp_a0);
+    plookat = self->alookat[0];
+    if (plookat != 0) {
+        if (grfLookat & 1) {
+            AddLookat(plookat);
         } else {
-            RemoveLookat(temp_a0);
+            RemoveLookat(plookat);
         }
-        if (arg1 & 2) {
-            AddLookat(M2C_FIELD(arg0, s32 *, 0x19E8));
+        if (grfLookat & 2) {
+            AddLookat(self->alookat[1]);
         } else {
-            RemoveLookat(M2C_FIELD(arg0, s32 *, 0x19E8));
+            RemoveLookat(self->alookat[1]);
         }
-        if (arg1 & 4) {
-            AddLookat(M2C_FIELD(arg0, s32 *, 0x19EC));
+        if (grfLookat & 4) {
+            AddLookat(self->alookat[2]);
         } else {
-            RemoveLookat(M2C_FIELD(arg0, s32 *, 0x19EC));
+            RemoveLookat(self->alookat[2]);
         }
-        if (arg1 & 8) {
-            AddLookat(M2C_FIELD(arg0, s32 *, 0x19F0));
+        if (grfLookat & 8) {
+            AddLookat(self->alookat[3]);
         } else {
-            RemoveLookat(M2C_FIELD(arg0, s32 *, 0x19F0));
+            RemoveLookat(self->alookat[3]);
         }
-        if (arg1 & 0x10) {
-            AddLookat(M2C_FIELD(arg0, s32 *, 0x19F4));
+        if (grfLookat & 0x10) {
+            AddLookat(self->alookat[4]);
         } else {
-            RemoveLookat(M2C_FIELD(arg0, s32 *, 0x19F4));
+            RemoveLookat(self->alookat[4]);
         }
-        if (arg1 & 0x20) {
-            AddLookat(M2C_FIELD(arg0, s32 *, 0x19FC));
+        if (grfLookat & 0x20) {
+            AddLookat(self->plookatBit5);
         } else {
-            RemoveLookat(M2C_FIELD(arg0, s32 *, 0x19FC));
+            RemoveLookat(self->plookatBit5);
         }
-        if (arg1 & 0x40) {
-            AddLookat(M2C_FIELD(arg0, s32 *, 0x19F8));
+        if (grfLookat & 0x40) {
+            AddLookat(self->plookatBit6);
             return;
         }
-        RemoveLookat(M2C_FIELD(arg0, s32 *, 0x19F8));
+        RemoveLookat(self->plookatBit6);
     }
 }

@@ -1,5 +1,7 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "hitfx.h"
 
-void HitFx_AddRef(void *arg0) {
-    M2C_FIELD(arg0, s32 *, 0x10) = (s32) (M2C_FIELD(arg0, s32 *, 0x10) + 1);
+void HitFx_AddRef(struct HITFX *pfx)
+{
+    pfx->cRef = pfx->cRef + 1;
 }

@@ -1,14 +1,15 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "bentleyview.h"
+#include "clock.h"
 
-M2C_UNK SetLookRigState(void *, M2C_UNK);           /* extern */
-extern f32 g_2dded0;
+void SetLookRigState(void *plookrig, s32 state);
 
-void SetBentleyAimState(void *arg0, s32 arg1) {
-    if (arg1 != M2C_FIELD(arg0, s32 *, 0x16BC)) {
-        M2C_FIELD(arg0, s32 *, 0x16BC) = arg1;
-        M2C_FIELD(arg0, f32 *, 0x16C0) = (f32) g_2dded0;
-        if (arg1 == 0) {
-            SetLookRigState(arg0 + 0x1710, -1);
+void SetBentleyAimState(struct BENTLEYVIEW *pbentley, s32 aimState) {
+    if (aimState != pbentley->aimState) {
+        pbentley->aimState = aimState;
+        pbentley->tAim = (f32) g_2dded0.t;
+        if (aimState == 0) {
+            SetLookRigState(pbentley->lookrig, -1);
         }
     }
 }

@@ -37,7 +37,9 @@ struct JTVIEW {
     /* 0xF14 */ void *pasegaHandle2;        /* func_00141928 retracts it after pasegaHandle */
     u8 unknown_0xF18[0xB8];
     /* 0xFD0 */ u8 vjoy[0];                 /* JT::PvVjoy(): GoalFollowCrvVjoy's Activate and Update pass it to func_001448F0 */
-    u8 unknown_0xFD0[0x54];
+    u8 unknown_0xFD0[0x30];
+    /* 0x1000 */ s32 field_0x1000;          /* JT::field_0x1000 (InitMurray sets 4, InitBentley 2); func_001841F0 masks it */
+    u8 unknown_0x1004[0x20];
     /* 0x1024 */ struct TN *ptnOverride;    /* func_00140C88 swaps it, calling SetTnTnsOverride on the old and the new */
     u8 unknown_0x1028[0xB4];
     /* 0x10DC */ sptr field_0x10DC;         /* JT::field_0x10DC, a STEPGUARD address: func_001431D0 takes its goal stack */

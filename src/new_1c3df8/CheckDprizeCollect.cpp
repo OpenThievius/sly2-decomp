@@ -1,39 +1,32 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "dprize.h"
+#include "sw.h"
+#include "clock.h"
+
 extern "C" {
-extern char B_003DD490[];
-extern float g_2dded0;
-int func_001C4BD8(void *, int, void *);
-int func_001C5B20(void *, void *);
+extern SW B_003DD490;
+int func_001C4BD8(SW *psw, int cpmagnetMax, void **apmagnet);
+int func_001C5B20(DPRIZE *pdprize, void *pmagnet);
 int FIsBasicDerivedFrom(void *, int);
 }
 
-struct VT { char pad[0x260]; short delta; short index; void (*fn)(void *, int); };
-
-struct DP {
-    char pad0[0xC];
-    VT *vt;
-    char pad1[0x1C8 - 0x10];
-    int collectable;
-    float expire;
-};
-
-void CheckDprizeCollect(DP *dp)
+void CheckDprizeCollect(DPRIZE *pdprize)
 {
-    if (dp->collectable == 0)
+    if (pdprize->collectable == 0)
         return;
-    if (dp->expire < g_2dded0) {
-        VT *vt = dp->vt;
-        vt->fn((char *)dp + vt->delta, 1);
+    if (pdprize->tExpire < g_2dded0.t) {
+        pdprize->SetDprizes(1);
         return;
     }
     void *apmagnet[16];
-    int count = func_001C4BD8(B_003DD490, 16, apmagnet);
-    void **slot = apmagnet;
-    for (int index = 0; index < count; slot++, index++) {
-        if (index > 0) {
-            if (FIsBasicDerivedFrom(dp, 0x5B) == 0)
+    int cpmagnet = func_001C4BD8(&B_003DD490, 16, apmagnet);
+    void **ppmagnet = apmagnet;
+    for (int ipmagnet = 0; ipmagnet < cpmagnet; ppmagnet++, ipmagnet++) {
+        if (ipmagnet > 0) {
+            if (FIsBasicDerivedFrom(pdprize, 0x5B) == 0)
                 break;
         }
-        if (func_001C5B20(dp, *slot) == 0)
+        if (func_001C5B20(pdprize, *ppmagnet) == 0)
             continue;
         break;
     }

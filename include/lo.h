@@ -87,7 +87,7 @@ struct LO : BASIC {
     virtual void SetPosMatFromXf();     /* 39: SetLoPosMatFromXf */
     virtual void CloneVirtual();        /* 40: CloneLoVirtual */
     virtual void Slot41(struct SO *psoSource); /* 41: CloneAloHierarchy passes the source object (an SO) */
-    virtual void Slot42();
+    virtual void Slot42(float value);   /* 42: func_001F3118 (SO) stores it in field_0x38 and passes it to each child's slot 42 */
     virtual void FReturnFalse();        /* 43: FReturnFalseLo */
     virtual void Slot44();
     virtual void Slot45();
@@ -105,7 +105,7 @@ struct LO : BASIC {
     /* 0x28 */ u64 grfo;               /* RecalcSoLocked, func_001C4BD8, UpdateRip */
     u8 unknown_0x30[0x4];
     /* 0x34 */ struct DCB *pdcb;       /* the object's callback table (PdcbAllocSw's result): func_001A5D98 runs its pfn(plo, pv). DCB is declared by its users */
-    u8 unknown_0x38[0x4];
+    /* 0x38 */ f32 field_0x38;         /* func_001F3118 (SO slot 42): set to its argument, compared with each child's */
     /* 0x3C */ struct SCOPE *pscope;   /* what PloFindSwObject searches when this object is the context: RefOpFindObject,
                                        func_001241E8, func_00124578, RefOpFindNearestObject; InitCloneSets sets its 0x24 */
     /* 0x40: flags until AddSwGrfEntry enters the object in the world's table (include/sw.h), then its entry, which keeps the

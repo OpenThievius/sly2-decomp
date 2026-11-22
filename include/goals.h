@@ -193,7 +193,7 @@ GOAL_CLASS(GOALFOLLOWCRV, GOAL, GOALFOLLOWCRV_FIELDS)
    slot 15). GoalFollowRoute_SetState starts it. */
 #define GOALFOLLOWCRVANIM_FIELDS \
     /* 0xC0 */ s32 kind;            /* GoalFollowCrvAnim_SetState: the sgs of the idle animation goal; 8 means "look at ptarget" */ \
-    u8 unknown_0xC4[0x4]; \
+    /* 0xC4 */ f32 field_0xC4;     /* GoalFollowCrvAnim_Init sets 1.0 (a method of the class) */ \
     /* 0xC8 */ struct LO *ptarget;  /* GoalFollowCrvAnim_SetState */ \
     u8 unknown_0xCC[0x4]; \
     /* 0xD0 */ QW posLast;          /* GoalFollowCrvAnim_SetState */ \
@@ -329,18 +329,21 @@ GOAL_CLASS(GOALB8, GOAL, GOALB8_FIELDS)
 /* 0xBA (186) GoalGoto, 0xD0 bytes: Init func_0017D360, Activate func_0017D3B0, Deactivate func_0017D408, Update func_0017D6C8,
    GoalGoto_SetState, func_0017D8A8 (finds the path), GoalGoto_FArrived */
 #define GOALGOTO_FIELDS \
-    u8 unknown_0x30[0x8]; \
-    /* 0x38 */ s32 field_0x38;      /* func_0017E278, func_0017C928 set 0x1C */ \
+    /* 0x30 */ s32 state;           /* GoalGoto_Init writes -1; GoalGoto_SetState, GoalGoto_FArrived, GoalGoto_FBlocked (states 1 and 2 follow the curve) */ \
+    /* 0x34 */ f32 tState;          /* GoalGoto_SetState: the clock at the last state change */ \
+    /* 0x38 */ s32 field_0x38;      /* GoalGoto_Activate adds it to the guard's sgs unless -1, GoalGoto_Deactivate removes it; GoalGoto_Init writes -1; func_0017E278, func_0017C928 set 0x1C */ \
     u8 unknown_0x3C[0x4]; \
     /* 0x40 */ struct GOALTARGET target;   /* SetGoalTarget; func_0017D8A8 resolves it */ \
     /* 0x60 */ struct GOALTARGET targetResolved; /* func_0017D8A8: target, or the near end of the path */ \
-    u8 unknown_0x80[0x28]; \
-    /* 0xA8 */ struct LO *ptarget;  /* func_0017C928 */ \
-    /* 0xAC */ s32 field_0xAC;      /* func_0017C928 sets 1 */ \
+    /* 0x80 */ struct GOALTARGET targetSnap; /* GoalGoto_SetState (state 5) copies it to the snap goal's target */ \
+    /* 0xA0 */ f32 field_0xA0;      /* GoalGoto_Init writes the smallest float */ \
+    /* 0xA4 */ s32 field_0xA4;      /* GoalGoto_Init copies it from the world's word at 0x28 (B_003E1A5C) */ \
+    /* 0xA8 */ struct LO *ptarget;  /* func_0017C928; GoalGoto_SetState hands it to the animation and follow goals */ \
+    /* 0xAC */ s32 field_0xAC;      /* func_0017C928 sets 1; GoalGoto_SetState tests it */ \
     u8 unknown_0xB0[0x4]; \
     /* 0xB4 */ s32 cpzlink;         /* func_0017D8A8: the path's links */ \
-    /* 0xB8 */ struct PZLINK *apzlink[1]; /* func_0017D8A8 */ \
-    /* 0xBC */ s32 fStraight;       /* func_0017D8A8: no path search */ \
+    /* 0xB8 */ struct PZLINK *apzlink[1]; /* func_0017D8A8; GoalGoto_SetState hands the first word to the route goal */ \
+    /* 0xBC */ s32 fStraight;       /* func_0017D8A8: no path search; GoalGoto_SetState copies it to the follow goal */ \
     /* 0xC0 */ s32 fLink;           /* func_0017D8A8: a partial path is fine; SetSearchState, func_0017C928, func_0017E278 set 1 */ \
     u8 unknown_0xC4[0xC];
 GOAL_CLASS(GOALGOTO, GOAL, GOALGOTO_FIELDS)

@@ -12,6 +12,7 @@ struct IKLIMB;
 struct ASEGA;
 
 struct MURRAY : JT {
+    void *PvCarry() { return (char *)this + 0x1910; } /* Murray's carry part, CarryThrow_Init's second one (JT::PvCarry is the first, at 0x11B0): InitMurray, PostMurrayLoad, GetMurrayCpdefi, HandleMurrayMessage, UpdateMurrayActive and func_001B8450 pass its address */
     u8 unknown_0x1320[0xB0];
     /* 0x13D0 */ s32 state; /* the state: InitMurray (7) sets -1; GetMurrayCpdefi (50), PresetMurrayAccel (70), FInvulnerableMurray (76), NMurrayActionCategory (85), SetMurrayAnimBase (90), FMurrayOnFoot (94), PredictMurrayLead (96) */
     u8 unknown_0x13D4[0x4];
@@ -81,7 +82,11 @@ struct MURRAY : JT {
     /* 0x1840 */ s32 field_0x1840; /* InitMurray sets -1 */
     u8 unknown_0x1844[0xC8];
     /* 0x190C */ struct ASEGA *field_0x190C; /* StartMurrayAttackA, StartMurrayAttackB read the aseg at its +0x14 */
-    u8 unknown_0x1910[0x148];
+    u8 unknown_0x1910[0x4];
+    /* 0x1914 */ s32 stateCarry; /* in Murray's carry part at 0x1910 (state at +4, CarryThrow_SetState); func_00136530 (Bentley) tests it against 7 */
+    u8 unknown_0x1918[0x4];
+    /* 0x191C */ struct SO *psoCarry; /* in the carry part (+0xC): func_00136530 (Bentley) asks it for a transform (SO slot 32) */
+    u8 unknown_0x1920[0x138];
     /* 0x1A58 */ void *apasegState[0x16]; /* SetMurrayAnimBase (90) binds the entry state indexes; the count is the room left before apasegByIndex */
     /* 0x1AB0 */ void *apasegByIndex[3]; /* SetMurrayAnimBase (90) */
     /* 0x1ABC */ void *pasegCarry; /* SetMurrayAnimBase (90), in state 2 while carrying */
@@ -116,6 +121,8 @@ SLY2_OFFSET_CHECK(MURRAY, field_0x17FC, 0x17FC);
 SLY2_OFFSET_CHECK(MURRAY, field_0x1804, 0x1804);
 SLY2_OFFSET_CHECK(MURRAY, field_0x1808, 0x1808);
 SLY2_OFFSET_CHECK(MURRAY, field_0x190C, 0x190C);
+SLY2_OFFSET_CHECK(MURRAY, stateCarry, 0x1914);
+SLY2_OFFSET_CHECK(MURRAY, psoCarry, 0x191C);
 SLY2_OFFSET_CHECK(MURRAY, field_0x13D8, 0x13D8);
 SLY2_OFFSET_CHECK(MURRAY, field_0x13E8, 0x13E8);
 SLY2_OFFSET_CHECK(MURRAY, field_0x13EC, 0x13EC);

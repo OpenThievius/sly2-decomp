@@ -1,5 +1,6 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "swview.h"
 
-s32 FSwBinocActive(void *arg0) {
-    return M2C_FIELD(arg0, s32 *, 0x3D84) > 0;
+s32 FSwBinocActive(struct SWVIEW *psw) {
+    return psw->cbinoc > 0;
 }

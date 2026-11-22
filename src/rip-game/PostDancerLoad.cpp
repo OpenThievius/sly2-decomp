@@ -1,24 +1,12 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "dancer.h"
 extern "C" {
-void PostStepLoad();                             /* extern */
-void ResolveDancerMoves(s8 *);                 /* extern */
-
-void PostDancerLoad(s8 *arg0) {
-    s8 *vtable;
-    s16 offset;
-    void (*method)(s8 *, s32);
-
-    PostStepLoad();
-    ResolveDancerMoves(arg0);
-    vtable = *(s8 **)(arg0 + 0xC);
-    offset = *(s16 *)(vtable + 0x278);
-    method = *(void (**)(s8 *, s32))(vtable + 0x27C);
-    method(arg0 + offset, 0);
+void PostStepLoad();
 }
+void ResolveDancerMoves(DANCER *);
 
+extern "C" void PostDancerLoad(DANCER *dancer) {
+    PostStepLoad();
+    ResolveDancerMoves(dancer);
+    dancer->SetPlayable(0);
 }

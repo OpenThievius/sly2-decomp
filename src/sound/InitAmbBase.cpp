@@ -1,21 +1,18 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "amb.h"
+struct AMBVPTR { u8 unknown_0x0[0xC]; void *vptr; };
 extern "C" {
-extern M2C_UNK D_002D9D00;
+extern u8 D_002D9D00[]; /* AMB's vtable: the class has no constructor of its own in source */
 
-s8 *InitAmbBase(s8 *arg0) {
-    M2C_FIELD(arg0, s32 *, 0) = 0;
-    M2C_FIELD(arg0, s32 *, 4) = 0;
-    M2C_FIELD(arg0, M2C_UNK **, 0xC) = &D_002D9D00;
-    M2C_FIELD(arg0, f32 *, 0x10) = 1.0f;
-    M2C_FIELD(arg0, f32 *, 0x44) = 1.0f;
-    M2C_FIELD(arg0, f32 *, 0x30) = 300.0f;
-    M2C_FIELD(arg0, f32 *, 0x34) = 3000.0f;
-    return arg0;
+AMB *InitAmbBase(AMB *pamb)
+{
+    pamb->dle.next = 0;
+    pamb->dle.prev = 0;
+    ((AMBVPTR *)pamb)->vptr = D_002D9D00;
+    pamb->volume = 1.0f;
+    pamb->volAudible = 1.0f;
+    pamb->lmMin = 300.0f;
+    pamb->lmMax = 3000.0f;
+    return pamb;
 }
-
 }

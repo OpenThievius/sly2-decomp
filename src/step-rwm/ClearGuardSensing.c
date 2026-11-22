@@ -5,7 +5,7 @@ void ClearGuardClassFilters(struct STEPGUARDVIEW *);
 void ClearGuardIgnoredClasses(struct STEPGUARDVIEW *);
 
 void ClearGuardSensing(struct STEPGUARDVIEW *pguard) {
-    pguard->psensor->field_0xFC = 0;
+    pguard->psensor->centry = 0;
     pguard->cgroup = 0;
     pguard->csensed = 0;
     ClearGuardIgnoredClasses(pguard);

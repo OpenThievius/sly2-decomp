@@ -1,9 +1,10 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "light.h"
 
-M2C_UNK RebuildLight(s32);                          /* extern */
-M2C_UNK RotateXfmToMat();                           /* extern */
+void RebuildLight(struct LIGHT *light);
+void RotateXfmToMat(struct LIGHT *light);
 
-void RotateLightToMat(s32 arg0) {
-    RotateXfmToMat();
-    RebuildLight(arg0);
+void RotateLightToMat(struct LIGHT *light) {
+    RotateXfmToMat(light);
+    RebuildLight(light);
 }

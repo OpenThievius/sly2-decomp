@@ -1,38 +1,43 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
-struct VT { char pad[0x40]; short delta; short index; void (*fn)(void *); };
-struct GO { char pad[0x0C]; VT *vptr; char pad1[0x30 - 0x10]; void *a30; char p34[4]; void *a38; char p3c[4]; int a40; char pad2[0x4C - 0x44]; void *a4C; };
-#include "stepguard.h"
-struct GUARD : STEPGUARD { u8 unknown_0x1010[0x8]; int tickPick; };
-struct POST { char pad[0x20]; int used; };
-struct PG { char pad[0x10]; GUARD *guard; char pad2[0x18 - 0x14]; char child[0x18]; int state; float t; void *target; POST *post; };
-extern "C" void Goal_Pop(void *);
-extern "C" GO *func_00205438(GUARD *, int);
-extern float g_2dded0;
-struct CK { float t; };
-extern "C" void func_00155788(PG *pg, int state)
+#include "clock.h"
+#include "goalpost.h"
+/* class 0xB5, the goal GoalPostRun pushes in state 0: it runs to the post and watches the target */
+struct GOALPOSTGO : GOAL {
+    u8 unknown_0x30[0x8];
+    /* 0x38 */ POSTPAIR *ppost;
+    u8 unknown_0x3C[0x10];
+    /* 0x4C */ LO *ptarget;
+};
+extern "C" {
+void Goal_Pop(GOAL **);
+GOAL *func_00205438(STEPGUARD *, int);
+}
+
+/* GoalPostRun_SetState */
+extern "C" void func_00155788(GOALPOSTRUN *pgoal, int state)
 {
-    if (state == pg->state) return;
-    if (pg->state == 0) pg->post->used = 1;
-    Goal_Pop(pg->child);
-    pg->state = state;
-    pg->t = ((CK*)&g_2dded0)->t;
+    if (state == pgoal->state)
+        return;
+    if (pgoal->state == 0)
+        pgoal->ppost->used = 1;
+    Goal_Pop(&pgoal->pgoalChild);
+    pgoal->state = state;
+    pgoal->tState = g_2dded0.t;
     switch (state) {
     case 0: {
-        GO *go = func_00205438(pg->guard, 0xB5);
-        go->a38 = pg->post;
-        go->a4C = pg->target;
-        VT *vt = go->vptr;
-        vt->fn((char *)go + vt->delta);
-        pg->guard->tickPick = pg->guard->field_0x33C;
+        GOALPOSTGO *ppostgo = (GOALPOSTGO *)func_00205438((STEPGUARD *)pgoal->pstep, 0xB5);
+        ppostgo->ppost = pgoal->ppost;
+        ppostgo->ptarget = pgoal->ptarget;
+        ppostgo->Activate();
+        ((STEPGUARDPOSTS *)pgoal->pstep)->tickPick = ((STEPGUARD *)pgoal->pstep)->field_0x33C;
         break; }
     case 1: {
-        GO *go = func_00205438(pg->guard, 0xA5);
-        void *tg = pg->target;
-        go->a40 = state;
-        go->a30 = tg;
-        VT *vt = go->vptr;
-        vt->fn((char *)go + vt->delta);
+        GOALNOTICE *pnotice = (GOALNOTICE *)func_00205438((STEPGUARD *)pgoal->pstep, 0xA5);
+        LO *ptarget = pgoal->ptarget;
+        pnotice->field_0x40 = state;
+        pnotice->ptarget = ptarget;
+        pnotice->Activate();
         break; }
     }
 }

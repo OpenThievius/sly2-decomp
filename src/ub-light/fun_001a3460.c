@@ -1,20 +1,19 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "light.h"
 
-M2C_UNK RebuildLight(void *);                       /* extern */
-M2C_UNK func_001A5E80();                            /* extern */
+void RebuildLight(struct LIGHT *light);
+void func_001A5E80(struct LIGHT *light);
 
-void func_001A3460(void *arg0) {
-    s32 var_v1;
-    void *temp_v0;
+void func_001A3460(struct LIGHT *light) {
+    s32 generation;
 
-    func_001A5E80();
-    temp_v0 = M2C_FIELD(arg0, void **, 0x50);
-    var_v1 = 0;
-    if (temp_v0 != NULL) {
-        var_v1 = M2C_FIELD(temp_v0, s32 *, 0xA4);
+    func_001A5E80(light);
+    generation = 0;
+    if (light->pxf != 0) {
+        generation = light->pxf->generation;
     }
-    if (M2C_FIELD(arg0, s32 *, 0xE4) < var_v1) {
-        M2C_FIELD(arg0, s32 *, 0xE4) = var_v1;
-        RebuildLight(arg0);
+    if (light->generation < generation) {
+        light->generation = generation;
+        RebuildLight(light);
     }
 }

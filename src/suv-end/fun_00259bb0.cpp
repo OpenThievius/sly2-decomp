@@ -1,15 +1,28 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "types.h"
-extern "C" {
-void func_00259BB0(s8 **arg0, s8 *arg1) {
-    s8 *vtable;
 
-    if (arg1 != 0) {
-        vtable = *(s8 **)(arg1 + 0xC);
-        void (*method)(s8 *) = *(void (**)(s8 *))(vtable + 0xC);
-        method(arg1 + *(s16 *)(vtable + 8));
+/* A vtable slot, 8 bytes: this-adjustment, then the method. */
+struct VTSLOT {
+    s16 delta;
+    s16 index;
+    void (*method)(void *);
+};
+struct VTABLE {
+    u8 unknown_0x0[8];
+    VTSLOT addref;      /* called by the reference's copy constructor (this function) */
+};
+struct REFCOUNTED {
+    u8 unknown_0x0[0xC];
+    VTABLE *vt;
+};
+
+extern "C" {
+void func_00259BB0(REFCOUNTED **ppref, REFCOUNTED *pobject) {
+    if (pobject != 0) {
+        VTABLE *vt = pobject->vt;
+        vt->addref.method((char *)pobject + vt->addref.delta);
     }
-    *arg0 = arg1;
+    *ppref = pobject;
 }
 
 }

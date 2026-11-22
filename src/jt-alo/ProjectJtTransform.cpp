@@ -1,26 +1,22 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "sly.h"
 extern "C" {
-s128 PosLoWorld(s8 *);                            /* extern */
-void ProjectSoTransform(s8 *);                 /* extern */
+QW PosLoWorld(void *);
+void ProjectSoTransform(SO *);
 
-void ProjectJtTransform(s8 *arg0) {
-    s128 temp_v0;
+void ProjectJtTransform(SLY *self) {
+    QW partPosition;
 
-    temp_v0 = PosLoWorld(M2C_FIELD(arg0, s8 **, 0x19A4));
-    M2C_FIELD(arg0, s32 *, 0x1880) = 0;
-    M2C_FIELD(arg0, s128 *, 0x18A0) = temp_v0;
-    ProjectSoTransform(arg0);
-    if (M2C_FIELD(arg0, s32 *, 0x18D8) == 0) {
-        M2C_FIELD(arg0, s128 *, 0x1890) = PosLoWorld(arg0);
-        M2C_FIELD(arg0, s128 *, 0x18B0) = PosLoWorld(M2C_FIELD(arg0, s8 **, 0x19A4));
-        M2C_FIELD(arg0, s32 *, 0x1880) = 3;
+    partPosition = PosLoWorld(self->apartHide[1]);
+    self->cbounds = 0;
+    self->abounds[1] = partPosition;
+    ProjectSoTransform(self);
+    if (self->jtcs == 0) {
+        self->abounds[0] = PosLoWorld(self);
+        self->abounds[2] = PosLoWorld(self->apartHide[1]);
+        self->cbounds = 3;
     } else {
-        M2C_FIELD(arg0, s32 *, 0x1880) = 0;
+        self->cbounds = 0;
     }
 }
 

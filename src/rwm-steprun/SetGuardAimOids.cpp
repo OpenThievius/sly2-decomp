@@ -1,7 +1,10 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // 0x20AF28
-void SetGuardAimOids(void* arg0, int a1, int a2, int a3)
+#include "guard.h"
+
+void SetGuardAimOids(AIMSTATE *paim, int oidA, int oidB, int oidLabel)
 {
-    *(int*)((char*)arg0 + 0x7c) = a1;
-    *(int*)((char*)arg0 + 0x80) = a2;
-    *(int*)((char*)arg0 + 0x84) = a3;
+    paim->oidA = oidA;
+    paim->oidB = oidB;
+    paim->oidLabel = oidLabel;
 }

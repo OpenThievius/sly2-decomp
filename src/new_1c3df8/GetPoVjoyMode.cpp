@@ -1,9 +1,13 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // 0x1C4080 GetPoVjoyMode
-extern "C" int GetPoVjoyMode(void* arg0)
+#include "joy.h"
+#include "po.h"
+
+extern "C" int GetPoVjoyMode(PO *ppo)
 {
-    int v1 = *(int*)((char*)arg0 + 0x150);
-    int v0 = -1;
-    if (v1 != 0)
-        v0 = *(int*)(v1 + 0x80);
-    return v0;
+    JOY *pjoy = ppo->pjoy;
+    int vjoym = -1;
+    if (pjoy != 0)
+        vjoym = pjoy->vjoym;
+    return vjoym;
 }

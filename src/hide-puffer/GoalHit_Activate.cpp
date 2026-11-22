@@ -57,7 +57,7 @@ void GoalHit_Activate(GOALHIT *pgoal) {
     ReplaceSwHitFx(&B_003DD490, 1, PosLoWorld(pgoal->pstep), (STEPGUARD *)pgoal->pstep, &((STEPGUARD *)pgoal->pstep)->field_0x35C);
     pgoal->tLimit = 3.4028235e38f;
     pgoal->tJolt = 3.4028235e38f;
-    ((STEPGUARD *)pgoal->pstep)->field_0xF04 = 0;
+    ((STEPGUARD *)pgoal->pstep)->tCooldown = 0;
     if (((STEPGUARD *)pgoal->pstep)->field_0x334 != 0) {
         int focus = PpoSwFocusBase(&B_003DD490);
         if (focus != 0) {

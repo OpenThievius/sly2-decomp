@@ -1,14 +1,17 @@
-#include "types.h"
-s32 GoalFollowCrv_FBlocked(s32);
-s32 GoalGoto_FBlocked(char *arg0)
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "stepguard.h"
+#include "goals.h"
+#include "sly2.h"
+s32 GoalFollowCrv_FBlocked(GOAL *pgoalFollow);
+s32 GoalGoto_FBlocked(GOALGOTO *pgoal)
 {
-    s32 var_v0 = 0;
-    s32 temp_v1 = *(s32 *)(arg0 + 0x30);
-    if (temp_v1 < 3) {
-        if (temp_v1 > 0) {
-            return GoalFollowCrv_FBlocked(*(s32 *)(arg0 + 0x18));
+    s32 blocked = 0;
+    s32 state = pgoal->state;
+    if (state < 3) {
+        if (state > 0) {
+            return GoalFollowCrv_FBlocked(pgoal->pgoalChild);
         }
-        return var_v0;
+        return blocked;
     }
-    return var_v0;
+    return blocked;
 }

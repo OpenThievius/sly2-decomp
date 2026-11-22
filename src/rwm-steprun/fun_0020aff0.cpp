@@ -1,26 +1,23 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "guard.h"
+
 extern "C" {
-void ResetAnimref(s8 *, s32);
-void func_0020BD78(s32 *);
-s32 *func_0020C010(M2C_UNK);
+void ResetAnimref(ANIMREF *, STEPGUARD *);
+void func_0020BD78(JUMPANIM *);
+JUMPANIM *func_0020C010(u32);
 
-void func_0020AFF0(s8 *arg0, s32 arg1) {
-    s32 *temp_v0;
-    s8 *temp_s1;
+void func_0020AFF0(AIMSTATE *paim, s32 id) {
+    JUMPANIM *pjumpanim;
+    ANIMREF *panimref;
 
-    temp_s1 = arg0 + 0xB0;
-    ResetAnimref(temp_s1, M2C_FIELD(arg0, s32 *, 0xAC));
-    M2C_FIELD(arg0, s32 *, 0xB0) = 2;
-    temp_v0 = func_0020C010(0x40);
-    M2C_FIELD(temp_s1, s32 **, 4) = temp_v0;
-    func_0020BD78(temp_v0);
-    *M2C_FIELD(temp_s1, s32 **, 4) = arg1;
-    M2C_FIELD(temp_s1, s32 *, 0xC) = 0;
+    panimref = &paim->animref;
+    ResetAnimref(panimref, paim->pguard);
+    paim->animref.kind = 2;
+    pjumpanim = func_0020C010(0x40);
+    panimref->pdata = pjumpanim;
+    func_0020BD78(pjumpanim);
+    ((JUMPANIM *)panimref->pdata)->field_0x0 = id;
+    panimref->grf = 0;
 }
 
 }

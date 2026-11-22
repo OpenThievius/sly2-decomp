@@ -1,44 +1,47 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
 #include "ps2inline.h"
 #include "vu0inline.h"
+#include "dancer.h"
+#include "rhythm.h"
 union VU_SCALE { QW q; VECTOR v; };
 extern "C" {
-extern char *B_002DE570;
-void UpdateStep(char *, float);
-int FAsegaGone(int);
-void SetXfKind(char *, int, int);
-void PlayDancerAnim(char *, int, int);
-void PlayDancerMove(char *, int, int, int);
-void JudgeRhythmPress(char *, char *);
-QW func_00204E38(char *, int, float);
+extern RHYTHM *B_002DE570;
+void UpdateStep(DANCER *, float);
+int FAsegaGone(ASEGA *);
+void SetXfKind(SO *, XF *, int);
+void PlayDancerAnim(DANCER *, void *, int);
+void PlayDancerMove(DANCER *, int, int, int);
+void JudgeRhythmPress(RHYTHM *, DANCER *);
+QW func_00204E38(DANCER *, ASEGA *, float);
 }
-void UpdateDancer(char *dancer, float dt)
+void UpdateDancer(DANCER *dancer, float dt)
 {
     UpdateStep(dancer, dt);
-    int handle = *(int *)(dancer + 0x408);
-    if (handle == 0 || FAsegaGone(handle)) {
-        SetXfKind(dancer, *(int *)(dancer + 0x58), 1);
-        SetXfKind(dancer, *(int *)(dancer + 0x5C), 1);
-        *(int *)(dancer + 0x40C) = 0;
-        PlayDancerAnim(dancer, *(int *)(dancer + 0x2C0), 8);
+    ASEGA *pasega = dancer->pasega;
+    if (pasega == 0 || FAsegaGone(pasega)) {
+        SetXfKind(dancer, dancer->pxfLinear, 1);
+        SetXfKind(dancer, dancer->pxfAngular, 1);
+        dancer->fMove = 0;
+        PlayDancerAnim(dancer, dancer->pasegIdle, 8);
     }
     int state = 0;
     if (B_002DE570)
-        state = *(int *)(B_002DE570 + 0x50);
+        state = B_002DE570->mode;
     switch (state) {
     case 0:
-        if (*(int *)(dancer + 0x40C) == 0)
+        if (dancer->fMove == 0)
             PlayDancerMove(dancer, -1, -1, 0);
         break;
     case 2:
         JudgeRhythmPress(B_002DE570, dancer);
         break;
     }
-    char *anim = *(char **)(dancer + 0x408);
-    if (anim) {
-        QW vel = func_00204E38(dancer, (sptr)anim, *(float *)(anim + 0x1C));
+    ASEGA *panim = dancer->pasega;
+    if (panim) {
+        QW vel = func_00204E38(dancer, panim, panim->tLocal);
         VU_SCALE scale;
         scale.q = VectorFromFloat(-1.0f);
-        *(QW *)(dancer + 0x190) = VectorScaleX(vel, scale.q);
+        dancer->velGoal = VectorScaleX(vel, scale.q);
     }
 }

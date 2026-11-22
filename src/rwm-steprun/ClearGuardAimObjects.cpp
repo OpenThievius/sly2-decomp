@@ -1,4 +1,8 @@
-extern "C" void ClearGuardAimObjects(char *guard) {
-    *(int *)(guard + 0xED8) = 0;
-    *(int *)(guard + 0xEFC) = 0;
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "guard.h"
+#include "stepguard.h"
+
+extern "C" void ClearGuardAimObjects(STEPGUARD *pguard) {
+    pguard->caoid = 0;
+    pguard->cfound = 0;
 }
