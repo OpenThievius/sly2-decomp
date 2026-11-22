@@ -5,7 +5,7 @@ struct SUB { int a; int b; int c; void *vptr; };
 /* the words of a guard (STEPGUARD, 0x1010 bytes) that its inlined constructor chain stores, vtable pointers included */
 struct GUARDINIT { int f0; int f4; int f8; void *vptr; char pad0[0x70]; GLOBSET globset; char pad1[0x174 - 0xD0]; int f174; char pad2[0xDB0 - 0x178]; char jumper[0x70]; SUB sub; };
 extern "C" char D_002D9978[], D_002CB1F0[], D_002DA568[], D_002DA9D0[];
-extern "C" int __7GLOBSET(GLOBSET *);
+extern "C" void *__7GLOBSET(GLOBSET *);
 extern "C" int InitJumper(void *);
 
 extern "C" GUARDINIT *ConstructGuard(GUARDINIT *pguard)

@@ -1,6 +1,6 @@
 #include "m2c_macros.h"
 
-M2C_UNK __7GLOBSET(s32);                               /* extern */
+void *__7GLOBSET(s32);                               /* extern: GLOBSET::GLOBSET, returns its argument */
 void *__builtin_new(M2C_UNK);                       /* extern */
 extern M2C_UNK D_002D61D8;
 extern M2C_UNK D_002D9978;

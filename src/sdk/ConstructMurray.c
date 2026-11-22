@@ -1,7 +1,7 @@
 #include "m2c_macros.h"
 
 M2C_UNK InitJumper(void *);                         /* extern */
-M2C_UNK __7GLOBSET(void *);                            /* extern */
+void *__7GLOBSET(void *);                            /* extern: GLOBSET::GLOBSET, returns its argument */
 extern M2C_UNK D_002D44C8;
 extern M2C_UNK D_002D9978;
 
