@@ -62,10 +62,11 @@ waves. Item numbers are stable: tools and docs cite them.
    the scorer fingerprint: do it between waves. Measure: `python3 scripts/check_cleanup.py --all`. Baseline 2026-11-21 (lines in
    `src/`): 324 local copies of shared types, 4,561 padding members, 1,557 cast offsets, 708 `(char *)p + offset`, 402 hand-written
    vtable calls, 4,463 m2c macros, 614 bare `long`. 2026-11-22, after the class waves (CRef, STEPGUARD, SO/LO/BASIC, PO/JT/MURRAY/XF,
-   SW/SLOTHEAP/STEP/GOAL/BENTLEY): 82, 4,325, 1,533, 699, 367, 4,407, 573. Left of the local copies: `CRef` in 48 files (28 behind the
-   frame-placement wall, 5 Splice core files that define CRef's own methods, the copy-constructor wrappers), about 30 local types
-   named after a shared class that are another class (subclasses, parts, list nodes: they stay, better named), and four functions
-   held back by the field rule (one reader, class a guess: UpdateJtStand, func_0020E2B0, ShowReconLinks, func_001430C8). Next: the
+   SW/SLOTHEAP/STEP/GOAL/BENTLEY) and the closing pass (CRef's frame "wall" was typing: a binding's vector is a `VECTOR`,
+   a struct GCC 2.95 places at its declaration, not a `QW`; misnamed local types renamed, subclasses derived from the shared type,
+   one-reader fields on a guessed class through local views; 0x167310 is GLOBSET's constructor, not CRef's): 3, 4,287, 1,534, 699,
+   362, 4,407, 571. The 3 left are by ruling or measurement: `RefOpMatrixLookAt` and `RefOpMatrixTiltUpright` (only with SetTag
+   wrappers, refused), `RefOpIsMember` (needs a CRef default constructor storing -1, which breaks 328 matched functions). Next: the
    m2c macros, cast offsets and padding module by module.
 2. **Whole files** (In Progress). Left: `po_screen_210eb0`, `SyncVBlank_file`, `StartupJmt_file`, `PloFindSpawn_file` (one callee or
    global written with several types), `QueueSwCallback_file` and `PsoHitTestLineObjects_file` (compile to another size), and four
