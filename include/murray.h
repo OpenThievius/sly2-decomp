@@ -9,17 +9,26 @@
 #include "jt.h"
 
 struct IKLIMB;
+struct ASEGA;
 
 struct MURRAY : JT {
     u8 unknown_0x1320[0xB0];
     /* 0x13D0 */ s32 state; /* the state: InitMurray (7) sets -1; GetMurrayCpdefi (50), PresetMurrayAccel (70), FInvulnerableMurray (76), NMurrayActionCategory (85), SetMurrayAnimBase (90), FMurrayOnFoot (94), PredictMurrayLead (96) */
     u8 unknown_0x13D4[0x4];
     /* 0x13D8 */ s32 field_0x13D8; /* InitMurray sets -1; NMurrayActionCategory (85) */
-    u8 unknown_0x13DC[0xC];
+    /* 0x13DC */ f32 field_0x13DC; /* func_001B6BA8 */
+    u8 unknown_0x13E0[0x4];
+    /* 0x13E4 */ s32 field_0x13E4; /* func_001B6BA8 */
     /* 0x13E8 */ s32 field_0x13E8; /* UseMurrayGadget (100) sets 1 */
     /* 0x13EC */ s32 field_0x13EC; /* UpdateMurrayActive (from UpdateMurray, slot 16) */
     /* 0x13F0 */ struct LO *ploCarried; /* what Murray carries: SetMurrayMode (88), SetMurrayAnimBase (90), func_001B81B8 (87) */
-    u8 unknown_0x13F4[0x1C];
+    /* 0x13F4 */ s32 field_0x13F4; /* SetMurrayLiftState sets it, DetachMurrayObject clears it */
+    /* 0x13F8 */ s32 field_0x13F8; /* as 0x13F4 */
+    /* 0x13FC */ s32 field_0x13FC; /* as 0x13F4 */
+    /* 0x1400 */ s32 field_0x1400; /* as 0x13F4 */
+    /* 0x1404 */ s32 field_0x1404; /* SetMurrayLiftState saves the carried object's linear transform kind, DetachMurrayObject restores it */
+    /* 0x1408 */ s32 field_0x1408; /* as 0x1404, angular */
+    u8 unknown_0x140C[0x4];
     /* 0x1410 */ f32 field_0x1410; /* InitMurray sets 1500 */
     /* 0x1414 */ f32 field_0x1414; /* InitMurray sets 3500 */
     u8 unknown_0x1418[0x18];
@@ -31,7 +40,7 @@ struct MURRAY : JT {
     /* 0x1448 */ s32 field_0x1448; /* UpdateMurrayLift, SetMurrayLiftState (two readers) */
     /* 0x144C */ s32 field_0x144C; /* InitMurray sets -1 */
     /* 0x1450 */ s32 field_0x1450; /* InitMurray sets -1 */
-    u8 unknown_0x1454[0x4];
+    /* 0x1454 */ f32 field_0x1454; /* SetMurrayLiftState: time of the last state change */
     /* 0x1458 */ s32 iapasegByIndex; /* InitMurray sets -1; SetMurrayAnimBase (90) indexes apasegByIndex with it in state 5 */
     u8 unknown_0x145C[0xD4];
     /* 0x1530 */ struct SMA *psmaPartner; /* StartMurrayMash sets it, ReleaseMurrayObject (in the mash state, 6) reads it */
@@ -41,19 +50,33 @@ struct MURRAY : JT {
     /* 0x15F4 */ void *field_0x15F4; /* LoadMurrayFromBrx */
     /* 0x15F8 */ void *field_0x15F8; /* LoadMurrayFromBrx */
     /* 0x15FC */ void *field_0x15FC; /* LoadMurrayFromBrx */
-    u8 unknown_0x1600[0x10];
+    /* 0x1600 */ s32 field_0x1600; /* DetachMurrayObject */
+    /* 0x1604 */ s32 field_0x1604; /* SetMurrayLiftState, DetachMurrayObject */
+    /* 0x1608 */ s32 field_0x1608; /* DetachMurrayObject */
+    /* 0x160C */ s32 field_0x160C; /* SetMurrayLiftState, DetachMurrayObject */
     /* 0x1610 */ struct IKLIMB *pikLimbA; /* LoadMurrayFromBrx allocates it and calls InitIkLimb */
     /* 0x1614 */ struct IKLIMB *pikLimbB; /* LoadMurrayFromBrx, as pikLimbA */
-    u8 unknown_0x1618[0x1DC];
+    /* 0x1618 */ s32 field_0x1618; /* SetMurrayLiftState, DetachMurrayObject */
+    /* 0x161C */ s32 field_0x161C; /* as 0x1618 */
+    /* 0x1620 */ s32 field_0x1620; /* as 0x1618 */
+    /* 0x1624 */ s32 field_0x1624; /* as 0x1618 */
+    u8 unknown_0x1628[0x1CC];
     /* 0x17F4 */ s32 field_0x17F4; /* InitMurray sets -1 */
-    u8 unknown_0x17F8[0x18];
+    u8 unknown_0x17F8[0x4];
+    /* 0x17FC */ void *field_0x17FC; /* StartMurrayAttackA, StartMurrayAttackB compare the fade's aseg with it */
+    u8 unknown_0x1800[0x4];
+    /* 0x1804 */ void *field_0x1804; /* as 0x17FC; StartMurrayAttackB tests it */
+    /* 0x1808 */ void *field_0x1808; /* StartMurrayAttackB tests it */
+    u8 unknown_0x180C[0x4];
     /* 0x1810 */ s32 field_0x1810; /* InitMurray sets -1 */
     u8 unknown_0x1814[8];
     /* 0x181C */ s32 field_0x181C; /* UpdateMurrayAttack: attack latched flag */
     u8 unknown_0x1820[0x10];
     /* 0x1830 */ QW field_0x1830; /* PredictMurrayLead (96) */
     /* 0x1840 */ s32 field_0x1840; /* InitMurray sets -1 */
-    u8 unknown_0x1844[0x214];
+    u8 unknown_0x1844[0xC8];
+    /* 0x190C */ struct ASEGA *field_0x190C; /* StartMurrayAttackA, StartMurrayAttackB read the aseg at its +0x14 */
+    u8 unknown_0x1910[0x148];
     /* 0x1A58 */ void *apasegState[0x16]; /* SetMurrayAnimBase (90) binds the entry state indexes; the count is the room left before apasegByIndex */
     /* 0x1AB0 */ void *apasegByIndex[3]; /* SetMurrayAnimBase (90) */
     /* 0x1ABC */ void *pasegCarry; /* SetMurrayAnimBase (90), in state 2 while carrying */
@@ -67,6 +90,27 @@ struct MURRAY : JT {
 #if defined(__mips__)
 SLY2_SIZE_CHECK(MURRAY, 0x1B00);
 SLY2_OFFSET_CHECK(MURRAY, state, 0x13D0);
+SLY2_OFFSET_CHECK(MURRAY, field_0x13DC, 0x13DC);
+SLY2_OFFSET_CHECK(MURRAY, field_0x13E4, 0x13E4);
+SLY2_OFFSET_CHECK(MURRAY, field_0x13F4, 0x13F4);
+SLY2_OFFSET_CHECK(MURRAY, field_0x13F8, 0x13F8);
+SLY2_OFFSET_CHECK(MURRAY, field_0x13FC, 0x13FC);
+SLY2_OFFSET_CHECK(MURRAY, field_0x1400, 0x1400);
+SLY2_OFFSET_CHECK(MURRAY, field_0x1404, 0x1404);
+SLY2_OFFSET_CHECK(MURRAY, field_0x1408, 0x1408);
+SLY2_OFFSET_CHECK(MURRAY, field_0x1454, 0x1454);
+SLY2_OFFSET_CHECK(MURRAY, field_0x1600, 0x1600);
+SLY2_OFFSET_CHECK(MURRAY, field_0x1604, 0x1604);
+SLY2_OFFSET_CHECK(MURRAY, field_0x1608, 0x1608);
+SLY2_OFFSET_CHECK(MURRAY, field_0x160C, 0x160C);
+SLY2_OFFSET_CHECK(MURRAY, field_0x1618, 0x1618);
+SLY2_OFFSET_CHECK(MURRAY, field_0x161C, 0x161C);
+SLY2_OFFSET_CHECK(MURRAY, field_0x1620, 0x1620);
+SLY2_OFFSET_CHECK(MURRAY, field_0x1624, 0x1624);
+SLY2_OFFSET_CHECK(MURRAY, field_0x17FC, 0x17FC);
+SLY2_OFFSET_CHECK(MURRAY, field_0x1804, 0x1804);
+SLY2_OFFSET_CHECK(MURRAY, field_0x1808, 0x1808);
+SLY2_OFFSET_CHECK(MURRAY, field_0x190C, 0x190C);
 SLY2_OFFSET_CHECK(MURRAY, field_0x13D8, 0x13D8);
 SLY2_OFFSET_CHECK(MURRAY, field_0x13E8, 0x13E8);
 SLY2_OFFSET_CHECK(MURRAY, field_0x13EC, 0x13EC);

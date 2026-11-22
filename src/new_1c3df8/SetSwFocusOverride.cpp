@@ -1,5 +1,5 @@
-struct VT { char pad[0x270]; short delta; short idx; void (*fn)(void *, int); };
-struct PO { char pad[0xC]; VT *vt; };
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "po.h"
 #include "sw.h"
 extern "C" PO *PpoSwFocus(SW *);
 
@@ -10,8 +10,8 @@ void SetSwFocusOverride(SW *psw, PO *ppo)
     if (ppoNew == 0)
         ppoNew = psw->ppoFocusBase;
     if (ppoOld != ppoNew && ppoOld != 0)
-        ppoOld->vt->fn((char *)ppoOld + ppoOld->vt->delta, 0);
+        ppoOld->OnActive(0);
     psw->ppoFocusOverride = ppo;
     if (ppoOld != ppoNew && ppoNew != 0)
-        ppoNew->vt->fn((char *)ppoNew + ppoNew->vt->delta, 1);
+        ppoNew->OnActive(1);
 }

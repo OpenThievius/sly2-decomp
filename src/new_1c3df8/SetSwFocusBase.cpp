@@ -1,7 +1,7 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
 struct CRef { int tagk; int n; int pad[2]; };
-struct VT { char pad[0x270]; short delta; short idx; void (*fn)(void *, int); };
-struct PO { char pad[0xC]; VT *vt; char pad2[0x18 - 0x10]; int oid; };
+#include "po.h"
 #include "sw.h"
 extern "C" {
 PO *PpoSwFocus(SW *);
@@ -19,10 +19,10 @@ void SetSwFocusBase(SW *psw, PO *ppo)
     if (ppoNew == 0)
         ppoNew = ppo;
     if (ppoOld != ppoNew && ppoOld != 0)
-        ppoOld->vt->fn((char *)ppoOld + ppoOld->vt->delta, 0);
+        ppoOld->OnActive(0);
     psw->ppoFocusBase = ppo;
     if (ppoOld != ppoNew && ppoNew != 0)
-        ppoNew->vt->fn((char *)ppoNew + ppoNew->vt->delta, 1);
+        ppoNew->OnActive(1);
     if (ppo != 0) {
         if (FIsBasicDerivedFrom(ppo, 0x34)) {
             CRef result;

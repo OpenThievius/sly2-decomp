@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
 #include "ps2inline.h"
+#include "xf.h"
 union VU_SCALE { QW q; VECTOR v; };
-struct XF { char pad[0x94]; unsigned mode; };
 extern "C" QW DecomposeRotateMatrixEuler(float *);
 // Lanes 0..2 of the vector: pextlw packs x and y, pcpyld adds z
 static inline QW Build(float x, float y, float z) {
@@ -12,7 +12,7 @@ QW GetXfDofValue(XF *xf, float *mat, QW result) {
     VU_SCALE frame;
     float y, x, z;
     QW built;
-    switch (xf->mode) {
+    switch (xf->dof) {
     case 1: case 4: case 5: case 9: case 10:
         x = mat[12]; y = mat[13]; z = mat[14];
         goto build;

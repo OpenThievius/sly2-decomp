@@ -31,7 +31,9 @@ struct SLY : JT {
                                            left before the carry state InitSly starts at 0x17D0, not a measured one */
     /* 0x17D0 */ u8 carry[0x30]; /* the carry state: Carry_SetState */
     /* 0x1800 */ struct ASEG *pasegCarry; /* SetJtJtcs (state 0) */
-    u8 unknown_0x1804[0x7C];
+    u8 unknown_0x1804[0x50];
+    /* 0x1854 */ s32 field_0x1854; /* StartAttach (case 6 stores its target); guess, one reader */
+    u8 unknown_0x1858[0x28];
     /* 0x1880 */ s32 cbounds; /* UpdateJtBounds (slot 49) */
     u8 unknown_0x1884[0xC];
     /* 0x1890 */ QW abounds[3]; /* UpdateJtBounds extends the bounds by each of the first cbounds; at most 3, ptarget follows */

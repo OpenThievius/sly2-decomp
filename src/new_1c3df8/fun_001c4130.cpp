@@ -1,6 +1,7 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
+#include "po.h"
 struct TN { char pad[0x128]; int state; };
-struct PO { char pad[0x16C]; TN *ptn; };
 struct SW;
 extern SW B_003DD490;
 void SetTnTnsOverride(TN *, int);

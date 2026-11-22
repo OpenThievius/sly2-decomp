@@ -1,35 +1,35 @@
-#include "sly2.h"
-struct VT { char pad[0xA8]; short delta; short index; void (*fn)(void *, int); char pad2[0x2B8 - 0xB0]; short delta2; short index2; void (*fn2)(void *, int); };
-struct OBJ { char pad[0xC]; VT *vt; };
-struct MURRAY { char pad[0xF1C]; OBJ *held; char pad2[0x13F0 - 0xF20]; OBJ *carrier; };
-struct CARRIER { char pad[0x180]; OBJ *obj; };
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "lo.h"
+#include "so.h"
+#include "murray.h"
+struct CARRY { char pad[0x180]; SO *so; };
 extern "C" void func_00205D10();
 extern "C" int FIsBasicDerivedFrom(void *, int);
 void func_001B81B8(MURRAY *m, int f)
 {
     func_00205D10();
     if (f) {
-        CARRIER *c = (CARRIER *)m->carrier;
+        CARRY *c = (CARRY *)m->ploCarried;
         if (c) {
-            OBJ *o = c->obj;
+            SO *o = c->so;
             if (o) {
-                m->held = o;
-                o->vt->fn((char *)o + o->vt->delta, 0);
-                if (FIsBasicDerivedFrom(m->held, 0x33)) {
-                    OBJ *h = m->held;
-                    h->vt->fn2((char *)h + h->vt->delta2, f);
+                m->field_0xF1C = o;
+                o->Slot21(0);
+                if (FIsBasicDerivedFrom(m->field_0xF1C, 0x33)) {
+                    STEP *h = (STEP *)m->field_0xF1C;
+                    h->Slot87(f);
                 }
             }
         }
     } else {
-        OBJ *o = m->held;
+        SO *o = m->field_0xF1C;
         if (o) {
-            o->vt->fn((char *)o + o->vt->delta, 1);
-            if (FIsBasicDerivedFrom(m->held, 0x33)) {
-                OBJ *h = m->held;
-                h->vt->fn2((char *)h + h->vt->delta2, 0);
+            o->Slot21(1);
+            if (FIsBasicDerivedFrom(m->field_0xF1C, 0x33)) {
+                STEP *h = (STEP *)m->field_0xF1C;
+                h->Slot87(0);
             }
-            m->held = 0;
+            m->field_0xF1C = 0;
         }
     }
 }

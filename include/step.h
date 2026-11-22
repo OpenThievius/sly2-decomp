@@ -9,11 +9,11 @@
 
 struct STEP : PO {
     virtual void Slot82();              /* 82: func_00205008, func_00140C30 (JT) */
-    virtual void RetainSmKinds();       /* 83: RetainAloSmKinds, JT_RetainSmKinds */
+    virtual void RetainSmKinds(int n1, int n2);       /* 83: RetainAloSmKinds, JT_RetainSmKinds */
     virtual void ReleaseSmKinds();      /* 84: ReleaseAloSmKinds, JT_ReleaseSmKinds */
     virtual void Slot85();              /* 85: func_002040F8, func_00143C78 (JT) */
     virtual int FLethalHit();           /* 86: func_00205D08, JT_FLethalHit */
-    virtual void Slot87();              /* 87: func_00205D10 */
+    virtual void Slot87(int arg);       /* 87: func_00205D10; func_001B81B8 (Murray) calls it with a flag on the held object */
     u8 unknown_0x180[0x4];
     /* 0x184 */ s32 idLootDefault; /* IdlootCrfodb: the loot id a guard carries by default */
     u8 unknown_0x188[0x8];

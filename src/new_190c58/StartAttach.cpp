@@ -1,11 +1,11 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 struct Clock { float time; float dt; };
-struct VT { char pad[0x2C0]; short delta; short index; void (*fn)(void *, int); };
-struct JT { char pad0[0xC]; VT *vtable; char pad[0x1854 - 0x10]; int target; };
-struct ATTACH { JT *pjt; float t; int kind; char pad[0x14 - 0xC]; int ptarget; int pmember; char pad2[0x4C4 - 0x1C]; int carryTarget; char pad3[0x500 - 0x4C8]; int noHold; };
+#include "sly.h"
+struct ATTACH { SLY *pjt; float t; int kind; char pad[0x14 - 0xC]; int ptarget; int pmember; char pad2[0x4C4 - 0x1C]; int carryTarget; char pad3[0x500 - 0x4C8]; int noHold; };
 extern Clock g_2dded0;
 extern "C" void SetAttachSubstate(ATTACH *, int);
-extern "C" void SetJtJtcs(JT *, int);
-extern "C" void EnsureAloSfx__FP3ALO(JT *);
+extern "C" void SetJtJtcs(SLY *, int);
+extern "C" void EnsureAloSfx__FP3ALO(SLY *);
 extern "C" void ForgetJtGuards(ATTACH *);
 extern "C" void Carry_SetState(void *, int);
 extern "C" void StartAttach(ATTACH *pattach, unsigned kind, int ptarget, int pmember)
@@ -16,18 +16,17 @@ extern "C" void StartAttach(ATTACH *pattach, unsigned kind, int ptarget, int pme
     pattach->t = g_2dded0.time;
     pattach->pmember = pmember;
     pattach->ptarget = ptarget;
-    JT *pjt = pattach->pjt;
-    VT *vt = pjt->vtable;
-    vt->fn((char *)pjt + vt->delta, 2);
+    SLY *pjt = pattach->pjt;
+    pjt->SetMode(2);
     switch (kind) {
     case 0:
     case 13:
         sub = 5;
         break;
     case 6: {
-        JT *jt = pattach->pjt;
+        SLY *jt = pattach->pjt;
         sub = 0;
-        jt->target = ptarget;
+        jt->field_0x1854 = ptarget;
         SetJtJtcs(jt, 0);
         EnsureAloSfx__FP3ALO(jt);
         break;

@@ -42,7 +42,8 @@ struct STEPGUARD : STEP {
     u8 unknown_0x2F4[0xC];
     /* 0x300 */ QW posHome; /* OnGuardAdd (26) */
     /* 0x310 */ f32 radHome; /* OnGuardAdd (26) */
-    u8 unknown_0x314[0x18];
+    u8 unknown_0x314[0x10];
+    /* 0x324 */ u8 lm[0x8]; /* func_0017C3E8 passes its address to FCheckLm (an embedded LM; size to fDown, a guess); one reader */
     /* 0x32C */ s32 fDown; /* func_0017A8C8 */
     /* 0x330 */ s32 field_0x330; /* OnGuardRemove (27) */
     u8 unknown_0x334[0x4];

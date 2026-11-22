@@ -1,6 +1,6 @@
-#include "sly2.h"
-struct XF { char pad[0x80]; float tMin, tMax; float *pcur; float *pend; };
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "xf.h"
 extern "C" void func_0022C818(void *palo, XF *pxf)
 {
-    pxf->tMin = 0.0f; pxf->tMax = 1.0f; pxf->pcur = &pxf->tMin; pxf->pend = &pxf->tMax;
+    pxf->tMin = 0; pxf->tMax = 1.0f; pxf->ptMin = &pxf->tMin; pxf->ptMax = &pxf->tMax;
 }

@@ -1,15 +1,16 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
-struct PZ { char pad[0x10]; void *zone; };
-struct OWN { char pad0[0xDC]; PZ *pz; };
+#include "step.h"
+#include "phys.h"
+struct LINK { char pad[0x10]; void *zone; };
 struct CRV { char pad[0xE8]; int count; char pad1[0xF4 - 0xEC]; QW *nodes; };
-struct JT { char pad0[0xE8]; OWN *own; char pad1[0x294 - 0xEC]; CRV *crv; };
 #include "goal.h"
 struct GOAL_144F48 : GOAL {
     int fSimple;
     char pad_34[0xC];
     QW posGoal;
 };
-extern "C" QW PosLoWorld(JT *);
+extern "C" QW PosLoWorld(STEP *);
 extern "C" void FFindPathzoneCrv(void *, QW, QW, CRV *);
 extern "C" void MeasureCrv(CRV *);
 extern "C" void GoalFollowCrv_SetCrv(GOAL_144F48 *, CRV *, int);
@@ -19,15 +20,15 @@ void GoalGotoPos_SetPos(GOAL_144F48 *goal, QW posGoal)
     goal->posGoal = posGoal;
     if (((GOAL_144F48 *)goal->pgoalChild) == 0)
         return;
-    JT *jt = ((JT *)goal->pstep);
-    CRV *crv = jt->crv;
-    PZ *pz = 0;
-    if (jt->own)
-        pz = jt->own->pz;
+    STEP *step = goal->pstep;
+    CRV *crv = (CRV *)step->pcrv;
+    LINK *pz = 0;
+    if (step->pphys)
+        pz = step->pphys->plink;
     void *zone = 0;
     if (pz)
         zone = pz->zone;
-    QW posOwner = PosLoWorld(jt);
+    QW posOwner = PosLoWorld(step);
     if (zone == 0 || goal->fSimple != 0) {
         crv->count = 2;
         QW *nodes = crv->nodes;

@@ -62,7 +62,7 @@ struct LO : BASIC {
     virtual void UpdateXfWorldHierarchy(); /* 18: func_0022FBD8, UpdateAloXfWorldHierarchy; called without arguments (TranslateSoToPos) */
     virtual void Slot19();
     virtual void Slot20(void *pcm, float uAlpha, float uAlphaOther, struct RO *pro); /* 20: called on each child by func_001F3CC8 (render) */
-    virtual void Slot21();
+    virtual void Slot21(int arg); /* 21: called by func_001B81B8 on the carried object, with 0 (take) or 1 (let go) */
     virtual void RemoveAloHierarchy();  /* 22: RemoveAloHierarchy */
     virtual void Slot23();
     virtual void Slot24();

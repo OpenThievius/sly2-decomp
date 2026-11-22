@@ -1,7 +1,8 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
+#include "po.h"
 struct VT { char pad[0x40]; short delta; short index; void (*fn)(void *); };
 struct GO { char pad[0x0C]; VT *vptr; char pad1[0x38 - 0x10]; int a38; char pad2[0xC0 - 0x3C]; int aC0; int aC4; float aC8; };
-struct PO { char pad[0x150]; int a150; };
 struct PG { char pad0[0x10]; void *pjt; char pad1[0x18 - 0x14]; char child[0x18]; void *pleader; char pad2[0x60 - 0x34]; int state; float t; };
 extern "C" {
 extern float g_2dded0;
@@ -25,7 +26,7 @@ extern "C" void func_00145B18(PG *pgoal, int state)
     case 0: {
         GO *pgo = func_00205438(pgoal->pjt, 0xA8);
         if (FIsBasicDerivedFrom(pgoal->pleader, 0x32) != 0) {
-            pgo->aC0 = ((PO *)pgoal->pleader)->a150;
+            pgo->aC0 = (int)((PO *)pgoal->pleader)->pjoy;
             pgo->aC4 = 8;
             pgo->aC8 = GRandInRange(0.1f, 0.3f);
         }
