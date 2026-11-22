@@ -1,6 +1,6 @@
 #include "sly2.h"
 #include "cref.h"
-extern "C" void CRef_SetF32(CRef *, float);
+extern "C" void SetF32__4CReff(CRef *, float);
 enum UFOK { kUfokSqrt };
 extern float (*D_002BBB70[])(float);
 
@@ -14,6 +14,6 @@ CRef RefUfo__FP4CRef4UFOK(CRef *ref, UFOK ufok)
     } else {
         value = (float)ref->m_tag.m_n;
     }
-    CRef_SetF32(&refResult, D_002BBB70[ufok](value));
+    SetF32__4CReff(&refResult, D_002BBB70[ufok](value));
     return refResult;
 }

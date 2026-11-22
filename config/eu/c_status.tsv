@@ -1204,7 +1204,7 @@ us_address	name	other_address	pair	score	addresses
 0x1294A0	CRef_ConstructProc	0X1294A0	identical	0	ok
 0x1294C0	CRef_ConstructBasic	0X1294C0	identical	0	ok
 0x129518	CRef_SetS32	0X129518	identical	0	ok
-0x129558	CRef_SetF32	0X129558	identical	0	ok
+0x129558	SetF32__4CReff	0X129558	identical	0	ok
 0x129598	CRef_SetBool	0X129598	identical	0	ok
 0x1295D8	CRef_SetSymid	0X1295D8	identical	0	ok
 0x129618	CRef_SetBifk	0X129618	identical	0	ok

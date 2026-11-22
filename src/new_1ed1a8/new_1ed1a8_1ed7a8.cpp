@@ -4,6 +4,7 @@
 #include "sly2.h"
 #include "types.h"
 #include "m2c_macros.h"
+#include "classinfo.h"
 
 struct CBinaryInputStream;
 
@@ -13,9 +14,7 @@ struct VT { char pad[0x38]; short delta; short index; void (*fn)(void *, void *)
 
 struct NODE { char pad[0xC]; VT *vt; char pad2[0x20]; NODE *owner; };
 
-struct CLS { int a, b, c, d; NODE *(*create)(); };
-
-extern CLS D_002BAAE8[];
+extern CLASSINFO D_002BAAE8[];
 
 unsigned short U16Read__18CBinaryInputStream(CBinaryInputStream *);
 
@@ -25,7 +24,7 @@ NODE *func_001ED7A8(NODE *owner, CBinaryInputStream *stream)
 {
     int index = (int)U16Read__18CBinaryInputStream(stream);
     if (index == -1) return 0;
-    NODE *node = D_002BAAE8[index].create();
+    NODE *node = (NODE *)D_002BAAE8[index].pfnCreate();
     node->owner = owner;
     char block[0x20];
     CBinaryInputStream_Read_thunk(stream, 0x20, block);
@@ -35,12 +34,6 @@ NODE *func_001ED7A8(NODE *owner, CBinaryInputStream *stream)
 }
 
 extern "C" {
-struct CLASSINFO {
-    char pad[0xC];
-    s32 cb;
-    s32 (*pfnCreate)();
-};
-
 struct OBJVTBL {
     char pad[0x30];
     s16 delta;
@@ -70,7 +63,7 @@ s32 func_001ED850(struct OBJ *pobj) {
 
     pvtbl = pobj->pvtbl;
     pclassinfo = pvtbl->pfnClassInfo((char *)pobj + pvtbl->delta);
-    temp_v0 = pclassinfo->pfnCreate();
+    temp_v0 = (s32)pclassinfo->pfnCreate();
     CopyAb__FPvT0Ui_1ED850(temp_v0, pobj, pclassinfo->cb);
     ClearSl(temp_v0 + 0x34);
     ClearSle(temp_v0 + 0x40);

@@ -1,17 +1,17 @@
 {
  "measures": {
-  "fuzzy_match_percent": 77.197882,
+  "fuzzy_match_percent": 77.192386,
   "total_code": "1164348",
-  "matched_code": "898852",
-  "matched_code_percent": 77.197882,
+  "matched_code": "898788",
+  "matched_code_percent": 77.192386,
   "total_data": "1038916",
   "total_functions": 6064,
-  "matched_functions": 5627,
-  "matched_functions_percent": 92.793536,
-  "complete_code": "235124",
-  "complete_code_percent": 20.193619,
+  "matched_functions": 5626,
+  "matched_functions_percent": 92.777045,
+  "complete_code": "232580",
+  "complete_code_percent": 19.975128,
   "total_units": 434,
-  "complete_units": 292
+  "complete_units": 291
  },
  "units": [
   {
@@ -50365,7 +50365,7 @@
     {
      "name": ".text",
      "size": "2544",
-     "fuzzy_match_percent": 100.0,
+     "fuzzy_match_percent": 97.484277,
      "metadata": {}
     }
    ],
@@ -50450,7 +50450,7 @@
     {
      "name": "CRef_SetF32",
      "size": "64",
-     "fuzzy_match_percent": 100.0,
+     "fuzzy_match_percent": 0.0,
      "metadata": {},
      "address": "944"
     },
@@ -50565,7 +50565,7 @@
     }
    ],
    "metadata": {
-    "complete": true,
+    "complete": false,
     "progress_categories": [
      "game",
      "sly1",
@@ -50573,19 +50573,19 @@
     ]
    },
    "measures": {
-    "fuzzy_match_percent": 100.0,
+    "fuzzy_match_percent": 97.484277,
     "total_code": "2544",
-    "matched_code": "2544",
-    "matched_code_percent": 100.0,
+    "matched_code": "2480",
+    "matched_code_percent": 97.484277,
     "matched_data_percent": 100.0,
     "total_functions": 27,
-    "matched_functions": 27,
-    "matched_functions_percent": 100.0,
-    "complete_code": "2544",
-    "complete_code_percent": 100.0,
+    "matched_functions": 26,
+    "matched_functions_percent": 96.296296,
+    "complete_code": "0",
+    "complete_code_percent": 0.0,
     "complete_data_percent": 100.0,
     "total_units": 1,
-    "complete_units": 1
+    "complete_units": 0
    }
   },
   {
@@ -59076,19 +59076,19 @@
    "id": "game",
    "name": "Game code",
    "measures": {
-    "fuzzy_match_percent": 77.588549,
+    "fuzzy_match_percent": 77.582286,
     "total_code": "1021924",
-    "matched_code": "792896",
-    "matched_code_percent": 77.588549,
+    "matched_code": "792832",
+    "matched_code_percent": 77.582286,
     "matched_data_percent": 100.0,
     "total_functions": 5546,
-    "matched_functions": 5219,
-    "matched_functions_percent": 94.103859,
-    "complete_code": "235124",
-    "complete_code_percent": 23.007973,
+    "matched_functions": 5218,
+    "matched_functions_percent": 94.085828,
+    "complete_code": "232580",
+    "complete_code_percent": 22.759031,
     "complete_data_percent": 100.0,
     "total_units": 429,
-    "complete_units": 292
+    "complete_units": 291
    }
   },
   {
@@ -59114,19 +59114,19 @@
    "id": "sly1",
    "name": "Sly 1 engine code",
    "measures": {
-    "fuzzy_match_percent": 78.069044,
+    "fuzzy_match_percent": 78.059305,
     "total_code": "657208",
-    "matched_code": "513076",
-    "matched_code_percent": 78.069044,
+    "matched_code": "513012",
+    "matched_code_percent": 78.059305,
     "matched_data_percent": 100.0,
     "total_functions": 3478,
-    "matched_functions": 3244,
-    "matched_functions_percent": 93.271995,
-    "complete_code": "164216",
-    "complete_code_percent": 24.986914,
+    "matched_functions": 3243,
+    "matched_functions_percent": 93.243243,
+    "complete_code": "161672",
+    "complete_code_percent": 24.599822,
     "complete_data_percent": 100.0,
     "total_units": 341,
-    "complete_units": 239
+    "complete_units": 238
    }
   },
   {
@@ -59209,19 +59209,19 @@
    "id": "script",
    "name": "Script",
    "measures": {
-    "fuzzy_match_percent": 83.254426,
+    "fuzzy_match_percent": 83.225841,
     "total_code": "223892",
-    "matched_code": "186400",
-    "matched_code_percent": 83.254426,
+    "matched_code": "186336",
+    "matched_code_percent": 83.225841,
     "matched_data_percent": 100.0,
     "total_functions": 1438,
-    "matched_functions": 1402,
-    "matched_functions_percent": 97.496523,
-    "complete_code": "43440",
-    "complete_code_percent": 19.402212,
+    "matched_functions": 1401,
+    "matched_functions_percent": 97.426982,
+    "complete_code": "40896",
+    "complete_code_percent": 18.26595,
     "complete_data_percent": 100.0,
     "total_units": 49,
-    "complete_units": 36
+    "complete_units": 35
    }
   },
   {

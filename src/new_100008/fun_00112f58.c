@@ -1,8 +1,9 @@
-#include "m2c_macros.h"
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "factory.h"
 
-M2C_UNK InitJumper(s32);                            /* extern */
-s32 __builtin_new(M2C_UNK);                         /* extern */
+void *InitJumper(void *);
 
-void func_00112F58(void) {
+void func_00112F58(void)
+{
     InitJumper(__builtin_new(0x70));
 }

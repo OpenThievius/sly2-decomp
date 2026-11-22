@@ -1,16 +1,15 @@
-#include "m2c_macros.h"
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "factory.h"
 
-void *__builtin_new(M2C_UNK);                       /* extern */
-M2C_UNK func_002562A8(s32);                         /* extern */
-extern M2C_UNK D_002CFC20;
+void func_002562A8(void *);
+extern char D_002CFC20[];
 
-void *func_00113840(void) {
-    void *temp_v0;
-
-    temp_v0 = __builtin_new(0x50);
-    M2C_FIELD(temp_v0, M2C_UNK **, 0xC) = &D_002CFC20;
-    M2C_FIELD(temp_v0, s32 *, 0) = 0;
-    M2C_FIELD(temp_v0, s32 *, 4) = 0;
-    func_002562A8(temp_v0 + 0x30);
-    return temp_v0;
+void *func_00113840(void)
+{
+    NEWSUB30 *pobject = (NEWSUB30 *)__builtin_new(0x50);
+    pobject->basic.pvtbl = D_002CFC20;
+    pobject->basic.field_0x0 = 0;
+    pobject->basic.psidebag = 0;
+    func_002562A8(pobject->sub_0x30);
+    return pobject;
 }

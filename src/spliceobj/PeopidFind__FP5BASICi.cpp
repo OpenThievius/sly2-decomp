@@ -2,8 +2,8 @@
 #include "sly2.h"
 #include "lo.h"
 #include "splopt.h"
+#include "classinfo.h"
 extern ARYSPLOPT RO_00279AD0[];
-struct CLASSINFO { int pad; int cid; };
 void *PeopidFind__FP5BASICi(BASIC *pbasic, int optid)
 {
     CLASSINFO *pclassinfo = pbasic->Slot6();

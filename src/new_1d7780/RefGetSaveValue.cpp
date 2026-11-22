@@ -6,7 +6,7 @@ struct SAVEPATH { int csym; unsigned short *asymid; };
 struct SAVEVARLOC { SAVEVARREC *prec; int iElement; };
 extern "C" {
 int FFindSaveVar(SAVEVARS *psavevars, SAVEPATH *ppath, SAVEVARLOC *psavevarloc);
-void CRef_SetF32(CRef *, float);
+void SetF32__4CReff(CRef *, float);
 void CRef_SetVectorPtr(CRef *, VECTOR *);
 void CRef_SetClqPtr(CRef *, CLQ *);
 void CRef_SetLmPtr(CRef *, LM *);
@@ -32,7 +32,7 @@ CRef RefGetSaveValue(SAVEVARS *psavevars, SAVEPATH *ppath, char *pbBase)
             ref.SetS32(((int *)pb)[savevarloc.iElement]);
             break;
         case 3:
-            CRef_SetF32(&ref, ((float *)pb)[savevarloc.iElement]);
+            SetF32__4CReff(&ref, ((float *)pb)[savevarloc.iElement]);
             break;
         case 4:
             if (prec->cElement != 0)

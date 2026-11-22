@@ -39,7 +39,7 @@ void func_00256120(METHOD *);
 void FreeSlotheapPv(void *, void *);
 void CRef_SetMethod(REF *, METHOD *);
 void CRef_SetBool(REF *, int);
-void CRef_SetF32(REF *, float);
+void SetF32__4CReff(REF *, float);
 void CRef_SetS32(REF *, int);
 void CRef_SetBasic(REF *, void *);
 void CRef_SetVector(REF *, QW);
@@ -106,7 +106,7 @@ extern "C" REF *RefGetPeopid(REF *result, BASIC *pbasic, EOPID *peopid)
             CRef_SetS32(&ref, *(int *)pv);
             break;
         case 1:
-            CRef_SetF32(&ref, *(float *)pv);
+            SetF32__4CReff(&ref, *(float *)pv);
             break;
         case 0:
             CRef_SetBool(&ref, *(int *)pv != 0);
@@ -161,7 +161,7 @@ extern "C" REF *RefGetPeopid(REF *result, BASIC *pbasic, EOPID *peopid)
             CRef_SetS32(&ref, (pbasic->*(peopid->pmfi))());
             break;
         case 1:
-            CRef_SetF32(&ref, (pbasic->*(peopid->pmff))());
+            SetF32__4CReff(&ref, (pbasic->*(peopid->pmff))());
             break;
         case 0:
             CRef_SetBool(&ref, (pbasic->*(peopid->pmfi))() != 0);

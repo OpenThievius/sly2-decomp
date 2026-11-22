@@ -1204,7 +1204,7 @@ address	name	size	file	whole_file	symbol
 0X1294A0	CRef_ConstructProc	32	splice-ref/CRef_ConstructProc.cpp		
 0X1294C0	CRef_ConstructBasic	84	splice-ref/CRef_ConstructBasic.cpp		
 0X129518	CRef_SetS32	64	splice-ref/CRef_SetS32.cpp		
-0X129558	CRef_SetF32	64	splice-ref/CRef_SetF32.cpp		
+0X129558	SetF32__4CReff	64	splice-ref/SetF32__4CReff.cpp		
 0X129598	CRef_SetBool	64	splice-ref/CRef_SetBool.cpp		
 0X1295D8	CRef_SetSymid	64	splice-ref/CRef_SetSymid.cpp		
 0X129618	CRef_SetBifk	64	splice-ref/CRef_SetBifk.cpp		

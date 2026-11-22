@@ -1,10 +1,13 @@
-extern "C" void *__builtin_new(unsigned int);
-extern "C" char D_002D0320;
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "factory.h"
+
+extern "C" char D_002D0320[];
+
 void *func_001133F8(void)
 {
-    int *object = (int *)__builtin_new(0xA0);
-    *(char **)((char *)object + 0xC) = &D_002D0320;
-    object[0] = 0;
-    object[1] = 0;
-    return object;
+    NEWBASIC *pobject = (NEWBASIC *)__builtin_new(0xA0);
+    pobject->pvtbl = D_002D0320;
+    pobject->field_0x0 = 0;
+    pobject->psidebag = 0;
+    return pobject;
 }

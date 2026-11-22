@@ -10,7 +10,7 @@ extern "C" {
 CPair *PpairNew(void);
 void PairHandle_Init(PairHandle *, CPair *);
 void PairHandle_Assign(PairHandle *, CPair *);
-void CRef_SetF32(CRef *, float);
+void SetF32__4CReff(CRef *, float);
 CRef *CRef_ConstructPair(CRef *, CPair *);
 void CPairPtr_Destructor(PairHandle *, int);
 void UnlinkPairNode(CPair *);
@@ -30,7 +30,7 @@ extern "C" CRef *RefOpMatrixDecomposeToRadianNormal(CRef *pref, int carg, CRef *
     pnormal->Decref();
     pnormal->SetTag(TAGK_Vector);
     DecomposeRotateMatrixRad__FP7MATRIX3PfP6VECTOR((MATRIX3 *)aref[0].m_tag.m_pmatrix, l.gAngle, (QW *)pnormal->m_tag.m_pvector);
-    CRef_SetF32(&h.p->ref, l.gAngle[0]);
+    SetF32__4CReff(&h.p->ref, l.gAngle[0]);
     CRef_ConstructPair(pref, h.p);
     CPair *held = h.p;
     if (held) {

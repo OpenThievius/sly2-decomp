@@ -1,8 +1,9 @@
-#include "m2c_macros.h"
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "factory.h"
 
-M2C_UNK ConstructMurray(s32);                       /* extern */
-s32 __builtin_new(M2C_UNK);                         /* extern */
+void *ConstructMurray(void *);
 
-void NewMurray(void) {
+void NewMurray(void)
+{
     ConstructMurray(__builtin_new(0x1B00));
 }
