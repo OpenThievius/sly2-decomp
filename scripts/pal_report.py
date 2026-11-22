@@ -18,6 +18,7 @@ import argparse
 import csv
 import json
 import os
+import re
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -98,11 +99,32 @@ def build(us_report, status, other_sections):
 
 def read_status(path):
     """{function name: True when the same C reproduces the PAL code and its addresses}, and the addresses of the rows."""
-    status, addresses = {}, set()
+    status, addresses, by_address = {}, set(), {}
     for row in csv.DictReader(open(path, encoding='utf-8'), delimiter='\t'):
-        status[row['name']] = row['score'] == '0' and row['addresses'] == 'ok'
-        addresses.add(int(row['us_address'], 16))
+        ok = row['score'] == '0' and row['addresses'] == 'ok'
+        status[row['name']] = ok
+        address = int(row['us_address'], 16)
+        addresses.add(address)
+        by_address[address] = ok
+    # The US report names a function after config/us/symbol_addrs.txt, the status file after the matching registry: a function
+    # renamed in the registry only (scripts/matching/rename.py) would otherwise lose its PAL status. Key the US names by address too.
+    for address, name in us_symbol_names().items():
+        if address in by_address and name not in status:
+            status[name] = by_address[address]
     return status, addresses
+
+
+def us_symbol_names(path=None):
+    """{address: name} of config/us/symbol_addrs.txt (`name = 0xADDRESS; ...`), the names objdiff's US report uses."""
+    names = {}
+    path = path or os.path.join(LAB, 'config', 'us', 'symbol_addrs.txt')
+    if not os.path.exists(path):
+        return names
+    for line in open(path, encoding='utf-8'):
+        match = re.match(r'\s*([A-Za-z_$][\w$.]*)\s*=\s*0x([0-9A-Fa-f]+)\s*;', line)
+        if match:
+            names.setdefault(int(match.group(2), 16), match.group(1))
+    return names
 
 
 def check(arguments):

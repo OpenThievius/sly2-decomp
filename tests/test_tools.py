@@ -1678,6 +1678,23 @@ class PalReportTests(unittest.TestCase):
         self.assertTrue(complete['one'])
         self.assertFalse(complete['two'])
 
+    def test_a_function_renamed_in_the_registry_keeps_its_pal_status_through_its_address(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as folder:
+            os.makedirs(os.path.join(folder, 'config', 'us'))
+            with open(os.path.join(folder, 'config', 'us', 'symbol_addrs.txt'), 'w') as handle:
+                handle.write('A = 0x100000; // type:func\n')
+            status_path = os.path.join(folder, 'c_status.tsv')
+            with open(status_path, 'w') as handle:
+                handle.write('us_address\tname\tother_address\tpair\tscore\taddresses\n0x100000\tRenamed__4CRef\t0X100000\tsame\t0\tok\n')
+            old = pal_report.LAB
+            pal_report.LAB = folder
+            try:
+                status, _ = pal_report.read_status(status_path)
+            finally:
+                pal_report.LAB = old
+        self.assertTrue(status['A'])
+
     def test_check_finds_a_matched_function_without_a_pal_row_and_a_stale_row(self):
         import argparse
         import json
