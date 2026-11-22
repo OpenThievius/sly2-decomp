@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
 extern "C" int FIsGuardInSgs(void *, int);
 extern "C" char *func_00205458(void *, int);
@@ -5,9 +6,8 @@ extern "C" void func_0017A8C8(void *, int);
 extern "C" void GoalAnimLeap_SetState(void *, int);
 extern "C" QW LimitVectorLength__FP6VECTORfT0(QW, float);
 extern "C" float D_002C3DA8;
-struct VT { char pad[0x108]; short d108; short i108; QW (*f108)(void *); char pad2[0x118 - 0x110]; short d118; short i118; void (*f118)(void *, QW); };
-struct GUARD { char pad[0xC]; VT *vt; };
-void func_00209EE0(GUARD *g)
+#include "stepguard.h"
+void func_00209EE0(STEPGUARD *g)
 {
     if (FIsGuardInSgs(g, 0x12) || FIsGuardInSgs(g, 0x13)) {
         func_0017A8C8(func_00205458(g, 0xB0), 2);
@@ -18,7 +18,7 @@ void func_00209EE0(GUARD *g)
     } else {
         return;
     }
-    QW v = g->vt->f108((char *)g + g->vt->d108);
+    QW v = g->GetVelocityVec();
     QW l = LimitVectorLength__FP6VECTORfT0(v, D_002C3DA8);
-    g->vt->f118((char *)g + g->vt->d118, l);
+    g->Slot35(l);
 }

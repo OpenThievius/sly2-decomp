@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-struct GUARD { char pad[0x32C]; int fDown; };
+#include "stepguard.h"
 #include "goal.h"
 struct GOAL_17A8C8 : GOAL {
     int state;
@@ -14,7 +14,7 @@ struct CLOCK { float t; float dt; };
 extern "C" CLOCK g_2dded0;
 extern "C" void Goal_Pop(void *);
 extern "C" void func_001EF038(GOAL_17A8C8 *);
-extern "C" OBJ *func_00205438(GUARD *, int);
+extern "C" OBJ *func_00205438(STEPGUARD *, int);
 void func_0017A8C8(GOAL_17A8C8 *pgoal, int nState)
 {
     if (pgoal->state == nState)
@@ -25,17 +25,17 @@ void func_0017A8C8(GOAL_17A8C8 *pgoal, int nState)
     if (nState != -1) {
         if (nState > -2) {
             if (nState < 5) {
-                OBJ *pobj = func_00205438(((GUARD *)pgoal->pstep), 0x9D);
+                OBJ *pobj = func_00205438(((STEPGUARD *)pgoal->pstep), 0x9D);
                 KT kinds = RO_002A55A0;
                 int scaled = pgoal->state << 2;
                 pobj->kind = *(int *)((char *)&kinds + scaled);
                 VT *vt = pobj->vt;
                 vt->fn((char *)pobj + vt->delta);
-                ((GUARD *)pgoal->pstep)->fDown = (unsigned)pgoal->state < 2;
+                ((STEPGUARD *)pgoal->pstep)->fDown = (unsigned)pgoal->state < 2;
             }
         }
     } else {
         func_001EF038(pgoal);
-        ((GUARD *)pgoal->pstep)->fDown = 0;
+        ((STEPGUARD *)pgoal->pstep)->fDown = 0;
     }
 }

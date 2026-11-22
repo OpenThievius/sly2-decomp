@@ -12,11 +12,14 @@ struct STEP : PO {
     virtual void RetainSmKinds();       /* 83: RetainAloSmKinds, JT_RetainSmKinds */
     virtual void ReleaseSmKinds();      /* 84: ReleaseAloSmKinds, JT_ReleaseSmKinds */
     virtual void Slot85();              /* 85: func_002040F8, func_00143C78 (JT) */
-    virtual void FLethalHit();          /* 86: func_00205D08, JT_FLethalHit */
+    virtual int FLethalHit();           /* 86: func_00205D08, JT_FLethalHit */
     virtual void Slot87();              /* 87: func_00205D10 */
-    u8 unknown_0x180[0x10];
+    u8 unknown_0x180[0x4];
+    /* 0x184 */ s32 idLootDefault; /* IdlootCrfodb: the loot id a guard carries by default */
+    u8 unknown_0x188[0x8];
     /* 0x190 */ QW velGoal; /* SetMurrayCarryState, func_001B5D30 (two readers) */
-    u8 unknown_0x1A0[0x8];
+    u8 unknown_0x1A0[0x4];
+    /* 0x1A4 */ s32 fLock; /* func_001750E0 */
     /* 0x1A8 */ f32 radHeading; /* ChooseJtSweepTarget, UpdateBinocHud (two readers) */
     u8 unknown_0x1AC[0x48];
     /* 0x1F4 */ f32 field_0x1F4; /* bevy_player_input_from_pad_cm */
@@ -39,7 +42,9 @@ struct STEP : PO {
     /* 0x268 */ void *pasegDefault; /* the fallback of SetMurrayAnimBase and func_00135D80 (slot 90 of Murray and Bentley) */
     u8 unknown_0x26C[0x4];
     /* 0x270 */ s32 field_0x270; /* UpdateJt (JT slot 16) */
-    u8 unknown_0x274[0x4C];
+    u8 unknown_0x274[0x20];
+    /* 0x294 */ void *pcrv; /* func_0017C550, GoalGoto_SetState */
+    u8 unknown_0x298[0x28];
 };
 
 #if defined(__mips__)
@@ -57,5 +62,8 @@ SLY2_OFFSET_CHECK(STEP, field_0x260, 0x260);
 SLY2_OFFSET_CHECK(STEP, pasegDefault, 0x268);
 SLY2_OFFSET_CHECK(STEP, field_0x270, 0x270);
 SLY2_OFFSET_CHECK(STEP, field_0x1F4, 0x1F4);
+SLY2_OFFSET_CHECK(STEP, idLootDefault, 0x184);
+SLY2_OFFSET_CHECK(STEP, fLock, 0x1A4);
+SLY2_OFFSET_CHECK(STEP, pcrv, 0x294);
 #endif
 #endif

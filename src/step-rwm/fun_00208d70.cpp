@@ -1,12 +1,13 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
-struct GUARD { char pad[0x2C0]; unsigned long grf; char pad2[0xE64 - 0x2C8]; int sensing; };
+#include "stepguard.h"
 extern "C" unsigned long GrfsgsFromSgs(int);
-extern "C" int func_00208D70(GUARD *pguard)
+extern "C" int func_00208D70(STEPGUARD *pguard)
 {
     unsigned long blind = GrfsgsFromSgs(0xB) | GrfsgsFromSgs(0x1D) | GrfsgsFromSgs(7) |
                           GrfsgsFromSgs(5) | GrfsgsFromSgs(6) | GrfsgsFromSgs(0x10) |
                           GrfsgsFromSgs(1) | GrfsgsFromSgs(0x16) | GrfsgsFromSgs(0x2A);
-    if ((blind & pguard->grf) != 0)
+    if ((blind & pguard->grfsgs) != 0)
         return 0;
     return pguard->sensing;
 }

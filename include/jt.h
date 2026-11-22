@@ -13,7 +13,7 @@
 #define SLY2_JT_H
 #include "step.h"
 
-struct GUARD;
+struct STEPGUARD;
 struct LOOT;
 struct SM;
 
@@ -32,7 +32,7 @@ struct JT : STEP {
     virtual void Slot92();
     virtual void Slot93();              /* 93: func_00140EB0; ZapContinue calls it without arguments */
     virtual void Slot94();
-    virtual void SetFocus(int prioNear, struct GUARD *pguardNear, int prioBest, struct GUARD *pguardBest); /* 95: SetJtFocus; UpdateJtFocus */
+    virtual void SetFocus(int prioNear, struct STEPGUARD *pguardNear, int prioBest, struct STEPGUARD *pguardBest); /* 95: SetJtFocus; UpdateJtFocus */
     virtual void PredictLead(float dt, struct LEAD *plead); /* 96: PredictLoLead; GoalAnimLeap_SetState passes a 0x30-byte LEAD */
     virtual void Slot97();              /* 97: func_00141588 */
     virtual void Slot98();              /* 98: func_001409B8 */
