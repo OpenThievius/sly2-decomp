@@ -7,7 +7,10 @@
 #include "po.h"
 
 struct SOHIT : PO {
-    u8 unknown_0x180[0x14];
+    /* 0x180 */ s32 hpMax;      /* SoHit_ResetState (func_0017F6B0) copies it to hp; Chaser_SetState does the same when its state leaves -1 */
+    /* 0x184 */ s32 hp;         /* the same two; Chaser_FTakeHit reads it */
+    /* 0x188 */ s32 dhp;        /* SoHit_Kill (the damage it deals on contact); Swarm_AdjustNewXp tests it */
+    u8 unknown_0x18C[0x8];
     /* 0x194 */ s32 hAsega;     /* SoHit_SetAnimEntry (func_0017F4C0), SoHit_FAnimDone (func_0017F550): the playing animation's handle */
     /* 0x198 */ s32 hSma;       /* the same two: the SM's handle */
 };

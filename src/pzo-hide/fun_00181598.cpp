@@ -1,10 +1,13 @@
-extern "C" void func_0017F6B0(char *);
-extern "C" void func_001815E8(char *, int);
-extern "C" void TriggerRsmg(char *, int, char *, char *, int);
-extern char B_003DD490[];
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "pzo_hide.h"
 
-void func_00181598(char *arg0) {
-    func_0017F6B0(arg0);
-    func_001815E8(arg0, 0);
-    TriggerRsmg(B_003DD490, *(int *)(arg0 + 0x200), arg0 + 0x204, arg0, 0);
+extern "C" void func_0017F6B0(GRAB *);
+extern "C" void func_001815E8(GRAB *, int);
+extern "C" void TriggerRsmg(void *, int, RSMG *, void *, int);
+extern SW B_003DD490;
+
+void func_00181598(GRAB *grab) {
+    func_0017F6B0(grab);
+    func_001815E8(grab, 0);
+    TriggerRsmg(&B_003DD490, grab->crsmg, grab->arsmg, grab, 0);
 }

@@ -1,42 +1,41 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 #include "sw.h"
-struct ITEM { int kind; char b[0x1C]; };
-struct ITEMCOPY { char b[0x20]; };
-struct PAUSE { char pad[0x20]; int blot; };
-struct MENUITEM { char pad[0x1C]; unsigned grf; };
-struct G1 { char pad[0x24]; int f; };
-struct MCM { char pad[0x4C]; int fPending; };
+#include "jt.h"
+#include "pausemenu.h"
+/* an unmapped object: OpenPauseMenu tests the word at 0x24 */
+struct G1 { u8 unknown_0x0[0x24]; s32 f; };
 extern "C" {
-extern ITEM D_002C00E8[];
-extern ITEM B_002F65D0[];
-extern PAUSE B_003D9ED0;
+extern PAUSEITEM D_002C00E8[];
+extern PAUSEITEM B_002F65D0[];
+extern PAUSEMENU B_003D9ED0;
 extern SW B_003DD490;
 extern G1 B_003DA3C0;
-extern MCM B_002E6550;
-extern char D_002BFD38[];
+extern char B_002E6550[];
+extern PAUSELABELS D_002BFD38;
 int FSwLoadBusy(SW *);
-int CGc_FFindScreen(MCM *);
+int CGc_FFindScreen(void *);
 void *PpoSwFocusBase(SW *);
 int FIsBasicDerivedFrom(void *, int);
 void SetBinocState(void *, int);
 int func_002127C8();
 int IEpisodeCurrent();
 int CidGetBasic(void *);
-void PauseMenu_Push(PAUSE *, int, ITEM *, int, void *);
+void PauseMenu_Push(PAUSEMENU *, int, PAUSEITEM *, PAUSEBLOT *, PAUSELABELS *);
 }
-int OpenPauseMenu(MENUITEM *caller)
+int OpenPauseMenu(PAUSEITEM *pitemCaller)
 {
-    if (B_003D9ED0.blot == 0) return 0;
+    if (B_003D9ED0.pblot == 0) return 0;
     if (FSwLoadBusy(&B_003DD490) != 0) return 0;
-    if (CGc_FFindScreen(&B_002E6550) != 0) return 0;
+    if (CGc_FFindScreen(B_002E6550) != 0) return 0;
     void *ppo = PpoSwFocusBase(&B_003DD490);
     if (ppo != 0) {
         if (FIsBasicDerivedFrom(ppo, 0x34) != 0)
-            SetBinocState((char *)ppo + 0xF00, -1);
+            SetBinocState(((JT *)ppo)->unknown_0xF00, -1);
     }
     if (func_002127C8() == 0) return 0;
     {
-    ITEM *source = D_002C00E8;
-    ITEM *dest = B_002F65D0;
+    PAUSEITEM *source = D_002C00E8;
+    PAUSEITEM *dest = B_002F65D0;
     unsigned index = 0;
     do {
         int show = 1;
@@ -67,15 +66,15 @@ int OpenPauseMenu(MENUITEM *caller)
             break;
         }
         if (show) {
-            *(ITEMCOPY *)dest = *(ITEMCOPY *)source;
+            *dest = *source;
             dest++;
         }
         index++;
         source++;
     } while (index < 7);
-    PauseMenu_Push(&B_003D9ED0, dest - B_002F65D0, B_002F65D0, B_003D9ED0.blot, D_002BFD38);
-    if (caller != 0)
-        caller->grf |= 2;
+    PauseMenu_Push(&B_003D9ED0, dest - B_002F65D0, B_002F65D0, B_003D9ED0.pblot, &D_002BFD38);
+    if (pitemCaller != 0)
+        pitemCaller->grf |= 2;
     return 1;
     }
 }

@@ -1,7 +1,8 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "types.h"
 
-M2C_UNK SignalSema(s32);                            /* extern */
-M2C_UNK WaitSema(s32);                              /* extern */
+s32 SignalSema(s32);                               /* extern */
+s32 WaitSema(s32);                                 /* extern */
 extern s32 B_003D3A40;
 extern s32 B_003D3A44;
 extern s32 g_2dd314;

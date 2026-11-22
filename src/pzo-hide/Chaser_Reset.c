@@ -1,9 +1,11 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "pzo_hide.h"
 
-M2C_UNK Chaser_SetState(s32, M2C_UNK);              /* extern */
-M2C_UNK func_0017F6B0();                            /* extern */
+struct CHASER;
+void func_0017F6B0(struct CHASER *);
+void Chaser_SetState(struct CHASER *, s32);
 
-void Chaser_Reset(s32 arg0) {
-    func_0017F6B0();
-    Chaser_SetState(arg0, 0);
+void Chaser_Reset(struct CHASER *chaser) {
+    func_0017F6B0(chaser);
+    Chaser_SetState(chaser, 0);
 }

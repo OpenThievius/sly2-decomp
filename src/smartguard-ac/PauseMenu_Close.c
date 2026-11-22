@@ -1,12 +1,13 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "pausemenu.h"
 
-void PauseMenu_SetState();                /* extern */
+void PauseMenu_SetState(PAUSEMENU *pmenu, s32 state);
 
-void PauseMenu_Close(void *arg0) {
-    if (M2C_FIELD(arg0, s32 *, 0x1E8) == 7) {
-        if (M2C_FIELD(arg0, s32 *, 0x24) >= 2) {
-            M2C_FIELD(arg0, s32 *, 0x24) = 1;
+void PauseMenu_Close(PAUSEMENU *pmenu) {
+    if (pmenu->state == 7) {
+        if (pmenu->depth >= 2) {
+            pmenu->depth = 1;
         }
-        PauseMenu_SetState(arg0, 8);
+        PauseMenu_SetState(pmenu, 8);
     }
 }

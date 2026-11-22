@@ -1,22 +1,14 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "cref.h"
-struct ITEM;
-typedef void (*PFNITEM)(ITEM *);
-struct ITEM { int f0; PFNITEM pfnActivate; int f8; int fC; PFNITEM pfnUpdate; int f14; int f18; int grf; };
-struct LABELS { int f0; int f4; int f8; int labelEnter; int f10; int labelBack; int labelUp; int labelDown; };
-struct BLOT;
-struct BLOTVT { char pad[0x190]; short delta; short index; void (*pfnHide)(BLOT *); };
-struct BLOT { char pad[0xC]; BLOTVT *vt; };
-struct PAGE { int citem; ITEM *aitem; BLOT *pblot; int fSub; int f10; int iitemCur; LABELS *plabels; };
-struct PAUSEMENU { char pad0[0x10]; void *pjoy; char pad14[0x24 - 0x14]; int depth; PAGE apage[16]; int state; int depthNext; };
-struct SAVE { char pad[0x5464]; };
+#include "pausemenu.h"
+struct SAVE { u8 unknown_0x0[0x5464]; };
 extern "C" {
-int FBlotLabelPlaying(BLOT *, int);
+int FBlotLabelPlaying(PAUSEBLOT *, int);
 int FJoyButtonPressed(void *, int);
 void MemcardMenu_SetState(void *, int);
-void PauseMenu_AdjustOption(PAUSEMENU *, PAGE *, ITEM *);
-void PauseMenu_ApplyOption(PAUSEMENU *, ITEM *);
-void PauseMenu_CancelOption(PAUSEMENU *, ITEM *);
+void PauseMenu_AdjustOption(PAUSEMENU *, PAUSEPAGE *, PAUSEITEM *);
+void PauseMenu_ApplyOption(PAUSEMENU *, PAUSEITEM *);
+void PauseMenu_CancelOption(PAUSEMENU *, PAUSEITEM *);
 void PauseMenu_Close(PAUSEMENU *);
 void PauseMenu_Pop(PAUSEMENU *);
 void PauseMenu_SetState(PAUSEMENU *, int);
@@ -26,8 +18,10 @@ void func_001AF490(PAUSEMENU *);
 int func_001B0078(PAUSEMENU *);
 void func_001D9870();
 extern char B_002E6550[];
-struct MCDATA { SAVE asave[3]; int pad[2]; };
-extern MCDATA B_002E6604;
+struct MCDATA { SAVE asave[3]; };
+/* the memory card menu's block at 0x7FDC of the same object: its selected slot is 0x7D58 into it */
+struct MCCARD { u8 unknown_0x0[0x7D58]; SAVE *psaveSelected; };
+extern union { MCDATA slots; struct { u8 unknown_0x0[0x7FDC]; MCCARD card; } block; } B_002E6604;
 extern int B_003E0FAC;
 }
 
@@ -35,9 +29,9 @@ extern "C" void PauseMenu_Update(PAUSEMENU *pmenu)
 {
     func_001D9870();
     if (pmenu->depth > 0) {
-        PAGE *ppage = &pmenu->apage[pmenu->depth - 1];
+        PAUSEPAGE *ppage = &pmenu->apage[pmenu->depth - 1];
         for (int iitem = 0; iitem < ppage->citem; iitem++) {
-            ITEM *pitem = &ppage->aitem[iitem];
+            PAUSEITEM *pitem = &ppage->aitem[iitem];
             if (pitem->pfnUpdate != 0)
                 pitem->pfnUpdate(pitem);
         }
@@ -60,8 +54,8 @@ extern "C" void PauseMenu_Update(PAUSEMENU *pmenu)
                 else
                     pmenu->depth--;
                 if (pmenu->depth == 0) {
-                    BLOT *pblot = ppage->pblot;
-                    pblot->vt->pfnHide((BLOT *)((char *)pblot + pblot->vt->delta));
+                    PAUSEBLOT *pblot = ppage->pblot;
+                    pblot->vt->pfnHide((char *)pblot + pblot->vt->deltaHide);
                     PauseMenu_SetState(pmenu, 0);
                 } else {
                     PauseMenu_SetState(pmenu, 7);
@@ -81,8 +75,8 @@ extern "C" void PauseMenu_Update(PAUSEMENU *pmenu)
             break;
         case 8:
             if (!FBlotLabelPlaying(ppage->pblot, 0x314)) {
-                BLOT *pblot = ppage->pblot;
-                pblot->vt->pfnHide((BLOT *)((char *)pblot + pblot->vt->delta));
+                PAUSEBLOT *pblot = ppage->pblot;
+                pblot->vt->pfnHide((char *)pblot + pblot->vt->deltaHide);
                 PauseMenu_SetState(pmenu, 0);
             }
             break;
@@ -121,7 +115,7 @@ extern "C" void PauseMenu_Update(PAUSEMENU *pmenu)
                     else
                         PauseMenu_Pop(pmenu);
                 } else if (pmenu->depth > 0 && (grfbtn & 0x40)) {
-                    ITEM *pitem = &ppage->aitem[ppage->iitemCur];
+                    PAUSEITEM *pitem = &ppage->aitem[ppage->iitemCur];
                     if (pitem->pfnActivate != 0)
                         pitem->pfnActivate(pitem);
                     if (!(pitem->grf & 2)) {
@@ -137,11 +131,11 @@ extern "C" void PauseMenu_Update(PAUSEMENU *pmenu)
                 } else if (grfbtn & 0x20) {
                     int kind = func_001B0078(pmenu);
                     if (kind == 0x19 || kind == 0x1E) {
-                        SAVE *psave = &B_002E6604.asave[ppage->iitemCur];
+                        SAVE *psave = &B_002E6604.slots.asave[ppage->iitemCur];
                         float value = RefGetGameSaveValue(B_003E0FAC, psave).m_tag.m_g;
                         if (value != 0.0f) {
-                            char *pcard = (char *)&B_002E6604 + 0x7FDC;
-                            *(SAVE **)(pcard + 0x7D58) = psave;
+                            MCCARD *pcard = &B_002E6604.block.card;
+                            pcard->psaveSelected = psave;
                             MemcardMenu_SetState(B_002E6550, 0x20);
                         }
                     }
@@ -164,7 +158,7 @@ extern "C" void PauseMenu_Update(PAUSEMENU *pmenu)
             break;
         case 10:
             if (pmenu->pjoy != 0) {
-                ITEM *pitem = &ppage->aitem[ppage->iitemCur];
+                PAUSEITEM *pitem = &ppage->aitem[ppage->iitemCur];
                 int grfbtn = FJoyButtonPressed(pmenu->pjoy, 0x850);
                 if (grfbtn & 0x800) {
                     PauseMenu_CancelOption(pmenu, pitem);

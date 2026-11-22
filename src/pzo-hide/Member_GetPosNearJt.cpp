@@ -1,15 +1,11 @@
-struct VSlotA { short delta; short index; void (*fn)(void *, void *, float *); };
-struct VSlotB { short delta; short index; void (*fn)(void *, float, void *, void *, float *); };
-struct VTable { char pad[0x10]; VSlotA slotParam; VSlotA slotPos; };
-struct Member { char pad[0x20]; VTable *vtbl; };
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "pzo_hide.h"
 
-extern "C" void Member_GetPosNearJt(Member *member, void *joint, float *paramOut, void *position, float *heading)
+extern "C" void Member_GetPosNearJt(MEMBER *member, void *joint, f32 *paramOut, void *position, f32 *heading)
 {
-    float param;
-    VSlotA *slotParam = &member->vtbl->slotParam;
-    slotParam->fn((char *)member + slotParam->delta, joint, &param);
-    VSlotB *slotPos = (VSlotB *)&member->vtbl->slotPos;
-    slotPos->fn((char *)member + slotPos->delta, param, joint, position, heading);
+    f32 param;
+    member->GetParam(joint, &param);
+    member->GetPosFromParam(param, joint, position, heading);
     if (paramOut != 0)
         *paramOut = param;
 }

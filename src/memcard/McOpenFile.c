@@ -1,8 +1,17 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "types.h"
 
-M2C_UNK McSync(void *, s32, M2C_UNK, s32);          /* extern */
-s32 sceMcOpen(s32, s32, s32, s32);                  /* extern */
+#include "memcard.h"
 
-void McOpenFile(void *arg0, s32 arg1, s32 arg2, s32 arg3) {
-    McSync(arg0 + 0xFD5C, sceMcOpen(M2C_FIELD(arg0, s32 *, 0), M2C_FIELD(arg0, s32 *, 4), arg1, arg2), 2, arg3);
+/* The memory card manager object: lives inside SAVE at 0xFD5C. */
+typedef struct B8 { char b[8]; } B8;
+
+
+
+
+s32 McSync(void *, s32, s32, s32 *);                /* extern */
+s32 sceMcOpen(s32, s32, const char *, s32);         /* extern */
+
+s32 McOpenFile(SAVE *save, const char *path, s32 mode, s32 *fd) {
+    return McSync(&save->mc, sceMcOpen(save->port, save->slot, path, mode), 2, fd);
 }

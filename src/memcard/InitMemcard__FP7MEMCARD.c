@@ -1,12 +1,12 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "types.h"
 
-s32 NewSema(M2C_UNK, M2C_UNK);                      /* extern */
+#include "memcard.h"
 
-void InitMemcard__FP7MEMCARD(void *arg0) {
-    s32 temp_v0;
+s32 NewSema(s32, s32);                              /* extern */
 
-    temp_v0 = NewSema(1, 1);
-    M2C_FIELD(arg0, s32 *, 0) = temp_v0;
-    M2C_FIELD(arg0, s32 *, 4) = -1;
-    M2C_FIELD(arg0, s32 *, 0x10) = 0x20;
+void InitMemcard__FP7MEMCARD(MEMCARD *card) {
+    card->semaphoreId = NewSema(1, 1);
+    card->threadId = -1;
+    card->busy = 0x20;
 }

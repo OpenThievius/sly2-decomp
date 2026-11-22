@@ -9,11 +9,12 @@
 
 struct CRV;
 struct ACT;
+struct ASEG;
 
 /* One of the six 0xC-byte entries at 0x17C: func_001B0B78 sets oid to -1 and def from a table of six words. */
 struct SLOTDEF {
     /* 0x0 */ s32 oid;
-    /* 0x4 */ s32 field_0x4;
+    /* 0x4 */ struct ASEG *paseg; /* ResolveSlotSoAsegs stores the resolved aseg of the handle at 0; func_001B0D08 reads it (GSpeedSlotSoAseg) */
     /* 0x8 */ s32 def;
 };
 
@@ -35,7 +36,7 @@ struct SLOTSO : SO {
     /* 0x1C8 */ void *field_0x1C8;    /* FAbsorbSlotSoWkr: an object whose slot-51 entry it calls with an event */
     /* 0x1CC */ f32 field_0x1CC;      /* func_001B0B78 sets it to 300 */
     /* 0x1D0 */ f32 field_0x1D0;      /* func_001B0B78 sets it to 1000 */
-    u8 unknown_0x1D4[0x4];
+    /* 0x1D4 */ s32 kindAngular;       /* func_001B0CA8 stores pxfAngular's kind after loading; func_001B1328 hands it back to SetXfKind */
     /* 0x1D8 */ f32 radHeading;        /* FSlotSoFacingHeading */
     u8 unknown_0x1DC[0x44];
     /* 0x220 */ s32 state;             /* UpdateSlotSo, FAbsorbSlotSoWkr; func_001B0B78 sets it to -1 */
@@ -56,6 +57,7 @@ SLY2_OFFSET_CHECK(SLOTSO, field_0x1CC, 0x1CC);
 SLY2_OFFSET_CHECK(SLOTSO, field_0x230, 0x230);
 SLY2_OFFSET_CHECK(SLOTSO, pactAnim, 0x1C4);
 SLY2_OFFSET_CHECK(SLOTSO, field_0x1C8, 0x1C8);
+SLY2_OFFSET_CHECK(SLOTSO, kindAngular, 0x1D4);
 SLY2_OFFSET_CHECK(SLOTSO, radHeading, 0x1D8);
 SLY2_OFFSET_CHECK(SLOTSO, state, 0x220);
 SLY2_OFFSET_CHECK(SLOTSO, tNext, 0x228);

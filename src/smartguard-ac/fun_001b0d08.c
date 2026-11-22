@@ -1,14 +1,30 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "types.h"
 
-M2C_UNK GSpeedSlotSoAseg(void *, s32, void *);      /* extern */
-M2C_UNK PostSoLoad();                               /* extern */
-M2C_UNK ResolveSlotSoAsegs(void *);                 /* extern */
-M2C_UNK func_001B0D90(void *);                      /* extern */
+struct ASEG;
 
-void func_001B0D08(void *arg0) {
-    PostSoLoad();
-    ResolveSlotSoAsegs(arg0);
-    GSpeedSlotSoAseg(arg0, M2C_FIELD(arg0, s32 *, 0x18C), arg0 + 0x1CC);
-    GSpeedSlotSoAseg(arg0, M2C_FIELD(arg0, s32 *, 0x1B0), arg0 + 0x1D0);
-    func_001B0D90(arg0);
+/* the part of SLOTSO (slotso.h, C++ only) this function reads; same offsets */
+struct SLOTSOVIEW {
+    u8 unknown_0x0[0x17C];
+    struct {
+        s32 oid;
+        struct ASEG *paseg;
+        s32 def;
+    } aslot[6];
+    u8 unknown_0x1C4[0x8];
+    f32 field_0x1CC;
+    f32 field_0x1D0;
+};
+
+void GSpeedSlotSoAseg(struct SLOTSOVIEW *pso, struct ASEG *paseg, f32 *pgSpeed);
+void PostSoLoad(struct SLOTSOVIEW *pso);
+void ResolveSlotSoAsegs(struct SLOTSOVIEW *pso);
+void func_001B0D90(struct SLOTSOVIEW *pso);
+
+void func_001B0D08(struct SLOTSOVIEW *pso) {
+    PostSoLoad(pso);
+    ResolveSlotSoAsegs(pso);
+    GSpeedSlotSoAseg(pso, pso->aslot[1].paseg, &pso->field_0x1CC);
+    GSpeedSlotSoAseg(pso, pso->aslot[4].paseg, &pso->field_0x1D0);
+    func_001B0D90(pso);
 }

@@ -1,19 +1,16 @@
-#include "sly2.h"
-struct ITEM { int a; int type; int c[5]; };
-struct GC { char pad0[0xC - 0]; ITEM items[1]; };
-struct GCX { char pad0[0xC]; ITEM items[0x20]; };
-struct GCH { char pad0[0x24]; int index; char pad1[0x1E8 - 0x28]; int mode; int alt; };
-extern char D_002BFDA8;
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "pausemenu.h"
+extern PAUSEITEM D_002BFDA8[];
 int CGc_FFindScreen();
-int func_001B0160(GCH *gc)
+int func_001B0160(PAUSEMENU *pmenu)
 {
     if (!CGc_FFindScreen()) return 0;
-    int index = gc->index;
-    if (index <= 0) return 0;
-    ITEM *item = (ITEM *)((char *)gc + 0xC) + index;
-    if (gc->mode == 1) {
-        int alt = gc->alt;
-        if (index < alt) item = (ITEM *)((char *)gc + 0xC) + alt;
+    int depth = pmenu->depth;
+    if (depth <= 0) return 0;
+    PAUSEPAGE *ppage = &pmenu->apage[depth - 1];
+    if (pmenu->state == 1) {
+        int depthNext = pmenu->depthNext;
+        if (depth < depthNext) ppage = &pmenu->apage[depthNext - 1];
     }
-    return item->type == (sptr)&D_002BFDA8;
+    return ppage->aitem == D_002BFDA8;
 }

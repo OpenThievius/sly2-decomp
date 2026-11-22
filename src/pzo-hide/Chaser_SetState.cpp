@@ -1,32 +1,31 @@
-#include "sly2.h"
-extern "C" float g_2dded0;
-extern "C" void func_0017F4C0(void *, void *);
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "pzo_hide.h"
+extern "C" void func_0017F4C0(SOHIT *, ANIMENTRY *);
 
-void Chaser_SetState(void *pchaser, int state)
+void Chaser_SetState(CHASER *chaser, int state)
 {
-    int *pint = (int *)pchaser;
-    int stateOld = pint[0x1C0 / 4];
+    int stateOld = chaser->state;
     if (stateOld == state)
         return;
     if (stateOld == -1)
-        pint[0x184 / 4] = pint[0x180 / 4];
-    pint[0x1C0 / 4] = state;
-    ((float *)pchaser)[0x1C4 / 4] = g_2dded0;
+        chaser->hp = chaser->hpMax;
+    chaser->state = state;
+    chaser->tState = g_2dded0.t;
     if (state != 3) {
         if (state < 4) {
             if (state >= 0) {
-                int *pvec = pint + 0x210 / 4;
+                s32 *pvec = chaser->field_0x210;
                 pvec[2] = 0;
                 pvec[1] = 0;
-                pint[0x210 / 4] = 0;
+                pvec[0] = 0;
             }
         } else if (state == 4) {
-            int *pvec = pint + 0x210 / 4;
+            s32 *pvec = chaser->field_0x210;
             pvec[2] = 0;
             pvec[1] = 0;
-            pint[0x210 / 4] = 0;
+            pvec[0] = 0;
         }
     }
-    void *pentry = (state == -1) ? 0 : (char *)pchaser + 0x220 + state * 0x10;
-    func_0017F4C0(pchaser, pentry);
+    ANIMENTRY *pentry = (state == -1) ? 0 : &chaser->aentry[state];
+    func_0017F4C0(chaser, pentry);
 }

@@ -1,24 +1,31 @@
-#include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "pzo_hide.h"
+
+/* the contact record of a new touch: one XPSIDE per party, 0x40 bytes each (the same layout AdjustLootNewXp and AdjustMurrayNewXp read) */
+struct XPSIDE {
+    u8 unknown_0x0[0xC];
+    /* 0xC */ void *plo; /* the object on this side */
+    u8 unknown_0x10[0x30];
+};
+struct XP {
+    XPSIDE side[2];
+};
+
 extern "C" {
-s32 FIsBasicDerivedFrom(s32, s32);
-void func_0017F1A0(s8 *, s32, s32);
-void func_0017F5B0(s8 *, s32);
+s32 FIsBasicDerivedFrom(void *, s32);
+void func_0017F1A0(SWARM *, XP *, s32);
+void func_0017F5B0(SWARM *, void *);
 
-void Swarm_AdjustNewXp(s8 *arg0, s32 arg1, s32 arg2) {
-    s32 temp_s0;
+void Swarm_AdjustNewXp(SWARM *swarm, XP *pxp, s32 iside)
+{
+    void *plo;
 
-    func_0017F1A0(arg0, arg1, arg2);
-    if (M2C_FIELD(arg0, s32 *, 0x188) != 0) {
-        temp_s0 = M2C_FIELD((arg1 + ((1 - arg2) << 6)), s32 *, 0xC);
-        if (FIsBasicDerivedFrom(temp_s0, 0x47) != 0) {
-            func_0017F5B0(arg0, temp_s0);
+    func_0017F1A0(swarm, pxp, iside);
+    if (swarm->dhp != 0) {
+        plo = pxp->side[1 - iside].plo;
+        if (FIsBasicDerivedFrom(plo, 0x47) != 0) {
+            func_0017F5B0(swarm, plo);
         }
     }
 }
-
 }

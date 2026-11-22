@@ -1,9 +1,10 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "pzo_hide.h"
 
-M2C_UNK InitXfm();                                  /* extern */
-M2C_UNK bevy_player_p6_182c70(s32);                 /* extern */
+void InitXfm(void *);
+void bevy_player_p6_182c70(struct MEMBER *);
 
-void AttachCyl_Init(s32 arg0) {
-    InitXfm();
-    bevy_player_p6_182c70(arg0 + 0xE0);
+void AttachCyl_Init(struct ATTACHCYL *attach) {
+    InitXfm(attach);
+    bevy_player_p6_182c70(&attach->member);
 }

@@ -1,22 +1,24 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 #include "types.h"
-typedef s32 M2C_UNK; typedef s8 M2C_UNK8; typedef s16 M2C_UNK16; typedef s32 M2C_UNK32; typedef s64 M2C_UNK64;
-#define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
-#define M2C_BITWISE(type, expr) ((type)(expr))
-#define M2C_ERROR(desc) (0)
-#define NULL 0
+
+#include "memcard.h"
+
+
+
+
+
+struct SAVEVARS;
+struct Bytes8 { s64 v; } __attribute__((packed));
+
 extern "C" {
-struct _m2c_stack_func_001ABD40 {
-    /* 0x00 */ char pad0[0x20];
-};                                                  /* size = 0x20 */
-struct Continuation { long value; } __attribute__((packed));
-void CreateMemcardThread__FP7MEMCARDii(s8 *, long);
-void SnapshotSaveData(M2C_UNK *, s32);
+void CreateMemcardThread__FP7MEMCARDii(MEMCARD *, s64);
+void SnapshotSaveData(SAVEVARS *, SAVEDATA *);
 void StoreAudioModeInSave();
-extern M2C_UNK B_003E0EA8;
-extern Continuation RO_002A6C90;
-void func_001ABD40(s8 *arg0) {
+extern SAVEVARS B_003E0EA8;
+extern Bytes8 RO_002A6C90;
+void func_001ABD40(SAVE *save) {
     StoreAudioModeInSave();
-    SnapshotSaveData(&B_003E0EA8, M2C_FIELD(arg0, s32 *, 0xFD50));
-    CreateMemcardThread__FP7MEMCARDii(arg0 + 0xFD5C, RO_002A6C90.value);
+    SnapshotSaveData(&B_003E0EA8, &save->pslotCur->data);
+    CreateMemcardThread__FP7MEMCARDii(&save->mc, RO_002A6C90.v);
 }
 }

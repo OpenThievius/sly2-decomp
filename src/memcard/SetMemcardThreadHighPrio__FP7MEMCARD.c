@@ -1,14 +1,17 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "types.h"
 
-M2C_UNK ChangeThreadPriority(s32, M2C_UNK);         /* extern */
-s32 FMemcardThreadValid__FP7MEMCARD();              /* extern */
-M2C_UNK SignalSema(s32);                            /* extern */
-M2C_UNK WaitSema(s32);                              /* extern */
+#include "memcard.h"
 
-void SetMemcardThreadHighPrio__FP7MEMCARD(void *arg0) {
-    if (FMemcardThreadValid__FP7MEMCARD() != 0) {
-        ChangeThreadPriority(M2C_FIELD(arg0, s32 *, 4), 1);
+s32 ChangeThreadPriority(s32, s32);                /* extern */
+s32 FMemcardThreadValid__FP7MEMCARD(MEMCARD *);     /* extern */
+s32 SignalSema(s32);                               /* extern */
+s32 WaitSema(s32);                                 /* extern */
+
+void SetMemcardThreadHighPrio__FP7MEMCARD(MEMCARD *card) {
+    if (FMemcardThreadValid__FP7MEMCARD(card) != 0) {
+        ChangeThreadPriority(card->threadId, 1);
     }
-    WaitSema(M2C_FIELD(arg0, s32 *, 0));
-    SignalSema(M2C_FIELD(arg0, s32 *, 0));
+    WaitSema(card->semaphoreId);
+    SignalSema(card->semaphoreId);
 }
