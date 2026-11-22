@@ -1678,12 +1678,12 @@ class PalReportTests(unittest.TestCase):
         self.assertTrue(complete['one'])
         self.assertFalse(complete['two'])
 
-    def test_a_function_renamed_in_the_registry_keeps_its_pal_status_through_its_address(self):
+    def test_a_function_renamed_in_the_registry_keeps_its_pal_status_through_the_committed_bridge(self):
         import tempfile
         with tempfile.TemporaryDirectory() as folder:
-            os.makedirs(os.path.join(folder, 'config', 'us'))
-            with open(os.path.join(folder, 'config', 'us', 'symbol_addrs.txt'), 'w') as handle:
-                handle.write('A = 0x100000; // type:func\n')
+            os.makedirs(os.path.join(folder, 'config', 'eu'))
+            with open(os.path.join(folder, 'config', 'eu', 'us_names.tsv'), 'w') as handle:
+                handle.write('us_address\tus_name\n0x100000\tA\n')
             status_path = os.path.join(folder, 'c_status.tsv')
             with open(status_path, 'w') as handle:
                 handle.write('us_address\tname\tother_address\tpair\tscore\taddresses\n0x100000\tRenamed__4CRef\t0X100000\tsame\t0\tok\n')
@@ -1694,6 +1694,16 @@ class PalReportTests(unittest.TestCase):
             finally:
                 pal_report.LAB = old
         self.assertTrue(status['A'])
+
+    def test_the_bridge_keeps_only_the_functions_whose_us_name_differs(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as folder:
+            status_path = os.path.join(folder, 'c_status.tsv')
+            with open(status_path, 'w') as handle:
+                handle.write('us_address\tname\tother_address\tpair\tscore\taddresses\n'
+                             '0x100000\tRenamed\t0X100000\tsame\t0\tok\n0x100100\tSame\t0X100100\tsame\t0\tok\n')
+            bridge = pal_report.make_bridge(status_path, {0x100000: 'Old', 0x100100: 'Same'})
+        self.assertEqual(bridge, {0x100000: 'Old'})
 
     def test_check_finds_a_matched_function_without_a_pal_row_and_a_stale_row(self):
         import argparse

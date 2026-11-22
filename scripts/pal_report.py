@@ -13,7 +13,8 @@ bytes. The report is what the `SCES_525.29_report` artifact of progress.yml carr
 
 --check needs no executable (it runs in `make check` and in CI): it fails when a matched function (src/MANIFEST.tsv) has no row in
 config/eu/c_status.tsv or a row belongs to a function that is no longer matched, and when the committed PAL report is not what the committed
-US report and c_status.tsv give: C was added, removed or re-measured without `make pal`."""
+US report and c_status.tsv give: C was added, removed or re-measured without `make pal`. config/eu/us_names.tsv carries the US report's
+name of each function renamed in the registry since (written by `make pal` from config/us/symbol_addrs.txt, which is not committed)."""
 import argparse
 import csv
 import json
@@ -97,7 +98,7 @@ def build(us_report, status, other_sections):
     return {'measures': measures(summaries), 'units': units, 'version': us_report.get('version', 2), 'categories': categories}
 
 
-def read_status(path):
+def read_status(path, bridge=None):
     """{function name: True when the same C reproduces the PAL code and its addresses}, and the addresses of the rows."""
     status, addresses, by_address = {}, set(), {}
     for row in csv.DictReader(open(path, encoding='utf-8'), delimiter='\t'):
@@ -107,19 +108,21 @@ def read_status(path):
         addresses.add(address)
         by_address[address] = ok
     # The US report names a function after config/us/symbol_addrs.txt, the status file after the matching registry: a function
-    # renamed in the registry only (scripts/matching/rename.py) would otherwise lose its PAL status. Key the US names by address too.
-    for address, name in us_symbol_names().items():
+    # renamed in the registry only (scripts/matching/rename.py) would otherwise lose its PAL status. Key the US names by address
+    # too, through the committed bridge (config/eu/us_names.tsv: CI has no config/us/symbol_addrs.txt).
+    for address, name in (read_bridge() if bridge is None else bridge).items():
         if address in by_address and name not in status:
             status[name] = by_address[address]
     return status, addresses
 
 
 def us_symbol_names(path=None):
-    """{address: name} of config/us/symbol_addrs.txt (`name = 0xADDRESS; ...`), the names objdiff's US report uses."""
-    names = {}
+    """{address: name} of config/us/symbol_addrs.txt (`name = 0xADDRESS; ...`), the names objdiff's US report uses; None when the
+    file is absent (it is game-derived and not committed)."""
     path = path or os.path.join(LAB, 'config', 'us', 'symbol_addrs.txt')
     if not os.path.exists(path):
-        return names
+        return None
+    names = {}
     for line in open(path, encoding='utf-8'):
         match = re.match(r'\s*([A-Za-z_$][\w$.]*)\s*=\s*0x([0-9A-Fa-f]+)\s*;', line)
         if match:
@@ -127,10 +130,42 @@ def us_symbol_names(path=None):
     return names
 
 
+def bridge_path():
+    return os.path.join(LAB, 'config', 'eu', 'us_names.tsv')
+
+
+def make_bridge(status_path, us_names):
+    """{address: US report name} for the status rows whose registry name differs from the US name (the renamed functions)."""
+    bridge = {}
+    for row in csv.DictReader(open(status_path, encoding='utf-8'), delimiter='\t'):
+        address = int(row['us_address'], 16)
+        name = us_names.get(address)
+        if name and name != row['name']:
+            bridge[address] = name
+    return bridge
+
+
+def read_bridge(path=None):
+    path = path or bridge_path()
+    if not os.path.exists(path):
+        return {}
+    return {int(row['us_address'], 16): row['us_name'] for row in csv.DictReader(open(path, encoding='utf-8'), delimiter='\t')}
+
+
+def write_bridge(bridge, path=None):
+    with open(path or bridge_path(), 'w', encoding='utf-8') as handle:
+        handle.write('us_address\tus_name\n')
+        for address in sorted(bridge):
+            handle.write(f'0x{address:06X}\t{bridge[address]}\n')
+
+
 def check(arguments):
     """The problems of the committed PAL data, empty when it is current."""
     problems = []
     manifest = {int(row['address'], 16): row['name'] for row in csv.DictReader(open(os.path.join(LAB, 'src', 'MANIFEST.tsv'), encoding='utf-8'), delimiter='\t')}
+    us_names = us_symbol_names()
+    if us_names is not None and make_bridge(arguments.status, us_names) != read_bridge():
+        problems.append(f'{os.path.relpath(bridge_path(), LAB)} is not what config/us/symbol_addrs.txt gives: run `make pal`')
     status, rows = read_status(arguments.status)
     for address in sorted(set(manifest) - rows):
         problems.append(f'{manifest[address]} ({address:#X}) is matched but has no row in {os.path.relpath(arguments.status, LAB)}: run `make pal`')
@@ -169,6 +204,9 @@ def main():
     with open(arguments.other, 'rb') as handle:
         image = ELFFile(handle)
         sections = {name: image.get_section_by_name(name)['sh_size'] for name in ('.rodata', '.data', '.vutext', '.irx')}
+    us_names = us_symbol_names()
+    if us_names is not None:
+        write_bridge(make_bridge(arguments.status, us_names))
     status, _ = read_status(arguments.status)
     report = build(json.load(open(arguments.us_report)), status, sections)
     os.makedirs(os.path.dirname(arguments.out), exist_ok=True)
