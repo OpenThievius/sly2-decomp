@@ -5,6 +5,7 @@
 #include "include_asm.h"
 #include "joy.h"
 #include "clock.h"
+#include "cm.h"
 
 extern "C" CLOCK g_2dded0;
 
@@ -39,14 +40,6 @@ extern "C" void _MatchCodes__FP3JOYUs(CODELIST *, JOY *, unsigned short);
 extern "C" s32 PpoSwFocusBase(void *);
 extern "C" void bevy_camera_follow_activity(void *, s32, s32);
 
-// the camera manager (cm.h's CM) as FReadJoy reads it: the mode word and the current policy's address
-struct CMVIEW {
-    u8 unknown_0x0[0x30C];
-    s32 field_0x30C;
-    u8 unknown_0x310[0x4];
-    char *field_0x314;
-};
-extern "C" CMVIEW D_002DDF40;
 extern "C" CODELIST D_002DDEC0;
 extern "C" char D_003DD490[];
 // the record bevy_camera_follow_activity keeps (AddGuardSgs passes it too): its first word is the time of the last follow
@@ -274,7 +267,7 @@ extern "C" s32 FReadJoy__FP3JOY(JOY *self)
             self->yStickRight = zero;
             self->xStickRight = zero;
         }
-        if (D_002DDF40.field_0x30C == 0 || D_002DDF40.field_0x314 != (char *)&D_002DDF40 + 0x3A0) {
+        if (B_002DDF40.ccpr == 0 || B_002DDF40.acpr[0].pcplcy != &B_002DDF40.cpman) {
             if ((self->grfbtnLatest & 0xF000) != 0) {
                 float zero = 0.0f;
                 self->uStickLeft = zero;

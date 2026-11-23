@@ -163,8 +163,6 @@ extern "C" u8 B_002DEB30[]; /* the task manager */
 
 struct SO;
 
-struct CPP { int v; };
-
 extern "C" void func_00161F10(u8 *ptaskmgr, u8 *atask, int ctaskMax, int *pctask, int arg4, int arg5);
 
 extern "C" void ApplyTaskStateRequests(u8 *ptaskmgr, int ctask, u8 *atask, LO *plo);
@@ -184,8 +182,6 @@ void RevokeCmPolicy(CM *pcm, int arg1, CPP cpp, CPLCY *pcplcy, SO *pso, void *pv
 
 void Warp_Start(WARP *pwarp)
 {
-    CPP cppNone;
-    cppNone.v = -1;
     if (pwarp->state != 3) return;
     if (pwarp->fChained != 0) {
         Warp_SetState(pwarp, 0);
@@ -193,8 +189,8 @@ void Warp_Start(WARP *pwarp)
         if (pwarpNext) Warp_Start_self(pwarpNext);
     } else {
         ApplyTaskStateRequests(B_002DEB30, pwarp->ctask, pwarp->atask, pwarp);
-        RevokeCmPolicy(&B_002DDF40, 2, cppNone, &B_002DDF40.acplcy[0], 0, 0);
-        RevokeCmPolicy(&B_002DDF40, 2, cppNone, &B_002DDF40.acplcy[1], 0, 0);
+        RevokeCmPolicy(&B_002DDF40, 2, CPP_NONE, &B_002DDF40.cplook, 0, 0);
+        RevokeCmPolicy(&B_002DDF40, 2, CPP_NONE, &B_002DDF40.k30cam, 0, 0);
         Warp_SetState(pwarp, 4);
         pwarp->tWarp = g_2dded0.t + pwarp->delay;
         pwarp->HandleSpliceEvent(5, 0, 0, 0, 0);

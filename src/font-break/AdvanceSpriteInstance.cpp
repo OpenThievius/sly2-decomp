@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
+#include "rgba.h"
 struct AFF { float a, b, c, d, e, f, u6, u7; } __attribute__((aligned(16)));
-struct RGBA4 { char b[4]; };
 struct MOVIECHAR;
-struct P16 { RGBA4 v; char pad[12]; };
-struct TMP { union { AFF dummy; struct { RGBA4 t0; char p0[12]; RGBA4 t1; char p1[12]; } c; } v; union { AFF lerped; struct { RGBA4 t2; char p2[12]; RGBA4 t3; } c; } u; };
+struct P16 { RGBA v; char pad[12]; };
+struct TMP { union { AFF dummy; struct { RGBA t0; char p0[12]; RGBA t1; char p1[12]; } c; } v; union { AFF lerped; struct { RGBA t2; char p2[12]; RGBA t3; } c; } u; };
 struct FRAME { AFF xf; P16 outAdd, outMul, s40, s50, s60; TMP tmp; };
 struct SLOT {
-    RGBA4 rgbaAdd; RGBA4 rgbaMul; char pad08[8];
+    RGBA rgbaAdd; RGBA rgbaMul; char pad08[8];
     AFF xf;
-    MOVIECHAR *pchar; int maskMode; float tFrom; RGBA4 rgbaAddFrom; RGBA4 rgbaMulFrom; AFF *pxfFrom;
-    float tTo; RGBA4 rgbaAddTo; RGBA4 rgbaMulTo; AFF *pxfTo; int iinst; float tUpdated;
+    MOVIECHAR *pchar; int maskMode; float tFrom; RGBA rgbaAddFrom; RGBA rgbaMulFrom; AFF *pxfFrom;
+    float tTo; RGBA rgbaAddTo; RGBA rgbaMulTo; AFF *pxfTo; int iinst; float tUpdated;
     unsigned char fTween; char pad61[0x68 - 0x61]; void *pslNext; char pad6c[4];
 };
 struct INST { int cslot; SLOT *aslot; short ilabel; short ikeyNext; float t; int fPaused; int pamb; };
@@ -21,10 +21,10 @@ extern "C" void ClearSle(void *);
 extern "C" void ApplySpriteKeySounds(LABEL *, int, int);
 extern "C" void func_002190F8(LABEL *, int, int);
 extern "C" void ClearSpriteKeySlots(LABEL *, int, int);
-extern "C" void PlaceSpriteKeyCharacters(float, float, LABEL *, int, int, AFF *, RGBA4 *, RGBA4 *);
+extern "C" void PlaceSpriteKeyCharacters(float, float, LABEL *, int, int, AFF *, RGBA *, RGBA *);
 extern "C" void func_002158C0(MOVIECHAR *, SLOT *);
-extern "C" void CombineColorTransforms(RGBA4 *, RGBA4 *, RGBA4 *, RGBA4 *, RGBA4 *, RGBA4 *);
-extern "C" void func_00215850(MOVIECHAR *, SLOT *, float, AFF *, RGBA4 *, RGBA4 *);
+extern "C" void CombineColorTransforms(RGBA *, RGBA *, RGBA *, RGBA *, RGBA *, RGBA *);
+extern "C" void func_00215850(MOVIECHAR *, SLOT *, float, AFF *, RGBA *, RGBA *);
 
 static inline AFF Mult(const AFF &child, const AFF &parent)
 {
@@ -49,7 +49,7 @@ static inline INST *PinstFromLabel(LABEL *label, int iinst)
 {
     return (INST *)(iinst * sizeof(INST) + (uptr)label->psprite->insts);
 }
-extern "C" void AdvanceSpriteInstance(float dt, LABEL *label, int iinst, AFF *pxf, RGBA4 *prgbaAdd, RGBA4 *prgbaMul)
+extern "C" void AdvanceSpriteInstance(float dt, LABEL *label, int iinst, AFF *pxf, RGBA *prgbaAdd, RGBA *prgbaMul)
 {
     FRAME fr;
     INST *inst;
@@ -105,18 +105,18 @@ extern "C" void AdvanceSpriteInstance(float dt, LABEL *label, int iinst, AFF *px
                 fr.xf = fr.tmp.u.lerped;
                 fr.tmp.v.c.t1 = slot->rgbaAddFrom;
                 fr.tmp.u.c.t2 = slot->rgbaAddTo;
-                fr.tmp.u.c.t3.b[0] = LerpByte((unsigned char)fr.tmp.v.c.t1.b[0], (unsigned char)fr.tmp.u.c.t2.b[0], u);
-                fr.tmp.u.c.t3.b[1] = LerpByte((unsigned char)fr.tmp.v.c.t1.b[1], (unsigned char)fr.tmp.u.c.t2.b[1], u);
-                fr.tmp.u.c.t3.b[2] = LerpByte((unsigned char)fr.tmp.v.c.t1.b[2], (unsigned char)fr.tmp.u.c.t2.b[2], u);
-                fr.tmp.u.c.t3.b[3] = LerpByte((unsigned char)fr.tmp.v.c.t1.b[3], (unsigned char)fr.tmp.u.c.t2.b[3], u);
+                fr.tmp.u.c.t3.r = LerpByte((unsigned char)fr.tmp.v.c.t1.r, (unsigned char)fr.tmp.u.c.t2.r, u);
+                fr.tmp.u.c.t3.g = LerpByte((unsigned char)fr.tmp.v.c.t1.g, (unsigned char)fr.tmp.u.c.t2.g, u);
+                fr.tmp.u.c.t3.b = LerpByte((unsigned char)fr.tmp.v.c.t1.b, (unsigned char)fr.tmp.u.c.t2.b, u);
+                fr.tmp.u.c.t3.a = LerpByte((unsigned char)fr.tmp.v.c.t1.a, (unsigned char)fr.tmp.u.c.t2.a, u);
                 fr.tmp.v.c.t0 = fr.tmp.u.c.t3;
                 fr.s40.v = fr.tmp.v.c.t0;
                 fr.tmp.v.c.t1 = slot->rgbaMulFrom;
                 fr.tmp.u.c.t2 = slot->rgbaMulTo;
-                fr.tmp.u.c.t3.b[0] = LerpByte((unsigned char)fr.tmp.v.c.t1.b[0], (unsigned char)fr.tmp.u.c.t2.b[0], u);
-                fr.tmp.u.c.t3.b[1] = LerpByte((unsigned char)fr.tmp.v.c.t1.b[1], (unsigned char)fr.tmp.u.c.t2.b[1], u);
-                fr.tmp.u.c.t3.b[2] = LerpByte((unsigned char)fr.tmp.v.c.t1.b[2], (unsigned char)fr.tmp.u.c.t2.b[2], u);
-                fr.tmp.u.c.t3.b[3] = LerpByte((unsigned char)fr.tmp.v.c.t1.b[3], (unsigned char)fr.tmp.u.c.t2.b[3], u);
+                fr.tmp.u.c.t3.r = LerpByte((unsigned char)fr.tmp.v.c.t1.r, (unsigned char)fr.tmp.u.c.t2.r, u);
+                fr.tmp.u.c.t3.g = LerpByte((unsigned char)fr.tmp.v.c.t1.g, (unsigned char)fr.tmp.u.c.t2.g, u);
+                fr.tmp.u.c.t3.b = LerpByte((unsigned char)fr.tmp.v.c.t1.b, (unsigned char)fr.tmp.u.c.t2.b, u);
+                fr.tmp.u.c.t3.a = LerpByte((unsigned char)fr.tmp.v.c.t1.a, (unsigned char)fr.tmp.u.c.t2.a, u);
                 fr.tmp.v.c.t0 = fr.tmp.u.c.t3;
                 fr.s60.v = fr.tmp.v.c.t0;
             } else {

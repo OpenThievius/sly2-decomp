@@ -66,8 +66,12 @@ waves. Item numbers are stable: tools and docs cite them.
    a struct GCC 2.95 places at its declaration, not a `QW`; misnamed local types renamed, subclasses derived from the shared type,
    one-reader fields on a guessed class through local views; 0x167310 is GLOBSET's constructor, not CRef's): 3, 4,287, 1,534, 699,
    362, 4,407, 571. The 3 left are by ruling or measurement: `RefOpMatrixLookAt` and `RefOpMatrixTiltUpright` (only with SetTag
-   wrappers, refused), `RefOpIsMember` (needs a CRef default constructor storing -1, which breaks 328 matched functions). Next: the
-   m2c macros, cast offsets and padding module by module.
+   wrappers, refused), `RefOpIsMember` (needs a CRef default constructor storing -1, which breaks 328 matched functions). 2026-11-22,
+   after the module waves (every module typed from the shared headers, PR #75): 3 local copies, 3,149 padding members, 725 cast
+   offsets, 248 `(char *)p + offset`, 172 hand-written vtable calls, 7 m2c macros, 543 bare `long` (m2c 4,362 -> 7). The last 7
+   went next (`SetEpselHint`: only the `hint` field needs casts, `tHint` typed scores 0; `FClipEdgeToPathzone` passes its other
+   three arguments through): 0 m2c macros, 3,148 padding, 727 cast offsets, 250 char offsets; then one CM and CPLCY in `cm.h` for the camera manager's file (cm.h had `acplcy[2]` at 0x450, which is the look policy, K30CAM sits at 0x520): 3,038 padding, 704 cast offsets, 230 char offsets; the policy classes derive from CPLCY, one `CPP` enum and `include/rgba.h`: 3,036 padding. Next: cast offsets, vtable calls,
+   padding and char offsets module by module.
 2. **Whole files** (In Progress). Left: `po_screen_210eb0`, `SyncVBlank_file`, `StartupJmt_file`, `PloFindSpawn_file` (one callee or
    global written with several types), `QueueSwCallback_file` and `PsoHitTestLineObjects_file` (compile to another size), and four
    files with per-function flag lists. Then the 826 low-confidence cuts inside a span, checked as item 3's first stage.

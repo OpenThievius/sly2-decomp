@@ -49,23 +49,19 @@ struct CMOWNER {
     s32 fPolicyOn;
 };
 
-// The camera manager's policy record at 0x600, past cm.h's two (which end at 0x5F0): only this function uses it, so it stays a local view.
-struct CMVIEW : CM {
-    u8 unknown_0x5F0[0x10];
-    CPLCY cplcyOwner;
-};
+
+void SetCmPolicy(CM *pcm, CPP cpp, CPLCY *pcplcy, SO *pso, void *pv);
+void RevokeCmPolicy(CM *pcm, int grf, CPP cpp, CPLCY *pcplcy, SO *pso, void *pv);
 
 extern "C" {
-s32 RevokeCmPolicy__FP2CMi3CPPP5CPLCYP2SOPv(CM *pcm, s32 prio, s32 cpp, CPLCY *pcplcy, SO *pso, void *pv);
-s32 SetCmPolicy__FP2CM3CPPP5CPLCYP2SOPv(CM *pcm, s32 cpp, CPLCY *pcplcy, SO *pso, void *pv);
 extern SO *g_2f7900;
 void func_001CBF90(CMOWNER *owner, s32 enable) {
     if (owner->fPolicyOn != enable) {
         owner->fPolicyOn = enable;
         if (enable != 0) {
-            SetCmPolicy__FP2CM3CPPP5CPLCYP2SOPv(&B_002DDF40, 6, &((CMVIEW *)&B_002DDF40)->cplcyOwner, g_2f7900, owner);
+            SetCmPolicy(&B_002DDF40, CPP_LOOK_AROUND, &B_002DDF40.cplookat, g_2f7900, owner);
         } else {
-            RevokeCmPolicy__FP2CMi3CPPP5CPLCYP2SOPv(&B_002DDF40, 1, 6, 0, 0, 0);
+            RevokeCmPolicy(&B_002DDF40, 1, CPP_LOOK_AROUND, 0, 0, 0);
         }
     }
 }
