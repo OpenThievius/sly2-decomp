@@ -70,7 +70,7 @@ waves. Item numbers are stable: tools and docs cite them.
    after the module waves (every module typed from the shared headers, PR #75): 3 local copies, 3,149 padding members, 725 cast
    offsets, 248 `(char *)p + offset`, 172 hand-written vtable calls, 7 m2c macros, 543 bare `long` (m2c 4,362 -> 7). The last 7
    went next (`SetEpselHint`: only the `hint` field needs casts, `tHint` typed scores 0; `FClipEdgeToPathzone` passes its other
-   three arguments through): 0 m2c macros, 3,148 padding, 727 cast offsets, 250 char offsets; then one CM and CPLCY in `cm.h` for the camera manager's file (cm.h had `acplcy[2]` at 0x450, which is the look policy, K30CAM sits at 0x520): 3,038 padding, 704 cast offsets, 230 char offsets. Next: cast offsets, vtable calls,
+   three arguments through): 0 m2c macros, 3,148 padding, 727 cast offsets, 250 char offsets; then one CM and CPLCY in `cm.h` for the camera manager's file (cm.h had `acplcy[2]` at 0x450, which is the look policy, K30CAM sits at 0x520): 3,038 padding, 704 cast offsets, 230 char offsets; the policy classes derive from CPLCY, one `CPP` enum and `include/rgba.h`: 3,036 padding. Next: cast offsets, vtable calls,
    padding and char offsets module by module.
 2. **Whole files** (In Progress). Left: `po_screen_210eb0`, `SyncVBlank_file`, `StartupJmt_file`, `PloFindSpawn_file` (one callee or
    global written with several types), `QueueSwCallback_file` and `PsoHitTestLineObjects_file` (compile to another size), and four
