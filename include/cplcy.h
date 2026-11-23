@@ -4,7 +4,8 @@
    CPLOOK (InitCplook), CPCLOSE (bevy_camera_looks_activate's "Close"), K30CAM (bevy_classes_k30_cam_*), CPPOLICY
    (bevy_camera_policy_*: a policy that holds a CPHOLDER, whose object it calls through a vtable entry).
    CM and CPLCY are cm.h's (C++ only): a C++ source gets them from there, a C source gets the C views below (the same offsets; in
-   C the policy's vtable pointer is a plain field, in C++ it belongs to the classes that declare virtuals). */
+   C the policy's vtable pointer is a plain field, in C++ it belongs to CPLCY, which declares the virtuals). In the CM, each policy
+   member is the CPLCY header of one of the classes below (cm.h lists which). */
 #ifndef SLY2_CPLCY_H
 #define SLY2_CPLCY_H
 #include "types.h"
@@ -12,19 +13,39 @@
 #ifdef __cplusplus
 #include "cm.h"
 #else
-/* C view of cm.h's CM */
-struct CM {
-    u8 unknown_0x0[0x24];
-    /* 0x24 */ f32 field_0x24; /* CM::field_0x24 */
-};
-
-/* C view of cm.h's CPLCY (0xD0 bytes) */
+/* C view of cm.h's CPLCY (0x10 bytes): in C the vtable pointer is a plain field */
 struct CPLCY {
     /* 0x0 */ s32 active; /* DeactivateCplcy clears it (ActivateCplcy stores its argument) */
-    /* 0x4 */ f32 savedField_0x24; /* DeactivateCplcy copies it back to CM::field_0x24 (ActivateCplcy saves it) */
+    /* 0x4 */ f32 savedRadFovTarget; /* DeactivateCplcy copies it back to CM::radFovTarget (ActivateCplcy saves it) */
     /* 0x8 */ f32 savedNearClip; /* DeactivateCplcy hands it to SetCmNearClip (ActivateCplcy saves the camera manager's) */
-    /* 0xC */ void *vtable; /* InitCplcy sets it; func_00151208, func_00151610, func_001518C8, InitCpman set their own */
-    u8 unknown_0x10[0xC0];
+    /* 0xC */ void *vtable; /* InitCplcy sets it; func_00151208, func_00151610, func_001518C8, InitCpman, CM_Construct set their own */
+};
+
+/* C view of cm.h's CM: the BASIC words CM_Construct clears and its vtable pointer, radFovTarget, and the policy members CM_Construct
+   initialises (the same offsets as cm.h) */
+struct CM {
+    /* 0x0 */ void *pframe;        /* BASIC::pframe */
+    /* 0x4 */ void *psidebag;      /* BASIC::psidebag */
+    u8 unknown_0x8[0x4];
+    /* 0xC */ void *vtable;        /* CM_Construct: D_002CA4D0 */
+    u8 unknown_0x10[0x14];
+    /* 0x24 */ f32 radFovTarget;   /* CM::radFovTarget */
+    u8 unknown_0x28[0x378];
+    /* 0x3A0 */ struct CPLCY cpman;
+    /* 0x3B0 */ struct CPLCY cptn;
+    u8 unknown_0x3C0[0x90];
+    /* 0x450 */ struct CPLCY cplook;
+    u8 unknown_0x460[0x48];
+    /* 0x4A8 */ struct CPLCY cplcyCamobj;
+    u8 unknown_0x4B8[0x8];
+    /* 0x4C0 */ struct CPLCY cpclose;
+    u8 unknown_0x4D0[0x30];
+    /* 0x500 */ struct CPLCY cppolicy;
+    u8 unknown_0x510[0x10];
+    /* 0x520 */ struct CPLCY k30cam;
+    u8 unknown_0x530[0xC0];
+    /* 0x5F0 */ struct CPLCY cpattach;
+    /* 0x600 */ struct CPLCY cplookat;
 };
 #endif
 

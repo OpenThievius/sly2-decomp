@@ -193,8 +193,8 @@ void Warp_Start(WARP *pwarp)
         if (pwarpNext) Warp_Start_self(pwarpNext);
     } else {
         ApplyTaskStateRequests(B_002DEB30, pwarp->ctask, pwarp->atask, pwarp);
-        RevokeCmPolicy(&B_002DDF40, 2, cppNone, &B_002DDF40.acplcy[0], 0, 0);
-        RevokeCmPolicy(&B_002DDF40, 2, cppNone, &B_002DDF40.acplcy[1], 0, 0);
+        RevokeCmPolicy(&B_002DDF40, 2, cppNone, &B_002DDF40.cplook, 0, 0);
+        RevokeCmPolicy(&B_002DDF40, 2, cppNone, &B_002DDF40.k30cam, 0, 0);
         Warp_SetState(pwarp, 4);
         pwarp->tWarp = g_2dded0.t + pwarp->delay;
         pwarp->HandleSpliceEvent(5, 0, 0, 0, 0);
