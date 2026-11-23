@@ -1,7 +1,8 @@
-#include "m2c_macros.h"
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "pathzone.h"
 
-M2C_UNK FClipEdgeToCg(s32);                         /* extern */
+s32 FClipEdgeToCg(struct CG *pcg, QW posFrom, QW posTo, s32 flags);
 
-void FClipEdgeToPathzone(s32 arg0) {
-    FClipEdgeToCg(arg0 + 0xE0);
+s32 FClipEdgeToPathzone(struct PATHZONE *pzone, QW posFrom, QW posTo, s32 flags) {
+    return FClipEdgeToCg(&pzone->cg, posFrom, posTo, flags);
 }
