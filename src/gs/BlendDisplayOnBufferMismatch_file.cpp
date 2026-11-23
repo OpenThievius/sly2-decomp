@@ -7,6 +7,7 @@
 #include "sw.h"
 #include "critsect.h"
 #include "include_asm.h"
+#include "rgba.h"
 
 struct GsPmode { u32 en1 : 1; u32 rest : 31; u32 hi : 32; };
 
@@ -277,7 +278,6 @@ struct GIFS : DMAS { char pad2[0x10]; };
 
 struct VIFS : DMAS { char pad2[0x10]; };
 
-union RGBA { u32 word; u8 channel[4]; };
 
 extern "C" void __4GIFS(GIFS *);
 
@@ -294,9 +294,9 @@ extern "C" void BuildClearGifs__FP2QWG4RGBAi(QW *pqw, RGBA *rgba, int clear)
     GIFS gifs;
     __4GIFS(&gifs);
     AllocStatic__4DMASiP2QW(&gifs, 0x25, pqw);
-    int prim = ((s8)rgba->channel[3] >= 0) ? 0x46 : 6;
+    int prim = ((s8)rgba->a >= 0) ? 0x46 : 6;
     AddPrimPack__4GIFSiiUl(&gifs, prim, 1, 0xE);
-    PackAD__4GIFSll(&gifs, 1, (unsigned long)rgba->channel[0] | ((unsigned long)rgba->channel[1] << 8) | ((unsigned long)rgba->channel[2] << 16) | ((unsigned long)rgba->channel[3] << 24));
+    PackAD__4GIFSll(&gifs, 1, (unsigned long)rgba->r | ((unsigned long)rgba->g << 8) | ((unsigned long)rgba->b << 16) | ((unsigned long)rgba->a << 24));
     long test;
     switch (clear) {
     case 1: test = 0x31001; break;

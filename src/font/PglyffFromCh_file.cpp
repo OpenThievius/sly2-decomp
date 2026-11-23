@@ -5,6 +5,7 @@
 #include "sly2.h"
 #include "m2c_macros.h"
 #include "include_asm.h"
+#include "rgba.h"
 
 struct Glyph_15F8A8 { unsigned short code; unsigned short pad[3]; };
 
@@ -68,7 +69,6 @@ extern "C" void Reset__9CRichText(CRichText_15F970 *self)
     self->flag = 0;
 }
 
-struct RGBA { unsigned char r, g, b, a; };
 
 struct CRichText_15F9A8 { char pad0[0x154]; RGBA colorA; char pad1[4]; RGBA colorB; };
 
@@ -131,11 +131,10 @@ float CRichText_15FF40::DxMaxLine() {
     return dxMax;
 }
 
-struct RGBA_15FFD0 { unsigned char r, g, b, a; };
 
 struct CFontBrx_15FFD0 { char pad0[0xC]; int dyUnscaled; char pad1[0x14 - 0x10]; float ryScale; };
 
-struct CTextBox_15FFD0 { float x; float y; float dx; float dy; RGBA_15FFD0 rgba; int jh; int jv; };
+struct CTextBox_15FFD0 { float x; float y; float dx; float dy; RGBA rgba; int jh; int jv; };
 
 struct GIFS_15FFD0;
 
@@ -147,7 +146,7 @@ extern "C" char ChNext__9CRichText(CRichText_15FFD0 *);
 
 extern "C" float DxFromCh__8CFontBrxc(CFontBrx_15FFD0 *, char);
 
-extern "C" void SetBaseColor__9CRichTextP4RGBA_15FFD0(CRichText_15FFD0 *, RGBA_15FFD0 *);
+extern "C" void SetBaseColor__9CRichTextP4RGBA_15FFD0(CRichText_15FFD0 *, RGBA *);
 
 extern "C" void SetupDraw__8CFontBrxP8CTextBoxP4GIFS(CFontBrx_15FFD0 *, CTextBox_15FFD0 *, GIFS_15FFD0 *);
 
@@ -181,7 +180,7 @@ extern "C" void Draw__9CRichTextP8CTextBoxT1P4GIFS(CRichText_15FFD0 *self, CText
         else
             y = ptb->y + (ptb->dy - dyText) * 0.5f;
     }
-    RGBA_15FFD0 rgba = ptb->rgba;
+    RGBA rgba = ptb->rgba;
     SetBaseColor__9CRichTextP4RGBA_15FFD0(self, &rgba);
     CFontBrx_15FFD0 *pfontSetup = 0;
     float x;

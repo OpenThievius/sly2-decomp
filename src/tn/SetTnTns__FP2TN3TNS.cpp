@@ -4,7 +4,6 @@
 #include "so.h"
 #include "cm.h"
 #include "clock.h"
-enum CPP { CPP_NONE = -1, CPP_DEFAULT = 1 };
 void SetCmPolicy(CM *, CPP, CPLCY *, SO *, void *);
 void RevokeCmPolicy(CM *, int, CPP, CPLCY *, SO *, void *);
 
@@ -14,7 +13,7 @@ void SetTnTns(TN *tn, TNS tns)
         return;
     switch (tns) {
     case TNS_ON:
-        SetCmPolicy(&B_002DDF40, (CPP)(tn->pri + 2), &B_002DDF40.cptn, tn->psoFocus, tn);
+        SetCmPolicy(&B_002DDF40, (CPP)(tn->pri + CPP_TUNNEL_PRI0), &B_002DDF40.cptn, tn->psoFocus, tn);
         tn->HandleSpliceEvent(5, 1, 0, 0, 0);
         tn->tns = tns;
         break;

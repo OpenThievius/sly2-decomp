@@ -1,6 +1,6 @@
 #include "sly2.h"
+#include "rgba.h"
 struct GIFS { char pad[0x30]; };
-struct RGBA { char c[4]; };
 struct CPROG { int f0; int max; int total; int remaining; char pad10[0x40]; int mode; RGBA c54; RGBA c58; RGBA c5c; RGBA c60; };
 extern "C" {
 void __4GIFS(GIFS *);

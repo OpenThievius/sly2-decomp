@@ -6,6 +6,7 @@
 #include "so.h"
 #include "m2c_macros.h"
 #include "include_asm.h"
+#include "rgba.h"
 
 struct GIFS {
     void AddPrimPack(int cqw, int nloop, unsigned long tag);
@@ -14,7 +15,6 @@ struct GIFS {
     void PackXYZF(int x, int y, int z, int f);
 };
 
-struct RGBA { unsigned char r, g, b, a; };
 
 void FillScreenRectImpl(RGBA *prgba, GIFS *pgifs, float x0, float y0, float x1, float y1)
 {

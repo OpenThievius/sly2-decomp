@@ -1,5 +1,5 @@
 #include "sly2.h"
-struct RGBA { unsigned char r, g, b, a; };
+#include "rgba.h"
 struct RGBA5551 { unsigned short r : 5, g : 5, b : 5, a : 1; };
 extern "C" int B_003E12C8;
 extern "C" void FilterColorRgba8_1ed278(RGBA *);

@@ -1,17 +1,13 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later */
-/* CM, the camera manager, and CPLCY, the base of its camera policies. C++ only (include/cplcy.h has the C views).
+/* CM, the camera manager, and CPP, the priority of its policy records. C++ only (include/cplcy.h has CPLCY, the policy classes
+   and the C view of CM).
 
    CM: one static global at 0x2DDF40 (B_002DDF40), built by CM_Construct (0x14D3D8) and torn down by CM_Destruct, which ends in
    BASIC_Destruct: a BASIC (lo.h) with its own vtable at 0x2CA4D0 (slots 1 to 6, slot 6 func_00114280). Its methods are the
    functions of retail's file 0x14D470-0x14FAC8 (src/new_14d1d0/new_14d1d0_14d470.cpp). Its policy members, 0x3A0 to 0x618, are
    the objects CM_Construct initialises in turn (InitCpman, InitCptn, InitCplook, InitCplcyCamobj, func_00151208, func_00151610,
-   func_00150728, func_001518C8, InitCplcy) and InitCm resets at the same offsets: each starts with the CPLCY header and its own
-   bytes follow as unknown (the derived classes are cplcy.h's C views: CPTN, CPLOOK, CPCLOSE, CPPOLICY, K30CAM).
-
-   CPLCY: 0x10 bytes, three words and the vtable pointer at 0xC (g++ 2.95 puts it after the first virtual class's own fields, as
-   lo.h explains). Every policy vtable (D_002CD570 for the base, InitCplcy) has seven slots after the type-info entry, declared
-   here in slot order; a signature is written only where a matched caller shows it (RevokeCmPolicy, UpdateCmLast,
-   bevy_camera_cm_14d650), the others are `void ()` placeholders.
+   func_00150728, func_001518C8, InitCplcy) and InitCm resets at the same offsets: each is one of cplcy.h's policy classes (CPLCY
+   and the classes derived from it).
 
    The field rule is lo.h's: a field is here when a method of the class reads it (the class is certain), with its readers.
    Names: `source:sly1` is TheOnlyZac/sly1's CM (CC0, THIRD_PARTY_NOTICES.md); the others are ours, from the readers. */
@@ -20,6 +16,8 @@
 #include "types.h"
 #include "sly2.h"
 #include "lo.h"
+#include "cplcy.h"
+#include "rgba.h" /* CM::rgbaFog: SetCmRgbaFog and InitCm read it as one unaligned word */
 
 struct SO;
 struct CMREGION; /* the object bevy_camera_cm_14e148 records: its body is local to its only reader's file (new_14d1d0_14d470.cpp) */
@@ -54,31 +52,27 @@ struct SMPA {
     /* 0xC */ f32 field_0xC;       /* InitCm: 10.0 */
 };
 
-/* A colour, four bytes; read as one unaligned word (SetCmRgbaFog, InitCm) */
-struct RGBA {
-    u8 r, g, b, a;
-};
-
-struct CPLCY {
-    /* 0x0 */ s32 active;              /* DeactivateCplcy clears it (ActivateCplcy stores its argument) */
-    /* 0x4 */ f32 savedRadFovTarget;   /* ActivateCplcy saves CM::radFovTarget, DeactivateCplcy puts it back; func_0014F5F8 sets it
-                                          on the current policy */
-    /* 0x8 */ f32 savedNearClip;       /* ActivateCplcy saves CM::sNearClip, DeactivateCplcy hands it to SetCmNearClip;
-                                          bevy_camera_cm_14f630 sets it on the current policy */
-    /* 0xC: the vtable pointer */
-    virtual void Destruct();                      /* 1: CPLCY_Destruct */
-    virtual void Activate(SO *pso, void *pv);     /* 2: ActivateCplcy; RevokeCmPolicy passes the new first record's object and data */
-    virtual void Deactivate(SO *pso, void *pv);   /* 3: DeactivateCplcy; RevokeCmPolicy passes the old first record's */
-    virtual void Set();                           /* 4: SetCplcy */
-    virtual void Revoke(void *pv);                /* 5: RevokeCplcy; RevokeCmPolicy passes each revoked record's data */
-    virtual void Update(CPDEFI *pcpdefi, void *pjoy); /* 6: UpdateCplcy; UpdateCmLast passes the focus's CPDEFI (or 0) and a pad:
-                                                     B_002DFC00 (a JOY) or B_002E0D00 */
-    virtual void Reset();                         /* 7: ResetCplcy; bevy_camera_cm_14d650 calls it on every record */
+/* A policy record's priority: SetCmPolicy and RevokeCmPolicy take one (3CPP in their mangled names), CPR keeps it. The values are
+   those the matched callers pass; the names marked source:sly1 are TheOnlyZac/sly1's CPP (CC0; Sly 1's values, a hypothesis
+   here), the others are ours from the callers. */
+enum CPP {
+    CPP_NONE = -1,           /* SetTnTns (TNS_OFF), Warp_Start: revoke whatever the record holds. source:sly1 CPP_Nil */
+    CPP_BASE = 0,            /* InitCm: the base policy, cpman. source:sly1 CPP_Base */
+    CPP_DEFAULT = 1,         /* OnPoActive: the tunnel policy for a PO without a tunnel. source:sly1 CPP_Default */
+    CPP_TUNNEL_PRI0 = 2,     /* SetTnTns passes CPP_TUNNEL_PRI0 + the tunnel's priority. source:sly1 CPP_Tunnel_Pri0 */
+    CPP_TUNNEL_PRI1 = 3,     /* source:sly1 CPP_Tunnel_Pri1 */
+    CPP_TUNNEL_PRI2 = 4,     /* source:sly1 CPP_Tunnel_Pri2 */
+    CPP_TUNNEL_PRI3 = 5,     /* source:sly1 CPP_Tunnel_Pri3 */
+    CPP_LOOK_AROUND = 6,     /* func_001CBF90: cplookat. source:sly1 CPP_LookAround */
+    CPP_ANIMATED = 7,        /* no matched Sly 2 caller. source:sly1 CPP_Animated */
+    CPP_MANUAL_OVERRIDE = 8, /* no matched Sly 2 caller. source:sly1 CPP_ManualOverride */
+    CPP_TANK = 9,            /* OnTankActive: cpattach (Sly 1's 9 is CPP_UserTestWalkthrough) */
+    CPP_CAMOBJ = 10          /* Camobj_PostLoLoad, Camobj_AddLoHierarchy: cplcyCamobj (Sly 1's CPP_Max) */
 };
 
 /* One policy record, 0x10 bytes: RevokeCmPolicy compares and copies them. source:sly1 CPR (psoFocus) */
 struct CPR {
-    /* 0x0 */ s32 cpp;             /* a CPP (enum CPP: tank.h and the sources that pass one) */
+    /* 0x0 */ CPP cpp;             /* RevokeCmPolicy, UpdateCmLast */
     /* 0x4 */ CPLCY *pcplcy;       /* RevokeCmPolicy, UpdateCmLast, bevy_camera_cm_14d650, func_0014F5F8, bevy_camera_cm_14f630 */
     /* 0x8 */ SO *psoFocus;        /* RevokeCmPolicy, UpdateCmLast */
     /* 0xC */ void *pv;            /* RevokeCmPolicy */
@@ -124,23 +118,16 @@ struct CM : BASIC {
     /* 0x390 */ f32 tActivateCplcy; /* RevokeCmPolicy: the clock's time when it activates the new first policy. source:sly1 */
     u8 unknown_0x394[0xC];
     /* 0x3A0 */ CPLCY cpman;       /* InitCpman; InitCm sets it as the base policy (SetCmPolicy, CPP 0). source:sly1 */
-    /* 0x3B0 */ CPLCY cptn;        /* the tunnel policy (cplcy.h's CPTN, 0xA0 bytes): InitCptn; SetTnTns sets it */
-    u8 unknown_0x3C0[0x90];
-    /* 0x450 */ CPLCY cplook;      /* the look policy (cplcy.h's CPLOOK, 0x58 bytes): InitCplook; Warp_Start revokes it;
-                                      CM_Destruct releases its words 0x34 and 0x38. source:sly1 */
-    u8 unknown_0x460[0x48];
-    /* 0x4A8 */ CPLCY cplcyCamobj; /* 0x18 bytes: InitCplcyCamobj */
-    u8 unknown_0x4B8[0x8];
-    /* 0x4C0 */ CPLCY cpclose;     /* cplcy.h's CPCLOSE, 0x40 bytes: func_00151208 (vtable D_002CD450, bevy_camera_looks_*) */
-    u8 unknown_0x4D0[0x30];
-    /* 0x500 */ CPLCY cppolicy;    /* cplcy.h's CPPOLICY, 0x20 bytes: func_00151610 (vtable D_002CD408, bevy_camera_policy_*) */
-    u8 unknown_0x510[0x10];
-    /* 0x520 */ CPLCY k30cam;      /* cplcy.h's K30CAM, 0xD0 bytes: func_00150728; Warp_Start revokes it; CM_Destruct releases its
-                                      words 0xC0 and 0xC4 */
-    u8 unknown_0x530[0xC0];
-    /* 0x5F0 */ CPLCY cpattach;    /* 0x10 bytes: func_001518C8 (vtable D_002CD3C0, ActivateCpattach); OnTankActive sets it */
-    /* 0x600 */ CPLCY cplookat;    /* 0x18 bytes: InitCplcy, then vtable D_002CD378 (ActivateCplookat); func_001CBF90 sets it */
-    u8 unknown_0x610[0x8];
+    /* 0x3B0 */ CPTN cptn;         /* the tunnel policy: InitCptn; SetTnTns, OnPoActive set it */
+    /* 0x450 */ CPLOOK cplook;     /* the look policy: InitCplook; Warp_Start revokes it; CM_Destruct releases its ambience and
+                                      field_0x38. source:sly1 */
+    /* 0x4A8 */ CPLCYCAMOBJ cplcyCamobj; /* InitCplcyCamobj; Camobj_PostLoLoad sets it (CPP_CAMOBJ) */
+    /* 0x4C0 */ CPCLOSE cpclose;   /* func_00151208 */
+    /* 0x500 */ CPPOLICY cppolicy; /* func_00151610 */
+    /* 0x520 */ K30CAM k30cam;     /* func_00150728; Warp_Start revokes it; CM_Destruct releases field_0xC0 and field_0xC4 */
+    /* 0x5F0 */ CPLCY cpattach;    /* no fields of its own, 0x10 bytes: func_001518C8 (vtable D_002CD3C0, ActivateCpattach);
+                                      OnTankActive sets it (CPP_TANK) */
+    /* 0x600 */ CPLOOKAT cplookat; /* CM_Construct; func_001CBF90 sets it (CPP_LOOK_AROUND) */
     /* 0x618 */ f32 tJolt;         /* JoltCm: the clock's time; InitCm: -10.0. source:sly1 */
     /* 0x61C */ s32 nJolt;         /* JoltCm; InitCm: -1 */
     /* 0x620 */ f32 sStereo;       /* UpdateCmLast smooths it to sStereoTarget; bevy_camera_cm_14d650 clears it */
@@ -151,15 +138,19 @@ extern "C" CM B_002DDF40; /* the camera manager */
 
 #if defined(__mips__)
 typedef char check_CPDEFI_size[(sizeof(CPDEFI) == 0x50) ? 1 : -1];
-typedef char check_CPLCY_size[(sizeof(CPLCY) == 0x10) ? 1 : -1];
 typedef char check_CPR_size[(sizeof(CPR) == 0x10) ? 1 : -1];
 typedef char check_CM_radFovTarget[((unsigned int)&((CM *)0)->radFovTarget == 0x24) ? 1 : -1];
 typedef char check_CM_cpdefi[((unsigned int)&((CM *)0)->cpdefi == 0x270) ? 1 : -1];
 typedef char check_CM_acpr[((unsigned int)&((CM *)0)->acpr == 0x310) ? 1 : -1];
 typedef char check_CM_cptn[((unsigned int)&((CM *)0)->cptn == 0x3B0) ? 1 : -1];
+typedef char check_CM_cplcyCamobj[((unsigned int)&((CM *)0)->cplcyCamobj == 0x4A8) ? 1 : -1];
+typedef char check_CM_cpclose[((unsigned int)&((CM *)0)->cpclose == 0x4C0) ? 1 : -1];
+typedef char check_CM_cppolicy[((unsigned int)&((CM *)0)->cppolicy == 0x500) ? 1 : -1];
+typedef char check_CM_cpattach[((unsigned int)&((CM *)0)->cpattach == 0x5F0) ? 1 : -1];
 typedef char check_CM_cplook[((unsigned int)&((CM *)0)->cplook == 0x450) ? 1 : -1];
 typedef char check_CM_k30cam[((unsigned int)&((CM *)0)->k30cam == 0x520) ? 1 : -1];
 typedef char check_CM_cplookat[((unsigned int)&((CM *)0)->cplookat == 0x600) ? 1 : -1];
+typedef char check_CM_tJolt[((unsigned int)&((CM *)0)->tJolt == 0x618) ? 1 : -1];
 typedef char check_CM_sStereoTarget[((unsigned int)&((CM *)0)->sStereoTarget == 0x624) ? 1 : -1];
 #endif
 #endif

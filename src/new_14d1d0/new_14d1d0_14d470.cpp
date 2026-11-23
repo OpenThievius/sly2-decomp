@@ -19,8 +19,6 @@ void func_0014D470(void) {
 
 struct JOY;
 
-struct VJOYCONFIG;
-
 /* An object of the class CploFindSwObjectsByClass finds for func_0014E078 (0x105), which ranks them (func_0014E000) and hands the
    first to bevy_camera_cm_14e148: read only in this file, so it stays local (cm.h forward-declares it for CM::pregion). */
 struct CMREGION {
@@ -34,11 +32,9 @@ struct CMREGION {
     u8 unknown_0x118[0x8];         /* 0x120 bytes: func_0014E000's last key is the pointers' difference, divided by 0x120 */
 };
 
-enum CPP { CPP_DEFAULT = 1 };
-
 extern "C" JOY B_002DFC00;
 
-extern "C" VJOYCONFIG B_002E0D00;
+extern "C" JOY B_002E0D00; /* the second controller: UpdateCmLast, UpdateVjoy, CGc_Update and InitHub pick it or B_002DFC00 by g_2dfbc0 */
 
 extern "C" char B_003DD490;
 
@@ -88,7 +84,7 @@ extern "C" void UpdateCmLast(CM *pcm)
                 pcpdefi = 0;
                 psoDone = 0;
             }
-            pcplcy->Update(pcpdefi, (g_2dfbc0 & 1) ? (void *)&B_002DFC00 : (void *)&B_002E0D00);
+            pcplcy->Update(pcpdefi, (g_2dfbc0 & 1) ? &B_002DFC00 : &B_002E0D00);
             pcplcyPrev = pcplcy;
         }
     }
@@ -183,7 +179,7 @@ extern "C" void InitCm(CM *pcm)
     CPLCY_Destruct(&pcm->cpattach);
     pcm->pregion = 0;
     pcm->field_0x14 = 0xFF;
-    SetCmPolicy(pcm, (CPP)0, pcpman, 0, 0);
+    SetCmPolicy(pcm, CPP_BASE, pcpman, 0, 0);
     pcm->nJolt = -1;
     pcm->tJolt = -10.0f;
 }

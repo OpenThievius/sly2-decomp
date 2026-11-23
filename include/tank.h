@@ -11,9 +11,6 @@
 struct ACT;
 struct LAUNCH;
 
-/* a camera policy priority, the type retail's mangled SetCmPolicy and RevokeCmPolicy take (enum CPP in the other sources) */
-enum CPP { CPP_NONE = -1, CPP_DEFAULT = 1, CPP_TANK = 9 };
-
 /* LM (a range; UpdateTankAim limits the pan and tilt with GLimitLm): clq.h */
 
 /* the controller words UpdateTankAim reads from PO::pjoy's block (JOY, include/joy.h, leaves them unknown): a local view,
