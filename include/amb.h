@@ -38,14 +38,14 @@ struct AMB : AMBBASE {
     /* 0x20 */ QW pos;                  /* UpdateAmbPositional converts it to world space; SetAmbPos */
     /* 0x30 */ f32 lmMin;               /* InitAmbBase sets 300.0; SetAmbRange; UpdateAmbPositional passes &lmMin to CalculateVolPan */
     /* 0x34 */ f32 lmMax;               /* InitAmbBase sets 3000.0; SetAmbRange */
-    u8 unknown_0x38[8];
+    /* 0x38 */ DLE dleSnd;             /* SNDSYSTEM::dl (ibDle 0x38) links the emitters through it; UpdateSnd steps it */
     /* 0x40 */ s32 voice;               /* OnAmbVoiceStarted sets it; ContinueAmbVoice, PauseAmbVoice, StopSound pass it to the sound driver */
     /* 0x44 */ f32 volAudible;          /* InitAmbBase sets 1.0; StartAmb (x 1024); UpdateAmbPositional */
     /* 0x48 */ f32 fadeSeconds;         /* StopSound: above 0 the stop fades out over it (x 240); StopAmb sets it */
     /* 0x4C */ u16 cRef;               /* AMB_AddRef (slot 1) increments it, AMB_Release (slot 2) decrements it and destroys the emitter at 0; StreamAmb_AddRef/StreamAmb_Release do the same on the stream class's slots */
     /* 0x4E */ s16 cPause;              /* PauseAmb */
     /* 0x50 */ u16 grf;                 /* SetAmbGrf; StartAmb, UpdateAmb */
-    /* 0x52 */ s16 fPending;            /* OnAmbVoiceStarted clears it; StartAmb sets it, UpdateAmb */
+    /* 0x52 */ u16 fPending;            /* OnAmbVoiceStarted clears it; StartAmb sets it, UpdateAmb (retail loads it with lhu: unsigned) */
     u8 unknown_0x54[0xC];
     /* 0x60 */ s32 sfxid;               /* InitAmb sets it; StartAmb */
     u8 unknown_0x64[4];

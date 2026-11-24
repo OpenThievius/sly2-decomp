@@ -65,7 +65,9 @@ struct STEPGUARDVIEW {
     /* 0x8D0 */ struct ANIMREF aarefA[26];
     /* 0xA70 */ struct ANIMREF aarefB[26];
     /* 0xC10 */ struct ANIMREF aarefC[26];
-    u8 unknown_0xDB0[0xF3C - 0xDB0];
+    u8 unknown_0xDB0[0xF04 - 0xDB0];
+    /* 0xF04 */ f32 tCooldown;
+    u8 unknown_0xF08[0xF3C - 0xF08];
     /* 0xF3C */ s32 fFlag;
     u8 unknown_0xF40[0xF64 - 0xF40];
     /* 0xF64 */ struct SENSOR *psensor;

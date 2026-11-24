@@ -1,21 +1,22 @@
 #include "types.h"
+#include "asega.h"
 
 extern "C" {
-void SetAsegaMasterSpeed(s8 *, f32);
+void SetAsegaMasterSpeed(ASEGA *, f32);
 
-void SetAsegsvtMaster(s8 *arg0, f32 fparg0) {
+void SetAsegsvtMaster(ASEG *aseg, f32 svtMaster) {
     /* stack area retail keeps at 0x0..0xF with no stores */
     s8 sp[0x10] __attribute__((aligned(16)));
-    s8 *var_s0;
+    ASEGA *asega;
 
-    var_s0 = *(s8 **)(arg0 + 0x50);
-    if (var_s0 != 0) {
+    asega = (ASEGA *)aseg->dlAsega.head;
+    if (asega != 0) {
         do {
-            SetAsegaMasterSpeed(var_s0, fparg0);
-            var_s0 = *(s8 **)(var_s0 + 0x2C);
-        } while (var_s0 != 0);
+            SetAsegaMasterSpeed(asega, svtMaster);
+            asega = asega->pasegaNext;
+        } while (asega != 0);
     }
-    *(f32 *)(arg0 + 0x78) = fparg0;
+    aseg->svtMaster = svtMaster;
 }
 
 }

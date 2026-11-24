@@ -1,22 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "joy.h"
 struct MATRIX3 { float mat[3][4]; } __attribute__((aligned(16)));
 
 struct TARGET {
     char field0[0x154];
     int field154;
-};
-
-struct VJOYCONFIG {
-    char field0[0x103C];
-    float field103C;
-    float field1040;
-    char field1044[0x1070 - 0x1044];
-    float field1070;
-    float field1074;
-    char field1078[0x10B4 - 0x1078];
-    int field10B4;
-    int field10B8;
-    int field10BC;
 };
 
 struct VJOY {
@@ -41,8 +29,8 @@ struct VJOY {
 
 extern "C" {
 extern int g_2dfbc0;
-extern VJOYCONFIG B_002DFC00;
-extern VJOYCONFIG B_002E0D00;
+extern JOY B_002DFC00;
+extern JOY B_002E0D00;
 extern MATRIX3 g_2ddfa0;
 void ResetVjoy(VJOY *pvjoy);
 MATRIX3 LoadRotateMatrixPanTilt(float pan, float tilt);
@@ -66,12 +54,12 @@ extern "C" void UpdateVjoy(VJOY *pvjoy)
         ResetVjoy(pvjoy);
         break;
     case 1: {
-        VJOYCONFIG *pconfig = (g_2dfbc0 & 2) ? &B_002DFC00 : &B_002E0D00;
-        pvjoy->field10 = pconfig->field103C;
-        pvjoy->field14 = pconfig->field1040;
-        pvjoy->field20 = pconfig->field1070;
-        pvjoy->field24 = pconfig->field1074;
-        pvjoy->field30 = (pconfig->field10B4 & ~pconfig->field10BC) | pvjoy->field7C->field154;
+        JOY *pconfig = (g_2dfbc0 & 2) ? &B_002DFC00 : &B_002E0D00;
+        pvjoy->field10 = pconfig->xStick;
+        pvjoy->field14 = pconfig->yStick;
+        pvjoy->field20 = pconfig->xStickRight;
+        pvjoy->field24 = pconfig->yStickRight;
+        pvjoy->field30 = (pconfig->grfbtnLatest & ~pconfig->grfbtnHeld) | pvjoy->field7C->field154;
         DecomposeRotateMatrixPanTilt__FP7MATRIX3PfT1(&g_2ddfa0, &pan, &tilt);
         break;
     }

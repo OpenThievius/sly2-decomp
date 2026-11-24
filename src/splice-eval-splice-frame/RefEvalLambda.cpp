@@ -1,7 +1,7 @@
 #include "sly2.h"
 struct Pair { int pad0; int pad4; int tagk; Pair *pv; Pair *next; };
-struct Proc { int cref; int pad4; int pad8; int crefReq; int fVarArg; Pair *formals; Pair *code; };
 struct Frame;
+struct Proc { int cref; int pad4; Frame *pframe; int crefReq; int fVarArg; Pair *formals; Pair *code; };
 struct Ref { int a; };
 extern "C" {
 Proc *PprocNew(void);
@@ -17,12 +17,12 @@ Ref *RefEvalLambda(Ref *ret, Pair *pair, Frame *frame)
     Pair *code = formals->next;
     Proc *h;
     func_00257038(&h, PprocNew());
-    CFramePtr_Assign((char *)h + 8, frame);
+    CFramePtr_Assign(&h->pframe, frame);
     if (formals->tagk == 0)
-        PairHandle_Assign((char *)h + 0x14, 0);
+        PairHandle_Assign(&h->formals, 0);
     else
-        PairHandle_Assign((char *)h + 0x14, formals->pv);
-    PairHandle_Assign((char *)h + 0x18, code);
+        PairHandle_Assign(&h->formals, formals->pv);
+    PairHandle_Assign(&h->code, code);
     int vararg = 0;
     int req = 0;
     Pair *p = h->formals;

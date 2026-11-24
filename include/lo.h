@@ -34,7 +34,7 @@ struct BASIC {
                                           (CFramePtr_Assign), Asega_Release clears it, PostLoLoad (LO slot 15) asks it for binding 1 */
     /* 0x4 */ struct CSidebag *psidebag; /* reader: RefGetOption (0x200BA0) calls its FFindBinding; RefSetOption, RefAddOption and
                                             RefEnsureOption (retail names P5BASIC) pass it to the CSidebag binding functions */
-    u8 unknown_0x8[0x4];
+    /* 0x8 */ struct SUBSCRIBER *psubFirst; /* the objects subscribed to this one, a list of SUBSCRIBER (defined where used): SubscribeLoObject, UnsubscribeLoObject, Basic_FreeSubscribers (three readers, one per function of OnLoAdd_file.cpp) */
     /* 0xC: the vtable pointer */
     virtual void OnAdd();               /*  1: OnLoAdd */
     virtual void Slot2();               /*  2: func_00132B08 */
@@ -137,6 +137,7 @@ SLY2_SIZE_CHECK(BASIC, 0x10);
 SLY2_SIZE_CHECK(LO, 0x50);
 SLY2_OFFSET_CHECK(BASIC, pframe, 0x0);
 SLY2_OFFSET_CHECK(BASIC, psidebag, 0x4);
+SLY2_OFFSET_CHECK(BASIC, psubFirst, 0x8);
 SLY2_OFFSET_CHECK(LO, psoParent, 0x10);
 SLY2_OFFSET_CHECK(LO, proot, 0x14);
 SLY2_OFFSET_CHECK(LO, pdcb, 0x34);

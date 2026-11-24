@@ -1,33 +1,37 @@
 #include "sly2.h"
-struct POINT { char pad[0x14]; int fBusy; float tReady; };
-struct VT { char pad[0x48]; short delta; short index; void (*fn)(void *); };
-struct ACTOR { char pad[0xC]; VT *vptr; };
-struct SLOT { ACTOR *pactor; char pad4[4]; float tFree; POINT *ppoint; int kind; char pad14[0xC]; QW posRelease; };
-struct SPAWNER { char pad[0x58]; int cSlot; };
-extern float g_2dded0;
+#include "lo.h"
+#include "clock.h"
+/* A spawn point of the guard spawner: whether a guard holds it and when it is free again. */
+struct SPAWNPOINT { u8 unknown_0x0[0x14]; s32 fBusy; f32 tReady; };
+struct SLOT { LO *pactor; u8 unknown_0x4[4]; f32 tFree; SPAWNPOINT *ppoint; s32 kind; u8 unknown_0x14[0xC]; QW posRelease; };
+/* The guard spawner (class not recovered): the slot count and the two delays func_00173928 adds to the clock. */
+struct GUARDSPAWNER {
+    u8 unknown_0x0[0x58];
+    /* 0x58 */ s32 cSlot;
+    u8 unknown_0x5C[0x44];
+    /* 0xA0 */ f32 dtFree;    /* func_00173928: how long a released slot waits (kind 1) */
+    /* 0xA4 */ f32 dtReady;   /* func_00173928: how long its spawn point waits (kind 1) */
+};
 extern "C" QW PosSpawnerFocus(void *);
-extern "C" void func_00173928(char *pspawner, SLOT *pslot, int kind, unsigned fKeepPoint)
+extern "C" void func_00173928(GUARDSPAWNER *pspawner, SLOT *pslot, int kind, unsigned fKeepPoint)
 {
     pslot->kind = kind;
     switch (kind) {
     case 0:
-        pslot->tFree = g_2dded0;
-        {
-            ACTOR *pactor = pslot->pactor;
-            pactor->vptr->fn((char *)pactor + pactor->vptr->delta);
-        }
+        pslot->tFree = g_2dded0.t;
+        pslot->pactor->Remove();
         if ((fKeepPoint ^ 1) & 1)
-            pslot->ppoint->tReady = g_2dded0;
+            pslot->ppoint->tReady = g_2dded0.t;
         break;
     case 1:
-        pslot->tFree = g_2dded0 + *(float *)(pspawner + 0xA0);
+        pslot->tFree = g_2dded0.t + pspawner->dtFree;
         pslot->posRelease = PosSpawnerFocus(pspawner);
         if ((fKeepPoint ^ 1) & 1)
-            pslot->ppoint->tReady = g_2dded0 + *(float *)(pspawner + 0xA4);
+            pslot->ppoint->tReady = g_2dded0.t + pspawner->dtReady;
         break;
     }
     pslot->pactor = 0;
     pslot->ppoint->fBusy = 0;
     pslot->ppoint = 0;
-    ((SPAWNER *)pspawner)->cSlot--;
+    pspawner->cSlot--;
 }

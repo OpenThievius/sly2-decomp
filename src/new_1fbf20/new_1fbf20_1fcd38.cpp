@@ -83,15 +83,15 @@ void InitSndSystem()
 }
 
 extern "C" void func_001FCF70(int arg0, long arg1) {
-    int *p = (int *)(int)arg1;
-    p[0x70 / 4] = arg0;
-    p[0x6C / 4] = 0;
+    SNDSYSTEM *psnd = (SNDSYSTEM *)(int)arg1;
+    *(int *)&psnd->progress = arg0;
+    psnd->started = 0;
 }
 
 extern "C" void func_001FCF88(int arg0, long arg1) {
-    char *target = (char *)(int)arg1;
-    *(int *)(target + 0xA4) = arg0;
-    *(int *)(target + 0xA0) = 0;
+    SNDSYSTEM *psnd = (SNDSYSTEM *)(int)arg1;
+    psnd->field_0xA4 = arg0;
+    psnd->field_0xA0 = 0;
 }
 
 extern "C" SNDENT *func_001FCFA0(SNDSYSTEM *psnd, int id)
@@ -143,24 +143,6 @@ extern "C" int func_001FD080(SNDSYSTEM *psnd, int target) {
     return ((sptr)psnd->amb ^ target) == 0 ? 0 : 2;
 }
 
-extern "C" {
-typedef struct SndManager {
-    char pad0[0x5C];
-    s32 counterA;
-    s32 counterB;
-    char pad64[4];
-    s32 field_0x68;
-    char pad6C[0x34];
-    s32 field_0xA0;
-    char padA4[0x58];
-    s32 field_0xFC;
-    char pad100[4];
-    s32 field_0x104;
-    char pad108[0x120];
-    s32 field_0x228;
-} SndManager;
-}
-
 extern "C" int D_002C3C40[];
 
 extern "C" int func_001FD0C0(void *pmgr, unsigned index)
@@ -169,7 +151,7 @@ extern "C" int func_001FD0C0(void *pmgr, unsigned index)
     return D_002C3C40[index];
 }
 
-struct OIDV { int pad0[2]; int w8; char pad[0x38 - 0xC]; int w38; int w3C; };
+struct OIDV { int unknown_0x0[2]; int w8; u8 unknown_0xC[0x38 - 0xC]; int w38; int w3C; };
 
 extern "C" void CBinaryInputStream_Read_thunk(CBinaryInputStream *, int, void *);
 
@@ -291,19 +273,9 @@ extern "C" void LoadSndFromBrx(SNDSYSTEM *snd, CBinaryInputStream *stream)
     }
 }
 
-struct CFileLocation { unsigned a; unsigned b; int mode; char pad[0x104]; void Clear(); };
+struct CFileLocation { unsigned a; unsigned b; int mode; u8 unknown_0xC[0x104]; void Clear(); };
 
-struct SndRec { unsigned w0; unsigned w1; char pad[0x2C]; unsigned w34; unsigned w38; unsigned w3c; };
-
-struct Snd {
-    char pad0[0xA8];
-    SndRec rec;
-    char pad1[0xE8 - 0xA8 - sizeof(SndRec)];
-    int bank;
-    char pad2[0xC];
-    int count;
-    int *states;
-};
+struct SndRec { unsigned w0; unsigned w1; u8 unknown_0x8[0x2C]; unsigned w34; unsigned w38; unsigned w3c; };
 
 extern "C" int snd_BankLoadByLoc(unsigned, int);
 
@@ -311,39 +283,31 @@ extern "C" void snd_ResolveBankXREFS();
 
 extern "C" int func_002322A0(int, int);
 
-void LoadSndBank(Snd *snd)
+void LoadSndBank(SNDSYSTEM *snd)
 {
     if (snd->bank == 0) {
         CFileLocation loc;
         loc.mode = 2;
         loc.Clear();
-        SndRec *rec = &snd->rec;
+        SndRec *rec = (SndRec *)&snd->oid;
         int valid;
         if (!rec) valid = 0; else {
             unsigned x = rec->w1;
             unsigned y = rec->w3c;
             loc.mode = 2;
             loc.b = x ^ y;
-            loc.a = (snd->rec.w0 ^ rec->w34) + 0xCA0;
+            loc.a = (rec->w0 ^ rec->w34) + 0xCA0;
             valid = x != y;
         }
         if (valid && loc.mode == 2)
             snd->bank = snd_BankLoadByLoc(loc.a, 0);
         snd_ResolveBankXREFS();
     }
-    for (int i = 0; i < snd->count; i++) {
-        if (snd->states[i] != 2 && func_002322A0(snd->bank, i) != 0)
-            snd->states[i] = 2;
+    for (int i = 0; i < snd->nbank; i++) {
+        if (snd->banks[i] != 2 && func_002322A0(snd->bank, i) != 0)
+            snd->banks[i] = 2;
     }
 }
-
-struct Snd_1FD700 {
-    char pad0[0x14];
-    int f14;
-    int f18;
-    char pad1[0x68 - 0x1C];
-    int f68;
-};
 
 extern "C" void snd_StopAllStreams();
 
@@ -384,13 +348,13 @@ extern "C" void ResetSnd(SNDSYSTEM *psnd)
     psnd->banks = 0;
     psnd->map = 0;
     ReplaceHitFx(0, g_2a2dd0, 0, &psnd->field_0x74);
-    memset(psnd->unknown_0x108, 0, 0xC);
+    memset(psnd->aw, 0, 0xC);
     func_00227788(&B_004435F0);
     func_00259B48(&psnd->field_0x200, 0);
     psnd->field_0x204 = 0;
     memset(psnd->words, 0, 0x20);
     func_00259B48(&psnd->field_0x228, 0);
-    memset(psnd->unknown_0x22C, 0, 0x18);
+    memset(psnd->aplo, 0, 0x18);
     psnd->field_0x68 = 3;
     ResetSlotheap(&psnd->heapAmb);
     ResetSlotheap(&psnd->heapStreamAmb);
@@ -398,95 +362,84 @@ extern "C" void ResetSnd(SNDSYSTEM *psnd)
     ResetSndbankVolumeFactors_1FD700(psnd);
 }
 
-struct SMP { float a; float b; float c; };
-
-struct AMB { char pad[0x38]; AMB *pambNext; };
-
-struct SND_1FD830 {
-    char pad0[0x4C]; AMB *pambFirst; char pad1[0x58 - 0x50]; int fPaused;
-    char pad2[0x15C - 0x5C]; float gTarget;
-    char pad3[0x1F0 - 0x160]; long tickCur; long tickPrev;
-    AMB *pambA; int cStack; AMB *apambStack[8]; AMB *pambC;
-};
-
-struct CLOCK { char pad[4]; float dt; char pad1[0x40 - 8]; float gScale; };
+struct CLOCK { u8 unknown_0x0[4]; float dt; u8 unknown_0x8[0x38]; float gScale; };
 
 extern "C" CLOCK g_2dded0_1FD830;
 
 extern "C" int g_2bd4c0;
 
-extern "C" SMP RO_002A8288;
+extern "C" CLQ RO_002A8288;
 
 extern "C" long TickReadCount_1FD830(CLOCK *);
 
-extern "C" void func_001FDA48_1FD830(SND_1FD830 *);
+extern "C" void func_001FDA48_1FD830(SNDSYSTEM *);
 
-extern "C" void func_001FDBA8_1FD830(SND_1FD830 *);
+extern "C" void func_001FDBA8_1FD830(SNDSYSTEM *);
 
-extern "C" void func_001FDEC0_1FD830(SND_1FD830 *);
+extern "C" void func_001FDEC0_1FD830(SNDSYSTEM *);
 
-extern "C" int func_001FE5E0_1FD830(SND_1FD830 *);
+extern "C" int func_001FE5E0_1FD830(SNDSYSTEM *);
 
 extern "C" void ContinueAmb(AMB *);
 
 extern "C" void PauseAmb(AMB *);
 
-extern "C" void UpdateSndMix_1FD830(SND_1FD830 *);
+extern "C" void UpdateSndMix_1FD830(SNDSYSTEM *);
 
-extern "C" void UpdateStreamCues_1FD830(SND_1FD830 *);
+extern "C" void UpdateStreamCues_1FD830(SNDSYSTEM *);
 
 extern "C" void UpdateAmb(AMB *);
 
-extern "C" float GSmooth__FfffP3SMPPf(float, float, float, SMP *, float *);
+extern "C" float GSmooth__FfffP3SMPPf(float, float, float, CLQ *, float *);
 
-extern "C" void SetSndbankVolumeFactor(SND_1FD830 *, int, float, int);
+extern "C" void SetSndbankVolumeFactor(SNDSYSTEM *, int, float, int);
 
 extern "C" void snd_FlushSoundCommands_1FD830(void);
 
-extern "C" void UpdateSnd(SND_1FD830 *self)
+extern "C" void UpdateSnd(SNDSYSTEM *self)
 {
-    self->tickPrev = self->tickCur;
-    self->tickCur = TickReadCount_1FD830(&g_2dded0_1FD830);
+    self->prev = self->now;
+    self->now = TickReadCount_1FD830(&g_2dded0_1FD830);
     func_001FDA48_1FD830(self);
     func_001FDBA8_1FD830(self);
-    AMB *pambTop = self->cStack > 0 ? ((AMB **)&self->cStack)[self->cStack] : 0;
+    AMB *pambTop = self->field_0x204 > 0 ? *(self->apamb + self->field_0x204) : 0;
     if (g_2bd4c0 == 3) {
-        if (self->fPaused) {
+        if (self->field_0x58) {
             if (pambTop)
                 ContinueAmb(pambTop);
             if (self->pambC)
                 ContinueAmb(self->pambC);
-            if (self->pambA)
-                ContinueAmb(self->pambA);
-            self->fPaused = 0;
+            if (self->pambStream)
+                ContinueAmb(self->pambStream);
+            self->field_0x58 = 0;
         }
-    } else if (!self->fPaused) {
+    } else if (!self->field_0x58) {
         if (pambTop)
             PauseAmb(pambTop);
         if (self->pambC)
             PauseAmb(self->pambC);
-        if (self->pambA)
-            PauseAmb(self->pambA);
-        self->fPaused = 1;
+        if (self->pambStream)
+            PauseAmb(self->pambStream);
+        self->field_0x58 = 1;
     }
     float gMute = 1.0f;
     UpdateSndMix_1FD830(self);
     func_001FDEC0_1FD830(self);
     UpdateStreamCues_1FD830(self);
-    SMP smp = RO_002A8288;
+    CLQ smp = RO_002A8288;
     if (func_001FE5E0_1FD830(self)) {
         if (g_2dded0_1FD830.dt == 0.0f)
             gMute = 0.0f;
     }
-    float gVolume = GSmooth__FfffP3SMPPf(self->gTarget, gMute, g_2dded0_1FD830.gScale, &smp, 0);
+    float gVolume = GSmooth__FfffP3SMPPf(self->grid[2][0], gMute, g_2dded0_1FD830.gScale, &smp, 0);
     SetSndbankVolumeFactor(self, 0, gVolume, 2);
     SetSndbankVolumeFactor(self, 1, gVolume, 2);
     SetSndbankVolumeFactor(self, 2, gMute, 2);
-    AMB *pamb = self->pambFirst;
+    AMB *pamb = (AMB *)self->dl.head;
     AMB *pambCur = pamb;
     if (pamb) {
         do {
-            pamb = pamb->pambNext;
+            pamb = (AMB *)pamb->dleSnd.next;
             UpdateAmb(pambCur);
             pambCur = pamb;
         } while (pamb);
@@ -495,28 +448,17 @@ extern "C" void UpdateSnd(SND_1FD830 *self)
 }
 
 struct HitFxTarget {
-    char pad0[0x54];
+    u8 unknown_0x0[0x54];
     f32 x;
     f32 negZ;
     f32 z;
 };
 
 struct FocusBlock {
-    char pad0[0x4034];
+    u8 unknown_0x0[0x4034];
     HitFxTarget *target;
 };
 
-struct HitFxEvent {
-    char pad0[0x10];
-    s32 active;
-    char pad1[0x6C - 0x14];
-    s32 started;
-    f32 progress;
-    char hitFxArgument[0xC];
-    f32 curveX[3];
-    char pad3[4];
-    f32 curveZ[3];
-};
 
 extern "C" FocusBlock B_003DD490;
 
@@ -532,62 +474,43 @@ extern "C" int ReplaceHitFx_1FDA48(void *, QW, void *, void *);
 
 extern "C" void func_002330D0(s32, s32, s32, s32, s32, s32, s32, void *, s64);
 
-extern "C" void func_001FDA48(HitFxEvent *event)
+extern "C" void func_001FDA48(SNDSYSTEM *psnd)
 {
-    if (event->active == 0) {
-        *(s32 *)&event->progress = 0;
-    } else if (event->started == 0) {
-        event->started = 1;
-        func_002330D0(0x524B5553, 0xB, 0, 0, 0, 0, 0, &func_001FCF70_1FDA48, (s64)event);
+    if (psnd->field_0x10 == 0) {
+        *(s32 *)&psnd->progress = 0;
+    } else if (psnd->started == 0) {
+        psnd->started = 1;
+        func_002330D0(0x524B5553, 0xB, 0, 0, 0, 0, 0, &func_001FCF70_1FDA48, (s64)psnd);
     }
     HitFxTarget *target = 0;
     QW position;
     void *focus = PpoSwFocusBase(&B_003DD490);
     if (focus != 0) {
         if (FIsBasicDerivedFrom(focus, 0x34) != 0) {
-            if (0.5f < event->progress) {
+            if (0.5f < psnd->progress) {
                 target = B_003DD490.target;
                 position = PosLoWorld(focus);
-                f32 progress = event->progress;
-                f32 *curveX = event->curveX;
-                f32 *curveZ = event->curveZ;
-                target->x = curveX[0] + progress * (curveX[1] + progress * curveX[2]);
-                f32 depth = curveZ[0] + event->progress * (curveZ[1] + event->progress * curveZ[2]);
+                f32 progress = psnd->progress;
+                CLQ *curveX = &psnd->fitA;
+                CLQ *curveZ = &psnd->fitB;
+                target->x = curveX->g0 + progress * (curveX->g1 + progress * curveX->g2);
+                f32 depth = curveZ->g0 + psnd->progress * (curveZ->g1 + psnd->progress * curveZ->g2);
                 target->z = depth;
                 target->negZ = -depth;
             }
         }
     }
-    ReplaceHitFx_1FDA48(target, position, focus, event->hitFxArgument);
+    ReplaceHitFx_1FDA48(target, position, focus, &psnd->field_0x74);
 }
 
 extern "C" s32 func_001FCF88_1FDBA8;
 
-extern "C" void func_001FDBA8(SndManager *self) {
+extern "C" void func_001FDBA8(SNDSYSTEM *self) {
     if (self->field_0xA0 == 0) {
         self->field_0xA0 = 1;
         func_002330D0(0x524B5553, 0xC, 0, 0, 0, 0, 0, &func_001FCF88_1FDBA8, (s64)self);
     }
 }
-
-struct AMB_1FDC08 { char pad0[0x50]; unsigned short grf; unsigned short cplay; };
-
-struct SMP_1FDC08 { float a, b, c; };
-
-struct SNDMIX {
-    char pad0[0x5C];
-    int fForce;
-    int fOff;
-    int imix;
-    char pad68[0x108 - 0x68];
-    float aw[3];
-    SMP_1FDC08 asmp[3];
-    char pad138[0x204 - 0x138];
-    union {
-        int camb;
-        AMB_1FDC08 *apamb[8];
-    };
-};
 
 extern char B_003DD490_1FDC08[];
 
@@ -595,13 +518,13 @@ extern float g_2ddf10;
 
 extern "C" JT *PpoSwFocus(char *);
 
-float GSmooth(float, float, float, SMP_1FDC08 *, float *);
+extern "C" float GSmooth__FfffP3SMPPf(float, float, float, CLQ *, float *);
 
-void SetAmbSlotVolume(AMB_1FDC08 *, int, float);
+void SetAmbSlotVolume(AMB *, int, float);
 
-static inline int FAmbActive(AMB_1FDC08 *pamb)
+static inline int FAmbActive(AMB *pamb)
 {
-    return pamb->cplay != 0 || (pamb->grf & 1) != 0;
+    return pamb->fPending != 0 || (pamb->grf & 1) != 0;
 }
 
 // Sqrt: sqrt.s with an early-clobber output (=&f). Measured on every sqrt.s user (16 sources): none gets worse, six get closer, two reach 0 (a third holds VU0 asm and stays out);
@@ -613,12 +536,12 @@ static inline float SqrtF(float value)
     return result;
 }
 
-void UpdateSndMix(SNDMIX *psm)
+void UpdateSndMix(SNDSYSTEM *psm)
 {
     psm->imix = 1;
-    if (psm->fForce != 0) {
+    if (psm->field_0x5C != 0) {
         psm->imix = 2;
-    } else if (psm->fOff != 0) {
+    } else if (psm->field_0x60 != 0) {
         psm->imix = 0;
     } else if (PpoSwFocus(B_003DD490_1FDC08) != 0 && FIsBasicDerivedFrom(PpoSwFocus(B_003DD490_1FDC08), 0x34) != 0) {
         JT *pjt = PpoSwFocus(B_003DD490_1FDC08);
@@ -635,11 +558,11 @@ void UpdateSndMix(SNDMIX *psm)
                 psm->imix = 0;
         }
     }
-    AMB_1FDC08 *pamb = psm->camb > 0 ? *(AMB_1FDC08 **)((char *)psm + psm->camb * 4 + 0x204) : 0;
+    AMB *pamb = psm->field_0x204 > 0 ? *(psm->apamb + psm->field_0x204) : 0;
     if (pamb == 0 || FAmbActive(pamb)) {
         psm->aw[psm->imix] = 1.0f;
     } else {
-        psm->aw[psm->imix] = GSmooth(psm->aw[psm->imix], 1.0f, g_2ddf10, &psm->asmp[psm->imix], 0);
+        psm->aw[psm->imix] = GSmooth__FfffP3SMPPf(psm->aw[psm->imix], 1.0f, g_2ddf10, &psm->clqA + psm->imix, 0);
     }
     float w2 = psm->aw[psm->imix] * psm->aw[psm->imix];
     float sum = 0.0f;
@@ -670,47 +593,39 @@ void func_001FDEC0(void) {
 }
 }
 
-struct Entry { s16 delay; char pad[6]; };
+struct Entry { s16 delay; u8 unknown_0x2[6]; };
 
-struct Sub { char pad0[0x50]; f32 limit; s32 count; Entry *entries; };
+extern "C" void RunStreamCue_1FDEC8(SNDSYSTEM *, Entry *);
 
-struct Cue {
-    char pad0[0x40]; s32 x40; char pad44[0xA]; s16 x4E; u16 x50; u16 x52; char pad54[0xC]; Sub *sub; s64 ticks;
-};
-
-struct Obj { char pad0[0x200]; Cue *cue; char pad204[0x40]; s32 index; f32 elapsed; f32 total; };
-
-extern "C" void RunStreamCue_1FDEC8(Obj *, Entry *);
-
-extern "C" void StopStream_1FDEC8(Obj *);
+extern "C" void StopStream_1FDEC8(SNDSYSTEM *);
 
 extern "C" f32 __floatdisf(s64);
 
 extern "C" f32 g_2ddf10_1FDEC8;
 
-static inline int Busy(Cue *cue) { return cue->x52 != 0 || (cue->x50 & 1); }
+static inline int Busy(AMB *cue) { return cue->fPending != 0 || (cue->grf & 1); }
 
 static inline f32 Ticks(s64 ticks) {
     if (ticks >= 0) return __floatdisf(ticks);
     return 2.0f * __floatdisf((ticks & 1) | ((u64)ticks >> 1));
 }
 
-extern "C" void UpdateStreamCues(Obj *self) {
-    if (self->cue != 0) {
-        if (!Busy(self->cue) && self->cue->x4E <= 0) {
-            Cue *cue = self->cue;
-            Sub *sub = cue->sub;
+extern "C" void UpdateStreamCues(SNDSYSTEM *self) {
+    if (self->pambStream != 0) {
+        if (!Busy(self->pambStream) && self->pambStream->cPause <= 0) {
+            STREAMAMB *cue = self->pambStream;
+            SNDENT *sub = (SNDENT *)cue->sfxid;
             self->total = self->total + g_2ddf10_1FDEC8;
-            int idle = cue->x40 == 0 && !Busy(cue);
+            int idle = cue->voice == 0 && !Busy(cue);
             if (idle != 0) {
-                if (Ticks(self->cue->ticks) * 3.390842e-9f > 0.0f || sub->limit <= self->total) StopStream_1FDEC8(self);
+                if (Ticks(self->pambStream->played) * 3.390842e-9f > 0.0f || sub->level <= self->total) StopStream_1FDEC8(self);
             } else {
-                while (self->index < sub->count) {
-                    Entry *entry = &sub->entries[self->index];
+                while (self->icue < sub->count) {
+                    Entry *entry = &((Entry *)sub->data)[self->icue];
                     f32 delay = (f32)entry->delay * 0.016666668f;
-                    if (!(Ticks(self->cue->ticks) * 3.390842e-9f >= self->elapsed + delay)) break;
+                    if (!(Ticks(self->pambStream->played) * 3.390842e-9f >= self->elapsed + delay)) break;
                     RunStreamCue_1FDEC8(self, entry);
-                    self->index = self->index + 1;
+                    self->icue = self->icue + 1;
                     self->elapsed = self->elapsed + delay;
                 }
             }
@@ -722,32 +637,26 @@ struct SMA;
 
 struct ALO;
 
-struct Cue_1FE0E8 { short pad0; short kind; union { int oid; float closed; }; };
-
-struct Stream_1FE0E8 { char pad[0x22C]; SMA *asma[4]; };
+struct Cue_1FE0E8 { short unknown_0x0; short kind; union { int oid; float closed; }; };
 
 extern "C" void SetAloEyesClosed(ALO *, float);
 
 void SetSmaGoal__FP3SMA3OID(SMA *, int);
 
-extern "C" void RunStreamCue(Stream_1FE0E8 *stream, Cue_1FE0E8 *cue)
+extern "C" void RunStreamCue(SNDSYSTEM *stream, Cue_1FE0E8 *cue)
 {
     int kind = cue->kind;
     if (kind != -1) {
-        SMA *sma = stream->asma[kind];
+        SMA *sma = (SMA *)stream->aplo[kind];
         if (sma != 0) {
             if (kind == 3) {
-                SetAloEyesClosed((ALO *)stream->asma[3], cue->closed);
+                SetAloEyesClosed((ALO *)stream->aplo[3], cue->closed);
             } else if (cue->oid != -1) {
                 SetSmaGoal__FP3SMA3OID(sma, cue->oid);
             }
         }
     }
 }
-
-struct VT { char pad0[0x10]; short delta; short index; void (*release)(void *); char pad1[0x38 - 0x18]; short delta38; short index38; void (*wake)(void *); };
-
-struct AMB_1FE150 { char pad[0xC]; VT *vt; };
 
 struct RANGE {
     float minimum;
@@ -757,21 +666,19 @@ struct RANGE {
 
 struct AMBREF;
 
-extern "C" void func_00259B48_1FE150(AMBREF *, AMB_1FE150 *);
+extern "C" void func_00259B48_1FE150(AMBREF *, STREAMAMB *);
 
-extern "C" void func_00259BB0(AMBREF *, AMB_1FE150 *);
+extern "C" void func_00259BB0(AMBREF *, STREAMAMB *);
 
 struct AMBREF {
-    AMB_1FE150 *amb;
+    STREAMAMB *amb;
     ~AMBREF()
     {
-        if (amb != 0) {
-            VT *vt = amb->vt;
-            vt->release((char *)amb + vt->delta);
-        }
+        if (amb != 0)
+            amb->Release();
     }
     AMBREF(const AMBREF &other) { func_00259BB0(this, other.amb); }
-    AMBREF &operator=(AMB_1FE150 *other)
+    AMBREF &operator=(STREAMAMB *other)
     {
         func_00259B48_1FE150(this, other);
         return *this;
@@ -783,117 +690,89 @@ struct AMBREF {
     }
 };
 
-struct SND_1FE150 { char pad[0x204]; int count; AMBREF q[8]; };
-
 extern "C" int g_2dd5bc;
 
 extern "C" int g_2f7900;
 
 extern "C" int g_2e1e40;
 
-extern "C" AMBREF func_001FE478_1FE150(SND_1FE150 *, int);
+extern "C" AMBREF func_001FE478_1FE150(SNDSYSTEM *, int);
 
-extern "C" void StopAmb(AMB_1FE150 *, float);
+extern "C" void StopAmb(STREAMAMB *, float);
 
-extern "C" void *func_001FCFF8_1FE150(SND_1FE150 *, int);
+extern "C" void *func_001FCFF8_1FE150(SNDSYSTEM *, int);
 
 extern "C" void *NewStreamAmb(void *, int);
 
-extern "C" void AddAmbSlotSource(AMB_1FE150 *, unsigned, int, float, const RANGE *);
+extern "C" void AddAmbSlotSource(STREAMAMB *, unsigned, int, float, const RANGE *);
 
 // `taken` is an AMBREF, a reference-holding smart pointer: its copy constructor and assignment call the real functions func_00259BB0 and
 // func_00259B48 and its inline destructor releases through the vtable. That makes func_001FE478 return it through a hidden pointer (taken
 // at sp+0, range at sp+0x10) and gives both release paths. It replaces the padding local the score-4 draft needed. AddAmbSlotSource is
 // declared volume before range, as in CloneProxy (same registers either way; only this order reproduces retail's call-site scheduling).
-extern "C" AMB_1FE150 *QueueStream(SND_1FE150 *snd, int id)
+extern "C" STREAMAMB *QueueStream(SNDSYSTEM *snd, int id)
 {
     AMBREF taken = func_001FE478_1FE150(snd, id);
-    int count = snd->count;
-    AMB_1FE150 *top = count > 0 ? *(AMB_1FE150 **)((char *)snd + count * 4 + 0x204) : 0;
+    int count = snd->field_0x204;
+    STREAMAMB *top = count > 0 ? *(snd->apamb + count) : 0;
     if (top != 0)
         StopAmb(top, 0.0f);
     if (taken.amb != 0) {
-        VT *vt = taken.amb->vt;
-        vt->wake((char *)taken.amb + vt->delta38);
+        taken.amb->Slot7();
     } else {
         void *rec = func_001FCFF8_1FE150(snd, id);
-        if (rec == 0 || snd->count == 8)
+        if (rec == 0 || snd->field_0x204 == 8)
             return 0;
-        taken = (AMB_1FE150 *)NewStreamAmb(rec, 4);
+        taken = (STREAMAMB *)NewStreamAmb(rec, 4);
         RANGE range(2000.0f, 5000.0f);
         AddAmbSlotSource(taken.amb, 3, g_2dd5bc, 1.0f, &range);
         AddAmbSlotSource(taken.amb, 3, g_2f7900, 1.0f, &range);
         AddAmbSlotSource(taken.amb, 4, g_2e1e40, 1.0f, &range);
     }
-    return (snd->q[snd->count++] = taken).amb;
+    return (((AMBREF *)snd->queue)[snd->field_0x204++] = taken).amb;
 }
 
-struct AMB_1FE310 { char pad[0x40]; int f40; char pad2[0x0C]; unsigned short f50; unsigned short f52; char pad3[0x0C]; };
+extern "C" void func_001FE478_1FE310(STREAMAMB **, SNDSYSTEM *, int);
 
-struct SND_1FE310 { char pad[0x204]; AMB_1FE310 *q[1]; };
+extern "C" void StopAmb_1FE310(STREAMAMB *, float);
 
-struct OBJ { char pad[0xC]; VT *vt; };
+extern "C" void func_00259B48_1FE310(STREAMAMB **, STREAMAMB *);
 
-extern "C" void func_001FE478_1FE310(AMB_1FE310 **, SND_1FE310 *, int);
+static inline int FAmbIdle(AMB *amb) { return amb->voice == 0 && !FAmbActive(amb); }
 
-extern "C" void StopAmb_1FE310(AMB_1FE310 *, float);
-
-extern "C" void func_00259B48_1FE310(AMB_1FE310 **, AMB_1FE310 *);
-
-static inline int FAmbRequested(AMB_1FE310 *amb) { return amb->f52 != 0 || (amb->f50 & 1) != 0; }
-
-static inline int FAmbIdle(AMB_1FE310 *amb) { return amb->f40 == 0 && !FAmbRequested(amb); }
-
-static inline void ReleaseRef(AMB_1FE310 **ref) {
-    if (*ref != 0) {
-        VT *vt = ((OBJ *)*ref)->vt;
-        vt->release((char *)*ref + vt->delta);
-    }
+static inline void ReleaseRef(STREAMAMB **ref) {
+    if (*ref != 0)
+        (*ref)->Release();
 }
 
-void DequeueStream(SND_1FE310 *snd, int id)
+void DequeueStream(SNDSYSTEM *snd, int id)
 {
-    AMB_1FE310 *taken;
+    STREAMAMB *taken;
     func_001FE478_1FE310(&taken, snd, id);
     if (taken != 0 && !FAmbIdle(taken)) {
         StopAmb_1FE310(taken, 0.0f);
-        int count = *(int *)&snd->q[0];
-        AMB_1FE310 *top = count > 0 ? *(AMB_1FE310 **)(count * 4 + (char *)snd + 0x204) : 0;
+        int count = snd->field_0x204;
+        STREAMAMB *top = count > 0 ? *(snd->apamb + count) : 0;
         func_00259B48_1FE310(&taken, top);
-        if (taken != 0) {
-            VT *vt = ((OBJ *)taken)->vt;
-            vt->wake((char *)taken + vt->delta38);
-        }
+        if (taken != 0)
+            taken->Slot7();
     }
     ReleaseRef(&taken);
 }
 
-struct Timer {
-    char pad0[0x68];
-    s64 ticks;
-};
-
-struct CLOCK_1FE3F8 {
-    char pad0[0x204];
-    union Slot {
-        int count;
-        Timer *timer;
-    } slots[1];
-};
-
-extern "C" f32 MarkClockTickRealOnly__FP5CLOCK(CLOCK_1FE3F8 *clock)
+extern "C" f32 MarkClockTickRealOnly__FP5CLOCK(SNDSYSTEM *clock)
 {
-    int count = clock->slots[0].count;
-    Timer *timer;
+    int count = clock->field_0x204;
+    STREAMAMB *timer;
     if (count > 0) {
-        timer = (*(CLOCK_1FE3F8 *)((char *)clock + count * 4)).slots[0].timer;
+        timer = *(clock->apamb + count);
     } else {
         timer = 0;
     }
     if (timer == 0) {
         return 0.0f;
     }
-    s64 ticks = timer->ticks;
+    s64 ticks = timer->played;
     f32 value;
     if (ticks >= 0) {
         value = __floatdisf(ticks);
@@ -903,21 +782,21 @@ extern "C" f32 MarkClockTickRealOnly__FP5CLOCK(CLOCK_1FE3F8 *clock)
     return value * 3.390842e-9f;
 }
 
-struct VT_1FE478 { char pad[0x10]; short delta; short index; void (*fn)(void *); };
+struct VT_1FE478 { u8 unknown_0x0[0x10]; short delta; short index; void (*fn)(void *); };
 
 struct Amb {
-    char pad0[0xC];
+    u8 unknown_0x0[0xC];
     VT_1FE478 *vt;
-    char pad1[0x60 - 0x10];
+    u8 unknown_0x10[0x60 - 0x10];
     int rec;
 };
 
 struct Stream {
-    char pad[0x204];
+    u8 unknown_0x0[0x204];
     int count;
 };
 
-#define AMB(st, i) (*(Amb **)((char *)(st) + 0x208 + (i) * 4))
+#define AMB_1FE478(st, i) (*(Amb **)((char *)(st) + 0x208 + (i) * 4))
 
 extern "C" int func_001FCFF8_1FE478(Stream *, int);
 
@@ -929,17 +808,17 @@ void **func_001FE478(void **out, Stream *stream, int id)
 {
     int rec = func_001FCFF8_1FE478(stream, id);
     int index = 0;
-    while (index < stream->count && AMB(stream, index)->rec != rec)
+    while (index < stream->count && AMB_1FE478(stream, index)->rec != rec)
         index++;
     if (index == stream->count) {
         func_00259BB0_1FE478(out, 0);
         return out;
     }
     Amb *taken;
-    func_00259BB0_1FE478(&taken, AMB(stream, index));
+    func_00259BB0_1FE478(&taken, AMB_1FE478(stream, index));
     stream->count = stream->count - 1;
     for (; index < stream->count; index++)
-        func_00259B48_1FE478(&AMB(stream, index), AMB(stream, index + 1));
+        func_00259B48_1FE478(&AMB_1FE478(stream, index), AMB_1FE478(stream, index + 1));
     func_00259BB0_1FE478(out, taken);
     if (taken) {
         VT_1FE478 *vt = taken->vt;
@@ -948,81 +827,65 @@ void **func_001FE478(void **out, Stream *stream, int id)
     return out;
 }
 
-struct A { char pad[0x68]; unsigned flags; };
-
-void func_001FE5B8(A* a, unsigned mask, int on)
+void func_001FE5B8(SNDSYSTEM *psnd, unsigned mask, int on)
 {
-    if (on) a->flags |= mask;
-    else a->flags &= ~mask;
+    if (on) psnd->field_0x68 |= mask;
+    else psnd->field_0x68 &= ~mask;
 }
 
 extern "C" {
-s32 func_001FE5E0(SndManager *self) {
+s32 func_001FE5E0(SNDSYSTEM *self) {
     return self->field_0x68 == 3;
 }
 }
 
-struct VT_1FE5F0 { char pad[8]; short delta; short index; void (*fn)(void *); };
+extern "C" void StopStream_1FE5F0(SNDSYSTEM *);
 
-struct Obj_1FE5F0 { char pad[0xC]; VT_1FE5F0 *vt; };
+extern "C" SNDENT *func_001FCFA0_1FE5F0(SNDSYSTEM *, int);
 
-struct Rec_1FE5F0 { char pad[0x48]; int oid; char pad4c[0x54 - 0x4C]; int f54; };
-
-struct Stream_1FE5F0 { char pad[0x200]; void *amb; char pad204[0x22C - 0x204]; Obj_1FE5F0 *aplo[6]; int f244; int f248; int f24C; };
-
-extern "C" void StopStream_1FE5F0(Stream_1FE5F0 *);
-
-extern "C" Rec_1FE5F0 *func_001FCFA0_1FE5F0(Stream_1FE5F0 *, int);
-
-extern "C" void *NewStreamAmb_1FE5F0(Rec_1FE5F0 *, int);
+extern "C" void *NewStreamAmb_1FE5F0(SNDENT *, int);
 
 extern "C" void func_00259B48_1FE5F0(void *, void *);
 
 extern "C" void func_00227728(void *, int, int);
 
-extern "C" Obj_1FE5F0 *PloFindSwObjectByClass(void *, int, int, int);
+extern "C" LO *PloFindSwObjectByClass(void *, int, int, int);
 
-extern "C" int func_001FD0C0_1FE5F0(Stream_1FE5F0 *, int);
+extern "C" int func_001FD0C0_1FE5F0(SNDSYSTEM *, int);
 
-extern "C" Obj_1FE5F0 *PsmaFindAlo(Obj_1FE5F0 *, int);
+extern "C" LO *PsmaFindAlo(LO *, int);
 
 extern "C" char B_003DD490_1FE5F0;
 
-extern "C" void *StartStream(Stream_1FE5F0 *stream, int id, int noSubtitle)
+extern "C" void *StartStream(SNDSYSTEM *stream, int id, int noSubtitle)
 {
     StopStream_1FE5F0(stream);
-    Rec_1FE5F0 *rec = func_001FCFA0_1FE5F0(stream, id);
+    SNDENT *rec = func_001FCFA0_1FE5F0(stream, id);
     if (rec == 0)
         return 0;
     void *amb = NewStreamAmb_1FE5F0(rec, 0);
-    func_00259B48_1FE5F0(&stream->amb, amb);
-    stream->f244 = 0;
-    stream->f248 = 0;
-    stream->f24C = 0;
+    func_00259B48_1FE5F0(&stream->field_0x200, amb);
+    stream->icue = 0;
+    stream->elapsed = 0;
+    stream->total = 0;
     if (noSubtitle == 0)
-        func_00227728(&B_004435F0, id, rec->oid);
-    if (rec->oid == -1 || rec->f54 == 0)
-        return stream->amb;
-    Obj_1FE5F0 *plo = PloFindSwObjectByClass(&B_003DD490_1FE5F0, 5, rec->oid, 0);
+        func_00227728(&B_004435F0, id, rec->ref48);
+    if (rec->ref48 == -1 || rec->count == 0)
+        return stream->pambStream;
+    LO *plo = PloFindSwObjectByClass(&B_003DD490_1FE5F0, 5, rec->ref48, 0);
     if (plo == 0)
-        return stream->amb;
+        return stream->pambStream;
     for (int i = 0; i < 6; i++) {
         if (i == 3)
             stream->aplo[3] = plo;
         else
             stream->aplo[i] = PsmaFindAlo(plo, func_001FD0C0_1FE5F0(stream, i));
-        Obj_1FE5F0 *obj = stream->aplo[i];
-        if (obj) {
-            VT_1FE5F0 *vt = obj->vt;
-            vt->fn((char *)obj + vt->delta);
-        }
+        LO *obj = stream->aplo[i];
+        if (obj)
+            obj->OnAdd();
     }
-    return stream->amb;
+    return stream->pambStream;
 }
-
-struct VT_1FE738 { char pad[0x10]; short delta; short index; void (*fn)(void *); };
-
-struct Obj_1FE738 { char pad[0xC]; VT_1FE738 *vt; };
 
 extern "C" void RunStreamCue_1FE738(void *, void *);
 
@@ -1032,50 +895,45 @@ extern "C" void StopAmb_1FE738(void *, float);
 
 extern "C" void func_00259B48_1FE738(void *, void *);
 
-#define F(type, base, off) (*(type *)((char *)(base) + (off)))
-
-void StopStream(void *stream)
+void StopStream(SNDSYSTEM *stream)
 {
-    if (F(int, stream, 0x200) == 0)
+    if (stream->field_0x200 == 0)
         return;
-    void *pamb = (char *)stream + 0x200;
-    Obj_1FE738 **slots = (Obj_1FE738 **)((char *)stream + 0x22C);
-    void *rec = F(void *, F(void *, stream, 0x200), 0x60);
-    int cue = F(int, stream, 0x244);
-    while (cue < F(int, rec, 0x54)) {
-        RunStreamCue_1FE738(stream, (char *)F(void *, rec, 0x58) + cue * 8);
-        cue = ++F(int, stream, 0x244);
+    void *pamb = &stream->field_0x200;
+    SNDENT *rec = (SNDENT *)stream->pambStream->sfxid;
+    int cue = stream->icue;
+    while (cue < rec->count) {
+        RunStreamCue_1FE738(stream, &((Entry *)rec->data)[cue]);
+        cue = ++stream->icue;
     }
-    if (F(void *, stream, 0x240))
-        SetSmaGoal__FP3SMA3OID_1FE738(F(void *, stream, 0x240), 0x611);
-    if (pamb && F(void *, stream, 0x200)) {
-        StopAmb_1FE738(F(void *, stream, 0x200), 0.0f);
+    if (stream->aplo[5])
+        SetSmaGoal__FP3SMA3OID_1FE738(stream->aplo[5], 0x611);
+    if (pamb && stream->field_0x200) {
+        StopAmb_1FE738(stream->pambStream, 0.0f);
         func_00259B48_1FE738(pamb, 0);
     }
-    F(int, stream, 0x244) = 0;
-    F(int, stream, 0x248) = 0;
-    F(int, stream, 0x24C) = 0;
+    stream->icue = 0;
+    stream->elapsed = 0;
+    stream->total = 0;
     for (int slot = 0; slot < 6; slot++) {
-        Obj_1FE738 *obj = slots[slot];
-        if (obj) {
-            VT_1FE738 *vt = obj->vt;
-            vt->fn((char *)obj + vt->delta);
-        }
+        LO *obj = stream->aplo[slot];
+        if (obj)
+            obj->Slot2();
     }
-    memset(slots, 0, 0x18);
+    memset(stream->aplo, 0, 0x18);
 }
 
-extern "C" int FStreamPlaying(char *arg0, int arg1)
+extern "C" int FStreamPlaying(SNDSYSTEM *psnd, int arg1)
 {
-    char *temp_v0;
-    char *temp_v1;
+    STREAMAMB *temp_v0;
+    SNDENT *temp_v1;
     int var_a0;
 
-    temp_v0 = *(char **)(arg0 + 0x200);
+    temp_v0 = psnd->pambStream;
     if (temp_v0 != 0) {
-        temp_v1 = *(char **)(temp_v0 + 0x60);
+        temp_v1 = (SNDENT *)temp_v0->sfxid;
         var_a0 = 0;
-        if (arg1 == -1 || *(int *)(temp_v1 + 0x40) == arg1) {
+        if (arg1 == -1 || temp_v1->id == arg1) {
             var_a0 = 1;
         }
         return var_a0;
@@ -1083,37 +941,31 @@ extern "C" int FStreamPlaying(char *arg0, int arg1)
     return 0;
 }
 
-struct STRM { char pad[0x40]; int f40; char pad2[0x0C]; unsigned short f50; unsigned short f52; char pad3[0x14]; unsigned long cycles; };
-
-struct STREAM { char pad[0x200]; STRM *pamb; char pad2[0x4C - 0x4]; float saved; };
-
-float TStream(STREAM *pstream)
+float TStream(SNDSYSTEM *pstream)
 {
-    if (pstream->pamb == 0)
+    if (pstream->pambStream == 0)
         return 0.0f;
-    float sPlayed = (float)pstream->pamb->cycles * 3.390842e-09f;
-    STRM *pamb = pstream->pamb;
+    float sPlayed = (float)pstream->pambStream->played * 3.390842e-09f;
+    STREAMAMB *pamb = pstream->pambStream;
     if (sPlayed == 0.0f) {
         int idle = 0;
-        if (pamb->f40 == 0) {
+        if (pamb->voice == 0) {
             int busy = 0;
-            if (pamb->f52 != 0 || (pamb->f50 & 1) != 0)
+            if (pamb->fPending != 0 || (pamb->grf & 1) != 0)
                 busy = 1;
             idle = busy ^ 1;
         }
         if (idle)
-            return pstream->saved;
+            return pstream->total;
     }
-    return (float)pamb->cycles * 3.390842e-09f;
+    return (float)pamb->played * 3.390842e-09f;
 }
 
-struct BANK { char pad[0x1D0]; int count; int table[1]; };
-
-extern "C" int func_001FE990(BANK *pbank, int value)
+extern "C" int func_001FE990(SNDSYSTEM *pbank, int value)
 {
-    int count = pbank->count;
+    int count = pbank->nstream;
     for (int index = 0; index < count; index++) {
-        if (pbank->table[index] == value) return index;
+        if (pbank->streams[index] == value) return index;
     }
     return -1;
 }
@@ -1121,7 +973,7 @@ extern "C" int func_001FE990(BANK *pbank, int value)
 extern "C" {
 void snd_SetPlaybackMode(s32);
 
-void SetSndPlaybackMode(SndManager *self, s32 mode) {
+void SetSndPlaybackMode(SNDSYSTEM *self, s32 mode) {
     if (self->field_0x104 != mode) {
         self->field_0x104 = mode;
         snd_SetPlaybackMode(mode);
@@ -1129,21 +981,19 @@ void SetSndPlaybackMode(SndManager *self, s32 mode) {
 }
 }
 
-struct SndBank { char pad0[0x1BC]; float masterVolume; };
-
 extern char g_2bbb60[];
 
 extern "C" float GLimitLm__FP2LMf(void *);
 
 extern "C" void snd_SetMasterVolume(int, int);
 
-extern "C" void SetSndbankMasterVolume(SndBank *self)
+extern "C" void SetSndbankMasterVolume(SNDSYSTEM *self)
 {
     float limited = GLimitLm__FP2LMf(g_2bbb60);
     int newVolume = (int)(limited * 1024.0f);
-    int oldVolume = (int)(self->masterVolume * 1024.0f);
+    int oldVolume = (int)(self->field_0x1BC * 1024.0f);
     if (oldVolume != newVolume) {
-        self->masterVolume = limited;
+        self->field_0x1BC = limited;
         snd_SetMasterVolume(0x10, newVolume);
     }
 }
@@ -1166,26 +1016,26 @@ extern "C" void ResetSndbankVolumeFactors(void *psndbank)
 }
 
 extern "C" {
-void func_001FEE90(SndManager *self) {
-    self->counterA = self->counterA + 1;
+void func_001FEE90(SNDSYSTEM *self) {
+    self->field_0x5C = self->field_0x5C + 1;
 }
 }
 
 extern "C" {
-void func_001FEEA0(SndManager *self) {
-    self->counterA = self->counterA - 1;
+void func_001FEEA0(SNDSYSTEM *self) {
+    self->field_0x5C = self->field_0x5C - 1;
 }
 }
 
 extern "C" {
-void IncrementCounterB_1feeb0(SndManager *self) {
-    self->counterB = self->counterB + 1;
+void IncrementCounterB_1feeb0(SNDSYSTEM *self) {
+    self->field_0x60 = self->field_0x60 + 1;
 }
 }
 
 extern "C" {
-void DecrementCounterB_1feec0(SndManager *self) {
-    self->counterB = self->counterB - 1;
+void DecrementCounterB_1feec0(SNDSYSTEM *self) {
+    self->field_0x60 = self->field_0x60 - 1;
 }
 }
 
@@ -1193,11 +1043,7 @@ struct T1 { int v[7][6]; };
 
 struct T2 { int v[25]; };
 
-struct REQ { int a; char pad4[0xC]; short b; char pad12[0xE]; short c; char pad22[6]; int d; char pad2c[4]; };
-
-struct SELF { char pad0[0xE8]; int e8; char padec[0x4C]; int f138; };
-
-struct SELF2 { char pad0[0x64]; int f64; };
+struct REQ { int a; u8 unknown_0x4[0xC]; short b; u8 unknown_0x12[0xE]; short c; u8 unknown_0x22[6]; int d; u8 unknown_0x2C[4]; };
 
 extern "C" int NRandInRange(int, int);
 
@@ -1211,20 +1057,20 @@ extern "C" T1 RO_002A82A8;
 
 extern "C" T2 RO_002A8350;
 
-extern "C" void func_001FEED0(SELF *self)
+extern "C" void func_001FEED0(SNDSYSTEM *self)
 {
-    if (((SELF2 *)self)->f64 == 0) {
+    if (self->imix == 0) {
         T1 table1 = RO_002A82A8;
         T2 table2 = RO_002A8350;
         REQ request;
         int column = NRandInRange(0, 5);
-        int row = table2.v[0xC + self->f138];
-        self->f138 = self->f138 + table1.v[row][column];
+        int row = table2.v[0xC + self->field_0x138];
+        self->field_0x138 = self->field_0x138 + table1.v[row][column];
         memset(&request, 0, 0x30);
         request.d = 0x13;
-        request.a = self->e8;
+        request.a = self->bank;
         request.b = func_001FD070_1FEED0(self, func_001FD028_1FEED0(self, 0x28));
-        request.c = self->f138 * 0x7F;
+        request.c = self->field_0x138 * 0x7F;
         func_002322F0(&request);
     }
 }
@@ -1233,9 +1079,9 @@ extern "C" void SetAmbSlotPan(s32, s32, s32);
 
 extern "C" void SetAmbSlotVolume_1FF108(s32, s32, f32);
 
-extern "C" s32 func_001FE990_1FF108(SndManager *);
+extern "C" s32 func_001FE990_1FF108(SNDSYSTEM *);
 
-extern "C" SndManager B_003DD040_1FF108;
+extern "C" SNDSYSTEM B_003DD040_1FF108;
 
 extern "C" void func_001FF108(f32 volume, s32 arg1, s32 arg2, s32 pan) {
     s32 slot = func_001FE990_1FF108(&B_003DD040_1FF108);
@@ -1243,10 +1089,6 @@ extern "C" void func_001FF108(f32 volume, s32 arg1, s32 arg2, s32 pan) {
     SetAmbSlotVolume_1FF108(owner, slot, volume);
     SetAmbSlotPan(owner, slot, pan);
 }
-
-struct VT_1FF188 { char pad[0x10]; short delta; short unused; void (*fn)(char *); };
-
-struct OBJ_1FF188 { char pad[0xC]; VT_1FF188 *vt; };
 
 extern "C" void BASIC_Destruct(void *, int);
 
@@ -1257,20 +1099,20 @@ extern "C" int B_002DD2E0, B_002DD2E4, B_002DD2E8, B_002DD2EC, B_002DD2F0, B_002
 extern "C" char B_004520A8[], B_004520D0[], B_004520F8[], B_00452120[], B_00452148[], B_00452170[];
 
 struct Ref_1FF188 {
-    OBJ_1FF188 *object;
+    STREAMAMB *object;
     ~Ref_1FF188() {
-        if (object != 0) object->vt->fn((char *)object + object->vt->delta);
+        if (object != 0) object->Release();
     }
 };
 
 struct Basic_1FF188 {
-    char pad[0x200];
+    u8 unknown_0x0[0x200];
     ~Basic_1FF188() { BASIC_Destruct(this, 2); }
 };
 
 struct SND_1FF188 : Basic_1FF188 {
     Ref_1FF188 obj200;
-    char pad204[4];
+    u8 unknown_0x204[4];
     Ref_1FF188 array[8];
     Ref_1FF188 obj228;
     ~SND_1FF188() {}

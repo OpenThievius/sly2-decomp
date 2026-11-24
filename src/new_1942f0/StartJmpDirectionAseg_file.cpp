@@ -71,10 +71,12 @@ extern "C" void StartJmpDirectionAseg(JMP *pthis)
 
 struct Node { int value; Node *next; };
 
-int PmqFirstOxaContact(char *self)
+struct PMQOWNER { u8 unknown_0x0[0x64]; Node *first; };
+
+int PmqFirstOxaContact(PMQOWNER *self)
 {
     int value = 0;
-    for (Node *node = *(Node **)(self + 0x64); node; node = node->next) {
+    for (Node *node = self->first; node; node = node->next) {
         value = node->value;
         if (value)
             return value;
@@ -104,6 +106,9 @@ extern "C" QW g_2a2dd0;
 extern "C" JT *g_2e1e40;
 
 extern "C" MURRAY *g_2f7900;
+
+/* the one field of MURRAY (0x1974) that UpdateJmpBodyState reads: local view, one reader */
+struct MURRAYCARRYVIEW { u8 unknown_0x0[0x1974]; void *pasegCarryThrow; };
 
 extern "C" QW PosLoWorld(void *);
 
@@ -265,7 +270,7 @@ extern "C" void UpdateJmpBodyState(JMP *pjmp)
             break;
         case 18:
             if (pjmp->pjt->pxfLinear->tArrive -
-                        TFindAsegLabel__FP4ASEG3OID(*(void **)((char *)g_2f7900 + 0x1974), 0x1C7) <=
+                        TFindAsegLabel__FP4ASEG3OID(((MURRAYCARRYVIEW *)g_2f7900)->pasegCarryThrow, 0x1C7) <=
                     g_2dded0.t &&
                 g_2f7900->stateCarry != 3) {
                 CarryThrow_SetState(g_2f7900->PvCarry(), 3);
@@ -403,14 +408,14 @@ INCLUDE_ASM(0X197F98);
 
 INCLUDE_ASM(0X1991A0);
 
-struct MQSIDE { SO *pso; char pad[0x3C]; };
+struct MQSIDE { SO *pso; u8 unknown_0x4[0x3C]; };
 
 struct MQ {
-    char pad0[8];
+    u8 unknown_0x0[8];
     MQSIDE aside[2];
-    char pad2[0x14];
+    u8 unknown_0x88[0x14];
     int kind;
-    char pad3[0xC];
+    u8 unknown_0xA0[0xC];
     MQ *next;
 };
 
@@ -420,17 +425,17 @@ struct MQLINK {
     MQ **ppmqSlot;
 };
 
-struct MQHOLDER { char pad[0x64]; MQLINK *first; };
+struct MQHOLDER { u8 unknown_0x0[0x64]; MQLINK *first; };
 
-struct MQLEVEL { char pad[0xEC]; MQHOLDER *pholder; };
+struct MQLEVEL { u8 unknown_0x0[0xEC]; MQHOLDER *pholder; };
 
-struct MQXPS { char pad[0x60]; SO *pso; };
+struct MQXPS { u8 unknown_0x0[0x60]; SO *pso; };
 
-struct MQINFO { char pad[0xEC]; MQXPS *poxa; };
+struct MQINFO { u8 unknown_0x0[0xEC]; MQXPS *poxa; };
 
-struct MQROOT { char pad[4]; MQINFO *pinfo; };
+struct MQROOT { u8 unknown_0x0[4]; MQINFO *pinfo; };
 
-struct MQOWNER { MQLEVEL *plevel; char pad[0x18]; int kind; char pad2[0xA8]; MQROOT *proot; };
+struct MQOWNER { MQLEVEL *plevel; u8 unknown_0x4[0x18]; int kind; u8 unknown_0x20[0xA8]; MQROOT *proot; };
 
 extern SW B_003DD490;
 
@@ -639,7 +644,7 @@ struct MJR {
     s32 field_0x0;
     s32 field_0x4;
     s32 field_0x8;
-    char pad0xC[4];
+    u8 unknown_0xC[4];
     s128 field_0x10;
 };
 
@@ -659,11 +664,11 @@ extern "C" f32 GMeasureJumpRail__FP3MJRf(MJR *pmjr) {
 
 extern "C" QW g_2a2dd0;
 
-struct Vt_19AAB8 { char pad0[0x18]; short delta; short pad1; void (*fn)(void *, int, QW *, int); };
+struct Vt_19AAB8 { u8 unknown_0x0[0x18]; short delta; short pad1; void (*fn)(void *, int, QW *, int); };
 
-struct Alo_19AAB8 { char pad0[0xE0]; };
+struct Alo_19AAB8 { u8 unknown_0x0[0xE0]; };
 
-struct Alo2_19AAB8 { char pad0[0x100]; Vt_19AAB8 *vt; };
+struct Alo2_19AAB8 { u8 unknown_0x0[0x100]; Vt_19AAB8 *vt; };
 
 struct Jt_19AAB8 { int first; };
 
@@ -681,11 +686,11 @@ extern "C" float GMeasureJumpHpnt(Goal_19AAB8 *goal) {
     return distance;
 }
 
-struct Vt_19AB38 { char pad0[0x18]; short delta; short pad1; void (*fn)(void *, int, QW *, int); };
+struct Vt_19AB38 { u8 unknown_0x0[0x18]; short delta; short pad1; void (*fn)(void *, int, QW *, int); };
 
-struct Alo_19AB38 { char pad0[0x190]; };
+struct Alo_19AB38 { u8 unknown_0x0[0x190]; };
 
-struct Alo2_19AB38 { char pad0[0x1B0]; Vt_19AB38 *vt; };
+struct Alo2_19AB38 { u8 unknown_0x0[0x1B0]; Vt_19AB38 *vt; };
 
 struct Jt_19AB38 { int first; };
 
@@ -716,7 +721,7 @@ float GMeasureJumpTargetTime(Mjt *mjt)
 
 struct Mjp { int jump; void *curve; };
 
-struct Mjt_19ABF0 { int jump; void *parent; char pad[8]; QW local; };
+struct Mjt_19ABF0 { int jump; void *parent; u8 unknown_0x8[8]; QW local; };
 
 struct Frame { QW position; Mjt_19ABF0 target; float measure; };
 
@@ -744,7 +749,7 @@ INCLUDE_ASM(0X19AC88);
 
 INCLUDE_ASM(0X19AE00);
 
-struct Jt { char pad[0xBC]; int landing; };
+struct Jt { u8 unknown_0x0[0xBC]; int landing; };
 
 extern float D_FLT_002BF900;
 
@@ -756,16 +761,24 @@ float GAdjustJtLandingScore(Jt *self, int landing, float score, float bonus)
     return score;
 }
 
-extern "C" int func_0019B0A8(char *arg0, char *arg1) {
-    if (*(long *)(arg1 + 0x10) & (0x8000L << 33)) {
+struct CANDIDATETARGET { u8 unknown_0x0[0x70]; s64 grf; };
+
+struct CANDIDATEINFO { u8 unknown_0x0[0xEC]; CANDIDATETARGET *ptarget; };
+
+struct CANDIDATE { u8 unknown_0x0[4]; CANDIDATEINFO *pinfo; u8 unknown_0x8[8]; s64 grf; };
+
+struct TARGETLIST { s32 count; CANDIDATETARGET **aptarget; };
+
+extern "C" int func_0019B0A8(TARGETLIST *arg0, CANDIDATE *arg1) {
+    if (arg1->grf & (0x8000L << 33)) {
         return 0;
     }
-    char *target = *(char **)(*(char **)(arg1 + 4) + 0xEC);
-    if (*(long *)(target + 0x70) & 4) {
+    CANDIDATETARGET *target = arg1->pinfo->ptarget;
+    if (target->grf & 4) {
         return 0;
     }
-    for (int index = 0; index < *(int *)arg0; index++) {
-        if (target == ((char **)*(char **)(arg0 + 4))[index]) {
+    for (int index = 0; index < arg0->count; index++) {
+        if (target == arg0->aptarget[index]) {
             return 0;
         }
     }
@@ -861,9 +874,9 @@ struct Saved {
 };
 
 struct CNVO {
-    char pad0[0x28];
+    u8 unknown_0x0[0x28];
     s32 field_0x28;
-    char pad2C[0xE0 - 0x2C];
+    u8 unknown_0x2C[0xE0 - 0x2C];
     struct Saved field_0xE0;
     f32 field_0xE8;
 };

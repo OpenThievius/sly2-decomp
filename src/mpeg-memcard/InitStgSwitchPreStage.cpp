@@ -1,16 +1,17 @@
-struct AllocReq_1BB9B8 { int cb; int cbAlign; };
-extern "C" void *PvAllocStackImpl__Fi(AllocReq_1BB9B8 *);
+#include "stgswitch.h"
+#include "alloc.h"
+extern "C" void *PvAllocStackImpl__Fi(ALLOCREQ *);
 
-void InitStgSwitchPreStage(char *arg0) {
-    *(int *)(arg0 + 0x15C) = -1;
-    char *base = *(char **)(arg0 + 0x164);
-    *(int *)(base - 0x10) = -1;
-    char *stage = base - 0x10;
-    *(int *)(stage + 0x4) = 1;
-    if (*(void **)(stage + 0xC) == 0) {
-        AllocReq_1BB9B8 req;
+void InitStgSwitchPreStage(STGSWITCH *pswitch) {
+    pswitch->istage = -1;
+    STGNODE *base = pswitch->anode;
+    base[-1].id = -1;
+    STGNODE *stage = base - 1;
+    stage->fForward = 1;
+    if (stage->ents == 0) {
+        ALLOCREQ req;
         req.cb = 0x200;
         req.cbAlign = 0x10;
-        *(void **)(stage + 0xC) = PvAllocStackImpl__Fi(&req);
+        stage->ents = PvAllocStackImpl__Fi(&req);
     }
 }

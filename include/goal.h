@@ -11,6 +11,14 @@
 struct STEP;
 struct JOY;
 
+/* a node of the list a goal counts itself into while it is active: its link at 0x14 and the count at 0x20 */
+struct GOALLINK {
+    u8 unknown_0x0[0x14];
+    /* 0x14 */ struct GOALLINK *next;
+    u8 unknown_0x18[0x8];
+    /* 0x20 */ s32 count;                /* func_001EEFC0 adds 1 to it, func_001EF038 subtracts 1 */
+};
+
 struct GOAL : BASIC {
     virtual void Init();                /*  7: func_001EEF68 (empty); GoalBrain_Init */
     virtual void Activate();            /*  8: func_001EEF70 (empty); GoalBrain_Activate, GoalHit_Activate */
@@ -21,9 +29,10 @@ struct GOAL : BASIC {
     virtual int FHandleMessage(int arg1, int arg2);      /* 13: Goal_FHandleMessage; GoalStack_HandleMessage calls it with two ints */
     virtual void FillVjoy(struct JOY *pjoy); /* 14: Goal_FillVjoy; UpdateJt calls the top goal's with the player's controller */
     /* 0x10 */ struct STEP *pstep;      /* the actor: Goal_FillVjoy (14) reads its heading (STEP 0x1A8), func_001EEFA0 (12) its 0x204 */
-    u8 unknown_0x14[0x4];
+    /* 0x14 */ struct GOALLINK *plink; /* the list func_001EEFC0 and func_001EF038 walk (two readers that agree) */
     /* 0x18 */ struct GOAL *pgoalChild; /* Goal_Deactivate (9) pops it; GoalGotoPos_SetPos and others read it */
-    u8 unknown_0x1C[0x14];
+    /* 0x1C */ s32 fActive;             /* func_001EEFC0 sets it (once), func_001EF038 clears it */
+    u8 unknown_0x20[0x10];
 };
 
 #if defined(__mips__)

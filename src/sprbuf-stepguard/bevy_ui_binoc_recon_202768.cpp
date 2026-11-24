@@ -1,57 +1,88 @@
+#include "blot.h"
+
+/* A recon target: RECON, an ALO subclass (class 46, 0x120 bytes; sprbuf_stepguard_202d38.cpp). */
+struct RECON : LO {
+    u8 unknown_0x50[0x9C];
+    /* 0xEC */ void *ptask;
+    u8 unknown_0xF0[0x4];
+    /* 0xF4 */ s32 field_0xF4;      /* the binocular state 7 copies it to BINOCRECON::field_0xBC */
+    u8 unknown_0xF8[0x4];
+    /* 0xFC */ s32 stream;          /* the stream (-1: none) and wipe argument the binocular state 9 starts */
+};
+
+/* The binocular recon screen (the bevy_ui_binoc_recon functions): its state, the recon targets and the two blots it shows. */
+struct BINOCRECON {
+    /* 0x0 */ s32 state;
+    u8 unknown_0x4[0x70];
+    /* 0x74 */ s32 clist;           /* the targets listed on the screen (bevy_ui_binoc_recon_202030) */
+    u8 unknown_0x78[0x14];
+    /* 0x8C */ RECON *precon;       /* the target being looked at */
+    u8 unknown_0x90[0x10];
+    /* 0xA0 */ s32 grfSaved;        /* state 8 saves the focus object's flags here and puts them back when it leaves */
+    /* 0xA4 */ s32 wipe;
+    /* 0xA8 */ LO **pplo;           /* the focus object */
+    /* 0xAC */ BLOT *pblotA;
+    /* 0xB0 */ BLOT *pblotB;
+    u8 unknown_0xB4[0x8];
+    /* 0xBC */ s32 field_0xBC;
+    /* 0xC0 */ s32 field_0xC0;
+};
+
+/* the field pblotB's subclass of BLOT keeps at 0xF4: the target it shows */
+struct RECONBLOTVIEW {
+    u8 unknown_0x0[0xF4];
+    /* 0xF4 */ RECON *precon;
+};
+
 extern "C" {
 void ClearHandsOff(void *, int);
-int ClearReconVisibility(char *, int);
-void HideReconLinks(char *);
+int ClearReconVisibility(BINOCRECON *, int);
+void HideReconLinks(BINOCRECON *);
 int NewEmitter(int, int);
-void SeekBlotLabel(char *, int, float);
-void SetBlotBlots(char *, int);
-void SetBlotModal(char *, int);
+void SeekBlotLabel(BLOT *, int, float);
+void SetBlotBlots(BLOT *, int);
+void SetBlotModal(BLOT *, int);
 void SetClockRate(void *, int, float);
 void SetEmitterUnpositioned(int, int);
 void SetHandsOff(void *, int);
-void SetReconTargetDone(char *, int);
-float SetTimerTimers__FP5TIMER6TIMERS(char *, int);
-void ShowReconLinks(char *);
+void SetReconTargetDone(RECON *, int);
+float SetTimerTimers__FP5TIMER6TIMERS(BLOT *, int);
+void ShowReconLinks(BINOCRECON *);
 int StartStream(void *, int, int);
 void StartWipe(int, int, int);
-void UpdateReconLinkFades(char *);
+void UpdateReconLinkFades(BINOCRECON *);
 void bevy_camera_follow_activity(void *, int, int);
-void bevy_ui_binoc_recon_201f90(char *);
-int bevy_ui_binoc_recon_202030(char *);
-void bevy_ui_binoc_recon_2021f8(char *);
-int bevy_ui_binoc_recon_2022d8(char *);
+void bevy_ui_binoc_recon_201f90(BINOCRECON *);
+int bevy_ui_binoc_recon_202030(BINOCRECON *);
+void bevy_ui_binoc_recon_2021f8(BINOCRECON *);
+int bevy_ui_binoc_recon_2022d8(BINOCRECON *);
 void func_0014FE28(void *);
 int func_001FE5B8(void *, int, int);
-void func_00213928(char *, int);
-void func_00213B00(char *, int);
+void func_00213928(BLOT *, int);
+void func_00213B00(BLOT *, int);
 extern char B_002DE390;
 extern char B_002DEB30;
 extern char B_003DD040;
 extern char B_003DD490;
 extern char g_2dded0;
-#define VTAB(object) (*(char **)((char *)(object) + 0xC))
-#define VADJ(object, off) ((char *)(object) + *(short *)(VTAB(object) + (off) - 4))
-#define VFN(object, off) (*(void **)(VTAB(object) + (off)))
-#define VCALL_INT_SELF(object, off, value) ((void (*)(char *, int))VFN(object, off))(VADJ(object, off), (value))
-#define VCALL_SELF(object, off) ((void (*)(char *))VFN(object, off))(VADJ(object, off))
-static inline int GrfOf(char *blot)
+static inline int GrfOf(LO *plo)
 {
-    int grf = *(int *)(blot + 0x40);
+    int grf = plo->grfSw;
     if (!(grf & 1))
         return *(int *)grf;
     return grf;
 }
-static inline void AddGrf(char *blot, int bits)
+static inline void AddGrf(LO *plo, int bits)
 {
-    int grf = *(int *)(blot + 0x40);
+    int grf = plo->grfSw;
     if (((grf ^ 1) & 1) != 0)
         *(int *)grf |= bits;
     else
-        *(int *)(blot + 0x40) = grf | bits;
+        plo->grfSw = grf | bits;
 }
-void bevy_ui_binoc_recon_202768(char *arg0, int arg1) {
-    int old = *(int *)arg0;
-    if ((old != arg1) && (*(char **)(arg0 + 0xAC) != 0) && (*(char **)(arg0 + 0xB0) != 0)) {
+void bevy_ui_binoc_recon_202768(BINOCRECON *arg0, int arg1) {
+    int old = arg0->state;
+    if ((old != arg1) && (arg0->pblotA != 0) && (arg0->pblotB != 0)) {
         int newIsRecon = (unsigned int)(arg1 - 8) < 2U;
         if (((unsigned int)(old - 8) < 2U) != newIsRecon) {
             if (newIsRecon != 0) {
@@ -60,146 +91,146 @@ void bevy_ui_binoc_recon_202768(char *arg0, int arg1) {
                 ClearHandsOff(&B_003DD490, 0);
             }
         }
-        switch (*(int *)arg0) {
+        switch (arg0->state) {
         case -1:
         case 10:
             break;
         case 1:
             UpdateReconLinkFades(arg0);
             bevy_ui_binoc_recon_202030(arg0);
-            func_00213B00(*(char **)(arg0 + 0xAC), 0x35D);
-            if (*(int *)(arg0 + 0x74) > 0) {
-                func_00213B00(*(char **)(arg0 + 0xAC), 0x35E);
+            func_00213B00(arg0->pblotA, 0x35D);
+            if (arg0->clist > 0) {
+                func_00213B00(arg0->pblotA, 0x35E);
             }
             bevy_ui_binoc_recon_2021f8(arg0);
             break;
         case 4:
-            func_00213928(*(char **)(arg0 + 0xB0), 0x359);
+            func_00213928(arg0->pblotB, 0x359);
             break;
         case 5:
         case 6:
-            func_00213928(*(char **)(arg0 + 0xB0), 0x35A);
+            func_00213928(arg0->pblotB, 0x35A);
             break;
         case 7:
-            func_00213928(*(char **)(arg0 + 0xAC), 0x356);
-            func_00213928(*(char **)(arg0 + 0xB0), 0x356);
-            func_00213928(*(char **)(arg0 + 0xB0), 0x357);
+            func_00213928(arg0->pblotA, 0x356);
+            func_00213928(arg0->pblotB, 0x356);
+            func_00213928(arg0->pblotB, 0x357);
             break;
         case 8: {
-            char *holder = **(char ***)(arg0 + 0xA8);
-            int tagged = *(int *)(holder + 0x40);
-            int saved = *(int *)(arg0 + 0xA0);
+            LO *holder = *arg0->pplo;
+            int tagged = holder->grfSw;
+            int saved = arg0->grfSaved;
             if (!(tagged & 1)) {
                 *(int *)tagged = saved | (*(int *)tagged & 1);
             } else {
-                *(int *)(holder + 0x40) = saved | (tagged & 1);
+                holder->grfSw = saved | (tagged & 1);
             }
             SetClockRate(&g_2dded0, 0, 1.0f);
             func_001FE5B8(&B_003DD040, 1, 1);
-            func_00213928(*(char **)(arg0 + 0xAC), 0x358);
+            func_00213928(arg0->pblotA, 0x358);
             break;
         }
         case 9:
             func_0014FE28(&B_002DE390);
-            SetBlotModal(*(char **)(arg0 + 0xAC), -1);
-            VCALL_INT_SELF(*(char **)(arg0 + 0xAC), 0x18C, 0x310);
-            if (*(int *)(arg0 + 0xA4) != 0) {
-                int stream = *(int *)(*(char **)(arg0 + 0x8C) + 0xFC);
+            SetBlotModal(arg0->pblotA, -1);
+            arg0->pblotA->Select(0x310);
+            if (arg0->wipe != 0) {
+                int stream = arg0->precon->stream;
                 if (stream != -1) {
                     StartStream(&B_003DD040, stream, 0);
                 }
-                StartWipe(*(int *)(arg0 + 0xA4), 0x608, *(int *)(*(char **)(arg0 + 0x8C) + 0xFC));
+                StartWipe(arg0->wipe, 0x608, arg0->precon->stream);
             }
-            SetReconTargetDone(*(char **)(arg0 + 0x8C), 1);
+            SetReconTargetDone(arg0->precon, 1);
             bevy_camera_follow_activity(&B_002DEB30, 0xA, 0);
-            *(char **)(arg0 + 0x8C) = 0;
+            arg0->precon = 0;
             if (bevy_ui_binoc_recon_2022d8(arg0) != 0) {
-                func_00213B00(*(char **)(arg0 + 0xAC), 0x35D);
-                if (*(int *)(arg0 + 0x74) > 0) {
-                    func_00213B00(*(char **)(arg0 + 0xAC), 0x35E);
+                func_00213B00(arg0->pblotA, 0x35D);
+                if (arg0->clist > 0) {
+                    func_00213B00(arg0->pblotA, 0x35E);
                 }
             }
             bevy_ui_binoc_recon_2021f8(arg0);
             break;
         }
-        int previous = *(int *)arg0;
-        *(int *)arg0 = arg1;
+        int previous = arg0->state;
+        arg0->state = arg1;
         switch (arg1) {
         case 0:
-            *(int *)(arg0 + 0xBC) = -1;
-            *(char **)(arg0 + 0x8C) = 0;
-            *(int *)(arg0 + 0xC0) = -1;
+            arg0->field_0xBC = -1;
+            arg0->precon = 0;
+            arg0->field_0xC0 = -1;
             ClearReconVisibility(arg0, previous);
-            VCALL_INT_SELF(*(char **)(arg0 + 0xAC), 0x18C, -1);
+            arg0->pblotA->Select(-1);
             HideReconLinks(arg0);
             bevy_ui_binoc_recon_201f90(arg0);
             bevy_camera_follow_activity(&B_002DEB30, 9, 0);
             return;
         case 1:
-            func_00213928(*(char **)(arg0 + 0xAC), 0x35D);
-            VCALL_INT_SELF(*(char **)(arg0 + 0xB0), 0x18C, 0x339);
+            func_00213928(arg0->pblotA, 0x35D);
+            arg0->pblotB->Select(0x339);
             return;
         case 5:
-            func_00213B00(*(char **)(arg0 + 0xB0), 0x35A);
-            SeekBlotLabel(*(char **)(arg0 + 0xB0), 0x35A, 0.0f);
+            func_00213B00(arg0->pblotB, 0x35A);
+            SeekBlotLabel(arg0->pblotB, 0x35A, 0.0f);
             return;
         case 6:
-            func_00213B00(*(char **)(arg0 + 0xB0), 0x35A);
-            SeekBlotLabel(*(char **)(arg0 + 0xB0), 0x35A, 0.0f);
+            func_00213B00(arg0->pblotB, 0x35A);
+            SeekBlotLabel(arg0->pblotB, 0x35A, 0.0f);
             return;
         case 7:
             SetEmitterUnpositioned(NewEmitter(0x52, previous), 0);
-            *(int *)(arg0 + 0xBC) = *(int *)(*(char **)(arg0 + 0x8C) + 0xF4);
-            func_00213B00(*(char **)(arg0 + 0xAC), 0x356);
-            func_00213B00(*(char **)(arg0 + 0xB0), 0x356);
-            func_00213B00(*(char **)(arg0 + 0xB0), 0x357);
+            arg0->field_0xBC = arg0->precon->field_0xF4;
+            func_00213B00(arg0->pblotA, 0x356);
+            func_00213B00(arg0->pblotB, 0x356);
+            func_00213B00(arg0->pblotB, 0x357);
             return;
         case 8: {
-            func_00213928(*(char **)(arg0 + 0xAC), 0x35B);
-            func_00213B00(*(char **)(arg0 + 0xAC), 0x358);
-            char **handle = *(char ***)(arg0 + 0xA8);
-            *(int *)(arg0 + 0xA0) = GrfOf(*handle) & ~1;
+            func_00213928(arg0->pblotA, 0x35B);
+            func_00213B00(arg0->pblotA, 0x358);
+            LO **handle = arg0->pplo;
+            arg0->grfSaved = GrfOf(*handle) & ~1;
             AddGrf(*handle, 0x102);
             func_001FE5B8(&B_003DD040, 1, 0);
             SetClockRate(&g_2dded0, 0, 0.0f);
             return;
         }
         case 9:
-            VCALL_INT_SELF(*(char **)(arg0 + 0xB0), 0x18C, 0x339);
-            VCALL_INT_SELF(*(char **)(arg0 + 0xAC), 0x18C, 0x35C);
-            SetBlotModal(*(char **)(arg0 + 0xAC), 0);
+            arg0->pblotB->Select(0x339);
+            arg0->pblotA->Select(0x35C);
+            SetBlotModal(arg0->pblotA, 0);
             return;
         case 3:
         case 4:
-            *(char **)(*(char **)(arg0 + 0xB0) + 0xF4) = *(char **)(arg0 + 0x8C);
-            VCALL_INT_SELF(*(char **)(arg0 + 0xB0), 0x18C, 0x337);
-            func_00213B00(*(char **)(arg0 + 0xB0), 0x359);
-            SeekBlotLabel(*(char **)(arg0 + 0xB0), 0x359, 0.0f);
+            ((RECONBLOTVIEW *)arg0->pblotB)->precon = arg0->precon;
+            arg0->pblotB->Select(0x337);
+            func_00213B00(arg0->pblotB, 0x359);
+            SeekBlotLabel(arg0->pblotB, 0x359, 0.0f);
             return;
         case 2:
-            VCALL_INT_SELF(*(char **)(arg0 + 0xB0), 0x18C, 0x339);
+            arg0->pblotB->Select(0x339);
             return;
         case 10:
-            *(int *)(arg0 + 0xBC) = -1;
-            *(char **)(arg0 + 0x8C) = 0;
-            *(int *)(arg0 + 0xC0) = -1;
-            VCALL_SELF(*(char **)(arg0 + 0xB0), 0x194);
-            VCALL_SELF(*(char **)(arg0 + 0xAC), 0x194);
+            arg0->field_0xBC = -1;
+            arg0->precon = 0;
+            arg0->field_0xC0 = -1;
+            arg0->pblotB->Hide();
+            arg0->pblotA->Hide();
             ShowReconLinks(arg0);
             bevy_camera_follow_activity(&B_002DEB30, 0xB, 0);
             return;
         case -1:
             if (previous != 0xA) {
                 bevy_camera_follow_activity(&B_002DEB30, 0xB, 0);
-                char *first = *(char **)(arg0 + 0xAC);
-                if (*(int *)(first + 0x58) != 0) {
+                BLOT *first = arg0->pblotA;
+                if (first->blots != 0) {
                     SetBlotBlots(first, 1);
-                    SetTimerTimers__FP5TIMER6TIMERS(*(char **)(arg0 + 0xAC), 1);
+                    SetTimerTimers__FP5TIMER6TIMERS(arg0->pblotA, 1);
                 }
-                char *second = *(char **)(arg0 + 0xB0);
-                if (*(int *)(second + 0x58) != 0) {
+                BLOT *second = arg0->pblotB;
+                if (second->blots != 0) {
                     SetBlotBlots(second, 1);
-                    SetTimerTimers__FP5TIMER6TIMERS(*(char **)(arg0 + 0xB0), 1);
+                    SetTimerTimers__FP5TIMER6TIMERS(arg0->pblotB, 1);
                 }
             }
             break;

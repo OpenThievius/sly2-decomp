@@ -5,23 +5,29 @@
 #include "sly2.h"
 #include "murray.h"
 #include "goal.h"
+#include "clock.h"
 #include "m2c_macros.h"
 #include "include_asm.h"
 
+/* The goal that holds Murray in a state (a GOAL of the Murray actor: state at 0x30, the clock at 0x34). */
+struct GOALMURRAYHOLD : GOAL {
+    /* 0x30 */ s32 state;   /* func_00146E18: a state from 2 to 4 is the one func_001EEFC0 and func_001EF038 enter and leave */
+    /* 0x34 */ f32 tState;  /* func_00146E18: the clock at the last change */
+};
+
 extern "C" {
-int func_001EEFC0(char *);
-int func_001EF038(char *);
-extern float g_2dded0;
-void func_00146E18(char *self, int state) {
-    int old = *(int *)(self + 0x30);
+int func_001EEFC0(GOALMURRAYHOLD *);
+int func_001EF038(GOALMURRAYHOLD *);
+void func_00146E18(GOALMURRAYHOLD *self, int state) {
+    int old = self->state;
     if (state != old) {
         if (old < 5) {
             if (old >= 2) {
                 func_001EF038(self);
             }
         }
-        *(int *)(self + 0x30) = state;
-        *(float *)(self + 0x34) = g_2dded0;
+        self->state = state;
+        self->tState = g_2dded0.t;
         if (state < 5) {
             if (state >= 2) {
                 func_001EEFC0(self);
@@ -32,37 +38,23 @@ void func_00146E18(char *self, int state) {
 }
 
 extern "C" {
-typedef struct MURRAYREF {
-    char pad[0x1AC0];
-    s32 field_0x1AC0;
-} MURRAYREF;
+s32 SetMurrayState(MURRAY *, s32);
 
-typedef struct OWNER {
-    char pad[0x10];
-    MURRAYREF *murray;
-} OWNER;
-
-s32 SetMurrayState(MURRAYREF *, s32);
-
-s32 func_001B8D30(MURRAYREF *, s32);
+s32 func_001B8D30(MURRAY *, s32);
 
 s32 func_001EEF70();
 
-void func_00146E98(OWNER *owner) {
+void func_00146E98(GOALMURRAYHOLD *self) {
     func_001EEF70();
-    owner->murray->field_0x1AC0 = 1;
-    SetMurrayState(owner->murray, 0xC);
-    func_001B8D30(owner->murray, 0);
+    ((MURRAY *)self->pstep)->field_0x1AC0 = 1;
+    SetMurrayState((MURRAY *)self->pstep, 0xC);
+    func_001B8D30((MURRAY *)self->pstep, 0);
 }
 }
 
-struct GOAL_146EE0 : GOAL { };
+void Goal_Deactivate(GOALMURRAYHOLD *);
 
-void Goal_Deactivate(GOAL_146EE0 *);
-
-void SetMurrayState(MURRAY *, int);
-
-void func_00146EE0(GOAL_146EE0 *self)
+void func_00146EE0(GOALMURRAYHOLD *self)
 {
     Goal_Deactivate(self);
     ((MURRAY *)self->pstep)->field_0x1AC0 = 0;

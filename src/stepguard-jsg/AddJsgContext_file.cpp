@@ -11,6 +11,12 @@
 #include "sw.h"
 #include "lo.h"
 #include "jt.h"
+#include "murray.h"
+#include "jsg.h"
+#include "joy.h"
+#include "clock.h"
+#include "pzo_hide.h"
+#include "goal.h"
 
 /* a record of the sequence's step list (0x50 bytes, PjsgeAllocJsg): the kind, whether it is asynchronous, then the arguments the
    AddSeqRecord function stored: a word each, an integer or a float according to the kind */
@@ -860,21 +866,23 @@ void Seqnode_AddRef(struct Seqnode *node) {
 }
 
 struct Seqnode_1E1B68 {
-    char pad0[0x10];
+    /* 0x0 */ void *pframe;      /* CFramePtr_Assign clears it (BASIC::pframe) */
+    /* 0x4 */ void *psidebag;    /* SidebagPtr_Assign clears it (BASIC::psidebag) */
+    u8 unknown_0x8[0x8];
     s32 field_0x10;
     s32 field_0x14;
     s32 field_0x18;
-    char pad1[0x14];
+    u8 unknown_0x1C[0x14];
     SeqnodeOwner *field_0x30;
-    char pad2[0xC];
+    u8 unknown_0x34[0xC];
     s32 field_0x40;
     s32 field_0x44;
-    char pad3[0x8];
+    u8 unknown_0x48[0x8];
     s32 field_0x50;
-    char pad4[0x4];
+    u8 unknown_0x54[0x4];
     s32 field_0x58;
     s32 field_0x5C;
-    char pad5[0x40];
+    u8 unknown_0x60[0x40];
     s32 field_0xA0;
 };
 
@@ -884,7 +892,7 @@ extern "C" void CFramePtr_Assign(void *target, s32 value);
 
 extern "C" void FreeSlotheapPv(void *slotheap, void *pointer);
 
-extern "C" void SidebagPtr_Assign(char *target, s32 value);
+extern "C" void SidebagPtr_Assign(void *target, s32 value);
 
 extern "C" s32 B_003E1560;
 
@@ -893,7 +901,7 @@ extern "C" void Seqnode_Release(Seqnode_1E1B68 *node) {
     node->field_0x10 = remaining;
     if (remaining <= 0) {
         CFramePtr_Assign(node, 0);
-        SidebagPtr_Assign((char *)node + 4, 0);
+        SidebagPtr_Assign(&node->psidebag, 0);
         Basic_FreeSubscribers(node);
         FreeSlotheapPv(&B_003E1560, node);
     }
@@ -936,7 +944,15 @@ extern "C" void HandleSeqnodeMessage(Seqnode_1E1BC8 *node, s32 message, SeqnodeM
 }
 
 /* record fields: one 0x50-byte record per sequence step */
-struct REC { int kind; int fChild; char pad[0x48]; };
+struct REC {
+    int kind;
+    int fChild;
+    u8 unknown_0x8[0x8];
+    union {
+        s32 n;
+        f32 f;
+    } arg[16]; /* the arguments, as JSGE::arg: UpdateSeqnodeDrive reads arg[0] of a kind 0x1D record */
+};
 
 struct LO;
 struct TN;
@@ -987,7 +1003,6 @@ struct SEQNODE {
     void *pamb;     /* 0xEC */
 };
 
-struct CLOCK { float dt; char pad[0x38]; float dtReal; };
 
 struct CM { char pad[0x90]; QW pos; };
 
@@ -1027,16 +1042,16 @@ extern "C" void RunSeqnode(SEQNODE *pseqnode)
         StopSeqnode_1E1C40(pseqnode);
 }
 
-extern "C" int FSeqnodeRecordDone_1E1D48(char *, char *);
+extern "C" int FSeqnodeRecordDone_1E1D48(SEQNODE *, REC *);
 
-extern "C" void SetSeqnodeDrive_1E1D48(char *, int, int);
+extern "C" void SetSeqnodeDrive_1E1D48(SEQNODE *, REC *, LO *);
 
-extern "C" void UpdateSeqnodeDrive(char *self)
+extern "C" void UpdateSeqnodeDrive(SEQNODE *self)
 {
-    char *record = *(char **)(self + 0x40);
+    REC *record = self->precDrive;
     if (record != 0 && FSeqnodeRecordDone_1E1D48(self, record) != 0) {
         int drive = 1;
-        if (*(int *)(*(char **)(self + 0x40)) == 0x1D) drive = *(int *)(*(char **)(self + 0x40) + 0x10) == -1;
+        if (self->precDrive->kind == 0x1D) drive = self->precDrive->arg[0].n == -1;
         if (drive != 0) {
             SetSeqnodeDrive_1E1D48(self, 0, 0);
         }
@@ -1075,18 +1090,19 @@ extern "C" LO *PloFindSeqnodeObject(SEQNODE *node, int id) {
 
 #define RP(p, off) (*(void **)((char *)(p) + (off)))
 
-/* virtual call through the vtable at +0xC: a delta (short) and a function per 8-byte slot */
-#define VT(p) (*(char **)((char *)(p) + 0xC))
-
-#define VFN(p, off, F) ((F) * (void **)(VT(p) + (off) + 4))
-
-#define VTHIS(p, off) ((char *)(p) + *(short *)(VT(p) + (off)))
-
 struct BEAT { float t; int n; char pad[0x28]; };
 
-struct WARP { LO *plo; void *pmember; int pad[2]; VECTOR pos; };
+struct WARP { LO *plo; MEMBER *pmember; int pad[2]; VECTOR pos; };
 
 struct MAT3 { QW a, b, c; };
+
+/* class 126 of retail's class table (0x110 bytes, derived from LO): the object the ShowSwf and HideSwf records (kinds 0xE, 0xF;
+   AddSeqRecordShowSwf, AddSeqRecordHideSwf) act on; StartNextSeqnodeRecord calls its two own slots */
+struct SWF : LO {
+    u8 unknown_0x50[0xC0];
+    virtual void Show(int arg); /* 49: kind 0xE passes the record's second word */
+    virtual void Hide();        /* 50: kind 0xF */
+};
 
 extern char B_003DD490[], B_002DE460[], B_002DEB30[], B_002DFC00[], B_003DA0C0[], B_003DA530[], B_003DD040[], B_004435F0[];
 
@@ -1096,7 +1112,6 @@ extern void *B_002DE570;
 
 extern int B_004435F8;
 
-extern CLOCK g_2dded0;
 
 extern QW g_2a2dc0, g_2a2dd0;
 
@@ -1192,7 +1207,7 @@ extern "C" void GoalFollowCrv_SetCrv(LO *, LO *, int);
 
 extern "C" void GoalGotoPos_SetPos(LO *, QW);
 
-extern "C" void *PmemberFromLo(LO *);
+extern "C" MEMBER *PmemberFromLo(LO *);
 
 extern "C" void FFindSurfaceAlongUp(VECTOR *, int, int, float, float);
 
@@ -1412,7 +1427,7 @@ extern "C" void StartNextSeqnodeRecord(SEQNODE *pseqnode)
     case 7: {
         LO *pso = PloFindSeqnodeObject(pseqnode, RI(prec, 0x10));
         if (pso != 0 && FIsBasicDerivedFrom(pso, 0x32) != 0)
-            VFN(pso, 0x278, void (*)(void *, int))(VTHIS(pso, 0x278), 1);
+            ((PO *)pso)->SetPlayable(1);
         break;
     }
     case 8:
@@ -1422,7 +1437,7 @@ extern "C" void StartNextSeqnodeRecord(SEQNODE *pseqnode)
         void *pparams = &RI(prec, 0x10);
         RP(pseqnode->psw, 0x68) = pseqnode;
         LO *psw = pseqnode->psw;
-        VFN(psw, 0x18, void (*)(void *, int, int, int, void **, int))(VTHIS(psw, 0x18), 4, 0, 1, &pparams, 0);
+        psw->HandleSpliceEvent(4, 0, 1, (int)&pparams, 0);
         RP(pseqnode->psw, 0x68) = 0;
         break;
     }
@@ -1443,7 +1458,7 @@ extern "C" void StartNextSeqnodeRecord(SEQNODE *pseqnode)
             LO *pasega = PasegaApplyAseg(pasegd, palo, 0.0f, 1.0f, RI(prec, 0x18));
             if (prec->fChild == 0) {
                 pseqnode->pasega = pasega;
-                VFN(pasega, 0x8, void (*)(void *))(VTHIS(pasega, 0x8));
+                pasega->OnAdd();
             }
         }
         break;
@@ -1488,11 +1503,11 @@ extern "C" void StartNextSeqnodeRecord(SEQNODE *pseqnode)
         LO *pso = PloFindSwObject_thunk(B_003DD490, 0x405, RI(prec, 0x10), 0);
         if (pso != 0 && FIsBasicDerivedFrom(pso, 0x7E) != 0) {
             if (prec->kind == 0xE) {
-                VFN(pso, 0x188, void (*)(void *, int))(VTHIS(pso, 0x188), RI(prec, 0x14));
+                ((SWF *)pso)->Show(RI(prec, 0x14));
                 if (prec->fChild == 0)
                     pseqnode->ploSw = pso;
             } else {
-                VFN(pso, 0x190, void (*)(void *))(VTHIS(pso, 0x190));
+                ((SWF *)pso)->Hide();
             }
         }
         break;
@@ -1568,37 +1583,36 @@ extern "C" void StartNextSeqnodeRecord(SEQNODE *pseqnode)
         if (fStep != 0) {
             QW posT = *(QW *)&pos;
             LO *pstep = pseqnode->psubject;
-            char *pvt = VT(pstep);
-            QW posStep = RQ(pstep, 0x240);
+            QW posStep = ((STEP *)pstep)->posLocal;
             QW dpos = VectorSub(posT, posStep);
-            ((void (*)(void *, QW)) * (void **)(pvt + 0xEC))((char *)pstep + *(short *)(pvt + 0xE8), dpos);
+            pstep->TranslateToPos(dpos);
             SetStepRadTarget(pstep, rad);
         } else {
             LO *psubj = pseqnode->psubject;
-            VFN(psubj, 0xE8, void (*)(void *, QW))(VTHIS(psubj, 0xE8), *(QW *)&pos);
+            psubj->TranslateToPos(*(QW *)&pos);
         }
         MAT3 matT = MatFromRad(rad);
         LO *psubj = pseqnode->psubject;
-        VFN(psubj, 0xF0, void (*)(void *, MAT3 *))(VTHIS(psubj, 0xF0), &matT);
+        psubj->Slot30(&matT);
         if (FIsBasicDerivedFrom(pseqnode->psubject, 0x34) != 0) {
             LO *pjt = pseqnode->psubject;
             QW up = *(QW *)&g_2a2dc0;
-            QW height = VectorFromWord(*(u32 *)((char *)pjt + 0x1048));
+            QW height = VectorFromWord(*(u32 *)&((JT *)pjt)->field_0x1048);
             VECTOR scale;
             *(QW *)&scale = height;
             QW posT2 = *(QW *)&pos;
             QW result = ScaleAddX(posT2, up, height);
             RQ(pjt, 0x1060) = result;
             if (RI(prec, 0x14) == 0 && RI(pjt, 0x12F4) == 0) {
-                SetJmpState((char *)pjt + 0x2C0, 0xB, 0, 0);
+                SetJmpState(((JT *)pjt)->PvJmp(), 0xB, 0, 0);
                 DiscardSoXps(pjt);
             }
             SetSeqnodeDrive(pseqnode, 0, 0);
         }
         psubj = pseqnode->psubject;
-        VFN(psubj, 0x118, void (*)(void *, QW))(VTHIS(psubj, 0x118), g_2a2dd0);
+        psubj->Slot35(g_2a2dd0);
         psubj = pseqnode->psubject;
-        VFN(psubj, 0x120, void (*)(void *, QW))(VTHIS(psubj, 0x120), g_2a2dd0);
+        psubj->Slot36(g_2a2dd0);
         break;
     }
     case 0x17:
@@ -1706,7 +1720,7 @@ extern "C" void StartNextSeqnodeRecord(SEQNODE *pseqnode)
                         grf = 0xFFFF;
                     else
                         grf = FIsBasicDerivedFrom(pjt, 0x37) != 0 ? 0xF8FE : 0xF8FA;
-                    FAttachGroundTarget((char *)pjt + 0x4C0, grf, pground);
+                    FAttachGroundTarget(((JT *)pjt)->PvAttach(), grf, pground);
                 }
                 if (RI(pjt, 0x4CC) != -1 && RI(pjt, 0x4C8) == 3) {
                     void *pcrv = RP(pjt, 0x4D4);
@@ -1736,7 +1750,7 @@ extern "C" void StartNextSeqnodeRecord(SEQNODE *pseqnode)
                 RI(pgoal, 0xCC) = RI(prec, 0x18);
                 RF(pgoal, 0xD0) = RF(prec, 0x1C);
                 GoalFollowCrv_SetCrv(pgoal, pcrv, RI(prec, 0x14) == 0);
-                VFN(pgoal, 0x40, void (*)(void *))(VTHIS(pgoal, 0x40));
+                ((GOAL *)pgoal)->Activate();
             }
         }
         break;
@@ -1753,7 +1767,7 @@ extern "C" void StartNextSeqnodeRecord(SEQNODE *pseqnode)
             RI(pgoal, 0x38) = RI(prec, 0x18);
             RF(pgoal, 0x3C) = RF(prec, 0x1C);
             GoalGotoPos_SetPos(pgoal, *(QW *)&pos);
-            VFN(pgoal, 0x40, void (*)(void *))(VTHIS(pgoal, 0x40));
+            ((GOAL *)pgoal)->Activate();
         }
         break;
     case 0x29:
@@ -1775,13 +1789,12 @@ extern "C" void StartNextSeqnodeRecord(SEQNODE *pseqnode)
                 QW sum = VectorAdd(posJt, posLo);
                 *(QW *)&warp.pos = sum;
             } else {
-                void *pmember = PmemberFromLo(pdest);
+                MEMBER *pmember = PmemberFromLo(pdest);
                 warp.pmember = pmember;
                 if (pmember != 0) {
                     if (RI(pjt, 0xF54) != -1 && RP(pjt, 0xF5C) == pdest)
                         break;
-                    char *pvt = *(char **)((char *)pmember + 0x20);
-                    ((void (*)(void *, LO *, VECTOR *))*(void **)(pvt + 0x14))((char *)pmember + *(short *)(pvt + 0x10), pjt, &warp.pos);
+                    pmember->GetParam(pjt, (f32 *)&warp.pos);
                     warp.plo = pdest;
                 } else {
                     GetSeqnodeObjectPosRad(pseqnode, pdest, &warp.pos, 0);
@@ -1888,7 +1901,7 @@ extern "C" void StartNextSeqnodeRecord(SEQNODE *pseqnode)
         LO *pjt = PloFindSeqnodeObject(pseqnode, RI(prec, 0x10));
         if (pjt != 0 && FIsBasicDerivedFrom(pjt, 0x34) != 0) {
             pseqnode->pjtBinoc = pjt;
-            StartBinoc((char *)pjt + 0xF00, 1, pfocus, panchor);
+            StartBinoc(((JT *)pjt)->PvBinoc(), 1, pfocus, panchor);
         }
         break;
     }
@@ -2030,7 +2043,7 @@ extern "C" void StartNextSeqnodeRecord(SEQNODE *pseqnode)
             LO *pjt = pseqnode->psubject;
             LO *pso = PloFindSeqnodeObject(pseqnode, RI(prec, 0x10));
             if (pso != 0 && FIsBasicDerivedFrom(pso, 0x36) != 0) {
-                SetJmpState((char *)pjt + 0x2C0, (RI(pjt, 0x2DC) == 0x11) ? 3 : 1, 0, 0);
+                SetJmpState(((JT *)pjt)->PvJmp(), (RI(pjt, 0x2DC) == 0x11) ? 3 : 1, 0, 0);
                 SetSeqnodeDrive(pseqnode, prec, pjt);
             }
         }
@@ -2042,7 +2055,7 @@ extern "C" void StartNextSeqnodeRecord(SEQNODE *pseqnode)
             if (state < 7) if (state >= 4) {
                 LO *pso = PloFindSeqnodeObject(pseqnode, RI(prec, 0x10));
                 if (pso != 0)
-                    func_00220508((char *)pjt + 0x1910, pso);
+                    func_00220508(((MURRAY *)pjt)->PvCarry(), pso);
             }
         }
         break;
@@ -2054,7 +2067,7 @@ extern "C" void StartNextSeqnodeRecord(SEQNODE *pseqnode)
                 RI(prec, 0x18) = RI(pjt, 0x1910);
                 LO *pso = PloFindSeqnodeObject(pseqnode, RI(prec, 0x10));
                 if (pso != 0) {
-                    func_00220508((char *)pjt + 0x1910, pso);
+                    func_00220508(((MURRAY *)pjt)->PvCarry(), pso);
                     SetSeqnodeDrive(pseqnode, prec, pjt);
                 }
             }
@@ -2065,14 +2078,13 @@ extern "C" void StartNextSeqnodeRecord(SEQNODE *pseqnode)
     }
 
     if (GrfSw(pseqnode->psw) & 0x100)
-        pseqnode->rClock = g_2dded0.dtReal;
+        pseqnode->rClock = g_2dded0.tReal;
     else
-        pseqnode->rClock = g_2dded0.dt;
+        pseqnode->rClock = g_2dded0.t;
 }
 
 /* SEQVT, REC and SEQNODE as the whole file (src/stepguard-jsg/AddJsgContext_file.cpp) declares them for RunSeqnode, which calls this
    function; RECDONE and SEQNODEDONE below are the fuller views of the same objects this function reads */
-struct Holder_1E5468;
 
 /* a record argument word: an object id, a count, a time or a distance, by record kind */
 union RECARG {
@@ -2100,8 +2112,8 @@ struct VTPLAYERJT {
     int (*pfn89)(void *);
 };
 
-/* the player: JT (include/jt.h, class 52) and its subclasses SLY (53) and MURRAY (54), as far as this function reads them. The whole
-   file cannot include include/jt.h: its local SO and PO clash with JT's base classes. */
+/* the player: JT (include/jt.h, class 52) and its subclasses SLY (53) and MURRAY (54), as far as FSeqnodeRecordDone and
+   UpdateSeqnodeVjoy read them: a local view, for the fields jt.h does not declare (0xF5C has another type in StartJmpDirectionAseg_file). */
 struct PLAYERJT {
     u8 unknown_0x0[0xC];
     /* 0xC */ VTPLAYERJT *pvt;
@@ -2110,12 +2122,18 @@ struct PLAYERJT {
     u8 unknown_0x2E0[0x1E8];
     /* 0x4C8 */ s32 attachKind; /* JT */
     /* 0x4CC */ s32 field_0x4CC; /* JT */
-    u8 unknown_0x4D0[0xA58];
+    u8 unknown_0x4D0[0x4];
+    /* 0x4D4 */ struct CRV *pcrvAttach; /* JT::field_0x4D4, the curve of attachment kind 3: UpdateSeqnodeVjoy evaluates it */
+    u8 unknown_0x4D8[0x4];
+    /* 0x4DC */ f32 uAttach;   /* the parameter along pcrvAttach: UpdateSeqnodeVjoy */
+    u8 unknown_0x4E0[0xA48];
     /* 0xF28 */ s32 field_0xF28;
     u8 unknown_0xF2C[0x24];
     /* 0xF50 */ s32 field_0xF50; /* JT: the pipe state */
-    u8 unknown_0xF54[0xC];
-    /* 0xF60 */ f32 field_0xF60;
+    u8 unknown_0xF54[0x8];
+    /* 0xF5C */ struct CRV *pcrvPipe; /* the pipe's curve: UpdateSeqnodeVjoy walks it, StartNextSeqnodeRecord compares it with an object
+                                         (StartJmpDirectionAseg_file stores a JMPASEGA * at this offset, so it stays out of jt.h) */
+    /* 0xF60 */ f32 field_0xF60; /* the arc length along pcrvPipe: UpdateSeqnodeVjoy, FSeqnodeRecordDone */
     u8 unknown_0xF64[0x6C];
     /* 0xFD0 */ s32 field_0xFD0; /* JT: the part func_00144638 starts */
     u8 unknown_0xFD4[0x60];
@@ -2233,7 +2251,7 @@ extern "C" int func_00171DA8(int, int);
 
 extern "C" void func_001E0070(LO *, int);
 
-extern "C" void func_001E5468(struct Holder_1E5468 *pseqnode); /* as the whole file defines it */
+extern "C" void func_001E5468(SEQNODE *pseqnode); /* as the whole file defines it */
 
 extern "C" int func_00205458(PLAYERJT *, int);
 
@@ -2247,7 +2265,7 @@ extern "C" char B_003DA530[];
 
 extern "C" char B_003DD040[];
 
-extern "C" char *B_003E133C;
+extern "C" JOY *B_003E133C; /* SW::pvjoyFirst, the world's list of virtual joysticks */
 
 extern "C" int B_004435F8;
 
@@ -2261,7 +2279,6 @@ extern "C" float RO_002C3628;
 
 extern "C" float RO_002C362C;
 
-extern CLOCK g_2dded0; /* the game clock */
 
 extern "C" float g_2ddf0c;
 
@@ -2278,7 +2295,7 @@ static inline float TSeqnode(SEQNODEDONE *pseqnode) {
     if (grf & 0x100) {
         t = g_2ddf0c;
     } else {
-        t = g_2dded0.dt;
+        t = g_2dded0.t;
     }
     return t - pseqnode->tStart;
 }
@@ -2332,7 +2349,7 @@ extern "C" int FSeqnodeRecordDone(SEQNODE *pseqnodeBase, REC *precBase) {
     case 0xB:
         fDone = pseqnode->pjsg == 0;
         if (pseqnode->pjsg != 0) {
-            if (*(int *)((char *)pseqnode->pjsg + 0x74) == 0) {
+            if (((JSG *)pseqnode->pjsg)->fRunning == 0) {
                 pseqnode->pjsg = 0;
             }
             fDone = pseqnode->pjsg == 0;
@@ -2346,7 +2363,7 @@ extern "C" int FSeqnodeRecordDone(SEQNODE *pseqnodeBase, REC *precBase) {
         break;
     case 0xE:
         if (pseqnode->ploSw != 0 && func_002121C8(pseqnode->ploSw) != 0) {
-            func_001E5468((Holder_1E5468 *)pseqnode);
+            func_001E5468((SEQNODE *)pseqnode);
         }
         fDone = pseqnode->ploSw == 0;
         break;
@@ -2465,7 +2482,7 @@ extern "C" int FSeqnodeRecordDone(SEQNODE *pseqnodeBase, REC *precBase) {
             fDone = 1;
         }
         if (fDone != 0) {
-            GoalStack_Clear((char *)pjt + 0x26C);
+            GoalStack_Clear(((JT *)pjt)->pgoalstack());
             if (prec->arg[5].n != -1) {
                 JT_EndPose((sptr)pjt);
             }
@@ -2484,7 +2501,7 @@ extern "C" int FSeqnodeRecordDone(SEQNODE *pseqnodeBase, REC *precBase) {
             fDone = 1;
         }
         if (fDone != 0) {
-            GoalStack_Clear((char *)pjt + 0x26C);
+            GoalStack_Clear(((JT *)pjt)->pgoalstack());
             if (prec->arg[5].n != -1) {
                 JT_EndPose((sptr)pjt);
             }
@@ -2528,7 +2545,7 @@ extern "C" int FSeqnodeRecordDone(SEQNODE *pseqnodeBase, REC *precBase) {
         LO *ploShown = pseqnode->ploShown;
         if (ploShown != 0) {
             if (prec->kind == 0x2C) {
-                if (((int)(ploShown->grfo >> 0x3C) & 1) && *(float *)((char *)ploShown + 0x12C) == 1.0f) {
+                if (((int)(ploShown->grfo >> 0x3C) & 1) && ((SO *)ploShown)->uFade == 1.0f) {
                     pseqnode->ploShown = 0;
                 }
             } else if (((int)(ploShown->grfo >> 0x3C) & 1) == 0) {
@@ -2549,7 +2566,7 @@ extern "C" int FSeqnodeRecordDone(SEQNODE *pseqnodeBase, REC *precBase) {
         break;
     }
     case 0x39:
-        fDone = pseqnode->tCam <= g_2dded0.dt;
+        fDone = pseqnode->tCam <= g_2dded0.t;
         if (fDone) {
             if (prec->arg[12].n != 0) {
                 StopSeqnodeCameraMove((SEQNODE *)pseqnode, prec->arg[13].n);
@@ -2583,10 +2600,10 @@ extern "C" int FSeqnodeRecordDone(SEQNODE *pseqnodeBase, REC *precBase) {
         if (prec->arg[1].n == -1) {
             fDone = FJoyButtonPressed(B_002DFC00, prec->arg[0].n);
         } else {
-            char *pvjoy;
-            for (pvjoy = B_003E133C; pvjoy != 0; pvjoy = *(char **)(pvjoy + 0x84)) {
+            JOY *pvjoy;
+            for (pvjoy = B_003E133C; pvjoy != 0; pvjoy = pvjoy->pjoyNext) {
                 fDone = 0;
-                if (FLoHasOid(*(int *)(pvjoy + 0x7C), prec->arg[1].n) != 0) {
+                if (FLoHasOid(pvjoy->field_0x7C, prec->arg[1].n) != 0) {
                     break;
                 }
             }
@@ -2840,35 +2857,35 @@ void UpdateSeqnodeVjoy(SEQNODE *pseqnode, VJOY *pvjoy)
 {
     struct { QW q0; QW q1; QW q2; QW q3; } l;
     int *prec = (int *)pseqnode->precDrive;
-    char *pso = (char *)pseqnode->ploDrive;
+    PLAYERJT *pso = (PLAYERJT *)pseqnode->ploDrive;
     switch (prec[0]) {
     case 0x1a: {
         int fBackward = 0;
         float step = 50.0f;
-        float ahead = func_001E6728(*(CRV **)(pso + 0xF5C), *(float *)(pso + 0xF60) + step);
-        GetPathPosFromS(*(CRV **)(pso + 0xF5C), &l.q0, 0, ahead);
-        float behind = func_001E6728(*(CRV **)(pso + 0xF5C), *(float *)(pso + 0xF60) - step);
-        GetPathPosFromS(*(CRV **)(pso + 0xF5C), &l.q1, 0, behind);
+        float ahead = func_001E6728(pso->pcrvPipe, pso->field_0xF60 + step);
+        GetPathPosFromS(pso->pcrvPipe, &l.q0, 0, ahead);
+        float behind = func_001E6728(pso->pcrvPipe, pso->field_0xF60 - step);
+        GetPathPosFromS(pso->pcrvPipe, &l.q1, 0, behind);
         QW dir = bevy_player_p14_1c4768(pvjoy, VectorSub(l.q0, l.q1));
         float x = LaneX(dir);
         float y = LaneX(RotateWords3(dir));
         pvjoy->radLeft = atan2f(y, x);
         pvjoy->xLeft = x;
         pvjoy->yLeft = y;
-        CRV *pcrv = *(CRV **)(pso + 0xF5C);
+        CRV *pcrv = pso->pcrvPipe;
         if (pcrv->closed != 0) {
             float sBackward, sForward;
-            if (pseqnode->sCrv7C < *(float *)(pso + 0xF60)) {
-                sBackward = *(float *)(pso + 0xF60) - pseqnode->sCrv7C;
-                sForward = (SMaxCrv(pcrv) + pseqnode->sCrv7C) - *(float *)(pso + 0xF60);
+            if (pseqnode->sCrv7C < pso->field_0xF60) {
+                sBackward = pso->field_0xF60 - pseqnode->sCrv7C;
+                sForward = (SMaxCrv(pcrv) + pseqnode->sCrv7C) - pso->field_0xF60;
             } else {
-                sForward = pseqnode->sCrv7C - *(float *)(pso + 0xF60);
-                sBackward = (SMaxCrv(pcrv) + *(float *)(pso + 0xF60)) - pseqnode->sCrv7C;
+                sForward = pseqnode->sCrv7C - pso->field_0xF60;
+                sBackward = (SMaxCrv(pcrv) + pso->field_0xF60) - pseqnode->sCrv7C;
             }
             if (sBackward < sForward)
                 fBackward = 1;
         } else {
-            if (pseqnode->sCrv7C < *(float *)(pso + 0xF60))
+            if (pseqnode->sCrv7C < pso->field_0xF60)
                 fBackward = 1;
         }
         if (fBackward) {
@@ -2882,7 +2899,7 @@ void UpdateSeqnodeVjoy(SEQNODE *pseqnode, VJOY *pvjoy)
     case 0x1d: case 0x1e: case 0x1f: case 0x20: case 0x21: case 0x22:
     group:
         pvjoy->sLeft = 0.0f;
-        if (*(int *)(pso + 0x4CC) != -1)
+        if (pso->field_0x4CC != -1)
             pvjoy->grfbtn |= 0x20;
         break;
     case 0x23: {
@@ -2900,9 +2917,9 @@ void UpdateSeqnodeVjoy(SEQNODE *pseqnode, VJOY *pvjoy)
             pvjoy->grfbtn |= 8;
         LO *ptarget = PloFindSeqnodeObject(pseqnode, prec[4]);
         if (ptarget != 0) {
-            if (*(int *)(pso + 0x4CC) != -1 && *(int *)(pso + 0x4C8) == 3) {
-                CRV *pcrv = *(CRV **)(pso + 0x4D4);
-                EvaluateCrvFromU(pcrv, &l.q0, &l.q1, *(float *)(pso + 0x4DC));
+            if (pso->field_0x4CC != -1 && pso->attachKind == 3) {
+                CRV *pcrv = pso->pcrvAttach;
+                EvaluateCrvFromU(pcrv, &l.q0, &l.q1, pso->uAttach);
                 ((int *)&l.q1)[2] = 0;
                 float eps = 0.0001f;
                 QW tangent = l.q1;
@@ -2917,17 +2934,17 @@ void UpdateSeqnodeVjoy(SEQNODE *pseqnode, VJOY *pvjoy)
                 pvjoy->radLeft = atan2f(((float *)&l.q1)[1], ((float *)&l.q1)[0]);
                 if (pcrv->closed != 0) {
                     float uBackward, uForward;
-                    if (pseqnode->sCrv78 < *(float *)(pso + 0x4DC)) {
-                        uBackward = *(float *)(pso + 0x4DC) - pseqnode->sCrv78;
-                        uForward = (UMaxCrv(pcrv) + pseqnode->sCrv78) - *(float *)(pso + 0x4DC);
+                    if (pseqnode->sCrv78 < pso->uAttach) {
+                        uBackward = pso->uAttach - pseqnode->sCrv78;
+                        uForward = (UMaxCrv(pcrv) + pseqnode->sCrv78) - pso->uAttach;
                     } else {
-                        uForward = pseqnode->sCrv78 - *(float *)(pso + 0x4DC);
-                        uBackward = (UMaxCrv(pcrv) + *(float *)(pso + 0x4DC)) - pseqnode->sCrv78;
+                        uForward = pseqnode->sCrv78 - pso->uAttach;
+                        uBackward = (UMaxCrv(pcrv) + pso->uAttach) - pseqnode->sCrv78;
                     }
                     if (uBackward < uForward)
                         fBackward = 1;
                 } else {
-                    if (pseqnode->sCrv78 < *(float *)(pso + 0x4DC))
+                    if (pseqnode->sCrv78 < pso->uAttach)
                         fBackward = 1;
                 }
                 if (fBackward)
@@ -2949,9 +2966,9 @@ void UpdateSeqnodeVjoy(SEQNODE *pseqnode, VJOY *pvjoy)
                 pvjoy->sLeft = pvjoy->sLeft * gSpeed;
             }
         }
-        if (*(int *)(pso + 0x4CC) == -1)
+        if (pso->field_0x4CC == -1)
             break;
-        if (*(int *)(pso + 0x4C8) != 0 && *(int *)(pso + 0x4C8) != 0xD)
+        if (pso->attachKind != 0 && pso->attachKind != 0xD)
             break;
         pvjoy->grfbtn |= 0x20;
         break;
@@ -2959,9 +2976,9 @@ void UpdateSeqnodeVjoy(SEQNODE *pseqnode, VJOY *pvjoy)
     case 0x29: {
         pvjoy->sLeft = __builtin_fabsf(((float *)prec)[5]);
         LO *ptarget = PloFindSeqnodeObject(pseqnode, prec[4]);
-        if (ptarget == 0 || *(int *)(pso + 0x4CC) == -1)
+        if (ptarget == 0 || pso->field_0x4CC == -1)
             break;
-        if (*(int *)(pso + 0x4C8) != 8)
+        if (pso->attachKind != 8)
             break;
         GetSeqnodeObjectPosRad(pseqnode, ptarget, (VECTOR *)&l.q0, 0);
         QW posTarget = l.q0;
@@ -2984,8 +3001,8 @@ void UpdateSeqnodeVjoy(SEQNODE *pseqnode, VJOY *pvjoy)
         goto tail;
     case 0x5a: {
         float eps = g_2c3640;
-        QW b = *(QW *)(pso + 0x1A20);
-        QW a = *(QW *)(pso + 0x19F0);
+        QW b = pso->field_0x1A20;
+        QW a = pso->field_0x19F0;
         int fNear = 0;
         if (FFloatsNear__Ffff(LaneX(b), LaneX(a), eps)
             && FFloatsNear__Ffff(LaneX(RotateWords3(b)), LaneX(RotateWords3(a)), eps))
@@ -3214,35 +3231,22 @@ extern "C" void AttachSeqnodeObject(SEQNODE *pseqnode, LO *plo, int n1, int n2)
 
 INCLUDE_ASM(0X1E5280);
 
-struct VT_1E5370 {
-    int pad[4];
-    short delta;
-    short pad2;
-    void (*fn)(void *);
-};
-
-struct Obj_1E5370 {
-    int pad[3];
-    VT_1E5370 *vt;
-};
-
 extern "C" void RetractAsega(void *);
 
 extern "C" void JT_EndPose(int);
 
-extern "C" void ReleaseSeqnodeAnim(char *self)
+extern "C" void ReleaseSeqnodeAnim(SEQNODE *self)
 {
-    Obj_1E5370 *anim = *(Obj_1E5370 **)(self + 0x4C);
+    LO *anim = self->pasega;
     if (anim != 0) {
         RetractAsega(anim);
-        Obj_1E5370 *held = *(Obj_1E5370 **)(self + 0x4C);
-        held->vt->fn((char *)held + held->vt->delta);
-        *(int *)(self + 0x4C) = 0;
+        self->pasega->Slot2();
+        self->pasega = 0;
     }
-    int pose = *(int *)(self + 0x54);
+    LO *pose = self->pjtPose;
     if (pose != 0) {
-        JT_EndPose(pose);
-        *(int *)(self + 0x54) = 0;
+        JT_EndPose((sptr)pose);
+        self->pjtPose = 0;
     }
 }
 
@@ -3272,17 +3276,11 @@ extern "C" void ReleaseSeqnodeSma(SEQNODE *pseqnode) {
     }
 }
 
-struct VT_1E5468 { char pad[0x190]; short delta; short unused; void (*fn)(void *); };
-
-struct Obj_1E5468 { char pad[0xC]; VT_1E5468 *vt; };
-
-struct Holder_1E5468 { char pad[0x64]; Obj_1E5468 *child; };
-
-extern "C" void func_001E5468(Holder_1E5468 *self) {
-    Obj_1E5468 *child = self->child;
-    if (child != 0) {
-        child->vt->fn((char *)child + child->vt->delta);
-        self->child = 0;
+extern "C" void func_001E5468(SEQNODE *self) {
+    LO *pswf = self->ploSw;
+    if (pswf != 0) {
+        ((SWF *)pswf)->Hide();
+        self->ploSw = 0;
     }
 }
 
@@ -3292,7 +3290,7 @@ void StopBinoc(void *binoc);
 void ReleaseSeqnodeBinoc(SEQNODE *node) {
     LO *pjtBinoc = node->pjtBinoc;
     if (pjtBinoc != 0) {
-        StopBinoc((char *)pjtBinoc + 0xF00);
+        StopBinoc(((JT *)pjtBinoc)->PvBinoc());
         node->pjtBinoc = 0;
     }
 }
@@ -3338,7 +3336,7 @@ extern "C" void func_001E5570(SEQ_1E5570 *seq)
 
 struct SVT { char pad0[8]; short d8; short i8; void (*fn8)(char *); short d10; short i10; void (*fn10)(char *); };
 
-struct SEQNODE_1E5628 { char pad0[0xC]; SVT *vt; char pad1[0x14 - 0x10]; char *powner; char pad2[0x9C - 0x18]; int fCamMove; };
+struct SEQNODE_1E5628 { u8 unknown_0x0[0xC]; SVT *vt; u8 unknown_0x10[0x4]; char *powner; u8 unknown_0x18[0x84]; int fCamMove; u8 unknown_0xA0[0x4C]; void *pamb; };
 
 struct SeqnodeScope {
     SEQNODE_1E5628 *node;
@@ -3346,7 +3344,6 @@ struct SeqnodeScope {
     ~SeqnodeScope() { node->vt->fn10((char *)node + node->vt->d10); }
 };
 
-extern CLOCK g_2dded0;
 
 extern "C" int FSeqnodeStopped_1E5628(SEQNODE_1E5628 *);
 
@@ -3385,7 +3382,7 @@ void StopSeqnode(SEQNODE_1E5628 *pseqnode)
     if (FSeqnodeStopped_1E5628(pseqnode) != 0)
         return;
     SeqnodeScope scope(pseqnode);
-    void **pamb = (void **)((char *)pseqnode + 0xEC);
+    void **pamb = &pseqnode->pamb;
     pseqnode->vt->fn8((char *)pseqnode + pseqnode->vt->d8);
     RemoveDlEntry(pseqnode->powner + 0x5C, pseqnode);
     ReleaseSeqnodeAnim_1E5628(pseqnode);
@@ -3432,15 +3429,21 @@ extern "C" void StopSeqnodeCameraMove(SEQNODE *pseqnode, int arg1)
 
 struct SVT_1E5AE0 { char pad0[8]; short d8; short i8; void (*fn8)(char *); };
 
-struct OWNER { char pad[0x50]; int crec; char *arec; };
+/* the JSG that owns the node (jsg.h: its records and the node list at 0x5C) */
+struct OWNER {
+    u8 unknown_0x0[0x50];
+    /* 0x50 */ int crec;
+    /* 0x54 */ JSGE *arec;
+    u8 unknown_0x58[0x4];
+    /* 0x5C */ DL dlSeqnode; /* JSG::dlSeqnode */
+};
 
 struct SEQNODE_1E5AE0 {
     int unk0; int unk4; int unk8; SVT_1E5AE0 *vt; int unk10; OWNER *powner; OWNER *pownerRoot; int plo;
-    char pad[0x28 - 0x20]; char *prec; char *precEnd;
+    char pad[0x28 - 0x20]; JSGE *prec; JSGE *precEnd;
     char pad2[0xEC - 0x30]; int pamb;
 };
 
-struct REC_1E5AE0 { char pad[0x10]; int oid; };
 
 extern char B_003E1560_1E5AE0;
 
@@ -3454,7 +3457,7 @@ extern "C" void *PloFindSwObject_thunk_1E5AE0(void *, int, int, int);
 
 extern "C" void PrependDlEntry(void *, void *);
 
-SEQNODE_1E5AE0 *PseqnodeNew(OWNER *powner, REC_1E5AE0 *prec, SEQNODE_1E5AE0 *pparent)
+SEQNODE_1E5AE0 *PseqnodeNew(OWNER *powner, JSGE *prec, SEQNODE_1E5AE0 *pparent)
 {
     SEQNODE_1E5AE0 *pseqnode = (SEQNODE_1E5AE0 *)PvAllocSlotheapImpl(&B_003E1560_1E5AE0);
     memset(pseqnode, 0, 0xF0);
@@ -3467,15 +3470,15 @@ SEQNODE_1E5AE0 *PseqnodeNew(OWNER *powner, REC_1E5AE0 *prec, SEQNODE_1E5AE0 *ppa
         pseqnode->pownerRoot = pparent->pownerRoot;
     else
         pseqnode->pownerRoot = powner;
-    int oid = prec->oid;
+    int oid = prec->arg[0].n;
     if (oid != -1)
         pseqnode->plo = (sptr)PloFindSwObject_thunk_1E5AE0(&B_003DD490_1E5AE0, 5, oid, 0);
-    pseqnode->prec = (char *)prec;
-    void *pdl = (char *)powner + 0x5C;
-    char *precLast = powner->arec + (powner->crec * 0x50 - 0x50);
+    pseqnode->prec = prec;
+    DL *pdl = &powner->dlSeqnode;
+    JSGE *precLast = &powner->arec[powner->crec - 1];
     int cdepth = 1;
-    for (char *precScan = (char *)prec + 0x50; precScan <= precLast; precScan += 0x50) {
-        switch (*(int *)precScan) {
+    for (JSGE *precScan = prec + 1; precScan <= precLast; precScan++) {
+        switch (precScan->jsgek) {
         case 0:
             cdepth++;
             break;

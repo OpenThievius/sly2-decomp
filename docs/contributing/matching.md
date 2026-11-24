@@ -283,6 +283,26 @@ Rewriting matched code onto the shared headers (ROADMAP item 1), measured on the
   shared type and adds fields past its size; a misnamed type gets an honest name (a script object, a 2D affine, a list node); a field inside the
   base that one function reads on a guessed class goes through a local view (see Rulings).
 
+## Levers from the module waves and the camera classes (2026-11-23)
+
+Measured on the m2c module waves and the CM, CPLCY and RGBA passes (PR #75, #76) and the follow-ups after them:
+- **A struct global against a scalar global changes scheduling** (CLOCK `g_2dded0`), and **member stores against cast stores** can too. A typed
+  member store can let gcc hoist a float load: `SetEpselHint` kept a cast on `hint` only (typed it scores 13); `ShopMenu_InitPage` and `GoalGoto_Init`
+  kept casts.
+- **A typed sub-object pointer of a class makes gcc cache the base address.** `CM_Destruct` scored 24 with `&cm->k30cam` and 0 as one view or, once
+  the policies were classes of their own, reading `cm->cplook` directly. Give each sub-object a class and read through the member.
+- **A wrapper that adds an offset to argument 0 passes `a1` to `a3` through** (`FClipEdgeToPathzone` into `FClipEdgeToCg`): declare the callee with
+  every argument the wrapper has, not a one-argument callee.
+- **`#include` of a shared header can silently kill the compile.** A local `struct K30CAM` clashing with `cplcy.h`'s, or a `char B_002DDF40[]` clashing
+  with `cm.h`'s `CM B_002DDF40`, made `ee-gcc` exit 1 with an empty message (`try.py` prints only `compile error`): bisect the includes, then the
+  local declarations of the same name.
+- **A constructor on a shared value type stays out of unions.** Adding `RGBA() {}`, `RGBA(unsigned)` and `RGBA(int, int, int, int)` to `rgba.h` left
+  181 of 183 functions that use it at the same score, and broke the two (`RefreshSpriteInstance`, `AdvanceSpriteInstance`) whose frame-steering
+  unions hold an `RGBA`: gcc 2.95 refuses a member with a constructor in a union. Those two need a matching rewrite first; four sources keep a
+  local `RGBA` with constructors until then.
+- **A header that must meet an opaque local type cannot include `types.h`.** `FillShaders` declares its own `struct QW;` (it mangles into the DMA
+  methods' symbols, `types.h`'s `QW` is a 128-bit integer): `rgba.h` uses `unsigned char`, not `u8`, so the file can include it.
+
 ## Walls
 
 `config/matching/walls.tsv` is the list: address, name, class (`blocker`, `fragment`, `helper`, `toolchain`, `tie`, `exhausted`), the reason, the evidence and the `unlock` condition.

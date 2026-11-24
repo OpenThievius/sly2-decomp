@@ -51,7 +51,7 @@ void UpdateMurrayCarry(MURRAY *pmurray)
                     SetMurrayState(pmurray, 8);
                 } else if (GrfbtnVjoyPressedWithin(pmurray->pjoy, 0x400, 0.15f) && pmurray->FCanUseGadget(3)) {
                     ClearVjoyPresses(pmurray->pjoy, 0x400);
-                    StartBinoc(((char *)pmurray + 0xF00), 0, 0, 0);
+                    StartBinoc(pmurray->PvBinoc(), 0, 0, 0);
                 } else {
                     float uStick = pmurray->pjoy->uStick;
                     if (pmurray->iapasegByIndex == 0 ? uStick > 0.1f : uStick > 0.0f) {
@@ -74,8 +74,8 @@ void UpdateMurrayCarry(MURRAY *pmurray)
         break;
     case 1:
         SetStepRadTarget(pmurray, pmurray->pjoy->radStick);
-        SetRunBlendU(((char *)pmurray + 0x1460), pmurray->pjoy->uStick);
-        UpdateRunBlendFootsteps(((char *)pmurray + 0x1460));
+        SetRunBlendU(pmurray->runBlendCarry, pmurray->pjoy->uStick);
+        UpdateRunBlendFootsteps(pmurray->runBlendCarry);
         break;
     case 2:
         SetStepRadTarget(pmurray, pmurray->pjoy->radStick);

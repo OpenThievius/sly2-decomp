@@ -5,8 +5,31 @@
 #include "m2c_macros.h"
 #include "types.h"
 #include "include_asm.h"
+#include "clq.h"
+#include "sw.h"
 
-struct DIFFICULTY;
+/* the parameters a DIFFICULTY points at: OnDifficultyBreak reads its ranges, ChangeSuck passes its first 8 bytes (an LM) to GLimitLm */
+struct DIFFPARAMS {
+    LM lm;
+    u8 unknown_0x8[8];
+    s32 cBreakMin;
+    s32 cBreakMax;
+    s32 cBreakMinLow;
+    s32 cBreakMaxLow;
+    u8 unknown_0x20[8];
+    struct { s32 nMin[2]; s32 nMax[2]; } arange[2];
+};
+
+/* the difficulty state (0x18 bytes: OnDifficultyGameLoad clears it): the break and prize counters OnDifficultyBreak runs down, the
+   three save-value paths of the "suck" mean (GetSuck; func_00154A80 clears them) and the parameters */
+struct DIFFICULTY {
+    s32 nBreak;
+    s32 nPrize;
+    s32 path0;
+    s32 path1;
+    s32 path2;
+    DIFFPARAMS *pparams;
+};
 
 void OnDifficultyGameLoad(DIFFICULTY *difficulty)
 {
@@ -14,22 +37,21 @@ void OnDifficultyGameLoad(DIFFICULTY *difficulty)
 }
 
 // 0x154A80 ClearDifficultySuckPaths
-void func_00154A80(void *a0)
+void func_00154A80(DIFFICULTY *difficulty)
 {
-    *(int *)((char *)a0 + 0x8) = 0;
-    *(int *)((char *)a0 + 0xC) = 0;
-    *(int *)((char *)a0 + 0x10) = 0;
+    difficulty->path0 = 0;
+    difficulty->path1 = 0;
+    difficulty->path2 = 0;
 }
 
 INCLUDE_ASM(0X154A90);
 
 #include "cref.h"
 
-struct DIFF { char pad[8]; int p0, p1, p2; };
+/* the object whose word at 0xA8 points at the "suck" value: B_003E0F9C, and SW::pjobCurrent in ChangeSuck */
+struct SUCKER { u8 unknown_0x0[0xA8]; float *psuck; };
 
-struct LS { char pad[0xA8]; float *psuck; };
-
-extern LS *B_003E0F9C;
+extern SUCKER *B_003E0F9C;
 
 extern int B_003D4A60;
 
@@ -43,15 +65,15 @@ static inline float Load(int path)
 
 // The mean is two statements, `suck = first + second + third; suck *= 0.33333334f;`. With `suck` set before the 1/3 constant is loaded,
 // both are live at once, so `suck` takes $f20 and the ending is retail's `mtc1 $zero,$f20; mov.s $f0,$f20`.
-extern "C" float GetSuck(DIFF *pdiff)
+extern "C" float GetSuck(DIFFICULTY *pdiff)
 {
     float suck;
     if (B_003E0F9C != 0) {
         suck = *B_003E0F9C->psuck;
-    } else if (pdiff->p0 != 0 && pdiff->p1 != 0 && pdiff->p2 != 0) {
-        float first = Load(pdiff->p0);
-        float second = Load(pdiff->p1);
-        float third = Load(pdiff->p2);
+    } else if (pdiff->path0 != 0 && pdiff->path1 != 0 && pdiff->path2 != 0) {
+        float first = Load(pdiff->path0);
+        float second = Load(pdiff->path1);
+        float third = Load(pdiff->path2);
         suck = first + second + third;
         suck *= 0.33333334f;
     } else {
@@ -70,22 +92,14 @@ void AddSuck(s32 arg0, f32 fparg0) {
 }
 }
 
-struct LM_154DC8;
+extern "C" float GLimitLm__FP2LMf(LM *, float);
 
-struct DIFFICULTY_154DC8 { char pad[0x14]; LM_154DC8 *plm; };
+extern SW B_003DD490;
 
-struct SUCKER_154DC8 { char pad[0xA8]; float *psuck; };
-
-struct GAME_154DC8 { char pad[0x3B0C]; SUCKER_154DC8 *psucker; };
-
-extern "C" float GLimitLm__FP2LMf(LM_154DC8 *, float);
-
-extern GAME_154DC8 B_003DD490;
-
-extern "C" void ChangeSuck__FfP10DIFFICULTY(float suck, DIFFICULTY_154DC8 *pdifficulty) {
-    GAME_154DC8 *pgame = &B_003DD490;
-    if (pgame->psucker != 0) {
-        *pgame->psucker->psuck = GLimitLm__FP2LMf(pdifficulty->plm, suck);
+extern "C" void ChangeSuck__FfP10DIFFICULTY(float suck, DIFFICULTY *pdifficulty) {
+    SW *pgame = &B_003DD490;
+    if (pgame->pjobCurrent != 0) {
+        *((SUCKER *)pgame->pjobCurrent)->psuck = GLimitLm__FP2LMf(&pdifficulty->pparams->lm, suck);
     }
 }
 
@@ -101,24 +115,7 @@ extern "C" int FIsBasicDerivedFrom(void *, int);
 
 extern "C" int CpdprizeAttractSwDprizes(void *, int, QW, void *, int);
 
-struct DIFFPARAMS_154E10 {
-    char pad0[0x10];
-    int cBreakMin;
-    int cBreakMax;
-    int cBreakMinLow;
-    int cBreakMaxLow;
-    char pad20[8];
-    struct { int nMin[2]; int nMax[2]; } arange[2];
-};
-
-struct DIFF_154E10 {
-    int nBreak;
-    int nPrize;
-    char pad8[0xC];
-    DIFFPARAMS_154E10 *pparams;
-};
-
-static inline int NSuckLerp(DIFF_154E10 *pdiff, int irange, int i)
+static inline int NSuckLerp(DIFFICULTY *pdiff, int irange, int i)
 {
     float g = GetSuck_154E10(&B_002DE578);
     int nMin = pdiff->pparams->arange[irange].nMin[i];
@@ -130,7 +127,7 @@ static inline int NSuckLerp(DIFF_154E10 *pdiff, int irange, int i)
     return nMax + (int)((1.0f - g) * (((float)nMin + 0.999f) - (float)nMax));
 }
 
-extern "C" void OnDifficultyBreak(DIFF_154E10 *pdiff, QW pos, int cprize, int dPrize, void *pso)
+extern "C" void OnDifficultyBreak(DIFFICULTY *pdiff, QW pos, int cprize, int dPrize, void *pso)
 {
     if (pdiff->nBreak <= 0) {
         int nLow = NSuckLerp(pdiff, 0, 0);
@@ -158,13 +155,13 @@ extern "C" void OnDifficultyBreak(DIFF_154E10 *pdiff, QW pos, int cprize, int dP
 }
 
 struct CurveData {
-    char pad0[0x20];
+    u8 unknown_0x0[0x20];
     f32 startValue;
     f32 endValue;
 };
 
 struct Crvl {
-    char pad0[0x14];
+    u8 unknown_0x0[0x14];
     CurveData *curve;
 };
 

@@ -1,3 +1,4 @@
+#include "rgba.h"
 struct QW;
 
 
@@ -34,17 +35,13 @@ struct DMAREF_1EB960 {
     QW *aqw;
 };
 
-struct RGBA_1EB960 {
-    unsigned char r, g, b, a;
-};
-
 struct SHD_1EB960 {
     int pad0;
     unsigned char kind;
     unsigned char grf;
     char pad6[6];
     unsigned char rgba[4];
-    RGBA_1EB960 rgbaTex;
+    RGBA rgbaTex;
     char pad14[4];
     int ishd;
     char pad1C[4];
@@ -107,7 +104,7 @@ void FillShaders(int grfshd) {
         case 3: {
             GIFS gifs;
             unsigned char rgba[4];
-            RGBA_1EB960 rgbaTex;
+            RGBA rgbaTex;
             gifs.AllocStatic(pdmaref->cqw, pdmaref->aqw);
             if (pshd->grf & 2) {
                 gifs.AddPrimBulk(0x7C, 0, 4, 0x4F12, 0);

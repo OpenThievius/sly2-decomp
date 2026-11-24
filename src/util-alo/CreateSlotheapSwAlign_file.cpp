@@ -53,11 +53,11 @@ void FreeSlotheapPv(SLOTHEAP *pslotheap, void **ppv) {
     pslotheap->pslotFree = ppv;
 }
 
-void func_0011CDB8(void* arg0)
+void func_0011CDB8(SLOTHEAP *pslotheap)
 {
-    *(unsigned int*)((unsigned char*)arg0 + 0x14) = 0;
-    *(unsigned int*)((unsigned char*)arg0 + 0x10) = 0;
-    *(unsigned int*)((unsigned char*)arg0 + 0xC) = 0;
+    pslotheap->pblockCur = 0;
+    pslotheap->cslotUsed = 0;
+    pslotheap->pslotFree = 0;
 }
 
 INCLUDE_ASM(0X11CDC8);

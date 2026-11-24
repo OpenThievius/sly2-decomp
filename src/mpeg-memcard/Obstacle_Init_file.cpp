@@ -8,39 +8,49 @@
 #include "dl.h"
 #include "include_asm.h"
 #include "lo.h"
+#include "crv.h"
 #include "vu0inline.h"
 
-struct DL;
+struct QB { char b[8]; };
+
+// An obstacle: a closed outline of control points the player's path may not cross (class table of retail, a curve subclass).
+// Each function of this file reads its own words past the curve's 0x180 bytes; the one type holds them all.
+struct OBSTACLE : CRV {
+    u8 unknown_0x180[0x10];
+    s32 convk;                     // 0x190: Obstacle_PostLoad
+    u8 unknown_0x194[0x30];
+    DL members;                    // 0x1C4: the obstacles of a group (Obstacle_Init starts it with item offset 0x1D0, JoinGroup, ObstacleGroup_Dissolve)
+    QB link;                       // 0x1D0: the member's DLE in its group's list
+    OBSTACLE *group;               // 0x1D8: Obstacle_JoinGroup, ObstacleGroup_Dissolve, Obstacle_RemoveLoHierarchy
+    s32 pathzone;                  // 0x1DC: Obstacle_RemoveFromPathzone
+    QB state;                      // 0x1E0
+    s32 field_0x1E8;               // 0x1E8: Obstacle_Init sets -1
+    void *pplanes;                 // 0x1EC: Obstacle_LoadFromBrx, Obstacle_Clone allocate it
+};
 
 void InitDl(DL *, int);
 
 extern "C" void InitCrv(void *);
 
-extern "C" void Obstacle_Init(char *self)
+extern "C" void Obstacle_Init(OBSTACLE *self)
 {
     InitCrv(self);
-    *(int *)(self + 0x1E8) = -1;
-    InitDl((DL *)(self + 0x1C4), 0x1D0);
+    self->field_0x1E8 = -1;
+    InitDl(&self->members, 0x1D0);
 }
-
-struct ALLOCREQ_1BC088 { int cb; int cbAlign; };
 
 extern "C" void LoadCrvFromBrx(void *);
 
-extern "C" void *PvAllocSwClearImpl__Fi(ALLOCREQ_1BC088 *);
+extern "C" void *PvAllocSwClearImpl__Fi(ALLOCREQ *);
 
-extern "C" void Obstacle_LoadFromBrx(char *obstacle)
+extern "C" void Obstacle_LoadFromBrx(OBSTACLE *obstacle)
 {
-    ALLOCREQ_1BC088 allocreq;
+    ALLOCREQ allocreq;
     LoadCrvFromBrx(obstacle);
-    allocreq.cb = (*(int *)(obstacle + 0xE8) * 0x10) - 0x10;
+    allocreq.cb = (obstacle->ccv * 0x10) - 0x10;
     allocreq.cbAlign = 0x10;
-    *(void **)(obstacle + 0x1EC) = PvAllocSwClearImpl__Fi(&allocreq);
+    obstacle->pplanes = PvAllocSwClearImpl__Fi(&allocreq);
 }
-
-struct QB { char b[8]; };
-
-struct OBSTACLE { char pad[0xE8]; int cpos; char pad2[0x1D0 - 0xEC]; QB link; char pad4[8]; QB state; char pad5[4]; void *pplanes; };
 
 extern "C" void CloneCrv(OBSTACLE *, OBSTACLE *);
 
@@ -56,7 +66,7 @@ void Obstacle_Clone(OBSTACLE *pobstacle, OBSTACLE *pbase)
     ALLOCREQ req;
     ALLOCREQ *preq = &req;
     int align = 0x10;
-    preq->cb = pobstacle->cpos * 0x10 - 0x10;
+    preq->cb = pobstacle->ccv * 0x10 - 0x10;
     preq->cbAlign = align;
     pobstacle->pplanes = PvAllocSwClearImpl__Fi_1BC0D0(preq);
 }
@@ -74,28 +84,23 @@ void Obstacle_AddLoHierarchy(s32 arg0) {
 }
 }
 
-struct OBSTACLE_1BC198 {
-    char pad0[0x1D8];
-    s32 field_0x1D8;
-};
+extern "C" s32 FFindDlEntry(s32 *, OBSTACLE *);
 
-extern "C" s32 FFindDlEntry(s32 *, OBSTACLE_1BC198 *);
+extern "C" void ObstacleGroup_Dissolve_1BC198(OBSTACLE *);
 
-extern "C" void ObstacleGroup_Dissolve_1BC198(s32);
+extern "C" void Obstacle_RemoveFromPathzone_1BC198(OBSTACLE *);
 
-extern "C" void Obstacle_RemoveFromPathzone_1BC198(OBSTACLE_1BC198 *);
-
-extern "C" void RemoveDlEntry(s32 *, OBSTACLE_1BC198 *);
+extern "C" void RemoveDlEntry(s32 *, OBSTACLE *);
 
 extern "C" void RemoveLoHierarchy();
 
 extern "C" s32 B_003E1A4C;
 
-extern "C" void Obstacle_RemoveLoHierarchy(OBSTACLE_1BC198 *obstacle) {
-    s32 group;
+extern "C" void Obstacle_RemoveLoHierarchy(OBSTACLE *obstacle) {
+    OBSTACLE *group;
 
     RemoveLoHierarchy();
-    group = obstacle->field_0x1D8;
+    group = obstacle->group;
     if (group != 0) {
         ObstacleGroup_Dissolve_1BC198(group);
     }
@@ -111,9 +116,9 @@ INCLUDE_ASM(0X1BC278);
 
 INCLUDE_ASM(0X1BC2F8);
 
-extern "C" int Obstacle_IposWrap(void *p, int ipos)
+extern "C" int Obstacle_IposWrap(OBSTACLE *p, int ipos)
 {
-    int cpos = ((int *)p)[0x3a];
+    int cpos = p->ccv;
     int r = ipos % cpos;
     if (!(r >= 0)) {
         int before = r - 1;
@@ -126,28 +131,26 @@ extern "C" int Obstacle_IposWrap(void *p, int ipos)
     return r;
 }
 
-struct OBSTACLE_1BC570 { char pad0[0xE8]; int cpos; float *au; int unkF0; VECTOR *apos; char pad1[0x190 - 0xF8]; int convk; };
+extern "C" void PostLoLoad(OBSTACLE *);
 
-extern "C" void PostLoLoad(OBSTACLE_1BC570 *);
+extern "C" int func_001BC2F8(OBSTACLE *);
 
-extern "C" int func_001BC2F8(OBSTACLE_1BC570 *);
+extern "C" float UMaxCrv(OBSTACLE *);
 
-extern "C" float UMaxCrv(OBSTACLE_1BC570 *);
+extern "C" void MeasureCrv(OBSTACLE *);
 
-extern "C" void MeasureCrv(OBSTACLE_1BC570 *);
-
-extern "C" void Obstacle_PostLoad(OBSTACLE_1BC570 *pobstacle)
+extern "C" void Obstacle_PostLoad(OBSTACLE *pobstacle)
 {
     PostLoLoad(pobstacle);
     int convk = func_001BC2F8(pobstacle);
     pobstacle->convk = convk;
     if (convk != 3) {
       if (convk == 4) {
-        int cswap = pobstacle->cpos / 2;
+        int cswap = pobstacle->ccv / 2;
         float uMax = UMaxCrv(pobstacle);
         for (int iswap = 0; iswap < cswap; iswap++) {
-            VECTOR *apos = pobstacle->apos;
-            int iposOther = pobstacle->cpos - iswap - 1;
+            VECTOR *apos = (VECTOR *)pobstacle->apos;
+            int iposOther = pobstacle->ccv - iswap - 1;
             VECTOR posSaved = apos[iswap];
             apos[iswap] = apos[iposOther];
             apos[iposOther] = posSaved;
@@ -168,16 +171,7 @@ INCLUDE_ASM(0X1BC688);
 
 INCLUDE_ASM(0X1BC9F0);
 
-struct CRV;
-
-struct Obstacle : LO {
-    u8 unknown_0x50[0xF4 - 0x50];
-    /* 0xF4 */ QW *apos;
-};
-
 extern "C" int IcvFindCrvS(CRV *pcrv, float s, float *pds, float *pdsSeg);
-
-extern "C" int Obstacle_IposWrap(void *p, int ipos);
 
 extern "C" void GetPathPosFromS(CRV *, float, void *, int);
 
@@ -188,7 +182,7 @@ extern "C" int FClipEdgeToPathzone(void *ppathzone, QW posFrom, QW posTo, int gr
 // transformed point and the address of posPrev live in reload's spill slots (0x60, 0x64, 0x70, 0x80), not in locals.
 // GetPathPosFromS takes s before the position, as in the matched func_001BD560 and func_001BD718: with s last, as
 // FFindCrvSInPathzone declares it, the argument moves of the first call come out in another order.
-int func_001BCAC0(float sFrom, float sTo, Obstacle *obstacle, void *pathzone, int forward)
+int func_001BCAC0(float sFrom, float sTo, OBSTACLE *obstacle, void *pathzone, int forward)
 {
     MATRIX4 mat;
     QW posPrev;
@@ -243,8 +237,6 @@ int func_001BCAC0(float sFrom, float sTo, Obstacle *obstacle, void *pathzone, in
 
 INCLUDE_ASM(0X1BCCE0);
 
-struct CRV;
-
 struct PATHZONE;
 
 extern "C" float g_2c0abc;
@@ -282,27 +274,18 @@ int FFindCrvSInPathzone(float s, CRV *pcrv, PATHZONE *ppathzone, float *psFound,
 INCLUDE_ASM(0X1BD040);
 
 extern "C" {
-typedef struct OBSTACLE_1BD1E0 {
-    char pad0[0x1DC];
-    s32 field_0x1DC;
-} OBSTACLE_1BD1E0;
+void RemovePathzoneObstacle(s32, OBSTACLE *);
 
-void RemovePathzoneObstacle(s32, OBSTACLE_1BD1E0 *);
-
-void Obstacle_RemoveFromPathzone(OBSTACLE_1BD1E0 *obstacle) {
+void Obstacle_RemoveFromPathzone(OBSTACLE *obstacle) {
     s32 pathzone;
 
-    pathzone = obstacle->field_0x1DC;
+    pathzone = obstacle->pathzone;
     if (pathzone != 0) {
         RemovePathzoneObstacle(pathzone, obstacle);
-        obstacle->field_0x1DC = 0;
+        obstacle->pathzone = 0;
     }
 }
 }
-
-struct VT { char pad[0x48]; short delta; short index; void (*fn)(char *); };
-
-struct OBS { char pad[0xC]; VT *vt; char pad2[0x1C4 - 0x10]; DL members; char pad3[0x1D8 - 0x1D0]; void *group; };
 
 extern "C" char B_003E1A4C_1BD218[];
 
@@ -319,43 +302,39 @@ void AppendDlEntry_1BD218(void *, void *);
 // through the pushed iterator (current starts at the list head, as in OnRipgRemove and UpdateCodes),
 // and PushDli reads the old head as it->next = g_2dd2fc. A draft that read list->first directly let
 // the scheduler hoist that load above the push (score 12).
-void ObstacleGroup_Dissolve(OBS *group)
+void ObstacleGroup_Dissolve(OBSTACLE *group)
 {
     DLI iterator;
     PushDli(&iterator, &group->members);
     for (char *item = (char *)PvStep(&iterator); item != 0; item = (char *)PvStep(&iterator)) {
-        OBS *member = (OBS *)item;
+        OBSTACLE *member = (OBSTACLE *)item;
         RemoveDlEntry_1BD218(&group->members, member);
         member->group = 0;
         if (!FFindDlEntry_1BD218(B_003E1A4C_1BD218, member))
             AppendDlEntry_1BD218(B_003E1A4C_1BD218, member);
     }
-    group->vt->fn((char *)group + group->vt->delta);
+    group->Remove();
     AppendDlEntry_1BD218(B_003E1A40, group);
     PopDli(&iterator);
 }
 
-struct OBS;
-
-struct LO;
-
 struct SAPQUERY;
 
-struct LSG { char pad[0x40]; float u1; float u2; char pad2[0x18]; };
+struct LSG { u8 unknown_0x0[0x40]; float u1; float u2; u8 unknown_0x48[0x18]; };
 
-extern "C" int CobstacleFindPathzoneBox(LO *, SAPQUERY *, QW, QW, int, OBS **);
+extern "C" int CobstacleFindPathzoneBox(LO *, SAPQUERY *, QW, QW, int, OBSTACLE **);
 
-extern "C" int ClsgClipEdgeToObstacle(OBS *, QW, QW, int, LSG *);
+extern "C" int ClsgClipEdgeToObstacle(OBSTACLE *, QW, QW, int, LSG *);
 
-OBS *PobstacleFindEdgeBlocker(LO *pathzone, SAPQUERY *query, QW posA, QW posB)
+OBSTACLE *PobstacleFindEdgeBlocker(LO *pathzone, SAPQUERY *query, QW posA, QW posB)
 {
-    OBS *apobstacle[0x80];
+    OBSTACLE *apobstacle[0x80];
     LSG alsg[2];
     int count = CobstacleFindPathzoneBox(pathzone, query, posA, posB, 0x80, apobstacle);
     float uBest = 1.0f;
-    OBS *best = 0;
+    OBSTACLE *best = 0;
     for (int index = 0; index < count; index++) {
-        OBS *obstacle = apobstacle[index];
+        OBSTACLE *obstacle = apobstacle[index];
         if (!ClsgClipEdgeToObstacle(obstacle, posA, posB, 2, alsg) || alsg[0].u1 != 0.0f) {
             best = obstacle;
             break;
@@ -371,9 +350,7 @@ OBS *PobstacleFindEdgeBlocker(LO *pathzone, SAPQUERY *query, QW posA, QW posB)
 
 INCLUDE_ASM(0X1BD400);
 
-struct LSG_1BD560 { VECTOR pos; char pad[0x50]; };
-
-struct CRV { char pad[0xE4]; int fClosed; };
+struct LSG_1BD560 { VECTOR pos; u8 unknown_0x10[0x50]; };
 
 extern float D_002C0AC0;
 
@@ -383,9 +360,9 @@ extern "C" float SMinCrv(CRV *);
 
 extern "C" float SMaxCrv(CRV *);
 
-extern "C" int ClsgClipEdgeToObstacle_1BD560(OBS *, QW, QW, int, LSG_1BD560 *);
+extern "C" int ClsgClipEdgeToObstacle_1BD560(OBSTACLE *, QW, QW, int, LSG_1BD560 *);
 
-int func_001BD560(OBS *pobs, CRV *pcrv, int fForward, VECTOR *pposHit, float *psHit, float s)
+int func_001BD560(OBSTACLE *pobs, CRV *pcrv, int fForward, VECTOR *pposHit, float *psHit, float s)
 {
     VECTOR posPrev;
     VECTOR pos;
@@ -402,7 +379,7 @@ int func_001BD560(OBS *pobs, CRV *pcrv, int fForward, VECTOR *pposHit, float *ps
             if (fWrapped)
                 break;
             fWrapped = 1;
-            if (pcrv->fClosed)
+            if (pcrv->closed)
                 s = SWrapCrv(pcrv, s);
             else
                 s = SMinCrv(pcrv);
@@ -410,7 +387,7 @@ int func_001BD560(OBS *pobs, CRV *pcrv, int fForward, VECTOR *pposHit, float *ps
             if (fWrapped)
                 break;
             fWrapped = 1;
-            if (pcrv->fClosed)
+            if (pcrv->closed)
                 s = SWrapCrv(pcrv, s);
             else
                 s = SMaxCrv(pcrv);
@@ -484,22 +461,17 @@ int func_001BDBC8(float *a, float *b) {
 
 INCLUDE_ASM(0X1BDBF0);
 
-struct OBSTACLE_1BDE18 {
-    char pad0[0x1D8];
-    s32 field_0x1D8;
-};
+extern "C" void AppendDlEntry_1BDE18(DL *, OBSTACLE *);
 
-extern "C" void AppendDlEntry_1BDE18(s32, OBSTACLE_1BDE18 *);
+extern "C" s32 FFindDlEntry_1BDE18(s32 *, OBSTACLE *);
 
-extern "C" s32 FFindDlEntry_1BDE18(s32 *, OBSTACLE_1BDE18 *);
+extern "C" void Obstacle_RemoveFromPathzone_1BDE18(OBSTACLE *);
 
-extern "C" void Obstacle_RemoveFromPathzone_1BDE18(OBSTACLE_1BDE18 *);
+extern "C" void RemoveDlEntry_1BDE18(s32 *, OBSTACLE *);
 
-extern "C" void RemoveDlEntry_1BDE18(s32 *, OBSTACLE_1BDE18 *);
-
-extern "C" void Obstacle_JoinGroup(OBSTACLE_1BDE18 *obstacle, s32 group) {
-    obstacle->field_0x1D8 = group;
-    AppendDlEntry_1BDE18(group + 0x1C4, obstacle);
+extern "C" void Obstacle_JoinGroup(OBSTACLE *obstacle, OBSTACLE *group) {
+    obstacle->group = group;
+    AppendDlEntry_1BDE18(&group->members, obstacle);
     Obstacle_RemoveFromPathzone_1BDE18(obstacle);
     if (FFindDlEntry_1BDE18(&B_003E1A4C, obstacle) != 0) {
         RemoveDlEntry_1BDE18(&B_003E1A4C, obstacle);

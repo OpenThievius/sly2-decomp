@@ -5,6 +5,7 @@
 #include "m2c_macros.h"
 #include "types.h"
 #include "alloc.h"
+#include "light.h"
 #include "include_asm.h"
 
 struct BIS_167870;
@@ -26,11 +27,11 @@ struct BND_167870 {
 
 struct BNDNODE_167870 { BND_167870 abnd[4]; };
 
-struct SUBGLOBI_167870 { signed char b; char pad[0x13]; };
+struct SUBGLOBI_167870 { signed char b; u8 unknown_0x1[0x13]; };
 
-struct SUBGLOB_167870 { char pad0[0xC]; unsigned grf; void *pv; char pad1[0x24 - 0x14]; BND_167870 *pbnd; };
+struct SUBGLOB_167870 { u8 unknown_0x0[0xC]; unsigned grf; void *pv; u8 unknown_0x14[0x24 - 0x14]; BND_167870 *pbnd; };
 
-struct GLOBSET_167870 { char pad0[0x3C]; SUBGLOBI_167870 *asubglobi; SUBGLOB_167870 *asubglob; char pad1[4]; BNDNODE_167870 *abndnode; };
+struct GLOBSET_167870 { u8 unknown_0x0[0x3C]; SUBGLOBI_167870 *asubglobi; SUBGLOB_167870 *asubglob; u8 unknown_0x44[4]; BNDNODE_167870 *abndnode; };
 
 extern "C" int S16Read__18CBinaryInputStream_167870(BIS_167870 *);
 
@@ -102,7 +103,7 @@ INCLUDE_ASM(0X167E58);
 
 INCLUDE_ASM(0X167F78);
 
-struct SW_16DD58 { char pad[0x3E38]; int flag; };
+struct SW_16DD58 { u8 unknown_0x0[0x3E38]; int flag; };
 
 extern "C" SW_16DD58 B_003DD490;
 
@@ -132,7 +133,7 @@ extern "C" void UploadRelightLights(void *vifs)
     int *header;
     int *dest;
     int staticCount = 0;
-    char *light;
+    LIGHT *light;
     int index;
     EnsureVu1Code__FP4VIFSPvT1_167FC0(vifs, RO_0025E090, RO_0025E668);
     AddDmaCnt__4DMAS_167FC0(vifs);
@@ -140,8 +141,8 @@ extern "C" void UploadRelightLights(void *vifs)
     AddVifBaseOffset__4VIFSii_167FC0(vifs, 0x32, 0);
     int count = CploFindSwObjectsByClass(&B_003DD490, 0x505, 4, 0, 0x180, lights);
     for (index = 0; index < count; index++) {
-        light = (char *)lights[index];
-        if (*(int *)(light + 0x160) == 0)
+        light = (LIGHT *)lights[index];
+        if (light->fDynamic == 0)
             staticCount++;
     }
     if (staticCount > 0x100)
@@ -153,8 +154,8 @@ extern "C" void UploadRelightLights(void *vifs)
     int chunkEnd = 0;
     dest = 0;
     for (index = 0; index < count; index++) {
-        light = (char *)lights[index];
-        if (*(int *)(light + 0x160) != 0)
+        light = (LIGHT *)lights[index];
+        if (light->fDynamic != 0)
             continue;
         if (chunkEnd <= written) {
             int rest = staticCount - written;
@@ -165,7 +166,7 @@ extern "C" void UploadRelightLights(void *vifs)
             UnpackHelper__4VIFS3UPKiiPiPPUi_167FC0(vifs, 0xC, (chunkEnd - written) * 3, written * 3 + 1, 0, &dest);
         }
         written++;
-        CopyAb__FPvT0Ui_167FC0(dest, light + 0x120, 0x30);
+        CopyAb__FPvT0Ui_167FC0(dest, light->block, 0x30);
         dest += 12;
         if (written > 0xff)
             break;
@@ -251,13 +252,13 @@ struct INFO_169AC8 { int a[10]; };
 
 struct EXTRA_169AC8 { int a[6]; };
 
-struct DESC_169AC8 { char pad0[2]; unsigned char fShared; signed char fSkip; char pad4[0x10 - 4]; int cqw; };
+struct DESC_169AC8 { u8 unknown_0x0[2]; unsigned char fShared; signed char fSkip; u8 unknown_0x4[0x10 - 4]; int cqw; };
 
 struct VTE_169AC8 { short delta; short index; int (*fn)(char *, int); };
 
-struct VT_169AC8 { char pad[0x198]; VTE_169AC8 find; };
+struct VT_169AC8 { u8 unknown_0x0[0x198]; VTE_169AC8 find; };
 
-struct OBJ_169AC8 { char pad[0xC]; VT_169AC8 *vt; };
+struct OBJ_169AC8 { u8 unknown_0x0[0xC]; VT_169AC8 *vt; };
 
 struct CTX_169AC8 { OBJ_169AC8 *pobj; };
 
@@ -368,7 +369,9 @@ extern "C" void func_00169AC8(CTX_169AC8 *pctx, HDR_169AC8 *phdrSrc, INFO_169AC8
     CStackFrame_Destructor(l.frame, 2);
 }
 
-struct GLOB { char pad[0x10]; int cqw; };
+struct DMAQUAD { unsigned tag; int address; u8 unknown_0x8[8]; };
+
+struct GLOB { u8 unknown_0x0[0x10]; int cqw; };
 
 struct GLOBI { char pad[0x10]; int chain; int data; };
 
@@ -387,9 +390,9 @@ void CopyGlobDmaChain(GLOB *pglob, GLOBI *pglobi, int cqw, char *source, int rel
         char *pw = chain;
         int delta = newBase - oldBase;
         while (pw < (char *)pglobi->chain + pglob->cqw * 16) {
-            switch ((int)(*(unsigned *)pw >> 28)) {
+            switch ((int)(((DMAQUAD *)pw)->tag >> 28)) {
             case 4:
-                *(int *)(pw + 4) = *(int *)(pw + 4) + delta;
+                ((DMAQUAD *)pw)->address = ((DMAQUAD *)pw)->address + delta;
                 pw += 16;
                 break;
             case 1:
@@ -454,11 +457,13 @@ extern "C" MAP_169AC8 *func_0016C8E0(CTX_169AC8 *, BIS_169AC8 *pbis)
 
 struct BIS;
 
-struct REC { char pad0[1]; char count; char pad2[0xA]; int base; };
+struct SHD_16CAA0 { u8 unknown_0x0[0x1C]; int cslot; };
+
+struct REC { u8 unknown_0x0[1]; char count; u8 unknown_0x2[0xA]; int base; int detached; /* reader: DMAS_DetachCopyPermanent destination */ };
 
 struct ENTRY { int n0; int n4; int n8; char pad[0x50 - 0xC]; };
 
-struct REC2 { char pad0[0x18]; ENTRY *arr; };
+struct REC2 { u8 unknown_0x0[0x10]; int detached; /* reader: DMAS_DetachCopyPermanent destination */ u8 unknown_0x14[4]; ENTRY *arr; };
 
 struct UNP { unsigned short w[10]; unsigned short ashd[2]; unsigned short aweight[4]; };
 
@@ -529,14 +534,16 @@ static inline void *PvAllocSwClear(ALLOCREQ *preq, int cb)
     return PvAllocSwClearImpl__Fi_16CAA0(preq);
 }
 
-extern "C" void LoadGlobStreamedFromBrx(char *glob, REC *rec, REC2 *rec2, int unused, int arg4, int arg5, BIS *stream)
+struct GLOB_16CAA0 { u8 unknown_0x0[0x50]; unsigned long flags; };
+
+extern "C" void LoadGlobStreamedFromBrx(GLOB_16CAA0 *glob, REC *rec, REC2 *rec2, int unused, int arg4, int arg5, BIS *stream)
 {
     L l;
     int frame1;
     UNP *punpack;
     int dmaOut;
     int count = 0;
-    *(unsigned long *)(glob + 0x50) |= 0x8000L << 18;
+    glob->flags |= 0x8000L << 18;
     c16CAA0__4VIFS(l.vifs);
     CStackFrame_Construct(&l.frame0);
     AllocStack__4DMASi_16CAA0(l.vifs, 0x2000);
@@ -576,13 +583,13 @@ extern "C" void LoadGlobStreamedFromBrx(char *glob, REC *rec, REC2 *rec2, int un
             int slot = 0;
             punpack->w[1] = cursor;
             int next = index + 1;
-            char *pshd = (char *)PshdFromIndex(U16Read__18CBinaryInputStream_16CAA0(stream));
-            if (*(int *)(pshd + 0x1C) > 0) {
+            SHD_16CAA0 *pshd = (SHD_16CAA0 *)PshdFromIndex(U16Read__18CBinaryInputStream_16CAA0(stream));
+            if (pshd->cslot > 0) {
                 do {
                     punpack->ashd[slot] = cursor;
                     cursor += func_001EC688(pshd, slot, cursor, l.vifs);
                     slot++;
-                } while (slot < *(int *)(pshd + 0x1C));
+                } while (slot < pshd->cslot);
             }
             int nverts = U8Read__18CBinaryInputStream_16CAA0(stream);
             AddVifStcycl__4VIFSii_16CAA0(l.vifs, 1, 2);
@@ -631,7 +638,7 @@ extern "C" void LoadGlobStreamedFromBrx(char *glob, REC *rec, REC2 *rec2, int un
     }
     EndDmaCnt__4DMAS_16CAA0(l.vifs);
     AddDmaRet__4DMAS_16CAA0(l.vifs);
-    DMAS_DetachCopyPermanent(l.vifs, (char *)rec + 0x10, &dmaOut, (char *)rec2 + 0x10);
+    DMAS_DetachCopyPermanent(l.vifs, &rec->detached, &dmaOut, &rec2->detached);
     func_001699E8_16CAA0(glob, rec, rec2, arg4, arg5, 0, 0, 0, stream);
     CStackFrame_Destructor(&l.frame0, 2);
 }

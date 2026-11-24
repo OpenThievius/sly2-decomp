@@ -1,9 +1,10 @@
 #include "sly2.h"
+#include "tank.h"
 extern "C" void ClonePo();
 
-void CloneTank(void *ptank, void *ptankBase)
+void CloneTank(TANK *ptank, TANK *ptankBase)
 {
     ClonePo();
-    if (*(void **)((char *)ptank + 0x1d0) == ptankBase)
-        *(void **)((char *)ptank + 0x1d0) = ptank;
+    if (ptank->field_0x1D0 == ptankBase)
+        ptank->field_0x1D0 = ptank;
 }

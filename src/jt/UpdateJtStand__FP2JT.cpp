@@ -29,8 +29,6 @@ struct SOBASEVIEW {
     u8 unknown_0x0[0x4C];
     /* 0x4C */ LO *base;
 };
-/* slot 92 of the player returns an int here; jt.h declares it void, so the call stays by hand. */
-struct VT0 { short delta; short index; int (*fn)(void *); };
 extern "C" {
 extern float g_2dded4;
 int func_001430C8(JT *);
@@ -46,8 +44,7 @@ void UpdateJtStand(JT *jt)
 {
     JTSTANDVIEW *view = (JTSTANDVIEW *)jt;
     SetSmaMask(jt->field_0x1034, func_001430C8(jt));
-    VT0 *vt0 = (VT0 *)(*(char **)((char *)jt + 0xC) + 0x2E0);
-    if (vt0->fn((char *)jt + vt0->delta) == 0 && jt->psoSurface) {
+    if (jt->Slot92() == 0 && jt->psoSurface) {
         LO *base = ((SOBASEVIEW *)jt->psoSurface)->base;
         union { QW q; float f[4]; } angular;
         angular.q = base->Slot34();

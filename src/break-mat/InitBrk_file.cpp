@@ -4,24 +4,17 @@
 #include "types.h"
 #include "m2c_macros.h"
 #include "sly2.h"
+#include "sw.h"
 #include "so.h"
+#include "brk.h"
 #include "include_asm.h"
-
-struct BrkObject {
-    char pad0[0x40];
-    s32 *field_0x40;
-    char pad44[0x180 - 0x44];
-    s32 field_0x180;
-    s32 field_0x184;
-    s32 field_0x188;
-};
 
 extern "C" s32 InitSo();
 
-extern "C" void InitBrk(BrkObject *brk) {
+extern "C" void InitBrk(BRK *brk) {
     s32 *temp_a2;
     InitSo();
-    temp_a2 = brk->field_0x40;
+    temp_a2 = (s32 *)brk->pgrfentry;
     brk->field_0x180 = 1;
     brk->field_0x184 = -0xA;
     brk->field_0x188 = 0x2000;
@@ -29,30 +22,26 @@ extern "C" void InitBrk(BrkObject *brk) {
         *temp_a2 = *temp_a2 | 2;
         return;
     }
-    brk->field_0x40 = (s32 *)((sptr)temp_a2 | 2);
+    brk->pgrfentry = (GRFENTRY *)((sptr)temp_a2 | 2);
 }
 
-struct BrkTarget {
-    char pad0[0xD4];
+/* the two words of an SO's PHYS that func_00228BB0 sets (PHYS keeps them as a gap: one reader) */
+struct BRKPHYS {
+    u8 unknown_0x0[0xD4];
     f32 field_0xD4;
     f32 field_0xD8;
 };
 
-struct BrkOwner {
-    char pad0[0xE8];
-    BrkTarget *field_0xE8;
-};
-
 extern "C" void func_001F3590();
 
-extern "C" void func_001F68A8(BrkOwner *, s32);
+extern "C" void func_001F68A8(SO *, s32);
 
-extern "C" void func_00228BB0(BrkOwner *owner) {
-    BrkTarget *target;
+extern "C" void func_00228BB0(SO *owner) {
+    BRKPHYS *target;
 
     func_001F3590();
     func_001F68A8(owner, 1);
-    target = owner->field_0xE8;
+    target = (BRKPHYS *)owner->pphys;
     target->field_0xD8 = 1.0f;
     target->field_0xD4 = 1.0f;
 }
@@ -67,11 +56,16 @@ void PostBrkLoad(void) {
 
 INCLUDE_ASM(0X228C18);
 
-struct SW;
+/* a water's acceleration record on an object (0x10 bytes from SW::slotheapXa): the water that drives the object, the object, and the next
+   record on that object (SO::pxaFirst) and on the water (WATER::pxaFirst) */
+struct XA { struct WATER *pwater; SO *so; XA *nextSo; XA *next; };
 
-struct XA { int unk0; SO *so; XA *nextSo; XA *next; };
+/* a water volume: an SO with the head of its records */
+struct WATER : SO {
+    /* 0x150 */ XA *pxaFirst;
+};
 
-extern char B_003DD490[];
+extern SW B_003DD490;
 
 void RemoveSoXa(SO *, XA *);
 
@@ -109,88 +103,67 @@ void UpdateSwXaList(SW *sw, XA **first)
         so2->grfso = g;
         xa = next;
     }
-    FreeSwXaList((SW *)B_003DD490, freeList);
+    FreeSwXaList(&B_003DD490, freeList);
 }
 
 INCLUDE_ASM(0X228E50);
 
-struct XA_2292D8 { char pad[4]; SO *target; };
-
-void AddWaterExternalAccelerations(void *water, XA_2292D8 *xa, float dt)
+void AddWaterExternalAccelerations(void *water, XA *xa, float dt)
 {
-    SO *target = xa->target;
+    SO *target = xa->so;
     target->Slot72(water, dt);
 }
 
-struct Link { char pad0[4]; int owner; char pad8[4]; Link *next; };
-
-struct Water { char pad0[0x150]; Link *links; };
-
-extern "C" void FreeSwXaList__FP2SWP2XA_229308(void *, Link *);
+extern "C" void FreeSwXaList__FP2SWP2XA_229308(SW *, XA *);
 
 extern "C" void RemoveSoLoHierarchy();
 
-extern "C" void RemoveSoXa__FP2SOP2XA_229308(int, Link *);
+extern "C" void RemoveSoXa__FP2SOP2XA_229308(SO *, XA *);
 
-extern "C" char B_003DD490_229308;
-
-extern "C" void RemoveWater(Water *water) {
-    Link *link;
+extern "C" void RemoveWater(WATER *water) {
+    XA *link;
 
     RemoveSoLoHierarchy();
-    link = water->links;
+    link = water->pxaFirst;
     if (link != 0) {
         do {
-            RemoveSoXa__FP2SOP2XA_229308(link->owner, link);
+            RemoveSoXa__FP2SOP2XA_229308(link->so, link);
             link = link->next;
         } while (link != 0);
     }
-    FreeSwXaList__FP2SWP2XA_229308(&B_003DD490_229308, water->links);
-    water->links = 0;
+    FreeSwXaList__FP2SWP2XA_229308(&B_003DD490, water->pxaFirst);
+    water->pxaFirst = 0;
 }
 
-struct SO;
+struct MSGWATER { WATER *pwater; SO *pso; };
 
-struct XA_229370 { char pad0[4]; SO *pso; char pad1[4]; XA_229370 *pxaNext; };
+void RemoveSoXa__FP2SOP2XA_229370(SO *, XA *);
 
-struct VT { char pad[0x20]; short delta; short index; void (*fn)(void *, int, void *); };
-
-struct SOV { char pad[0xC]; VT *vt; };
-
-struct WATER { char pad[0x150]; XA_229370 *pxaFirst; };
-
-struct MSGWATER { WATER *pwater; SOV *pso; };
-
-extern "C" char B_003DD490_229370[];
-
-void RemoveSoXa__FP2SOP2XA_229370(SO *, XA_229370 *);
-
-void FreeSwXaList__FP2SWP2XA_229370(SW *, XA_229370 *);
+void FreeSwXaList__FP2SWP2XA_229370(SW *, XA *);
 
 extern "C" void HandleLoMessage(void *, int, void *);
 
 extern "C" void HandleWaterMessage(WATER *pwater, int msgid, void *pvMessage)
 {
     if (msgid == 1 && pvMessage != pwater) {
-        XA_229370 **ppxa = &pwater->pxaFirst;
-        XA_229370 *pxa;
+        XA **ppxa = &pwater->pxaFirst;
+        XA *pxa;
         for (pxa = *ppxa; pxa; pxa = *ppxa) {
-            if (pxa->pso == pvMessage) {
-                *ppxa = pxa->pxaNext;
+            if (pxa->so == pvMessage) {
+                *ppxa = pxa->next;
                 break;
             }
-            ppxa = &(*ppxa)->pxaNext;
+            ppxa = &(*ppxa)->next;
         }
         MSGWATER msg;
         msg.pwater = pwater;
-        msg.pso = (SOV *)pxa->pso;
+        msg.pso = pxa->so;
         if (pxa) {
-            pxa->pxaNext = 0;
-            RemoveSoXa__FP2SOP2XA_229370(pxa->pso, pxa);
-            FreeSwXaList__FP2SWP2XA_229370((SW *)B_003DD490_229370, pxa);
+            pxa->next = 0;
+            RemoveSoXa__FP2SOP2XA_229370(pxa->so, pxa);
+            FreeSwXaList__FP2SWP2XA_229370(&B_003DD490, pxa);
         }
-        VT *vt = msg.pso->vt;
-        vt->fn((char *)msg.pso + vt->delta, 5, &msg);
+        msg.pso->PostMessage(5, &msg);
     }
     HandleLoMessage(pwater, msgid, pvMessage);
 }
@@ -206,66 +179,58 @@ void UpdateSoBounds_thunk(void) {
 }
 
 extern "C" {
-s32 PvAllocSlotheapImpl(s32);                   /* extern */
+s32 PvAllocSlotheapImpl(SLOTHEAP *);            /* extern */
 
-void PxaAllocSw(s32 arg0) {
-    PvAllocSlotheapImpl(arg0 + 0x40E8);
+void PxaAllocSw(SW *psw) {
+    PvAllocSlotheapImpl(&psw->slotheapXa);
 }
 }
 
-extern "C" void FreeSlotheapPv(char *, char *);
+extern "C" void FreeSlotheapPv(SLOTHEAP *, XA *);
 
-extern "C" void FreeSwXaList__FP2SWP2XA(char *sw, char *xaList)
+void FreeSwXaList(SW *sw, XA *xaList)
 {
-    char *node = xaList;
-    char *nextNode;
+    XA *node = xaList;
+    XA *nextNode;
     if (node != 0) {
         do {
-            nextNode = *(char **)(node + 0xC);
-            FreeSlotheapPv(sw + 0x40E8, node);
+            nextNode = node->next;
+            FreeSlotheapPv(&sw->slotheapXa, node);
             node = nextNode;
         } while (node != 0);
     }
 }
 
-struct XA_229710 { char pad[8]; XA_229710 *next; };
+extern "C" void func_001F5078(SO *);
 
-struct SO_229710 { char pad[0x138]; XA_229710 *xaList; };
-
-extern "C" void func_001F5078(SO_229710 *);
-
-void AddSoXa(SO_229710 *so, XA_229710 *xa)
+void AddSoXa(SO *so, XA *xa)
 {
-    xa->next = so->xaList;
-    so->xaList = xa;
+    xa->nextSo = so->pxaFirst;
+    so->pxaFirst = xa;
     func_001F5078(so);
 }
 
 #define NULL 0
 
-struct XA_229738 { char pad[8]; XA_229738 *next; };
+extern "C" void func_001F5078_229738(SO *, XA *);
 
-struct SO_229738 { char pad[0x138]; XA_229738 *head; };
-
-extern "C" void func_001F5078_229738(SO_229738 *, XA_229738 *);
-
-extern "C" void RemoveSoXa__FP2SOP2XA(SO_229738 *so, XA_229738 *xa) {
-    XA_229738 **link = &so->head;
-    XA_229738 *node = *link;
-    XA_229738 *prev;
+void RemoveSoXa(SO *so, XA *xa) {
+    XA **link = &so->pxaFirst;
+    XA *node = *link;
+    XA *prev;
     if (node != NULL) {
         if (node == xa) {
-            so->head = xa->next;
-            xa->next = NULL;
+            so->pxaFirst = xa->nextSo;
+            xa->nextSo = NULL;
         } else {
             for (;;) {
                 prev = *link;
-                link = &prev->next;
+                link = &prev->nextSo;
                 node = *link;
                 if (node == NULL) break;
                 if (node != xa) continue;
-                prev->next = xa->next;
-                xa->next = NULL;
+                prev->nextSo = xa->nextSo;
+                xa->nextSo = NULL;
                 break;
             }
         }
@@ -273,16 +238,11 @@ extern "C" void RemoveSoXa__FP2SOP2XA(SO_229738 *so, XA_229738 *xa) {
     func_001F5078_229738(so, xa);
 }
 
-typedef void (*UpdateSoDrivenCall_229798)(void *, void *);
-
-void UpdateSoDriven(char *arg0) {
-    char *node = *(char **)(arg0 + 0x138);
+void UpdateSoDriven(SO *so) {
+    XA *node = so->pxaFirst;
     while (node != 0) {
-        char *owner = *(char **)node;
-        char *vtable = *(char **)(owner + 0xC);
-        UpdateSoDrivenCall_229798 call = *(UpdateSoDrivenCall_229798 *)(vtable + 0x23C);
-        call(owner + *(short *)(vtable + 0x238), node);
-        node = *(char **)(node + 0x8);
+        node->pwater->Slot71(node);
+        node = node->nextSo;
     }
 }
 
@@ -296,9 +256,12 @@ INCLUDE_ASM(0X2297F8);
 
 struct WATERBITS { unsigned long long low : 50; unsigned long long flag : 1; unsigned long long high : 13; };
 
-int func_00229D60(void* a0, void* a1)
+/* the object func_00229D60 tests: a flag bit of its word at 0x10 */
+struct WATERTARGET { u8 unknown_0x0[0x10]; WATERBITS bits; };
+
+int func_00229D60(void* a0, WATERTARGET *a1)
 {
-    return !((WATERBITS *)((char *)a1 + 0x10))->flag;
+    return !a1->bits.flag;
 }
 
 extern "C" {

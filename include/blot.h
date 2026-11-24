@@ -38,7 +38,8 @@ struct BLOT : LO {
     /* 0x98 */ s32 width;               /* the same */
     /* 0x9C */ f32 field_0x9C;          /* PostBlotLoad: 2048 minus half the height scaled to 640 */
     /* 0xA0 */ f32 field_0xA0;          /* PostBlotLoad: 2048 minus half the width scaled by 0.4545 */
-    u8 unknown_0xA4[0x4];
+    /* 0xA4 */ s32 order;              /* reader: FBlotObscured (a blot is obscured by one with a larger value), func_00215BA8 copies it;
+                                          func_00217298 shifts it left by 18 into a DMA record's depth */
     /* 0xA8 */ s32 field_0xA8;          /* PostBlotLoad sets -1 */
     u8 unknown_0xAC[0x10];
     /* 0xBC */ s32 field_0xBC;          /* LoadBlotFromBrx reads it from the stream; PostBlotLoad finds the world's font when it is set */

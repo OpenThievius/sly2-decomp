@@ -1,20 +1,20 @@
-#include "types.h"
+#include "sohit.h"
 extern "C" {
 s32 FAsegaGone(s32);
 s32 GetSmaCur(s32);
 s32 GetSmaGoal(s32);
-s32 func_0017F550(char *arg0) {
+s32 func_0017F550(SOHIT *arg0) {
     s32 current;
     s32 difference;
     s32 result;
 
-    if (*(s32 *)(arg0 + 0x194) != 0) {
-        return FAsegaGone(*(s32 *)(arg0 + 0x194));
+    if (arg0->hAsega != 0) {
+        return FAsegaGone(arg0->hAsega);
     }
     result = 1;
-    if (*(s32 *)(arg0 + 0x198) != 0) {
-        current = GetSmaCur(*(s32 *)(arg0 + 0x198));
-        difference = current ^ GetSmaGoal(*(s32 *)(arg0 + 0x198));
+    if (arg0->hSma != 0) {
+        current = GetSmaCur(arg0->hSma);
+        difference = current ^ GetSmaGoal(arg0->hSma);
         result = difference == 0;
     }
     return result;

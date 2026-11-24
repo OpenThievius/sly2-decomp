@@ -1,17 +1,16 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-#include "types.h"
+#include "sw.h"
+#include "blot.h"
 extern "C" {
-void HideCountdownBlot(s8 *arg0) {
-    s8 *obj = *(s8 **)(arg0 + 0x3BC4);
+void HideCountdownBlot(SW *arg0) {
+    BLOT *obj = (BLOT *)arg0->ahudblot[3].plo;
 
     if (obj != 0) {
-        s8 *vtable = *(s8 **)(obj + 0xC);
-        void (*method)(s8 *) = *(void (**)(s8 *))(vtable + 0x194);
-        method(obj + *(s16 *)(vtable + 0x190));
-        *(s32 *)(arg0 + 0x476C) = 0;
+        obj->Hide();
+        arg0->tEmit = 0.0f;
         return;
     }
-    *(s32 *)(arg0 + 0x476C) = 0;
+    arg0->tEmit = 0.0f;
 }
 
 }

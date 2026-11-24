@@ -1,10 +1,11 @@
 #include "types.h"
-extern "C" void CRef_Destruct(void *pref);
+#include "cref.h"
+extern "C" void CRef_Destruct(CRef *pref);
 
-int CRef_SetSymid(void *pref, int symid)
+int CRef_SetSymid(CRef *pref, int symid)
 {
     CRef_Destruct(pref);
-    *(int *)((char *)pref + 4) = symid;
-    *(int *)((char *)pref + 0) = 0x18;
+    pref->m_tag.m_n = symid;
+    pref->m_tagk = TAGK_Symid;
     return (sptr)pref;
 }

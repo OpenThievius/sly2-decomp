@@ -1,92 +1,80 @@
 #include "sly2.h"
-struct VT { char pad[0x40]; short delta; short unused; void (*fn)(void *); };
-struct OBJ { char pad[0xC]; VT *vt; };
-struct RANGE { char pad[0x60]; float lo; float hi; };
-struct PLAYER { char pad0[0x3CC]; char *alert; char pad1[0xF04 - 0x3D0]; float cooldown; char pad2[0xF64 - 0xF08]; void *link; };
-struct NOTICE {
-    char pad0[0x10]; PLAYER *player; char pad1[0x18 - 0x14]; char popSlot[0x18]; void *target; unsigned state; float since; RANGE *range;
-    char pad2[0x44 - 0x40]; void *zone; char pad3[0x50 - 0x48]; QW lastPos;
-};
+#include "stepguard.h"
+#include "goals.h"
+#include "clock.h"
 extern "C" {
 float GRandInRange(float, float);
-void Goal_Pop(void *);
+void Goal_Pop(GOAL **);
 QW PosLoWorld(void *);
-void *PpathzoneFindPos(QW, int);
-void SetAlertState(char *, int);
-void SetGoalTarget(void *, void *);
+PATHZONE *PpathzoneFindPos(QW, int);
+void SetAlertState(ALERT *, int);
+void SetGoalTarget(GOALGOTO *, GOALTARGET *);
 void func_00154038(void *, void *, int);
-char *func_00205438(PLAYER *, int);
+GOAL *func_00205438(STEPGUARD *, int);
 void func_00208540(void *, int);
 void func_002562A8(void *);
-extern float g_2dded0[];
-void GoalNotice_SetState(NOTICE *self, unsigned state) {
-    struct { int first; int second; int pad[2]; QW vec; } target;
+void GoalNotice_SetState(GOALNOTICE *self, unsigned state) {
+    GOALTARGET target;
     if (state != self->state) {
-        Goal_Pop(self->popSlot);
+        Goal_Pop(&self->pgoalChild);
         if (self->state == 1) {
-            RANGE *range = self->range;
-            float now = g_2dded0[0];
-            self->player->cooldown = now + GRandInRange(range->lo, range->hi);
-            self->range = 0;
+            GOALREACTRANGE *range = self->prange;
+            float now = g_2dded0.t;
+            GOAL_GUARD(self)->tCooldown = now + GRandInRange(range->lo, range->hi);
+            self->prange = 0;
         }
         self->state = state;
-        self->since = g_2dded0[0];
+        self->tState = g_2dded0.t;
         switch (state) {
         case 0: {
-            OBJ *obj = (OBJ *)func_00205438(self->player, 0xB3);
-            VT *vt = obj->vt;
-            vt->fn((char *)obj + vt->delta);
+            GOAL *obj = func_00205438(GOAL_GUARD(self), 0xB3);
+            obj->Activate();
             return;
         }
         case 1: {
-            char *obj = func_00205438(self->player, 0xA4);
-            *(void **)(obj + 0x30) = self->target;
-            *(RANGE **)(obj + 0x3C) = self->range;
-            self->player->cooldown = 3.4028235e38f;
-            VT *vt = ((OBJ *)obj)->vt;
-            vt->fn(obj + vt->delta);
-            SetAlertState(self->player->alert, 3);
+            GOALREACT *obj = (GOALREACT *)func_00205438(GOAL_GUARD(self), 0xA4);
+            obj->ptarget = self->ptarget;
+            *(GOALREACTRANGE **)((char *)obj + 0x3C) = self->prange; /* GOALREACT::pxf is at 0x3C: this goal keeps a range there */
+            GOAL_GUARD(self)->tCooldown = 3.4028235e38f;
+            obj->Activate();
+            SetAlertState(GOAL_GUARD(self)->palert, 3);
             return;
         }
         case 2: {
-            char *obj = func_00205438(self->player, 0xAD);
-            VT *vt = ((OBJ *)obj)->vt;
-            *(void **)(obj + 0x38) = self->target;
-            vt->fn(obj + vt->delta);
-            SetAlertState(self->player->alert, 4);
+            GOALANIM *obj = (GOALANIM *)func_00205438(GOAL_GUARD(self), 0xAD);
+            obj->ptarget = self->ptarget;
+            obj->Activate();
+            SetAlertState(GOAL_GUARD(self)->palert, 4);
             return;
         }
         case 3: {
-            char *obj = func_00205438(self->player, 0xBA);
-            *(int *)(obj + 0xC0) = 1;
-            *(int *)(obj + 0x38) = 0x1C;
-            QW posA = PosLoWorld(self->target);
-            QW posB = PosLoWorld(self->target);
+            GOALGOTO *obj = (GOALGOTO *)func_00205438(GOAL_GUARD(self), 0xBA);
+            obj->fLink = 1;
+            obj->field_0x38 = 0x1C;
+            QW posA = PosLoWorld(self->ptarget);
+            QW posB = PosLoWorld(self->ptarget);
             func_002562A8(&target);
-            target.vec = posB;
+            target.pos = posB;
             SetGoalTarget(obj, &target);
-            VT *vt = ((OBJ *)obj)->vt;
-            *(void **)(obj + 0xA8) = self->target;
-            *(int *)(obj + 0xAC) = 1;
-            vt->fn(obj + vt->delta);
-            self->lastPos = posA;
-            self->zone = PpathzoneFindPos(posA, 1);
+            obj->ptarget = self->ptarget;
+            obj->field_0xAC = 1;
+            obj->Activate();
+            self->posLast = posA;
+            self->pzone = PpathzoneFindPos(posA, 1);
             return;
         }
         case 4: {
-            char *obj = func_00205438(self->player, 0x9D);
-            VT *vt = ((OBJ *)obj)->vt;
-            *(int *)(obj + 0x3C) = 0xD;
-            vt->fn(obj + vt->delta);
-            func_00154038(self->player->link, self->target, 0);
-            func_00208540(self->player, 0);
+            GOALANIM *obj = (GOALANIM *)func_00205438(GOAL_GUARD(self), 0x9D);
+            obj->sgs = 0xD;
+            obj->Activate();
+            func_00154038(GOAL_GUARD(self)->psensor, self->ptarget, 0);
+            func_00208540(GOAL_GUARD(self), 0);
             return;
         }
         case 5: {
-            char *obj = func_00205438(self->player, 0x9E);
-            VT *vt = ((OBJ *)obj)->vt;
-            *(int *)(obj + 0x3C) = 1;
-            vt->fn(obj + vt->delta);
+            GOALANIM *obj = (GOALANIM *)func_00205438(GOAL_GUARD(self), 0x9E);
+            obj->sgs = 1;
+            obj->Activate();
             break;
         }
         }

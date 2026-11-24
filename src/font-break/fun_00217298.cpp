@@ -1,5 +1,5 @@
-#include "types.h"
-struct VIFS { char pad[0xC]; char *p; };
+#include "blot.h"
+struct VIFS { u8 unknown_0x0[0xC]; char *p; };
 struct SLOT { int a; float f; int c; int d; };
 extern "C" {
 extern VIFS g_2dea28;
@@ -14,10 +14,10 @@ static inline void Emit(VIFS *pv, unsigned first, unsigned second)
     *(int *)(pv->p += 4) = 0x13000000;
     pv->p += 4;
 }
-void func_00217298(char *self, int kind, int unused, float base)
+void func_00217298(BLOT *self, int kind, int unused, float base)
 {
     char *tag = g_2dea28.p;
-    *(long *)tag = 0x10000000;
+    *(s64 *)tag = 0x10000000;
     g_2dea28.p = g_2dea28.p + 0x10;
     switch (kind) {
     case 1:
@@ -51,11 +51,11 @@ void func_00217298(char *self, int kind, int unused, float base)
     }
     Pad(&g_2dea28);
     *(int *)tag |= (int)((g_2dea28.p - tag) >> 4) - 1;
-    *(long *)g_2dea28.p = 0x60000000;
+    *(s64 *)g_2dea28.p = 0x60000000;
     g_2dea28.p += 0x10;
     SLOT *slot = OnGameLoad__FP4GAME();
     slot->a = 0x15;
-    float scaled = (float)(*(int *)(self + 0xA4) << 0x12);
+    float scaled = (float)(self->order << 0x12);
     slot->c = (sptr)tag & 0x0FFFFFFF;
     slot->d = 0;
     slot->f = base + scaled;

@@ -5,11 +5,19 @@
 #include "m2c_macros.h"
 #include "include_asm.h"
 
-void func_00185E30(char *arg0, QW arg1, QW arg2, QW arg3)
+/* the object the binoc-joy splice method fills (name from the module; class unknown, so a local view: three quadwords from 0x1F30) */
+struct BINOC {
+    u8 unknown_0x0[0x1F30];
+    /* 0x1F30 */ QW field_0x1F30; /* reader: func_00185E30 */
+    /* 0x1F40 */ QW field_0x1F40;
+    /* 0x1F50 */ QW field_0x1F50;
+};
+
+void func_00185E30(BINOC *arg0, QW arg1, QW arg2, QW arg3)
 {
-    *(QW *)(arg0 + 0x1F30) = arg1;
-    *(QW *)(arg0 + 0x1F40) = arg2;
-    *(QW *)(arg0 + 0x1F50) = arg3;
+    arg0->field_0x1F30 = arg1;
+    arg0->field_0x1F40 = arg2;
+    arg0->field_0x1F50 = arg3;
 }
 
 INCLUDE_ASM(0X185E40);

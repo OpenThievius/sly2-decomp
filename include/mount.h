@@ -17,11 +17,15 @@ struct MOUNTREC { s32 oidPart; s32 oidObject; void *pxf; void *pact; void *plo; 
     /* 0x1C0 */ s32 state;               /* Mount_Init sets -1; Mount_SetState (and Chaser, Grab for their own: the slot is shared) */ \
     /* 0x1C4 */ f32 tState;              /* the clock at the last state change (Mount_SetState) */ \
     /* 0x1C8 */ struct ANIMENTRY aentry[5]; /* Mount_Init clears them (func_0017F3E0), Mount_PostLoad resolves them (func_0017F408), Mount_SetState plays the one of the new state (func_0017F4C0) */ \
-    u8 unknown_0x218[0x18]; \
+    /* 0x218 */ f32 radStick;            /* Mount_Update (slot 16) copies the controller's stick angle into it in state 1 */ \
+    u8 unknown_0x21C[0x4]; \
+    /* 0x220 */ QW vecStick;             /* Mount_Update: the stick as a vector (SetVectorCylind) in state 1, zero in the others */ \
     /* 0x230 */ s32 crec;                /* Mount_BindRecords (func_0017F770), Mount_AddPart (0x1800A0, named UseStepguardDeathAnimation by a wrong match): count, at most 4 */ \
     /* 0x234 */ struct MOUNTREC arec[4]; /* the same two: the records */ \
-    u8 unknown_0x294[0x14]; \
-    /* 0x2A8 */ s32 field_0x2A8;         /* Mount_Init (a method) sets -1 */
+    u8 unknown_0x294[0x10]; \
+    /* 0x2A4 */ struct AMB *pamb;        /* Mount_Update: the ambient sound it fades with the stick magnitude */ \
+    /* 0x2A8 */ s32 field_0x2A8;         /* Mount_Init (a method) sets -1 */ \
+    /* 0x2AC */ f32 volAmb;              /* Mount_Update: the smoothed volume of pamb */
 
 #ifdef __cplusplus
 struct MOUNT : SOHIT {

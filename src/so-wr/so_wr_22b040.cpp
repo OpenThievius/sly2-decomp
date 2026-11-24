@@ -6,77 +6,72 @@
 #include "m2c_macros.h"
 #include "include_asm.h"
 #include "sw.h"
+#include "blot.h"
 
 INCLUDE_ASM(0X22B040);
 
-struct WIPE {
-    char pad[0x20];
+/* The screen wipe between levels (the global at 0x443740): its state, the load request it holds back until the wipe has
+   covered the screen, and the blot that plays it. Not the WIPE class of wipe.h (an SO). */
+struct SCREENWIPE {
+    /* 0x0 */ int wipes;         /* 0 idle, 1 covering, 2 uncovering, 3 covered (the request goes out) */
+    /* 0x4 */ int fHasTrans;
+    /* 0x8 */ LOADREQ trans;
+    /* 0x54 */ BLOT *pblot;
+    /* 0x58 */ int oidWipe;
 };
 
-extern "C" void SetWipeWipes_22B050(void* pwipe, int state);
+extern "C" void SetWipeWipes_22B050(SCREENWIPE* pwipe, int state);
 
-void* InitWipe(void* pwipe)
+void* InitWipe(SCREENWIPE* pwipe)
 {
-    *(int*)((char*)pwipe + 0x54) = 0;
-    *(int*)((char*)pwipe + 0x0) = -1;
-    *(int*)((char*)pwipe + 0x58) = -1;
+    pwipe->pblot = 0;
+    pwipe->wipes = -1;
+    pwipe->oidWipe = -1;
     SetWipeWipes_22B050(pwipe, 0);
     return pwipe;
 }
-
-struct SW;
-
-struct BLOT;
-
-struct VT { char pad[0x188]; short delta; short index; void (*fnMessage)(void *, int); short delta2; short index2; void (*fnStop)(void *); };
-
-struct BLOTV { char pad[0xC]; VT *vt; };
-
-struct WIPE_22B090 { int wipes; int fHasTrans; char trans[0x4C]; BLOTV *pblot; int oidWipe; };
 
 extern "C" char B_003DD490[];
 
 extern "C" void SetSwLoadRequest(void *, void *);
 
-extern "C" void SetWipeWipes(WIPE_22B090 *pwipe, int wipesNew)
+extern "C" void SetWipeWipes(SCREENWIPE *pwipe, int wipesNew)
 {
     if (pwipe->wipes != wipesNew) {
         pwipe->wipes = wipesNew;
         switch (wipesNew) {
         case 0:
             pwipe->fHasTrans = 0;
-            memset(pwipe->trans, 0, 0x4C);
+            memset(&pwipe->trans, 0, 0x4C);
             if (pwipe->pblot) {
-                BLOTV *pblot = pwipe->pblot;
-                pblot->vt->fnStop((char *)pblot + pblot->vt->delta2);
+                BLOT *pblot = pwipe->pblot;
+                pblot->Hide();
             }
             break;
         case 1: {
-            BLOTV *pblot = pwipe->pblot;
-            pblot->vt->fnMessage((char *)pblot + pblot->vt->delta, 0x311);
+            BLOT *pblot = pwipe->pblot;
+            pblot->Select(0x311);
             break;
         }
         case 2: {
-            BLOTV *pblot = pwipe->pblot;
-            pblot->vt->fnMessage((char *)pblot + pblot->vt->delta, 0x30F);
+            BLOT *pblot = pwipe->pblot;
+            pblot->Select(0x30F);
             break;
         }
         case 3:
-            SetSwLoadRequest(B_003DD490, pwipe->trans);
+            SetSwLoadRequest(B_003DD490, &pwipe->trans);
             pwipe->fHasTrans = 0;
-            memset(pwipe->trans, 0, 0x4C);
+            memset(&pwipe->trans, 0, 0x4C);
             break;
         }
     }
 }
 
-struct WIPE_22B198 { int wipes; char pad[0x54 - 4]; void *pblot; };
+extern "C" int FBlotLabelPlaying(BLOT *, int);
 
-extern "C" int FBlotLabelPlaying(void *, int);
+extern "C" void SetWipeWipes_22B198(SCREENWIPE *, int);
 
-extern "C" void SetWipeWipes_22B198(WIPE_22B198 *, int);
-
-void bevy_gfx_screen_22b198(WIPE_22B198 *pwipe)
+void bevy_gfx_screen_22b198(SCREENWIPE *pwipe)
 {
     int wipes = pwipe->wipes;
     switch (wipes) {
@@ -96,39 +91,39 @@ void bevy_gfx_screen_22b198(WIPE_22B198 *pwipe)
     SetWipeWipes_22B198(pwipe, wipes);
 }
 
-static inline int FEqualLevel(char *lhs, char *rhs) {
+static inline int FEqualLevel(LEVELID *lhs, LEVELID *rhs) {
     if (lhs == rhs) return 1;
     if (rhs == 0) return 0;
     if (lhs == 0) return 0;
-    return (*(u32 *)(rhs + 8) ^ *(u32 *)(rhs + 0x38)) == (*(u32 *)(lhs + 8) ^ *(u32 *)(lhs + 0x38));
+    return (rhs->field_0x8 ^ rhs->field_0x38) == (lhs->field_0x8 ^ lhs->field_0x38);
 }
 
 extern "C" s32 PloFindSwObject_thunk(s32 *, s32, s32, s32);
 
-extern "C" void SetWipeWipes(WIPE_22B090 *, int);
+extern "C" void SetWipeWipes(SCREENWIPE *, int);
 
-extern "C" char B_003E10D0[];
+extern "C" LEVELID B_003E10D0;
 
-extern "C" void ActivateWipe(WIPE_22B090 *wipe, LOADREQ *request, int oidWipe, int wipesNew) {
+extern "C" void ActivateWipe(SCREENWIPE *wipe, LOADREQ *request, int oidWipe, int wipesNew) {
     switch (wipe->wipes) {
     case 2:
         SetWipeWipes(wipe, 0);
     case 0:
     default: {
-        char *level = (char *)request + 4;
-        int same = FEqualLevel(level, B_003E10D0);
+        LEVELID *level = &request->level;
+        int same = FEqualLevel(level, &B_003E10D0);
         if (same)
             request->grf |= 2;
         else
             request->grf &= ~2;
         s32 found = PloFindSwObject_thunk((s32 *)B_003DD490, 0x405, oidWipe, 0);
-        wipe->pblot = (BLOTV *)found;
+        wipe->pblot = (BLOT *)found;
         if (found == 0) {
             SetSwLoadRequest(B_003DD490, request);
             return;
         }
         wipe->fHasTrans = 1;
-        *(LOADREQ *)wipe->trans = *request;
+        wipe->trans = *request;
         wipe->oidWipe = oidWipe;
         SetWipeWipes(wipe, wipesNew);
     }
@@ -139,25 +134,18 @@ extern "C" void ActivateWipe(WIPE_22B090 *wipe, LOADREQ *request, int oidWipe, i
 }
 
 extern "C" {
-struct Wipe {
-    s32 field_0x0;
-    char pad4[0x54 - 4];
-    s32 field_0x54;
-    s32 field_0x58;
-};
-
 s32 PloFindSwObject_thunk(s32 *, s32, s32, s32);
 
-s32 SetWipeWipes_22B420(struct Wipe *, s32);
+s32 SetWipeWipes_22B420(SCREENWIPE *, s32);
 
 extern s32 B_003DD490_22B420;
 
-void PostLoadWipe(struct Wipe *wipe) {
+void PostLoadWipe(SCREENWIPE *wipe) {
     s32 found;
 
-    found = PloFindSwObject_thunk(&B_003DD490_22B420, 0x405, wipe->field_0x58, 0);
-    wipe->field_0x54 = found;
-    if ((found == 0) || (wipe->field_0x0 != 3)) {
+    found = PloFindSwObject_thunk(&B_003DD490_22B420, 0x405, wipe->oidWipe, 0);
+    wipe->pblot = (BLOT *)found;
+    if ((found == 0) || (wipe->wipes != 3)) {
         SetWipeWipes_22B420(wipe, 0);
         return;
     }
@@ -165,9 +153,7 @@ void PostLoadWipe(struct Wipe *wipe) {
 }
 }
 
-struct LEVELBLK { char b[0x40]; };
-
-struct TRANS { unsigned grf; LEVELBLK level; int oidSpawn; int oidSpawnParent; };
+struct TRANS { unsigned grf; LEVELID level; int oidSpawn; int oidSpawnParent; };
 
 extern char B_00443740[];
 
@@ -177,10 +163,10 @@ void SetSwLoadRequest_22B490(SW *, TRANS *);
 
 void RequestTransition(SW *sw, void *level, int oidSpawn, int oidSpawnParent, unsigned grf, int oidWipe)
 {
-    char *current = (char *)sw + 0x3C40;
+    LEVELID *current = &sw->level;
     TRANS trans;
-    trans.level = *(LEVELBLK *)(level ? level : current);
-    char *alevel = trans.level.b;
+    trans.level = *(LEVELID *)(level ? level : current);
+    LEVELID *alevel = &trans.level;
     trans.oidSpawn = oidSpawn;
     trans.oidSpawnParent = oidSpawnParent;
     trans.grf = grf;
@@ -190,8 +176,8 @@ void RequestTransition(SW *sw, void *level, int oidSpawn, int oidSpawnParent, un
     else if (current == 0)
         same = 0;
     else {
-        unsigned x = *(unsigned *)(alevel + 8) ^ *(unsigned *)(alevel + 0x38);
-        unsigned y = *(unsigned *)(current + 8) ^ *(unsigned *)(current + 0x38);
+        unsigned x = alevel->field_0x8 ^ alevel->field_0x38;
+        unsigned y = current->field_0x8 ^ current->field_0x38;
         same = x == y;
     }
     if (same) trans.grf |= 2;

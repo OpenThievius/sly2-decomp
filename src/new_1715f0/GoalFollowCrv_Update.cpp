@@ -1,29 +1,44 @@
 #include "sly2.h"
 #include "ps2inline.h"
 #include "vu0inline.h"
-struct FCVT { char pad[0x78]; short delta; short unused; void (*setState)(void *, int); };
-struct FCVPLO { char pad[0xDC]; char *crvdata; };
-struct FCVPLAYER { char pad[0xE8]; FCVPLO *plo; };
-struct FCVCRV { char pad0[0x28]; unsigned long flags; char pad1[0x1D8 - 0x30]; int busy; };
-struct GOALFOLLOWCRV {
-    char pad0[0xC]; FCVT *vt; FCVPLAYER *player; char pad1[0x30 - 0x14]; int owner; float ownerS; int mode38; char pad2[0x40 - 0x3C]; int fixed;
-    char pad3[0x4C - 0x44]; unsigned state; char pad4[0x54 - 0x50]; FCVCRV *crv; unsigned result; float hint; float diff;
-    char pad5[0x68 - 0x64]; float nearDist; float farDist; char pad6[0x80 - 0x70]; QW goalPos;
+#include "stepguard.h"
+#include "goals.h"
+#include "crv.h"
+#include "phys.h"
+
+/* The region link a solid object's PHYS points at (PHYS::plink): only the part func_001BD718's caller reads. */
+struct LINK {
+    u8 unknown_0x0[0x10];
+    /* 0x10 */ s32 id;         /* GoalFollowCrv_Update passes it as the second argument */
+    u8 unknown_0x14[0xC];
+    /* 0x20 */ u8 region[1];   /* GoalFollowCrv_Update passes its address as the third argument */
 };
+
+/* The curve family object GoalFollowCrv_Update follows (a CRV subclass, 0x1D8 and up: the class table has CRV children of 0x1C0 to 0x1F0). */
+struct CRVBUSY : CRV {
+    u8 unknown_0x180[0x58];
+    /* 0x1D8 */ s32 busy;      /* GoalFollowCrv_Update: while set the goal does not follow it */
+};
+
+/* GoalFollowCrv with its slot 15 (GoalFollowCrv_SetState). */
+struct GOALFOLLOWCRVSTATE : GOALFOLLOWCRV {
+    virtual void SetState(int state);
+};
+
 extern "C" {
-void FindCrvClosestPointAll(FCVCRV *, QW, void *, int, int, int, float *);
-void GoalFollowCrv_Steer(GOALFOLLOWCRV *);
+void FindCrvClosestPointAll(CRV *, QW, void *, int, int, int, float *);
+void GoalFollowCrv_Steer(GOALFOLLOWCRVSTATE *);
 QW PosLoWorld(void *);
-float SDiffCrv(FCVCRV *, float, float);
-unsigned func_001BD718(QW, int, void *, int, float, int, void *, void *);
+float SDiffCrv(CRV *, float, float);
+unsigned func_001BD718(QW, int, void *, CRV *, float, int, CRV **, float *);
 void func_001EEF98();
 extern char B_003DD020[];
-void GoalFollowCrv_Update(GOALFOLLOWCRV *self) {
+void GoalFollowCrv_Update(GOALFOLLOWCRVSTATE *self) {
     float closest;
     QW pos;
     func_001EEF98();
     GoalFollowCrv_Steer(self);
-    pos = PosLoWorld(self->player);
+    pos = PosLoWorld(self->pstep);
     unsigned old;
     do {
         old = self->state;
@@ -31,27 +46,27 @@ void GoalFollowCrv_Update(GOALFOLLOWCRV *self) {
         case 0:
         case 2:
         case 3: {
-            if (self->fixed == 0) {
-                FCVPLO *plo = self->player->plo;
-                char *crvdata = 0;
-                if (plo != 0) crvdata = plo->crvdata;
+            if (self->field_0x40 == 0) {
+                PHYS *pphys = GOAL_GUARD(self)->pphys;
+                LINK *plink = 0;
+                if (pphys != 0) plink = pphys->plink;
                 int id = 0;
-                if (crvdata != 0) id = ((int *)crvdata)[4];
-                unsigned result = func_001BD718(pos, id, plo->crvdata + 0x20, self->owner, self->ownerS, self->mode38 == 0, &self->crv, &self->diff);
+                if (plink != 0) id = plink->id;
+                unsigned result = func_001BD718(pos, id, GOAL_GUARD(self)->pphys->plink->region, self->pcrv, self->s, self->reverse == 0, &self->pcrvLast, &self->diff);
                 self->result = result;
                 switch (result) {
                 case 0:
                     break;
                 case 3:
                 case 4:
-                    self->vt->setState((char *)self + self->vt->delta, 3);
+                    self->SetState(3);
                     break;
                 case 1:
                 case 2:
-                    FindCrvClosestPointAll(self->crv, pos, B_003DD020, 0, 0, 0, &closest);
-                    if (__builtin_fabsf(SDiffCrv(self->crv, closest, self->diff)) > 80.0f) {
+                    FindCrvClosestPointAll(self->pcrvLast, pos, B_003DD020, 0, 0, 0, &closest);
+                    if (__builtin_fabsf(SDiffCrv(self->pcrvLast, closest, self->diff)) > 80.0f) {
                         self->hint = closest;
-                        self->vt->setState((char *)self + self->vt->delta, 1);
+                        self->SetState(1);
                         break;
                     }
                     self->result = 0;
@@ -64,35 +79,35 @@ void GoalFollowCrv_Update(GOALFOLLOWCRV *self) {
                     limit = self->nearDist;
                 else
                     limit = self->farDist;
-                float dist = LaneX(SqrtX(SquaredLengthXy(VectorSub(pos, self->goalPos))));
+                float dist = LaneX(SqrtX(SquaredLengthXy(VectorSub(pos, self->posGoal))));
                 int farther = limit < dist;
                 if (farther != 0)
-                    self->vt->setState((char *)self + self->vt->delta, 0);
+                    self->SetState(0);
                 else
-                    self->vt->setState((char *)self + self->vt->delta, 2);
+                    self->SetState(2);
             }
             break;
         }
         case 1:
         case 4: {
-            FCVCRV *crv = self->crv;
-            if (((int)(crv->flags >> 60) & 1) == 0 || crv->busy != 0) {
-                self->vt->setState((char *)self + self->vt->delta, 0);
+            CRVBUSY *crv = (CRVBUSY *)self->pcrvLast;
+            if (((int)(crv->grfo >> 60) & 1) == 0 || crv->busy != 0) {
+                self->SetState(0);
             } else {
                 if (__builtin_fabsf(SDiffCrv(crv, self->hint, self->diff)) < 80.0f) {
-                    self->vt->setState((char *)self + self->vt->delta, 0);
+                    self->SetState(0);
                 } else {
                     float limit;
                     if (self->state == 1)
                         limit = self->nearDist;
                     else
                         limit = self->farDist;
-                    float dist = LaneX(SqrtX(SquaredLengthXy(VectorSub(pos, self->goalPos))));
+                    float dist = LaneX(SqrtX(SquaredLengthXy(VectorSub(pos, self->posGoal))));
                     int farther = limit < dist;
                     if (farther != 0)
-                        self->vt->setState((char *)self + self->vt->delta, 1);
+                        self->SetState(1);
                     else
-                        self->vt->setState((char *)self + self->vt->delta, 4);
+                        self->SetState(4);
                 }
             }
             break;

@@ -122,14 +122,14 @@ INCLUDE_ASM(0X22C028);
 
 struct WARP { int kind; int id; char pad0[8]; QW pos; char pad1[0x60 - 0x20]; int state; char pad2[0xD0 - 0x64]; };
 
-struct WR_22C3B0 { char pad0[0x54]; int cwarp; int idNext; int idPending; WARP awarp[1]; };
+struct WR_22C3B0 { u8 unknown_0x0[0x54]; int cwarp; int idNext; int idPending; WARP awarp[8]; int iwreCur; /* 0x6E0: PwreGetWrCur */ };
 
 extern "C" QW g_2a2da0;
 
 extern "C" void AddWrCircleWarp__FP2WR(WR_22C3B0 *pwr)
 {
     WARP *pwarp = &pwr->awarp[pwr->cwarp++];
-    *(int *)((char *)pwr + 0x6E0) += 1;
+    pwr->iwreCur += 1;
     pwarp->kind = 0;
     pwarp->pos = g_2a2da0;
     int pending = pwr->idPending;
@@ -194,23 +194,23 @@ void PwreGetWrBend__FP2WR4ENSK(void* pwr, int ensk)
     PwreGetWrCur__FP2WR4ENSK4WREK_22C4F8(pwr, ensk, 1);
 }
 
-extern "C" s8 *PwreGetWrCircle__FP2WR4ENSK_22C518(s8 *, s32);
+struct WrCircle {
+    u8 unknown_0x0[0x64];
+    f32 frequency;
+};
+
+extern "C" WrCircle *PwreGetWrCircle__FP2WR4ENSK_22C518(s8 *, s32);
 
 extern "C" void SetWrWavelength__FP2WRf(s8 *arg0, f32 fparg0) {
-    s8 *temp_v0;
+    WrCircle *temp_v0;
 
     temp_v0 = PwreGetWrCircle__FP2WR4ENSK_22C518(arg0, 1);
     if (fparg0 == 0.0f) {
-        *(f32 *)(temp_v0 + 0x64) = 0.0f;
+        temp_v0->frequency = 0.0f;
     } else {
-        *(f32 *)(temp_v0 + 0x64) = 1.0f / fparg0;
+        temp_v0->frequency = 1.0f / fparg0;
     }
 }
-
-struct WrCircle {
-    char pad0[0x64];
-    f32 frequency;
-};
 
 struct WR;
 

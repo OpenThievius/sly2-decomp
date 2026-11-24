@@ -1,10 +1,20 @@
+#include "types.h"
+struct CPROG {
+    s32 field0;
+    s32 field4;
+    s32 field8;
+    s32 fieldC;
+    s8 byte10;
+    u8 unknown_0x11[0x3F];
+    s32 field50;
+};
 // 0x1C8DB8 EndCProg   (Sly 1: CProg::End)
-extern "C" void End__5CProg(void *arg0)
+extern "C" void End__5CProg(CPROG *prog)
 {
-    *(int *)((char *)arg0 + 0x0) = 0;
-    *(int *)((char *)arg0 + 0x50) = 0;
-    *(int *)((char *)arg0 + 0xC) = 0;
-    *(int *)((char *)arg0 + 0x8) = 0;
-    *(int *)((char *)arg0 + 0x4) = 0;
-    *(char *)((char *)arg0 + 0x10) = 0;
+    prog->field0 = 0;
+    prog->field50 = 0;
+    prog->fieldC = 0;
+    prog->field8 = 0;
+    prog->field4 = 0;
+    prog->byte10 = 0;
 }

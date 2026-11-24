@@ -39,7 +39,8 @@ struct TANK : PO {
     /* 0x1C4 */ struct LAUNCH *plaunch; /* UpdateTankFire aims the clone with it (LaunchSoAtTarget) */
     /* 0x1C8 */ struct SO *psoClone;  /* UpdateTankFire: the clone it leased */
     /* 0x1CC */ s32 fRotAct;          /* PostTankLoad clears it and restarts the act (func_00226370); UpdateTankAim tests it */
-    u8 unknown_0x1D0[0x8];
+    /* 0x1D0 */ struct TANK *field_0x1D0; /* CloneTank: re-pointed at the clone when it pointed at the tank cloned from */
+    u8 unknown_0x1D4[0x4];
     /* 0x1D8 */ struct ACT *pact;     /* the rotation act func_00226370 starts and stops; UpdateTankAim updates it */
     u8 unknown_0x1DC[0x4];
     /* PO::pjoy's block as the stick words UpdateTankAim reads (JOY leaves them unknown); an accessor, as STEP::pgoalstack() */
@@ -56,5 +57,6 @@ SLY2_OFFSET_CHECK(TANK, skill, 0x1BC);
 SLY2_OFFSET_CHECK(TANK, ploCloneSrc, 0x1C0);
 SLY2_OFFSET_CHECK(TANK, fRotAct, 0x1CC);
 SLY2_OFFSET_CHECK(TANK, pact, 0x1D8);
+SLY2_OFFSET_CHECK(TANK, field_0x1D0, 0x1D0);
 #endif
 #endif

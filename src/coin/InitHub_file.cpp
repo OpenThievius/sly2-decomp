@@ -5,6 +5,28 @@
 #include "m2c_macros.h"
 #include "types.h"
 #include "include_asm.h"
+#include "joy.h"
+#include "po.h"
+#include "sw.h"
+#include "job.h"
+
+/* a state machine (SM): the hub reads its entry count */
+struct SM { u8 unknown_0x0[0x50]; s32 csms; };
+
+/* one door of the hub: the state machine animation it belongs to, the button that opens it and the object it starts (-1: none) */
+struct HUBENTRY { int sma; int button; int oid; };
+
+/* the hub: a playable object (PO, 0x180 bytes) with its state, state machine and the table of doors UpdateHub walks (AddHubEntry
+   appends, at most 12) and the allowed object ids SetHubAllowedStates reads from its argument */
+struct HUB : PO {
+    /* 0x180 */ s32 state;
+    /* 0x184 */ SM *sm;
+    /* 0x188 */ s32 sma;
+    /* 0x18C */ s32 centry;
+    /* 0x190 */ HUBENTRY entry[12];
+    /* 0x220 */ s32 coid;
+    /* 0x224 */ s32 aoid[6];
+};
 
 extern "C" int B_003D4A54;
 
@@ -18,14 +40,11 @@ extern "C" void InitHub(int hub)
 
 extern "C" void PostSoLoad(char *arg0);
 
-extern "C" void PostHubLoad(char *arg0) {
-    PostSoLoad(arg0);
-    char *hub = *(char **)(arg0 + 0xC);
-    (*(void (**)(char *, int))(hub + 0x27C))(arg0 + *(short *)(hub + 0x278), 0);
+extern "C" void PostHubLoad(HUB *hub) {
+    PostSoLoad((char *)hub);
+    hub->SetPlayable(0);
 }
 
-struct HUBENTRY { int sma; int button; int oid; };
-struct HUB_1D72A8 { char pad0[0x180]; int state; int sm; int sma; int centry; HUBENTRY entry[1]; };
 struct LO;
 
 extern "C" {
@@ -35,26 +54,26 @@ int GetSmaCur(int);
 LO *PloFindSwObject_thunk(void *, int, int, void *);
 void ShopMenu_SetPage(void *, int);
 void StartJsg(LO *, int);
-void StepHubState_1D72A8(HUB_1D72A8 *, int);
+void StepHubState_1D72A8(HUB *, int);
 int UpdateJoyNavX(void *);
 void UpdateSo(void);
 extern char B_002DE2E0[];
-extern char B_002DFC00[];
-extern char B_002E0D00[];
+extern JOY B_002DFC00;
+extern JOY B_002E0D00;
 extern char B_003DA150[];
 extern char B_003DD490_1D72A8[];
 extern int g_2dfbc0;
 
-void UpdateHub(HUB_1D72A8 *hub)
+void UpdateHub(HUB *hub)
 {
     UpdateSo();
     if (hub->state != 0) {
         if (hub->state == 1 && hub->sma != 0 && FActiveCplcy(B_002DE2E0) == 0) {
-            char *joy;
+            JOY *joy;
             if (g_2dfbc0 & 2)
-                joy = B_002DFC00;
+                joy = &B_002DFC00;
             else
-                joy = B_002E0D00;
+                joy = &B_002E0D00;
             int nav = UpdateJoyNavX(joy);
             if (nav == 0) {
                 for (int index = 0; index < hub->centry; index++) {
@@ -97,66 +116,19 @@ void SetHubPlayable(s32 arg0, s32 arg1) {
 }
 }
 
-struct SM;
-
 #include "cref.h"
 
-struct PAD12 { char pad[0xC]; };
-
-// Retail's virtual calls read the gcc 2.95 vtable at +0xC: slot k sits at (k + 1) * 8 ({short delta, short index, fn}).
-// HUB calls slot 2 (+0x18) with five arguments. The vtable pointer is declared in a base so that gcc 2.95 puts it
-// at +0xC, ahead of the derived class's fields.
-struct HUB_BASE : PAD12 {
-    virtual void Slot0();
-    virtual void Slot1();
-    virtual void Message(int message, int arg1, int arg2, int arg3, int arg4);
-};
-
-struct HUB : HUB_BASE {
-    char pad1[0x180 - 0x10];
-    int state;
-    SM *sm;
-    int sma;
-};
-
-// Objects of class 0x64 receive slot 75 (+0x260) with one int argument.
-struct NOTIFY_OBJECT : PAD12 {
-    virtual void Slot0();  virtual void Slot1();  virtual void Slot2();  virtual void Slot3();  virtual void Slot4();
-    virtual void Slot5();  virtual void Slot6();  virtual void Slot7();  virtual void Slot8();  virtual void Slot9();
-    virtual void Slot10(); virtual void Slot11(); virtual void Slot12(); virtual void Slot13(); virtual void Slot14();
-    virtual void Slot15(); virtual void Slot16(); virtual void Slot17(); virtual void Slot18(); virtual void Slot19();
-    virtual void Slot20(); virtual void Slot21(); virtual void Slot22(); virtual void Slot23(); virtual void Slot24();
-    virtual void Slot25(); virtual void Slot26(); virtual void Slot27(); virtual void Slot28(); virtual void Slot29();
-    virtual void Slot30(); virtual void Slot31(); virtual void Slot32(); virtual void Slot33(); virtual void Slot34();
-    virtual void Slot35(); virtual void Slot36(); virtual void Slot37(); virtual void Slot38(); virtual void Slot39();
-    virtual void Slot40(); virtual void Slot41(); virtual void Slot42(); virtual void Slot43(); virtual void Slot44();
-    virtual void Slot45(); virtual void Slot46(); virtual void Slot47(); virtual void Slot48(); virtual void Slot49();
-    virtual void Slot50(); virtual void Slot51(); virtual void Slot52(); virtual void Slot53(); virtual void Slot54();
-    virtual void Slot55(); virtual void Slot56(); virtual void Slot57(); virtual void Slot58(); virtual void Slot59();
-    virtual void Slot60(); virtual void Slot61(); virtual void Slot62(); virtual void Slot63(); virtual void Slot64();
-    virtual void Slot65(); virtual void Slot66(); virtual void Slot67(); virtual void Slot68(); virtual void Slot69();
-    virtual void Slot70(); virtual void Slot71(); virtual void Slot72(); virtual void Slot73(); virtual void Slot74();
+// Objects of class 0x64 receive slot 76 (+0x260) with one int argument: the first slot past SO's.
+struct NOTIFY_OBJECT : SO {
     virtual void Notify(int message);
 };
 
-// Objects of class 0x4F receive slot 8 (+0x48) with no argument besides this.
-struct RESET_OBJECT : PAD12 {
-    virtual void Slot0(); virtual void Slot1(); virtual void Slot2(); virtual void Slot3();
-    virtual void Slot4(); virtual void Slot5(); virtual void Slot6(); virtual void Slot7();
-    virtual void Reset();
-};
+/* the word SetHubState tests on the current job (JOB leaves it as a gap: one reader) */
+struct JOBHUB { u8 unknown_0x0[0x74]; s32 field_0x74; };
 
-struct JOB { char pad[0x74]; int field74; };
-
-struct GLOBALS { char pad[0x3B0C]; JOB *job; };
-
-extern "C" GLOBALS B_003DD490;
+extern "C" SW B_003DD490;
 
 extern "C" int g_2dfbc0;
-
-extern "C" char B_002DFC00[];
-
-extern "C" char B_002E0D00[];
 
 extern "C" const char RO_002A7878[];
 
@@ -170,7 +142,7 @@ extern "C" int OidFromSmIsms(SM *, int);
 
 extern "C" void StepHubState_1D7480(HUB *, int);
 
-extern "C" void bevy_jobs_162e38(JOB *);
+extern "C" void bevy_jobs_162e38(JOBHUB *);
 
 extern "C" void bevy_player_p18_gadget_refill(void *, int);
 
@@ -181,7 +153,7 @@ extern "C" CRef func_001D8A38(const char *, int);
 
 extern "C" void func_001F1448(SM *, HUB *, int, int, int *);
 
-// Retail's third loop loads each object into $a1 and calls slot 8 with $a0 = object + delta and nothing else set up:
+// Retail's third loop loads each object into $a1 and calls slot 9 (LO::Remove) with $a0 = object + delta and nothing else set up:
 // $a1 is just the next free register, not an argument. Declaring that slot with an argument (the object) makes gcc
 // copy the object into $a1 and keep it in $a0 (score 12); the slot takes no argument, as written here.
 // The three virtual calls are real C++ virtual calls (gcc 2.95 vtables), as in src/new_17dd70/Mount_SetState.cpp.
@@ -189,18 +161,18 @@ void SetHubState(HUB *hub, int state)
 {
     void *players[4];
     NOTIFY_OBJECT *notified[0x20];
-    RESET_OBJECT *reset[0x20];
+    LO *reset[0x20];
     if (hub->state == state)
         return;
     if (hub->state == 1) {
         func_001F1448(0, hub, -1, 0, &hub->sma);
-        hub->Message(6, 0, 0, 0, 0);
+        hub->HandleSpliceEvent(6, 0, 0, 0, 0);
     }
     hub->state = state;
     if (state != 1)
         return;
-    JOB *job = B_003DD490.job;
-    if (job && job->field74 == 0)
+    JOBHUB *job = (JOBHUB *)B_003DD490.pjobCurrent;
+    if (job && job->field_0x74 == 0)
         bevy_jobs_162e38(job);
     int count = CploFindSwObjectsByClass(&B_003DD490, 5, 0x34, 0, 3, players);
     for (int index = 0; index < count; index++) {
@@ -213,7 +185,7 @@ void SetHubState(HUB *hub, int state)
         notified[index]->Notify(4);
     count = CploFindSwObjectsByClass(&B_003DD490, 0x105, 0x4F, 0, 0x20, reset);
     for (int index = 0; index < count; index++)
-        reset[index]->Reset();
+        reset[index]->Remove();
     int oid;
     if (hub->sm) {
         int value;
@@ -230,36 +202,32 @@ void SetHubState(HUB *hub, int state)
     }
     func_001F1448(hub->sm, hub, oid, 0, &hub->sma);
     StepHubState_1D7480(hub, 0);
-    func_00187E78(g_2dfbc0 & 2 ? B_002DFC00 : B_002E0D00);
-    hub->Message(5, 0, 0, 0, 0);
+    func_00187E78(g_2dfbc0 & 2 ? &B_002DFC00 : &B_002E0D00);
+    hub->HandleSpliceEvent(5, 0, 0, 0, 0);
 }
 
-extern "C" void AddHubEntry(char *hub, int a, int b, int c)
+extern "C" void AddHubEntry(HUB *hub, int a, int b, int c)
 {
-    unsigned count = *(unsigned *)(hub + 0x18C);
+    unsigned count = hub->centry;
     if (count < 12) {
-        *(unsigned *)(hub + 0x18C) = count + 1;
-        int *entry = (int *)(hub + (count * 12 + 0x190));
-        entry[0] = a;
-        entry[1] = b;
-        entry[2] = c;
+        hub->centry = count + 1;
+        HUBENTRY *entry = &hub->entry[count];
+        entry->sma = a;
+        entry->button = b;
+        entry->oid = c;
     }
 }
 
-extern "C" void StepHubState_1D7780(s8 *, s32);
+extern "C" void StepHubState_1D7780(HUB *, s32);
 
-extern "C" CRef func_002013D8(CRef *, s32, s32, unsigned *, s32 *);
+extern "C" CRef func_002013D8(CRef *, s32, s32, s32 *, s32 *);
 
-extern "C" void SetHubAllowedStates(s8 *arg0, CRef *prefStates) {
+extern "C" void SetHubAllowedStates(HUB *arg0, CRef *prefStates) {
     {
-        CRef refResult = func_002013D8(prefStates, 6, 6, (unsigned *)(arg0 + 0x220), (s32 *)(arg0 + 0x224));
+        CRef refResult = func_002013D8(prefStates, 6, 6, &arg0->coid, arg0->aoid);
     }
     StepHubState_1D7780(arg0, 0);
 }
-
-struct SM { char pad[0x50]; int csms; };
-
-struct HUB_1D77D0 { char pad[0x184]; SM *sm; int sma; char pad1[0x220 - 0x18C]; int coid; int aoid[1]; };
 
 extern "C" int GetSmaCur(int);
 
@@ -267,9 +235,9 @@ extern "C" int IsmsFindSmRequired__FP2SM3OID(SM *, int);
 
 extern "C" void SetSmaGoal__FP3SMA3OID(int, int);
 
-extern "C" void func_001F1448_1D77D0(int, HUB_1D77D0 *, int, int, int *);
+extern "C" void func_001F1448_1D77D0(int, HUB *, int, int, int *);
 
-extern "C" void StepHubState(HUB_1D77D0 *hub, int step)
+extern "C" void StepHubState(HUB *hub, int step)
 {
     if (hub->sma == 0)
         return;

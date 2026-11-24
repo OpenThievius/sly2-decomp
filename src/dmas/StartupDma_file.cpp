@@ -34,11 +34,17 @@ void StartupDma__Fv(void) {
 }
 }
 
+/* the DMA tag buffer builder (retail's DMAS, mangled in AddDmaCnt__4DMAS and the others): a buffer from pbBase to pbMax, a cursor pbCur and the
+   open cnt tag pbCnt (EndDmaCnt closes it). The vtable at 0x18 is not at 0xC: DMAS is not a BASIC. */
+struct DMASVT { u8 unknown_0x0[8]; s16 delta; s16 index; void (*fn)(void *, int); };
 struct DMAS {
-    char pad0[0x10];
-    s32 field_0x10;
-    s32 field_0x14;
-    void *field_0x18;
+    /* 0x00 */ u8 *pbMax;
+    /* 0x04 */ u8 *pbBase;
+    /* 0x08 */ u8 *pbCnt;
+    /* 0x0C */ u8 *pbCur;
+    /* 0x10 */ s32 fPad;     /* EndDmaCnt: pad the cursor to a quadword */
+    /* 0x14 */ s32 fEndPrim; /* EndDmaCnt: call the vtable's slot instead */
+    /* 0x18 */ DMASVT *vt;
 };
 
 extern "C" void Clear__4DMAS_157278(DMAS *);
@@ -46,95 +52,68 @@ extern "C" void Clear__4DMAS_157278(DMAS *);
 extern "C" char D_002CE488[];
 
 extern "C" DMAS *__4DMAS(DMAS *dmas) {
-    dmas->field_0x10 = 0;
-    dmas->field_0x14 = 0;
-    dmas->field_0x18 = D_002CE488;
+    dmas->fPad = 0;
+    dmas->fEndPrim = 0;
+    dmas->vt = (DMASVT *)D_002CE488;
     Clear__4DMAS_157278(dmas);
     return dmas;
 }
 
 // 0x1572B8 DMAS::Clear
-extern "C" void Clear__4DMAS(void *arg0)
+extern "C" void Clear__4DMAS(DMAS *dmas)
 {
-    *(int *)((char *)arg0 + 0x0) = 0;
-    *(int *)((char *)arg0 + 0x4) = 0;
-    *(int *)((char *)arg0 + 0x8) = 0;
-    *(int *)((char *)arg0 + 0xC) = 0;
+    dmas->pbMax = 0;
+    dmas->pbBase = 0;
+    dmas->pbCnt = 0;
+    dmas->pbCur = 0;
 }
 
-extern "C" {
-typedef struct DMAS_1572D0 {
-    s32 field_0x0;
-    s32 field_0x4;
-    s32 field_0x8;
-    s32 field_0xC;
-} DMAS_1572D0;
-
-void Reset__4DMAS(DMAS_1572D0 *dmas) {
-    dmas->field_0x8 = 0;
-    dmas->field_0xC = dmas->field_0x4;
-}
+extern "C" void Reset__4DMAS(DMAS *dmas) {
+    dmas->pbCnt = 0;
+    dmas->pbCur = dmas->pbBase;
 }
 
 void *PvAllocStackImpl__Fi(void *, int);
 
-void AllocStack__4DMASi(char *arg0, int arg1)
+void AllocStack__4DMASi(DMAS *dmas, int arg1)
 {
     int sp[4];
     int size;
-    char *block;
+    u8 *block;
     size = arg1 << 4;
     sp[0] = size;
     sp[1] = 0x10;
-    block = (char *)PvAllocStackImpl__Fi(sp, arg1);
-    *(char **)(arg0 + 0xC) = block;
-    *(char **)(arg0 + 0) = block + size;
-    *(char **)(arg0 + 4) = block;
+    block = (u8 *)PvAllocStackImpl__Fi(sp, arg1);
+    dmas->pbCur = block;
+    dmas->pbMax = block + size;
+    dmas->pbBase = block;
+}
+
+extern "C" void AllocStatic__4DMASiP2QW(DMAS *dmas, s32 count, QW *pqw) {
+    dmas->pbBase = (u8 *)pqw;
+    dmas->pbCur = (u8 *)pqw;
+    dmas->pbMax = (u8 *)pqw + (count * 0x10);
 }
 
 extern "C" {
-typedef struct DMAS_157330 {
-    s32 field_0x0;
-    s32 field_0x4;
-    s32 field_0x8;
-    s32 field_0xC;
-} DMAS_157330;
-
-void AllocStatic__4DMASiP2QW(DMAS_157330 *dmas, s32 count, s32 buffer) {
-    dmas->field_0x4 = buffer;
-    dmas->field_0xC = buffer;
-    dmas->field_0x0 = buffer + (count * 0x10);
-}
-}
-
-extern "C" {
-typedef struct DMAS_157348 {
-    s32 field_0x0;
-    s32 field_0x4;
-    s32 field_0x8;
-    s32 field_0xC;
-} DMAS_157348;
-
-void Clear__4DMAS_157348(DMAS_157348 *);
+void Clear__4DMAS_157348(DMAS *);
 
 void EndDmaCnt__4DMAS_157348();
 
-void func_001574A0_157348(DMAS_157348 *);
+void func_001574A0_157348(DMAS *);
 
-void Detach__4DMASPiPP2QW(DMAS_157348 *dmas, u32 *quadwordCount, s32 *buffer) {
+void Detach__4DMASPiPP2QW(DMAS *dmas, u32 *quadwordCount, QW **ppqw) {
     EndDmaCnt__4DMAS_157348();
     func_001574A0_157348(dmas);
     if (quadwordCount != 0) {
-        *quadwordCount = (u32)(dmas->field_0xC - dmas->field_0x4) >> 4;
+        *quadwordCount = (u32)(dmas->pbCur - dmas->pbBase) >> 4;
     }
-    if (buffer != 0) {
-        *buffer = dmas->field_0x4;
+    if (ppqw != 0) {
+        *ppqw = (QW *)dmas->pbBase;
     }
     Clear__4DMAS_157348(dmas);
 }
 }
-
-struct DMAS;
 
 extern char g_2dd590[];
 
@@ -145,24 +124,22 @@ extern "C" void DMAS_DetachCopyPermanent(DMAS *dmas, int *count, int *start, uns
     DMAS_DetachCopy_1573C0(dmas, g_2dd590, count, start, copy);
 }
 
-struct DMAS_1573F8 { int a0; unsigned ab; int a8; unsigned pb; };
+extern "C" void EndDmaCnt__4DMAS_1573F8(DMAS *);
 
-extern "C" void EndDmaCnt__4DMAS_1573F8(DMAS_1573F8 *);
+extern "C" void func_001574A0_1573F8(DMAS *);
 
-extern "C" void func_001574A0_1573F8(DMAS_1573F8 *);
-
-extern "C" void Clear__4DMAS_1573F8(DMAS_1573F8 *);
+extern "C" void Clear__4DMAS_1573F8(DMAS *);
 
 extern "C" void *PvAllocCopyImpl(void *, int, void *, int);
 
-void DMAS_DetachCopy(DMAS_1573F8 *dmas, void *alloc, int *pcqw, unsigned *ppqw, void **ppvCopy)
+void DMAS_DetachCopy(DMAS *dmas, void *alloc, int *pcqw, unsigned *ppqw, void **ppvCopy)
 {
     EndDmaCnt__4DMAS_1573F8(dmas);
     func_001574A0_1573F8(dmas);
-    unsigned cqw = (dmas->pb - dmas->ab) >> 4;
+    unsigned cqw = (unsigned)(dmas->pbCur - dmas->pbBase) >> 4;
     if (pcqw) *pcqw = cqw;
-    if (ppqw) *ppqw = dmas->ab;
-    if (ppvCopy) *ppvCopy = PvAllocCopyImpl(alloc, cqw << 4, (void *)dmas->ab, 4);
+    if (ppqw) *ppqw = (unsigned)dmas->pbBase;
+    if (ppvCopy) *ppvCopy = PvAllocCopyImpl(alloc, cqw << 4, dmas->pbBase, 4);
     Clear__4DMAS_1573F8(dmas);
 }
 
@@ -175,71 +152,61 @@ void func_001574A0(void) {
 INCLUDE_ASM(0X1574A8);
 
 extern "C" {
-typedef struct DMAS_1574B8 {
-    char pad0[8];
-    s64 *field_0x8;
-    s64 *field_0xC;
-} DMAS_1574B8;
-
 void EndDmaCnt__4DMAS_1574B8();
 
-void AddDmaCnt__4DMAS(DMAS_1574B8 *dmas) {
+void AddDmaCnt__4DMAS(DMAS *dmas) {
     s64 *cursor;
 
     EndDmaCnt__4DMAS_1574B8();
-    cursor = dmas->field_0xC;
-    dmas->field_0x8 = cursor;
-    dmas->field_0xC = cursor + 2;
+    cursor = (s64 *)dmas->pbCur;
+    dmas->pbCnt = (u8 *)cursor;
+    dmas->pbCur = (u8 *)(cursor + 2);
     *cursor = 0x10000000;
-    dmas->field_0x8[1] = 0;
+    ((s64 *)dmas->pbCnt)[1] = 0;
 }
 }
 
-struct DMAS_157500 { int pbMax; int ab; unsigned long *pqwCnt; unsigned long *pb; };
+extern "C" void EndDmaCnt__4DMAS_157500(DMAS *);
 
-extern "C" void EndDmaCnt__4DMAS_157500(DMAS_157500 *);
-
-extern "C" void AddDmaRefs__4DMASiP2QW(DMAS_157500 *pdmas, int cqw, QW *pqw)
+extern "C" void AddDmaRefs__4DMASiP2QW(DMAS *pdmas, int cqw, QW *pqw)
 {
     int fCntWasOpen = 0;
-    if (pdmas->pqwCnt) {
+    if (pdmas->pbCnt) {
         EndDmaCnt__4DMAS_157500(pdmas);
         fCntWasOpen = 1;
     }
-    unsigned long *pullTag = pdmas->pb;
-    pdmas->pb = pullTag + 2;
-    pullTag[0] = ((unsigned long)(long)cqw | 0x40000000UL) | ((long)(sptr)pqw << 32);
+    u64 *pullTag = (u64 *)pdmas->pbCur;
+    pdmas->pbCur = (u8 *)(pullTag + 2);
+    pullTag[0] = ((u64)(s64)cqw | 0x40000000UL) | ((s64)(sptr)pqw << 32);
     pullTag[1] = 0;
     if (fCntWasOpen) {
-        unsigned long *pullCnt = pdmas->pb;
-        pdmas->pb = pullCnt + 2;
-        pdmas->pqwCnt = pullCnt;
+        u64 *pullCnt = (u64 *)pdmas->pbCur;
+        pdmas->pbCur = (u8 *)(pullCnt + 2);
+        pdmas->pbCnt = (u8 *)pullCnt;
         pullCnt[0] = 0x10000000UL;
-        pdmas->pqwCnt[1] = 0;
+        ((u64 *)pdmas->pbCnt)[1] = 0;
     }
 }
 
-struct DMAS_157598 { int pbMax; int ab; unsigned long *pqwCnt; unsigned long *pb; };
+extern "C" void EndDmaCnt__4DMAS_157598(DMAS *);
 
-extern "C" void EndDmaCnt__4DMAS_157598(DMAS_157598 *);
-
-extern "C" void AddDmaCall__4DMASP2QW(DMAS_157598 *pdmas, QW *pqw)
+extern "C" void AddDmaCall__4DMASP2QW(DMAS *pdmas, QW *pqw)
 {
     int fCntWasOpen = 0;
-    if (pdmas->pqwCnt) {
+    if (pdmas->pbCnt) {
         EndDmaCnt__4DMAS_157598(pdmas);
         fCntWasOpen = 1;
     }
-    unsigned long *pullTag = pdmas->pb;
-    pdmas->pb = pullTag + 2;
-    pullTag[0] = ((long)(sptr)pqw << 32) | 0x50000000UL;
+    u64 *pullTag = (u64 *)pdmas->pbCur;
+    pdmas->pbCur = (u8 *)(pullTag + 2);
+    pullTag[0] = ((s64)(sptr)pqw << 32) | 0x50000000UL;
     pullTag[1] = 0;
     if (fCntWasOpen) {
-        unsigned long *pullCnt = pdmas->pb;
-        pdmas->pb = pullCnt + 2;
-        pdmas->pqwCnt = pullCnt;
+        u64 *pullCnt = (u64 *)pdmas->pbCur;
+        pdmas->pbCur = (u8 *)(pullCnt + 2);
+        pdmas->pbCnt = (u8 *)pullCnt;
         pullCnt[0] = 0x10000000UL;
-        pdmas->pqwCnt[1] = 0;
+        ((u64 *)pdmas->pbCnt)[1] = 0;
     }
 }
 
@@ -249,76 +216,57 @@ struct DMATAG {
     s64 high;
 };
 
-struct DMAS_157620 {
-    char pad[0xC];
-    struct DMATAG *pdmatagNext;
-};
-
 s32 EndDmaCnt__4DMAS_157620();                         /* extern */
 
-void AddDmaRet__4DMAS(struct DMAS_157620 *pdmas) {
+void AddDmaRet__4DMAS(DMAS *pdmas) {
     struct DMATAG *pdmatag;
 
     EndDmaCnt__4DMAS_157620();
-    pdmatag = pdmas->pdmatagNext;
-    pdmas->pdmatagNext = pdmatag + 1;
+    pdmatag = (DMATAG *)pdmas->pbCur;
+    pdmas->pbCur = (u8 *)(pdmatag + 1);
     pdmatag->low = 0x60000000;
     pdmatag->high = 0;
 }
 }
 
-struct DMAS_157660 {
-    char pad0[0xC];
-    s32 field_0xC;
-};
+extern "C" void CopyAqw__FPvT0i_157660(void *, QW *, s32);
 
-extern "C" void CopyAqw__FPvT0i_157660(s32, s32, s32);
-
-extern "C" void AddDmaBulk__4DMASiP2QW(DMAS_157660 *dmas, s32 count, s32 source) {
-    CopyAqw__FPvT0i_157660(dmas->field_0xC, source, count);
-    dmas->field_0xC = dmas->field_0xC + (count * 0x10);
+extern "C" void AddDmaBulk__4DMASiP2QW(DMAS *dmas, s32 count, QW *source) {
+    CopyAqw__FPvT0i_157660(dmas->pbCur, source, count);
+    dmas->pbCur = dmas->pbCur + (count * 0x10);
 }
 
 extern "C" {
-struct DMAS_1576B0 {
-    char pad[0xC];
-    struct DMATAG *pdmatagNext;
-};
-
 s32 EndDmaCnt__4DMAS_1576B0();                         /* extern */
 
-void AddDmaEnd__4DMAS(struct DMAS_1576B0 *pdmas) {
+void AddDmaEnd__4DMAS(DMAS *pdmas) {
     struct DMATAG *pdmatag;
 
     EndDmaCnt__4DMAS_1576B0();
-    pdmatag = pdmas->pdmatagNext;
-    pdmas->pdmatagNext = pdmatag + 1;
+    pdmatag = (DMATAG *)pdmas->pbCur;
+    pdmas->pbCur = (u8 *)(pdmatag + 1);
     pdmatag->low = 0x70000000;
     pdmatag->high = 0;
 }
 }
 
-struct VT { char pad[8]; short delta; short index; void (*fn)(void *, int); };
-
-struct DMAS_1576F0 { int a0; unsigned ab; unsigned *pqwCnt; unsigned *pb; int fPad; int fEndPrim; VT *vt; };
-
-void EndDmaCnt__4DMAS(DMAS_1576F0 *dmas)
+void EndDmaCnt__4DMAS(DMAS *dmas)
 {
     if (dmas->fPad) {
-        unsigned *cursor = dmas->pb;
+        u32 *cursor = (u32 *)dmas->pbCur;
         if ((uptr)cursor & 0xF) {
             *cursor = 0;
             while ((uptr)++cursor & 0xF)
                 *cursor = 0;
         }
-        dmas->pb = cursor;
+        dmas->pbCur = (u8 *)cursor;
     } else if (dmas->fEndPrim) {
         dmas->vt->fn((char *)dmas + dmas->vt->delta, 0);
     }
-    unsigned *cnt = dmas->pqwCnt;
+    u32 *cnt = (u32 *)dmas->pbCnt;
     if (cnt) {
-        *cnt = *cnt | (((sptr)dmas->pb - (sptr)cnt) >> 4) - 1;
-        dmas->pqwCnt = 0;
+        *cnt = *cnt | (((sptr)dmas->pbCur - (sptr)cnt) >> 4) - 1;
+        dmas->pbCnt = 0;
     }
 }
 

@@ -88,7 +88,8 @@ struct ASEGA : BASIC {
     /* 0x48 */ f32 svtMaster;  /* SeekAsega, ApplyAseg */
     /* 0x4C */ f32 factor;     /* SeekAsega; ApplyAseg stores the limited clqSpeed there */
     /* 0x50 */ s32 iea;        /* ApplyAseg */
-    u8 unknown_0x54[0x8];
+    u8 unknown_0x54[0x4];
+    /* 0x58 */ s32 handsOff;  /* SetAsegaHandsOff (an ASEGA function: it sets and clears the world's hands-off state as this changes) */
     /* 0x5C */ s32 field_0x5C; /* ApplyAseg (0) */
 };
 

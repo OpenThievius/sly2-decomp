@@ -8,7 +8,34 @@
 #include "include_asm.h"
 #include "dl.h"
 
-struct DZG { int crow; char pad[0x4C]; int cxp; int axp; int cso; int apso; void *axpd; };
+/* one zero-crossing constraint row (0x28 bytes, kept on one of the DZG's lists through its DLE) */
+struct DZ {
+    /* 0x00 */ s32 dzk;  /* SolveDzg: 1 is a row waiting to be placed */
+    u8 unknown_0x4[0xC];
+    /* 0x10 */ f32 sdv;  /* SolveDzg picks the most negative */
+    u8 unknown_0x14[4];
+    /* 0x18 */ s32 field_0x18; /* SolveDzg: zero means FillDzgDz has not run for the row */
+    u8 unknown_0x1C[4];
+    /* 0x20 */ DLE dle;
+};
+
+/* the constraint solver (InitDzg, func_0011A550 in src/dl-dzg/ keeps its own local copy) */
+struct DZG {
+    /* 0x00 */ s32 cdzMax;
+    /* 0x04 */ s32 cdz;
+    /* 0x08 */ DZ *adz;
+    /* 0x0C */ DL dlPos;
+    /* 0x18 */ DL dlZero;
+    /* 0x24 */ DL dlMax;
+    /* 0x30 */ DL dlUncat;
+    /* 0x3C */ s32 cdzPos;
+    u8 unknown_0x40[0x10];
+    /* 0x50 */ s32 cxp;
+    /* 0x54 */ s32 axp;
+    /* 0x58 */ s32 cso;
+    /* 0x5C */ s32 apso;
+    /* 0x60 */ void *axpd;
+};
 
 extern "C" DZG *func_0011A550(DZG *, int);
 
@@ -19,7 +46,7 @@ extern "C" DZG *InitDzg(DZG *pdzg, int cxp, int axp, int cso, int apso)
     ALLOCREQ req;
     func_0011A550(pdzg, cxp << 1);
     pdzg->cxp = cxp;
-    req.cb = pdzg->crow * 0x60;
+    req.cb = pdzg->cdzMax * 0x60;
     pdzg->axp = axp; pdzg->cso = cso; req.cbAlign = 0x10; pdzg->apso = apso;
     pdzg->axpd = PvAllocStackClearImpl__Fi(&req);
     return pdzg;
@@ -30,29 +57,22 @@ INCLUDE_ASM(0X158668);
 INCLUDE_ASM(0X158728);
 
 extern "C" {
-typedef struct SLOTARRAY {
-    char pad[8];
-    s32 field_0x8;
-    char pad2[0x60 - 0xC];
-    s32 field_0x60;
-} SLOTARRAY;
-
-s32 func_00158958(SLOTARRAY *array, s32 address) {
-    return array->field_0x60 + (((s32)((address - array->field_0x8) * 0xCCCCCCCD) >> 3) * 0x60);
+s32 func_00158958(DZG *pdzg, s32 address) {
+    return (s32)pdzg->axpd + (((s32)((address - (s32)pdzg->adz) * 0xCCCCCCCD) >> 3) * 0x60);
 }
 }
 
-extern "C" void AppendDlEntry(void *, void *);
+extern "C" void AppendDlEntry(DL *, DZ *);
 
-extern "C" void EnforceDzgDz__FP3DZGP2DZ_158988(void *, void *);
+extern "C" void EnforceDzgDz__FP3DZGP2DZ_158988(DZG *, DZ *);
 
-extern "C" void FillDzgDz(void *, s32, void *, s32);
+extern "C" void FillDzgDz(DZG *, s32, DZ *, s32);
 
-extern "C" void RemoveDlEntry(void *, void *);
+extern "C" void RemoveDlEntry(DL *, DZ *);
 
-extern "C" s32 func_00158958_158988(void *, void *);
+extern "C" s32 func_00158958_158988(DZG *, DZ *);
 
-extern "C" void SolveDzg__FP3DZGiiPP2XPPiPPP2SO(char *dzg, s32 arg1)
+extern "C" void SolveDzg__FP3DZGiiPP2XPPiPPP2SO(DZG *dzg, s32 arg1)
 {
     DLI iterator;
     DLI second;
@@ -63,33 +83,33 @@ extern "C" void SolveDzg__FP3DZGiiPP2XPPiPPP2SO(char *dzg, s32 arg1)
     s32 ibDle = *(s32 *)(list + 8);
     g_2dd2fc = &iterator;
     iterator.m_pdliNext = previous;
-    char *head = *(char **)list;
+    DZ *head = *(DZ **)list;
     iterator.m_ibDle = ibDle;
-    iterator.m_ppv = (void **)(head + ibDle);
-    char *node = head;
+    iterator.m_ppv = (void **)((char *)head + ibDle);
+    DZ *node = head;
     while (node != 0) {
-        if (*(s32 *)node == 1) {
-            if (*(s32 *)(node + 0x18) == 0)
+        if (node->dzk == 1) {
+            if (node->field_0x18 == 0)
                 FillDzgDz(dzg, arg1, node, func_00158958_158988(dzg, node));
-            RemoveDlEntry(dzg + 0x30, node);
-            AppendDlEntry(dzg + 0xC, node);
-            *(s32 *)(dzg + 0x3C) = *(s32 *)(dzg + 0x3C) + 1;
+            RemoveDlEntry(&dzg->dlUncat, node);
+            AppendDlEntry(&dzg->dlPos, node);
+            dzg->cdzPos = dzg->cdzPos + 1;
         }
-        char *next = (char *)*iterator.m_ppv;
-        iterator.m_ppv = (void **)(next + iterator.m_ibDle);
+        DZ *next = (DZ *)*iterator.m_ppv;
+        iterator.m_ppv = (void **)((char *)next + iterator.m_ibDle);
         node = next;
     }
     EnforceDzgDz__FP3DZGP2DZ_158988(dzg, 0);
     g_2dd2fc = iterator.m_pdliNext;
     for (;;) {
         f32 best = -0.01f;
-        char *sel = 0;
-        for (char *p = *(char **)(dzg + 0x30); p != 0; p = *(char **)(p + 0x20)) {
-            f32 value = *(f32 *)(p + 0x10);
-            if (value < best) { best = value; sel = p; }
+        DZ *sel = 0;
+        for (DZ *dz = (DZ *)dzg->dlUncat.head; dz != 0; dz = (DZ *)dz->dle.next) {
+            f32 value = dz->sdv;
+            if (value < best) { best = value; sel = dz; }
         }
         if (sel == 0) break;
-        if (*(s32 *)(sel + 0x18) == 0)
+        if (sel->field_0x18 == 0)
             FillDzgDz(dzg, arg1, sel, func_00158958_158988(dzg, sel));
         EnforceDzgDz__FP3DZGP2DZ_158988(dzg, sel);
     }

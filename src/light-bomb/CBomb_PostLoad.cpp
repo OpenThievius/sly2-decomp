@@ -1,16 +1,24 @@
+#include "alloc.h"
+/* the bomb: AddBombCustomXps reads the same three words (0x1F4 the custom-xp flag, 0x1FC the allocated xp array) */
+struct BOMB {
+    u8 unknown_0x0[0x1F4];
+    /* 0x1F4 */ s32 fCustom;
+    /* 0x1F8 */ s32 cXp;
+    /* 0x1FC */ void *axp;
+};
 extern "C" {
 void PostSoLoad();
-int PvAllocSwImpl__Fi(char *arg0);
+void *PvAllocSwImpl__Fi(ALLOCREQ *);
 
-void CBomb_PostLoad(char *arg0)
+void CBomb_PostLoad(BOMB *bomb)
 {
-    char sp[0x10] __attribute__((aligned(16)));
+    ALLOCREQ req __attribute__((aligned(16)));
 
     PostSoLoad();
-    if (*(int *)(arg0 + 0x1F4) != 0) {
-        *(int *)(sp + 0) = 0xC0;
-        *(int *)(sp + 4) = 0x10;
-        *(int *)(arg0 + 0x1FC) = PvAllocSwImpl__Fi(sp);
+    if (bomb->fCustom != 0) {
+        req.cb = 0xC0;
+        req.cbAlign = 0x10;
+        bomb->axp = PvAllocSwImpl__Fi(&req);
     }
 }
 }

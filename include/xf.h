@@ -40,7 +40,9 @@ struct XF {
         struct XFMIRROR *pxfmirror;
         struct XF *pxfSource;       /* LoadAloFromBrx: kinds 8 and 14 keep the transform they mirror (its position negated) */
     };
-    u8 unknown_0xAC[0x4];              /* LoadAloFromBrx stores two halfwords here (its local view XFLOADVIEW): one reader, not a method of XF */
+    /* 0xAC */ u16 limitLo;            /* thousandths: func_001F87A0, func_001F8870 read it (lhu, times 0.001), func_001F87C8, func_001F8898 store
+                                          it and wake the XF; LoadAloFromBrx stores it through its view XFLOADVIEW (names from there) */
+    /* 0xAE */ u16 limitHi;            /* the same: func_001F8808 reads it, func_001F8830 stores it */
     /* 0xB0 */ QW vel;                 /* func_001F4898, func_001F4930, ProjectSoTransform, GetActvalPositionGoal */
     /* 0xC0 */ QW posGoal;             /* GetActPositionGoal, func_0012DFE0, func_001C8918 */
     /* 0xD0 */ QW velGoal;             /* GetActPositionGoal, func_001C8918 (a tangent there) */
