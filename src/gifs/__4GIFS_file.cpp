@@ -6,24 +6,52 @@
 #include "m2c_macros.h"
 #include "include_asm.h"
 
+/* the GIFS packet builder: a DMAS (src/dmas/) with the GS packet state after it. g++ puts the vtable pointer after the own fields of
+   the first class that declares a virtual, here the DMAS part at 0x18; slot 1 reserves room in the buffer. The cursor is the DMAS's
+   pbCur at 0xC, read as the width of the element each function writes. */
+struct DMASBASE {
+    u8 unknown_0x0[0xC];
+    /* 0x0C */ union {
+        u8 *pb;
+        u32 *pw;
+        s32 *pi;
+        f32 *pf;
+        u64 *pdw;
+        s64 *pll;
+    } cur;
+    /* 0x10 */ s32 fPad;
+    /* 0x14 */ s32 fEndPrim;
+    virtual void Reserve(int);
+};
+struct GIFS : DMASBASE {
+    /* 0x1C */ u64 *pdwTag;   /* the open primitive's tag (AddPrimPack), 0 when closed; AddPrimList keeps the list entry here */
+    /* 0x20 */ s32 creg;      /* registers per loop of the open primitive */
+    /* 0x24 */ s32 cregAll;   /* registers written so far: CheckReg counts them, EndPrim divides by creg for the loop count */
+    void AddPrimPack(int, int, u64);
+    void EndPrim(int);
+    void CheckReg(int, int);
+    void ListUV(int, int);
+    void ListXYZF(int, int, int, int);
+};
+/* where retail's constructor writes the vtable pointer by hand (a compiler-made constructor would hide it) */
+struct GIFSCTOR {
+    u8 unknown_0x0[0x14];
+    /* 0x14 */ s32 fEndPrim;
+    /* 0x18 */ char *vt;
+    /* 0x1C */ s32 field_0x1C;
+    /* 0x20 */ s32 field_0x20;
+    /* 0x24 */ s32 field_0x24;
+};
+
 extern "C" {
 extern void *__4DMAS();
 
 extern char D_002CF508[];
 
-struct GIFS {
-    char pad0[0x14];
-    s32 field_0x14;
-    char *field_0x18;
-    s32 field_0x1C;
-    s32 field_0x20;
-    s32 field_0x24;
-};
-
-struct GIFS *__4GIFS(struct GIFS *gifs) {
+GIFSCTOR *__4GIFS(GIFSCTOR *gifs) {
     __4DMAS();
-    gifs->field_0x14 = 1;
-    gifs->field_0x18 = D_002CF508;
+    gifs->fEndPrim = 1;
+    gifs->vt = D_002CF508;
     gifs->field_0x1C = 0;
     gifs->field_0x20 = 0;
     gifs->field_0x24 = 0;
@@ -31,35 +59,27 @@ struct GIFS *__4GIFS(struct GIFS *gifs) {
 }
 }
 
-struct GIFS_166968;
+extern "C" void AddPrimPack__4GIFSiiUl(GIFS *, int, int, int);
 
-struct GIFS_VT { char pad[8]; short delta; short unused; void (*fn)(void *, int); };
-
-struct GIFS_166968 { char pad[0x18]; GIFS_VT *vt; int field_0x1C; };
-
-extern "C" void AddPrimPack__4GIFSiiUl(GIFS_166968 *, int, int, int);
-
-extern "C" void AddPrimEnd__4GIFS(GIFS_166968 *gifs)
+extern "C" void AddPrimEnd__4GIFS(GIFS *gifs)
 {
-    if (gifs->field_0x1C != 0) {
-        gifs->vt->fn((char *)gifs + gifs->vt->delta, 1);
+    if (gifs->pdwTag != 0) {
+        gifs->Reserve(1);
         return;
     }
     AddPrimPack__4GIFSiiUl(gifs, 0, 1, 0xE);
-    gifs->vt->fn((char *)gifs + gifs->vt->delta, 1);
+    gifs->Reserve(1);
 }
 
-struct Gifs_1669E0 { char pad0[0xC]; unsigned long *cursor; char pad10[0xC]; unsigned *tag; unsigned divisor; unsigned dividend; };
-
-extern "C" void EndPrim__4GIFSi(Gifs_1669E0 *self, int eop) {
-    if (self->tag != 0) {
-        unsigned count = self->dividend / self->divisor;
-        unsigned long *cursor = self->cursor;
+void GIFS::EndPrim(int eop) {
+    if (pdwTag != 0) {
+        unsigned count = (unsigned)cregAll / (unsigned)creg;
+        u64 *cursor = cur.pdw;
         if (((uptr)cursor & 0xF) != 0) {
-            self->cursor = cursor + 1;
+            cur.pdw = cursor + 1;
             *cursor = 0;
         }
-        unsigned *tag = self->tag;
+        u32 *tag = (u32 *)pdwTag;
         unsigned value;
         if (eop != 0) {
             value = *tag | 0x8000;
@@ -67,163 +87,99 @@ extern "C" void EndPrim__4GIFSi(Gifs_1669E0 *self, int eop) {
             value = *tag;
         }
         *tag = value | count;
-        self->tag = 0;
+        pdwTag = 0;
     }
 }
 
-extern "C" {
-struct GIFS_166A50 {
-    char pad0[0x24];
-    s32 field_0x24;
-};
-
-void CheckReg__4GIFSii(struct GIFS_166A50 *gifs) {
-    gifs->field_0x24 = gifs->field_0x24 + 1;
-}
+void GIFS::CheckReg(int, int) {
+    cregAll = cregAll + 1;
 }
 
-struct IFACE { char pad[8]; short delta; short index; void (*reserve)(void *, int); };
-
-struct GIFS_166A60 { char pad0[0xC]; unsigned long *pb; char pad1[0x18 - 0x10]; IFACE *iface; };
-
-void GIFS_AddPrimTag(GIFS_166A60 *gifs, long prim, int cloop, long creg, unsigned long regs, unsigned feop)
+void GIFS_AddPrimTag(GIFS *gifs, s64 prim, int cloop, s64 creg, u64 regs, unsigned feop)
 {
-    IFACE *iface = gifs->iface;
-    iface->reserve((char *)gifs + iface->delta, 0);
-    unsigned long *pdw = gifs->pb;
-    unsigned long primBits = ((unsigned long)prim << 0x2F) | 0x400000000000UL;
-    unsigned long low = (long)cloop | ((unsigned long)feop << 15);
-    gifs->pb = pdw + 2;
-    pdw[0] = low | primBits | ((unsigned long)creg << 0x3C);
+    gifs->Reserve(0);
+    u64 *pdw = gifs->cur.pdw;
+    u64 primBits = ((u64)prim << 0x2F) | 0x400000000000UL;
+    u64 low = (s64)cloop | ((u64)feop << 15);
+    gifs->cur.pdw = pdw + 2;
+    pdw[0] = low | primBits | ((u64)creg << 0x3C);
     pdw[1] = regs;
 }
 
-struct VT { char pad[8]; short delta; short index; void (*reserve)(void *, int); };
-
-struct GIFS_166B10 { char pad[0xC]; unsigned long *pb; char pad1[8]; VT *vt; };
-
-extern "C" void AddPrimBulk__4GIFSiiiUlPP2QW(GIFS_166B10 *gifs, int prim, int cloop, int creg, unsigned long regs, QW **ppqw)
+extern "C" void AddPrimBulk__4GIFSiiiUlPP2QW(GIFS *gifs, int prim, int cloop, int creg, u64 regs, QW **ppqw)
 {
-    gifs->vt->reserve((char *)gifs + gifs->vt->delta, 0);
-    unsigned long *pdw = gifs->pb;
-    gifs->pb = pdw + 2;
-    unsigned long header = ((unsigned long)prim << 0x2F) | 0x400000000000UL;
-    header = (unsigned long)cloop | header;
-    pdw[0] = header | ((unsigned long)creg << 0x3C);
+    gifs->Reserve(0);
+    u64 *pdw = gifs->cur.pdw;
+    gifs->cur.pdw = pdw + 2;
+    u64 header = ((u64)prim << 0x2F) | 0x400000000000UL;
+    header = (u64)cloop | header;
+    pdw[0] = header | ((u64)creg << 0x3C);
     pdw[1] = regs;
     if (ppqw != 0)
-        *ppqw = (QW *)gifs->pb;
-    gifs->pb = (unsigned long *)((char *)gifs->pb + cloop * creg * 0x10);
+        *ppqw = (QW *)gifs->cur.pdw;
+    gifs->cur.pb = gifs->cur.pb + cloop * creg * 0x10;
 }
 
-struct GIFS_166BD8;
-
-struct VSLOT { short delta; short index; void (*fn)(void *, int); };
-
-struct GIFS_166BD8 {
-    char pad0[0xC];
-    unsigned long *cursor;
-    char pad1[0x18 - 0x10];
-    VSLOT *vtable;
-    unsigned long *prim;
-    int creg;
-    int cregAll;
-    void AddPrimPack(int, int, unsigned long);
-};
-
-void GIFS_166BD8::AddPrimPack(int prim_, int creg_, unsigned long regs)
+void GIFS::AddPrimPack(int prim_, int creg_, u64 regs)
 {
-    VSLOT *slot = &vtable[1];
-    slot->fn((char *)this + slot->delta, 0);
-    unsigned long *tag = cursor;
-    cursor = tag + 2;
-    tag[0] = (((unsigned long)prim_ << 0x2F) | 0x400000000000UL) | ((unsigned long)creg_ << 0x3C);
+    Reserve(0);
+    u64 *tag = cur.pdw;
+    cur.pdw = tag + 2;
+    tag[0] = (((u64)prim_ << 0x2F) | 0x400000000000UL) | ((u64)creg_ << 0x3C);
     tag[1] = regs;
     creg = creg_;
     cregAll = 0;
-    prim = tag;
+    pdwTag = tag;
 }
 
-struct GIFS_166C70 {
-    char pad0[0xC];
-    u32 *cursor;
-};
-
-extern "C" void CheckReg__4GIFSii_166C70(GIFS_166C70 *gifs, s32 a, s32 b);
-
-extern "C" void PackRGBA__4GIFSUi(GIFS_166C70 *gifs, u32 color) {
+extern "C" void PackRGBA__4GIFSUi(GIFS *gifs, u32 color) {
     u32 *quad;
 
-    CheckReg__4GIFSii_166C70(gifs, 1, 1);
-    quad = gifs->cursor;
-    gifs->cursor = quad + 4;
+    gifs->CheckReg(1, 1);
+    quad = gifs->cur.pw;
+    gifs->cur.pw = quad + 4;
     quad[0] = color & 0xFF;
     quad[1] = (color & 0xFF00) >> 8;
     quad[2] = (color >> 0x10) & 0xFF;
     quad[3] = color >> 0x18;
 }
 
-struct GIFS_166CE0 {
-    char pad0[0xC];
-    s32 *cursor;
-};
-
-extern "C" void CheckReg__4GIFSii_166CE0(GIFS_166CE0 *gifs, s32 a, s32 b);
-
-extern "C" void PackUV__4GIFSii(GIFS_166CE0 *gifs, s32 u, s32 v) {
+extern "C" void PackUV__4GIFSii(GIFS *gifs, s32 u, s32 v) {
     s32 *quad;
 
-    CheckReg__4GIFSii_166CE0(gifs, 1, 3);
-    quad = gifs->cursor;
-    gifs->cursor = quad + 4;
+    gifs->CheckReg(1, 3);
+    quad = gifs->cur.pi;
+    gifs->cur.pi = quad + 4;
     quad[0] = u;
     quad[1] = v;
 }
 
-struct GIFS_166D38 {
-    char pad0[0xC];
-    f32 *cursor;
-};
-
-extern "C" void CheckReg__4GIFSii_166D38(GIFS_166D38 *gifs, s32 a, s32 b);
-
-extern "C" void PackSTQ__4GIFSfff(GIFS_166D38 *gifs, f32 s, f32 t, f32 q) {
+extern "C" void PackSTQ__4GIFSfff(GIFS *gifs, f32 s, f32 t, f32 q) {
     f32 *quad;
 
-    CheckReg__4GIFSii_166D38(gifs, 1, 2);
-    quad = gifs->cursor;
-    gifs->cursor = quad + 4;
+    gifs->CheckReg(1, 2);
+    quad = gifs->cur.pf;
+    gifs->cur.pf = quad + 4;
     quad[0] = s;
     quad[1] = t;
     quad[2] = q;
 }
 
-struct GIFS_166DA0 { char pad[0xC]; char *cur; };
-
-extern "C" void CheckReg__4GIFSii_166DA0(GIFS_166DA0 *, int, int);
-
-extern "C" void PackXYZ__4GIFSiii(GIFS_166DA0 *self, int x, int y, long z) {
-    CheckReg__4GIFSii_166DA0(self, 1, 5);
-    char *p = self->cur;
-    self->cur = p + 0x10;
-    *(int *)(p + 0) = x;
-    *(int *)(p + 4) = y;
-    *(long *)(p + 8) = z;
+extern "C" void PackXYZ__4GIFSiii(GIFS *self, int x, int y, s64 z) {
+    self->CheckReg(1, 5);
+    s32 *quad = self->cur.pi;
+    self->cur.pi = quad + 4;
+    quad[0] = x;
+    quad[1] = y;
+    ((s64 *)quad)[1] = z;
 }
 
-struct GIFS_166E08 {
-    char pad0[0xC];
-    s32 *cursor;
-};
-
-extern "C" void CheckReg__4GIFSii_166E08(GIFS_166E08 *gifs, s32 a, s32 b);
-
-extern "C" void PackXYZF__4GIFSiiii(GIFS_166E08 *gifs, s32 x, s32 y, s32 z, s32 fog) {
+extern "C" void PackXYZF__4GIFSiiii(GIFS *gifs, s32 x, s32 y, s32 z, s32 fog) {
     s32 *quad;
 
-    CheckReg__4GIFSii_166E08(gifs, 1, 4);
-    quad = gifs->cursor;
-    gifs->cursor = quad + 4;
+    gifs->CheckReg(1, 4);
+    quad = gifs->cur.pi;
+    gifs->cur.pi = quad + 4;
     quad[0] = x;
     quad[1] = y;
     quad[2] = z;
@@ -232,129 +188,78 @@ extern "C" void PackXYZF__4GIFSiiii(GIFS_166E08 *gifs, s32 x, s32 y, s32 z, s32 
 
 INCLUDE_ASM(0X166E88);
 
-struct GIFS_166E90 {
-    char pad0[0xC];
-    s64 *cursor;
-};
-
-extern "C" void CheckReg__4GIFSii_166E90(GIFS_166E90 *gifs, s32 a, s32 b);
-
-extern "C" void PackAD__4GIFSll(GIFS_166E90 *gifs, s64 address, s64 data) {
+extern "C" void PackAD__4GIFSll(GIFS *gifs, s64 address, s64 data) {
     s64 *quad;
 
-    CheckReg__4GIFSii_166E90(gifs, 1, 0xE);
-    quad = gifs->cursor;
-    gifs->cursor = quad + 2;
+    gifs->CheckReg(1, 0xE);
+    quad = gifs->cur.pll;
+    gifs->cur.pll = quad + 2;
     quad[0] = data;
     quad[1] = address;
 }
 
 INCLUDE_ASM(0X166EE8);
 
-struct GIFSClass {
-    char pad0[8];
-    s16 delta;
-    char pad1[2];
-    void (*field_0xC)(void *, s32);
-};
+extern "C" void AddPrimList__4GIFSiUl(GIFS *gifs, s32 prim, u64 data) {
+    u64 *entry;
 
-struct GIFS_166EF0 {
-    char pad0[0xC];
-    char *cursor;
-    char pad1[4];
-    s32 field_0x14;
-    GIFSClass *classInfo;
-    char *field_0x1C;
-    s32 field_0x20;
-    s32 field_0x24;
-};
-
-extern "C" void AddPrimList__4GIFSiUl(GIFS_166EF0 *gifs, s32 prim, u64 data) {
-    GIFSClass *classInfo;
-    char *entry;
-
-    classInfo = gifs->classInfo;
-    classInfo->field_0xC((char *)gifs + classInfo->delta, 0);
-    entry = gifs->cursor;
-    gifs->cursor = entry + 0x10;
-    *(u64 *)(entry + 8) = data;
-    *(u64 *)entry = ((u64)prim << 0x3C) | ((u64)0x8000 << 0x2B);
-    gifs->field_0x20 = prim;
-    gifs->field_0x1C = entry;
-    gifs->field_0x24 = 0;
+    gifs->Reserve(0);
+    entry = gifs->cur.pdw;
+    gifs->cur.pdw = entry + 2;
+    entry[1] = data;
+    entry[0] = ((u64)prim << 0x3C) | ((u64)0x8000 << 0x2B);
+    gifs->creg = prim;
+    gifs->pdwTag = entry;
+    gifs->cregAll = 0;
 }
-
-struct Gifs_166F70 { char pad0[0xC]; unsigned long *cursor; };
 
 union FloatBits_166F70 { float value; unsigned bits; };
 
-extern "C" void CheckReg__4GIFSii_166F70(Gifs_166F70 *, int, int);
-
-extern "C" void ListRGBAQ__4GIFSUif(Gifs_166F70 *self, unsigned red_green_blue, float q) {
-    CheckReg__4GIFSii_166F70(self, 0, 1);
+extern "C" void ListRGBAQ__4GIFSUif(GIFS *self, unsigned red_green_blue, float q) {
+    self->CheckReg(0, 1);
     FloatBits_166F70 bits;
     bits.value = q;
-    unsigned long *cursor = self->cursor;
-    self->cursor = cursor + 1;
-    *cursor = (unsigned long)red_green_blue | ((unsigned long)bits.bits << 32);
+    u64 *cursor = self->cur.pdw;
+    self->cur.pdw = cursor + 1;
+    *cursor = (u64)red_green_blue | ((u64)bits.bits << 32);
 }
 
 INCLUDE_ASM(0X166FE0);
 
-extern "C" int CheckReg__4GIFSii_166FE8(void *, int, int);
+void GIFS::ListUV(int arg1, int arg2) {
+    s64 *entry;
+    s64 value;
 
-void ListUV__4GIFSii(char *arg0, int arg1, int arg2) {
-    char *temp_v1;
-    long value;
-
-    CheckReg__4GIFSii_166FE8(arg0, 0, 3);
-    value = (long)arg1 | (long)(arg2 << 16);
-    temp_v1 = *(char **)(arg0 + 0xC);
-    *(char **)(arg0 + 0xC) = temp_v1 + 8;
-    *(long *)temp_v1 = value;
+    CheckReg(0, 3);
+    value = (s64)arg1 | (s64)(arg2 << 16);
+    entry = cur.pll;
+    cur.pll = entry + 1;
+    *entry = value;
 }
 
-struct GIFS_167048 {
-    char pad0[0xC];
-    s64 *cursor;
-};
-
-extern "C" void CheckReg__4GIFSii_167048(GIFS_167048 *gifs, s32 a, s32 b);
-
-extern "C" void GIFS_ListXYZ(GIFS_167048 *gifs, s32 x, s32 y, s64 z) {
+extern "C" void GIFS_ListXYZ(GIFS *gifs, s32 x, s32 y, s64 z) {
     s64 *entry;
 
-    CheckReg__4GIFSii_167048(gifs, 0, 5);
-    entry = gifs->cursor;
-    gifs->cursor = entry + 1;
+    gifs->CheckReg(0, 5);
+    entry = gifs->cur.pll;
+    gifs->cur.pll = entry + 1;
     *entry = x | (y << 0x10) | (z << 0x20);
 }
 
-struct GIFS_1670B8 {
-    char pad0[0xC];
-    unsigned long *cursor;
-    void CheckReg(int, int);
-    void ListXYZF(int, int, int, int);
-};
-
-void GIFS_1670B8::ListXYZF(int x, int y, int z, int fog)
+void GIFS::ListXYZF(int x, int y, int z, int fog)
 {
     CheckReg(0, 4);
-    unsigned long *dword = cursor;
-    cursor = dword + 1;
-    *dword = (unsigned long)(x | (y << 16)) | ((unsigned long)(z & 0xFFFFFF) << 32) | ((unsigned long)fog << 56);
+    u64 *dword = cur.pdw;
+    cur.pdw = dword + 1;
+    *dword = (u64)(x | (y << 16)) | ((u64)(z & 0xFFFFFF) << 32) | ((u64)fog << 56);
 }
 
 INCLUDE_ASM(0X167148);
 
-struct Vt167150 { char pad[8]; s16 adjust; s16 pad2; void (*fn)(s8 *, s32); };
-
-struct Gif167150 { char pad[0xC]; u64 *cursor; char pad10[8]; Vt167150 *stream; };
-
-extern "C" void AddImage__4GIFSi(Gif167150 *self, s32 arg1) {
-    self->stream->fn((s8 *) self + self->stream->adjust, 0);
-    u64 *cursor = self->cursor;
-    self->cursor = cursor + 2;
+extern "C" void AddImage__4GIFSi(GIFS *self, s32 arg1) {
+    self->Reserve(0);
+    u64 *cursor = self->cur.pdw;
+    self->cur.pdw = cursor + 2;
     cursor[0] = arg1 | (0x8000L << 0x2C);
     cursor[1] = 0;
 }

@@ -8,6 +8,7 @@
 #include "include_asm.h"
 #include "vu0inline.h"
 #include "so.h"
+#include "jt.h"
 #include "sw.h"
 #include "ps2inline.h"
 
@@ -397,7 +398,7 @@ extern "C" void AdjustCmCpdefi__FP2CMP2SOfP6CPDEFI(CM *pcm, SO *pso, float, CPDE
 {
     QW adjust = CalcCmAdjust__FP2CMP2SOP6CPDEFIP6VECTOR_14E768(pcm, pcpdefi);
     if (FIsBasicDerivedFrom(pso, 0x34)) {
-        int mode = *(int *)((char *)pso + 0x4F4);
+        int mode = ((JT *)pso)->attachMode;
         switch (mode) {
         case 0:
             SpringCm__FfffP2CMP6VECTORP6VECTORP6VECTOR_14E768(pcm, &pcm->dposAdjust, &pcm->vAdjust, adjust, 5.0f, -3.5f);
@@ -457,9 +458,16 @@ INCLUDE_ASM(0X14EB70);
 INCLUDE_ASM(0X14EDA0);
 
 // 0x14F030 FFilterCamera_14f030
-extern "C" int func_0014F030(void* p1, void* p2)
+/* The object func_0014F030 filters on: a BSP holder, with a node count at 0x70 and the node array at 0x74 (read by func_0014F030,
+   func_0014EA08 and func_0014EDA0, which docs/reports/header-errors.md traces to this layout). Its class is not recovered. */
+struct BSPHOLDER {
+    u8 unknown_0x0[0x70];
+    /* 0x70 */ s32 cnode;
+};
+
+extern "C" int func_0014F030(void* p1, BSPHOLDER* p2)
 {
-    int v0 = *(int*)((char*)p2 + 0x70);
+    int v0 = p2->cnode;
     return v0 > 0;
 }
 

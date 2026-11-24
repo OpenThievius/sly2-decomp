@@ -1,17 +1,25 @@
 #include "sly2.h"
 
-extern void *B_003E1060;
+/* a blot in the modal list B_003E1060: sort key at 0xA4, list link at 0xB4 */
+struct BLOTNODE {
+    u8 unknown_0x0[0xA4];
+    s32 order;
+    u8 unknown_0xA8[0xC];
+    BLOTNODE *next;
+};
 
-s32 FBlotObscured(char *arg0) {
+extern BLOTNODE *B_003E1060;
+
+s32 FBlotObscured(BLOTNODE *blot) {
     VECTOR local;
-    char *node = (char *)B_003E1060;
+    BLOTNODE *node = B_003E1060;
     if (node != 0) {
-        s32 key = *(s32 *)(arg0 + 0xA4);
+        s32 key = blot->order;
         do {
-            if (key < *(s32 *)(node + 0xA4)) {
+            if (key < node->order) {
                 return 1;
             }
-            node = *(char **)(node + 0xB4);
+            node = node->next;
         } while (node != 0);
     }
     return 0;

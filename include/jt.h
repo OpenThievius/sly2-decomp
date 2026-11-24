@@ -27,6 +27,12 @@ struct GADGETSLOT {
     /* 0x8 */ struct LO *plo;   /* UseSlyGadget tests it and attaches to it; func_0018D698 subscribes to it */
 };
 
+/* One object PostJtLoad removes from the world, 8 bytes. */
+struct JTLOENTRY {
+    struct LO *plo;
+    u8 unknown_0x4[0x4];
+};
+
 struct JT : STEP {
     virtual void SetMode(int mode);     /* 88: SetBentleyMode (Bentley); func_0023C820 in Sly's vtable, as are 89 to 92, 94 and 103.
                                            JT_StartPose, StartAttach, FAbsorbHbskWkr pass one int */
@@ -67,12 +73,17 @@ struct JT : STEP {
     /* 0x3D8 */ f32 field_0x3D8; /* InitBentley (Bentley slot 7) sets -70 */
     u8 unknown_0x3DC[0x58];
     /* 0x434 */ s32 field_0x434; /* GetJtCpdefi (JT slot 50) */
-    u8 unknown_0x438[0x90];
+    u8 unknown_0x438[0x58];
+    /* 0x490 */ QW field_0x490; /* WarpJtToSafePoint copies the safe point it warps to here: its first quadword (the object and a flag) */
+    /* 0x4A0 */ QW field_0x4A0; /* WarpJtToSafePoint: the safe point's second quadword */
+    u8 unknown_0x4B0[0x18];
     /* 0x4C8 */ s32 attachKind; /* in the attachment InitJt starts at 0x4C0: func_00143C78 (85); func_00211420, UpdateSndMix */
     /* 0x4CC */ s32 field_0x4CC; /* func_0018A428 (Sly slot 50) */
     u8 unknown_0x4D0[0x4];
     /* 0x4D4 */ struct ATTACHEDOBJ *field_0x4D4; /* in the attachment: AdjustSlyNewXp (Sly slot 55) tests its word at 0x1BC; the object's class is not recovered */
-    u8 unknown_0x4D8[0x48];
+    u8 unknown_0x4D8[0x1C];
+    /* 0x4F4 */ s32 attachMode; /* in the attachment InitJt starts at 0x4C0: AdjustCmCpdefi switches on it after testing the object is class 0x34 (JT) */
+    u8 unknown_0x4F8[0x28];
     /* 0x520 */ void *field_0x520; /* BindJtStepAseg (Sly slot 90) */
     u8 unknown_0x524[0x47C];
     /* 0x9A0 */ struct SO *pcarried; /* in the attachment: func_00211420, after testing the object is class 52 */
@@ -124,7 +135,8 @@ struct JT : STEP {
     /* 0x1084 */ struct SEQNODE *pseqnode; /* UpdateJt (JT slot 16) passes it to UpdateSeqnodeVjoy when the goal stack is empty; bevy_player_p4_144068 tests it */
     /* 0x1088 */ struct GADGETSTATE *field_0x1088; /* SetMurrayLiftState (guess: one reader) */
     /* 0x108C */ s32 field_0x108C; /* SetBentleyState and func_00135EB0 (Bentley's slots) test it against 0 before blowing up a bomb or adding a safe point; func_001942F0 reads it too */
-    u8 unknown_0x1090[0x8];
+    /* 0x1090 */ struct JTLOENTRY *aloentry; /* reader: PostJtLoad (slot 15) allocates it for the objects CploFindSwObjects returns */
+    /* 0x1094 */ s32 cloentry;               /* reader: PostJtLoad, the count */
     /* 0x1098 */ f32 field_0x1098; /* InitMurray and InitBentley set -100 */
     /* 0x109C */ f32 field_0x109C; /* InitMurray and InitBentley set 100 */
     /* 0x10A0 */ f32 field_0x10A0; /* InitMurray and InitBentley set 50 */
@@ -134,7 +146,8 @@ struct JT : STEP {
     /* 0x10B0 */ f32 field_0x10B0; /* InitMurray and InitBentley set 1 */
     /* 0x10B4 */ f32 field_0x10B4; /* InitMurray and InitBentley set 4500 */
     /* 0x10B8 */ void *field_0x10B8; /* PostBentleyLoad (Bentley slot 15) */
-    u8 unknown_0x10BC[0xC];
+    u8 unknown_0x10BC[0x8];
+    /* 0x10C4 */ void *hitfxParms; /* readers: func_001409E8 (hit-effect spawn probe), func_00140750 (passes it to PhitfxSpawn_156548); two agree */
     /* 0x10C8 */ s32 field_0x10C8; /* InitJt sets -1; UpdateSndMix */
     u8 unknown_0x10CC[0x8];
     /* 0x10D4 */ f32 field_0x10D4; /* InitJt sets 1 */

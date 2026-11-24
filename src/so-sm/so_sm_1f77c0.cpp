@@ -692,16 +692,16 @@ void PartHandle_AddRef(PartHandle *handle) {
 }
 }
 
-struct Sm {
-    char pad[0x10];
-    s32 referenceCount;
+/* a reference-counted BASIC from a slot heap (B_003E15CC): its count follows the vtable pointer */
+struct Sm : BASIC {
+    /* 0x10 */ s32 referenceCount;
 };
 
 extern "C" void Basic_FreeSubscribers(Sm *);
 
 extern "C" void CFramePtr_Assign(Sm *, s32);
 
-extern "C" void SidebagPtr_Assign(char *, s32);
+extern "C" void SidebagPtr_Assign(CSidebag **, s32);
 
 extern "C" s32 B_003E15CC_1F8740;
 
@@ -712,61 +712,59 @@ extern "C" void Sm_Release(Sm *sm) {
     sm->referenceCount = newCount;
     if (newCount <= 0) {
         CFramePtr_Assign(sm, 0);
-        SidebagPtr_Assign((char *)sm + 4, 0);
+        SidebagPtr_Assign(&sm->psidebag, 0);
         Basic_FreeSubscribers(sm);
         FreeSlotheapPv(&B_003E15CC_1F8740, sm);
     }
 }
 
-struct D { char pad[0xAC]; unsigned short v; };
+/* What the functions from 0x1F87A0 to 0x1F8B58 are handed: an object (passed on as an int) at 0x20 and one of its transforms
+   at 0x24 (WakeXf, RemoveXfAct, SetXfKind take the two). */
+struct XFREF {
+    u8 unknown_0x0[0x20];
+    /* 0x20 */ int alo;
+    /* 0x24 */ XF *xf;
+};
 
-struct A_1F87A0 { char pad[0x24]; D *d; };
-
-extern "C" float func_001F87A0(A_1F87A0 *self)
+extern "C" float func_001F87A0(XFREF *self)
 {
-    return (float)self->d->v * 0.001f;
+    return (float)self->xf->limitLo * 0.001f;
 }
 
-extern "C" void WakeXf(void *, void *);
+extern "C" void WakeXf(int, XF *);
 
-extern "C" void func_001F87C8(void *arg0, float arg1) {
+extern "C" void func_001F87C8(XFREF *arg0, float arg1) {
     s16 scaled = (s16)(arg1 * 1000.0f);
-    *(s16 *)((char *)*(void **)((char *)arg0 + 0x24) + 0xAC) = scaled;
-    WakeXf(*(void **)((char *)arg0 + 0x20), *(void **)((char *)arg0 + 0x24));
+    arg0->xf->limitLo = scaled;
+    WakeXf(arg0->alo, arg0->xf);
 }
 
-struct D_1F8808 { char pad[0xAE]; unsigned short v; };
-
-struct A_1F8808 { char pad[0x24]; D_1F8808 *d; };
-
-extern "C" float func_001F8808(A_1F8808 *self)
+extern "C" float func_001F8808(XFREF *self)
 {
-    return (float)self->d->v * 0.001f;
+    return (float)self->xf->limitHi * 0.001f;
 }
 
-extern "C" void WakeXf_1F8830(s32, void *, f32);
+extern "C" void WakeXf_1F8830(s32, XF *, f32);
 
-extern "C" void func_001F8830(void *arg0, f32 fparg0) {
-    char *target = *(char **)((char *)arg0 + 0x24);
-    *(s16 *)(target + 0xAE) = (s16)(fparg0 * 1000.0f);
-    WakeXf_1F8830(*(s32 *)((char *)arg0 + 0x20), *(void **)((char *)arg0 + 0x24), fparg0 * 1000.0f);
+extern "C" void func_001F8830(XFREF *arg0, f32 fparg0) {
+    XF *target = arg0->xf;
+    target->limitHi = (s16)(fparg0 * 1000.0f);
+    WakeXf_1F8830(arg0->alo, arg0->xf, fparg0 * 1000.0f);
 }
 
-struct A_1F8870 { char pad[0x24]; D *d; };
-
-extern "C" float func_001F8870(A_1F8870 *self)
+extern "C" float func_001F8870(XFREF *self)
 {
-    return (float)self->d->v * 0.001f;
+    return (float)self->xf->limitLo * 0.001f;
 }
 
-extern "C" void WakeXf_1F8898(void *a0, void *a1, float a2);
+extern "C" void WakeXf_1F8898(int a0, XF *a1, float a2);
 
-void func_001F8898(unsigned char *arg0, float arg1)
+void func_001F8898(XFREF *arg0, float arg1)
 {
     float scaled = arg1 * 1000.0f;
 
-    *(short *)((unsigned char *)*(void **)(arg0 + 0x24) + 0xAC) = (short)(int)scaled;
-    WakeXf_1F8898(*(void **)(arg0 + 0x20), *(void **)(arg0 + 0x24), scaled);
+    arg0->xf->limitLo = (short)(int)scaled;
+    WakeXf_1F8898(arg0->alo, arg0->xf, scaled);
 }
 
 extern "C" {
@@ -787,8 +785,6 @@ s32 func_001F88D8(Object1F88D8 *object, s32 arg1) {
 }
 
 struct ACT { int kind; char pad4[8]; int priority; ACT *next; };
-
-struct XFREF { char pad[0x20]; int alo; XF *xf; };
 
 extern "C" void RemoveXfAct(int, XF *, ACT *);
 
@@ -852,10 +848,8 @@ extern "C" QW ConvertXfPos__Fiii(int, int, QW);
 
 extern "C" void func_001F89E0__FPviii(void *, int, int, QW);
 
-struct OBJ_1F8A78 { char pad[0x24]; char *xf; };
-
-extern "C" void func_001F8A78__FPvii(OBJ_1F8A78 *arg0, int arg1, int arg2, QW arg3) {
-    QW result = ConvertXfPos__Fiii(0, *(int *)(arg0->xf + 0xA0), arg3);
+extern "C" void func_001F8A78__FPvii(XFREF *arg0, int arg1, int arg2, QW arg3) {
+    QW result = ConvertXfPos__Fiii(0, (int)arg0->xf->pxfParent, arg3);
     func_001F89E0__FPviii(arg0, arg1, arg2, result);
 }
 

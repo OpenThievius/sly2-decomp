@@ -8,6 +8,11 @@
 
 struct JT;
 struct PIPE;
+/* The jump target when it derives from class 0x13: GoalJump_Activate reads its word 0x124 (3 selects the surface goal). One reader on a guessed class: a local view. */
+struct LOCLASS13VIEW {
+    u8 unknown_0x0[0x124];
+    /* 0x124 */ s32 state;
+};
 /* the difference of a vector read through a reference (retail keeps the minuend in memory) */
 static inline QW VectorSubFrom(const QW &first, QW second)
 {
@@ -77,7 +82,7 @@ void GoalJump_Activate(GOALJUMP *pgoal)
             pgoal->fMatrix = 1;
             GetJtPipeGoalMat__FP2JTP4PIPEfP7MATRIX3((JT *)pgoal->ploTarget, pgoal->ppipe, u, &pgoal->mat);
             func_0017A468(pgoal);
-        } else if (FIsBasicDerivedFrom(pgoal->ploTarget, 0x13) != 0 && *(int *)((u8 *)pgoal->ploTarget + 0x124) == 3) {
+        } else if (FIsBasicDerivedFrom(pgoal->ploTarget, 0x13) != 0 && ((LOCLASS13VIEW *)pgoal->ploTarget)->state == 3) {
             grfsgsAdd |= GrfsgsFromSgs(0x28);
             pgoal->fMatrix = 1;
             pgoal->mat = BuildOrthonormalMatrixY__FP6VECTORT0P7MATRIX3(PmatLoWorld(pgoal->ploTarget)->row[0], g_2a2dc0);
@@ -92,7 +97,7 @@ void GoalJump_Activate(GOALJUMP *pgoal)
     ((STEPGUARD *)pgoal->pstep)->grfsgs &= ~grfsgsAdd;
     ((STEPGUARD *)pgoal->pstep)->grfsgs |= grfsgsSaved;
     if (pgoal->panimref != 0) {
-        switch (*(int *)((u8 *)pgoal->pstep + 0xF80)) {
+        switch (((STEPGUARD *)pgoal->pstep)->modePath) {
         case -1:
         case 0:
         case 3: {
@@ -104,7 +109,7 @@ void GoalJump_Activate(GOALJUMP *pgoal)
         case 2: {
             QW pos = pgoal->posTarget;
             QW dir = VectorSubFrom(pos, PosLoWorld(pgoal->pstep));
-            MATRIX3Q mat = BuildOrthonormalMatrixY__FP6VECTORT0P7MATRIX3(PmatLoWorld(*(LO **)((u8 *)pgoal->pstep + 0xF84))->row[0], dir);
+            MATRIX3Q mat = BuildOrthonormalMatrixY__FP6VECTORT0P7MATRIX3(PmatLoWorld((LO *)((STEPGUARD *)pgoal->pstep)->ptargetPath)->row[0], dir);
             func_00209840(&((STEPGUARD *)pgoal->pstep)->heading, &mat);
             break;
         }

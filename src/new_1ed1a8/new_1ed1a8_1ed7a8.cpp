@@ -5,14 +5,29 @@
 #include "types.h"
 #include "m2c_macros.h"
 #include "classinfo.h"
+#include "lo.h"
+#include "sl.h"
 
 struct CBinaryInputStream;
 
-struct NODE;
-
-struct VT { char pad[0x38]; short delta; short index; void (*fn)(void *, void *); };
-
-struct NODE { char pad[0xC]; VT *vt; char pad2[0x20]; NODE *owner; };
+/* a screen animation node (retail "saa"): a BASIC whose slot 7 reads its record; the subclasses below add their own fields at 0x50 */
+struct SAA : BASIC {
+    virtual void LoadFromRecord(void *precord); /* 7: func_001ED7A8 calls it with the 0x20-byte record it just read */
+    /* 0x10 */ f32 tLast;          /* FUpdatableSaa: the clock time of the last update */
+    /* 0x14 */ s32 oid;            /* InitSaa copies it from the record; FMatchesSaaOid */
+    /* 0x18 */ s32 field_0x18;     /* InitSaa copies it from the record */
+    /* 0x1C */ s32 cframe;         /* the frame count: InitSaa copies it from the record; SetSaiIframe, UpdateLoop */
+    /* 0x20 */ s32 field_0x20;     /* InitSaa copies it from the record */
+    /* 0x24 */ s16 du;             /* SetSaiDuDv: 12-bit fixed point */
+    /* 0x26 */ s16 dv;
+    /* 0x28 */ u16 iframe;         /* SetSaiIframe */
+    u8 unknown_0x2A[0x2];
+    /* 0x2C */ s32 fDirty;         /* SetSaiIframe, SetSaiDuDv set it; FlushSaaUnpacks clears it */
+    /* 0x30 */ SAA *owner;         /* func_001ED7A8 sets it; InitSaa appends the node to the list only when it has none */
+    /* 0x34 */ SL sl;              /* InitSaa: InitSl(.., 0x10), the node's pending unpacks */
+    /* 0x40 */ SAA *next;          /* the link in B_003E159C's list (FlushSaaUnpacks) */
+    u8 unknown_0x44[0xC];
+};
 
 extern CLASSINFO D_002BAAE8[];
 
@@ -20,32 +35,19 @@ unsigned short U16Read__18CBinaryInputStream(CBinaryInputStream *);
 
 extern "C" void CBinaryInputStream_Read_thunk(CBinaryInputStream *, int, void *);
 
-NODE *func_001ED7A8(NODE *owner, CBinaryInputStream *stream)
+SAA *func_001ED7A8(SAA *owner, CBinaryInputStream *stream)
 {
     int index = (int)U16Read__18CBinaryInputStream(stream);
     if (index == -1) return 0;
-    NODE *node = (NODE *)D_002BAAE8[index].pfnCreate();
+    SAA *node = (SAA *)D_002BAAE8[index].pfnCreate();
     node->owner = owner;
     char block[0x20];
     CBinaryInputStream_Read_thunk(stream, 0x20, block);
-    VT *vt = node->vt;
-    vt->fn((char *)node + vt->delta, block);
+    node->LoadFromRecord(block);
     return node;
 }
 
 extern "C" {
-struct OBJVTBL {
-    char pad[0x30];
-    s16 delta;
-    char pad2[2];
-    struct CLASSINFO *(*pfnClassInfo)(char *);
-};
-
-struct OBJ {
-    char pad[0xC];
-    struct OBJVTBL *pvtbl;
-};
-
 s32 AppendSlEntry(s32 *, s32);              /* extern */
 
 s32 ClearSl(s32);                               /* extern */
@@ -56,13 +58,11 @@ s32 CopyAb__FPvT0Ui_1ED850(s32, void *, s32);          /* extern */
 
 extern s32 B_003E159C;
 
-s32 func_001ED850(struct OBJ *pobj) {
+s32 func_001ED850(BASIC *pobj) {
     s32 temp_v0;
     struct CLASSINFO *pclassinfo;
-    struct OBJVTBL *pvtbl;
 
-    pvtbl = pobj->pvtbl;
-    pclassinfo = pvtbl->pfnClassInfo((char *)pobj + pvtbl->delta);
+    pclassinfo = pobj->Slot6();
     temp_v0 = (s32)pclassinfo->pfnCreate();
     CopyAb__FPvT0Ui_1ED850(temp_v0, pobj, pclassinfo->cb);
     ClearSl(temp_v0 + 0x34);
@@ -71,19 +71,6 @@ s32 func_001ED850(struct OBJ *pobj) {
     return temp_v0;
 }
 }
-
-struct SAA {
-    char pad0[0x10];
-    f32 field_0x10;
-    s32 field_0x14;
-    s32 field_0x18;
-    s32 field_0x1C;
-    s32 field_0x20;
-    char pad24[0xC];
-    s32 field_0x30;
-    s32 field_0x34;
-    char pad38[0x50 - 0x38];
-};
 
 struct SAAF {
     s32 field_0x0;
@@ -106,19 +93,19 @@ extern "C" s32 PrependSlEntry(s32 *, SAA *);
 extern "C" s32 B_003E159C;
 
 extern "C" void InitSaa(SAA *saa, SAAF *saaf) {
-    saa->field_0x14 = saaf->field_0x0;
+    saa->oid = saaf->field_0x0;
     saa->field_0x18 = saaf->field_0x4;
     saa->field_0x20 = saaf->field_0x8;
-    saa->field_0x1C = saaf->field_0xA;
-    InitSl((sptr)&saa->field_0x34, 0x10);
-    if (saa->field_0x30 == 0) {
+    saa->cframe = saaf->field_0xA;
+    InitSl((sptr)&saa->sl, 0x10);
+    if (saa->owner == 0) {
         PrependSlEntry(&B_003E159C, saa);
         return;
     }
     AppendSlEntry_1ED8E0(&B_003E159C, saa);
 }
 
-struct ENTRY { void *next; void *dest; int a; void *owner; int sl; };
+struct ENTRY { void *next; void *dest; int a; SAA *owner; ENTRY *link; };
 
 extern "C" int B_003DA790;
 
@@ -132,20 +119,20 @@ extern "C" void UnpackHelper__4VIFS3UPKiiPiPPUi_1ED960(void *, int, int, int, vo
 
 extern "C" void func_001EC718(void *);
 
-extern "C" int func_001ED960(char *node, int source, void *vifs)
+extern "C" int func_001ED960(SAA *node, int source, void *vifs)
 {
     ENTRY stackEntry;
     ENTRY *entry;
     if (B_003DA790 < 0x200) {
         entry = &B_003DA798[B_003DA790++];
-        ClearSle_1ED960((char *)entry + 0x10);
-        PrependSlEntry_1ED960(node + 0x34, entry);
+        ClearSle_1ED960(&entry->link);
+        PrependSlEntry_1ED960(&node->sl, entry);
         entry->owner = node;
     } else {
         entry = &stackEntry;
     }
-    UnpackHelper__4VIFS3UPKiiPiPPUi_1ED960(vifs, 0xD, 1, source, entry, (char *)entry + 8);
-    entry->dest = node + 0x24;
+    UnpackHelper__4VIFS3UPKiiPiPPUi_1ED960(vifs, 0xD, 1, source, entry, &entry->a);
+    entry->dest = &node->du;
     func_001EC718(entry);
     return 1;
 }
@@ -154,8 +141,8 @@ extern "C" {
 extern f32 g_2dded0;
 
 s32 FUpdatableSaa__FP3SAA(struct SAA *saa) {
-    if (saa->field_0x10 != g_2dded0) {
-        saa->field_0x10 = g_2dded0;
+    if (saa->tLast != g_2dded0) {
+        saa->tLast = g_2dded0;
         return 1;
     }
     return 0;
@@ -174,13 +161,11 @@ f32 UCompleteSaa__FP3SAA(void) {
 }
 }
 
-struct SAI { char pad0[0x1C]; int cframe; char pad20[8]; unsigned short iframe; char pad2A[2]; int fDirty; char pad30[4]; char sl[1]; };
-
 extern "C" int FIsSlEmpty(void *);
 
-extern "C" void SetSaiIframe(SAI *sai, int iframe)
+extern "C" void SetSaiIframe(SAA *sai, int iframe)
 {
-    if (FIsSlEmpty(sai->sl) != 0)
+    if (FIsSlEmpty(&sai->sl) != 0)
         return;
     int top = sai->cframe - 1;
     int clamped;
@@ -197,15 +182,13 @@ extern "C" void SetSaiIframe(SAI *sai, int iframe)
     }
 }
 
-struct SAA_1EDAD8 { char pad[0x24]; short du; short dv; int unk; int dirty; char pad2[4]; char sl[1]; };
-
-void SetSaiDuDv(SAA_1EDAD8 *s, float du, float dv)
+void SetSaiDuDv(SAA *s, float du, float dv)
 {
-    if (FIsSlEmpty(s->sl)) return;
+    if (FIsSlEmpty(&s->sl)) return;
     int duFixed = (int)(du * 4096.0f + 0.5f) & 0xFFF;
     int dvFixed = (int)(dv * 4096.0f + 0.5f) & 0xFFF;
     if (s->du != duFixed || s->dv != dvFixed) {
-        s->dirty = 1;
+        s->fDirty = 1;
         s->dv = dvFixed;
         s->du = duFixed;
     }
@@ -213,17 +196,24 @@ void SetSaiDuDv(SAA_1EDAD8 *s, float du, float dv)
 
 extern "C" {
 s32 FMatchesSaaOid(struct SAA *saa, s32 *oid) {
-    return *oid == saa->field_0x14;
+    return *oid == saa->oid;
 }
 }
 
 struct F2 { float lo, hi; };
 
-struct SAAF_1EDB98 { char pad[0xC]; F2 loop; F2 pause; unsigned short frame; };
+struct SAAF_1EDB98 { u8 unknown_0x0[0xC]; F2 loop; F2 pause; unsigned short frame; };
 
-struct LOOP { char pad[0x1C]; int cframe; char pad2[0x30]; F2 loop; F2 pause; float rate, gframe, req, cur; };
+struct LOOP : SAA {
+    /* 0x50 */ F2 loop;            /* the range of seconds one pass takes */
+    /* 0x58 */ F2 pause;           /* the range of seconds it waits between passes */
+    /* 0x60 */ float rate;         /* frames per second */
+    /* 0x64 */ float gframe;
+    /* 0x68 */ float req;          /* the pause drawn for this pass */
+    /* 0x6C */ float cur;          /* the pause left */
+};
 
-extern "C" void InitSaa_1EDB98(LOOP *, SAAF_1EDB98 *);
+extern "C" void InitSaa_1EDB98(SAA *, SAAF_1EDB98 *);
 
 extern "C" float GRandInRange(float, float);
 
@@ -250,64 +240,59 @@ extern "C" void InitLoop__FP4LOOPP4SAAF(LOOP *loop, SAAF_1EDB98 *saaf)
     loop->cur = pause;
 }
 
-struct LOOP_1EDC40 { char pad0[0x1C]; int cframe; char pad1[0x14]; char slsai[0x1C]; float dtMin; float dtMax; float dtPauseMin; float dtPauseMax; float sviframe; float gframe; float dtPauseRequested; float dtPause; };
-
 extern float g_2dded4;
 
 float GModPositive(float, float);
 
-extern "C" void SetSaiIframe_1EDC40(LOOP_1EDC40 *, int);
+extern "C" void SetSaiIframe_1EDC40(SAA *, int);
 
-void UpdateLoop(LOOP_1EDC40 *ploop, float dt)
+void UpdateLoop(LOOP *ploop, float dt)
 {
-    if (FIsSlEmpty(ploop->slsai))
+    if (FIsSlEmpty(&ploop->sl))
         return;
     int cframe = ploop->cframe;
     if (cframe < 2)
         return;
-    float dtPause = ploop->dtPause;
+    float dtPause = ploop->cur;
     if (0.0f < dtPause) {
-        ploop->dtPause = dtPause - g_2dded4;
+        ploop->cur = dtPause - g_2dded4;
         return;
     }
-    float gframe = ploop->gframe + ploop->sviframe * g_2dded4;
+    float gframe = ploop->gframe + ploop->rate * g_2dded4;
     ploop->gframe = gframe;
     if ((float)cframe <= gframe) {
-        float dtLoop = GRandInRange(ploop->dtMin, ploop->dtMax);
-        ploop->sviframe = (float)ploop->cframe / dtLoop;
-        float dtPauseNew = GRandInRange(ploop->dtPauseMin, ploop->dtPauseMax);
-        ploop->dtPauseRequested = dtPauseNew;
-        ploop->dtPause = dtPauseNew;
+        float dtLoop = GRandInRange(ploop->loop.lo, ploop->loop.hi);
+        ploop->rate = (float)ploop->cframe / dtLoop;
+        float dtPauseNew = GRandInRange(ploop->pause.lo, ploop->pause.hi);
+        ploop->req = dtPauseNew;
+        ploop->cur = dtPauseNew;
     }
     float gframeWrapped = GModPositive(ploop->gframe, (float)ploop->cframe);
     ploop->gframe = gframeWrapped;
     SetSaiIframe_1EDC40(ploop, (int)gframeWrapped);
 }
 
-extern "C" {
-struct LOOP_1EDD30 {
-    struct SAA saa;
-    char pad50[0x10];
-    f32 field_0x60;
-    f32 field_0x64;
-    f32 field_0x68;
-};
-
-f32 UCompleteLoop__FP4LOOP(struct LOOP_1EDD30 *loop) {
+extern "C" f32 UCompleteLoop__FP4LOOP(LOOP *loop) {
     f32 temp_f2;
 
-    temp_f2 = loop->field_0x60;
-    return (loop->field_0x64 / temp_f2) / (((f32) loop->saa.field_0x1C / temp_f2) + loop->field_0x68);
-}
+    temp_f2 = loop->rate;
+    return (loop->gframe / temp_f2) / (((f32) loop->cframe / temp_f2) + loop->req);
 }
 
 struct R2 { float a, b; };
 
-struct PINGPONG { char pad0[0x1C]; int cframe; char pad1[0x30]; R2 dt; R2 pause; float sv, gframe, dtPause, dtReq; };
+struct PINGPONG : SAA {
+    /* 0x50 */ R2 dt;              /* the range of seconds one sweep takes */
+    /* 0x58 */ R2 pause;           /* the range of seconds it waits at the start */
+    /* 0x60 */ float sv;           /* frames per second, negative on the way back (UCompletePingpong) */
+    /* 0x64 */ float gframe;
+    /* 0x68 */ float dtReq;        /* the pause drawn for this sweep */
+    /* 0x6C */ float dtPause;      /* the pause left */
+};
 
-struct SAAF_1EDD60 { char pad[0xC]; float a, b, c, d; unsigned short e; };
+struct SAAF_1EDD60 { u8 unknown_0x0[0xC]; float a, b, c, d; unsigned short e; };
 
-extern "C" void InitSaa_1EDD60(void *, void *);
+extern "C" void InitSaa_1EDD60(SAA *, void *);
 
 extern "C" void InitPingpong__FP8PINGPONGP4SAAF(PINGPONG *pp, SAAF_1EDD60 *saaf)
 {
@@ -328,21 +313,15 @@ extern "C" void InitPingpong__FP8PINGPONGP4SAAF(PINGPONG *pp, SAAF_1EDD60 *saaf)
     int twice = pp->cframe << 1;
     pp->sv = (float)twice / t;
     float p = GRandInRange(pause->a, pause->b);
-    pp->dtPause = p;
     pp->dtReq = p;
+    pp->dtPause = p;
 }
 
-struct PINGPONG_1EDE10 {
-char pad0[0x1C]; int cframe; char pad20[0x14]; char sl[0x1C];
-float dtMin; float dtMax; float dtPauseMin; float dtPauseMax;
-float sviframe; float gframe; float dtPauseRequested; float dtPause;
-};
-
-extern "C" void SetSaiIframe_1EDE10(void *, int);
+extern "C" void SetSaiIframe_1EDE10(SAA *, int);
 
 extern "C" float g_2dded4_1EDE10;
 
-void UpdatePingpong(PINGPONG_1EDE10 *ppingpong, float dt)
+void UpdatePingpong(PINGPONG *ppingpong, float dt)
 {
     if (FIsSlEmpty(&ppingpong->sl))
         return;
@@ -353,42 +332,39 @@ void UpdatePingpong(PINGPONG_1EDE10 *ppingpong, float dt)
         ppingpong->dtPause = ppingpong->dtPause - g_2dded4_1EDE10;
         return;
     }
-    float sviframe = ppingpong->sviframe;
+    float sviframe = ppingpong->sv;
     float dgframe = sviframe * g_2dded4_1EDE10;
     float gframe = ppingpong->gframe + dgframe;
     ppingpong->gframe = gframe;
     if ((float)cframe <= gframe) {
         ppingpong->gframe = gframe - dgframe;
-        ppingpong->sviframe = -sviframe;
+        ppingpong->sv = -sviframe;
     }
     if (ppingpong->gframe < 0.0f) {
         ppingpong->gframe = 0.0f;
-        float dtPingpong = GRandInRange(ppingpong->dtMin, ppingpong->dtMax);
-        ppingpong->sviframe = (float)(ppingpong->cframe << 1) / dtPingpong;
-        float dtPause = GRandInRange(ppingpong->dtPauseMin, ppingpong->dtPauseMax);
-        ppingpong->dtPauseRequested = dtPause;
+        float dtPingpong = GRandInRange(ppingpong->dt.a, ppingpong->dt.b);
+        ppingpong->sv = (float)(ppingpong->cframe << 1) / dtPingpong;
+        float dtPause = GRandInRange(ppingpong->pause.a, ppingpong->pause.b);
+        ppingpong->dtReq = dtPause;
         ppingpong->dtPause = dtPause;
     }
     SetSaiIframe_1EDE10(ppingpong, (int)ppingpong->gframe);
 }
 
-struct PINGPONG_1EDF28 { char pad[0x1C]; int half; char pad2[0x40]; float velocity; float position; float extra; };
-
-extern "C" float UCompletePingpong__FP8PINGPONG(PINGPONG_1EDF28 *pingpong)
+extern "C" float UCompletePingpong__FP8PINGPONG(PINGPONG *pingpong)
 {
-    float speed = pingpong->velocity;
+    float speed = pingpong->sv;
     float distance;
     if (speed < 0.0f) {
         speed = -speed;
-        distance = (float)(pingpong->half * 2) - pingpong->position;
+        distance = (float)(pingpong->cframe * 2) - pingpong->gframe;
     } else {
-        distance = pingpong->position;
+        distance = pingpong->gframe;
     }
-    return (distance / speed) / ((float)(pingpong->half * 2) / speed + pingpong->extra);
+    return (distance / speed) / ((float)(pingpong->cframe * 2) / speed + pingpong->dtReq);
 }
 
-struct ACTSEG {
-    SAA saa;
+struct ACTSEG : SAA {
     f32 field_0x50;
     f32 field_0x54;
 };
@@ -399,28 +375,22 @@ extern "C" void CloneActseg__FP6ACTSEGT0(ACTSEG *actseg, SAAF *saaf) {
     f32 valueA;
     f32 valueB;
 
-    InitSaa_1EDFA0(&actseg->saa, saaf);
+    InitSaa_1EDFA0(actseg, saaf);
     valueB = saaf->field_0xC;
     valueA = saaf->field_0x10;
     actseg->field_0x54 = valueA;
     actseg->field_0x50 = valueB;
 }
 
-struct SHUFFLE {
-    char pad0[0x1C];
-    int cframe;
-    char pad20[8];
-    unsigned short iframe;
-    char pad2A[10];
-    char sl[0x1C];
-    float dtMin;
-    float dtMax;
-    float dtPause;
+struct SHUFFLE : SAA {
+    /* 0x50 */ float dtMin;
+    /* 0x54 */ float dtMax;
+    /* 0x58 */ float dtPause;
 };
 
 extern "C" int NRandInRange(int, int);
 
-extern "C" void SetSaiIframe_1EDFE0(SHUFFLE *, int);
+extern "C" void SetSaiIframe_1EDFE0(SAA *, int);
 
 void UpdateShuffle(SHUFFLE *pshuffle, float dt)
 {
@@ -440,14 +410,18 @@ void UpdateShuffle(SHUFFLE *pshuffle, float dt)
     pshuffle->dtPause = dtPause;
 }
 
-struct EYES {
-    SAA saa;
-    f32 field_0x50;
-    f32 field_0x54;
-    f32 field_0x58;
-    f32 field_0x5C;
-    s32 field_0x60;
-    s32 field_0x64;
+struct EYES : SAA {
+    /* 0x50 */ f32 scale;
+    /* 0x54 */ f32 lo;
+    /* 0x58 */ f32 hi;
+    /* 0x5C */ f32 limit;
+    /* 0x60 */ s32 oidShd;         /* PsaiFromEyesShd compares a SHD's id with it */
+    /* 0x64 */ s32 mode;           /* the blink state: SetEyesEyess, UpdateEyes, SetEyesClosed */
+    /* 0x68 */ f32 value;          /* the clock time of the last change */
+    /* 0x6C */ f32 level;
+    /* 0x70 */ f32 step;
+    /* 0x74 */ f32 pos;
+    /* 0x78 */ f32 ratio;
 };
 
 extern "C" void InitSaa_1EE090(SAA *, SAAF *);
@@ -455,15 +429,15 @@ extern "C" void InitSaa_1EE090(SAA *, SAAF *);
 extern "C" void SetEyesEyess__FP4EYES5EYESS_1EE090(EYES *, s32);
 
 extern "C" void InitEyes__FP4EYESP4SAAF(EYES *eyes, SAAF *saaf) {
-    InitSaa_1EE090(&eyes->saa, saaf);
-    eyes->field_0x60 = saaf->field_0x1C;
-    eyes->field_0x50 = saaf->field_0xC;
+    InitSaa_1EE090(eyes, saaf);
+    eyes->oidShd = saaf->field_0x1C;
+    eyes->scale = saaf->field_0xC;
     f32 y = saaf->field_0x10;
     f32 z = saaf->field_0x14;
-    eyes->field_0x54 = y;
-    eyes->field_0x58 = z;
-    eyes->field_0x5C = saaf->field_0x18;
-    eyes->field_0x64 = -1;
+    eyes->lo = y;
+    eyes->hi = z;
+    eyes->limit = saaf->field_0x18;
+    eyes->mode = -1;
     SetEyesEyess__FP4EYES5EYESS_1EE090(eyes, 0);
 }
 
@@ -471,12 +445,7 @@ extern "C" float GRandInRange__Fff_1EE100(float, float);
 
 extern float g_2dded0_1EE100;
 
-struct EYES_1EE100 {
-    char pad0[0x1C]; int count; char pad20[0x30]; float scale; float lo; float hi; float limit;
-    char pad60[4]; int mode; float value; float level; float step; float pos; float ratio;
-};
-
-void SetEyesEyess__FP4EYES5EYESS(EYES_1EE100 *self, int mode)
+void SetEyesEyess__FP4EYES5EYESS(EYES *self, int mode)
 {
     if (mode == self->mode) return;
     if (mode == 1) goto store;
@@ -491,7 +460,7 @@ void SetEyesEyess__FP4EYES5EYESS(EYES_1EE100 *self, int mode)
 
 zero:
     {
-        int count = self->count;
+        int count = self->cframe;
         float span = (float)(count << 1) * (1.0f - self->ratio) / self->scale;
         self->pos = (float)(count - 1) * self->ratio;
         self->step = span;
@@ -506,7 +475,7 @@ zero:
 
 two:
     {
-        int last = self->count - 1;
+        int last = self->cframe - 1;
         if ((int)self->pos == last) {
             self->mode = mode;
             goto tail;
@@ -521,137 +490,105 @@ tail:
     self->value = g_2dded0_1EE100;
 }
 
-struct Eyes {
-    char pad0[0x1C];
-    s32 frameCount;
-    char pad20[0x14];
-    s32 slotList;
-    char pad38[0x2C];
-    s32 state;
-    f32 blinkStart;
-    f32 blinkDelay;
-    f32 speed;
-    f32 frame;
-    f32 openFraction;
-};
+extern "C" s32 FIsSlEmpty_1EE228(SL *);
 
-extern "C" s32 FIsSlEmpty_1EE228(s32);
+extern "C" void SetEyesEyess__FP4EYES5EYESS_1EE228(EYES*, s32);
 
-extern "C" void SetEyesEyess__FP4EYES5EYESS_1EE228(Eyes*, s32);
-
-extern "C" void SetSaiIframe_1EE228(Eyes*, s32);
+extern "C" void SetSaiIframe_1EE228(SAA*, s32);
 
 extern "C" f32 g_2dded0;
 
 extern "C" f32 g_2dded4_1EE228;
 
-extern "C" void UpdateEyes__FP4EYESf(Eyes* eyes) {
-    if (FIsSlEmpty_1EE228((sptr)&eyes->slotList) == 0) {
-        s32 frameCount = eyes->frameCount;
+extern "C" void UpdateEyes__FP4EYESf(EYES* eyes) {
+    if (FIsSlEmpty_1EE228(&eyes->sl) == 0) {
+        s32 frameCount = eyes->cframe;
         if (frameCount >= 2) {
-            s32 state = eyes->state;
+            s32 state = eyes->mode;
             switch (state) {
             case 0:
-                if (eyes->blinkDelay <= (g_2dded0 - eyes->blinkStart)) {
+                if (eyes->level <= (g_2dded0 - eyes->value)) {
                     state = 1;
                 }
                 break;
             case 1: {
-                f32 step = eyes->speed * g_2dded4_1EE228;
-                f32 advanced = eyes->frame + step;
-                eyes->frame = advanced;
+                f32 step = eyes->step * g_2dded4_1EE228;
+                f32 advanced = eyes->pos + step;
+                eyes->pos = advanced;
                 if ((f32)frameCount <= advanced) {
                     f32 restored = advanced - step;
-                    eyes->frame = restored;
+                    eyes->pos = restored;
                     state = (((s32)restored ^ (frameCount - 1)) == 0) ? 2 : 3;
                 }
                 break;
             }
             case 2:
-                if (eyes->openFraction < 1.0f) {
+                if (eyes->ratio < 1.0f) {
                     state = 3;
                 }
                 break;
             case 3: {
-                f32 retreated = eyes->frame - (eyes->speed * g_2dded4_1EE228);
-                eyes->frame = retreated;
-                if (retreated <= ((f32)frameCount * eyes->openFraction)) {
+                f32 retreated = eyes->pos - (eyes->step * g_2dded4_1EE228);
+                eyes->pos = retreated;
+                if (retreated <= ((f32)frameCount * eyes->ratio)) {
                     state = 0;
                 }
                 break;
             }
             }
             SetEyesEyess__FP4EYES5EYESS_1EE228(eyes, state);
-            SetSaiIframe_1EE228(eyes, (s32)eyes->frame);
+            SetSaiIframe_1EE228(eyes, (s32)eyes->pos);
         }
     }
 }
 
-struct EYES_1EE3B0 {
-    SAA saa;
-    f32 field_0x50;
-    f32 field_0x54;
-    f32 field_0x58;
-    f32 field_0x5C;
-    s32 field_0x60;
-    s32 field_0x64;
-    char pad68[0x74 - 0x68];
-    f32 field_0x74;
-    f32 field_0x78;
-};
+extern "C" void SetEyesEyess__FP4EYES5EYESS_1EE3B0(EYES *, s32);
 
-extern "C" void SetEyesEyess__FP4EYES5EYESS_1EE3B0(EYES_1EE3B0 *, s32);
+extern "C" s32 SetSaiIframe_1EE3B0(SAA *, s32);
 
-extern "C" s32 SetSaiIframe_1EE3B0(EYES_1EE3B0 *, s32);
-
-extern "C" void SetEyesClosed__FP4EYESf(EYES_1EE3B0 *eyes, f32 closed) {
-    eyes->field_0x78 = closed;
+extern "C" void SetEyesClosed__FP4EYESf(EYES *eyes, f32 closed) {
+    eyes->ratio = closed;
     if (closed >= 1.0f) {
         SetEyesEyess__FP4EYES5EYESS_1EE3B0(eyes, 2);
     } else {
-        eyes->field_0x64 = -1;
+        eyes->mode = -1;
         SetEyesEyess__FP4EYES5EYESS_1EE3B0(eyes, 0);
     }
-    SetSaiIframe_1EE3B0(eyes, (s32) eyes->field_0x74);
+    SetSaiIframe_1EE3B0(eyes, (s32) eyes->pos);
 }
-
-struct EYES_1EE420 { char pad[0x60]; int oid; };
 
 struct SHD { int oid; };
 
-extern "C" int FMatchesSaaOid_1EE420(EYES_1EE420 *, SHD *);
+extern "C" int FMatchesSaaOid_1EE420(SAA *, SHD *);
 
-int PsaiFromEyesShd__FP4EYESP3SHD(EYES_1EE420 *eyes, SHD *shd)
+int PsaiFromEyesShd__FP4EYESP3SHD(EYES *eyes, SHD *shd)
 {
     int result = 0;
-    if (FMatchesSaaOid_1EE420(eyes, shd) != 0 || shd->oid == eyes->oid)
+    if (FMatchesSaaOid_1EE420(eyes, shd) != 0 || shd->oid == eyes->oidShd)
         result = 1;
     return result;
 }
 
-struct SCROLLER {
-    SAA saa;
-    f32 field_0x50;
-    f32 field_0x54;
-    f32 field_0x58;
-    f32 field_0x5C;
-    f32 field_0x60;
-    f32 field_0x64;
+struct SCROLLER : SAA {
+    /* 0x50 */ f32 speedU;
+    /* 0x54 */ f32 speedV;
+    /* 0x58 */ f32 modU;
+    /* 0x5C */ f32 modV;
+    /* 0x60 */ f32 masterU;
+    /* 0x64 */ f32 masterV;
 };
 
 extern "C" void InitSaa_1EE480(SAA *, SAAF *);
 
 extern "C" void InitScroller__FP8SCROLLERP4SAAF(SCROLLER *scroller, SAAF *saaf) {
-    InitSaa_1EE480(&scroller->saa, saaf);
-    scroller->field_0x50 = saaf->field_0xC;
-    scroller->field_0x54 = saaf->field_0x10;
-    scroller->field_0x58 = saaf->field_0x14;
-    scroller->field_0x5C = saaf->field_0x18;
-    scroller->field_0x64 = 1.0f;
-    scroller->field_0x60 = 1.0f;
+    InitSaa_1EE480(scroller, saaf);
+    scroller->speedU = saaf->field_0xC;
+    scroller->speedV = saaf->field_0x10;
+    scroller->modU = saaf->field_0x14;
+    scroller->modV = saaf->field_0x18;
+    scroller->masterV = 1.0f;
+    scroller->masterU = 1.0f;
 }
-
-struct SCROLLER_1EE4E0 { char pad0[0x24]; short du; short dv; char pad28[0xC]; char sl[0x1C]; float speedU; float speedV; float modU; float modV; float masterU; float masterV; };
 
 struct CLOCK { int unk0; float dt; };
 
@@ -659,9 +596,9 @@ extern "C" CLOCK g_2dded0_1EE4E0;
 
 extern "C" float fmodf(float, float);
 
-extern "C" void SetSaiDuDv_1EE4E0(SCROLLER_1EE4E0 *, float, float);
+extern "C" void SetSaiDuDv_1EE4E0(SAA *, float, float);
 
-void UpdateScroller__FP8SCROLLERf(SCROLLER_1EE4E0 *pscroller)
+void UpdateScroller__FP8SCROLLERf(SCROLLER *pscroller)
 {
     if (!FIsSlEmpty(&pscroller->sl)) {
         float du = fmodf((float)pscroller->du * 0.00024414062f + pscroller->speedU * pscroller->masterU * g_2dded0_1EE4E0.dt, pscroller->modU);
@@ -670,46 +607,39 @@ void UpdateScroller__FP8SCROLLERf(SCROLLER_1EE4E0 *pscroller)
     }
 }
 
-struct SCR { char pad0[0x24]; short a, b; char pad1[0x28]; float su, sv, du, dv; };
-
-extern "C" float UCompleteScroller__FP8SCROLLER(SCR *s)
+extern "C" float UCompleteScroller__FP8SCROLLER(SCROLLER *s)
 {
     float u = 0.0f;
-    if (s->su != 0.0f) u += ((float)s->a * 0.00024414062f / s->du) * 0.5f;
+    if (s->speedU != 0.0f) u += ((float)s->du * 0.00024414062f / s->modU) * 0.5f;
     else u += 0.5f;
-    if (s->sv != 0.0f) u += ((float)s->b * 0.00024414062f / s->dv) * 0.5f;
+    if (s->speedV != 0.0f) u += ((float)s->dv * 0.00024414062f / s->modV) * 0.5f;
     else u += 0.5f;
     return u;
 }
 
 extern "C" void SetScrollerMasterSpeeds__FP8SCROLLERff(SCROLLER *scroller, f32 speedA, f32 speedB) {
-    scroller->field_0x60 = speedA;
-    scroller->field_0x64 = speedB;
+    scroller->masterU = speedA;
+    scroller->masterV = speedB;
 }
 
 extern "C" {
-struct CIRCLER {
-    struct SAA saa;
-    f32 field_0x50;
-    f32 field_0x54;
-    f32 field_0x58;
-    f32 field_0x5C;
+struct CIRCLER : SAA {
+    /* 0x50 */ f32 sw;         /* radians per second */
+    /* 0x54 */ f32 sRadius;
+    /* 0x58 */ f32 du;         /* the centre */
+    /* 0x5C */ f32 dv;
 };
 
 void InitSaa_1EE688(struct SAA *, struct SAAF *);
 
 void InitCircler__FP7CIRCLERP4SAAF(struct CIRCLER *circler, struct SAAF *saaf) {
-    InitSaa_1EE688(&circler->saa, saaf);
-    circler->field_0x50 = saaf->field_0xC;
-    circler->field_0x54 = saaf->field_0x10;
-    circler->field_0x58 = saaf->field_0x14;
-    circler->field_0x5C = saaf->field_0x18;
+    InitSaa_1EE688(circler, saaf);
+    circler->sw = saaf->field_0xC;
+    circler->sRadius = saaf->field_0x10;
+    circler->du = saaf->field_0x14;
+    circler->dv = saaf->field_0x18;
 }
 }
-
-struct SLE { int x; };
-
-struct CIRCLER_1EE6D8 { char pad0[0x34]; int sl[7]; float sw; float sRadius; float du; float dv; };
 
 extern float g_2dded0_1EE6D8;
 
@@ -717,11 +647,11 @@ extern "C" float RadNormalize__Ff_1EE6D8(float);
 
 extern "C" void CalculateSinCos__FfPfT1_1EE6D8(float, float *, float *);
 
-extern "C" void SetSaiDuDv_1EE6D8(float, float, void *);
+extern "C" void SetSaiDuDv_1EE6D8(float, float, SAA *);
 
-extern "C" void UpdateCircler__FP7CIRCLERf(CIRCLER_1EE6D8 *pcircler, float dt)
+extern "C" void UpdateCircler__FP7CIRCLERf(CIRCLER *pcircler, float dt)
 {
-    if (FIsSlEmpty(&pcircler->sl[0]) != 0)
+    if (FIsSlEmpty(&pcircler->sl) != 0)
         return;
     float rad = RadNormalize__Ff_1EE6D8(g_2dded0_1EE6D8 * pcircler->sw);
     float sc[2];
@@ -736,34 +666,30 @@ extern "C" float GModPositive__Fff_1EE768(float, float);
 
 extern "C" float g_2dded0_1EE768;
 
-extern "C" float UCompleteCircler__FP7CIRCLER(char *circler)
+extern "C" float UCompleteCircler__FP7CIRCLER(CIRCLER *circler)
 {
-    return GModPositive__Fff_1EE768(g_2dded0_1EE768 * *(float *)(circler + 0x50), 6.2831855f) * 0.15915494f;
+    return GModPositive__Fff_1EE768(g_2dded0_1EE768 * circler->sw, 6.2831855f) * 0.15915494f;
 }
 
 struct VECTOR_1EE7B0 { float x, y, z, w; } __attribute__((aligned(16)));
 
-struct SaaUnpack { char pad0[0x10]; SaaUnpack *next; };
+extern "C" void func_001EC718_1EE7B0(ENTRY *);
 
-struct Saa { char pad0[0x2C]; int pending; char pad30[4]; SaaUnpack *unpacks; char pad38[8]; Saa *next; };
-
-extern "C" void func_001EC718_1EE7B0(SaaUnpack *);
-
-extern "C" Saa *B_003E159C_1EE7B0;
+extern "C" SAA *B_003E159C_1EE7B0;
 
 extern "C" void FlushSaaUnpacks(void) {
     VECTOR_1EE7B0 vector;
-    Saa *saa = B_003E159C_1EE7B0;
-    SaaUnpack *unpack;
+    SAA *saa = B_003E159C_1EE7B0;
+    ENTRY *unpack;
     if (saa != 0) {
         do {
-            if (saa->pending != 0) {
-                unpack = saa->unpacks;
-                saa->pending = 0;
+            if (saa->fDirty != 0) {
+                unpack = (ENTRY *)saa->sl.pvFirst;
+                saa->fDirty = 0;
                 if (unpack != 0) {
                     do {
                         func_001EC718_1EE7B0(unpack);
-                        unpack = unpack->next;
+                        unpack = unpack->link;
                     } while (unpack != 0);
                 }
             }

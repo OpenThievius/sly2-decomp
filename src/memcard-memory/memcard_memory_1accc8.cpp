@@ -6,17 +6,16 @@
 #include "include_asm.h"
 #include "cref.h"
 #include "memcardmenu.h"
+#include "memcard.h"
+#include "pausemenu.h"
+#include "sw.h"
 #include "joy.h"
 
-struct B8 { long v; } __attribute__((packed));
+struct B8 { s64 v; } __attribute__((packed));
 
 struct MEMCARD;
 
-struct SLOTSCREEN { char pad[0x24]; int icur; };
-
-struct AUTOSAVE { char pad[0xFD50]; void *pslotCur; void *pad2; void *pslotOther; char pad3[0xFD6C - 0xFD5C]; int field_FD6C; };
-
-extern "C" void CreateMemcardThread__FP7MEMCARDii_1ACCC8(MEMCARD *, long);
+extern "C" void CreateMemcardThread__FP7MEMCARDii_1ACCC8(MEMCARD *, s64);
 
 extern "C" int FJoyButtonPressed(JOY *, int);
 
@@ -38,13 +37,13 @@ extern "C" void func_001ACFE0(MEMCARDMENU *);
 
 extern "C" void func_001AD168_1ACCC8(MEMCARDMENU *);
 
-extern "C" AUTOSAVE B_002E65E0;
+extern "C" SAVE B_002E65E0;
 
 extern "C" int B_002E65E8;
 
 extern "C" char B_002F633C[];
 
-extern "C" SLOTSCREEN B_003D9ED0;
+extern "C" PAUSEMENU B_003D9ED0;
 
 extern "C" s32 B_003DD490;
 
@@ -92,7 +91,7 @@ extern "C" void MemcardMenu_Update(MEMCARDMENU *self)
             break;
         case 19:
             if (FMemcardThreadValid__FP7MEMCARD_1ACCC8(B_002F633C) == 0) {
-                if (B_002E65E0.field_FD6C == 0) {
+                if (B_002E65E0.mc.busy == 0) {
                     CreateMemcardThread__FP7MEMCARDii_1ACCC8((MEMCARD *)B_002F633C, RO_002A6D88.v);
                     MemcardMenu_SetState(self, 0x16);
                 } else {
@@ -102,7 +101,7 @@ extern "C" void MemcardMenu_Update(MEMCARDMENU *self)
             break;
         case 22:
             if (FMemcardThreadValid__FP7MEMCARD_1ACCC8(B_002F633C) == 0) {
-                if (B_002E65E0.field_FD6C != 0)
+                if (B_002E65E0.mc.busy != 0)
                     MemcardMenu_SetState(self, 0x17);
                 else
                     MemcardMenu_ClearState(self);
@@ -110,7 +109,7 @@ extern "C" void MemcardMenu_Update(MEMCARDMENU *self)
             break;
         case 26:
             if (FMemcardThreadValid__FP7MEMCARD_1ACCC8(B_002F633C) == 0) {
-                if (B_002E65E0.field_FD6C == 0) {
+                if (B_002E65E0.mc.busy == 0) {
                     MemcardMenu_ClearState(self);
                     int next = self->mode;
                     switch (next) {
@@ -130,8 +129,8 @@ extern "C" void MemcardMenu_Update(MEMCARDMENU *self)
             break;
         case 33:
             if (FMemcardThreadValid__FP7MEMCARD_1ACCC8(B_002F633C) == 0) {
-                B_002E65E0.pslotOther = 0;
-                if (B_002E65E0.field_FD6C == 0)
+                B_002E65E0.pslotInit = 0;
+                if (B_002E65E0.mc.busy == 0)
                     MemcardMenu_ClearState(self);
                 else
                     MemcardMenu_SetState(self, 0x1D);
@@ -145,7 +144,7 @@ INCLUDE_ASM(0X1ACFE0);
 
 struct MEMCARD;
 
-extern "C" void CreateMemcardThread__FP7MEMCARDii(MEMCARD *, long);
+extern "C" void CreateMemcardThread__FP7MEMCARDii(MEMCARD *, s64);
 
 extern "C" void MemcardMenu_SetState(MEMCARDMENU *, int);
 
@@ -182,13 +181,10 @@ extern "C" void func_001AD168(MEMCARDMENU *pmenu)
 
 struct CRef_1AD250 { int tagk; float g; };
 
-extern "C" char B_002E6604[];
-
 extern "C" char *B_003E0FAC;
 
-struct SAVE { char pad[0x7D50]; char *pslotCur; };
-
-struct ITEM { char pad[8]; int slot; char pad2[0x10]; unsigned flags; };
+// The menu item of a save slot: the slot index and the flags word func_001AD250, SlotItem_Load and func_001AD480 read.
+struct SLOTITEM { u8 unknown_0x0[8]; int slot; u8 unknown_0xC[0x10]; unsigned flags; };
 
 extern "C" CRef_1AD250 *RefGetGameSaveValue(CRef_1AD250 *, void *, void *);
 
@@ -202,19 +198,17 @@ extern "C" void *NewEmitter(int);
 
 extern "C" void SetEmitterUnpositioned(void *, void *);
 
-extern "C" void func_001AD250(ITEM *item)
+extern "C" void func_001AD250(SLOTITEM *item)
 {
-    char *base = B_002E6604;
-    char *pslot = base + item->slot * 0x5464;
+    SLOT *pslot = &B_002E65E0.aslot[item->slot];
     CRef_1AD250 ref;
     RefGetGameSaveValue(&ref, B_003E0FAC, pslot);
     float g = ref.g;
     CRef_Destruct(&ref);
     if (g == 0.0f) {
-        SAVE *psave = (SAVE *)(base + 0x7FDC);
-        psave->pslotCur = pslot;
+        B_002E65E0.pslotCur = pslot;
         ResetSaveKeepingOptions(pslot, 1);
-        StartGameFromSave(psave->pslotCur);
+        StartGameFromSave(B_002E65E0.pslotCur);
     } else {
         void *emitter = NewEmitter(0x36);
         SetEmitterUnpositioned(emitter, 0);
@@ -223,13 +217,7 @@ extern "C" void func_001AD250(ITEM *item)
     }
 }
 
-struct CRef_1AD320 { int tagk; float g; int pad[2]; };
-
-struct ITEM_1AD320 { char pad0[8]; int slot; char pad0C[0x1C - 0xC]; int flags; };
-
-struct SLOT { char data[0x5464]; };
-
-extern SLOT B_002E6604_1AD320[];
+struct CRef_1AD320 { int tagk; float g; int unknown_0x8[2]; };
 
 extern int B_003E0FAC_1AD320;
 
@@ -237,18 +225,17 @@ extern "C" void RefGetGameSaveValue_1AD320(CRef_1AD320 *, int, void *);
 
 extern "C" void CRef_Destruct_1AD320(CRef_1AD320 *);
 
-void SlotItem_Load(ITEM_1AD320 *item)
+void SlotItem_Load(SLOTITEM *item)
 {
-    char *slot = (char *)&B_002E6604_1AD320[item->slot];
-    char *saves = (char *)B_002E6604_1AD320 + 0x7FDC;
+    SLOT *slot = &B_002E65E0.aslot[item->slot];
     CRef_1AD320 ref;
     RefGetGameSaveValue_1AD320(&ref, B_003E0FAC_1AD320, slot);
     float value = ref.g;
     CRef_Destruct_1AD320(&ref);
-    *(char **)(saves + 0x7D50) = slot;
+    B_002E65E0.pslotCur = slot;
     if (value == 0.0f) {
         ResetSaveKeepingOptions(slot, 1);
-        StartGameFromSave(*(char **)(saves + 0x7D50));
+        StartGameFromSave(B_002E65E0.pslotCur);
     } else {
         StartGameFromSave(slot);
         if (item != 0)
@@ -258,11 +245,9 @@ void SlotItem_Load(ITEM_1AD320 *item)
 
 struct CRef_1AD3E0 { int tag; int n; int a; int b; };
 
-struct MENU_1AD3E0 { char pad[0x4C]; int mode; };
+extern SAVE B_002E65E0;
 
-extern AUTOSAVE B_002E65E0;
-
-extern MENU_1AD3E0 B_002E6550;
+extern MEMCARDMENU B_002E6550;
 
 extern void *B_003E0FE4;
 
@@ -272,14 +257,14 @@ extern "C" void RefGetGameSaveValue_1AD3E0(CRef_1AD3E0 *, void *, void *);
 
 extern "C" void CRef_Destruct_1AD3E0(CRef_1AD3E0 *);
 
-extern "C" void MemcardMenu_SetState_1AD3E0(MENU_1AD3E0 *, int);
+extern "C" void MemcardMenu_SetState_1AD3E0(MEMCARDMENU *, int);
 
 extern "C" void func_001ABD40(void *);
 
 void func_001AD3E0()
 {
     CRef_1AD3E0 ref;
-    B_002E65E0.pslotCur = B_002E65E0.pslotOther;
+    B_002E65E0.pslotCur = B_002E65E0.pslotInit;
     B_002E6550.mode = 2;
     RefGetGameSaveValue_1AD3E0(&ref, B_003E0FE4, B_003D4A60);
     int n = ref.n;
@@ -294,32 +279,24 @@ void func_001AD3E0()
 
 struct CRef_1AD480 { int a; union { float g; int n; }; int c; int d; };
 
-struct ITEM_1AD480 { char pad0[8]; int slot; char pad1[0x10]; int flags; };
-
 extern int B_003E0FAC_1AD480;
-
-struct SLOT_1AD480 { char pad[0x5464]; };
-
-struct CARD { SLOT_1AD480 slots[3]; char pad[8]; SLOT_1AD480 *cur; };
-
-extern CARD B_002E6604_1AD480;
 
 extern char B_002E6550_1AD480;
 
-extern "C" void RefGetGameSaveValue_1AD480(CRef_1AD480 *, int, SLOT_1AD480 *);
+extern "C" void RefGetGameSaveValue_1AD480(CRef_1AD480 *, int, SLOT *);
 
 extern "C" void CRef_Destruct_1AD480(CRef_1AD480 *);
 
 extern "C" void MemcardMenu_SetState_1AD480(char *, int);
 
-extern "C" void func_001AD480(ITEM_1AD480 *item)
+extern "C" void func_001AD480(SLOTITEM *item)
 {
     CRef_1AD480 ref;
-    SLOT_1AD480 *slot = &B_002E6604_1AD480.slots[item->slot];
+    SLOT *slot = &B_002E65E0.aslot[item->slot];
     RefGetGameSaveValue_1AD480(&ref, B_003E0FAC_1AD480, slot);
     float dt = ref.g;
     CRef_Destruct_1AD480(&ref);
-    { char *p = (char *)&B_002E6604_1AD480 + 0x7FDC; *(SLOT_1AD480 **)(p + 0x7D58) = slot; }
+    B_002E65E0.pslotInit = slot;
     if (dt == 0.0f)
         func_001AD3E0();
     else
@@ -328,41 +305,25 @@ extern "C" void func_001AD480(ITEM_1AD480 *item)
         item->flags |= 2;
 }
 
-struct SLOT_1AD538 { char pad[0x5464]; };
+extern "C" SW B_003DD490_1AD538;
 
-struct SAVE_1AD538 {
-    char pad0[0x24]; SLOT_1AD538 aslot[3];
-    char pad2[0xFD50 - 0x24 - 3 * 0x5464];
-    SLOT_1AD538 *pslotCur;
-};
+extern "C" MEMCARDMENU B_002E6550_1AD538;
 
-struct ENTRY_1AD538 { char pad[0x14]; int slot; int pad18; };
+extern "C" SAVE B_002E65E0_1AD538;
 
-struct PAUSEMENU_1AD538 { char pad[0x24]; int count; };
+extern "C" PAUSEMENU B_003D9ED0_1AD538;
 
-struct MENU_1AD538 { char pad[0x44]; int phase; };
+extern "C" PAUSEPAGE B_003D9EDC_1AD538[];
 
-struct SW_1AD538 { char pad[0x3B1C]; void *psavepathDt; };
-
-extern "C" SW_1AD538 B_003DD490_1AD538;
-
-extern "C" MENU_1AD538 B_002E6550_1AD538;
-
-extern "C" SAVE_1AD538 B_002E65E0_1AD538;
-
-extern "C" PAUSEMENU_1AD538 B_003D9ED0_1AD538;
-
-extern "C" ENTRY_1AD538 B_003D9EDC_1AD538[];
-
-extern "C" void func_001ACC38_1AD538(MENU_1AD538 *, int);
+extern "C" void func_001ACC38_1AD538(MEMCARDMENU *, int);
 
 extern "C" CRef RefGetGameSaveValue_1AD538(void *, void *);
 
-extern "C" int func_001B0078_1AD538(PAUSEMENU_1AD538 *);
+extern "C" int func_001B0078_1AD538(PAUSEMENU *);
 
 static inline float SaveValue(int index)
 {
-    SLOT_1AD538 *slot = &B_002E65E0_1AD538.aslot[index];
+    SLOT *slot = &B_002E65E0_1AD538.aslot[index];
     return RefGetGameSaveValue_1AD538(B_003DD490_1AD538.psavepathDt, slot).m_tag.m_g;
 }
 
@@ -370,8 +331,8 @@ extern "C" void func_001AD538(void)
 {
     float values[3];
     func_001ACC38_1AD538(&B_002E6550_1AD538, 1);
-    if (B_003D9ED0_1AD538.count > 0) {
-        ENTRY_1AD538 *entry = &B_003D9EDC_1AD538[B_003D9ED0_1AD538.count];
+    if (B_003D9ED0_1AD538.depth > 0) {
+        PAUSEPAGE *entry = &B_003D9EDC_1AD538[B_003D9ED0_1AD538.depth];
         for (int index = 0; index < 3; index++) {
             values[index] = SaveValue(index);
         }
@@ -379,7 +340,7 @@ extern "C" void func_001AD538(void)
         case 30:
             for (int index = 0; index < 3; index++) {
                 if (values[index] == 0.0f) {
-                    entry->slot = index;
+                    entry->iitemCur = index;
                     break;
                 }
             }
@@ -387,14 +348,14 @@ extern "C" void func_001AD538(void)
         case 31:
             for (int index = 0; index < 3; index++) {
                 if (values[index] != 0.0f) {
-                    entry->slot = index;
+                    entry->iitemCur = index;
                     break;
                 }
             }
             break;
         case 25:
             if (B_002E65E0_1AD538.pslotCur != 0)
-                entry->slot = B_002E65E0_1AD538.pslotCur - B_002E65E0_1AD538.aslot;
+                entry->iitemCur = B_002E65E0_1AD538.pslotCur - B_002E65E0_1AD538.aslot;
             break;
         }
     }
@@ -402,17 +363,13 @@ extern "C" void func_001AD538(void)
 
 struct ITEM_1AD740 { int unk0; int unk4; int islot; };
 
-struct SLOTENT { int unk0; int unk4; void *pblot; char pad[0x14 - 0xC]; int selected; char pad2[0x1C - 0x18]; };
-
 extern int g_2e6594;
 
-extern SLOTSCREEN B_003D9ED0;
+extern PAUSEPAGE B_003D9EDC[];
 
-extern SLOTENT B_003D9EDC[];
+extern "C" void PauseMenu_Pop(PAUSEMENU *);
 
-extern "C" void PauseMenu_Pop(SLOTSCREEN *);
-
-extern "C" int func_001B0108(SLOTSCREEN *);
+extern "C" int func_001B0108(PAUSEMENU *);
 
 extern "C" void func_00213B00(void *, int);
 
@@ -424,8 +381,8 @@ void func_001AD740(ITEM_1AD740 *pitem)
     }
     if (func_001B0108(&B_003D9ED0) != 0) {
         int islot = pitem->islot;
-        SLOTENT *pent = &B_003D9EDC[B_003D9ED0.icur];
-        if (pent->selected == islot)
+        PAUSEPAGE *pent = &B_003D9EDC[B_003D9ED0.depth];
+        if (pent->iitemCur == islot)
             func_00213B00(pent->pblot, islot + 0x5C8);
         else
             func_00213B00(pent->pblot, islot + 0x5C5);
@@ -554,9 +511,9 @@ void func_001ADBB8(char *dest)
 INCLUDE_ASM(0X1ADC40);
 
 struct BusyMenu {
-    char pad0[0xC];
+    u8 unknown_0x0[0xC];
     void *field_0xC;
-    char pad1[0x10];
+    u8 unknown_0x10[0x10];
     s32 field_0x20;
 };
 
@@ -627,7 +584,7 @@ struct Obj {
     virtual void Target(int);
 };
 
-struct Menu { char pad[0x24]; Obj *obj; };
+struct Menu { u8 unknown_0x0[0x24]; Obj *obj; };
 
 void BusyMenu_Show(Menu *menu)
 {
@@ -689,7 +646,7 @@ struct Obj_1ADE70 {
     virtual void Target();
 };
 
-struct Menu_1ADE70 { char pad[0x24]; Obj_1ADE70 *obj; };
+struct Menu_1ADE70 { u8 unknown_0x0[0x24]; Obj_1ADE70 *obj; };
 
 void BusyMenu_Hide(Menu_1ADE70 *menu)
 {
@@ -697,17 +654,15 @@ void BusyMenu_Hide(Menu_1ADE70 *menu)
         menu->obj->Target();
 }
 
-struct BLOT { char pad0[0x58]; int blots; float tBlots; char pad1[4]; int timers; };
-
-struct MENU_1ADEE8 { char pad[0x24]; BLOT *pblot; };
+struct MENU_1ADEE8 { u8 unknown_0x0[0x24]; MENUOBJECT *pblot; };
 
 extern "C" int BusyMenu_FShowing(MENU_1ADEE8 *pmenu) {
-    BLOT *pblot = pmenu->pblot;
+    MENUOBJECT *pblot = pmenu->pblot;
     if (pblot == 0) return 0;
     int result = 1;
-    if (pblot->blots < 2) {
+    if (pblot->field_0x58 < 2) {
         result = 1;
-        if (pblot->timers < 2) return 0;
+        if (pblot->field_0x64 < 2) return 0;
     }
     return result;
 }
@@ -725,15 +680,15 @@ int FMemcardThreadValid(MEMCARD *);
 void BusyMenu_Update(MENU_1ADEE8 *pmenu)
 {
     Menu_Update(pmenu);
-    BLOT *pblot = pmenu->pblot;
-    if (pblot != 0 && pblot->blots == 2 && pblot->timers == 2 && 1.0f < g_2ddf0c - pblot->tBlots
+    MENUOBJECT *pblot = pmenu->pblot;
+    if (pblot != 0 && pblot->field_0x58 == 2 && pblot->field_0x64 == 2 && 1.0f < g_2ddf0c - pblot->field_0x5C
         && FMemcardThreadValid(&B_002F633C_1ADEE8) == 0)
         BusyMenu_Hide_1ADEE8(pmenu);
 }
 
 extern "C" {
 struct BusyMenu_1ADF78 {
-    char pad0[0x28];
+    u8 unknown_0x0[0x28];
     s32 dir;
     f32 dirTime;
 };

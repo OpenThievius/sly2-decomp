@@ -1,16 +1,22 @@
 #include "types.h"
+/* the allocator a blot's palloc points at (retail's vtable pointer at 0, first virtual in slot 1) */
+struct BLOTALLOC {
+    virtual void *Alloc(s32 size, s32 align);
+};
+/* the blot's fields this function reads (blot.h's BLOT: palloc at 0xC4) */
+struct BLOTBUFFER {
+    u8 unknown_0x0[0xC4];
+    BLOTALLOC *palloc;
+    u8 unknown_0xC8[0x30];
+    s128 *pqwBuffer;
+};
 extern "C" {
-struct OBJ_213C68;
-struct VT_213C68 { char pad[8]; short delta; short unused; void *(*fn)(char *, int, int); };
-struct OBJ_213C68 { VT_213C68 *vt; };
-void func_00213C68(char *arg0, char *arg1) {
-    if (*(s128 **)(arg0 + 0xF8) == 0) {
-        OBJ_213C68 *obj = *(OBJ_213C68 **)(arg0 + 0xC4);
-        VT_213C68 *vt = obj->vt;
-        *(void **)(arg0 + 0xF8) = vt->fn((char *)obj + vt->delta, 0x20, 0x1F);
+void func_00213C68(BLOTBUFFER *blot, s128 *source) {
+    if (blot->pqwBuffer == 0) {
+        blot->pqwBuffer = (s128 *)blot->palloc->Alloc(0x20, 0x1F);
     }
-    s128 *dst = *(s128 **)(arg0 + 0xF8);
-    dst[0] = *(s128 *)arg1;
-    dst[1] = *(s128 *)(arg1 + 0x10);
+    s128 *dst = blot->pqwBuffer;
+    dst[0] = source[0];
+    dst[1] = source[1];
 }
 }

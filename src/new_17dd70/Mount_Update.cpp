@@ -1,35 +1,46 @@
 #include "sly2.h"
 #include "ps2inline.h"
+#include "mount.h"
+#include "amb.h"
 struct SMP;
+/* The controller a mount reads (PO::pjoy): JOY's stick, and two words past it only Mount_Update reads (one reader: a local view). */
+struct MOUNTJOY {
+    u8 unknown_0x0[0x18];
+    /* 0x18 */ f32 radStick;
+    /* 0x1C */ f32 uStick;
+    u8 unknown_0x20[0x8];
+    /* 0x28 */ f32 field_0x28;   /* Mount_Update: the z of the vector it hands to func_0012D108 */
+    /* 0x2C */ f32 field_0x2C;   /* Mount_Update: above 0 picks SM goal 0x68, else 0x66 */
+};
 extern "C" {
-void ContinueAmb(char *);
+void ContinueAmb(AMB *);
 float GSmooth__FfffP3SMPPf(float, float, float, SMP *, float *);
-void Mount_SetState(char *, int);
-void PauseAmb(char *);
-void SetAmbVolume(char *, float);
+void Mount_SetState(MOUNT *, int);
+void PauseAmb(AMB *);
+void SetAmbVolume(AMB *, float);
 void SetSmaGoal__FP3SMA3OID(void *, int);
 QW SetVectorCylind__FP6VECTORfff(float, float, float);
-void UpdateSo(char *);
+void UpdateSo(MOUNT *);
 void func_0012D108(void *, QW);
-int func_0017F550(char *);
+int func_0017F550(MOUNT *);
 extern SMP D_002BE7F0;
 extern float g_2be7e8;
 extern float g_2dded4;
-void Mount_Update(char *mount) {
+void Mount_Update(MOUNT *mount) {
     unsigned state;
     unsigned after;
     UpdateSo(mount);
     do {
-        state = *(unsigned *)(mount + 0x1C0);
+        state = mount->state;
         if (state == 2 && func_0017F550(mount) != 0) {
             Mount_SetState(mount, 1);
         }
-        after = *(unsigned *)(mount + 0x1C0);
+        after = mount->state;
     } while (after != state);
     switch (after) {
     case 0:
         {
-            int *vec = (int *)(mount + 0x220);
+            int *vec = (int *)&mount->vecStick;
             vec[2] = 0;
             vec[1] = 0;
             vec[0] = 0;
@@ -37,7 +48,7 @@ void Mount_Update(char *mount) {
         break;
     case 2:
         {
-            int *vec = (int *)(mount + 0x220);
+            int *vec = (int *)&mount->vecStick;
             vec[2] = 0;
             vec[1] = 0;
             vec[0] = 0;
@@ -45,7 +56,7 @@ void Mount_Update(char *mount) {
         break;
     case 3:
         {
-            int *vec = (int *)(mount + 0x220);
+            int *vec = (int *)&mount->vecStick;
             vec[2] = 0;
             vec[1] = 0;
             vec[0] = 0;
@@ -53,60 +64,60 @@ void Mount_Update(char *mount) {
         break;
     case 4:
         {
-            int *vec = (int *)(mount + 0x220);
+            int *vec = (int *)&mount->vecStick;
             vec[2] = 0;
             vec[1] = 0;
             vec[0] = 0;
         }
         break;
     case 1: {
-        char *data = *(char **)(mount + 0x150);
+        MOUNTJOY *data = (MOUNTJOY *)mount->pjoy;
         float scale = g_2be7e8;
         int index = 0;
-        *(float *)(mount + 0x218) = *(float *)(data + 0x18);
-        *(QW *)(mount + 0x220) = SetVectorCylind__FP6VECTORfff(*(float *)(data + 0x18), *(float *)(data + 0x1C) * scale, 0.0f);
-        float second = *(float *)(*(char **)(mount + 0x150) + 0x28);
+        mount->radStick = data->radStick;
+        mount->vecStick = SetVectorCylind__FP6VECTORfff(data->radStick, data->uStick * scale, 0.0f);
+        float second = ((MOUNTJOY *)mount->pjoy)->field_0x28;
         union VectorQuad { QW q; VECTOR v; } stored;
         stored.q = VectorFromFloats3(0.0f, 0.0f, second);
         QW vector = stored.q;
-        if (*(int *)(mount + 0x230) > 0) {
-            char *entry = mount + 0x234;
+        if (mount->crec > 0) {
+            MOUNTREC *entry = &mount->arec[0];
             do {
-                void *link = *(void **)(entry + 0xC);
+                void *link = entry->pact;
                 if (link != 0) {
                     func_0012D108(link, vector);
                 }
-                void *sma = *(void **)(entry + 0x14);
+                void *sma = entry->psma;
                 if (sma != 0) {
-                    if (*(float *)(*(char **)(mount + 0x150) + 0x2C) > 0.0f) {
+                    if (((MOUNTJOY *)mount->pjoy)->field_0x2C > 0.0f) {
                         SetSmaGoal__FP3SMA3OID(sma, 0x68);
                     } else {
                         SetSmaGoal__FP3SMA3OID(sma, 0x66);
                     }
                 }
                 index += 1;
-                entry += 0x18;
-            } while (index < *(int *)(mount + 0x230));
+                entry += 1;
+            } while (index < mount->crec);
         }
         break;
     }
     }
-    if (*(char **)(mount + 0x2A4) != 0) {
+    if (mount->pamb != 0) {
         float goal;
-        if (*(unsigned *)(mount + 0x1C0) == 1) {
-            goal = *(float *)(*(char **)(mount + 0x150) + 0x1C);
+        if (mount->state == 1) {
+            goal = ((MOUNTJOY *)mount->pjoy)->uStick;
         } else {
             goal = 0.0f;
         }
-        float smoothed = GSmooth__FfffP3SMPPf(*(float *)(mount + 0x2AC), goal, g_2dded4, &D_002BE7F0, 0);
-        *(float *)(mount + 0x2AC) = smoothed;
-        SetAmbVolume(*(char **)(mount + 0x2A4), smoothed);
-        char *amb = *(char **)(mount + 0x2A4);
-        if (*(float *)(mount + 0x2AC) > 0.0f) {
-            if (*(short *)(amb + 0x4E) > 0) {
+        float smoothed = GSmooth__FfffP3SMPPf(mount->volAmb, goal, g_2dded4, &D_002BE7F0, 0);
+        mount->volAmb = smoothed;
+        SetAmbVolume(mount->pamb, smoothed);
+        AMB *amb = mount->pamb;
+        if (mount->volAmb > 0.0f) {
+            if (amb->cPause > 0) {
                 ContinueAmb(amb);
             }
-        } else if (*(short *)(amb + 0x4E) <= 0) {
+        } else if (amb->cPause <= 0) {
             PauseAmb(amb);
         }
     }

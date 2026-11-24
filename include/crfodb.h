@@ -12,7 +12,7 @@ struct CRFODB : LO {
     u8 unknown_0x50[0x134];
     /* 0x184 */ s32 idLootDefault; /* IdlootCrfodb: the loot id the crate carries when the save has none */
     /* 0x188 */ s32 kind;       /* Crfodb_OnGrab (compared with the held loot's kind) */
-    u8 unknown_0x18C[0x4];
+    /* 0x18C */ f32 field_0x18C; /* reader: InitCrfodb (sets 15.0f) */
     /* 0x190 */ s32 fAlert;     /* Crfodb_OnGrab */
     /* 0x194 */ struct LOOT *ploot; /* Crfodb_SpawnLoot, Crfodb_OnGrab: the loot it carries */
     u8 unknown_0x198[0x8];

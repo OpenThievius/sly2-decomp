@@ -20,6 +20,9 @@ struct BRK : LO {
     /* 0x14C */ BRKTOUCH atouch[4];    /* AddBrkTouchObject */
     /* 0x16C */ unsigned ccid;         /* AddBrkTouchClass */
     /* 0x170 */ int acid[4];           /* AddBrkTouchClass */
+    /* 0x180 */ s32 field_0x180;       /* reader: InitBrk (BRK slot 7) sets 1 */
+    /* 0x184 */ s32 field_0x184;       /* InitBrk sets -10 */
+    /* 0x188 */ s32 field_0x188;       /* InitBrk sets 0x2000 */
 };
 
 #if defined(__mips__)

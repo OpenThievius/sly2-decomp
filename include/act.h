@@ -21,7 +21,7 @@ struct ACT {
     /* 0x04 */ struct ALO *palo; /* PactNewForXf */
     /* 0x08 */ struct XF *pxf; /* PactNewForXf */
     /* 0x0C */ s32 priority;  /* PactNewForXf; ApplyAseg copies ASEG::priorityAct */
-    u8 unknown_0x10[0x4];     /* ACTADJ keeps its pactNext here */
+    /* 0x10 */ struct ACT *pactNext; /* the next act on the transform (XF::pactFirst): func_00131B10 walks it; ACTADJ keeps its pactNext in the same word */
     /* 0x14 */ s32 xfk;       /* PactNewForXf; ApplyAseg (5 or 7), PactNew kind 9 (0x14) */
     /* 0x18 */ void *vtable;  /* PactNew sets each kind's own (game data) */
 };

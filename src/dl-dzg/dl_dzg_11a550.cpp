@@ -11,47 +11,76 @@ extern "C" void *PvAllocStackImpl__Fi_11A550(void *);
 
 extern "C" void *PvAllocStackClearImpl__Fi_11A550(void *);
 
-extern "C" void InitDl__FP2DLi_11A550(void *, int);
+extern "C" void InitDl__FP2DLi_11A550(DL *, int);
 
-struct DZG { int cdzMax; int cdzPos; void *adz; char dl[4][12]; int cdz; void *aagPos; void *aagPosCrout; void *asdv; void *adsfPos; };
+/* one inequality (0x28 bytes) of the solver: its kind, bounds, running value, slack and its row of the matrix; dle links it into one of
+   the DZG's lists. Named from the mangled EnforceDzgDz__FP3DZGP2DZ; the fields are what ClearDzgSolution, EnforceDzgDz, SolveDzgPrefilled
+   and SolveInequalities read. */
+struct DZ {
+    s32 dzk;        /* SolveDzgPrefilled: 1 moves it from the uncategorised list to the positive one */
+    f32 lo;         /* EnforceDzgDz: the lower bound of sdv */
+    f32 hi;         /* the upper bound (SolveInequalities stores sfMax) */
+    f32 sdv;        /* the value: SolveInequalities hands it back, ClearDzgSolution clears it */
+    f32 sf;         /* SolveDzgPrefilled picks the uncategorised one with the most negative; ClearDzgSolution clears it; EnforceDzgDz moves it by step * db (SolveInequalities stores ag[idz]) */
+    f32 db;         /* EnforceDzgDz: the change of sf per unit step */
+    f32 *row;       /* its row of the matrix (SolveInequalities fills it) */
+    u8 unknown_0x1C[4];
+    union {
+        DLE dle;    /* the entry in one of the DZG's lists */
+        struct { DZ *next; DZ *prev; };
+    };
+};
+
+/* the solver (0x50 bytes; DZG, from EnforceDzgDz__FP3DZGP2DZ): four lists of DZ (the positive ones, those at their lower bound, at their
+   upper bound, and the uncategorised ones), the matrix and its Crout decomposition */
+struct DZG {
+    s32 cdzMax;
+    s32 cdz;        /* the number of inequalities */
+    DZ *adz;
+    DL dlPos;       /* EnforceDzgDz's active set */
+    DL dlZero;      /* at the lower bound */
+    DL dlMax;       /* at the upper bound */
+    DL dlUncat;     /* not yet put in a list */
+    s32 cdzPos;     /* the length of dlPos */
+    f32 *aagPos;    /* the matrix of the active set */
+    f32 *aagPosCrout; /* its decomposition */
+    f32 *asdv;      /* the right-hand side */
+    f32 *adsfPos;   /* the solution */
+};
 
 extern "C" DZG *func_0011A550(DZG *pdzg, int cdzMax)
 {
     int req[2];
     pdzg->cdzMax = cdzMax;
-    pdzg->cdz = 0;
     pdzg->cdzPos = 0;
+    pdzg->cdz = 0;
     req[0] = cdzMax * 0x28;
     req[1] = 0x10;
-    pdzg->adz = PvAllocStackClearImpl__Fi_11A550(req);
-    memset(pdzg->dl[0], 0, 0xC);
-    memset(pdzg->dl[1], 0, 0xC);
-    memset(pdzg->dl[2], 0, 0xC);
-    memset(pdzg->dl[3], 0, 0xC);
-    InitDl__FP2DLi_11A550(pdzg->dl[0], 0x20);
-    InitDl__FP2DLi_11A550(pdzg->dl[1], 0x20);
-    InitDl__FP2DLi_11A550(pdzg->dl[2], 0x20);
-    InitDl__FP2DLi_11A550(pdzg->dl[3], 0x20);
+    pdzg->adz = (DZ *)PvAllocStackClearImpl__Fi_11A550(req);
+    memset(&pdzg->dlPos, 0, 0xC);
+    memset(&pdzg->dlZero, 0, 0xC);
+    memset(&pdzg->dlMax, 0, 0xC);
+    memset(&pdzg->dlUncat, 0, 0xC);
+    InitDl__FP2DLi_11A550(&pdzg->dlPos, 0x20);
+    InitDl__FP2DLi_11A550(&pdzg->dlZero, 0x20);
+    InitDl__FP2DLi_11A550(&pdzg->dlMax, 0x20);
+    InitDl__FP2DLi_11A550(&pdzg->dlUncat, 0x20);
     int cbMatrix = cdzMax * cdzMax * 4;
     req[0] = cbMatrix;
     req[1] = 0x10;
-    pdzg->aagPos = PvAllocStackImpl__Fi_11A550(req);
+    pdzg->aagPos = (f32 *)PvAllocStackImpl__Fi_11A550(req);
     req[0] = cbMatrix;
     req[1] = 0x10;
-    pdzg->aagPosCrout = PvAllocStackImpl__Fi_11A550(req);
+    pdzg->aagPosCrout = (f32 *)PvAllocStackImpl__Fi_11A550(req);
     int cbVector = cdzMax << 2;
     req[0] = cbVector;
     req[1] = 0x10;
-    pdzg->asdv = PvAllocStackImpl__Fi_11A550(req);
+    pdzg->asdv = (f32 *)PvAllocStackImpl__Fi_11A550(req);
     req[0] = cbVector;
     req[1] = 0x10;
-    pdzg->adsfPos = PvAllocStackImpl__Fi_11A550(req);
+    pdzg->adsfPos = (f32 *)PvAllocStackImpl__Fi_11A550(req);
     return pdzg;
 }
-
-struct DZ { int pad0[3]; float sdv; float sf; int pad1[3]; DLE dle; };
-
-struct DZG_11A6B8 { int pad0; int cdz; DZ *adz; DL dlPos; DL dlZero; DL dlMax; DL dlUncat; int cdzPos; };
 
 void ClearDl(DL *);
 
@@ -59,7 +88,7 @@ void ClearDle(DLE *);
 
 void AppendDlEntry(DL *, DZ *);
 
-void ClearDzgSolution(DZG_11A6B8 *dzg)
+void ClearDzgSolution(DZG *dzg)
 {
     dzg->cdzPos = 0;
     ClearDl(&dzg->dlPos);
@@ -74,103 +103,69 @@ void ClearDzgSolution(DZG_11A6B8 *dzg)
     }
 }
 
-struct DZ_11A770 {
-    int pad0;
-    float lo;
-    float hi;
-    float value;
-    float b;
-    float db;
-    float *row;
-    int pad1c;
-    DZ_11A770 *next;
-    DZ_11A770 *prev;
-};
-
-struct DL_11A770 {
-    DZ_11A770 *head;
-    int pad4;
-    int pad8;
-};
-
-struct DZG_11A770 {
-    int pad0;
-    int count;
-    DZ_11A770 *dzs;
-    DL_11A770 listActive;
-    DL_11A770 listLower;
-    DL_11A770 listUpper;
-    DL_11A770 listFree;
-    int activeCount;
-    float *matrix;
-    float *lu;
-    float *rhs;
-    float *solution;
-};
-
 extern "C" const float RO_002A4120;
 
 extern "C" const float RO_002A4124;
 
-extern "C" void AppendDlEntry_11A770(DL_11A770 *, DZ_11A770 *);
+extern "C" void AppendDlEntry_11A770(DL *, DZ *);
 
-extern "C" void RemoveDlEntry(DL_11A770 *, DZ_11A770 *);
+extern "C" void RemoveDlEntry(DL *, DZ *);
 
 extern "C" void CroutDecomp__FiPfT1_11A770(int, float *, float *);
 
 extern "C" void CroutSolve__FiPfN21_11A770(int, float *, float *, float *);
 
-extern "C" void EnforceDzgDz__FP3DZGP2DZ(DZG_11A770 *dzg, DZ_11A770 *pdz) {
+extern "C" void EnforceDzgDz__FP3DZGP2DZ(DZG *dzg, DZ *pdz) {
     int iterations;
-    DZ_11A770 *outer;
-    DZ_11A770 *inner;
+    DZ *outer;
+    DZ *inner;
     float *cursor;
     int index;
     if (pdz != 0) {
-        RemoveDlEntry(&dzg->listFree, pdz);
-        AppendDlEntry_11A770(&dzg->listActive, pdz);
-        dzg->activeCount++;
+        RemoveDlEntry(&dzg->dlUncat, pdz);
+        AppendDlEntry_11A770(&dzg->dlPos, pdz);
+        dzg->cdzPos++;
     }
     iterations = 0;
     do {
         {
-            float *out = dzg->matrix;
-            for (outer = dzg->listActive.head; outer; outer = outer->next) {
-                for (inner = dzg->listActive.head; inner; inner = inner->next) {
-                    *out = outer->row[inner - dzg->dzs];
+            float *out = dzg->aagPos;
+            for (outer = (DZ *)dzg->dlPos.head; outer; outer = outer->next) {
+                for (inner = (DZ *)dzg->dlPos.head; inner; inner = inner->next) {
+                    *out = outer->row[inner - dzg->adz];
                     out++;
                 }
             }
         }
-        CroutDecomp__FiPfT1_11A770(dzg->activeCount, dzg->matrix, dzg->lu);
+        CroutDecomp__FiPfT1_11A770(dzg->cdzPos, dzg->aagPos, dzg->aagPosCrout);
         {
-            float *out = dzg->rhs;
-            for (outer = dzg->listActive.head; outer; outer = outer->next) {
-                *out = -outer->b;
+            float *out = dzg->asdv;
+            for (outer = (DZ *)dzg->dlPos.head; outer; outer = outer->next) {
+                *out = -outer->sf;
                 out++;
             }
         }
-        CroutSolve__FiPfN21_11A770(dzg->activeCount, dzg->lu, dzg->rhs, dzg->solution);
-        for (index = 0; index < dzg->count; index++) {
+        CroutSolve__FiPfN21_11A770(dzg->cdzPos, dzg->aagPosCrout, dzg->asdv, dzg->adsfPos);
+        for (index = 0; index < dzg->cdz; index++) {
             float sum = 0.0f;
-            float *w = dzg->solution;
-            for (outer = dzg->listActive.head; outer; outer = outer->next) {
+            float *w = dzg->adsfPos;
+            for (outer = (DZ *)dzg->dlPos.head; outer; outer = outer->next) {
                 sum += *w * outer->row[index];
                 w++;
             }
-            dzg->dzs[index].db = sum;
+            dzg->adz[index].db = sum;
         }
 
-        DZ_11A770 *hit = 0;
+        DZ *hit = 0;
         float step = 1.0f;
         int code = 0;
-        cursor = dzg->solution;
-        for (outer = dzg->listActive.head; outer; outer = outer->next) {
+        cursor = dzg->adsfPos;
+        for (outer = (DZ *)dzg->dlPos.head; outer; outer = outer->next) {
             float delta = *cursor;
             cursor++;
             if (0.0001f < delta) {
                 if (outer->hi != 3.4028235e38f) {
-                    float candidate = (outer->hi - outer->value) / delta;
+                    float candidate = (outer->hi - outer->sdv) / delta;
                     if (candidate < step) {
                         step = candidate;
                         hit = outer;
@@ -179,7 +174,7 @@ extern "C" void EnforceDzgDz__FP3DZGP2DZ(DZG_11A770 *dzg, DZ_11A770 *pdz) {
                 }
             } else if (delta < -0.0001f) {
                 if (outer->lo != -3.4028235e38f) {
-                    float candidate = (outer->lo - outer->value) / delta;
+                    float candidate = (outer->lo - outer->sdv) / delta;
                     if (candidate < step) {
                         step = candidate;
                         hit = outer;
@@ -188,11 +183,11 @@ extern "C" void EnforceDzgDz__FP3DZGP2DZ(DZG_11A770 *dzg, DZ_11A770 *pdz) {
                 }
             }
         }
-        for (DZ_11A770 *dz = dzg->listLower.head; dz; dz = dz->next) {
+        for (DZ *dz = (DZ *)dzg->dlZero.head; dz; dz = dz->next) {
             float db = dz->db;
             if (-0.0001f < db) {
             } else {
-                float candidate = -dz->b / db;
+                float candidate = -dz->sf / db;
                 if (candidate < step) {
                     step = candidate;
                     hit = dz;
@@ -200,11 +195,11 @@ extern "C" void EnforceDzgDz__FP3DZGP2DZ(DZG_11A770 *dzg, DZ_11A770 *pdz) {
                 }
             }
         }
-        for (DZ_11A770 *dz = dzg->listUpper.head; dz; dz = dz->next) {
+        for (DZ *dz = (DZ *)dzg->dlMax.head; dz; dz = dz->next) {
             float db = dz->db;
             if (db < 0.0001f) {
             } else {
-                float candidate = -dz->b / db;
+                float candidate = -dz->sf / db;
                 if (candidate < step) {
                     step = candidate;
                     hit = dz;
@@ -212,14 +207,14 @@ extern "C" void EnforceDzgDz__FP3DZGP2DZ(DZG_11A770 *dzg, DZ_11A770 *pdz) {
                 }
             }
         }
-        for (index = 0; index < dzg->count; index++) {
-            DZ_11A770 *dz = dzg->dzs + index;
-            dz->b += step * dz->db;
+        for (index = 0; index < dzg->cdz; index++) {
+            DZ *dz = dzg->adz + index;
+            dz->sf += step * dz->db;
         }
         {
-            cursor = dzg->solution;
-            for (outer = dzg->listActive.head; outer; outer = outer->next) {
-                outer->value += step * *cursor;
+            cursor = dzg->adsfPos;
+            for (outer = (DZ *)dzg->dlPos.head; outer; outer = outer->next) {
+                outer->sdv += step * *cursor;
                 cursor++;
             }
         }
@@ -227,68 +222,64 @@ extern "C" void EnforceDzgDz__FP3DZGP2DZ(DZG_11A770 *dzg, DZ_11A770 *pdz) {
         case 0:
             return;
         case 2:
-            dzg->activeCount--;
-            RemoveDlEntry(&dzg->listActive, hit);
-            AppendDlEntry_11A770(&dzg->listLower, hit);
+            dzg->cdzPos--;
+            RemoveDlEntry(&dzg->dlPos, hit);
+            AppendDlEntry_11A770(&dzg->dlZero, hit);
             if (hit == pdz) return;
             break;
         case 1:
-            dzg->activeCount++;
-            RemoveDlEntry(&dzg->listLower, hit);
-            AppendDlEntry_11A770(&dzg->listActive, hit);
+            dzg->cdzPos++;
+            RemoveDlEntry(&dzg->dlZero, hit);
+            AppendDlEntry_11A770(&dzg->dlPos, hit);
             break;
         case 4:
-            dzg->activeCount--;
-            RemoveDlEntry(&dzg->listActive, hit);
-            AppendDlEntry_11A770(&dzg->listUpper, hit);
+            dzg->cdzPos--;
+            RemoveDlEntry(&dzg->dlPos, hit);
+            AppendDlEntry_11A770(&dzg->dlMax, hit);
             if (hit == pdz) return;
             break;
         case 3:
-            dzg->activeCount++;
-            RemoveDlEntry(&dzg->listUpper, hit);
-            AppendDlEntry_11A770(&dzg->listActive, hit);
+            dzg->cdzPos++;
+            RemoveDlEntry(&dzg->dlMax, hit);
+            AppendDlEntry_11A770(&dzg->dlPos, hit);
             break;
         }
         iterations++;
     } while (iterations < 10);
 }
 
-struct DZ_11ABF8 { int dzk; int pad0[3]; float sdv; int pad1[3]; DZ_11ABF8 *next; };
-
-struct DZG_11ABF8 { char pad0[0xC]; DL pos; char pad1[0x18]; DL uncat; int cdzPos; };
-
 void RemoveDlEntry(DL *, void *);
 
 void AppendDlEntry(DL *, void *);
 
-extern "C" void EnforceDzgDz__FP3DZGP2DZ_11ABF8(DZG_11ABF8 *, DZ_11ABF8 *);
+extern "C" void EnforceDzgDz__FP3DZGP2DZ(DZG *, DZ *);
 
-void SolveDzgPrefilled(DZG_11ABF8 *dzg)
+void SolveDzgPrefilled(DZG *dzg)
 {
     DLI iterator;
     DLI dliUnused; // frame: retail has an untouched 16-byte slot at sp+0x10 (a second DLI nothing reads or writes)
-    PushDli(&iterator, &dzg->uncat);
-    for (DZ_11ABF8 *row = (DZ_11ABF8 *)PvStep(&iterator); row != 0; row = (DZ_11ABF8 *)PvStep(&iterator)) {
+    PushDli(&iterator, &dzg->dlUncat);
+    for (DZ *row = (DZ *)PvStep(&iterator); row != 0; row = (DZ *)PvStep(&iterator)) {
         if (row->dzk == 1) {
-            RemoveDlEntry(&dzg->uncat, row);
-            AppendDlEntry(&dzg->pos, row);
+            RemoveDlEntry(&dzg->dlUncat, row);
+            AppendDlEntry(&dzg->dlPos, row);
             dzg->cdzPos = dzg->cdzPos + 1;
         }
     }
-    EnforceDzgDz__FP3DZGP2DZ_11ABF8(dzg, 0);
+    EnforceDzgDz__FP3DZGP2DZ(dzg, 0);
     PopDli(&iterator);
     while (true) {
-        DZ_11ABF8 *worst = 0;
-        float worstSdv = -0.01f;
-        for (DZ_11ABF8 *scan = (DZ_11ABF8 *)dzg->uncat.head; scan != 0; scan = scan->next) {
-            if (scan->sdv < worstSdv) {
+        DZ *worst = 0;
+        float worstSf = -0.01f;
+        for (DZ *scan = (DZ *)dzg->dlUncat.head; scan != 0; scan = scan->next) {
+            if (scan->sf < worstSf) {
                 worst = scan;
-                worstSdv = scan->sdv;
+                worstSf = scan->sf;
             }
         }
         if (worst == 0)
             break;
-        EnforceDzgDz__FP3DZGP2DZ_11ABF8(dzg, worst);
+        EnforceDzgDz__FP3DZGP2DZ(dzg, worst);
     }
 }
 
@@ -320,22 +311,22 @@ void SolveInequalities(int c, const float *aag, const float *ag, float *agSoln, 
 {
     char frame[0x10];
     CStackFrame_Construct(frame);
-    char pdzg[0x50];
-    func_0011A550_11AD30(pdzg, c);
+    DZG dzg;
+    func_0011A550_11AD30(&dzg, c);
     int idz;
     for (idz = 0; idz < c; idz++) {
-        char *pdz = *(char **)(pdzg + 0x8) + idz * 0x28;
-        *(float *)(pdz + 0x8) = sfMax;
+        DZ *pdz = &dzg.adz[idz];
+        pdz->hi = sfMax;
         void *mpidzg = PvAllocStack(c * 4);
-        *(void **)(pdz + 0x18) = mpidzg;
+        pdz->row = (f32 *)mpidzg;
         CopyAb__FPvT0Ui_11AD30(mpidzg, aag + idz * c, (c * 4));
-        *(float *)(pdz + 0x10) = ag[idz];
-        AppendDlEntry_11AD30(pdzg + 0x30, pdz);
+        pdz->sf = ag[idz];
+        AppendDlEntry_11AD30(&dzg.dlUncat, pdz);
     }
-    *(int *)(pdzg + 0x4) = c;
-    SolveDzgPrefilled(pdzg);
+    dzg.cdz = c;
+    SolveDzgPrefilled(&dzg);
     for (idz = 0; idz < c; idz++)
-        agSoln[idz] = *(float *)(*(char **)(pdzg + 0x8) + idz * 0x28 + 0xC);
+        agSoln[idz] = dzg.adz[idz].sdv;
     CStackFrame_Destructor(frame, 2);
 }
 

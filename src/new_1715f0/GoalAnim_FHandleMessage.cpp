@@ -1,45 +1,51 @@
 #include "sly2.h"
 #include "goal.h"
+#include "stepguard.h"
+#include "goals.h"
 #include "ps2inline.h"
 #include "vu0inline.h"
 union VU_SCALE { QW q; VECTOR v; };
-struct GOAL_174BD0 : GOAL {
-    char pad_30[0x10];
-    char *animref;
+struct VT { char pad[0x118]; short delta; short index; void (*fn)(char *, QW); }; /* STEPGUARD slot 35 (Slot35) */
+
+/* The data of an animation event message (message 9): who it came from, a float argument and the event id. */
+struct ANIMEVENTMSG {
+    /* 0x0 */ s32 sender;   /* GoalAnim_FHandleMessage compares it with func_00209518's id of the goal's animation */
+    /* 0x4 */ f32 arg;      /* event 0x15E: the time func_00204E38 takes */
+    /* 0x8 */ s32 event;    /* the event id the switch tests */
 };
-struct VT { char pad[0x118]; short delta; short index; void (*fn)(char *, QW); };
-struct OBJ30 { char pad[0x30]; char *focus; char pad2[0x50 - 0x34]; void *field50; };
 extern "C" {
-int func_00209518(void *);
-void *func_002097C8(void *, void *);
-void func_002097D8(void *, void *);
-void func_001EEFC0(void *, int);
-void func_001EF038(void *, int);
-int func_001A6AF8(void *, char *);
-QW func_00204E38(char *, int, float);
-void func_001F7A68(void *, int);
-void *func_00205458(void *, int);
-char *PpoSwFocusBase(char *);
+int func_00209518(ANIMREF *);
+void *func_002097C8(GUARDHEADING *, GOAL *);
+void func_002097D8(GUARDHEADING *, GOAL *);
+void func_001EEFC0(GOAL *, int);
+void func_001EF038(GOAL *, int);
+int func_001A6AF8(void *, PO *);
+QW func_00204E38(STEPGUARD *, int, float);
+void func_001F7A68(STEPGUARD *, int);
+GOAL *func_00205458(STEPGUARD *, int);
+PO *PpoSwFocusBase(char *);
 void TriggerJoyRumbleRumk__FP3JOY4RUMKf(void *, int, float);
 void JoltCm(void *, int);
 extern char B_002DDF40[];
 extern char B_002DFC00[];
 extern char B_003DD490[];
-extern char *g_2f7900;
-#define guard (((char *)goal->pstep))
-int GoalAnim_FHandleMessage(GOAL_174BD0 *goal, int message, int *data) {
+extern PO *g_2f7900;
+#define guard GOAL_GUARD(goal)
+int GoalAnim_FHandleMessage(GOALANIM *goal, int message, ANIMEVENTMSG *data) {
     if (message == 9) {
-        void *animref = goal->animref;
+        ANIMREF *animref = goal->panimref;
         if (animref != 0) {
             int sender = func_00209518(animref);
-            if (sender == data[0]) {
-                switch (data[2]) {
+            if (sender == data->sender) {
+                switch (data->event) {
                 case 0x15E: {
-                    QW vel = func_00204E38(guard, sender, *(float *)(data + 1));
+                    QW vel = func_00204E38(guard, sender, data->arg);
                     VU_SCALE scale;
                     scale.q = VectorFromFloat(-1.0f);
-                    *(QW *)(guard + 0x190) = VectorScaleX(vel, scale.q);
-                    char *base = guard;
+                    *(QW *)((char *)guard + 0x190) = VectorScaleX(vel, scale.q);
+                    /* kept as the hand-written byte offsets: typed members (guard->velGoal, matHeading) and the virtual Slot35 hoist the guard
+                       load and move the vtable and matrix loads after TransformVector (scores 36 to 76), retail loads them first */
+                    char *base = (char *)guard;
                     VT *vtable = *(VT **)(base + 0xC);
                     QW *rows = (QW *)(base + 0x1B0);
                     QW row0 = rows[0];
@@ -52,16 +58,16 @@ int GoalAnim_FHandleMessage(GOAL_174BD0 *goal, int message, int *data) {
                     return 1;
                 }
                 case 0x25:
-                    func_002097C8(guard + 0xFD0, goal);
+                    func_002097C8(&guard->heading, goal);
                     return 1;
                 case 0x26:
-                    func_002097D8(guard + 0xFD0, goal);
+                    func_002097D8(&guard->heading, goal);
                     return 1;
                 case 0x29:
-                    *(int *)(guard + 0x1A4) = 1;
+                    guard->fLock = 1;
                     return 1;
                 case 0x2A:
-                    *(int *)(guard + 0x1A4) = 0;
+                    guard->fLock = 0;
                     return 1;
                 case 0x27:
                     func_001EEFC0(goal, sender);
@@ -70,20 +76,20 @@ int GoalAnim_FHandleMessage(GOAL_174BD0 *goal, int message, int *data) {
                     func_001EF038(goal, sender);
                     return 1;
                 case 0x2F: {
-                    OBJ30 *obj = (OBJ30 *)func_00205458(guard, 0xA5);
+                    GOALNOTICE *obj = (GOALNOTICE *)func_00205458(guard, 0xA5);
                     if (obj != 0) {
-                        if (obj->focus == PpoSwFocusBase(B_003DD490))
+                        if ((PO *)obj->ptarget == PpoSwFocusBase(B_003DD490))
                             TriggerJoyRumbleRumk__FP3JOY4RUMKf(B_002DFC00, 8, 1.0f);
                     }
                     return 0;
                 }
                 case 0x34:
                 case 0x35: {
-                    char *focus = PpoSwFocusBase(B_003DD490);
-                    OBJ30 *obj = (OBJ30 *)func_00205458(guard, 0xA0);
-                    if (obj != 0 && func_001A6AF8(obj->field50, focus) != 0) {
+                    PO *focus = PpoSwFocusBase(B_003DD490);
+                    GOALHIT *obj = (GOALHIT *)func_00205458(guard, 0xA0);
+                    if (obj != 0 && func_001A6AF8((void *)obj->args.arg, focus) != 0) {
                         if (focus == g_2f7900) {
-                            int type = data[2];
+                            int type = data->event;
                             if (type != 0x34) {
                                 if (type == 0x35) JoltCm(B_002DDF40, 0);
                             } else {

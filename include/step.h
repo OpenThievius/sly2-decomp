@@ -15,7 +15,8 @@
 struct GOALSTACK;
 
 struct STEP : PO {
-    virtual void Slot82();              /* 82: func_00205008, func_00140C30 (JT) */
+    virtual void Slot82(int event, void *ppath, QW pos, QW tangent, QW posWorld); /* 82: func_00205008, func_00140C30 (JT); func_0019E950 passes 7, the PIPE and three quadwords;
+                                           func_00209C88 (STEPGUARD's path mode) passes 0x22 or 7, the path target and three positions */
     virtual void RetainSmKinds(int n1, int n2);       /* 83: RetainAloSmKinds, JT_RetainSmKinds */
     virtual void ReleaseSmKinds();      /* 84: ReleaseAloSmKinds, JT_ReleaseSmKinds */
     virtual void Slot85();              /* 85: func_002040F8, func_00143C78 (JT) */

@@ -13,7 +13,7 @@ struct ASEGA;
 
 struct MURRAY : JT {
     void *PvCarry() { return (char *)this + 0x1910; } /* Murray's carry part, CarryThrow_Init's second one (JT::PvCarry is the first, at 0x11B0): InitMurray, PostMurrayLoad, GetMurrayCpdefi, HandleMurrayMessage, UpdateMurrayActive and func_001B8450 pass its address */
-    u8 unknown_0x1320[0xB0];
+    u8 runBlendA[0xB0]; /* reader: InitMurray (7) starts a run blend part here (func_0020B840); SetMurrayCarryState passes it to ResetRunBlendFootsteps */
     /* 0x13D0 */ s32 state; /* the state: InitMurray (7) sets -1; GetMurrayCpdefi (50), PresetMurrayAccel (70), FInvulnerableMurray (76), NMurrayActionCategory (85), SetMurrayAnimBase (90), FMurrayOnFoot (94), PredictMurrayLead (96) */
     u8 unknown_0x13D4[0x4];
     /* 0x13D8 */ s32 field_0x13D8; /* InitMurray sets -1; NMurrayActionCategory (85) */
@@ -43,13 +43,15 @@ struct MURRAY : JT {
     /* 0x1450 */ s32 field_0x1450; /* InitMurray sets -1 */
     /* 0x1454 */ f32 field_0x1454; /* SetMurrayLiftState: time of the last state change */
     /* 0x1458 */ s32 iapasegByIndex; /* InitMurray sets -1; SetMurrayAnimBase (90) indexes apasegByIndex with it in state 5 */
-    u8 unknown_0x145C[0xC8];
+    u8 unknown_0x145C[0x4];
+    u8 runBlendCarry[0xC4]; /* reader: InitMurray (7); UpdateMurrayCarry passes it to SetRunBlendU and UpdateRunBlendFootsteps */
     /* 0x1524 */ f32 tMashLeft; /* UpdateMurrayMash counts it down by the frame time; HandleMurrayMessage (10) sets it from the table of the mash level */
     /* 0x1528 */ f32 field_0x1528; /* UpdateMurrayMash copies tMashLeft into it; HandleMurrayMessage (10) sets it with tMashLeft */
     /* 0x152C */ s32 cMashLeft; /* UpdateMurrayMash counts it down and tests <= 0; HandleMurrayMessage (10) sets it from tMashLeft */
     /* 0x1530 */ struct SMA *psmaPartner; /* StartMurrayMash sets it, ReleaseMurrayObject (in the mash state, 6) reads it */
     /* 0x1534 */ s32 iMashLevel; /* StartMurrayMash; HandleMurrayMessage (5) */
-    u8 unknown_0x1538[0xB8];
+    u8 unknown_0x1538[0x8];
+    u8 runBlendC[0xB0]; /* reader: InitMurray (7) starts a run blend part here */
     /* 0x15F0 */ void *field_0x15F0; /* LoadMurrayFromBrx (14) */
     /* 0x15F4 */ void *field_0x15F4; /* LoadMurrayFromBrx */
     /* 0x15F8 */ void *field_0x15F8; /* LoadMurrayFromBrx */
@@ -64,7 +66,8 @@ struct MURRAY : JT {
     /* 0x161C */ s32 field_0x161C; /* as 0x1618 */
     /* 0x1620 */ s32 field_0x1620; /* as 0x1618 */
     /* 0x1624 */ s32 field_0x1624; /* as 0x1618 */
-    u8 unknown_0x1628[0x1CC];
+    u8 unknown_0x1628[0x8];
+    u8 runBlendD[0x1C4]; /* reader: InitMurray (7) starts a run blend part here (the part is smaller; the rest is not read) */
     /* 0x17F4 */ s32 field_0x17F4; /* InitMurray sets -1 */
     u8 unknown_0x17F8[0x4];
     /* 0x17FC */ void *field_0x17FC; /* StartMurrayAttackA, StartMurrayAttackB compare the fade's aseg with it */
@@ -80,7 +83,8 @@ struct MURRAY : JT {
     u8 unknown_0x1824[0xC];
     /* 0x1830 */ QW field_0x1830; /* PredictMurrayLead (96) */
     /* 0x1840 */ s32 field_0x1840; /* InitMurray sets -1 */
-    u8 unknown_0x1844[0xC8];
+    u8 unknown_0x1844[0xC];
+    u8 part1850[0xBC]; /* reader: InitMurray (7) passes its address to func_0020BD78 */
     /* 0x190C */ struct ASEGA *field_0x190C; /* StartMurrayAttackA, StartMurrayAttackB read the aseg at its +0x14 */
     u8 unknown_0x1910[0x4];
     /* 0x1914 */ s32 stateCarry; /* in Murray's carry part at 0x1910 (state at +4, CarryThrow_SetState); func_00136530 (Bentley) tests it against 7 */

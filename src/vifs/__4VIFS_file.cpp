@@ -8,9 +8,9 @@
 
 extern "C" {
 typedef struct VIFS {
-    char pad[0x10];
+    u8 unknown_0x0[0x10];
     s32 field_0x10;
-    char pad2[4];
+    u8 unknown_0x14[4];
     s32 *field_0x18;
     s32 field_0x1C;
     s32 field_0x20;
@@ -30,7 +30,7 @@ VIFS *__4VIFS(VIFS *vifs) {
 }
 }
 
-struct VIFS_226C58 { char pad[0xC]; int addr; };
+struct VIFS_226C58 { u8 unknown_0x0[0xC]; int addr; };
 
 void Align__4VIFSi(VIFS_226C58 *pvifs, int align)
 {
@@ -46,9 +46,9 @@ void Align__4VIFSi(VIFS_226C58 *pvifs, int align)
 
 class VIFS_226CA8 {
 public:
-    char pad[0xC];
+    u8 unknown_0x0[0xC];
     unsigned *cursor;
-    char pad2[0xC];
+    u8 unknown_0x10[0xC];
     unsigned mask;
     void AddVifBaseOffset(int base, int offset);
     void AddVifMscal(void *program);
@@ -70,7 +70,7 @@ void VIFS_226CA8::AddVifBaseOffset(int base, int offset)
 
 class VIFS_226CE0 {
 public:
-    char pad[0xC];
+    u8 unknown_0x0[0xC];
     unsigned *cursor;
     void AddVifMscal(void *program);
 };
@@ -80,30 +80,30 @@ void VIFS_226CE0::AddVifMscal(void *program)
     int address = (sptr)program / 8; unsigned *slot = cursor; cursor = slot + 1; *slot = address | 0x14000000;
 }
 
-typedef struct { char pad[0xC]; int unk0xC; } VIFS_226D10;
+struct VIFS_226D10 { u8 unknown_0x0[0xC]; int *cursor; };
 
-extern "C" int AddVifFlush__4VIFS(void* a0)
+extern "C" int AddVifFlush__4VIFS(VIFS_226D10 *vifs)
 {
-    int v1 = *(int*)((char*)a0 + 0xC);
-    int v0 = v1 + 4;
-    *(int*)((char*)a0 + 0xC) = v0;
-    *(int*)v1 = 0x11000000;
-    return v0;
+    int *slot = vifs->cursor;
+    int *next = slot + 1;
+    vifs->cursor = next;
+    *slot = 0x11000000;
+    return (int)next;
 }
 
 // 0x226D28 VIFS::AddVifFlusha
-typedef struct { char pad[0xC]; int unk0xC; } VIFS_226D28;
+struct VIFS_226D28 { u8 unknown_0x0[0xC]; int *cursor; };
 
-extern "C" int AddVifFlusha__4VIFS(void* a0)
+extern "C" int AddVifFlusha__4VIFS(VIFS_226D28 *vifs)
 {
-    int v1 = *(int*)((char*)a0 + 0xC);
-    int v0 = v1 + 4;
-    *(int*)((char*)a0 + 0xC) = v0;
-    *(int*)v1 = 0x13000000;
-    return v0;
+    int *slot = vifs->cursor;
+    int *next = slot + 1;
+    vifs->cursor = next;
+    *slot = 0x13000000;
+    return (int)next;
 }
 
-struct VIFS_226D40 { int pad[3]; int *pcur; void AddVifStcycl(int, int); };
+struct VIFS_226D40 { u8 unknown_0x0[0xC]; int *pcur; void AddVifStcycl(int, int); };
 
 void VIFS_226D40::AddVifStcycl(int wl, int cl)
 {
@@ -113,7 +113,7 @@ void VIFS_226D40::AddVifStcycl(int wl, int cl)
 }
 
 struct VIFS_226D68 {
-    char pad[0xC];
+    u8 unknown_0x0[0xC];
     s32 *cursor;
 };
 
@@ -150,9 +150,9 @@ extern "C" void AddVifStrow__4VIFSP2QW(VIFS_226D68 *vifs, VifStrowData *quad) {
 
 class VIFS_226DD0 {
 public:
-    char pad[0xC];
+    u8 unknown_0x0[0xC];
     unsigned *cursor;
-    char pad2[0xC];
+    u8 unknown_0x10[0xC];
     unsigned mask;
     void AddVifBaseOffset(int base, int offset);
     void AddVifMscal(void *program);
@@ -177,7 +177,7 @@ void VIFS_226DD0::AddVifStmask(unsigned maskValue)
 
 INCLUDE_ASM(0X226E08);
 
-struct VIFS_226E10 { char pad0[0xC]; unsigned *pcur; char pad1[0x1C - 0x10]; int flag; };
+struct VIFS_226E10 { u8 unknown_0x0[0xC]; unsigned *pcur; u8 unknown_0x10[0xC]; int flag; };
 
 extern "C" int D_002C4430[];
 
@@ -202,7 +202,7 @@ extern "C" int VIFS_AddUnpackCommand(VIFS_226E10 *pvifs, int a, int b, int c)
 enum UPK { UPK_DUMMY };
 
 struct VIFS_226E88 {
-    char pad[0xC];
+    u8 unknown_0x0[0xC];
     char *m_pb;
     void UnpackHelper(UPK upk, int c, int uAddr, int *pcb, unsigned **ppb);
 };
@@ -227,7 +227,7 @@ void VIFS_226E88::UnpackHelper(UPK upk, int c, int uAddr, int *pcb, unsigned **p
 }
 
 struct VIFS_226F28 {
-    char pad[0xC];
+    u8 unknown_0x0[0xC];
     char *m_pb;
     void UnpackHelper(UPK upk, int c, int uAddr, int *pcb, unsigned **ppb);
     void AddVifUnpack(UPK upk, int c, void *pvSrc, int uAddr);
@@ -281,7 +281,7 @@ extern "C" void VIFS_AddVifUnpackFromStream(void *thisVifs, void *upk, s32 arg2,
 }
 
 struct VIFS_227010 {
-    char pad[8];
+    u8 unknown_0x0[8];
     int cursor;
     void AddVifUnpackRefs(UPK upk, int c, void *pvSrc, int uAddr, void ***ppvOut);
 };
@@ -303,29 +303,33 @@ void VIFS_227010::AddVifUnpackRefs(UPK upk, int c, void *pvSrc, int uAddr, void 
     }
 }
 
-extern "C" void AddDmaBulk__4DMASiP2QW(s8 *, s32, s32);
+struct VIFS_2270C8 { u8 unknown_0x0[0xC]; u32 *cursor; };
 
-extern "C" int Align__4VIFSi_2270C8(s8 *, int);
+extern "C" void AddDmaBulk__4DMASiP2QW(VIFS_2270C8 *, s32, s32);
 
-extern "C" void AddVifDirect__4VIFSiP2QWi(s8 *arg0, s32 arg1, s32 arg2, s32 arg3) {
+extern "C" int Align__4VIFSi_2270C8(VIFS_2270C8 *, int);
+
+extern "C" void AddVifDirect__4VIFSiP2QWi(VIFS_2270C8 *arg0, s32 arg1, s32 arg2, s32 arg3) {
     Align__4VIFSi_2270C8(arg0, 3);
-    u32 *slot = *(u32 **)(arg0 + 0xC);
-    u32 hdr = (arg3 << 31) | 0x50000000; *(u32 **)(arg0 + 0xC) = slot + 1; *slot = arg1 | hdr;
+    u32 *slot = arg0->cursor;
+    u32 hdr = (arg3 << 31) | 0x50000000; arg0->cursor = slot + 1; *slot = arg1 | hdr;
     AddDmaBulk__4DMASiP2QW(arg0, arg1, arg2);
 }
 
-extern "C" void AddDmaRefs__4DMASiP2QW_227148(s8 *, s32, s32);
+struct VIFS_227148 { u8 unknown_0x0[0xC]; u32 *cursor; };
 
-extern "C" int Align__4VIFSi_227148(s8 *, int);
+extern "C" void AddDmaRefs__4DMASiP2QW_227148(VIFS_227148 *, s32, s32);
 
-extern "C" void AddVifDirectRefs__4VIFSiP2QWi(s8 *arg0, s32 arg1, s32 arg2, s32 arg3) {
+extern "C" int Align__4VIFSi_227148(VIFS_227148 *, int);
+
+extern "C" void AddVifDirectRefs__4VIFSiP2QWi(VIFS_227148 *arg0, s32 arg1, s32 arg2, s32 arg3) {
     Align__4VIFSi_227148(arg0, 3);
-    u32 *slot = *(u32 **)(arg0 + 0xC);
-    u32 hdr = (arg3 << 31) | 0x50000000; *(u32 **)(arg0 + 0xC) = slot + 1; *slot = arg1 | hdr;
+    u32 *slot = arg0->cursor;
+    u32 hdr = (arg3 << 31) | 0x50000000; arg0->cursor = slot + 1; *slot = arg1 | hdr;
     AddDmaRefs__4DMASiP2QW_227148(arg0, arg1, arg2);
 }
 
-class GIFS { public: char pad[4]; unsigned base; char pad2[4]; unsigned cursor; };
+class GIFS { public: u8 unknown_0x0[4]; unsigned base; u8 unknown_0x8[4]; unsigned cursor; };
 
 class VIFS_2271C8 {
 public:

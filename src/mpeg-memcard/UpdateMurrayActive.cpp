@@ -2,13 +2,6 @@
 // UpdateMurrayActive: per-frame state update of Murray's active states.
 #include "murray.h"
 #include "joy.h"
-/* The player's jump part (InitJmp, at 0x2C0 of the player); only the words this update reads. */
-struct JMP {
-    u8 unknown_0x0[0x4];
-    s32 state;
-    u8 unknown_0x8[0x14];
-    s32 cjump;
-};
 
 extern "C" {
 extern float g_2dded0;
@@ -83,7 +76,7 @@ void UpdateMurrayActive(MURRAY *pmurray)
             } else if (GrfbtnVjoyPressedWithin(pmurray->pjoy, 0x400, 0.15f) &&
                        pmurray->FCanUseGadget(3)) {
                 ClearVjoyPresses(pmurray->pjoy, 0x400);
-                StartBinoc(((char *)pmurray + 0xF00), 0, 0, 0);
+                StartBinoc(pmurray->PvBinoc(), 0, 0, 0);
             } else if (FMurrayAttackCanChain(pmurray) &&
                        FButtonPressedWithin(pmurray->pjoy, 0x10, D_002C08DC)) {
                 StartMurrayAttackB(pmurray);
@@ -111,13 +104,13 @@ void UpdateMurrayActive(MURRAY *pmurray)
             break;
         case 2: {
             UpdateJmpBodyState(pmurray->PvJmp());
-            switch (((JMP *)((char *)pmurray + 0x2C0))->state) {
+            switch (pmurray->field_0x2C4) {
             case 0: case 11: case 15: case 16:
                 break;
             default:
                 if (GrfbtnVjoyPressedWithin(pmurray->pjoy, 0x90, D_002C08DC) &&
                     pmurray->FCanUseGadget(2)) {
-                    int cjump = ((JMP *)((char *)pmurray + 0x2C0))->cjump;
+                    int cjump = pmurray->jmpState;
                     if (cjump < 6) {
                         if (cjump > 0 && !FJtLandsWithin(pmurray, D_002C08E0)) {
                             ClearVjoyPresses(pmurray->pjoy, 0x90);
@@ -134,7 +127,7 @@ void UpdateMurrayActive(MURRAY *pmurray)
             UpdateAttachInput(pmurray->PvAttach());
             break;
         case 14:
-            UpdateZap(((char *)pmurray + 0xDF0));
+            UpdateZap(pmurray->PvZap());
             break;
         case 3:
             func_001B6BA8(pmurray);
@@ -162,7 +155,7 @@ void UpdateMurrayActive(MURRAY *pmurray)
             func_001B8EC0(pmurray);
             break;
         case 15:
-            CarryThrow_Update(((char *)pmurray + 0x1910));
+            CarryThrow_Update(pmurray->PvCarry());
             break;
         case 20:
             UpdateJtActivePipe(pmurray->PvPipe());

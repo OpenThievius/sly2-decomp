@@ -45,7 +45,7 @@ struct SO : LO {
     virtual void Slot68();
     virtual void Slot69();
     virtual void Slot70();              /* 70: called without arguments (ProjectSoTransform) */
-    virtual void Slot71();
+    virtual void Slot71(struct XA *pxa); /* 71: UpdateSoDriven calls it on each XA's water, with the XA */
     virtual void Slot72(void *pwater, float dt); /* 72: AddWaterExternalAccelerations */
     virtual int Slot73(QW pos);         /* 73: UpdateRip */
     virtual void Slot74();              /* 74: func_001F7410; func_001F7950 calls it without arguments */
@@ -64,7 +64,8 @@ struct SO : LO {
     /* 0xB8 */ s32 field_0xB8;        /* readers: func_001F5FF8 (count), CSo_LoadFromBrx (tested against 0) */
     u8 unknown_0xBC[0x4];
     /* 0xC0 */ struct GLOBENTRY *field_0xC0; /* readers: func_001F5FF8 (array of 0x28-byte entries, key first), func_001F69F8, func_001F6A68 (the same, field_0xB8 many) */
-    u8 unknown_0xC4[0x8];
+    u8 unknown_0xC4[0x4];
+    /* 0xC8 */ s32 field_0xC8;        /* reader: func_001B4478 (an SO's render entry of vtable D_002D4260, whose Init func_001B4438 calls InitSo): it renders the globset through a node stack when it is set */
     /* 0xCC */ s32 islot;              /* func_001CB518 (SO's slot 26) sets it to -1 */
     /* 0xD0 */ u64 field_0xD0;        /* reader: func_001F2768 (sets bit 34 from a flag) */
     u8 unknown_0xD8[0x8];
@@ -77,7 +78,7 @@ struct SO : LO {
     /* 0x12C */ f32 uFade;             /* UpdateSo, InitFragile */
     /* 0x130 */ f32 duFade;            /* the same functions */
     /* 0x134 */ struct RO *field_0x134; /* reader: func_001F3CC8 (a 0x30-byte render options block, copied when the caller passes none) */
-    u8 unknown_0x138[0x4];
+    /* 0x138 */ struct XA *pxaFirst;   /* the list of XA records driving this object (XA::pxaNextSo): AddSoXa, RemoveSoXa, UpdateSoDriven */
     /* 0x13C */ f32 field_0x13C;       /* InitSo (from a constant) */
     /* 0x140 */ s32 field_0x140;       /* InitSo (-1) */
     u8 unknown_0x144[0x4];

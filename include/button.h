@@ -32,7 +32,7 @@ struct BTN {
     /* 0x00 */ struct BUTTON *pbutton; /* CloneButton points it at the button that owns it */
     /* 0x04 */ struct ASHLIST ashOn;   /* AddBtnAseg appends to it */
     /* 0x48 */ struct ASHLIST ashOff;  /* AddBtnOffAseg appends to it */
-    u8 unknown_0x8C[0x4];
+    /* 0x8C */ f32 field_0x8C; /* reader: InitBtn sets it to 1 (the Btn family's init) */
     /* 0x90 */ s32 buttons;   /* the pressed state UpdateButton and FAbsorbButtonWkr pass to SetButtonButtons */
     /* 0x94 */ f32 tButtons;  /* the time of the last change */
     /* 0x98 */ f32 dtRepush;  /* how long a mode 2 button waits before it can be pressed again; negative: never released */

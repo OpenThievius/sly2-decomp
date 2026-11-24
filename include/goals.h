@@ -25,6 +25,7 @@ struct STEPGUARD;
 struct CRV;
 struct PIPE;
 struct PZLINK;
+struct PATHZONE;
 struct JOY;
 
 /* The actor of a guard's goal: every goal here belongs to a STEPGUARD */
@@ -154,15 +155,25 @@ GOAL_CLASS(GOALHIT, GOALANIM, GOALHIT_FIELDS)
     u8 unknown_0x44[0xC];
 GOAL_CLASS(GOALREACT, GOAL, GOALREACT_FIELDS)
 
+/* The range a notice waits in (GoalNotice_SetState): its cooldown is drawn from [lo, hi] (GRandInRange). */
+struct GOALREACTRANGE {
+    u8 unknown_0x0[0x60];
+    /* 0x60 */ f32 lo;
+    /* 0x64 */ f32 hi;
+};
+
 /* 0xA5 (165) GoalNotice, 0x60 bytes: Init func_00175758, Activate func_00175790, Deactivate func_001757D0, GoalNotice_Update,
    GoalNotice_SetState, FGoalNoticeDone. The brain's command 4 and GoalPicked start it (turn to an object). */
 #define GOALNOTICE_FIELDS \
     /* 0x30 */ struct LO *ptarget;  /* func_00175790 hands it to func_00208540 (the guard's alert object); GoalBrain_SetCommand,
                                        func_0017B8B0 set it */ \
     /* 0x34 */ s32 state;           /* GoalNotice_SetState, FGoalNoticeDone */ \
-    u8 unknown_0x38[0x8]; \
+    /* 0x38 */ f32 tState;          /* GoalNotice_SetState (a method of the class): the clock at the last change */ \
+    /* 0x3C */ struct GOALREACTRANGE *prange; /* GoalNotice_SetState: set in state 1 from the brain's data, cleared on leaving it; it hands it to GoalReact */ \
     /* 0x40 */ s32 field_0x40;      /* func_0017B8B0 sets 1 */ \
-    u8 unknown_0x44[0x1C];
+    /* 0x44 */ struct PATHZONE *pzone; /* GoalNotice_SetState (state 3): PpathzoneFindPos of where the target was */ \
+    u8 unknown_0x48[0x8]; \
+    /* 0x50 */ QW posLast;          /* GoalNotice_SetState (state 3): where the target was seen */
 GOAL_CLASS(GOALNOTICE, GOAL, GOALNOTICE_FIELDS)
 
 /* 0xA6 (166) GoalFollowCrv, 0xC0 bytes: GoalFollowCrv_Init, _Activate, _Update, _SetState (slot 15), _SetCrv, _FBlocked; 0xA7 and
@@ -177,9 +188,14 @@ GOAL_CLASS(GOALNOTICE, GOAL, GOALNOTICE_FIELDS)
     /* 0x48 */ f32 sHint;           /* GoalFollowCrv_SetCrv: where to start looking, or -1 */ \
     /* 0x4C */ s32 state;           /* GoalFollowCrv_SetState, GoalFollowCrv_FBlocked (3), GoalFollowCrvAnim_SetState */ \
     /* 0x50 */ f32 tState;          /* GoalFollowCrv_SetState */ \
-    u8 unknown_0x54[0x10]; \
+    /* 0x54 */ struct CRV *pcrvLast; /* GoalFollowCrv_Update (slot 10): the curve func_001BD718 found, then tested for bit 60 and busy */ \
+    /* 0x58 */ u32 result;          /* GoalFollowCrv_Update: func_001BD718's result, 0 to 4 */ \
+    /* 0x5C */ f32 hint;            /* GoalFollowCrv_Update: where on the curve to resume (states 1 and 4) */ \
+    /* 0x60 */ f32 diff;            /* GoalFollowCrv_Update: func_001BD718's out-argument, SDiffCrv's third */ \
     /* 0x64 */ f32 field_0x64;      /* GoalFollowRoute_SetState sets 10.0 */ \
-    u8 unknown_0x68[0x18]; \
+    /* 0x68 */ f32 nearDist;        /* GoalFollowCrv_Update: the distance limit in states 0 and 1 */ \
+    /* 0x6C */ f32 farDist;         /* GoalFollowCrv_Update: the limit in the other states */ \
+    u8 unknown_0x70[0x10]; \
     /* 0x80 */ QW posGoal;          /* the point it steers at: GoalFollowCrv_Activate, GoalFollowCrv_Update; GoalFollowCrvVjoy's Activate and
                                        Update hand it to func_001448F0 */ \
     u8 unknown_0x90[0x20]; \
@@ -223,6 +239,12 @@ GOAL_CLASS(GOALFOLLOWCRVVJOY, GOALFOLLOWCRV, GOALFOLLOWCRVVJOY_FIELDS)
     u8 unknown_0x44[0xC];
 GOAL_CLASS(GOALIDLE, GOAL, GOALIDLE_FIELDS)
 
+/* One spot a GoalSearch looks at (0x20 bytes): its position goes to the follow goal's target. */
+struct SEARCHSPOT {
+    /* 0x0 */ QW pos;
+    u8 unknown_0x10[0x10];
+};
+
 /* 0xAB (171) GoalSearch, 0xE0 bytes: Init func_00171F58, Activate func_00171FA0, Deactivate func_00171FD0, Update func_00172018,
    SetSearchState, SetSearchGoal, func_00172550 (done), func_00172560 */
 #define GOALSEARCH_FIELDS \
@@ -232,7 +254,11 @@ GOAL_CLASS(GOALIDLE, GOAL, GOALIDLE_FIELDS)
     /* 0x3C */ f32 field_0x3C;      /* func_00172560 */ \
     /* 0x40 */ f32 field_0x40;      /* func_00171F58 */ \
     /* 0x44 */ struct GOAL *pgoalSearch; /* SetSearchGoal */ \
-    /* 0x48 */ s32 fChanged;        /* SetSearchGoal, SetSearchState */
+    /* 0x48 */ s32 fChanged;        /* SetSearchGoal, SetSearchState */ \
+    u8 unknown_0x4C[0x4]; \
+    /* 0x50 */ struct SEARCHSPOT aspot[4]; /* func_00172F10 (the goal's slot 10 helper, called from SetSearchState): the spots it looks at in turn */ \
+    /* 0xD0 */ u32 ispot;           /* func_00172F10: the next spot, wrapping after 3 */ \
+    u8 unknown_0xD4[0xC];
 GOAL_CLASS(GOALSEARCH, GOAL, GOALSEARCH_FIELDS)
 
 #ifdef __cplusplus
@@ -342,7 +368,7 @@ GOAL_CLASS(GOALB8, GOAL, GOALB8_FIELDS)
     /* 0xA4 */ s32 field_0xA4;      /* GoalGoto_Init copies it from the world's word at 0x28 (B_003E1A5C) */ \
     /* 0xA8 */ struct LO *ptarget;  /* func_0017C928; GoalGoto_SetState hands it to the animation and follow goals */ \
     /* 0xAC */ s32 field_0xAC;      /* func_0017C928 sets 1; GoalGoto_SetState tests it */ \
-    u8 unknown_0xB0[0x4]; \
+    /* 0xB0 */ f32 field_0xB0;     /* reader: ExecuteGuardScriptCmd stores the command's float */ \
     /* 0xB4 */ s32 cpzlink;         /* func_0017D8A8: the path's links */ \
     /* 0xB8 */ struct PZLINK *apzlink[1]; /* func_0017D8A8; GoalGoto_SetState hands the first word to the route goal */ \
     /* 0xBC */ s32 fStraight;       /* func_0017D8A8: no path search; GoalGoto_SetState copies it to the follow goal */ \
@@ -382,9 +408,14 @@ GOAL_CLASS(GOALSNAPTOPOINT, GOAL, GOALSNAPTOPOINT_FIELDS)
 /* 0xC0 (192) GoalFollowCurve, 0x60 bytes: Init func_0017EB48, Activate func_0017EB88, Deactivate func_0017EC80, Update func_0017ECB0,
    Advance func_0017ECF0 */
 #define GOALFOLLOWCURVE_FIELDS \
-    u8 unknown_0x30[0x8]; \
-    /* 0x38 */ f32 s;               /* the curve parameter, -1.0 before Activate (Init) */ \
-    u8 unknown_0x3C[0x24];
+    /* 0x30 */ s32 pcrv;            /* reader: ExecuteGuardScriptCmd (type 6, guard mode -1) stores the found curve object here (guess) */ \
+    /* 0x34 */ s32 field_0x34;      /* the same: the command's word b */ \
+    /* 0x38 */ f32 s;               /* the curve parameter, -1.0 before Activate (Init); ExecuteGuardScriptCmd copies the source's value in */ \
+    u8 unknown_0x3C[0x14]; \
+    /* 0x50 */ s32 poidOther;       /* reader: ExecuteGuardScriptCmd stores the object of the command's word c (guess) */ \
+    u8 unknown_0x54[0x4]; \
+    /* 0x58 */ s32 field_0x58;      /* reader: ExecuteGuardScriptCmd stores the script's flag 0x4C */ \
+    u8 unknown_0x5C[0x4];
 GOAL_CLASS(GOALFOLLOWCURVE, GOAL, GOALFOLLOWCURVE_FIELDS)
 
 /* 0xC2 (194) GoalPartnerFollow, 0xA0 bytes: a partner (a JT: GOAL_JT) follows the leader. Init GoalPartnerFollow_Init, Activate

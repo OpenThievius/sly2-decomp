@@ -27,14 +27,12 @@ int CompareAb16(const void *pvA, const void *pvB)
 
 INCLUDE_ASM(0x116D20); // func_00116D20: two words, not a function compiled from C
 
-struct VTable116D28 {
-    char pad[0x18];
-    short delta;
-    short index;
-    void (*function)(char *, int);
-};
-struct Object116D28 {
-    VTable116D28 *vtable;
+// The allocator interface the arrays hold: a vtable pointer and no fields. Slot 2 resizes a block (CAry_Reserve), slot 3 takes
+// one word (func_00116D28).
+struct ALLOC {
+    virtual void Slot1();
+    virtual void *Resize(void *pv, int cb, int cbAlign);
+    virtual void Slot3(int);
 };
 struct Holder116D28 {
     int first;
@@ -42,19 +40,16 @@ struct Holder116D28 {
     int third;
     int unk0xC;
     int unk0x10;
-    Object116D28 *object;
+    ALLOC *object;
 };
 void func_00116D28(Holder116D28 *self)
 {
-    Object116D28 *object = self->object;
-    object->vtable->function((char *)object + object->vtable->delta, self->first);
+    self->object->Slot3(self->first);
     self->first = 0;
     self->third = 0;
     self->second = 0;
 }
 
-struct VT { char pad[0x10]; short delta; short index; void *(*fn)(void *, void *, int, int); };
-struct ALLOC { VT *vt; };
 struct CAry { void *data; int count; int max; int elemSize; ALLOC *alloc0; ALLOC *alloc; };
 
 void CAry_Reserve(CAry *ary, int needed)
@@ -71,9 +66,7 @@ void CAry_Reserve(CAry *ary, int needed)
         } else {
             newMax = (needed + 0x3FF) & ~0x3FF;
         }
-        ALLOC *alloc = ary->alloc;
-        VT *vt = alloc->vt;
-        void *result = vt->fn((char *)alloc + vt->delta, ary->data, newMax * ary->elemSize, 4);
+        void *result = ary->alloc->Resize(ary->data, newMax * ary->elemSize, 4);
         ary->data = result;
         ary->max = newMax;
     }
@@ -81,14 +74,14 @@ void CAry_Reserve(CAry *ary, int needed)
 
 extern "C" int memcpy(int, int, int);
 
-void func_00116E30(char *arg0, int arg1, int arg2)
+void func_00116E30(CAry *ary, int arg1, int arg2)
 {
     int temp_v0;
 
-    CAry_Reserve((CAry *)arg0, *(int *)(arg0 + 4) + arg2);
-    temp_v0 = *(int *)(arg0 + 0xC);
-    memcpy(*(int *)(arg0 + 0) + (temp_v0 * *(int *)(arg0 + 4)), arg1, temp_v0 * arg2);
-    *(int *)(arg0 + 4) = *(int *)(arg0 + 4) + arg2;
+    CAry_Reserve(ary, ary->count + arg2);
+    temp_v0 = ary->elemSize;
+    memcpy((int)ary->data + (temp_v0 * ary->count), arg1, temp_v0 * arg2);
+    ary->count = ary->count + arg2;
 }
 
 INCLUDE_ASM(0x116EA8); // func_00116EA8: epilogue fragments, nonmatching/ at score 11

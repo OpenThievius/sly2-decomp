@@ -6,12 +6,15 @@
 #include "m2c_macros.h"
 #include "include_asm.h"
 #include "lo.h"
+#include "sw.h"
+#include "hitfx.h"
+#include "dl.h"
 
 INCLUDE_ASM(0X156918);
 
-struct HITFXPLO : LO { int f50; float f54; u8 pad58[8]; float f60; int f64; };
+struct HITFXPLO : LO { int f50; float f54; u8 unknown_0x58[8]; float f60; int f64; };
 
-struct Parms_1569B8 { char pad[0x4020]; HITFXPLO *p20, *p24, *p28, *p2C, *p30, *p34, *p38; };
+struct Parms_1569B8 { u8 unknown_0x0[0x4020]; HITFXPLO *p20, *p24, *p28, *p2C, *p30, *p34, *p38; };
 
 extern "C" LO *PloNew(int, int, int, int);
 
@@ -70,32 +73,22 @@ extern "C" void InitSwHitFxParms(Parms_1569B8 *parms) {
     obj->Remove();
 }
 
-struct SWHITFX156B98 { char pad[0x4020]; void *player0; void *player1; };
-
 extern "C" {
-void PhitfxSpawn(void *, QW, int);
-void SpawnSwHitFx(SWHITFX156B98 *sw, int kind, QW pos, int arg)
+void PhitfxSpawn(BASIC *, QW, int);
+void SpawnSwHitFx(SW *sw, int kind, QW pos, int arg)
 {
-    void *target;
+    BASIC *target;
     switch (kind) {
     case 0:
-        target = sw->player0;
+        target = sw->phitfxdef;
         break;
     case 1:
-        target = sw->player1;
+        target = sw->phitfxdefB;
         break;
     }
     PhitfxSpawn(target, pos, arg);
 }
 }
-
-struct VT0 { char pad[8]; short delta; short index; void (*fn)(void *); };
-
-struct VT1 { char pad[0x10]; short delta; short index; void (*fn)(void *); };
-
-struct HITFX { char pad[0xC]; VT0 *vt; };
-
-struct HITFX1 { char pad[0xC]; VT1 *vt; };
 
 struct HITFXPARMS;
 
@@ -107,27 +100,27 @@ void ReplaceHitFx(HITFXPARMS *parms, QW pos, void *owner, HITFX **slot)
 {
     if (*slot) {
         HitFx_Remove(*slot);
-        HITFX1 *held = (HITFX1 *)*slot;
-        held->vt->fn((char *)held + held->vt->delta);
+        HITFX *held = *slot;
+        held->Slot2();
         *slot = 0;
     }
     if (parms) {
         PhitfxSpawn_156548(parms, pos, owner, slot);
         HITFX *held = *slot;
-        held->vt->fn((char *)held + held->vt->delta);
+        held->OnAdd();
     }
 }
 
 extern "C" {
-int ReplaceHitFx(int, QW, int, int);
-int ReplaceSwHitFx(char *self, int side, QW vec, int a, int b) {
-    int target;
+int ReplaceHitFx(BASIC *, QW, int, int);
+int ReplaceSwHitFx(SW *self, int side, QW vec, int a, int b) {
+    BASIC *target;
     switch (side) {
     case 0:
-        target = *(int *)(self + 0x4020);
+        target = self->phitfxdef;
         break;
     case 1:
-        target = *(int *)(self + 0x4024);
+        target = self->phitfxdefB;
         break;
     default:
         target = 0;
@@ -137,23 +130,28 @@ int ReplaceSwHitFx(char *self, int side, QW vec, int a, int b) {
 }
 }
 
+/* The hit-effect sensor: an LO (retail's class 0x75's sibling; InitHitFxSensor starts it with InitXfm) that keeps up to eight hit effects
+   it has seen, and sits in the list B_003E1468 through the DLE at 0x104 (InitDl ibDle 0x104). */
+struct HITFXSENSOR : LO {
+    u8 unknown_0x50[0x90];
+    /* 0xE0 */ s32 chitfx;        /* SweepHitFxSensor, UpdateHitFxSensor: how many hit effects it holds */
+    /* 0xE4 */ HITFX *aphitfx[8]; /* the same */
+    /* 0x104 */ DLE dle;         /* its link in B_003E1468: CloneHitFxSensor keeps it across CloneXfm */
+};
+
 extern "C" {
-typedef struct HITFXSENSOR {
-    char pad[0x40];
-    s32 field_0x40;
-} HITFXSENSOR;
 s32 InitXfm();
 s32 func_001A6CA8(HITFXSENSOR *, s32);
 void InitHitFxSensor(HITFXSENSOR *sensor) {
     s32 flags;
     InitXfm();
     func_001A6CA8(sensor, 0);
-    flags = sensor->field_0x40;
+    flags = sensor->grfSw;
     if ((flags ^ 1) & 1) {
         *(s32 *)flags = (s32) (*(s32 *)flags | 2);
         return;
     }
-    sensor->field_0x40 = (s32) (flags | 2);
+    sensor->grfSw = (s32) (flags | 2);
 }
 }
 
@@ -180,35 +178,26 @@ void RemoveHitFxSensorHierarchy(s32 arg0) {
     RemoveDlEntry(&B_003E1468, arg0);
 }
 
-struct Bytes8 { char bytes[8]; };
-
 extern "C" {
-void CloneXfm(char *);
-void CloneHitFxSensor(char *self) {
-    Bytes8 saved = *(Bytes8 *)(self + 0x104);
+void CloneXfm(HITFXSENSOR *);
+void CloneHitFxSensor(HITFXSENSOR *self) {
+    DLE saved = self->dle;
     CloneXfm(self);
-    *(Bytes8 *)(self + 0x104) = saved;
+    self->dle = saved;
 }
 }
-
-struct VT { char pad[0x10]; short delta; short index; void (*fn)(void *); };
-
-struct Hitfx { char pad[0xC]; VT *vptr; };
-
-struct Sensor { char pad[0xE0]; int chitfx; Hitfx *aphitfx[1]; };
 
 extern "C" {
 void *memmove(void *, const void *, unsigned int);
-int FHitFxGone(Hitfx *);
-void SweepHitFxSensor(Sensor *psensor, int fRemoveAll)
+int FHitFxGone(HITFX *);
+void SweepHitFxSensor(HITFXSENSOR *psensor, int fRemoveAll)
 {
     int ihitfx = 0;
     while (ihitfx < psensor->chitfx) {
-        Hitfx **pslot = &psensor->aphitfx[ihitfx];
-        Hitfx *phitfx = *pslot;
+        HITFX **pslot = &psensor->aphitfx[ihitfx];
+        HITFX *phitfx = *pslot;
         if (fRemoveAll != 0 || FHitFxGone(phitfx) != 0) {
-            VT *vtable = phitfx->vptr;
-            vtable->fn((char *)phitfx + vtable->delta);
+            phitfx->Slot2();
             memmove(pslot, pslot + 1, (psensor->chitfx - ihitfx) * 4 - 4);
             psensor->chitfx -= 1;
         } else {
@@ -218,38 +207,30 @@ void SweepHitFxSensor(Sensor *psensor, int fRemoveAll)
 }
 }
 
-struct VTE { short delta; short index; void (*fn)(void *, ...); };
+extern "C" HITFX *B_003E148C;
 
-struct VT_156EB8 { char pad[8]; VTE entry[4]; };
+extern "C" void UpdateLo(LO *);
 
-struct HITFX_156EB8 { char pad[0xC]; VT_156EB8 *vt; char pad2[0x58 - 0x10]; HITFX_156EB8 *next; };
+extern "C" void SweepHitFxSensor_156EB8(HITFXSENSOR *, int);
 
-struct SENSOR { char pad[0xC]; VT_156EB8 *vt; char pad2[0xE0 - 0x10]; unsigned count; HITFX_156EB8 *list[8]; };
+extern "C" int FHitFxSensorReaches(HITFXSENSOR *, HITFX *);
 
-extern "C" HITFX_156EB8 *B_003E148C;
-
-extern "C" void UpdateLo(SENSOR *);
-
-extern "C" void SweepHitFxSensor_156EB8(SENSOR *, int);
-
-extern "C" int FHitFxSensorReaches(SENSOR *, HITFX_156EB8 *);
-
-extern "C" void UpdateHitFxSensor(SENSOR *sensor)
+extern "C" void UpdateHitFxSensor(HITFXSENSOR *sensor)
 {
     UpdateLo(sensor);
     SweepHitFxSensor_156EB8(sensor, 0);
-    for (HITFX_156EB8 *fx = B_003E148C; fx; fx = fx->next) {
+    for (HITFX *fx = B_003E148C; fx; fx = fx->pnext) {
         int i;
-        for (i = 0; i < (int)sensor->count; i++) {
-            if (fx == sensor->list[i]) break;
+        for (i = 0; i < sensor->chitfx; i++) {
+            if (fx == sensor->aphitfx[i]) break;
         }
-        if (i < (int)sensor->count || !FHitFxSensorReaches(sensor, fx)) continue;
-        if (sensor->count > 7) return;
-        fx->vt->entry[0].fn((char *)fx + fx->vt->entry[0].delta);
-        int count = sensor->count;
-        sensor->list[count] = fx;
-        sensor->count = count + 1;
-        sensor->vt->entry[2].fn((char *)sensor + sensor->vt->entry[2].delta, 5, 0, 0, 0, 0);
+        if (i < sensor->chitfx || !FHitFxSensorReaches(sensor, fx)) continue;
+        if ((unsigned)sensor->chitfx > 7) return;
+        fx->OnAdd();
+        int count = sensor->chitfx;
+        sensor->aphitfx[count] = fx;
+        sensor->chitfx = count + 1;
+        sensor->HandleSpliceEvent(5, 0, 0, 0, 0);
         return;
     }
 }

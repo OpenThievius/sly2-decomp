@@ -17,9 +17,10 @@
 
 #ifdef __cplusplus
 struct MEMBER {
-    u8 unknown_0x0[8];
+    /* 0x0 */ s32 field_0x0;   /* reader: SetJtPipeState (a PIPE's word at 0x190, passed to func_00140C88) */
+    u8 unknown_0x4[4];
     /* 0x8 */ f32 field_0x8;   /* InitCtrlBlock_182c70 (bevy_player_p6_182c70): FLT_MAX; a method of the class, so certain */
-    u8 unknown_0xC[4];
+    /* 0xC */ s32 field_0xC;  /* reader: UpdateJtPipeLook (tests it for 0 before adding a safe point) */
     /* 0x10 */ s32 field_0x10; /* AttachPt_Init (1) and LiftPt_Init (-1) set it, after the base constructor */
     /* 0x14 */ s32 field_0x14; /* the same: -1 */
     u8 unknown_0x18[4];

@@ -1,23 +1,25 @@
 #include "sly2.h"
-struct XFA { char pad0[0x50]; int count; char *base; char pad1[0x10]; int *seg; };
-struct SOA { char pad0[0x10]; SOA *parent; char pad1[0x3C]; int count; char *base; };
-extern "C" void func_001F4CA0(SOA *so, SOA *src, int *ref)
+#include "so.h"
+#include "xf.h"
+/* Points *ref, an XF of src's transforms (or of its parent's), at the XF of the same index in so's (or so's parent's), and
+   re-points that XF's ptMin and ptMax at its own tMin and tMax when they pointed at the source's. */
+extern "C" void func_001F4CA0(SO *so, SO *src, int *ref)
 {
     int old = *ref;
     if (old == 0) return;
-    char *nw = 0;
-    int idx = (old - (sptr)src->base) >> 8;
-    if (idx >= 0 && idx < so->count) {
-        nw = so->base + (idx << 8);
+    XF *nw = 0;
+    int idx = (old - (sptr)src->axf) >> 8;
+    if (idx >= 0 && idx < so->cxf) {
+        nw = so->axf + idx;
     } else {
-        SOA *srcparent = src->parent;
-        idx = (old - (sptr)srcparent->base) >> 8;
-        if (idx >= 0 && idx < srcparent->count)
-            nw = so->parent->base + (idx << 8);
+        SO *srcparent = src->psoParent;
+        idx = (old - (sptr)srcparent->axf) >> 8;
+        if (idx >= 0 && idx < srcparent->cxf)
+            nw = so->psoParent->axf + idx;
     }
-    if (*(int *)(nw + 0x88) == old + 0x80)
-        *(int *)(nw + 0x88) = (sptr)nw + 0x80;
-    if (*(int *)(nw + 0x8C) == old + 0x84)
-        *(int *)(nw + 0x88) = (sptr)nw + 0x84;
+    if ((int)nw->ptMin == old + 0x80)
+        nw->ptMin = &nw->tMin;
+    if ((int)nw->ptMax == old + 0x84)
+        nw->ptMin = &nw->tMax;
     *ref = (sptr)nw;
 }

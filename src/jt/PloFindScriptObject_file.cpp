@@ -5,42 +5,40 @@
 #include "sly2.h"
 #include "stepguard.h"
 #include "types.h"
+#include "goal.h"
+#include "goals.h"
 
-struct Script { char pad[0x34]; int context; };
-
-extern "C" SW B_003DD490;
-
-extern "C" void *PloFindSwObject_thunk(SW *, int, int, int);
-
-void PloFindScriptObject(Script *script, int oid)
-{
-    int flags = script->context ? 4 : 5;
-    PloFindSwObject_thunk(&B_003DD490, flags, oid, script->context);
-}
-
-struct VT {
-    char pad0[0x18];
-    short delta18; short unused18; void (*fn1C)(void *, int, int, int, void *, int);
-    char pad1[0x40 - 0x20];
-    short delta40; short unused40; void (*fn44)(void *);
-};
-
-struct OBJ { char pad0[0xC]; VT *vt; };
-
-
+/* the guard's script behaviour (a GOAL, retail's GUARDSCRIPTBEH of include/guardscriptbeh.h with its virtuals): it runs a SCRIPT's
+   commands for the guard in pstep. Slot 3 of the BASIC base takes the command's messages. */
 struct CMD { unsigned op; int a; int b; int c; int d; float e; };
 
 struct CMDPOS { unsigned op; int a; QW *ppos; float g; };
 
 struct GTARGET { int target0; int target1; int pad18[2]; QW vec2; };
 
-struct OBJ2 { char pad[8]; float value; };
+struct OBJ2 { u8 unknown_0x0[8]; float value; };
 
-struct SCRIPTRUN {
-    char pad0[0xC]; VT *vt; STEPGUARD *player; char pad1[0x30 - 0x14];
-    CMD *labelBase; int object; CMD *current; float timer; int done; OBJ2 *source; float value48; int flag4C;
-    char animref[4]; int ref54; int pad58; int ref5C;
+struct GOALSCRIPT : GOAL {
+    /* 0x30 */ struct SCRIPT *pscript;  /* the script: SetGuardScript; PcmdFindScriptLabel searches it */
+    /* 0x34 */ int object;              /* the command's context object (SetGuardScript's context) */
+    /* 0x38 */ CMD *pcmd;               /* the current command, 0 when done */
+    /* 0x3C */ float timer;
+    /* 0x40 */ int done;                /* nonzero while a goal it started runs: JumpGuardScript pops pgoalChild */
+    /* 0x44 */ OBJ2 *source;
+    /* 0x48 */ float value48;
+    /* 0x4C */ int flag4C;
+    /* 0x50 */ ANIMREF animref;     /* ResetAnimref and BindAnimref take its address */
 };
+
+extern "C" SW B_003DD490;
+
+extern "C" void *PloFindSwObject_thunk(SW *, int, int, int);
+
+void PloFindScriptObject(GOALSCRIPT *script, int oid)
+{
+    int flags = script->object ? 4 : 5;
+    PloFindSwObject_thunk(&B_003DD490, flags, oid, script->object);
+}
 
 extern "C" void ApplyAseg(int, int, float, float, int, void *);
 
@@ -52,27 +50,27 @@ extern "C" void EnsureSggAlarm__FP3SGGP5ALARM_1715F0(int, int);
 
 extern "C" int FIsBasicDerivedFrom(int, int);
 
-extern "C" CMD *PcmdFindScriptLabel(CMD *, int);
+extern "C" CMD *PcmdFindScriptLabel(SCRIPT *, int);
 
-extern "C" int PloFindScriptObject_1715F0(SCRIPTRUN *, int);
+extern "C" int PloFindScriptObject_1715F0(GOALSCRIPT *, int);
 
 extern "C" void ResetAnimref(void *, void *);
 
 extern "C" void SetGoalTarget(void *, void *);
 
-extern "C" void TeleportGuardScript_1715F0(SCRIPTRUN *, QW, float);
+extern "C" void TeleportGuardScript_1715F0(GOALSCRIPT *, QW, float);
 
-extern "C" void func_00171AF8_1715F0(SCRIPTRUN *, int, void *, void *);
+extern "C" void func_00171AF8_1715F0(GOALSCRIPT *, int, void *, void *);
 
 extern "C" void func_0017CDB8(void *, int);
 
 extern "C" void func_0017D110(void *, int);
 
-extern "C" int func_001EEFC0(SCRIPTRUN *);
+extern "C" int func_001EEFC0(GOALSCRIPT *);
 
-extern "C" int func_001EF038(SCRIPTRUN *);
+extern "C" int func_001EF038(GOALSCRIPT *);
 
-extern "C" char *func_00205438(STEPGUARD *, int);
+extern "C" GOAL *func_00205438(STEPGUARD *, int);
 
 extern "C" void func_002562A8(GTARGET *);
 
@@ -80,7 +78,7 @@ extern "C" float g_2dded0;
 
 static inline void InitGoalTarget(GTARGET *ptarget) { func_002562A8(ptarget); }
 
-extern "C" void ExecuteGuardScriptCmd(SCRIPTRUN *self, CMD *cmd) {
+extern "C" void ExecuteGuardScriptCmd(GOALSCRIPT *self, CMD *cmd) {
     VECTOR position;
     GTARGET target;
     float heading;
@@ -92,10 +90,10 @@ extern "C" void ExecuteGuardScriptCmd(SCRIPTRUN *self, CMD *cmd) {
     default:
         break;
     case 1:
-        self->player->field_0x2CC = *(WORDPAIR *)&cmd->b;
+        ((STEPGUARD *)self->pstep)->field_0x2CC = *(WORDPAIR *)&cmd->b;
         break;
     case 2:
-        self->player->field_0x2D4 = *(WORDPAIR *)&cmd->b;
+        ((STEPGUARD *)self->pstep)->field_0x2D4 = *(WORDPAIR *)&cmd->b;
         break;
     case 3:
         func_00171AF8_1715F0(self, PloFindScriptObject_1715F0(self, cmd->a), &position, &heading);
@@ -103,29 +101,22 @@ extern "C" void ExecuteGuardScriptCmd(SCRIPTRUN *self, CMD *cmd) {
         break;
     case 4: {
         argument = &cmd->a;
-        VT *vt = self->vt;
-        vt->fn1C((char *)self + vt->delta18, 4, 0, 1, &argument, 0);
+        self->HandleSpliceEvent(4, 0, 1, (int)&argument, 0);
         break;
     }
     case 5: {
-        STEPGUARD *player = self->player;
+        STEPGUARD *player = (STEPGUARD *)self->pstep;
         switch (player->modePath) {
         case 2: {
-            OBJ *obj = (OBJ *)func_00205438(player, 0xBB);
-            VT *vt = obj->vt;
-            vt->fn44((char *)obj + vt->delta40);
+            func_00205438(player, 0xBB)->Activate();
             break;
         }
         case 3: {
-            OBJ *obj = (OBJ *)func_00205438(player, 0xBC);
-            VT *vt = obj->vt;
-            vt->fn44((char *)obj + vt->delta40);
+            func_00205438(player, 0xBC)->Activate();
             break;
         }
         case -1: {
-            OBJ *obj = (OBJ *)func_00205438(player, 0x9E);
-            VT *vt = obj->vt;
-            vt->fn44((char *)obj + vt->delta40);
+            func_00205438(player, 0x9E)->Activate();
             break;
         }
         }
@@ -133,38 +124,35 @@ extern "C" void ExecuteGuardScriptCmd(SCRIPTRUN *self, CMD *cmd) {
         break;
     }
     case 6: {
-        int found = PloFindScriptObject_1715F0(self, self->current->a);
+        int found = PloFindScriptObject_1715F0(self, self->pcmd->a);
         if (found != 0) {
-            STEPGUARD *player = self->player;
+            STEPGUARD *player = (STEPGUARD *)self->pstep;
             int mode = player->modePath;
             switch (mode) {
             case -1: {
-                char *obj = func_00205438(player, 0xC0);
-                *(int *)(obj + 0x30) = found;
-                *(int *)(obj + 0x34) = cmd->b;
-                *(int *)(obj + 0x58) = self->flag4C;
+                GOALFOLLOWCURVE *obj = (GOALFOLLOWCURVE *)func_00205438(player, 0xC0);
+                obj->pcrv = found;
+                obj->field_0x34 = cmd->b;
+                obj->field_0x58 = self->flag4C;
                 if (self->flag4C == 0)
                     EnsureCrvExcludedRanges(found);
                 if (self->source != 0)
-                    *(float *)(obj + 0x38) = self->source->value;
+                    obj->s = self->source->value;
                 if (cmd->c != -1)
-                    *(int *)(obj + 0x50) = PloFindScriptObject_1715F0(self, cmd->c);
-                VT *vt = ((OBJ *)obj)->vt;
-                vt->fn44(obj + vt->delta40);
+                    obj->poidOther = PloFindScriptObject_1715F0(self, cmd->c);
+                obj->Activate();
                 break;
             }
             case 0: {
-                char *obj = func_00205438(player, 0xB8);
-                func_0017CDB8(obj, self->current->b);
-                VT *vt = ((OBJ *)obj)->vt;
-                vt->fn44(obj + vt->delta40);
+                GOAL *obj = func_00205438(player, 0xB8);
+                func_0017CDB8(obj, self->pcmd->b);
+                obj->Activate();
                 break;
             }
             case 1: {
-                char *obj = func_00205438(player, 0xB9);
-                func_0017D110(obj, self->current->b);
-                VT *vt = ((OBJ *)obj)->vt;
-                vt->fn44(obj + vt->delta40);
+                GOAL *obj = func_00205438(player, 0xB9);
+                func_0017D110(obj, self->pcmd->b);
+                obj->Activate();
                 break;
             }
             }
@@ -174,7 +162,7 @@ extern "C" void ExecuteGuardScriptCmd(SCRIPTRUN *self, CMD *cmd) {
     }
     case 7: {
         InitGoalTarget(&target);
-        CMD *current = self->current;
+        CMD *current = self->pcmd;
         int objectId = current->a;
         if (objectId == -1) {
             target.vec2 = *((CMDPOS *)current)->ppos;
@@ -189,17 +177,16 @@ extern "C" void ExecuteGuardScriptCmd(SCRIPTRUN *self, CMD *cmd) {
                     target.target1 = found;
             }
         }
-        STEPGUARD *player = self->player;
+        STEPGUARD *player = (STEPGUARD *)self->pstep;
         int mode = player->modePath;
         if (mode == -1) {
-            char *obj = func_00205438(player, 0xBA);
+            GOALGOTO *obj = (GOALGOTO *)func_00205438(player, 0xBA);
             SetGoalTarget(obj, &target);
             int other = cmd->d;
-            if (other != mode) *(int *)(obj + 0xA8) = PloFindScriptObject_1715F0(self, other);
-            VT *vt = ((OBJ *)obj)->vt;
-            *(float *)(obj + 0xB0) = cmd->e;
-            *(int *)(obj + 0xBC) = self->flag4C;
-            vt->fn44(obj + vt->delta40);
+            if (other != mode) obj->ptarget = (LO *)PloFindScriptObject_1715F0(self, other);
+            obj->field_0xB0 = cmd->e;
+            obj->fStraight = self->flag4C;
+            obj->Activate();
         }
         self->done = 1;
         break;
@@ -208,8 +195,8 @@ extern "C" void ExecuteGuardScriptCmd(SCRIPTRUN *self, CMD *cmd) {
         ApplyAseg(PloFindScriptObject_1715F0(self, cmd->a), 0, 0.0f, 1.0f, 0, &asegResult);
         break;
     case 10: {
-        CMD *label = PcmdFindScriptLabel(self->labelBase, cmd->a);
-        if (label != 0) self->current = label;
+        CMD *label = PcmdFindScriptLabel(self->pscript, cmd->a);
+        if (label != 0) self->pcmd = label;
         break;
     }
     case 11:
@@ -219,28 +206,26 @@ extern "C" void ExecuteGuardScriptCmd(SCRIPTRUN *self, CMD *cmd) {
         func_001EF038(self);
         break;
     case 13: {
-        int found = PloFindScriptObject_1715F0(self, self->current->a);
-        char *obj = func_00205438(self->player, 0xAC);
-        *(int *)(obj + 0x60) = found;
-        *(int *)(obj + 0x68) = 1;
-        VT *vt = ((OBJ *)obj)->vt;
-        *(int *)(obj + 0x64) = cmd->b;
-        vt->fn44(obj + vt->delta40);
+        int found = PloFindScriptObject_1715F0(self, self->pcmd->a);
+        GOALJUMP *obj = (GOALJUMP *)func_00205438((STEPGUARD *)self->pstep, 0xAC);
+        obj->ploTarget = (LO *)found;
+        obj->fTrackTarget = 1;
+        obj->fFacing = cmd->b;
+        obj->Activate();
         self->done = 1;
         break;
     }
     case 14: {
-        char *animref = self->animref;
-        ResetAnimref(animref, self->player);
-        self->ref54 = cmd->a;
-        self->ref5C = cmd->b;
-        BindAnimref(animref, self->player);
-        STEPGUARD *player = self->player;
+        ANIMREF *animref = &self->animref;
+        ResetAnimref(animref, self->pstep);
+        self->animref.oid = cmd->a;
+        self->animref.grf = cmd->b;
+        BindAnimref(animref, self->pstep);
+        STEPGUARD *player = (STEPGUARD *)self->pstep;
         if (player->modePath == -1) {
-            char *obj = func_00205438(player, 0x9D);
-            *(void **)(obj + 0x40) = animref;
-            VT *vt = ((OBJ *)obj)->vt;
-            vt->fn44(obj + vt->delta40);
+            GOALANIM *obj = (GOALANIM *)func_00205438(player, 0x9D);
+            obj->panimref = animref;
+            obj->Activate();
             self->done = 1;
         }
         break;
@@ -252,87 +237,49 @@ extern "C" void ExecuteGuardScriptCmd(SCRIPTRUN *self, CMD *cmd) {
     self->timer = g_2dded0;
 }
 
-struct GUARDCHILD {
-    char pad[0x38];
-    f32 field_0x38;
-};
-
-struct GUARDSCRIPT {
-    char pad[0x10];
-    STEPGUARD *field_0x10;
-    char pad1[4];
-    struct GUARDCHILD *field_0x18;
-    char pad2[0x30 - 0x1C];
-    void *field_0x30;
-    s32 field_0x34;
-    s32 *field_0x38;
-    char pad3[0x40 - 0x3C];
-    s32 field_0x40;
-};
-
 struct GUARDSCRIPTPOSE {
-    s32 *field_0x0;
+    CMD *pcmd;
     s32 field_0x4;
     f32 field_0x8;
 };
 
-struct SCRIPTLINK {
-    char pad[0x30];
-    s32 field_0x30;
-    char pad2[0x40 - 0x34];
-    s32 field_0x40;
-};
-
-extern "C" void GetScriptPose(void *, s128, s32, s32, s32);
+extern "C" void GetScriptPose(SCRIPT *, s128, s32, s32, s32);
 
 extern "C" s128 PosLoWorld(STEPGUARD *);
 
-extern "C" void func_00171AF8(GUARDSCRIPT *arg0, s32 arg1, s32 arg2, s32 arg3) {
-    GetScriptPose(arg0->field_0x30, PosLoWorld(arg0->field_0x10), arg1, arg2, arg3);
+extern "C" void func_00171AF8(GOALSCRIPT *arg0, s32 arg1, s32 arg2, s32 arg3) {
+    GetScriptPose(arg0->pscript, PosLoWorld((STEPGUARD *)arg0->pstep), arg1, arg2, arg3);
 }
 
-struct VT_171B60 {
-    char p0[0xE8];
-    short dE8; short iE8; void (*fE8)(void *, QW);
-    short dF0; short iF0; void (*fF0)(void *, const void *);
-    char p2[0x20];
-    short d118; short i118; void (*f118)(void *, QW);
-    short d120; short i120; void (*f120)(void *, QW);
-};
+extern "C" void ClearGuardPathMode(STEP *);
 
-struct LO_171B60 { char pad[0xC]; VT_171B60 *vt; };
-
-struct GUARDREF { char pad[0x10]; LO_171B60 *plo; };
-
-extern "C" void ClearGuardPathMode(LO_171B60 *);
-
-extern "C" void SetStepRadTarget(LO_171B60 *, float);
+extern "C" void SetStepRadTarget(STEP *, float);
 
 extern QW g_2a2dd0;
 
-extern "C" void TeleportGuardScript(GUARDREF *pref, QW target, float radTarget)
+extern "C" void TeleportGuardScript(GOAL *pgoal, QW target, float radTarget)
 {
-    LO_171B60 *plo = pref->plo;
-    ClearGuardPathMode(plo);
-    plo->vt->fE8((char *)plo + plo->vt->dE8, target);
-    SetStepRadTarget(plo, radTarget);
-    plo->vt->fF0((char *)plo + plo->vt->dF0, (char *)plo + 0x1B0);
-    plo->vt->f118((char *)plo + plo->vt->d118, g_2a2dd0);
-    plo->vt->f120((char *)plo + plo->vt->d120, g_2a2dd0);
+    STEP *pstep = pgoal->pstep;
+    ClearGuardPathMode(pstep);
+    pstep->TranslateToPos(target);
+    SetStepRadTarget(pstep, radTarget);
+    pstep->Slot30(&pstep->matHeading);
+    pstep->Slot35(g_2a2dd0);
+    pstep->Slot36(g_2a2dd0);
 }
 
-extern "C" void func_00171C18(GUARDSCRIPT *arg0, GUARDSCRIPTPOSE *arg1) {
-    s32 *temp_v1;
+extern "C" void func_00171C18(GOALSCRIPT *arg0, GUARDSCRIPTPOSE *arg1) {
+    CMD *temp_v1;
     s32 temp_a2;
 
-    temp_a2 = arg0->field_0x10->modePath;
+    temp_a2 = ((STEPGUARD *)arg0->pstep)->modePath;
     if (temp_a2 == -1) {
-        temp_v1 = arg0->field_0x38;
-        arg1->field_0x0 = temp_v1;
-        arg1->field_0x4 = arg0->field_0x34;
+        temp_v1 = arg0->pcmd;
+        arg1->pcmd = temp_v1;
+        arg1->field_0x4 = arg0->object;
         if (temp_v1 != 0) {
-            if (*temp_v1 == 6) {
-                arg1->field_0x8 = arg0->field_0x18->field_0x38;
+            if (temp_v1->op == 6) {
+                arg1->field_0x8 = ((GOALFOLLOWCURVE *)arg0->pgoalChild)->s;
             }
         }
     } else if (temp_a2 >= -1) {
@@ -343,17 +290,17 @@ extern "C" void func_00171C18(GUARDSCRIPT *arg0, GUARDSCRIPTPOSE *arg1) {
 }
 
 extern "C" {
-void Goal_Pop(struct GUARDCHILD **);
+void Goal_Pop(GOAL **);
 
-s32 *PcmdFindScriptLabel_171C98(void *, s32);
+CMD *PcmdFindScriptLabel_171C98(SCRIPT *, s32);
 
-void JumpGuardScript(struct GUARDSCRIPT *arg0, s32 arg1) {
-    if (arg0->field_0x30 != 0) {
-        if (arg0->field_0x40 != 0) {
-            Goal_Pop(&arg0->field_0x18);
-            arg0->field_0x40 = 0;
+void JumpGuardScript(GOALSCRIPT *arg0, s32 arg1) {
+    if (arg0->pscript != 0) {
+        if (arg0->done != 0) {
+            Goal_Pop(&arg0->pgoalChild);
+            arg0->done = 0;
         }
-        arg0->field_0x38 = PcmdFindScriptLabel_171C98(arg0->field_0x30, arg1);
+        arg0->pcmd = PcmdFindScriptLabel_171C98(arg0->pscript, arg1);
     }
 }
 }
@@ -383,7 +330,7 @@ extern "C" void GoalBrain_SetCommand_171D58(int brain, void *command);
 
 extern "C" void *memset_171D58(void *, int, unsigned);
 
-struct Cmd_171D58 { int kind; char pad[0x6C]; };
+struct Cmd_171D58 { int kind; u8 unknown_0x4[0x6C]; };
 
 extern "C" void func_00171D58(void *self) {
     Cmd_171D58 command __attribute__((aligned(16)));
@@ -395,17 +342,17 @@ extern "C" void func_00171D58(void *self) {
     }
 }
 
-extern "C" struct SCRIPTLINK *func_00205458_171DA8(s32, s32);
+extern "C" GOALBRAIN *func_00205458_171DA8(s32, s32);
 
 extern "C" s32 func_00171DA8(s32 arg0, s32 arg1) {
     s32 var_a1;
-    SCRIPTLINK *temp_v0;
+    GOALBRAIN *temp_v0;
 
     temp_v0 = func_00205458_171DA8(arg0, 0x9C);
     var_a1 = 0;
     if (temp_v0 != 0) {
-        if (temp_v0->field_0x30 == 5) {
-            var_a1 = temp_v0->field_0x40 == arg1;
+        if (temp_v0->cmd.type == 5) {
+            var_a1 = temp_v0->cmd.args.arg == arg1;
         }
     }
     return var_a1;

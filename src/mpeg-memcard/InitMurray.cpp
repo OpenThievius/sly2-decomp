@@ -25,12 +25,12 @@ extern "C" void InitMurray(MURRAY *murray)
     murray->field_0x1414 = 3500.0f;
     murray->field_0x103C = 60.0f;
     murray->field_0x1048 = 125.0f;
-    func_0020B840((char *)murray + 0x1320, murray, 0x15);
-    func_0020B840((char *)murray + 0x1460, murray, 0x15);
-    func_0020B840((char *)murray + 0x1630, murray, 0x15);
-    func_0020B840((char *)murray + 0x1540, murray, 0x15);
-    func_0020BD78((char *)murray + 0x1850);
-    char *tuning = (char *)murray + 0x10A8;
+    func_0020B840(murray->runBlendA, murray, 0x15);
+    func_0020B840(murray->runBlendCarry, murray, 0x15);
+    func_0020B840(murray->runBlendD, murray, 0x15);
+    func_0020B840(murray->runBlendC, murray, 0x15);
+    func_0020BD78(murray->part1850);
+    char *tuning = (char *)&murray->field_0x10A8;
     murray->field_0x1AC8 = -60.0f;
     murray->field_0x1434 = -60.0f;
     murray->field_0x1098 = -100.0f;
@@ -41,7 +41,7 @@ extern "C" void InitMurray(MURRAY *murray)
     *(float *)(tuning + 8) = 1.0f;
     *(int *)(tuning + 4) = 0;
     *(float *)(tuning + 0xC) = 4500.0f;
-    CarryThrow_Init((char *)murray + 0x1910, murray);
+    CarryThrow_Init(murray->PvCarry(), murray);
     murray->field_0x1000 = 4;
     g_2f7900 = murray;
 }

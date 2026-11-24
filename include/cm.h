@@ -97,7 +97,9 @@ struct CM : BASIC {
     /* 0x60 */ MATRIX4 mat;        /* row 3 the position: SetCmPosMat, SetCmMat, func_0014F3C8, func_0014F4E0, func_0014E078; InitCm */
     u8 unknown_0xA0[0x60];
     /* 0x100 */ MATRIX4 matProj;   /* RecalcCmFrustrum (BuildSimpleProjectionMatrix). source:sly1 */
-    u8 unknown_0x140[0x100];
+    /* 0x140 */ MATRIX4 matClip;   /* DrawPassSetupCamera and dmas_dzg_157fa0 send it as the first matrix; FlushRenderRecords uploads it to VU1
+                                      with mat when there is no stereo pass (guess: name) */
+    u8 unknown_0x180[0xC0];
     /* 0x240 */ f32 sNearFog;      /* SetCmNearFog, BuildCmFgfn; InitCm. source:sly1 */
     /* 0x244 */ f32 sFarFog;       /* SetCmFarFog, BuildCmFgfn; InitCm. source:sly1 */
     /* 0x248 */ f32 uFogMax;       /* SetCmUFogMax, BuildCmFgfn; InitCm. source:sly1 */

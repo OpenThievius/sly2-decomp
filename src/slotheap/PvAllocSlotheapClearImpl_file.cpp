@@ -6,25 +6,24 @@
 #include "alloc.h"
 #include "m2c_macros.h"
 
-struct VT_116918 { char pad[8]; short delta; short unused; void *(*fn)(void *, int, int); };
-
-struct ALLOCATOR { VT_116918 *vt; };
+/* An allocator: its vtable pointer at 0 and one virtual, the allocation (slot 1: size and a tag). InitArena's arena is one
+   (vtable D_002CA550). */
+struct ALLOCATOR {
+    virtual void *PvAlloc(int cb, int tag);
+};
 
 extern "C" void *memset(void *, int, unsigned int);
 
 extern "C" void *PvAllocSlotheapClearImpl__FP8SLOTHEAP(ALLOCATOR *heap, int size, int extra) {
-    VT_116918 *vt = heap->vt;
-    short delta = vt->delta;
-    void *result = vt->fn((char *)heap + delta, size, extra);
+    void *result = heap->PvAlloc(size, extra);
     memset(result, 0, size);
     return result;
 }
 
 extern "C" void CopyAb__FPvT0Ui(void *, int, int);
 
-extern "C" void *PvAllocCopyImpl(char *arg0, int arg1, int arg2, int arg3) {
-    char *vtable = *(char **)arg0;
-    void *result = (*(void *(**)(char *, int, int))(vtable + 0xC))(arg0 + *(short *)(vtable + 8), arg1, arg3);
+extern "C" void *PvAllocCopyImpl(ALLOCATOR *arg0, int arg1, int arg2, int arg3) {
+    void *result = arg0->PvAlloc(arg1, arg3);
     CopyAb__FPvT0Ui(result, arg2, arg1);
     return result;
 }
@@ -47,17 +46,17 @@ void *PvAllocSwAlign16(void *, int cb)
     return PvAllocSwImpl((sptr)&req);
 }
 
-struct VT { char pad[8]; short delta; short idx; int (*fn)(void *, int, int); };
+/* an allocator with a default tag at 4, used when the caller passes -1 */
+struct ALLOCTAG : ALLOCATOR {
+    int tag;
+};
 
-struct A { VT *vt; int tag; };
-
-void func_00116A58(A *a, int unused, int cb, int tagFallback)
+void func_00116A58(ALLOCTAG *a, int unused, int cb, int tagFallback)
 {
-    VT *vt = a->vt;
     int tag = a->tag;
     if (tag == -1)
         tag = tagFallback;
-    vt->fn((char *)a + vt->delta, cb, tag);
+    a->PvAlloc(cb, tag);
 }
 
 extern "C" {
@@ -91,11 +90,10 @@ extern "C" void *PvAllocGlobalImpl__Fi(Arena_116AB8 *a, int cb)
     return a->base + used;
 }
 
-struct VT_116AF8 { char pad[8]; short delta; short idx; int (*fn)(void *, int, int, int); };
-
- struct A_116AF8 { VT_116AF8 *vt; };
-
-void func_00116AF8(A_116AF8 *a, int unused, int cb, int tag){ VT_116AF8 *vt = a->vt; int d = vt->delta; vt->fn((char *)a + d, cb, tag, d); }
+void func_00116AF8(ALLOCATOR *a, int unused, int cb, int tag)
+{
+    a->PvAlloc(cb, tag);
+}
 
 extern "C" {
 void func_00116B28(void) {

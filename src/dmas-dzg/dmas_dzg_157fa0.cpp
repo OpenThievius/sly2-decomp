@@ -4,16 +4,15 @@
 #include "m2c_macros.h"
 #include "sly2.h"
 #include "sw.h"
+#include "cm.h"
 
 struct V3_157FA0 { char xy[8]; int z; };
 
 struct V4_157FA0 { V3_157FA0 v; float w; };
 
-struct Cam_157FA0 { char pad0[0x4C]; float nearPlane; float farPlane; char pad1[0x60 - 0x54]; QW view[4]; char pad2[0x140 - 0xA0]; QW proj[4]; };
+struct Vifs_157FA0 { u8 unknown_0x0[0xC]; QW *pqwCur; u8 unknown_0x10[0x10]; int fActive; };
 
-struct Vifs_157FA0 { char pad0[0xC]; QW *pqwCur; char pad1[0x20 - 0x10]; int fActive; };
-
-struct Dmas_157FA0 { char pad0[0x24]; QW *pqwSaved; };
+struct Dmas_157FA0 { u8 unknown_0x0[0x24]; QW *pqwSaved; };
 
 struct Rec_157FA0 { int type; int unk4; u32 chain0; u32 chain1; };
 
@@ -51,8 +50,6 @@ extern "C" QW B_003B3980[];
 
 extern "C" QW *B_003D4A50;
 
-extern "C" Cam_157FA0 B_002DDF40;
-
 extern "C" char B_002DEA00[];
 
 extern "C" Dmas_157FA0 B_002DEA50;
@@ -75,7 +72,7 @@ extern "C" int D_002BDD20[];
 
 extern "C" PFNPASS_157FA0 D_002BDD88[][2];
 
-extern "C" void FlushRenderRecords(char *psw)
+extern "C" void FlushRenderRecords(SW *psw)
 {
     QW mat[8];
     Rec_157FA0 *aprec[8192];
@@ -88,7 +85,7 @@ extern "C" void FlushRenderRecords(char *psw)
     AddDmaCall__4DMASP2QW(&g_2dea28, B_002DF800);
     g_2dea28.fActive = 1;
     AddDmaCnt__4DMAS(&g_2dea28);
-    if (*(int *)(psw + 0x3E3C) != 0 || aiStart[1] == aiEnd[1]) {
+    if (psw->fDirectPacket != 0 || aiStart[1] == aiEnd[1]) {
         AddVifDirect__4VIFSiP2QWi(&g_2dea28, 0x25, B_002DEDC0, 0);
     }
     if (B_003DD490.field_0x3E38 != 0) {
@@ -101,8 +98,8 @@ extern "C" void FlushRenderRecords(char *psw)
     }
     AddVifBaseOffset__4VIFSii(&g_2dea28, 0, 0);
     params[0].v = *(V3_157FA0 *)D_002C1F00;
-    float ratio = (B_002DDF40.nearPlane + B_002DDF40.farPlane) / (B_002DDF40.nearPlane - B_002DDF40.farPlane);
-    float scale = B_002DDF40.nearPlane * (1.0f - ratio);
+    float ratio = (B_002DDF40.sNearClip + B_002DDF40.sFarClip) / (B_002DDF40.sNearClip - B_002DDF40.sFarClip);
+    float scale = B_002DDF40.sNearClip * (1.0f - ratio);
     params[0].w = 1.0f / scale;
     params[1].v = *(V3_157FA0 *)D_002C1F10;
     params[1].w = -ratio / scale;
@@ -116,20 +113,20 @@ extern "C" void FlushRenderRecords(char *psw)
             bevy_camera_cm_14f768(&B_002DDF40, 2, 0, mat, mat + 4);
         }
     } else {
-        char *proj = (char *)&B_002DDF40 + 0x140;
-        char *view = (char *)&B_002DDF40 + 0x60;
-        mat[0] = *(QW *)((char *)&B_002DDF40 + 0x140);
-        mat[1] = *(QW *)(proj + 0x10);
-        mat[2] = *(QW *)(proj + 0x20);
-        mat[3] = *(QW *)(proj + 0x30);
-        mat[4] = *(QW *)((char *)&B_002DDF40 + 0x60);
-        mat[5] = *(QW *)(view + 0x10);
-        mat[6] = *(QW *)(view + 0x20);
-        mat[7] = *(QW *)(view + 0x30);
+        MATRIX4 *proj = &B_002DDF40.matClip;
+        MATRIX4 *view = &B_002DDF40.mat;
+        mat[0] = proj->row[0];
+        mat[1] = proj->row[1];
+        mat[2] = proj->row[2];
+        mat[3] = proj->row[3];
+        mat[4] = view->row[0];
+        mat[5] = view->row[1];
+        mat[6] = view->row[2];
+        mat[7] = view->row[3];
     }
     AddVifUnpack__4VIFS3UPKiPvi(&g_2dea28, 0xC, 4, mat, 2);
     AddVifUnpack__4VIFS3UPKiPvi(&g_2dea28, 0xC, 4, mat + 4, 6);
-    AddVifUnpack__4VIFS3UPKiPvi(&g_2dea28, 0xC, 1, psw + 0x3E28, 10);
+    AddVifUnpack__4VIFS3UPKiPvi(&g_2dea28, 0xC, 1, &psw->vifParams, 10);
     AddVifBaseOffset__4VIFSii(&g_2dea28, 0x32, 0x1E7);
     EndDmaCnt__4DMAS(&g_2dea28);
     int ipassCurrent = -1;
@@ -161,8 +158,8 @@ extern "C" void FlushRenderRecords(char *psw)
     B_003D4A50 = 0;
     func_001574A0(B_002DEA00);
     func_001574A0(&g_2dea28);
-    if (*(int *)(psw + 0x3EA8) != 0) {
-        *(int *)(psw + 0x3EA8) = 0;
+    if (psw->fGsDirty != 0) {
+        psw->fGsDirty = 0;
         func_001EA9F0(psw, 0);
     }
 }

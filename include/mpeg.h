@@ -75,13 +75,19 @@ typedef struct MPEGDEC {
     u8 unknown_0xF0[4];
     int strideSelect;                             /* 0x0F4, a multiple of 16: 0 means the destination steps by the block size; source:func_0024B9F0 */
     int strideStep;                               /* 0x0F8, the base advances by strideStep * 0xC0 per pass; source:func_0024B9F0 */
-    u8 unknown_0xFC[0x128 - 0xFC];
+    int field_0xFC;                               /* 0x0FC, func_00253C80 (picture start) clears it; reader: func_00253C80 */
+    u8 unknown_0x100[0x128 - 0x100];
     int field_0x128;                              /* 0x128, func_0024B590 clears it */
     int field_0x12C;                              /* a fault flag in one reader, "last code zero" in another */
-    u8 unknown_0x130[0x13C - 0x130];
+    u8 unknown_0x130[0x134 - 0x130];
+    int field_0x134;                              /* 0x134, low 12 bits plus (extension bits << 12); reader: func_00253E68 (sequence extension) */
+    int field_0x138;                              /* 0x138, the same for the other dimension; reader: func_00253E68 */
     int width;                                    /* 0x13C, in macroblocks */
     int height;                                   /* 0x140 */
-    u8 unknown_0x144[0x154 - 0x144];
+    int field_0x144;                              /* 0x144, adds 12 extension bits << 18; reader: func_00253E68 */
+    int field_0x148;                              /* 0x148, adds 8 extension bits << 10; reader: func_00253E68 */
+    int field_0x14C;                              /* 0x14C, one bit of the sequence extension; readers: func_00253E68, func_002547A0 */
+    int field_0x150;                              /* 0x150, two bits of the sequence extension, 1 expected; reader: func_00253E68 */
     int field_0x154;                              /* 0x154, an 8-bit value from the sequence header */
     int field_0x158;                              /* 0x158, 14 bits */
     int field_0x15C;                              /* 0x15C, 14 bits */
@@ -95,7 +101,9 @@ typedef struct MPEGDEC {
     int topFieldFirst;                            /* 0x188, picks which dual-prime vector pair goes first; source:func_0024FAD0 */
     int framePredFrameDct;                        /* 0x18C */
     int concealmentVectors;                       /* 0x190 */
-    u8 unknown_0x194[0x1BC - 0x194];
+    u8 unknown_0x194[0x1B4 - 0x194];
+    int field_0x1B4;                              /* 0x1B4, func_00253C80 reads one bit-count-1 value into it; reader: func_00253C80 */
+    int field_0x1B8;                              /* 0x1B8, the same; reader: func_00253C80 */
     int pictureIndex;                             /* 0x1BC, gopBase + temporal reference; func_00253D20 */
     int resetDcPredictor;                         /* 0x1C0 */
     int quantizerScaleCode;                       /* 0x1C4 */

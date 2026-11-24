@@ -7,70 +7,77 @@
 #include "include_asm.h"
 #include "ps2inline.h"
 #include "vu0inline.h"
+#include "pipe.h"
+#include "sly.h"
 
-struct VT_19E950 { char pad[0x290]; short delta; short index; void (*fn)(void *, int, void *, QW, QW, QW); };
-
-struct ALO_19E950 { char pad[0xC]; VT_19E950 *vt; };
-
-struct OWNER_19E950 { ALO_19E950 *palo; char pad[0x8]; void *pcrv; float s; char pad2[0x1C]; QW posLocal; };
+/* the pipe state InitJt starts at JT+0xF50 (jt.h PvPipe): the player, its state, the PIPE it rides and the position along it */
+struct JTPIPE {
+    /* 0x0 */ JT *pjt;
+    /* 0x4 */ s32 state;
+    /* 0x8 */ f32 tState;
+    /* 0xC */ PIPE *ppath;
+    /* 0x10 */ f32 s;
+    u8 unknown_0x14[0x4];
+    /* 0x18 */ s32 fReverse;
+    /* 0x1C */ s32 n1C;
+    /* 0x20 */ s32 stateExit;
+    u8 unknown_0x24[0xC];
+    /* 0x30 */ QW pos30;
+    u8 unknown_0x40[0x30];
+    /* 0x70 */ struct ASEG_19EAB0 *pasegSlide;
+    /* 0x74 */ struct ASEG_19EAB0 *pasegEnter;
+    /* 0x78 */ struct ASEG_19EAB0 *pasegExit;
+    /* 0x7C */ struct ASEG_19EAB0 *pasegSpin;
+};
 
 extern "C" void GetPathPosFromS(float, void *, QW *, QW *);
 
 extern "C" QW ConvertAloPos(void *, void *, QW);
 
-extern "C" void func_0019E950(OWNER_19E950 *powner)
+extern "C" void func_0019E950(JTPIPE *ppipe)
 {
     struct { QW pos; QW tangent; QW posWorld; } l;
-    GetPathPosFromS(powner->s, powner->pcrv, &l.pos, &l.tangent);
-    l.posWorld = ConvertAloPos(powner->palo, 0, powner->posLocal);
-    ALO_19E950 *palo = powner->palo;
-    palo->vt->fn((char *)palo + palo->vt->delta, 7, powner->pcrv, l.pos, l.tangent, l.posWorld);
+    GetPathPosFromS(ppipe->s, ppipe->ppath, &l.pos, &l.tangent);
+    l.posWorld = ConvertAloPos(ppipe->pjt, 0, ppipe->pos30);
+    ppipe->pjt->Slot82(7, ppipe->ppath, l.pos, l.tangent, l.posWorld);
 }
 
-void func_0019E9C8(void* a0, void* a1)
+/* a record the pipe's constraint fills: two words at 0x94 */
+struct PIPECONSTRAINT {
+    u8 unknown_0x0[0x94];
+    /* 0x94 */ s32 field_0x94;
+    /* 0x98 */ s32 field_0x98;
+};
+
+void func_0019E9C8(void* a0, PIPECONSTRAINT *record)
 {
-    *(int*)((char*)a1 + 0x94) = 0;
-    *(int*)((char*)a1 + 0x98) = 0;
+    record->field_0x94 = 0;
+    record->field_0x98 = 0;
 }
-
-struct PathUser { char pad[0xC]; void *path; float s; };
 
 extern "C" void GetPathPosFromS_19E9D8(void *, void *, int, float);
 
-void func_0019E9D8(PathUser *self, void *out)
+void func_0019E9D8(JTPIPE *self, void *out)
 {
-    GetPathPosFromS_19E9D8(self->path, out, 0, self->s);
+    GetPathPosFromS_19E9D8(self->ppath, out, 0, self->s);
 }
 
 INCLUDE_ASM(0X19EA00);
 
 extern "C" {
-struct JTMEMBER {
-    char pad[0x190];
-    char member[0xC];
-    s32 field_0x19C;
-};
-
-struct JTPIPE {
-    s32 pjt;
-    char pad[8];
-    struct JTMEMBER *pmember;
-    f32 value;
-};
-
 s32 AddSafePointOnMember(s32, void *, void *, f32); /* extern */
 
-void UpdateJtPipeLook(struct JTPIPE *pjtpipe) {
-    struct JTMEMBER *pmember;
+void UpdateJtPipeLook(JTPIPE *pjtpipe) {
+    PIPE *pmember;
 
-    pmember = pjtpipe->pmember;
-    if (pmember->field_0x19C == 0) {
-        AddSafePointOnMember(pjtpipe->pjt + 0x9E0, (pmember == NULL) ? NULL : pmember->member, pmember, pjtpipe->value);
+    pmember = pjtpipe->ppath;
+    if (pmember->member.field_0xC == 0) {
+        AddSafePointOnMember((s32)pjtpipe->pjt->PvPart9E0(), (pmember == NULL) ? NULL : &pmember->member, pmember, pjtpipe->s);
     }
 }
 }
 
-struct JtPipe { char pad[0x30]; s128 foot; s128 hand; };
+struct JtPipe { u8 unknown_0x0[0x30]; s128 foot; s128 hand; };
 
 extern "C" void SetJtPipeHandFoot(JtPipe *self, s128 foot, s128 hand)
 {
@@ -83,70 +90,29 @@ struct VEC_19EAB0 {
     void Clear() { x = y = z = 0; }
 } __attribute__((aligned(16)));
 
-union DPOS_19EAB0 { QW q; VECTOR v; };
-
 struct LM_19EAB0 { float gMin; float gMax; };
 
-struct ASEG_19EAB0 { char pad0[0x74]; float duration; };
+struct ASEG_19EAB0 { u8 unknown_0x0[0x74]; float duration; };
 
-struct VT_19EAB0 { char pad0[0x18]; short d18; short i18; void (*Notify)(void *, int, int, int, int, int); };
-
-struct PATH_19EAB0 {
-    char pad0[0xC];
-    VT_19EAB0 *vt;
-    char pad10[0x190 - 0x10];
-    int n190;
-    char pad194[0x1D0 - 0x194];
-    int sfxEnter;
-    int sfxExit;
-};
-
-struct JT_19EAB0 {
-    char pad0[0x190];
-    VEC_19EAB0 v190;
-    char pad1A0[0x1010 - 0x1A0];
+/* the part of a JT in front of the pipe's offset (jt.h has no field at 0x1010 yet: one reader) */
+struct JTPOSOFFSET {
+    u8 unknown_0x0[0x1010];
     QW posOffset;
-    char pad1020[0x1030 - 0x1020];
-    char asega[4];
-    char sma[0x1060 - 0x1034];
-    QW pos1060;
-    DPOS_19EAB0 dpos1070;
-    char pad1080[0x14D4 - 0x1080];
-    int f14D4;
 };
 
-struct PIPE_19EAB0 {
-    JT_19EAB0 *pjt;
-    int state;
-    float tState;
-    PATH_19EAB0 *ppath;
-    float s;
-    char pad14[0x18 - 0x14];
-    int fReverse;
-    int n1C;
-    int stateExit;
-    char pad24[0x30 - 0x24];
-    QW pos30;
-    char pad40[0x70 - 0x40];
-    ASEG_19EAB0 *pasegSlide;
-    ASEG_19EAB0 *pasegEnter;
-    ASEG_19EAB0 *pasegExit;
-    ASEG_19EAB0 *pasegSpin;
-};
+extern "C" void SubscribeLoObject(PIPE *, JT *);
 
-extern "C" void SubscribeLoObject(PATH_19EAB0 *, JT_19EAB0 *);
+extern "C" void UnsubscribeLoObject(PIPE *, JT *);
 
-extern "C" void UnsubscribeLoObject(PATH_19EAB0 *, JT_19EAB0 *);
+extern "C" void func_00204F78(JT *, PIPE *, int);
 
-extern "C" void func_00204F78(JT_19EAB0 *, PATH_19EAB0 *, int);
+extern "C" float func_001E6728(PIPE *, float);
 
-extern "C" float func_001E6728(PATH_19EAB0 *, float);
-
-extern "C" void bevy_player_p14_19e110(PIPE_19EAB0 *, LM_19EAB0 *);
+extern "C" void bevy_player_p14_19e110(JTPIPE *, LM_19EAB0 *);
 
 extern "C" float GLimitLm__FP2LMf(LM_19EAB0 *, float);
 
-extern "C" void func_00140C88(JT_19EAB0 *, int);
+extern "C" void func_00140C88(JT *, int);
 
 extern "C" int NewEmitter(int);
 
@@ -154,23 +120,19 @@ extern "C" void SetEmitterUnpositioned(int, void *);
 
 extern "C" void SetAmbPos(int, QW);
 
-extern "C" QW PosLoWorld(JT_19EAB0 *);
+extern "C" QW PosLoWorld(JT *);
 
-extern "C" void SetJtJtcs(JT_19EAB0 *, int);
+extern "C" void SetJtJtcs(JT *, int);
 
 extern "C" void RetractSmaRef(void *);
 
-extern "C" void ApplyAsegToHandle(ASEG_19EAB0 *, float, float, JT_19EAB0 *, int, void *);
+extern "C" void ApplyAsegToHandle(ASEG_19EAB0 *, float, float, JT *, int, void *);
 
-extern "C" JT_19EAB0 *g_2e1e40;
+extern "C" JT *g_2e1e40;
 
 extern "C" QW g_2a2dc0;
 
-struct CLOCK_19EAB0 { float t; };
-
-extern "C" CLOCK_19EAB0 g_2dded0;
-
-extern "C" void SetJtPipeState(PIPE_19EAB0 *ppipe, int state)
+extern "C" void SetJtPipeState(JTPIPE *ppipe, int state)
 {
     struct {
         QW posAhead;
@@ -185,8 +147,8 @@ extern "C" void SetJtPipeState(PIPE_19EAB0 *ppipe, int state)
     switch (stateOld) {
     case -1: {
         float ds = 50.0f;
-        PATH_19EAB0 *ppath = ppipe->ppath;
-        ppath->vt->Notify((char *)ppath + ppath->vt->d18, 5, 0, 0, 0, 0);
+        PIPE *ppath = ppipe->ppath;
+        ppath->HandleSpliceEvent(5, 0, 0, 0, 0);
         SubscribeLoObject(ppipe->ppath, ppipe->pjt);
         func_00204F78(ppipe->pjt, ppipe->ppath, 1);
         ppipe->stateExit = stateOld;
@@ -206,22 +168,22 @@ extern "C" void SetJtPipeState(PIPE_19EAB0 *ppipe, int state)
         ppipe->s = GLimitLm__FP2LMf(&l.lm, ppipe->s);
         GetPathPosFromS(ppipe->s, ppipe->ppath, &l.pos, 0);
         l.posLocal = ConvertAloPos(ppipe->pjt, 0, ppipe->pos30);
-        ppipe->pjt->posOffset = VectorSub(l.pos, l.posLocal);
-        JT_19EAB0 *pjt = ppipe->pjt;
-        pjt->dpos1070.q = VectorSub(pjt->pos1060, l.pos);
-        ppipe->pjt->dpos1070.v.z = 0;
-        func_00140C88(ppipe->pjt, ppipe->ppath->n190);
-        if (ppipe->ppath->sfxEnter) {
-            int emitter = NewEmitter(ppipe->ppath->sfxEnter);
+        ((JTPOSOFFSET *)ppipe->pjt)->posOffset = VectorSub(l.pos, l.posLocal);
+        JT *pjt = ppipe->pjt;
+        pjt->dir = VectorSub(pjt->look, l.pos);
+        ((VECTOR *)&ppipe->pjt->dir)->z = 0;
+        func_00140C88(ppipe->pjt, ppipe->ppath->member.field_0x0);
+        if (ppipe->ppath->field_0x1D0) {
+            int emitter = NewEmitter(ppipe->ppath->field_0x1D0);
             SetEmitterUnpositioned(emitter, 0);
             SetAmbPos(emitter, l.pos);
         }
         break;
     }
     case 0: {
-        JT_19EAB0 *pjt = ppipe->pjt;
+        JT *pjt = ppipe->pjt;
         if (pjt == g_2e1e40)
-            SetJtJtcs(pjt, pjt->f14D4 ? 10 : 2);
+            SetJtJtcs(pjt, ((SLY *)pjt)->apasegHide[0] ? 10 : 2);
         break;
     }
     }
@@ -233,17 +195,17 @@ extern "C" void SetJtPipeState(PIPE_19EAB0 *ppipe, int state)
     ppipe->tState = g_2dded0.t;
     switch (state) {
     case -1: {
-        PATH_19EAB0 *ppath = ppipe->ppath;
-        ppath->vt->Notify((char *)ppath + ppath->vt->d18, 6, 0, 0, 0, 0);
+        PIPE *ppath = ppipe->ppath;
+        ppath->HandleSpliceEvent(6, 0, 0, 0, 0);
         UnsubscribeLoObject(ppipe->ppath, ppipe->pjt);
         func_00204F78(ppipe->pjt, ppipe->ppath, 0);
-        JT_19EAB0 *pjt = ppipe->pjt;
-        QW posOld = pjt->pos1060;
-        pjt->dpos1070.q = VectorSub(posOld, PosLoWorld(pjt));
-        ppipe->pjt->dpos1070.v.z = 0;
+        JT *pjt = ppipe->pjt;
+        QW posOld = pjt->look;
+        pjt->dir = VectorSub(posOld, PosLoWorld(pjt));
+        ((VECTOR *)&ppipe->pjt->dir)->z = 0;
         func_00140C88(ppipe->pjt, 0);
-        if (ppipe->ppath->sfxExit) {
-            int emitter = NewEmitter(ppipe->ppath->sfxExit);
+        if (ppipe->ppath->field_0x1D4) {
+            int emitter = NewEmitter(ppipe->ppath->field_0x1D4);
             SetEmitterUnpositioned(emitter, 0);
             SetAmbPos(emitter, PosLoWorld(ppipe->pjt));
         }
@@ -277,10 +239,10 @@ extern "C" void SetJtPipeState(PIPE_19EAB0 *ppipe, int state)
         paseg = ppipe->pasegSpin;
         break;
     }
-    RetractSmaRef(ppipe->pjt->sma);
-    JT_19EAB0 *pjt = ppipe->pjt;
-    ApplyAsegToHandle(paseg, tStart, svt, pjt, grf, pjt->asega);
-    ppipe->pjt->v190.Clear();
+    RetractSmaRef(&ppipe->pjt->field_0x1034);
+    JT *pjt = ppipe->pjt;
+    ApplyAsegToHandle(paseg, tStart, svt, pjt, grf, &pjt->field_0x1030);
+    ((VEC_19EAB0 *)&ppipe->pjt->velGoal)->Clear();
 }
 
 extern "C" int FActiveCplcy(void *);
@@ -289,10 +251,10 @@ extern char B_002DE2E0[];
 
 extern int g_2dfbc0;
 
-extern "C" int func_0019EEF0(char **arg0, int arg1) {
+extern "C" int func_0019EEF0(JTPIPE *ppipe, int arg1) {
     if (arg1 == 3) {
         int result = 0;
-        if (*(int *)(*arg0 + 0x12F0) != 0) {
+        if (ppipe->pjt->fGadgetsAllowed != 0) {
             if (g_2dfbc0 & 2)
                 result = FActiveCplcy(B_002DE2E0) == 0;
         }

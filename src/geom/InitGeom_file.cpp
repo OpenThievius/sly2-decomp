@@ -17,16 +17,33 @@ void InitGeom__FP4GEOM(void *arg0) {
     a0[7] = 0;
 }
 
+/* the binary input stream: Pump refills it, the Read functions take bytes from pb while cb lasts. g++ puts the vtable pointer after the
+   own fields, at 0x30 (func_00118480 and func_001184B8 write it by hand, see STREAMVPTR). */
 struct CBinaryInputStream {
-    unsigned flags;
-    int unk0x4;
-    int cb;
-    int cbPumped;
-    char *pbRaw;
-    int cbRaw;
-    char pad[0x18];
+    /* 0x00 */ unsigned flags;       /* bit 1: the data is compressed (Pump decompresses) */
+    /* 0x04 */ u8 *pb;               /* the next byte to read */
+    /* 0x08 */ int cb;               /* bytes left at pb; -1 after a short read */
+    /* 0x0C */ int cbPumped;
+    /* 0x10 */ u8 *pbRaw;           /* the raw bytes not yet pumped */
+    /* 0x14 */ int cbRaw;
+    u8 unknown_0x18[0x8];
+    /* 0x20 */ s32 field_0x20;       /* func_001179D8: its first argument, with flag 2 set */
+    /* 0x24 */ s32 field_0x24;       /* its second argument */
+    u8 unknown_0x28[0x8];
     virtual void RawPump();
     void Decompress();
+    unsigned U16Read();
+    unsigned U32Read();
+};
+/* the stream over a memory block (its vtable is D_002CA5A0): the block's size and address wait at 0x34 and 0x38 */
+struct CBinaryInputStreamMem : CBinaryInputStream {
+    /* 0x34 */ s32 cbSource;
+    /* 0x38 */ u8 *pbSource;
+};
+/* a stream's vtable pointer, written by hand where retail's constructor and destructor store it */
+struct STREAMVPTR {
+    u8 unknown_0x0[0x30];
+    /* 0x30 */ void *vt;
 };
 
 void CBinaryInputStream_Pump(CBinaryInputStream *pbis)
@@ -37,7 +54,7 @@ void CBinaryInputStream_Pump(CBinaryInputStream *pbis)
         } else {
             pbis->RawPump();
             pbis->cb = pbis->cbRaw;
-            pbis->unk0x4 = (sptr)pbis->pbRaw;
+            pbis->pb = pbis->pbRaw;
             pbis->pbRaw = pbis->pbRaw + pbis->cbRaw;
             pbis->cbRaw = 0;
         }
@@ -45,33 +62,31 @@ void CBinaryInputStream_Pump(CBinaryInputStream *pbis)
     }
 }
 
-struct CBinaryInputStream_117898 { int pad0; char *cursor; int available; };
-
-extern "C" void CBinaryInputStream_Pump_117898(CBinaryInputStream_117898 *);
+extern "C" void CBinaryInputStream_Pump_117898(CBinaryInputStream *);
 
 extern "C" void CopyAb__FPvT0Ui(void *, void *, unsigned int);
 
-int CBinaryInputStream_Read(CBinaryInputStream_117898 *stream, int count, void *dest)
+int CBinaryInputStream_Read(CBinaryInputStream *stream, int count, void *dest)
 {
     int left = count;
-    if (stream->available < 0) {
+    if (stream->cb < 0) {
         return 0;
     }
     while (left > 0) {
         CBinaryInputStream_Pump_117898(stream);
-        int available = stream->available;
+        int available = stream->cb;
         if (available == 0) {
-            stream->available = -1;
+            stream->cb = -1;
             break;
         }
         int chunk = available;
         if (left < available) chunk = left;
         if (dest) {
-            CopyAb__FPvT0Ui(dest, stream->cursor, chunk);
+            CopyAb__FPvT0Ui(dest, stream->pb, chunk);
             dest = (char *)dest + chunk;
         }
-        stream->cursor += chunk;
-        stream->available -= chunk;
+        stream->pb += chunk;
+        stream->cb -= chunk;
         left -= chunk;
     }
     return count - left;
@@ -86,14 +101,12 @@ void CBinaryInputStream_Read_thunk(void) {
 }
 
 // 0x117988 CBinaryInputStream::Align
-struct Bis_117988 { int pad0; int pb; int cb; };
-
-extern "C" void Align__18CBinaryInputStreami(Bis_117988 *s, int n) {
-    int old = s->pb;
+extern "C" void Align__18CBinaryInputStreami(CBinaryInputStream *s, int n) {
+    int old = (sptr)s->pb;
     int mask = -n;
     int cb = s->cb;
     int nw = (old + (n - 1)) & mask;
-    s->pb = nw;
+    s->pb = (u8 *)nw;
     s->cb = cb - (nw - old);
 }
 
@@ -106,14 +119,7 @@ void CBinaryInputStream_Skip(void* a0, int a1)
 }
 
 extern "C" {
-typedef struct FlaggedObject {
-    u32 flags;
-    char pad_0x4[0x1C];
-    s32 field_0x20;
-    s32 field_0x24;
-} FlaggedObject;
-
-void func_001179D8(FlaggedObject *object, s32 arg1, s32 arg2) {
+void func_001179D8(CBinaryInputStream *object, s32 arg1, s32 arg2) {
     object->field_0x24 = arg2;
     object->field_0x20 = arg1;
     object->flags = object->flags | 2;
@@ -124,22 +130,16 @@ INCLUDE_ASM(0X1179F0);
 
 INCLUDE_ASM(0X117BC8);
 
-struct Stream117BD0 {
-    int unk0x0;
-    unsigned char *cursor;
-    int remaining;
-};
+extern "C" void CBinaryInputStream_Read_thunk_117BD0(CBinaryInputStream *, int, void *);
 
-extern "C" void CBinaryInputStream_Read_thunk_117BD0(Stream117BD0 *, int, void *);
-
-extern "C" int U8Read__18CBinaryInputStream(Stream117BD0 *stream)
+extern "C" int U8Read__18CBinaryInputStream(CBinaryInputStream *stream)
 {
-    int count = stream->remaining;
+    int count = stream->cb;
     if (count >= 1) {
-        unsigned char *pointer = stream->cursor;
+        unsigned char *pointer = stream->pb;
         int value = pointer[0];
-        stream->cursor = pointer + 1;
-        stream->remaining = count - 1;
+        stream->pb = pointer + 1;
+        stream->cb = count - 1;
         return value;
     }
     unsigned char value;
@@ -147,38 +147,34 @@ extern "C" int U8Read__18CBinaryInputStream(Stream117BD0 *stream)
     return value;
 }
 
-struct Stream117C20 { int unk0x0; unsigned char *cursor; int remaining; };
+extern "C" void CBinaryInputStream_Read_thunk_117C20(CBinaryInputStream *, int, void *);
 
-extern "C" void CBinaryInputStream_Read_thunk_117C20(Stream117C20 *, int, void *);
-
-extern "C" unsigned short U16Read__18CBinaryInputStream(Stream117C20 *stream)
+extern "C" unsigned short U16Read__18CBinaryInputStream(CBinaryInputStream *stream)
 {
     unsigned short value;
-    int remaining = stream->remaining;
+    int remaining = stream->cb;
     if (remaining >= 2) {
-        unsigned char *cursor = stream->cursor;
+        unsigned char *cursor = stream->pb;
         unsigned short result = cursor[0] | (cursor[1] << 8);
-        stream->cursor = cursor + 2;
-        stream->remaining = remaining - 2;
+        stream->pb = cursor + 2;
+        stream->cb = remaining - 2;
         return result;
     }
     CBinaryInputStream_Read_thunk_117C20(stream, 2, &value);
     return value;
 }
 
-struct Stream117C80 { int unk0x0; unsigned char *cursor; int remaining; };
+extern "C" void CBinaryInputStream_Read_thunk_117C80(CBinaryInputStream *, int, void *);
 
-extern "C" void CBinaryInputStream_Read_thunk_117C80(Stream117C80 *, int, void *);
-
-extern "C" unsigned int U32Read__18CBinaryInputStream(Stream117C80 *stream)
+extern "C" unsigned int U32Read__18CBinaryInputStream(CBinaryInputStream *stream)
 {
     unsigned int value;
-    int remaining = stream->remaining;
+    int remaining = stream->cb;
     if (remaining >= 4) {
-        unsigned char *cursor = stream->cursor;
+        unsigned char *cursor = stream->pb;
         unsigned int result = cursor[0] + (cursor[1] << 8) + (cursor[2] << 16) + (cursor[3] << 24);
-        stream->cursor = cursor + 4;
-        stream->remaining = remaining - 4;
+        stream->pb = cursor + 4;
+        stream->cb = remaining - 4;
         return result;
     }
     CBinaryInputStream_Read_thunk_117C80(stream, 4, &value);
@@ -187,22 +183,16 @@ extern "C" unsigned int U32Read__18CBinaryInputStream(Stream117C80 *stream)
 
 INCLUDE_ASM(0X117CF8);
 
-struct Stream117D00 {
-    int unk0x0;
-    unsigned char *cursor;
-    int remaining;
-};
+extern "C" void CBinaryInputStream_Read_thunk_117D00(CBinaryInputStream *, int, void *);
 
-extern "C" void CBinaryInputStream_Read_thunk_117D00(Stream117D00 *, int, void *);
-
-extern "C" int S8Read__18CBinaryInputStream(Stream117D00 *stream)
+extern "C" int S8Read__18CBinaryInputStream(CBinaryInputStream *stream)
 {
-    int count = stream->remaining;
+    int count = stream->cb;
     if (count >= 1) {
-        unsigned char *pointer = stream->cursor;
+        unsigned char *pointer = stream->pb;
         int value = (signed char)pointer[0];
-        stream->cursor = pointer + 1;
-        stream->remaining = count - 1;
+        stream->pb = pointer + 1;
+        stream->cb = count - 1;
         return value;
     }
     signed char value;
@@ -210,42 +200,34 @@ extern "C" int S8Read__18CBinaryInputStream(Stream117D00 *stream)
     return value;
 }
 
-struct Stream117D50 {
-    int unk0x0;
-    unsigned char *cursor;
-    int remaining;
-};
+extern "C" void CBinaryInputStream_Read_thunk_117D50(CBinaryInputStream *, int, void *);
 
-extern "C" void CBinaryInputStream_Read_thunk_117D50(Stream117D50 *, int, void *);
-
-extern "C" int S16Read__18CBinaryInputStream(Stream117D50 *stream)
+extern "C" int S16Read__18CBinaryInputStream(CBinaryInputStream *stream)
 {
     short value;
-    int remaining = stream->remaining;
+    int remaining = stream->cb;
     if (remaining >= 2) {
-        unsigned char *cursor = stream->cursor;
+        unsigned char *cursor = stream->pb;
         int result = cursor[0] | (short)(cursor[1] << 8);
-        stream->cursor = cursor + 2;
-        stream->remaining = remaining - 2;
+        stream->pb = cursor + 2;
+        stream->cb = remaining - 2;
         return result;
     }
     CBinaryInputStream_Read_thunk_117D50(stream, 2, &value);
     return value;
 }
 
-struct Stream117DB8 { int unk0x0; unsigned char *cursor; int remaining; };
+extern "C" void CBinaryInputStream_Read_thunk_117DB8(CBinaryInputStream *, int, void *);
 
-extern "C" void CBinaryInputStream_Read_thunk_117DB8(Stream117DB8 *, int, void *);
-
-extern "C" int S32Read__18CBinaryInputStream(Stream117DB8 *stream)
+extern "C" int S32Read__18CBinaryInputStream(CBinaryInputStream *stream)
 {
     int value;
-    int remaining = stream->remaining;
+    int remaining = stream->cb;
     if (remaining >= 4) {
-        unsigned char *cursor = stream->cursor;
+        unsigned char *cursor = stream->pb;
         int result = cursor[0] + (cursor[1] << 8) + (cursor[2] << 16) + (((signed char *)cursor)[3] << 24);
-        stream->cursor = cursor + 4;
-        stream->remaining = remaining - 4;
+        stream->pb = cursor + 4;
+        stream->cb = remaining - 4;
         return result;
     }
     CBinaryInputStream_Read_thunk_117DB8(stream, 4, &value);
@@ -254,23 +236,17 @@ extern "C" int S32Read__18CBinaryInputStream(Stream117DB8 *stream)
 
 INCLUDE_ASM(0X117E30);
 
-struct Stream117E38 {
-    int unk0x0;
-    unsigned char *cursor;
-    int remaining;
-};
+extern "C" void CBinaryInputStream_Read_thunk_117E38(CBinaryInputStream *, int, void *, int);
 
-extern "C" void CBinaryInputStream_Read_thunk_117E38(Stream117E38 *, int, void *, int);
-
-extern "C" float F32Read__18CBinaryInputStream(Stream117E38 *stream)
+extern "C" float F32Read__18CBinaryInputStream(CBinaryInputStream *stream)
 {
     float value[16 / sizeof(float)] __attribute__((aligned(16)));
-    int remaining = stream->remaining;
+    int remaining = stream->cb;
     if (remaining >= 4) {
-        unsigned char *cursor = stream->cursor;
+        unsigned char *cursor = stream->pb;
         int bits = cursor[0] + (cursor[1] << 8) + (cursor[2] << 16) + (cursor[3] << 24);
-        stream->cursor = cursor + 4;
-        stream->remaining = remaining - 4;
+        stream->pb = cursor + 4;
+        stream->cb = remaining - 4;
         return *(float *)&bits;
     }
     CBinaryInputStream_Read_thunk_117E38(stream, 4, value, remaining);
@@ -298,28 +274,17 @@ extern "C" {
 struct VECTOR;
 }
 
-struct Matrix4Dest {
-    char pad_0x0[0xC];
-    s32 field_0xC;
-    char pad_0x10[0xC];
-    s32 field_0x1C;
-    char pad_0x20[0xC];
-    s32 field_0x2C;
-    char pad_0x30[0xC];
-    f32 field_0x3C;
-};
-
 extern "C" void CBinaryInputStream_ReadMatrix_117F18(); /* extern */
 
-extern "C" void ReadVector__18CBinaryInputStreamP6VECTOR_117F18(s32, VECTOR *); /* extern */
+extern "C" void ReadVector__18CBinaryInputStreamP6VECTOR_117F18(CBinaryInputStream *, VECTOR *); /* extern */
 
-extern "C" void CBinaryInputStream_ReadMatrix4(s32 stream, Matrix4Dest *matrix) {
+extern "C" void CBinaryInputStream_ReadMatrix4(CBinaryInputStream *stream, MATRIX4 *matrix) {
     CBinaryInputStream_ReadMatrix_117F18();
-    ReadVector__18CBinaryInputStreamP6VECTOR_117F18(stream, (VECTOR *)((char *)matrix + 0x30));
-    matrix->field_0xC = 0;
-    matrix->field_0x1C = 0;
-    matrix->field_0x2C = 0;
-    matrix->field_0x3C = 1.0f;
+    ReadVector__18CBinaryInputStreamP6VECTOR_117F18(stream, (VECTOR *)matrix->mat[3]);
+    matrix->mat[0][3] = 0.0f;
+    matrix->mat[1][3] = 0.0f;
+    matrix->mat[2][3] = 0.0f;
+    matrix->mat[3][3] = 1.0f;
 }
 
 extern "C" int CBinaryInputStream_Read_thunk_117F70(void *, int, void *);
@@ -356,7 +321,7 @@ struct GEOMPLANE_117FD0 {
     s32 dist;
     GEOMEDGE_117FD0 *pedgeFirst;
     GEOMEDGE_117FD0 *pedgeList;
-    s32 pad18;
+    s32 field_0x18;
     s32 iface;
 };
 struct GEOM_117FD0 {
@@ -373,14 +338,14 @@ void *PvAllocSwClearImpl__Fi(ALLOCREQ *);
 void BuildPlane(GEOMPLANE_117FD0 *pplane, QW pos0, QW pos1, QW pos2);
 void ReadVector__18CBinaryInputStreamP6VECTOR_117FD0(void *stream, void *dest);
 }
-extern "C" void CBinaryInputStream_ReadGeom(void *pbis, GEOM_117FD0 *pgeom)
+extern "C" void CBinaryInputStream_ReadGeom(CBinaryInputStream *pbis, GEOM_117FD0 *pgeom)
 {
     union {
         ALLOCREQ allocreq;
         int aivert[3];
     } scratch;
     int ivert = 0;
-    int cvert = U16Read__18CBinaryInputStream((Stream117C20 *)pbis);
+    int cvert = U16Read__18CBinaryInputStream(pbis);
     scratch.allocreq.cb = cvert * 0x10;
     scratch.allocreq.cbAlign = 0x10;
     pgeom->cvert = cvert;
@@ -391,11 +356,11 @@ extern "C" void CBinaryInputStream_ReadGeom(void *pbis, GEOM_117FD0 *pgeom)
             ivert++;
         } while (ivert < pgeom->cvert);
     }
-    pgeom->cplane = U16Read__18CBinaryInputStream((Stream117C20 *)pbis);
+    pgeom->cplane = U16Read__18CBinaryInputStream(pbis);
     scratch.allocreq.cb = pgeom->cplane << 5;
     scratch.allocreq.cbAlign = 0x10;
     pgeom->aplane = (GEOMPLANE_117FD0 *)PvAllocSwClearImpl__Fi(&scratch.allocreq);
-    int cedge = U16Read__18CBinaryInputStream((Stream117C20 *)pbis);
+    int cedge = U16Read__18CBinaryInputStream(pbis);
     scratch.allocreq.cbAlign = 0x10;
     pgeom->cedge = cedge;
     scratch.allocreq.cb = cedge * 0x10;
@@ -407,23 +372,23 @@ extern "C" void CBinaryInputStream_ReadGeom(void *pbis, GEOM_117FD0 *pgeom)
         int iplaneNext = iplane + 1;
         {
             GEOMPLANE_117FD0 *pplane = pgeom->aplane + iplane;
-            scratch.aivert[0] = U16Read__18CBinaryInputStream((Stream117C20 *)pbis);
-            scratch.aivert[1] = U16Read__18CBinaryInputStream((Stream117C20 *)pbis);
-            scratch.aivert[2] = U16Read__18CBinaryInputStream((Stream117C20 *)pbis);
+            scratch.aivert[0] = U16Read__18CBinaryInputStream(pbis);
+            scratch.aivert[1] = U16Read__18CBinaryInputStream(pbis);
+            scratch.aivert[2] = U16Read__18CBinaryInputStream(pbis);
             QW *avert = pgeom->avert;
             BuildPlane(pplane, avert[scratch.aivert[0]], avert[scratch.aivert[1]], avert[scratch.aivert[2]]);
             pplane->iface = scratch.aivert[0];
             for (int ifloat = 3; ifloat >= 0; ifloat--)
-                F32Read__18CBinaryInputStream((Stream117E38 *)pbis);
-            int cedgePlane = U8Read__18CBinaryInputStream((Stream117BD0 *)pbis);
+                F32Read__18CBinaryInputStream(pbis);
+            int cedgePlane = U8Read__18CBinaryInputStream(pbis);
             for (int iedge = 0; iedge < cedgePlane; iedge++) {
                 GEOMEDGE_117FD0 *pedgeNew = pedge;
                 pedge++;
-                pedgeNew->ivertA = U16Read__18CBinaryInputStream((Stream117C20 *)pbis);
-                int ivertB = U16Read__18CBinaryInputStream((Stream117C20 *)pbis);
+                pedgeNew->ivertA = U16Read__18CBinaryInputStream(pbis);
+                int ivertB = U16Read__18CBinaryInputStream(pbis);
                 pedgeNew->iplane = iplane;
                 pedgeNew->ivertB = ivertB;
-                pedgeNew->iplaneOther = U16Read__18CBinaryInputStream((Stream117C20 *)pbis);
+                pedgeNew->iplaneOther = U16Read__18CBinaryInputStream(pbis);
                 if (iedge == 0)
                     pplane->pedgeFirst = pedgeNew;
                 else
@@ -439,19 +404,15 @@ extern "C" void CBinaryInputStream_ReadGeom(void *pbis, GEOM_117FD0 *pgeom)
 
 INCLUDE_ASM(0X118218);
 
-struct CBinaryInputStream_118220 { int pad; unsigned U16Read(); unsigned U32Read(); };
-
 struct BSPNODE { unsigned pbspNeg; unsigned pbspPos; unsigned psurf; };
 
 struct BSPC { int cbsp; int unk4; int unk8; BSPNODE *absp; };
-
-struct GEOM { char pad[0xC]; char *psurf; };
 
 extern "C" void *PvAllocSwClearImpl__Fi(ALLOCREQ *);
 
 extern "C" char D_002BBAF0;
 
-void CBinaryInputStream_ReadBspc(CBinaryInputStream_118220 *pbis, GEOM *pgeom, BSPC *pbspc)
+void CBinaryInputStream_ReadBspc(CBinaryInputStream *pbis, GEOM_117FD0 *pgeom, BSPC *pbspc)
 {
     pbspc->cbsp = pbis->U32Read();
     pbspc->unk4 = pbis->U32Read();
@@ -467,7 +428,7 @@ void CBinaryInputStream_ReadBspc(CBinaryInputStream_118220 *pbis, GEOM *pgeom, B
             pbsp->psurf = (uptr)&D_002BBAF0;
             continue;
         }
-        pbsp->psurf = (uptr)(pgeom->psurf + isurf * 0x20);
+        pbsp->psurf = (uptr)(pgeom->aplane + isurf);
         unsigned ibspNeg = pbis->U32Read();
         if (ibspNeg != 0xFFFFFFFFu)
             pbsp->pbspNeg = (uptr)(pbspc->absp + ibspNeg);
@@ -479,18 +440,13 @@ void CBinaryInputStream_ReadBspc(CBinaryInputStream_118220 *pbis, GEOM *pgeom, B
 
 INCLUDE_ASM(0X118378);
 
-struct CBinaryInputStream_118380 {
-    char pad[0x24];
-    int U16Read();
-};
-
-struct AVT { char pad[8]; short delta; short index; char *(*fn)(void *, int, int); };
+struct AVT { u8 unknown_0x0[8]; short delta; short index; char *(*fn)(void *, int, int); };
 
 struct ALLOC { AVT *vptr; };
 
-extern "C" void CBinaryInputStream_Read_thunk_118380(CBinaryInputStream_118380 *, int, char *);
+extern "C" void CBinaryInputStream_Read_thunk_118380(CBinaryInputStream *, int, char *);
 
-void func_00118380(CBinaryInputStream_118380 *stream, char **out, ALLOC *alloc, int arg)
+void func_00118380(CBinaryInputStream *stream, char **out, ALLOC *alloc, int arg)
 {
     int length = stream->U16Read();
     if (length == 0) {
@@ -524,18 +480,13 @@ extern "C" int func_00118458(void *stream, void *dest)
 INCLUDE_ASM(0X118478);
 
 extern "C" {
-typedef struct BinaryInputStreamHolder {
-    char pad_0x0[0x30];
-    void *field_0x30;
-} BinaryInputStreamHolder;
-
 void CBinaryInputStream_Constructor(); /* extern */
 
 extern char D_002CA5A0;
 
-BinaryInputStreamHolder *func_00118480(BinaryInputStreamHolder *holder) {
+STREAMVPTR *func_00118480(STREAMVPTR *holder) {
     CBinaryInputStream_Constructor();
-    holder->field_0x30 = &D_002CA5A0;
+    holder->vt = &D_002CA5A0;
     return holder;
 }
 }
@@ -544,9 +495,7 @@ extern "C" char D_002CA5A0_1184B8[];
 
 extern "C" void __builtin_delete(void *);
 
-struct Obj { char pad[0x30]; void *vt; };
-
-void func_001184B8(Obj *o, int flags)
+void func_001184B8(STREAMVPTR *o, int flags)
 {
     o->vt = D_002CA5A0_1184B8;
     if (flags & 1)
@@ -554,28 +503,18 @@ void func_001184B8(Obj *o, int flags)
 }
 
 extern "C" {
-typedef struct QueueState {
-    char pad_0x0[0x10];
-    s32 field_0x10;
-    s32 field_0x14;
-    char pad_0x18[0x1C];
-    s32 field_0x34;
-    s32 field_0x38;
-} QueueState;
-
-void func_001184E8(QueueState *state) {
-    state->field_0x14 = state->field_0x34;
-    state->field_0x10 = state->field_0x38;
-    state->field_0x34 = 0;
+void func_001184E8(CBinaryInputStreamMem *state) {
+    state->cbRaw = state->cbSource;
+    state->pbRaw = state->pbSource;
+    state->cbSource = 0;
 }
 }
 
-void func_00118500(void *a0, int a1, int a2, int a3)
+void func_00118500(CBinaryInputStreamMem *stream, int cbSource, int pbSource, int flags)
 {
-    void *p = a0;
-    *(int *)((char *)p + 0x34) = a1;
-    *(int *)((char *)p + 0x38) = a2;
-    *(int *)((char *)p + 0) = a3;
+    stream->cbSource = cbSource;
+    stream->pbSource = (u8 *)pbSource;
+    stream->flags = flags;
 }
 
 extern "C" {
