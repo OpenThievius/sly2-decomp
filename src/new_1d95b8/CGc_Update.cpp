@@ -1,4 +1,5 @@
 struct DL;
+#include "joy.h"
 extern "C" void RemoveGrfusr__Fi(int);
 int FIsDlEmpty__FP2DL(DL *);
 extern "C" int FJoyButtonPressed(void *, int);
@@ -17,8 +18,8 @@ extern "C" void BusyMenu_Update(void *);
 extern "C" void Menu_Update(void *);
 extern "C" void TitleMenu_Update(void *);
 extern int B_002DFBC4;
-extern char B_002DFC00[];
-extern char B_002E0D00[];
+extern JOY B_002DFC00;
+extern JOY B_002E0D00;
 extern char B_002E6550[];
 extern char B_002E65A0[];
 extern char B_003D9E80[];
@@ -36,22 +37,22 @@ extern float g_2dded0[];
 
 void CGc_Update(DL *dl)
 {
-    char *joy;
+    JOY *joy;
     if (B_002DFBC4 & 8) {
         if (g_2dded0[2] == 0.0f || g_2dded0[0] / g_2dded0[2] > 0.1f)
             RemoveGrfusr__Fi(8);
     }
     if (g_2dfbc0 & 2)
-        joy = B_002DFC00;
+        joy = &B_002DFC00;
     else
-        joy = B_002E0D00;
+        joy = &B_002E0D00;
     if (FJoyButtonPressed(joy, 0x800)) {
         if (!OpenPauseMenu(0))
             func_00187E08(joy, 0x800);
     } else if (g_2dfbc0 & 2) {
         int empty = FIsDlEmpty__FP2DL(dl);
         int idle = 0;
-        if (*(int *)(joy + 0x100C) == 1 && g_2dded0[0] >= 5.0f)
+        if (joy->joys == 1 && g_2dded0[0] >= 5.0f)
             idle = 1;
         if (empty && idle)
             OpenPauseMenu(0);

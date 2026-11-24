@@ -5,6 +5,7 @@
 #include "m2c_macros.h"
 #include "types.h"
 #include "include_asm.h"
+#include "joy.h"
 
 extern "C" int B_003D4A54;
 
@@ -39,8 +40,8 @@ void StepHubState_1D72A8(HUB_1D72A8 *, int);
 int UpdateJoyNavX(void *);
 void UpdateSo(void);
 extern char B_002DE2E0[];
-extern char B_002DFC00[];
-extern char B_002E0D00[];
+extern JOY B_002DFC00;
+extern JOY B_002E0D00;
 extern char B_003DA150[];
 extern char B_003DD490_1D72A8[];
 extern int g_2dfbc0;
@@ -50,11 +51,11 @@ void UpdateHub(HUB_1D72A8 *hub)
     UpdateSo();
     if (hub->state != 0) {
         if (hub->state == 1 && hub->sma != 0 && FActiveCplcy(B_002DE2E0) == 0) {
-            char *joy;
+            JOY *joy;
             if (g_2dfbc0 & 2)
-                joy = B_002DFC00;
+                joy = &B_002DFC00;
             else
-                joy = B_002E0D00;
+                joy = &B_002E0D00;
             int nav = UpdateJoyNavX(joy);
             if (nav == 0) {
                 for (int index = 0; index < hub->centry; index++) {
@@ -154,10 +155,6 @@ extern "C" GLOBALS B_003DD490;
 
 extern "C" int g_2dfbc0;
 
-extern "C" char B_002DFC00[];
-
-extern "C" char B_002E0D00[];
-
 extern "C" const char RO_002A7878[];
 
 extern "C" int CploFindSwObjectsByClass(void *, int, int, int, int, void *);
@@ -230,7 +227,7 @@ void SetHubState(HUB *hub, int state)
     }
     func_001F1448(hub->sm, hub, oid, 0, &hub->sma);
     StepHubState_1D7480(hub, 0);
-    func_00187E78(g_2dfbc0 & 2 ? B_002DFC00 : B_002E0D00);
+    func_00187E78(g_2dfbc0 & 2 ? &B_002DFC00 : &B_002E0D00);
     hub->Message(5, 0, 0, 0, 0);
 }
 

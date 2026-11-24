@@ -6,10 +6,9 @@
    bitmaps' palette. source:sly1 RGBA (common.h: bRed, bGreen, bBlue, bAlpha there; the names here are ours). */
 #ifndef SLY2_RGBA_H
 #define SLY2_RGBA_H
-#include "types.h"
-
+/* No types.h: FillShaders declares its own opaque QW, which types.h's typedef of QW would clash with. */
 struct RGBA {
-    u8 r, g, b, a;
+    unsigned char r, g, b, a;
 };
 
 #if defined(__mips__)
