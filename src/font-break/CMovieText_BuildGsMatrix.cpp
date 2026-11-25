@@ -1,5 +1,5 @@
 #include "sly2.h"
-struct TEXT { char pad[0x64]; float xOffset; float yOffset; };
+struct TEXT { u8 unknown_0x0[0x64]; float xOffset; float yOffset; };
 
 void CMovieText_BuildGsMatrix(TEXT *text, float *out, float *affine)
 {

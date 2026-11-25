@@ -17,10 +17,14 @@ struct JOY {
     /* 0x4 */ s32 field_0x4;  /* VJOY_constructor clears it */
     u8 unknown_0x8[0x4];
     /* 0xC */ const void *pvtbl; /* VJOY_constructor stores retail's vtable (D_002CA240) here */
-    u8 unknown_0x10[0x8];
+    /* 0x10 */ f32 xLeft;     /* the stick's x: UpdateVjoy passes its address to UpdateVjoyStick (px); UpdateSeqnodeVjoy sets it; ResetVjoy clears it */
+    /* 0x14 */ f32 yLeft;     /* the stick's y: UpdateVjoy (py), UpdateSeqnodeVjoy; ResetVjoy clears it */
     /* 0x18 */ f32 radStick;  /* the stick's angle: UpdateMurrayActive, UpdateMurrayCarry; Goal_FillVjoy sets the actor's heading */
     /* 0x1C */ f32 uStick;    /* the stick's magnitude: UpdateMurrayActive, UpdateMurrayCarry; Goal_FillVjoy clears it */
-    u8 unknown_0x20[0x10];
+    /* 0x20 */ f32 field_0x20;  /* ResetVjoy clears it */
+    /* 0x24 */ f32 field_0x24;  /* ResetVjoy clears it */
+    /* 0x28 */ f32 field_0x28;  /* ResetVjoy clears it */
+    /* 0x2C */ f32 field_0x2C;  /* ResetVjoy clears it; UpdateVjoyPressTimes (VJOY's own) tests it above 0 to pick tStickRight's slot */
     /* 0x30 */ u32 grfbtn;    /* the buttons held: UpdateMurrayActive, UpdateMurrayCarry, FVjoyButtonHeld */
     u8 unknown_0x34[0x44];
     /* 0x78 */ s32 field_0x78; /* SetVjoyMode sets 0xFFFF when the mode becomes 1 */
@@ -28,7 +32,10 @@ struct JOY {
     /* 0x80 */ s32 vjoym;      /* the mode: SetVjoyMode (sets), VJOY_constructor (-1), GetPoVjoyMode; UpdateJt tests 1 on the player's */
     /* 0x84 */ struct JOY *pjoyNext; /* the link of the world's list of virtual joysticks (SW::pvjoyFirst): UpdateSw walks it, Sw_Construct's
                                        InitSl gives its offset */
-    u8 unknown_0x88[0xF78];
+    /* 0x88 */ f32 tButton[16];  /* UpdateVjoyPressTimes (VJOY's own): the clock when each button last went down */
+    /* 0xC8 */ f32 tStickLeft[2]; /* the same: the clock of the left stick's last frame with it below or above 0 (index 0 or 1) */
+    /* 0xD0 */ f32 tStickRight[2];
+    u8 unknown_0xD8[0xF28];
     /* The controller from 0x1000: its own methods (UpdateJoy, SetJoyJoys, FReadJoy, FJoyButtonPressed, UpdateJoyNavX/Y) read and write it. */
     /* 0x1000 */ s32 port;      /* InitJoy stores it; every libpad call passes it */
     /* 0x1004 */ s32 slot;      /* InitJoy stores it */

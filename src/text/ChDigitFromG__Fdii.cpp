@@ -4,7 +4,7 @@ double GTrunc(double);
 extern "C" double pow(double, double);
 extern "C" double __floatsidf(int);
 extern "C" double __muldf3(double, double);
-extern "C" double mul_dl(double, long) __asm__("__muldf3");
+extern "C" double mul_dl(double, s64) __asm__("__muldf3");
 extern "C" double __subdf3(double, double);
 extern "C" int __fixdfsi(double);
 

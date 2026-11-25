@@ -1,4 +1,5 @@
-struct Source { char pad0[0x60]; int field60; };
+#include "types.h"
+struct Source { u8 unknown_0x0[0x60]; int field60; };
 void *memset(void *, int, int);
 int func_001F3FB0(struct Source *source, float *matrix) {
     if (matrix != 0) {

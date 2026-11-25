@@ -1,20 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
-/* Local overlay of the player (include/jt.h JT lacks the fields at 0x10C4, 0x10CC and 0x10D0, and declares
-   slot 98 (func_001409B8) as void while it returns 0 or -1). */
-struct VTE_140750 { short delta; short index; int (*fn)(void *); };
-struct VT_140750 { char pad[0x310]; VTE_140750 slot98; };
-struct JT_140750 {
-    char pad0[0xC];
-    VT_140750 *vt;
-    char pad10[0xDF4 - 0x10];
-    int zapState;
-    char padDF8[0x10C4 - 0xDF8];
-    void *hitfxParms; /* passed to PhitfxSpawn_156548 as its parameters */
-    int field_0x10C8;
-    float field_0x10CC;
-    float field_0x10D0;
-};
+#include "jt.h"
 struct CLOCK_140750 { float t; float dt; };
 extern "C" {
 extern CLOCK_140750 g_2dded0;
@@ -22,7 +8,7 @@ extern const float D_002BCC6C;
 extern const float D_002BCC70;
 extern const float D_002BCC74;
 extern const float D_002BCC78;
-int func_001409E8(JT_140750 *);
+int func_001409E8(JT *);
 QW PosLoWorld(void *);
 void PhitfxSpawn_156548(void *parms, QW pos, void *owner, void **out);
 }
@@ -36,7 +22,7 @@ static inline float GClamp(float g, float lo, float hi)
     return g;
 }
 
-extern "C" void func_00140750(JT_140750 *jt)
+extern "C" void func_00140750(JT *jt)
 {
     if (jt->hitfxParms) {
         switch (func_001409E8(jt)) {
@@ -62,7 +48,7 @@ extern "C" void func_00140750(JT_140750 *jt)
             jt->field_0x10C8 = 1;
         else
             jt->field_0x10C8 = 0;
-        int mode = jt->vt->slot98.fn((char *)jt + jt->vt->slot98.delta);
+        int mode = jt->Slot98();
         if (jt->field_0x10C8 != 1 && mode == 1)
             mode = 2;
         switch (mode) {

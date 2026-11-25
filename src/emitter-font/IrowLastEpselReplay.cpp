@@ -1,7 +1,7 @@
 #include "sly2.h"
 struct CRef_15D798 { int a; union { float g; int n; }; int c; int d; };
-struct EPSEL_15D798 { char pad0[0x118]; int last; };
-struct GS_15D798 { char pad[0x3B58]; int dt[9]; int path[9]; };
+struct EPSEL_15D798 { u8 unknown_0x0[0x118]; int last; };
+struct GS_15D798 { u8 unknown_0x0[0x3B58]; int dt[9]; int path[9]; };
 extern int D_002BE26C;
 extern int D_002BE2D0[];
 extern GS_15D798 B_003DD490;

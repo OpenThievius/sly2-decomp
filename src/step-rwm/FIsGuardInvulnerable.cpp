@@ -1,6 +1,11 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "sly2.h"
+#include "stepguard.h"
 extern "C" int FIsGuardInSgs(void *, int);
-struct G { char pad0[0x298]; int unk0x298; char pad1[0x90]; int unk0x32C; };
-int FIsGuardInvulnerable(G *guard)
+/* local view: 0x298 lies in STEP's unknown block and only this method reads it */
+struct STEPGUARDVIEW298 { u8 unknown_0x0[0x298]; s32 field_0x298; };
+int FIsGuardInvulnerable(STEPGUARD *guard)
 {
-if (guard->unk0x32C || guard->unk0x298) return 1; return FIsGuardInSgs(guard, 0x2A) != 0;
+    if (guard->fDown || ((STEPGUARDVIEW298 *)guard)->field_0x298) return 1;
+    return FIsGuardInSgs(guard, 0x2A) != 0;
 }

@@ -1,8 +1,8 @@
 #include "sly2.h"
 extern "C" {
 struct Node { int kind; int oid; void *plo; };
-struct Crv { char pad[0xE8]; int cnode; char pad2[8]; QW *apos; };
-struct Path { char pad[0x54]; int cnode; Node *anode; Crv *pcrv; };
+struct Crv { u8 unknown_0x0[0xE8]; int cnode; u8 unknown_0xEC[0x8]; QW *apos; };
+struct Path { u8 unknown_0x0[0x54]; int cnode; Node *anode; Crv *pcrv; };
 extern char B_003DD490;
 void PostLoLoad(Path *);
 Crv *PcrvNew(int, int);

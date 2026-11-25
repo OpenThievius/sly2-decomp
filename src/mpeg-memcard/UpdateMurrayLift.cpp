@@ -1,6 +1,6 @@
 #include "sly2.h"
 #include "murray.h"
-struct CARRIER { char pad[0x180]; LO *lo; };
+#include "carry.h"
 extern "C" void SetMurrayState(MURRAY *, int);
 extern "C" int FAsegaGone(void *);
 void UpdateMurrayLift(MURRAY *m)
@@ -14,7 +14,7 @@ void UpdateMurrayLift(MURRAY *m)
                 if (!m->ploCarried) {
                     SetMurrayState(m, 0);
                 } else {
-                    unsigned long bit = (((CARRIER *)m->ploCarried)->lo->grfo >> 60) & 1;
+                    u64 bit = (((CARRY *)m->ploCarried)->pso->grfo >> 60) & 1;
                     if (!bit) {
                         SetMurrayState(m, 0);
                         m->ploCarried = 0;

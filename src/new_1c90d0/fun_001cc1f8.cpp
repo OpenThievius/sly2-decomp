@@ -1,5 +1,5 @@
 #include "sly2.h"
-struct CARRY { char pad[0x18]; void *crvA; char pad2[0x10]; void *crvB; };
+struct CARRY { u8 unknown_0x0[0x18]; void *crvA; u8 unknown_0x1C[0x10]; void *crvB; };
 extern "C" {
 void EvaluateCrvFromU(void *, float, QW *, void *);
 void ClosestPointOnSegment(QW, QW, QW, void *, float *, float *);

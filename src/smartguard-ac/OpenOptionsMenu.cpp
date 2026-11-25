@@ -1,24 +1,20 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later */
 #include "sly2.h"
-struct ITEM { int kind; char b[0x1C]; };
-struct ITEMCOPY { char b[0x20]; };
-struct PAUSE { char pad[0x20]; int blot; };
-struct SCREEN { char pad[1]; };
-struct MENUITEM { char pad[0x1C]; unsigned grf; };
+#include "pausemenu.h"
 extern "C" {
-extern ITEM D_002BFEC8[];
-extern ITEM B_002F6470[];
-extern PAUSE B_003D9ED0;
-extern SCREEN B_003DA530;
-extern char D_002BFD38[];
-int CGc_FFindScreen(SCREEN *);
-void PauseMenu_Push(PAUSE *, int, ITEM *, int, void *);
-void func_001AF390(PAUSE *, int, ITEM *);
+extern PAUSEITEM D_002BFEC8[];
+extern PAUSEITEM B_002F6470[];
+extern PAUSEMENU B_003D9ED0;
+extern char B_003DA530;
+extern PAUSELABELS D_002BFD38;
+int CGc_FFindScreen(void *);
+void PauseMenu_Push(PAUSEMENU *, int, PAUSEITEM *, PAUSEBLOT *, PAUSELABELS *);
+void func_001AF390(PAUSEMENU *, int, PAUSEITEM *);
 }
-void OpenOptionsMenu(MENUITEM *caller)
+void OpenOptionsMenu(PAUSEITEM *caller)
 {
-    ITEM *source = D_002BFEC8;
-    ITEM *dest = B_002F6470;
+    PAUSEITEM *source = D_002BFEC8;
+    PAUSEITEM *dest = B_002F6470;
     unsigned index = 0;
     do {
         int show = 1;
@@ -33,7 +29,7 @@ void OpenOptionsMenu(MENUITEM *caller)
             break;
         }
         if (show) {
-            *(ITEMCOPY *)dest = *(ITEMCOPY *)source;
+            *dest = *source;
             dest++;
         }
         index++;
@@ -43,6 +39,6 @@ void OpenOptionsMenu(MENUITEM *caller)
         func_001AF390(&B_003D9ED0, dest - B_002F6470, B_002F6470);
         caller->grf |= 2;
     } else {
-        PauseMenu_Push(&B_003D9ED0, dest - B_002F6470, B_002F6470, B_003D9ED0.blot, D_002BFD38);
+        PauseMenu_Push(&B_003D9ED0, dest - B_002F6470, B_002F6470, B_003D9ED0.pblot, &D_002BFD38);
     }
 }

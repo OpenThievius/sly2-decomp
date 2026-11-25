@@ -3,9 +3,9 @@
 struct AdjustStepXpsNode;
 struct AdjustStep;
 struct AdjustStepXpsHalf {
-    char pad0[0xC];
+    u8 unknown_0x0[0xC];
     void *ownerStep;
-    char pad1[0x30];
+    u8 unknown_0x10[0x30];
 };
 struct AdjustStepXpsLink {
     AdjustStepXpsNode *head;
@@ -13,32 +13,32 @@ struct AdjustStepXpsLink {
     AdjustStepXpsNode **outHead;
 };
 struct AdjustStepXpsSet {
-    char pad0[0x64];
+    u8 unknown_0x0[0x64];
     AdjustStepXpsLink *links;
     AdjustStepXpsNode *firstNode;
 };
 struct AdjustStepXpsNode {
-    char pad0[0x8];
+    u8 unknown_0x0[0x8];
     AdjustStep *owner;
     void *ownerStep;
-    char pad1[0x40 - 0x10];
+    u8 unknown_0x10[0x40 - 0x10];
     void *alternate;
-    char pad2[0x50 - 0x48];
+    u8 unknown_0x48[0x50 - 0x48];
     QW quad;
-    char pad3[0x90 - 0x60];
+    u8 unknown_0x60[0x90 - 0x60];
     float value;
-    char pad4[0x9C - 0x94];
+    u8 unknown_0x94[0x9C - 0x94];
     int kind;
-    char pad5[0xAC - 0xA0];
+    u8 unknown_0xA0[0xAC - 0xA0];
     AdjustStepXpsNode *next;
 };
 struct AdjustStep {
-    char pad0[0xEC];
+    u8 unknown_0x0[0xEC];
     AdjustStepXpsSet *set;
-    char pad1[0x208 - 0xF0];
+    u8 unknown_0xF0[0x208 - 0xF0];
     AdjustStepXpsNode *chosen;
     float chosenScale;
-    char pad2[0x230 - 0x210];
+    u8 unknown_0x210[0x230 - 0x210];
     QW chosenQuad;
 };
 extern "C" void func_001F4F10(void *);

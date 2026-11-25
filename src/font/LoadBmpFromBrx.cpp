@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "alloc.h"
-struct BMP { int oid; unsigned char bmpk; signed char ccond; char pad6[10]; int cbPixels; void *pvPixels; int cqw; };
+#include "bmp.h"
 extern "C" int CBinaryInputStream_Read_thunk(void *, int, void *);
 extern "C" void CBinaryInputStream_Skip(void *, int);
 extern "C" int func_0013FAD0(int, short *);

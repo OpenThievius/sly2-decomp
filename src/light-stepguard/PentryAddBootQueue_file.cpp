@@ -4,23 +4,20 @@
 #include "types.h"
 #include "m2c_macros.h"
 #include "include_asm.h"
+#include "bootq.h"
 
 extern "C" void *memset(void *, int, unsigned);
 
 extern "C" s32 B_002E1E68;
 
-struct Entry { s32 key; char pad[0x18]; };
-
-struct Queue { u32 count; Entry entries[16]; };
-
-extern "C" s32 *PentryAddBootQueue(Queue *queue, s32 arg1) {
-    u32 index = queue->count;
+extern "C" s32 *PentryAddBootQueue(BOOTQ *queue, s32 arg1) {
+    u32 index = queue->cEntry;
     s32 *result;
     if (index < 0x10U) {
-        queue->count = index + 1;
-        Entry *entry = &queue->entries[index];
+        queue->cEntry = index + 1;
+        BOOTENTRY *entry = &queue->aentry[index];
         memset(entry, 0, 0x1C);
-        entry->key = arg1;
+        entry->kind = arg1;
         result = (s32 *)entry;
     } else {
         result = &B_002E1E68;
@@ -28,7 +25,7 @@ extern "C" s32 *PentryAddBootQueue(Queue *queue, s32 arg1) {
     return result;
 }
 
-struct MOVIE { int unk0; int id; char pad[0x34]; int idLast; };
+struct MOVIE { int unk0; int id; u8 unknown_0x8[0x34]; int idLast; };
 
 struct ENTRY { int unk0; MOVIE *pmovie; };
 
@@ -43,9 +40,9 @@ extern "C" void AddBootQueueMovie(void *pbq, MOVIE *pmovie)
 
 INCLUDE_ASM(0X1A5070);
 
-struct Level_1A5078 { char p0[4]; s32 f4; char p8[0x34]; s32 f3C; };
+struct Level_1A5078 { u8 unknown_0x0[4]; s32 f4; u8 unknown_0x8[0x34]; s32 f3C; };
 
-struct Entry_1A5078 { char p0[8]; Level_1A5078 *level; s32 fC; s32 f10; };
+struct Entry_1A5078 { u8 unknown_0x0[8]; Level_1A5078 *level; s32 fC; s32 f10; };
 
 extern "C" Entry_1A5078 *PentryAddBootQueue_1A5078(void *, s32);
 

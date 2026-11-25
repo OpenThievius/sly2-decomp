@@ -1,5 +1,6 @@
+#include "types.h"
 struct SLOT_173E78 { void *actor; float tSpawn; float tFree; int pad[9]; };
-struct SPAWNER_173E78 { char pad[0x5C]; int count; SLOT_173E78 *slots; };
+struct SPAWNER_173E78 { u8 unknown_0x0[0x5C]; int count; SLOT_173E78 *slots; };
 extern float g_2dded0;
 extern float D_002BE5E0;
 extern "C" SLOT_173E78 *func_00173E78(SPAWNER_173E78 *spawner, void *exclude)

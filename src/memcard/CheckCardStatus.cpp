@@ -1,5 +1,5 @@
 #include "sly2.h"
-struct SAVE { int port; int slot; int field8; int state; int field10; float tNext; int cardType; int cFree; int formatted; char pad[0xFD5C - 0x24]; char mc[4]; };
+#include "memcard.h"
 extern "C" {
 int sceMcGetInfo(int, int, int *, int *, int *);
 int McSync(void *, int, int, int *);
@@ -15,34 +15,34 @@ extern float g_2ddf0c;
 // sceMcGetInfo call: the source takes it into pmc first, as the original did.
 int CheckCardStatus(SAVE *psave)
 {
-    char *pmc = psave->mc;
+    MEMCARD *pmc = &psave->mc;
     int nStart = sceMcGetInfo(psave->port, psave->slot, &psave->cardType, &psave->cFree, &psave->formatted);
     int nError = McSync(pmc, nStart, 1, 0);
     switch (nError) {
     case 0xB:
-        psave->state = 1;
+        psave->cardState = 1;
         break;
     case 9:
-        psave->state = 3;
+        psave->cardState = 3;
         break;
     case 10:
     case 0xC:
-        psave->state = 2;
+        psave->cardState = 2;
         nError = 0xC;
         break;
     case 0:
         if (psave->formatted != 0) {
-            if (psave->state > 2)
+            if (psave->cardState > 2)
                 break;
-            psave->state = 3;
+            psave->cardState = 3;
         } else
-            psave->state = 2;
+            psave->cardState = 2;
         break;
     }
     if (nError == 0 || nError == 0xC) {
         if (psave->cardType != 2) {
             nError = 0xB;
-            psave->state = 1;
+            psave->cardState = 1;
         }
     }
     psave->tNext = g_2ddf0c + 0.3f;

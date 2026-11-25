@@ -1,14 +1,15 @@
+#include "types.h"
 extern "C" {
 struct PadSlot { int buffer; int pad4[3]; int opened; int pad14[2]; };
 struct PadPort { PadSlot slots[4]; };
 struct PadActuatorEntry { unsigned char values[4]; };
 struct PadReport {
-    char pad0[0x30];
+    u8 unknown_0x0[0x30];
     PadActuatorEntry actuators[13];
     unsigned char modeId;
-    char pad65[0x5];
+    u8 unknown_0x65[0x5];
     unsigned char actuatorCount;
-    char pad6B[7];
+    u8 unknown_0x6B[7];
     unsigned char status;
 };
 extern PadPort B_004505D0[];

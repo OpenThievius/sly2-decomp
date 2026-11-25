@@ -1,19 +1,19 @@
 #include "sly2.h"
 struct TEX0 {
-    unsigned long tbp0 : 14;
-    unsigned long tbw : 6;
-    unsigned long psm : 6;
-    unsigned long tw : 4;
-    unsigned long th : 4;
-    unsigned long tcc : 1;
-    unsigned long tfx : 2;
-    unsigned long cbp : 14;
-    unsigned long cpsm : 4;
-    unsigned long csm : 1;
-    unsigned long csa : 5;
-    unsigned long cld : 3;
+    u64 tbp0 : 14;
+    u64 tbw : 6;
+    u64 psm : 6;
+    u64 tw : 4;
+    u64 th : 4;
+    u64 tcc : 1;
+    u64 tfx : 2;
+    u64 cbp : 14;
+    u64 cpsm : 4;
+    u64 csm : 1;
+    u64 csa : 5;
+    u64 cld : 3;
 };
-struct CLUT { char pad0[8]; unsigned short count; char pad[0xE]; TEX0 tex0; };
+struct CLUT { u8 unknown_0x0[8]; u16 count; u8 unknown_0xA[0xE]; TEX0 tex0; };
 
 void BuildClutTex2__FP4CLUTi(CLUT *pclut, int iblock)
 {

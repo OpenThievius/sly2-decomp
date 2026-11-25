@@ -1,10 +1,9 @@
 #include "sly2.h"
+#include "job.h"
 struct CRefX { int tagk; int n; int pad[2]; };
-struct JOB;
-struct TASK { char pad0[0x18]; int oid; char pad1c[0x7C - 0x1C]; JOB *pjob; char pad80[0xB8 - 0x80]; int fB8; int fBC; int fC0; char padC4[0xF0 - 0xC4]; int fF0; int fF4; int fF8; };
 #include "sw.h"
 struct CTaskHold {
-    TASK *pother;
+    JOB *pother;
     TASK *ptask;
     int saveF4;
     int saveF8;
@@ -13,28 +12,27 @@ struct CTaskHold {
         pother = 0;
         ptask = task;
         if (ptask != 0) {
-            saveF4 = ptask->fF4;
-            ptask->fF4 = value;
-            saveF8 = ptask->fF8;
-            ptask->fF8 = 0;
+            saveF4 = ptask->cause;
+            ptask->cause = value;
+            saveF8 = ptask->causeArg;
+            ptask->causeArg = 0;
         }
     }
     ~CTaskHold()
     {
         if (pother != 0) {
-            pother->fF0 = saveF4;
-            pother->fF4 = saveF8;
+            pother->cause = saveF4;
+            pother->causeArg = saveF8;
         }
         if (ptask != 0) {
-            ptask->fF4 = saveF4;
-            ptask->fF8 = saveF8;
+            ptask->cause = saveF4;
+            ptask->causeArg = saveF8;
         }
     }
 };
-struct JOB : TASK { };
 struct CJobHold {
     JOB *pjob;
-    JOB *pother;
+    TASK *pother;
     int saveF0;
     int saveF4;
     CJobHold(JOB *job, int value)
@@ -42,21 +40,21 @@ struct CJobHold {
         pjob = job;
         pother = 0;
         if (pjob != 0) {
-            saveF0 = pjob->fF0;
-            pjob->fF0 = value;
-            saveF4 = pjob->fF4;
-            pjob->fF4 = 0;
+            saveF0 = pjob->cause;
+            pjob->cause = value;
+            saveF4 = pjob->causeArg;
+            pjob->causeArg = 0;
         }
     }
     ~CJobHold()
     {
         if (pjob != 0) {
-            pjob->fF0 = saveF0;
-            pjob->fF4 = saveF4;
+            pjob->cause = saveF0;
+            pjob->causeArg = saveF4;
         }
         if (pother != 0) {
-            pother->fF4 = saveF0;
-            pother->fF8 = saveF4;
+            pother->cause = saveF0;
+            pother->causeArg = saveF4;
         }
     }
 };
@@ -75,18 +73,18 @@ void func_001D8B20(CRefX *, CRefX *, const char *, int);
 void RestartAtTask(TASK *task)
 {
     CTaskHold holdTask(task, 2);
-    CJobHold holdJob(task->pjob, 2);
-    if (task->pjob != B_003DD490.pjobCurrent) {
+    CJobHold holdJob(task->job, 2);
+    if (task->job != B_003DD490.pjobCurrent) {
         if (B_003DD490.pjobCurrent != 0) {
             CJobHold holdCur(B_003DD490.pjobCurrent, 2);
             EndJob(B_003DD490.pjobCurrent);
         }
-        if (task->pjob != 0)
-            SetCurrentJob(task->pjob);
+        if (task->job != 0)
+            SetCurrentJob(task->job);
     }
     SetTaskState(task, 1);
     SwitchCurrentTask(task);
-    int value = task->fC0;
+    int value = task->field_0xC0;
     if (value != -1) {
         CRefX result;
         CRefX arg;
@@ -97,9 +95,9 @@ void RestartAtTask(TASK *task)
         CRef_Destruct(&arg);
     }
     int mode = 4;
-    int row = task->fB8 == -1 ? 0x189 : task->fB8;
-    if (B_003DD490.field_0x3E38 != 0 && (task->fBC == -1 || task->fBC == IdCurrentLevel()))
+    int row = task->oidSpawn == -1 ? 0x189 : task->oidSpawn;
+    if (B_003DD490.field_0x3E38 != 0 && (task->levelRow == -1 || task->levelRow == IdCurrentLevel()))
         mode = 0x24;
-    RequestTransition(&B_003DD490, PdescFromLevelRow(task->fBC), row, -1, mode, 0x30A);
+    RequestTransition(&B_003DD490, PdescFromLevelRow(task->levelRow), row, -1, mode, 0x30A);
 }
 }

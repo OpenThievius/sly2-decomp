@@ -1,7 +1,8 @@
-struct CLK { char pad[0x3C]; float t; };
+#include "types.h"
+struct CLK { u8 unknown_0x0[0x3C]; float t; };
 struct BLOT {
-    char pad0[0x58]; int blots; float f5C; char pad1[4]; int req; float f68; char pad2[8];
-    int f74; int f78; int f7C; char pad3[4]; void *f84; float f88; float f8C;
+    u8 unknown_0x0[0x58]; int blots; float f5C; u8 unknown_0x60[0x4]; int req; float f68; u8 unknown_0x6C[0x8];
+    int f74; int f78; int f7C; u8 unknown_0x80[0x4]; void *f84; float f88; float f8C;
 };
 extern "C" {
 void UpdateLo(BLOT *);

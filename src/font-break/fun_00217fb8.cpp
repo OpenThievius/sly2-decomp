@@ -1,6 +1,6 @@
-struct Spr { char pad[0x28]; void *inst; };
-extern "C" void SeekSpriteInstanceFraction(Spr *, int, int);
-void func_00217FB8(Spr *spr)
+#include "fbsprite.h"
+extern "C" void SeekSpriteInstanceFraction(SPRITE *, int, int);
+void func_00217FB8(SPRITE *sprite)
 {
-    if (spr->inst) SeekSpriteInstanceFraction(spr, 0, 0);
+    if (sprite->fRoot) SeekSpriteInstanceFraction(sprite, 0, 0);
 }

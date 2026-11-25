@@ -10,7 +10,7 @@ struct Bis;
 
 struct REC { char *name; int a; int b; int c; char blk[0x40]; };
 
-struct LOX { char pad[0x50]; int crec; REC *arec; };
+struct LOX { u8 unknown_0x0[0x50]; int crec; REC *arec; };
 
 extern "C" {
 void LoadLoFromBrx(LOX *, Bis *);

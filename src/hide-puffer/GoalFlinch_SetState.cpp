@@ -1,11 +1,11 @@
 #include "sly2.h"
-struct Sma { int kind; int pad4; int oid; };
-struct Guard { char pad0[0xE7C]; float lo; float hi; };
+struct Sma { int kind; u8 unknown_0x4[4]; int oid; };
+struct Guard { u8 unknown_0x0[0xE7C]; float lo; float hi; };
 #include "goal.h"
 struct GOAL_17A5B0 : GOAL {
-    char pad_30[0x10];
+    u8 unknown_0x30[0x10];
     Sma *sma;
-    char pad_44[0xC];
+    u8 unknown_0x44[0xC];
     int state;
     float stateF;
     float timer;

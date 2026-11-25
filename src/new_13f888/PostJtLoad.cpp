@@ -3,7 +3,7 @@
 #include "jt.h"
 #include "xf.h"
 #include "sw.h"
-struct UL { unsigned long v; } __attribute__((packed));
+struct UL { u64 v; } __attribute__((packed));
 extern "C" {
 void PostStepLoad(JT *);
 void SetSoProperties(void *, int, void *);
@@ -21,7 +21,7 @@ int PalertEnsure(void *);
 void SetSoMass__FP2SOf(void *, float);
 QW PosLoWorld(void *);
 QW *PmatLoWorld(void *);
-void QueueSwCallback(SW *, void *, unsigned long, int);
+void QueueSwCallback(SW *, void *, u64, int);
 void LoadJtGadgetSlots(JT *);
 extern SW B_003DD490;
 extern char D_002BC9F0[];

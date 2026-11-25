@@ -16,7 +16,7 @@ struct SIDEBAG {
 
 struct VARB {
     GNODE node;
-    u8 unknown_0x8[0x4];
+    /* 0x8 */ u32 symid;      /* the binding's symbol: CFrame_RefAddBinding stores it, func_0012B0E8 copies it (guess: its readers are the frame lookups) */
     CRef ref;
     VARB *pvarbNext;
 };

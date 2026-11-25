@@ -1,8 +1,9 @@
+#include "types.h"
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "lo.h"
 #include "so.h"
 #include "murray.h"
-struct CARRY { char pad[0x180]; SO *so; };
+#include "carry.h"
 extern "C" void func_00205D10();
 extern "C" int FIsBasicDerivedFrom(void *, int);
 void func_001B81B8(MURRAY *m, int f)
@@ -11,7 +12,7 @@ void func_001B81B8(MURRAY *m, int f)
     if (f) {
         CARRY *c = (CARRY *)m->ploCarried;
         if (c) {
-            SO *o = c->so;
+            SO *o = c->pso;
             if (o) {
                 m->field_0xF1C = o;
                 o->Slot21(0);

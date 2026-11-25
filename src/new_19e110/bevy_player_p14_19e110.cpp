@@ -1,22 +1,19 @@
 #include "types.h"
-struct CurveOwner {
-    char pad[0xE4];
-    s32 disabled;
-};
+#include "crv.h"
 struct CurveSpan {
-    char pad0[0xC];
-    CurveOwner *owner;
-    char pad1[0x8];
+    u8 unknown_0x0[0xC];
+    CRV *owner;
+    u8 unknown_0x10[0x8];
     s32 reversed;
 };
 extern "C" {
-float SMinCrv(CurveOwner *);
-float SMaxCrv(CurveOwner *);
+float SMinCrv(CRV *);
+float SMaxCrv(CRV *);
 }
 extern "C" void bevy_player_p14_19e110(CurveSpan *span, float *range)
 {
-    CurveOwner *owner = span->owner;
-    if (owner->disabled != 0) {
+    CRV *owner = span->owner;
+    if (owner->closed != 0) {
         range[0] = -3.402823466e+38f;
         range[1] = 3.402823466e+38f;
         return;

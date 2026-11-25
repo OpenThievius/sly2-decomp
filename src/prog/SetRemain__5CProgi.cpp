@@ -1,4 +1,5 @@
-struct CProg1C8D40 { int f0; int f4; int f8; int fC; char pad[0x40]; int f50; };
+#include "types.h"
+struct CProg1C8D40 { int f0; int f4; int f8; int fC; u8 unknown_0x10[0x40]; int f50; };
 extern "C" {
 void ClearFrameBuffers__Fv(void);
 void Draw__5CProg(CProg1C8D40 *);

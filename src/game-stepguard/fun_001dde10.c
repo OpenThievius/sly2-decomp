@@ -1,7 +1,7 @@
 #include "types.h"
 
 struct EpisodeMenu {
-    char pad_0x0[0x6C];
+    u8 unknown_0x0[0x6C];
     s32 field_0x6C;
     s32 field_0x70;
 };

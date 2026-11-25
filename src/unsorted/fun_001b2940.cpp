@@ -6,13 +6,13 @@ struct ThreadParam {
     int stackSize;
     void *gpReg;
     int priority;
-    int pad[6];
+    s32 unknown_0x18[6];
 };
 extern "C" int NewSema(int, int);
 extern "C" int CreateThread(ThreadParam *);
 extern "C" void func_002355E0(int, int);
 extern "C" void MpegDisplayThread(void *);
-struct MPEGSTATE { char pad[0x114]; int a114; char pad2[0x23C - 0x118]; int sema; };
+struct MPEGSTATE { u8 unknown_0x0[0x114]; s32 a114; u8 unknown_0x118[0x23C - 0x118]; s32 sema; };
 extern MPEGSTATE B_002F66B0;
 extern char B_002E5270[];
 extern char B_002F6900[];

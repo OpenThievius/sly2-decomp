@@ -3,11 +3,12 @@ struct Bis;
 #include "alloc.h"
 #include "phys.h"
 #include "so.h"
+#include "sw.h"
 struct GEOMDATA { int word[6]; };
 struct SOREC {
     void *shape; void *owner; float field8; int fieldC;
-    int field10; short field14; unsigned long flagA : 1; unsigned long flagB : 1; unsigned long flagC : 1;
-    int field18; int field1C; char pad20[0x48]; int field68[4]; GEOMDATA geomSource; GEOMDATA geomCopy; char padA8[8];
+    int field10; short field14; u64 flagA : 1; u64 flagB : 1; u64 flagC : 1;
+    int field18; int field1C; u8 unknown_0x20[0x48]; int field68[4]; GEOMDATA geomSource; GEOMDATA geomCopy; u8 unknown_0xA8[8];
 };
 extern "C" {
 int U32Read__18CBinaryInputStream(Bis *);
@@ -77,7 +78,7 @@ extern "C" void CSo_LoadFromBrx(SO *pso, Bis *pbis)
         int offset = index * 0xB0;
         do {
             index++;
-            rec = (SOREC *)((char *)pso->ageom + offset);
+            rec = (SOREC *)((uptr)pso->ageom + offset);
             rec->field14 = -10;
             offset += 0xB0;
         } while (index < pso->cgeom + extra);
@@ -95,11 +96,11 @@ extern "C" void CSo_LoadFromBrx(SO *pso, Bis *pbis)
     }
     LoadOptionsFromBrx__FPvP18CBinaryInputStream(pso, pbis);
     if (pso->field_0xB8 != 0) {
-        int *flags = (int *)pso->pgrfentry;
-        if (((uptr)flags ^ 1) & 1) {
-            *flags |= 8;
+        u32 grf = pso->grfSw;
+        if ((grf ^ 1) & 1) {
+            pso->pgrfentry->grf |= 8;
         } else {
-            pso->grfSw = (u32)((sptr)flags | 8);
+            pso->grfSw = grf | 8;
         }
     }
     func_001F2500(pso);

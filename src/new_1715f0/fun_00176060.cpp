@@ -1,5 +1,6 @@
-struct Parent { char pad[0x3CC]; int handle; char pad3D0[4]; int blocked; };
-struct Obj { char pad[0x10]; Parent *parent; char pad14[0x2C]; int busy; };
+#include "types.h"
+struct Parent { u8 unknown_0x0[0x3CC]; int handle; u8 unknown_0x3D0[4]; int blocked; };
+struct Obj { u8 unknown_0x0[0x10]; Parent *parent; u8 unknown_0x14[0x2C]; int busy; };
 extern "C" int func_0020A7E0(int);
 int func_00176060(Obj *obj)
 {

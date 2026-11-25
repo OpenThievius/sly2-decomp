@@ -1,5 +1,5 @@
 #include "sly2.h"
-struct SHD { int oid; char pad[0x2C - 4]; };
+#include "shd.h"
 extern "C" {
 extern int B_003DCFE8;
 extern SHD *B_003DCFEC;

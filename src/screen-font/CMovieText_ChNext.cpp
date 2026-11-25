@@ -1,6 +1,6 @@
 #include "sly2.h"
 struct B4 { char b[4]; };
-struct MT { char pad0[4]; unsigned char *p; int cur; int base; int other; B4 rgbaCur; B4 rgbaBase; B4 rgbaOther; char pad20[0x40]; int changed; };
+struct MT { u8 unknown_0x0[0x4]; unsigned char *p; int cur; int base; int other; B4 rgbaCur; B4 rgbaBase; B4 rgbaOther; u8 unknown_0x20[0x40]; int changed; };
 extern "C" void CMovieText_UpdateFont(MT *);
 
 unsigned char CMovieText_ChNext(MT *t)

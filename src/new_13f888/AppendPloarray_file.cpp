@@ -39,7 +39,7 @@ int FIsBasicDerivedFrom(void *, int);
 
 extern "C" void func_0013F990(LO *plo, int nLayer)
 {
-    unsigned long bits = (unsigned long)(nLayer & 0xf) << 0x30;
+    u64 bits = (u64)(nLayer & 0xf) << 0x30;
     plo->grfo = (plo->grfo & 0xfff0ffffffffffffUL) | bits;
     if (FIsBasicDerivedFrom(plo, 0x30)) {
         for (LO *ploChild = (LO *)((SO *)plo)->dlChild.head; ploChild != 0; ploChild = ploChild->ploNext)

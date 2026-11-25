@@ -1,8 +1,6 @@
-#include "sly2.h"
-struct CBinaryInputStream { int pad; unsigned U16Read(); };
 #include "alloc.h"
-struct TEX { char pad[6]; unsigned char cbmp; unsigned char cpal; int unk8; unsigned *abmp; unsigned *apal; };
-extern "C" int CBinaryInputStream_Read_thunk(void *, int, void *);
+#include "bis.h"
+#include "shd.h"
 extern "C" void *PvAllocSwImpl__Fi(ALLOCREQ *);
 extern "C" unsigned B_003DCFF4;
 extern "C" unsigned B_003DCFFC;

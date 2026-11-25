@@ -14,7 +14,7 @@ extern "C" Pair *PpairNew(void);
 
 extern "C" HP *PairHandle_Init(HP *h, Pair *p);
 
-extern "C" void CRef_RefClone(void *out, void *src, Frame *frame, unsigned long arg);
+extern "C" void CRef_RefClone(void *out, void *src, Frame *frame, u64 arg);
 
 extern "C" void __as__4CRefRC4CRef(void *dst, void *src);
 
@@ -30,9 +30,9 @@ extern "C" void FreeSlotheapPv(void *heap, void *p);
 
 extern "C" char B_004520A8[];
 
-extern "C" HP *func_00128CB8(HP *result, Pair *src, Frame *frame, unsigned long arg);
+extern "C" HP *func_00128CB8(HP *result, Pair *src, Frame *frame, u64 arg);
 
-extern "C" HP *PpairClone(HP *result, Pair *src, Frame *frame, unsigned long arg)
+extern "C" HP *PpairClone(HP *result, Pair *src, Frame *frame, u64 arg)
 {
     HP h;
     PairHandle_Init(&h, PpairNew());

@@ -17,7 +17,7 @@ extern "C" void func_0020CA48(s32 arg0) {
 
 extern "C" {
 struct FlagObject {
-    char pad0[0x24];
+    u8 unknown_0x0[0x24];
     s32 field_0x24;
 };
 
@@ -27,13 +27,13 @@ s32 func_0020CA98(struct FlagObject *object) {
 }
 
 struct DirAnim {
-    char pad0[0x34];
+    u8 unknown_0x0[0x34];
     s32 field_0x34;
     s32 field_0x38;
 };
 
 struct LoMessage {
-    char pad0[8];
+    u8 unknown_0x0[0x8];
     s32 field_0x8;
 };
 

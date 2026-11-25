@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "types.h"
-struct SPRITESLOT { char pad[0x30]; void *pdepth; char pad2[0x70 - 0x34]; };
-struct SPRITEGROUP { int count; SPRITESLOT *aslot; char pad[0x10]; };
-struct SPRITES { char pad[8]; SPRITEGROUP *agroup; };
+struct SPRITESLOT { u8 unknown_0x0[0x30]; void *pdepth; u8 unknown_0x34[0x3C]; };
+struct SPRITEGROUP { int count; SPRITESLOT *aslot; u8 unknown_0x8[0x10]; };
+struct SPRITES { u8 unknown_0x0[0x8]; SPRITEGROUP *agroup; };
 extern "C" void InitDepthSlot(SPRITESLOT *);
 extern "C" void func_002158C0(void *, SPRITESLOT *);
 extern "C" void ClearSpriteInstance(SPRITES *psprites, int igroup)

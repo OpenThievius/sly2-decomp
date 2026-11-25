@@ -6,9 +6,9 @@
 
 extern "C" {
 typedef struct HND {
-    char pad0[0xE8];
+    u8 unknown_0x0[0xE8];
     s32 field_0xE8;
-    char padEC[0x40];
+    u8 unknown_0xEC[0x40];
     s32 field_0x12C;
     s32 field_0x130;
 } HND;

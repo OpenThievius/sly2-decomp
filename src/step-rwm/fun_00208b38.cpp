@@ -1,10 +1,12 @@
-struct Guard_208B38 { char pad[0x3C0]; int count; int classes[1]; };
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "sly2.h"
+#include "stepguard.h"
 extern "C" {
 int FIsBasicDerivedFrom(int, int);
-int func_00208B38(Guard_208B38 *self, int cls) {
-    int i;
-    for (i = 0; i < self->count; i++) {
-        if (FIsBasicDerivedFrom(cls, self->classes[i]) != 0) return 1;
+int func_00208B38(STEPGUARD *self, int cls) {
+    int index;
+    for (index = 0; index < self->cclassFilter; index++) {
+        if (FIsBasicDerivedFrom(cls, self->aclassFilter[index]) != 0) return 1;
     }
     return 0;
 }

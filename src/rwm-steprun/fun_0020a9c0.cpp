@@ -1,5 +1,6 @@
+#include "types.h"
 struct Owner_20A9C0 {
-    char pad0[0xEB8]; int types[8];
+    u8 unknown_0x0[0xEB8]; int types[8];
     int typeCount;
     int plos[8];
     int ploCount;

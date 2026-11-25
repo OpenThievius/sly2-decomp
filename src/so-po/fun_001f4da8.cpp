@@ -1,5 +1,5 @@
 #include "sly2.h"
-struct N_1F4DA8 { char pad0[8]; int key; char pad1[0xA0]; N_1F4DA8 *next; };
+struct N_1F4DA8 { u8 unknown_0x0[8]; int key; u8 unknown_0xC[0xA0]; N_1F4DA8 *next; };
 extern "C" void func_001F5078(void);
 extern "C" void FreeSwMqList__FP2SWP2MQ(void *, N_1F4DA8 *);
 extern "C" char B_003DD490;

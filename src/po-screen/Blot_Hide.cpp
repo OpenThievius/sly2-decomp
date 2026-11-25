@@ -1,33 +1,33 @@
 #include "types.h"
 extern "C" {
 typedef struct BLOTMOVIE {
-    char pad0[0x44];
+    u8 unknown_0x0[0x44];
     s32 field_0x44;
     s32 field_0x48;
 } BLOTMOVIE;
 
 typedef struct BLOT {
-    char pad0[0xC];
+    u8 unknown_0x0[0xC];
     s32 *field_0xC;
-    char pad1[0x40];
+    u8 unknown_0x10[0x40];
     s32 field_0x50;
     s32 field_0x54;
     s32 field_0x58;
     f32 field_0x5C;
-    char pad2[4];
+    u8 unknown_0x60[4];
     s32 field_0x64;
     f32 field_0x68;
-    char pad3[0xC];
+    u8 unknown_0x6C[0xC];
     s32 field_0x78;
-    char pad4[4];
+    u8 unknown_0x7C[4];
     s16 field_0x80;
-    char pad5[2];
+    u8 unknown_0x82[2];
     s32 field_0x84;
-    char pad6[0x20];
+    u8 unknown_0x88[0x20];
     s32 field_0xA8;
-    char pad7[0x14];
+    u8 unknown_0xAC[0x14];
     BLOTMOVIE *field_0xC0;
-    char pad8[0x34];
+    u8 unknown_0xC4[0x34];
     s32 field_0xF8;
     char field_0xFC[0x14];
     s32 field_0x110;

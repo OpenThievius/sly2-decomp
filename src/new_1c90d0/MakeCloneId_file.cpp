@@ -284,9 +284,9 @@ void ClonePool_AcquireLeaseCallback(CLONEPOOL *ppool) {
 }
 }
 
-struct UL { unsigned long v; } __attribute__((packed));
+struct UL { u64 v; } __attribute__((packed));
 
-extern "C" void QueueSwCallbackOnce(char *, CLONEPOOL *, unsigned long, int);
+extern "C" void QueueSwCallbackOnce(char *, CLONEPOOL *, u64, int);
 
 extern "C" void func_001A6178(LO *plo);
 

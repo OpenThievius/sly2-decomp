@@ -1,14 +1,15 @@
-struct Pic { char pad28[0x28]; int fDone; };
+#include "types.h"
+struct Pic { u8 unknown_0x28[0x28]; int fDone; };
 struct Mpeg {
-    char pad0[0x130];
+    u8 unknown_0x0[0x130];
     int fOdd;
-    char pad134[0x184 - 0x134];
+    u8 unknown_0x134[0x184 - 0x134];
     int structure;
-    char pad188[0x1D0 - 0x188];
+    u8 unknown_0x188[0x1D0 - 0x188];
     Pic *pTop;
-    char pad1D4[0x1E0 - 0x1D4];
+    u8 unknown_0x1D4[0x1E0 - 0x1D4];
     Pic *pField1;
-    char pad1E4[0x1F0 - 0x1E4];
+    u8 unknown_0x1E4[0x1F0 - 0x1E4];
     Pic *pField2;
 };
 extern "C" {

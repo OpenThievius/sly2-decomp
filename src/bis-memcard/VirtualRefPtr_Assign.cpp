@@ -1,17 +1,17 @@
 #include "types.h"
 extern "C" {
-struct Obj_258040;
-struct VT_258040 {
-    char pad0[8]; s16 d8; s16 pa; void (*fnC)(char *);
-    s16 d10; s16 p12; void (*fn14)(char *);
+/* a counted object that VirtualRefPtr_Assign takes and drops a reference of through its vtable at 0xC (slot 1: take, slot 2: drop) */
+struct COUNTEDOBJ {
+    u8 unknown_0x0[0xC];
+    virtual void TakeRef();
+    virtual void DropRef();
 };
-struct Obj_258040 { char pad[0xC]; VT_258040 *vt; };
-void VirtualRefPtr_Assign(Obj_258040 **arg0, Obj_258040 *arg1) {
+void VirtualRefPtr_Assign(COUNTEDOBJ **arg0, COUNTEDOBJ *arg1) {
     if (arg1 != 0)
-        arg1->vt->fnC((char *)arg1 + arg1->vt->d8);
-    Obj_258040 *old = *arg0;
+        arg1->TakeRef();
+    COUNTEDOBJ *old = *arg0;
     if (old != 0)
-        old->vt->fn14((char *)old + old->vt->d10);
+        old->DropRef();
     *arg0 = arg1;
 }
 }

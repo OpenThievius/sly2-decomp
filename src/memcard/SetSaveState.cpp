@@ -9,8 +9,8 @@
 
 
 
-struct UL { long v; } __attribute__((packed));
-struct MENU { char pad[0x44]; int phase; };
+struct UL { s64 v; } __attribute__((packed));
+struct MENU { u8 unknown_0x0[0x44]; int phase; };
 extern "C" {
 #include "sw.h"
 extern SW B_003DD490;
@@ -23,7 +23,7 @@ void func_001ACC38(MENU *, int);
 int BusyMenu_FShowing(void *);
 void BusyMenu_Hide(void *);
 void MemcardMenu_SetState(MENU *, int);
-void CreateMemcardThread__FP7MEMCARDii(MEMCARD *, long);
+void CreateMemcardThread__FP7MEMCARDii(MEMCARD *, s64);
 CRef RefGetGameSaveValue(void *, void *);
 void ResetSaveKeepingOptions(SLOT *, int);
 int CompareSaves__FP4SAVET0(MCFILEINFO *, MCFILEINFO *);

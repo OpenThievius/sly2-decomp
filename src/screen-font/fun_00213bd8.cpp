@@ -1,7 +1,7 @@
 #include "sly2.h"
-struct LABEL { char pad[0x14]; int id; };
-struct SPRITE { unsigned short clabel; short pad; LABEL* labels; char pad2[0x30 - 8]; };
-struct BLOT { char pad[0x80]; unsigned short csprite; short pad2; SPRITE* sprites; };
+struct LABEL { u8 unknown_0x0[0x14]; int id; };
+struct SPRITE { unsigned short clabel; short pad; LABEL* labels; u8 unknown_0x8[0x28]; };
+struct BLOT { u8 unknown_0x0[0x80]; unsigned short csprite; short pad2; SPRITE* sprites; };
 extern "C" void FStartSpriteDepthInstance(BLOT*, int, int, int, int, int);
 extern "C" void func_00213BD8(BLOT* pblot, int label, int idDepth)
 {

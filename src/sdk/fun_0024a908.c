@@ -1,16 +1,16 @@
 #include "types.h"
 typedef struct Mpeg {
-    char pad0[0x5A0];
+    u8 unknown_0x0[0x5A0];
     unsigned int field5A0;
     unsigned int field5A4;
-    char pad5A8[0x6E0 - 0x5A8];
+    u8 unknown_0x5A8[0x6E0 - 0x5A8];
     unsigned int field6E0;
     unsigned int field6E4;
-    char pad6E8[0x820 - 0x6E8];
+    u8 unknown_0x6E8[0x820 - 0x6E8];
     int field820;
-    char pad824[0x830 - 0x824];
+    u8 unknown_0x824[0x830 - 0x824];
     unsigned int field830;
-    char pad834[0x87C - 0x834];
+    u8 unknown_0x834[0x87C - 0x834];
     int bufferType;
     char buffer880[0x300];
     char bufferB80[0x300];

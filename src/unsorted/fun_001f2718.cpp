@@ -1,6 +1,6 @@
-#include "sly2.h"
-struct A { char pad[0x148]; unsigned long f148; };
-void func_001F2718(A* a, int v)
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "so.h"
+void func_001F2718(SO *so, int value)
 {
-    a->f148 = (a->f148 & ~0xF00000UL) | ((v & 0xF) << 20);
+    so->grfso = (so->grfso & ~0xF00000UL) | ((value & 0xF) << 20);
 }

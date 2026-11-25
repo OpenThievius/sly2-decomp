@@ -1,5 +1,5 @@
 #include "sly2.h"
-struct Spawner { char pad0[0x50]; int count; void *points; char pad58[0x3C]; void *templates; int offsetCount; void *offsets; };
+struct Spawner { u8 unknown_0x0[0x50]; int count; void *points; u8 unknown_0x58[0x3C]; void *templates; int offsetCount; void *offsets; };
 extern "C" QW g_2a2dd0;
 extern "C" void CStackFrame_Construct(void *);
 extern "C" void CStackFrame_Destructor(void *, int);

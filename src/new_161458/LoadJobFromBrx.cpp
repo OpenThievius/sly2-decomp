@@ -1,6 +1,6 @@
 #include "sly2.h"
 #include "alloc.h"
-struct JOB { char pad0[0x54]; int cevFail; void *aevFail; int cevComplete; void *aevComplete; char pad1[0x28]; int ctoggle; void *atoggle; int canim; void *aanim; };
+#include "job.h"
 struct CBIS;
 extern "C" void CStackFrame_Construct(void *);
 extern "C" void CStackFrame_Destructor(void *, int);
@@ -24,10 +24,10 @@ void LoadJobFromBrx(JOB *job, CBIS *stream)
     job->aanim = PvAllocStackImpl__Fi(preq);
     preq->cb = size80;
     preq->cbAlign = align;
-    job->aevFail = PvAllocStackImpl__Fi(preq);
+    job->aevFail = (s32 *)PvAllocStackImpl__Fi(preq);
     preq->cb = size80;
     preq->cbAlign = align;
-    job->aevComplete = PvAllocStackImpl__Fi(preq);
+    job->aevComplete = (s32 *)PvAllocStackImpl__Fi(preq);
     LoadLoFromBrx(job, stream);
     preq->cb = job->ctoggle << 4;
     preq->cbAlign = align;
@@ -37,10 +37,10 @@ void LoadJobFromBrx(JOB *job, CBIS *stream)
     job->aanim = PvAllocSwCopyImpl__FiPv(preq, job->aanim);
     preq->cb = job->cevFail << 2;
     preq->cbAlign = align;
-    job->aevFail = PvAllocSwCopyImpl__FiPv(preq, job->aevFail);
+    job->aevFail = (s32 *)PvAllocSwCopyImpl__FiPv(preq, job->aevFail);
     preq->cb = job->cevComplete << 2;
     preq->cbAlign = align;
-    job->aevComplete = PvAllocSwCopyImpl__FiPv(preq, job->aevComplete);
+    job->aevComplete = (s32 *)PvAllocSwCopyImpl__FiPv(preq, job->aevComplete);
     Unknown1__18CBinaryInputStream(stream);
     CStackFrame_Destructor(frame, 2);
 }

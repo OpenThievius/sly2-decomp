@@ -1,5 +1,6 @@
+#include "types.h"
 extern "C" {
-struct ThreadParam_235388 { int attr; void *entry; void *stack; int stackSize; void *gp; int initPriority; char pad18[8]; const char *name; };
+struct ThreadParam_235388 { int attr; void *entry; void *stack; int stackSize; void *gp; int initPriority; u8 unknown_0x18[8]; const char *name; };
 struct SemaParam_235388 { int attr; int initCount; int maxCount; int field0C; int field10; const char *name; };
 struct Pair_235388 { int first; int second; };
 int CreateSema(SemaParam_235388 *);

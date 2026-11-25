@@ -12,17 +12,23 @@
 #include "sw.h"
 
 struct JSG : LO {
-    /* 0x50 */ s32 phase;       /* ClearJsg zeroes it; fun_001e01c8 tests it (< 2) before it takes a new ajsge */
-    /* 0x54 */ s32 ajsge;       /* StartJsg passes it to PseqnodeNew; fun_001e01c8 stores its argument (1 to 0x1FF) */
-    u8 unknown_0x58[4];
+    union {
+        /* 0x50 */ s32 phase;   /* ClearJsg zeroes it; fun_001e01c8 tests it (< 2) before it sets cjsgeMax */
+        s32 cjsge;              /* the same word as a count of ajsge's records: PjsgeAllocJsg and CSeq_LoadFromBrx agree (CSeq_LoadFromBrx
+                                   copies cjsge * 0x50 bytes); the shared name `phase` stays for the sources that use it */
+    };
+    /* 0x54 */ s32 ajsge;       /* StartJsg passes it to PseqnodeNew; CSeq_LoadFromBrx, CSeq_Clone, PjsgeAllocJsg
+                                   keep an array of 0x50-byte records here (an address held in an s32) */
+    /* 0x58 */ s32 cjsgeMax;    /* the capacity of ajsge: CSeq_LoadFromBrx, CSeq_Clone (cb = cjsgeMax * 0x50), PjsgeAllocJsg; InitJsg sets -1;
+                                   fun_001e01c8 stores its argument (1 to 0x1FF) while phase < 2 */
     /* 0x5C */ DL dlSeqnode;    /* StartJsg asks FIsDlEmpty; StopJsg stops each node */
     u8 unknown_0x68[4];
     /* 0x6C */ s32 psoSubject;  /* StartJsg stores its argument, StopJsg clears it */
     /* 0x70 */ f32 tRun;        /* StopJsg zeroes it */
     /* 0x74 */ s32 fRunning;    /* FIsJsgActive, StartJsg, StopJsg */
     /* 0x78 */ s32 fLatched;    /* StartJsg sets it after taking grf bit 2; StopJsg clears that bit when it is set */
-    /* 0x7C */ s32 fPendingCut; /* ClearJsg sets it; fun_001e01c8 sets it; StartJsg clears it after AddSeqRecordEndThread */
-    u8 unknown_0x80[4];
+    /* 0x7C */ s32 fPendingCut; /* ClearJsg sets it; StartJsg clears it after AddSeqRecordEndThread */
+    /* 0x80 */ s32 fOwnsAjsge; /* CSeq_Clone copies the ajsge array only when it is set; fun_001e01c8 sets it with cjsgeMax */
 #else
 /* C view of the JSG above */
 struct JSG {

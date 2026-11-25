@@ -1,10 +1,8 @@
 #include "cref.h"
-struct ENT { int id; int unk; };
-struct SHOPMENU { char pad0[0x4C]; ENT aent[0x40]; char padx[0x250 - 0x4C - 0x40 * 8]; int ifirst; };
-struct LOOT { int a; int sidName; int c; };
+#include "shopmenu.h"
 extern SHOPMENU B_003DA150;
 extern char B_003DD490;
-extern LOOT D_002C3288[];
+extern LOOTROW D_002C3288[];
 extern "C" const char RO_002A79A0[];
 extern "C" const char RO_002A79D0[];
 extern "C" const char RO_002A79D8[];
@@ -18,7 +16,7 @@ void GetLootRowName(char *pchz, int irow)
 {
     int sid = -1;
     int cloot = 0;
-    unsigned loot = B_003DA150.aent[B_003DA150.ifirst + irow].id;
+    unsigned loot = B_003DA150.arow[B_003DA150.ifirst + irow].id;
     if (loot < 0x40) {
         CRef ref;
         ref.m_tagk = TAGK_Nil;

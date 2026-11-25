@@ -45,7 +45,9 @@ struct ASEGPART {
 
 /* A keyed event of an ASEG (0x10 bytes), passed to HandleAsegaEvent. */
 struct ASEGEVENT {
-    u8 unknown_0x0[0x10];
+    /* 0x0 */ f32 tLocal;     /* reader: HandleAsegaEvents, HandleAsegaEventsFF, UpdateAsegaIeaCur, RetractAsega (it rewrites it to the handle's clock) */
+    /* 0x4 */ s32 eatyp;      /* reader: HandleAsegaEventsFF switches on it; HandleAsegaEvents, RetractAsega pass the event on */
+    u8 unknown_0x8[0x8];
 };
 
 struct ASEG : LO {
@@ -77,7 +79,8 @@ struct ASEGA : BASIC {
     /* 0x18 */ LO *paloRoot;   /* ApplyAseg */
     /* 0x1C */ f32 tLocal;
     /* 0x20 */ f32 tTarget;    /* SeekAsega, ApplyAseg */
-    u8 unknown_0x24[0x8];
+    /* 0x24 */ struct ASEGA *pasegaNextAll; /* the DLE of the global list B_003E1218 (RetractAsega removes from it): PasegaFindAlo follows it */
+    u8 unknown_0x28[0x4];
     /* 0x2C */ struct ASEGA *pasegaNext; /* the DLE in ASEG::dlAsega: SetAsegsvtMaster follows it */
     u8 unknown_0x30[0x4];
     /* 0x34 */ ACTASEG *pactFirst; /* SeekAsega, ApplyAseg */
@@ -89,7 +92,7 @@ struct ASEGA : BASIC {
     /* 0x48 */ f32 svtMaster;  /* SeekAsega, ApplyAseg */
     /* 0x4C */ f32 factor;     /* SeekAsega; ApplyAseg stores the limited clqSpeed there */
     /* 0x50 */ s32 iea;        /* ApplyAseg */
-    u8 unknown_0x54[0x4];
+    /* 0x54 */ s32 ieaRetract; /* reader: RetractAsega (an ASEGA function) counts it up to the ASEG's retract event count (ASEG 0xA8, not declared: one reader) */
     /* 0x58 */ s32 handsOff;  /* SetAsegaHandsOff (an ASEGA function: it sets and clears the world's hands-off state as this changes) */
     /* 0x5C */ s32 field_0x5C; /* ApplyAseg (0) */
 };

@@ -1,26 +1,12 @@
 #include "sly2.h"
+#include "tn.h"
+#include "po.h"
+#include "jt.h"
+#include "sw.h"
 
 struct CGT;
 
-struct TN
-{
-    char pad0[0xE0];
-    void *focus;
-    char padE4[0x24];
-    void *cbsp;
-    char pad10C[0x18];
-    int fAir;
-    char pad128[0x14];
-    int tnsOverride;
-};
-
-struct PO
-{
-    char pad0[0x2DC];
-    int field2DC;
-};
-
-extern char B_003DD490[];
+extern SW B_003DD490;
 extern int B_002DE240;
 extern "C" PO *PpoSwFocus(void *);
 extern "C" QW PosLoWorld(void *);
@@ -36,12 +22,12 @@ extern "C" void SetTnTns__FP2TN3TNS(TN *, int);
 // exactly that: the constant is not carried across the calls of the else arm.
 void UpdateTnCallback(TN *tunnel)
 {
-    PO *focus = PpoSwFocus(B_003DD490);
+    PO *focus = PpoSwFocus(&B_003DD490);
     if (focus == 0)
         return;
-    if (focus != tunnel->focus) {
+    if (focus != tunnel->psoFocus) {
         SetTnTns__FP2TN3TNS(tunnel, 0);
-        tunnel->focus = focus;
+        tunnel->psoFocus = focus;
     }
     int tns;
     if (tunnel->tnsOverride != -1) {
@@ -49,9 +35,9 @@ void UpdateTnCallback(TN *tunnel)
     } else {
         QW world = PosLoWorld(focus);
         QW local = ConvertAloPos(0, tunnel, world);
-        tns = PcgtPointInCbspQuick__FP4CBSPP6VECTOR(tunnel->cbsp, 0x7FFFFFFF, local) != 0;
+        tns = PcgtPointInCbspQuick__FP4CBSPP6VECTOR(tunnel->pcbsp, 0x7FFFFFFF, local) != 0;
     }
-    if (tunnel->fAir != 0 || !FIsBasicDerivedFrom(focus, 0x34) || focus->field2DC == -1 || B_002DE240 != 0
+    if (tunnel->fAir != 0 || !FIsBasicDerivedFrom(focus, 0x34) || ((JT *)focus)->jmpState == -1 || B_002DE240 != 0
         || tunnel->tnsOverride != -1)
         SetTnTns__FP2TN3TNS(tunnel, tns);
 }

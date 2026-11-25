@@ -1,6 +1,6 @@
 #include "sly2.h"
 struct SMACKI { QW posTarget; QW vTarget; };
-struct SMACK { char pad[0x14]; float tCreated; float dtLifetime; char pad2[0x70 - 0x1C]; QW pos; QW posPrev; QW v; char pad3[0xF0 - 0xA0]; SMACKI *psmacki; char pad4[0x100 - 0xF4]; QW posScreen; };
+struct SMACK { u8 unknown_0x0[0x14]; float tCreated; float dtLifetime; u8 unknown_0x1C[0x54]; QW pos; QW posPrev; QW v; u8 unknown_0xA0[0x50]; SMACKI *psmacki; u8 unknown_0xF4[0xC]; QW posScreen; };
 extern "C" {
 extern float g_2dded0[2];
 extern char B_002DDF40[];

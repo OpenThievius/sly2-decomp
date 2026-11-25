@@ -1,7 +1,7 @@
 #include "types.h"
 
 struct HudLabelBlot {
-    char pad_0x0[0x28];
+    u8 unknown_0x0[0x28];
     void *field_0x28;
 };
 

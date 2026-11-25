@@ -1,4 +1,5 @@
-struct Game_162E38 { char pad0[0x3B18]; int pending; char pad1[0x3C84 - 0x3B1C]; int busy; };
+#include "types.h"
+struct Game_162E38 { u8 unknown_0x0[0x3B18]; int pending; u8 unknown_0x3B1C[0x3C84 - 0x3B1C]; int busy; };
 extern "C" {
 extern Game_162E38 B_003DD490;
 int FSwLoadBusy(Game_162E38 *);

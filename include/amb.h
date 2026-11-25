@@ -28,6 +28,7 @@ struct AMBBASE {
     virtual void Slot13();
     virtual void Slot14();
     virtual void Slot15(int arg1);      /* 15: UpdateAmbPositional calls it with 0 when the audible volume leaves 0 and 1 when it falls to 0 */
+    virtual void Slot16();              /* 16: UpdateAmb calls it when grf bit 0x200 is set (guess at the name) */
 };
 
 struct AMB : AMBBASE {

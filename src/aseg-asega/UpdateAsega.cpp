@@ -1,71 +1,54 @@
-/* SPDX-License-Identifier: GPL-3.0-or-later */
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "asega.h"
 #include "sly2.h"
-struct Aseg { char pad0[0x40]; unsigned grf; char pad44[0xA0 - 0x44]; int count; };
-struct Asega;
-struct Listener {
-    virtual void Slot0();
-    virtual void Notify(void *arg, void *arg2, float time, float rate);
-};
-struct Hook { Listener *listener; void *arg; char pad8[8]; Hook *next; };
-struct AsegaBase {
-    char pad[0xC];
-    virtual void AddRef();
-    virtual void Release();
-    virtual void Slot3();
-    virtual void Message(int msgid, void *arg);
-};
-struct Asega : AsegaBase {
-    char pad10[4]; Aseg *aseg; char pad18[4]; float tLocal; char pad20[0x38 - 0x20];
-    Hook *hooks; unsigned grf; float svt; char pad44[0x50 - 0x44]; int iea;
-};
 extern float g_2ddf10;
 extern float g_2dded4;
 extern "C" {
-void HandleAsegaEvents(Asega *);
-int FAsegaGone(Asega *);
-int FWrapAsegaTime(Asega *, float *, float *);
-void RetractAsega(Asega *);
+void HandleAsegaEvents(ASEGA *);
+int FAsegaGone(ASEGA *);
+int FWrapAsegaTime(ASEGA *, float *, float *);
+void RetractAsega(ASEGA *);
 }
-static inline unsigned GrfValue(Aseg *aseg)
+static inline unsigned GrfValue(ASEG *aseg)
 {
-    unsigned value = aseg->grf;
+    unsigned value = aseg->grfSw;
     if ((value ^ 1) & 1)
         return *(unsigned *)value;
     return value;
 }
 struct AsegaHold {
-    Asega *asega;
-    AsegaHold(Asega *target) { asega = target; asega->AddRef(); }
-    ~AsegaHold() { asega->Release(); }
+    ASEGA *pasega;
+    AsegaHold(ASEGA *target) { pasega = target; pasega->OnAdd(); }
+    ~AsegaHold() { pasega->Slot2(); }
 };
-extern "C" void UpdateAsega(Asega *asega)
+extern "C" void UpdateAsega(ASEGA *asega)
 {
-    if (__builtin_fabsf(asega->svt) < 0.0001f)
+    if (__builtin_fabsf(asega->svtLocal) < 0.0001f)
         return;
     AsegaHold hold(asega);
-    unsigned grf = GrfValue(asega->aseg);
+    unsigned grf = GrfValue(asega->paseg);
     if (grf & 0x100)
-        asega->tLocal = asega->tLocal + asega->svt * g_2ddf10;
+        asega->tLocal = asega->tLocal + asega->svtLocal * g_2ddf10;
     else
-        asega->tLocal = asega->tLocal + asega->svt * g_2dded4;
+        asega->tLocal = asega->tLocal + asega->svtLocal * g_2dded4;
     HandleAsegaEvents(asega);
     if (FAsegaGone(asega))
         return;
-    int wrapped = FWrapAsegaTime(asega, &asega->tLocal, &asega->svt);
+    int wrapped = FWrapAsegaTime(asega, &asega->tLocal, &asega->svtLocal);
     if (wrapped) {
-        if (asega->grf & 8)
-            asega->iea = asega->svt <= 0.0f ? asega->aseg->count : 0;
+        if (asega->grfapl & 8)
+            asega->iea = asega->svtLocal <= 0.0f ? asega->paseg->iea : 0;
     }
     if (wrapped) {
-        asega->Message(3, asega);
+        asega->PostMessage(3, asega);
         if (FAsegaGone(asega))
             return;
     }
     HandleAsegaEvents(asega);
     if (FAsegaGone(asega))
         return;
-    if (wrapped && (asega->grf & 0x38) == 0)
+    if (wrapped && (asega->grfapl & 0x38) == 0)
         RetractAsega(asega);
-    for (Hook *hook = asega->hooks; hook != 0; hook = hook->next)
-        hook->listener->Notify(hook->arg, 0, asega->tLocal, asega->svt);
+    for (PARTLINK *plink = asega->plink; plink != 0; plink = plink->pnext)
+        plink->psink->Slot2(plink->nTarget, 0, asega->tLocal, asega->svtLocal);
 }

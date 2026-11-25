@@ -1,6 +1,6 @@
 #include "types.h"
 extern "C" {
-struct F_215A50 { char pad[0x20]; s32 count; s32 *table; };
+struct F_215A50 { u8 unknown_0x0[0x20]; s32 count; s32 *table; };
 s32 IglyphFromFontCh(F_215A50 *font, u8 ch) {
     s32 hi = font->count - 1;
     s32 lo = 0;

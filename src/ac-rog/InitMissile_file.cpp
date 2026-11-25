@@ -7,21 +7,37 @@
 #include "lo.h"
 #include "include_asm.h"
 
-typedef struct MISSILE {
-    char pad0[0x260];
-    f32 field_0x260;
-    s32 field_0x264;
-    char pad268[4];
-    f32 field_0x26C;
-} MISSILE;
+#include "so.h"
+#include "asega.h"
+#include "bomb.h"
+
+/* The bomb family (classes our names): BOMB is bomb.h's; MISSILE, ROV and TARMISS follow the chain InitMissile -> InitBomb, InitRov
+   and InitTarmiss -> InitMissile. */
+
+struct MISSILE : BOMB {
+    /* 0x260 */ f32 field_0x260; /* InitMissile sets it to 800 */
+    /* 0x264 */ s32 fActbank;    /* InitMissile sets it to 1; FireMissile tests it (InitRov clears it) */
+    /* 0x268 */ s32 actbank;     /* FireMissile stores CreateXfActbank's result; func_001B1E38, StickTrigBomb release it through func_0012E460 */
+    /* 0x26C */ f32 gain;        /* InitMissile sets it to 1; FireMissile passes it to CreateXfActbank */
+};
+
+struct ROV : MISSILE {
+    /* 0x270 */ f32 field_0x270; /* InitRov sets it to 2000 */
+    /* 0x274 */ f32 field_0x274; /* InitRov sets it to 5000 */
+};
+
+struct TARMISS : MISSILE {
+    u8 unknown_0x270[0x4];
+    /* 0x274 */ f32 field_0x274; /* InitTarmiss sets it to 1500 */
+};
 
 s32 InitBomb();                                     /* extern */
 
 void InitMissile(MISSILE *missile) {
     InitBomb();
-    missile->field_0x264 = 1;
+    missile->fActbank = 1;
     missile->field_0x260 = 800.0f;
-    missile->field_0x26C = 1.0f;
+    missile->gain = 1.0f;
 }
 
 s32 CSo_LoadFromBrx();                            /* extern */
@@ -41,99 +57,84 @@ void ApplyAsegToHandle(int, void *, int, void *, float, float);
 
 void func_0012E460(void *);
 
-void func_001B1E38(char *arg0)
+void func_001B1E38(MISSILE *pmissile)
 {
-    RemoveSoLoHierarchy(arg0);
-    ApplyAsegToHandle(0, arg0, 0, arg0 + 0x234, 0.0f, 1.0f);
-    func_0012E460(arg0 + 0x268);
+    RemoveSoLoHierarchy(pmissile);
+    ApplyAsegToHandle(0, pmissile, 0, &pmissile->pasega, 0.0f, 1.0f);
+    func_0012E460(&pmissile->actbank);
 }
 
-struct BOMB {
-    char pad0[0x5C];
-    int xf;
-    char pad1[0x210 - 0x60];
-    int target;
-    char pad2[0xC];
-    VECTOR posTarget;
-    void *paseg;
-    char handle[0x30];
-    int fActbank;
-    int actbank;
-    float gain;
-};
+extern "C" void ApplyAsegToHandle(void *paseg, SO *palo, int grfapl, ASEGA **ppasega, float tLocal, float svtLocal);
 
-extern "C" void ApplyAsegToHandle(void *paseg, BOMB *palo, int grfapl, char *handle, float tLocal, float svtLocal);
+extern "C" int CreateXfActbank(SO *, XF *, float, float, int, int);
 
-extern "C" int CreateXfActbank(BOMB *, int, float, float, int, int);
-
-void FireMissile(BOMB *pbomb, int target, VECTOR *pposTarget)
+void FireMissile(MISSILE *pmissile, int target, VECTOR *pposTarget)
 {
     VECTOR posTarget = *pposTarget;
-    pbomb->target = target;
-    pbomb->posTarget = posTarget;
-    ApplyAsegToHandle(pbomb->paseg, pbomb, 8, pbomb->handle, 0.0f, 1.0f);
-    if (pbomb->fActbank != 0)
-        pbomb->actbank = CreateXfActbank(pbomb, pbomb->xf, pbomb->gain, 0.0f, 0, 5);
+    pmissile->target = target;
+    pmissile->posTarget = posTarget;
+    ApplyAsegToHandle(pmissile->paseg, pmissile, 8, &pmissile->pasega, 0.0f, 1.0f);
+    if (pmissile->fActbank != 0)
+        pmissile->actbank = CreateXfActbank(pmissile, pmissile->pxfAngular, pmissile->gain, 0.0f, 0, 5);
 }
 
-s32 func_0012E460(s32);                         /* extern */
+s32 func_0012E460(s32 *);                       /* extern */
 
 s32 func_0013B250();                            /* extern */
 
-void StickTrigBomb(s32 arg0) {
+void StickTrigBomb(MISSILE *pmissile) {
     func_0013B250();
-    func_0012E460(arg0 + 0x268);
+    func_0012E460(&pmissile->actbank);
 }
 
-struct TRIG { char pad[0x238]; int coid; int aoid[4]; int ccid; int acid[4]; };
-
-extern "C" int FIgnoreBombIntersection(TRIG *, LO *);
+extern "C" int FIgnoreBombIntersection(BOMB *, LO *);
 
 extern "C" int FIsBasicDerivedFrom(LO *, int);
 
 extern "C" int IMax(int, int);
 
- int func_001B1F40(TRIG *self, LO *plo) { int answer = FIgnoreBombIntersection(self, plo); for (int i = 0; i < self->coid; i++) { if (self->aoid[i] == plo->oid) answer = IMax(answer, 1); } for (int j = 0; j < self->ccid; j++) { if (FIsBasicDerivedFrom(plo, self->acid[j])) answer = IMax(answer, 1); } return answer; }
-
-struct TrigBomb { char pad[0x238]; unsigned count; int oids[4]; };
-
-void AddTrigBombOid(TrigBomb *self, int oid)
+int func_001B1F40(BOMB *self, LO *plo)
 {
-    unsigned count = self->count;
+    int answer = FIgnoreBombIntersection(self, plo);
+    for (int index = 0; index < self->coid; index++) {
+        if (self->aoid[index] == plo->oid)
+            answer = IMax(answer, 1);
+    }
+    for (int index = 0; index < self->ccid; index++) {
+        if (FIsBasicDerivedFrom(plo, self->acid[index]))
+            answer = IMax(answer, 1);
+    }
+    return answer;
+}
+
+void AddTrigBombOid(BOMB *self, int oid)
+{
+    unsigned count = self->coid;
     if (count < 4) {
-        self->oids[count] = oid;
-        self->count = count + 1;
+        self->aoid[count] = oid;
+        self->coid = count + 1;
     }
 }
 
-struct S { char pad[0x24C]; unsigned count; int cid[4]; };
-
-void AddTrigBombCid(S *self, int cid) {
-    unsigned n = self->count;
-    if (n < 4) {
-        self->cid[n] = cid;
-        self->count = n + 1;
+void AddTrigBombCid(BOMB *self, int cid) {
+    unsigned count = self->ccid;
+    if (count < 4) {
+        self->acid[count] = cid;
+        self->ccid = count + 1;
     }
 }
-
-struct ROV { char pad[0x264]; int field264; char pad2[8]; float field26C_unused[0]; float field270; float field274; };
 
 extern "C" void InitMissile(ROV *);
 
 void InitRov__FP3ROV(ROV *rov)
 {
     InitMissile(rov);
-    rov->field270 = 2000.0f;
-    rov->field274 = 5000.0f;
-    rov->field264 = 0;
+    rov->field_0x270 = 2000.0f;
+    rov->field_0x274 = 5000.0f;
+    rov->fActbank = 0;
 }
 
 INCLUDE_ASM(0X1B20B8);
-
-typedef struct TARMISS {
-    char pad0[0x274];
-    f32 field_0x274;
-} TARMISS;
 
 s32 InitMissile();                                  /* extern */
 

@@ -20,7 +20,8 @@ struct ATTACH {
     /* 0x018 */ s32 imember;    /* StartAttach: the target's member index (func_001942F0 passes it to AddSafePointOnMember) */
     u8 unknown_0x1C[0x4];
     /* 0x020 */ f32 value;      /* func_001942F0 passes it to AddSafePointOnMember (kinds 3, 0 and 13) */
-    u8 unknown_0x24[0x44];
+    u8 unknown_0x24[0x30];
+    /* 0x054 */ void *apaseg[5]; /* PasegAttachBase (the attach's own reader): the animation segment of the kind (0: [0], or [3] for sub-kind 5; 1: [1]; 8: [4] for sub-kinds 9 and 10, the secondary one); [2] is not read there */
     /* 0x068 */ TN *ptn;        /* LoadAttach: PloNew(0xF, 0, 0x148, -1); ResetJtDynamicTunnel reads its tunnel from here */
     u8 unknown_0x6C[0x4];
     /* 0x070 */ u8 blendA[0x100]; /* LoadAttach: BuildPlainBlend's second argument, with the quadword at 0x170 */

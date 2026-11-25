@@ -1,19 +1,18 @@
 #include "sly2.h"
-#include "xf.h"
-struct ACT { char pad[0x8]; XF *pxf; char pad2[0x14]; QW pos; QW vel; };
+#include "act.h"
 extern float g_2dded0;
 extern "C" void EvaluateBezierPos__FfffP6VECTORN63(float, float, float, QW, QW, QW, QW, QW *, QW *, QW *);
 
-void GetActvalPositionGoal(ACT *pact, float dt, QW *pvecPos, QW *pvecVel)
+void GetActvalPositionGoal(ACTVAL *pact, float dt, QW *pvecPos, QW *pvecVel)
 {
-    XF *pxf = pact->pxf;
+    XF *pxf = pact->act.pxf;
     float tEnd = pxf->tArrive;
     if (tEnd <= g_2dded0 + dt) {
         if (pvecPos != 0)
-            *pvecPos = pact->pos;
+            *pvecPos = pact->posGoal;
         if (pvecVel != 0)
-            *pvecVel = pact->vel;
+            *pvecVel = pact->velGoal;
     } else {
-        EvaluateBezierPos__FfffP6VECTORN63(tEnd - g_2dded0, dt, 1.0f, pxf->mat.row[3], pxf->vel, pact->pos, pact->vel, pvecPos, pvecVel, 0);
+        EvaluateBezierPos__FfffP6VECTORN63(tEnd - g_2dded0, dt, 1.0f, pxf->mat.row[3], pxf->vel, pact->posGoal, pact->velGoal, pvecPos, pvecVel, 0);
     }
 }

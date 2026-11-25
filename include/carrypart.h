@@ -8,13 +8,21 @@
 #include "types.h"
 
 struct LO;
+struct SO;
+struct JT;
 
 struct CARRYPART {
-    u8 unknown_0x0[0x84];
+    /* 0x0 */ struct JT *pjt;   /* Carry_Attach (the carry part's method): the player it hangs on */
+    u8 unknown_0x4[0x30];
+    /* 0x34 */ struct LO *source; /* Carry_Attach: the object whose slot 32 gives the transform the carried object is parented to */
+    u8 unknown_0x38[0x4C];
     /* 0x84 */ struct LO *plo;  /* func_001CC9A8: func_001A5BF0 resolves it to its owning SO */
     u8 unknown_0x88[0x8];
     /* 0x90 */ s32 field_0x90;  /* Carry_Init sets -1 */
-    u8 unknown_0x94[0x10];
+    /* 0x94 */ void *act94;    /* Carry_Attach, Carry_Detach, func_001CD308 (methods of the part): the acts that hold the carried object, released together */
+    /* 0x98 */ void *act98;
+    /* 0x9C */ void *act9C;
+    /* 0xA0 */ struct SO *attached; /* the carried object: Carry_Attach sets it, Carry_Detach and func_001CD308 clear it */
     /* 0xA4 */ s32 state;       /* Carry_Init sets -1; func_001CC9A8 tests 1 (guess: a state word) */
 };
 

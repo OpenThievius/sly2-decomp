@@ -6,7 +6,7 @@ void func_001CE9B8();
 float GRandInRange(float, float);
 void LoadLookAtMatrix(MAT3 *, QW);
 }
-struct LEAF { char pad[0x40]; QW r0, r1, r2; };
+struct LEAF { u8 unknown_0x0[0x40]; QW r0, r1, r2; };
 struct EMITB;
 
 void PostLeafEmit(LEAF *leaf, EMITB *emit)

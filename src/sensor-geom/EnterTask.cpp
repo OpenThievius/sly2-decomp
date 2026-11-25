@@ -34,7 +34,7 @@ void EnterTask(TASK *task) {
     SaveTaskVariables(task);
     bevy_camera_follow_activity(&B_002DEB30, 0x23, task);
     ApplyTaskToggles(task, 4, task->ctoggle, task->atoggle);
-    ApplyTaskAnims(task, 4, task->canim, task->aanim, task->field_0xF4);
+    ApplyTaskAnims(task, 4, task->canim, task->aanim, task->cause);
     if (task->labelId != -1 && task->labelFlag != 0)
         ShowHudLabel(-1.0f, &B_003DA0C0, task->labelId);
     task->HandleSpliceEvent(0x13, 0, 0, 0, 0);

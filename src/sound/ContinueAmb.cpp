@@ -1,4 +1,4 @@
-struct AMB { char pad[0x4E]; short cPause; };
+#include "amb.h"
 extern "C" void SetAmbGrf(struct AMB *, unsigned short, unsigned short);
 extern "C" void ContinueAmb(AMB *pamb)
 {

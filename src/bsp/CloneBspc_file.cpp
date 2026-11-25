@@ -55,7 +55,7 @@ extern "C" {
 typedef union PLANE {
     s128 normal;
     struct {
-        char pad[0xC];
+        u8 unknown_0x0[0xC];
         f32 distance;
     } parts;
 } PLANE;

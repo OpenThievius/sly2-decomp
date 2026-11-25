@@ -1,19 +1,15 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
-struct AFFINE2D { float a, b, c, d, e, f; float pad[2]; } __attribute__((aligned(16)));
-struct INST { char pad0[8]; short ilabel; short pause; float t; int key; int unk; };
-struct LABEL { char pad[0x18]; };
-struct SPRITE { int unk0; LABEL *labels; INST *insts; char pad[0x20]; AFFINE2D *pxf; };
-struct B4 { char b[4]; };
+#include "fbsprite.h"
 struct L { AFFINE2D composed; QW add; QW mul; };
-extern "C" void AdvanceSpriteInstance(LABEL *plabel, int iinst, AFFINE2D *pxf, QW *padd, QW *pmul, float t);
-void StartSpriteInstance(float t, SPRITE *psprite, int ilabel, int iinst, AFFINE2D *pxf, B4 *padd, B4 *pmul)
+extern "C" void AdvanceSpriteInstance(SPRITELABEL *plabel, int iinst, AFFINE2D *pxf, QW *padd, QW *pmul, float t);
+void StartSpriteInstance(float t, SPRITE *psprite, int ilabel, int iinst, AFFINE2D *pxf, RGBA *padd, RGBA *pmul)
 {
-    INST *pinst = psprite->insts + iinst;
+    SPRITEINST *pinst = psprite->insts + iinst;
     pinst->ilabel = ilabel;
-    pinst->key = 0;
+    pinst->fPaused = 0;
     pinst->t = t;
-    pinst->pause = 0;
+    pinst->ikeyNext = 0;
     L l;
     AFFINE2D *pxfcall;
     if (psprite->pxf) {
@@ -33,7 +29,7 @@ void StartSpriteInstance(float t, SPRITE *psprite, int ilabel, int iinst, AFFINE
     } else {
         pxfcall = pxf;
     }
-    *(B4 *)&l.add = *padd;
-    *(B4 *)&l.mul = *pmul;
+    *(RGBA *)&l.add = *padd;
+    *(RGBA *)&l.mul = *pmul;
     AdvanceSpriteInstance(psprite->labels + pinst->ilabel, iinst, pxfcall, &l.add, &l.mul, t);
 }

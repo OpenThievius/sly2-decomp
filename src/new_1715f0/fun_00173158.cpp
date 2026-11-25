@@ -1,4 +1,5 @@
-struct Lo { char pad0[0x80]; float f80; int f84; int f88; int f8C; char pad90[0x10]; float fA0; float fA4; };
+#include "types.h"
+struct Lo { u8 unknown_0x0[0x80]; float f80; int f84; int f88; int f8C; u8 unknown_0x90[0x10]; float fA0; float fA4; };
 void InitLo(Lo *);
 extern "C" void func_00173158(Lo *self) {
     InitLo(self);

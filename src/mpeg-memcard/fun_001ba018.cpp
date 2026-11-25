@@ -2,7 +2,7 @@
 #include "sly2.h"
 #include "vu0inline.h"
 #include "xf.h"
-struct GL { char pad0[0x1020]; void *paseg; char p0[0xC]; void *xfa; void *xfb; char pad1[0x1040-0x1038]; QW off; char pad2[0x1060-0x1050]; int f1060; char pad3[0x106C-0x1064]; int f106c; };
+struct GL { u8 unknown_0x0[0x1020]; void *paseg; u8 unknown_0x1028[0xC]; void *xfa; void *xfb; u8 unknown_0x1038[0x1040-0x1038]; QW off; u8 unknown_0x1050[0x1060-0x1050]; int f1060; u8 unknown_0x1064[0x106C-0x1064]; int f106c; };
 extern "C" void PostGuardLoad(GL *);
 extern "C" void SetSoProperties(GL *, int, const void *);
 extern "C" float *PeaFindAsegLabel(void *, int);

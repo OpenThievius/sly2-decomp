@@ -7,10 +7,10 @@ extern "C" void PostBlotLoad(BLOT *);
 extern "C" void *PloFindSwObject_thunk(SW *, int, int, int);
 
 struct BLOT {
-    char pad0[0x110];
+    u8 unknown_0x0[0x110];
     int countB;
     JOBENT entriesB[1];
-    char pad1[0x194 - 0x11C];
+    u8 unknown_0x11C[0x194 - 0x11C];
     int countA;
     JOBENT entriesA[1];
 };

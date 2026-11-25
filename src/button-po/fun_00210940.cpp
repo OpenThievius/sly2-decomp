@@ -1,4 +1,5 @@
-struct Owner { char pad0[0x4638]; void *swObject; };
+#include "types.h"
+struct Owner { u8 unknown_0x0[0x4638]; void *swObject; };
 extern "C" void *PloFindSwObject_thunk(Owner *, int, int, int);
 void func_00210940(Owner *owner)
 {

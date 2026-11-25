@@ -26,7 +26,7 @@ extern "C" s32 B_003DD490_18E3A0;
 
 extern "C" s32 RO_002A5F9F;
 
-struct UL { unsigned long v; } __attribute__((packed));
+struct UL { u64 v; } __attribute__((packed));
 
 extern "C" char RO_002A5F98[];
 

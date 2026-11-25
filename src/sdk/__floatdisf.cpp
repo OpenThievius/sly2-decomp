@@ -1,10 +1,11 @@
+#include "types.h"
 extern "C" {
 double __floatsidf(int);
 double __muldf3(double, double);
 double __adddf3(double, double);
 float func_0023DFA0(double);
-float __floatdisf(long value) {
-    if ((unsigned long)(value + 0x1FFFFFFFFFFFFFL) > 0x3FFFFFFFFFFFFEUL) {
+float __floatdisf(s64 value) {
+    if ((u64)(value + 0x1FFFFFFFFFFFFFL) > 0x3FFFFFFFFFFFFEUL) {
         if ((int)value & 0x7FF) {
             value |= 0x800;
         }

@@ -5,9 +5,9 @@
 #include "m2c_macros.h"
 #include "include_asm.h"
 
-struct Src { char pad[0xA8]; int value; };
+struct Src { u8 unknown_0x0[0xA8]; int value; };
 
-struct Dst { char pad[0x1C]; int value; };
+struct Dst { u8 unknown_0x0[0x1C]; int value; };
 
 extern "C" void CloneAct(Dst *, int, int, Src *);
 
@@ -19,14 +19,14 @@ void func_0021C820(Dst *dst, int b, int c, Src *src)
 
 extern "C" {
 struct ActTarget {
-    char pad0[0xA8];
+    u8 unknown_0x0[0xA8];
     s32 field_0xA8;
 };
 
 struct Act {
-    char pad0[8];
+    u8 unknown_0x0[8];
     struct ActTarget *field_0x8;
-    char padC[0x1C - 0xC];
+    u8 unknown_0xC[0x1C - 0xC];
     s32 field_0x1C;
 };
 

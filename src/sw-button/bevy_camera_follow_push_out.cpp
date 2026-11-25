@@ -3,8 +3,8 @@
 #include "sly2.h"
 #include "alloc.h"
 #include "vu0inline.h"
-struct GEOM { char pad[0x60]; GEOM *pgeomNext; };
-struct SWNODE { float lo[3]; float pad0; float hi[3]; char pad1[0x18]; GEOM *pgeom; char pad2[8]; SWNODE *pnext; };
+struct GEOM { u8 unknown_0x0[0x60]; GEOM *pgeomNext; };
+struct SWNODE { float lo[3]; u8 unknown_0xC[0x4]; float hi[3]; u8 unknown_0x1C[0x18]; GEOM *pgeom; u8 unknown_0x38[0x8]; SWNODE *pnext; };
 union BOXES { QW q[2]; float f[8]; };
 extern "C" {
 void *PvAllocStackImpl__Fi(ALLOCREQ *);

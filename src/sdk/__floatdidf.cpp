@@ -1,8 +1,9 @@
+#include "types.h"
 extern "C" {
 double __floatsidf(int);
 double __muldf3(double, double);
 double __adddf3(double, double);
-double __floatdidf(long value) {
+double __floatdidf(s64 value) {
     double high = __floatsidf((int)(value >> 32));
     high = __muldf3(high, 65536.0);
     high = __muldf3(high, 65536.0);

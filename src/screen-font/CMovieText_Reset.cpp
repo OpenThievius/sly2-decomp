@@ -1,8 +1,9 @@
+#include "types.h"
 #include "rgba.h"
 extern "C" {
 struct MovieText215CA8 {
     int value0, value4, value8, valueC;
-    char pad10[4];
+    u8 unknown_0x10[0x4];
     RGBA color14, color18;
     unsigned int flags1C;
 };

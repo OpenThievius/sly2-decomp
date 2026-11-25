@@ -14,9 +14,9 @@ struct CBase112100 {
     virtual void Virtual0();
 };
 struct CRefHolder112100 : CBase112100 {
-    char pad[0x70];
+    u8 unknown_0x10[0x70];
     GLOBSET globset;
-    char pad2[0x94];
+    u8 unknown_0xD0[0x94];
     virtual void Virtual0();
 };
 struct CSecondary112100 {
@@ -24,7 +24,7 @@ struct CSecondary112100 {
     virtual void Virtual0();
 };
 struct CObject112100 : CRefHolder112100, CSecondary112100 {
-    char pad3[0x1A0 - 0x174];
+    u8 unknown_0x174[0x1A0 - 0x174];
     virtual void Virtual0();
 };
 void *func_00112100(void)

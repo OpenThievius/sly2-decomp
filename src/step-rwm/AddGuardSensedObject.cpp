@@ -1,30 +1,11 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-#include "types.h"
+#include "sly2.h"
+#include "stepguard.h"
 extern "C" void *memmove(void *, const void *, unsigned int);
 struct CLOCK_2085D0 { float t; float dt; };
 extern "C" CLOCK_2085D0 g_2dded0;
 
-struct SensedEntry {
-    void *plo;
-    int seen;
-    float time;
-    int field0C;
-};
-
-struct SensedList {
-    char pad[0xFC];
-    unsigned int count;
-    SensedEntry entries[8];
-};
-
-struct Guard {
-    char pad0[0x3A4];
-    int tail;
-    char pad1[0xF64 - 0x3A8];
-    SensedList *psensed;
-};
-
-extern "C" SensedEntry *PentryFindSensorLo(SensedList *list, void *plo);
+extern "C" SENSORENTRY *PentryFindSensorLo(SENSOR *list, LO *plo);
 
 // Retail keeps the found entry, the count, the insertion index and the entry address in one
 // callee-saved register ($s0): every step (subtract the tail, scale by 16, add the 0x100 array
@@ -32,53 +13,53 @@ extern "C" SensedEntry *PentryFindSensorLo(SensedList *list, void *plo);
 // The last step goes through an inline helper: written in place (`slot = list + slot`) GCC swaps
 // the operands (`addu s0, s0, a0`); retail has the list first. The time is read from the clock
 // struct (Clock_135248 elsewhere): as a plain float its load is hoisted above the stores.
-static inline unsigned int OffsetInList(SensedList *list, unsigned int offset)
+static inline unsigned int OffsetInList(SENSOR *list, unsigned int offset)
 {
     return (uptr)list + offset;
 }
 
-extern "C" int AddGuardSensedObject(Guard *guard, void *plo, int append)
+extern "C" int AddGuardSensedObject(STEPGUARD *guard, LO *plo, int append)
 {
     if (plo != 0) {
         if (plo == guard)
             return 0;
         unsigned int slot = 0;
         if (append == 0)
-            slot = (uptr)PentryFindSensorLo(guard->psensed, plo);
+            slot = (uptr)PentryFindSensorLo(guard->psensor, plo);
         if (slot != 0)
             return 0;
-        SensedList *list = guard->psensed;
-        slot = list->count;
+        SENSOR *list = guard->psensor;
+        slot = list->centry;
         if (slot >= 8) {
             if (append != 0)
                 return 0;
-            int tail = guard->tail;
+            int tail = guard->csensed;
             if (tail > 0) {
-                guard->tail = tail - 1;
+                guard->csensed = tail - 1;
                 slot = 8;
                 slot -= tail;
-                slot *= sizeof(SensedEntry);
+                slot *= sizeof(SENSORENTRY);
                 slot += 0x100;
                 slot = OffsetInList(list, slot);
-                memmove((SensedEntry *)slot + 1, (SensedEntry *)slot, (tail - 1) * sizeof(SensedEntry));
+                memmove((SENSORENTRY *)slot + 1, (SENSORENTRY *)slot, (tail - 1) * sizeof(SENSORENTRY));
             } else {
                 return 0;
             }
         } else if (append != 0) {
-            slot = (uptr)&list->entries[slot];
+            slot = (uptr)&list->aentry[slot];
         } else {
-            int tail = guard->tail;
+            int tail = guard->csensed;
             slot -= tail;
-            slot *= sizeof(SensedEntry);
+            slot *= sizeof(SENSORENTRY);
             slot += 0x100;
             slot = OffsetInList(list, slot);
-            memmove((SensedEntry *)slot + 1, (SensedEntry *)slot, tail * sizeof(SensedEntry));
+            memmove((SENSORENTRY *)slot + 1, (SENSORENTRY *)slot, tail * sizeof(SENSORENTRY));
         }
-        SensedEntry *entry = (SensedEntry *)slot;
+        SENSORENTRY *entry = (SENSORENTRY *)slot;
         entry->plo = plo;
-        entry->seen = 0;
-        entry->time = g_2dded0.t;
-        guard->psensed->count++;
+        entry->state = 0;
+        entry->tState = g_2dded0.t;
+        guard->psensor->centry++;
         return 1;
     }
     return 0;

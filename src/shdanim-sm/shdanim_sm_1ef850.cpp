@@ -5,22 +5,22 @@
 #include "po.h"
 #include "sly2.h"
 #include "ps2inline.h"
-
-struct Object { char pad0[0x40]; int flagsOrPointer; char pad1[0x148 - 0x44]; long mask; };
+#include "so.h"
+#include "sw.h"
 
 extern "C" {
 void PostSoLoad();
-void func_001A6CA8(Object *, int);
-void func_001EF850(Object *object) {
+void func_001A6CA8(SO *, int);
+void func_001EF850(SO *pso) {
     PostSoLoad();
-    func_001A6CA8(object, 1);
-    int value = object->flagsOrPointer;
-    if ((value ^ 1) & 1) {
-        *(int *)value = *(int *)value | 2;
+    func_001A6CA8(pso, 1);
+    u32 grf = pso->grfSw;
+    if ((grf ^ 1) & 1) {
+        pso->pgrfentry->grf |= 2;
     } else {
-        object->flagsOrPointer = value | 2;
+        pso->grfSw = grf | 2;
     }
-    object->mask = object->mask & ~(1L << 35);
+    pso->grfso = pso->grfso & ~(1UL << 35);
 }
 }
 

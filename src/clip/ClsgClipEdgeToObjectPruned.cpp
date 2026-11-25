@@ -1,6 +1,6 @@
 #include "sly2.h"
-struct Xf_14C6D8 { char pad[0x70]; QW pos; };
-struct So_14C6D8 { Xf_14C6D8 *pxf; int pad4; float sRadius; int padc; unsigned long grf; };
+struct Xf_14C6D8 { u8 unknown_0x0[0x70]; QW pos; };
+struct So_14C6D8 { Xf_14C6D8 *pxf; int pad4; float sRadius; int padc; u64 grf; };
 extern "C" int ClsgClipEdgeToBsp(void *, int, QW, QW, int, int);
 extern "C" int ClsgClipEdgeToSphere__FP6VECTORfT0T0iP3LSG(QW, float, QW, QW, int, int);
 extern "C" int ClsgClipEdgeToObjectPruned(So_14C6D8 *pso, void *pbsp, QW posA, QW posB, int clsgMax, int alsg)

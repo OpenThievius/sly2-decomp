@@ -1,14 +1,13 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
 #include "loot.h"
-struct PMF { char b[8]; };
-struct UL { unsigned long v; } __attribute__((packed));
-struct XP { char pad0[8]; void *plo; char pad[0x34]; };
+struct UL { u64 v; } __attribute__((packed));
+struct XP { u8 unknown_0x0[8]; void *plo; u8 unknown_0xC[0x34]; };
 extern "C" char B_003DD490[];
 extern "C" const UL RO_002A4B58;
 void func_001F4FB0(SO *, XP *, int);
 int FIsBasicDerivedFrom(void *, int);
-void QueueSwCallbackOnce(void *, SO *, unsigned long, int);
+void QueueSwCallbackOnce(void *, SO *, u64, int);
 void AdjustLootNewXp(LOOT *ploot, XP *pxp, int iside)
 {
     func_001F4FB0(ploot, pxp, iside);

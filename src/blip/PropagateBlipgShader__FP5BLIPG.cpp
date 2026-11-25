@@ -1,10 +1,6 @@
-#include "types.h"
-struct SHD { char pad0[8]; unsigned flags; unsigned char color[4]; int cframe; long *apacket; };
-struct BLIPG {
-    char pad0[0x1A0]; int cqwTexture; char pad1[0x1B0 - 0x1A4]; QW aqw[1];
-    char pad2[0x3B0 - 0x1C0]; int hasColor; unsigned char color[4]; char pad3[0x438 - 0x3B8]; char *pgifs;
-};
-struct PK { long packet; int six; int keep; };
+#include "blip.h"
+struct SHD { u8 unknown_0x0[8]; unsigned flags; unsigned char color[4]; int cframe; s64 *apacket; };
+struct PK { s64 packet; int six; int keep; };
 extern "C" SHD *PshdframesOrFirst(int);
 extern "C" char B_002DD600;
 extern "C" char B_002DD5C0;
@@ -32,7 +28,7 @@ extern "C" void PropagateBlipgShader__FP5BLIPG(BLIPG *pblipg, int oidShader)
     pblipg->cqwTexture = cqw;
     QW *pqw = pblipg->aqw;
     for (int iframe = 0; iframe < cframe; iframe++) {
-        long packet = pshd->apacket[iframe];
+        s64 packet = pshd->apacket[iframe];
         ((PK *)pqw)->six = 6;
         ((PK *)pqw)->packet = packet;
         if (iframe < cduplicate) {

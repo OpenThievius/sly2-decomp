@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "types.h"
 #include "mpeg.h"
 extern "C" {
 struct MacroblockCounters_250E98 {
@@ -33,7 +34,7 @@ int func_00250E98(MPEGDEC *decoder, int limit)
     int ok;
     int result;
     int value;
-    long wide;
+    s64 wide;
     int status;
     state.count = 0;
     state.remaining = 0;
@@ -68,7 +69,7 @@ int func_00250E98(MPEGDEC *decoder, int limit)
             }
         }
         value = *(volatile int *)0x10002020;
-        wide = *(volatile long *)0x10002030;
+        wide = *(volatile s64 *)0x10002030;
         decoder->topBits = (int)wide;
         if (wide < 0) {
             int low = value & 0x1F;

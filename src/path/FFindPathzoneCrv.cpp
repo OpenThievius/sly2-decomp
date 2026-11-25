@@ -1,5 +1,6 @@
+#include "types.h"
 // SPDX-License-Identifier: GPL-3.0-or-later
-struct PATHZONE_1C02D0 { char pad0[0xE8]; int cSteps; char pad1[0xF4 - 0xEC]; int iLimit; };
+struct PATHZONE_1C02D0 { u8 unknown_0x0[0xE8]; int cSteps; u8 unknown_0xEC[0xF4 - 0xEC]; int iLimit; };
 extern "C" {
 int CposFindPath__FP2CGP6VECTORT1iT1(void *, void *, void *, int, int);
 void MeasureCrv(void *);

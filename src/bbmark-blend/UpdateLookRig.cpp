@@ -1,19 +1,18 @@
-struct JOY { char pad[0x30]; unsigned grf; };
-#include "jt.h"
-struct RIG { JT *pjt; int state; char pad0[4]; int fCanRestart; char pad1[4]; int fReleased; char pad2[0xC8]; int pasega; };
+#include "lookrig.h"
+#include "joy.h"
 extern "C" {
-int FAsegaGone(int);
+int FAsegaGone(void *);
 int GrfbtnVjoyPressedWithin(float, JOY *, int);
 void ClearVjoyPresses(JOY *, int);
-void SetLookRigState(RIG *, int);
+void SetLookRigState(LOOKRIG *, int);
 }
-extern "C" void UpdateLookRig(RIG *prig, int mode)
+extern "C" void UpdateLookRig(LOOKRIG *prig, int mode)
 {
-    if (prig->pasega != 0 && FAsegaGone(prig->pasega) != 0)
+    if (prig->phandle != 0 && FAsegaGone(prig->phandle) != 0)
         SetLookRigState(prig, -1);
     if (mode != prig->state && prig->state != -1)
         SetLookRigState(prig, mode);
-    if (mode != -1 && (prig->state == -1 || prig->fCanRestart != 0)) {
+    if (mode != -1 && (prig->state == -1 || prig->field_0xC != 0)) {
         if (GrfbtnVjoyPressedWithin(0.1f, prig->pjt->pjoy, 0x80) != 0 &&
             prig->pjt->FCanUseGadget(2) != 0) {
             ClearVjoyPresses(prig->pjt->pjoy, 0x80);
@@ -21,6 +20,6 @@ extern "C" void UpdateLookRig(RIG *prig, int mode)
             SetLookRigState(prig, mode);
         }
     }
-    if ((prig->pjt->pjoy->grf & 0x80) == 0)
+    if ((prig->pjt->pjoy->grfbtn & 0x80) == 0)
         prig->fReleased = 1;
 }

@@ -1,30 +1,29 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-struct SO2 {
-    char pad0[0x40];
-    unsigned p40;
-    char pad1[0x104];
-    unsigned long grfso;
-    char pad2[0x154 - 0x150];
-    int cid;
-    float s158, s15c;
-    char pad3[0x178 - 0x160];
-    int f178;
-    char pad4[0x184 - 0x17C];
-    int f184;
+#include "sw.h"
+#include "so.h"
+struct SOPROP : SO {
+    u8 unknown_0x150[0x4];
+    s32 cid;
+    f32 field_0x158;
+    f32 field_0x15C;
+    u8 unknown_0x160[0x18];
+    s32 field_0x178;
+    u8 unknown_0x17C[0x8];
+    s32 field_0x184;
 };
-extern "C" void InitSo(SO2 *);
-extern "C" void func_00229EF0(SO2 *so)
+extern "C" void InitSo(SO *);
+extern "C" void func_00229EF0(SOPROP *so)
 {
     InitSo(so);
     so->cid = 0x32;
-    so->s158 = 300.0f;
-    so->s15c = 500.0f;
-    so->f178 = -1;
-    so->f184 = -1;
-    unsigned p = so->p40;
-    if ((p ^ 1) & 1)
-        *(unsigned *)p |= 0xA;
+    so->field_0x158 = 300.0f;
+    so->field_0x15C = 500.0f;
+    so->field_0x178 = -1;
+    so->field_0x184 = -1;
+    u32 grf = so->grfSw;
+    if ((grf ^ 1) & 1)
+        so->pgrfentry->grf |= 0xA;
     else
-        so->p40 = p | 0xA;
+        so->grfSw = grf | 0xA;
     so->grfso &= (~0UL ^ (1UL << 35));
 }

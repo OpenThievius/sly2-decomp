@@ -1,7 +1,7 @@
 #include "types.h"
 #define NULL 0
-struct Inner_2127C8 { char pad[0x58]; s32 state; s32 pad2; s32 start; s32 value; };
-struct Node_2127C8 { char pad[0x40]; Inner_2127C8 *inner; char pad2[0x8]; Node_2127C8 *next; };
+struct Inner_2127C8 { u8 unknown_0x0[0x58]; s32 state; s32 pad2; s32 start; s32 value; };
+struct Node_2127C8 { u8 unknown_0x0[0x40]; Inner_2127C8 *inner; u8 unknown_0x44[0x8]; Node_2127C8 *next; };
 extern "C" {
 extern Node_2127C8 *B_003E106C;
 extern s32 g_2be538;

@@ -1,7 +1,8 @@
+#include "types.h"
 typedef struct RegTable {
     int base;
     int field04[5];
-    long entry[80];
+    s64 entry[80];
     int field298;
     char kind[1];
 } RegTable;

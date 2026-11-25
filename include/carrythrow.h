@@ -26,7 +26,14 @@ struct CARRYTHROW {
     /* 0x28 */ f32 field_0x28;      /* CarryThrow_Init: 1000 */
     u8 unknown_0x2C[0x4];
     /* 0x30 */ union CARRYVECTOR omega; /* CarryThrow_Init sets (0, 0, 25); CarryThrow_Launch passes it through the heading weight to slot 36 of the carried object */
-    u8 unknown_0x40[0x80];
+    /* 0x40 */ u8 ablHold[0x18];   /* CarryThrow_EnsureBlends: the hold blend (EnsureAsegBlendDynamic fills it) */
+    /* 0x58 */ void *pasegblHold;  /* CarryThrow_EnsureBlends */
+    u8 unknown_0x5C[0xC];
+    /* 0x68 */ u8 ablAim[0x30];    /* CarryThrow_EnsureBlends */
+    /* 0x98 */ void *pasegblAim;   /* CarryThrow_EnsureBlends */
+    u8 unknown_0x9C[0x8];
+    /* 0xA4 */ u8 ablThrow[0x18];  /* CarryThrow_EnsureBlends */
+    /* 0xBC */ void *pasegblThrow; /* CarryThrow_EnsureBlends */
     /* 0xC0 */ union CARRYVECTOR vecAim;    /* CarryThrow_Init sets (1000, 0, 0) */
     /* 0xD0 */ union CARRYVECTOR vecLaunch; /* CarryThrow_Init sets (42, -73, -50) */
     u8 unknown_0xE0[0x10];

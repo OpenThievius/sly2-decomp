@@ -1,11 +1,10 @@
-struct ENTRY { int id; char pad[0x1C]; };
-struct MENU { char pad[0x4C]; int count; ENTRY *entries; };
-extern "C" ENTRY *GadgetMenu_PgmeFind(MENU *menu, int id)
+#include "gadgetmenu.h"
+extern "C" GADGETMENUENTRY *GadgetMenu_PgmeFind(GADGETMENU *menu, int id)
 {
-    int count = menu->count;
+    int count = menu->cgme;
     if (count > 0) {
         int index = 0;
-        ENTRY *entry = menu->entries;
+        GADGETMENUENTRY *entry = menu->agme;
         do {
             index++;
             if (entry->id == id)

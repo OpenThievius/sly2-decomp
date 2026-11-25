@@ -1,5 +1,6 @@
 #include "sly2.h"
-struct LASER { char pad[0x150]; int coid; int aoid[7]; int ccls; int acls[7]; };
+/* the laser as func_001DE2D8 reads it: an oid filter and a class filter after the SO (laser.h leaves them undeclared: one reader) */
+struct LASER { u8 unknown_0x0[0x150]; int coid; int aoid[7]; int ccls; int acls[7]; };
 extern "C" int FLoHasOid(void *, int);
 extern "C" int FIsBasicDerivedFrom(void *, int);
 extern "C" int IMax(int, int);

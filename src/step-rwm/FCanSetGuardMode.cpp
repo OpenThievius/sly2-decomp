@@ -1,18 +1,21 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "sly2.h"
+#include "stepguard.h"
+/* the goal func_00205458 finds (kind 0xA9): only this function reads its word at 0x4C */
+struct GOALVIEW_206EB0 { u8 unknown_0x0[0x4C]; s32 field_0x4C; };
 extern "C" {
-struct Guard206EB0;
-struct Class206EB0 { char pad[0x4C]; int field4C; };
-int FIsBasicDerivedFrom(Guard206EB0 *, int);
-int FIsGuardInSgs(Guard206EB0 *, int);
-int FIsGuardSpecialClass(Guard206EB0 *);
-Class206EB0 *func_00205458(Guard206EB0 *, int);
-int FCanSetGuardMode(Guard206EB0 *guard, int mode)
+int FIsBasicDerivedFrom(STEPGUARD *, int);
+int FIsGuardInSgs(STEPGUARD *, int);
+int FIsGuardSpecialClass(STEPGUARD *);
+GOALVIEW_206EB0 *func_00205458(STEPGUARD *, int);
+int FCanSetGuardMode(STEPGUARD *guard, int mode)
 {
     int result;
     if (mode == -1) return 1;
     if (FIsGuardInSgs(guard, 7) != 0) return 0;
-    Class206EB0 *entry = func_00205458(guard, 0xA9);
+    GOALVIEW_206EB0 *entry = func_00205458(guard, 0xA9);
     if (entry != 0) {
-        if (entry->field4C != 0) return 0;
+        if (entry->field_0x4C != 0) return 0;
     }
     switch (mode - 8) {
     case 0:

@@ -57,7 +57,7 @@ struct SLY : JT {
     /* 0x18DC */ f32 tJtcs; /* SetJtJtcs */
     /* 0x18E0 */ struct ASEGA *pasegaJtcs; /* SetJtJtcs: ApplyAsegToHandle's handle */
     /* 0x18E4 */ s32 field_0x18E4;
-    u8 unknown_0x18E8[0x4];
+    /* 0x18E8 */ s32 field_0x18E8; /* reader: UpdateJtCaneInput (a Sly method) tests it in the cane's charge state */
     /* 0x18EC */ s32 field_0x18EC;
     u8 unknown_0x18F0[0x10];
     /* 0x1900 */ struct HANGBODY *phangbody; /* AddJtHangBodyReaction (slot 105) */

@@ -1,3 +1,4 @@
+#include "types.h"
 #include "ps2inline.h"
 typedef struct {
     u64 frame1;
@@ -32,8 +33,8 @@ int sceGsSetDefDrawEnv(DrawEnv *env, short psm, short width, short height, short
     } else {
         env->zbuf1 = (u64)sceGszbufaddr(psm, width, height) | (u64)(zpsm & 0xF) << 24;
     }
-    offsetX = (0x800 - (long)(short)(width >> 1)) << 4;
-    offsetY = (0x800 - (long)(short)(height >> 1)) << 36;
+    offsetX = (0x800 - (s64)(short)(width >> 1)) << 4;
+    offsetY = (0x800 - (s64)(short)(height >> 1)) << 36;
     env->xyoffset1Address = 0x18;
     env->xyoffset1 = offsetX | offsetY;
     env->scissor1Address = 0x40;

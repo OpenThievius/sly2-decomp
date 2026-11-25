@@ -1,21 +1,21 @@
 #include "types.h"
 #include "ps2inline.h"
-struct HOLDER { char pad[0x18C4]; void *field_0x18C4; int field_0x18C8; };
+#include "sly.h"
 extern "C" {
-void func_00141588(HOLDER *, QW *);
+void func_00141588(SLY *, QW *);
 QW PosLoWorld(void *);
 }
-void func_0018A350(HOLDER *pholder, QW *ppos)
+void func_0018A350(SLY *pholder, QW *ppos)
 {
     float *pcomponents = (float *)ppos;
-    switch (pholder->field_0x18C8) {
+    switch (pholder->jts) {
     case 3:
         func_00141588(pholder, ppos);
-        pcomponents[2] = FloatFromWord(LaneWordZ(PosLoWorld(pholder->field_0x18C4))) + -175.0f;
+        pcomponents[2] = FloatFromWord(LaneWordZ(PosLoWorld(pholder->pjtcsinfo))) + -175.0f;
         break;
     case 0x16:
         func_00141588(pholder, ppos);
-        pcomponents[2] = FloatFromWord(LaneWordZ(PosLoWorld(pholder->field_0x18C4))) + -100.0f;
+        pcomponents[2] = FloatFromWord(LaneWordZ(PosLoWorld(pholder->pjtcsinfo))) + -100.0f;
         break;
     case 0x15:
         *ppos = PosLoWorld(pholder);

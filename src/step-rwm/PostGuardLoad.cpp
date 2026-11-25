@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
-struct UL { unsigned long v; } __attribute__((packed));
+struct UL { u64 v; } __attribute__((packed));
 #include "stepguard.h"
 /* The routine PostGuardLoad creates (class 0x71): its home follows LO's fields. */
 struct ROUTINE : LO { HOME *phome; };
@@ -14,7 +14,7 @@ void ResolveGuardAimObjects(STEPGUARD *);
 void *__builtin_new(unsigned int);
 void func_0020CE28(void *, STEPGUARD *);
 void func_0020D1B0(void *, STEPGUARD *);
-void QueueSwCallback(void *, STEPGUARD *, unsigned long, int);
+void QueueSwCallback(void *, STEPGUARD *, u64, int);
 ROUTINE *PloNew(int, int, int, int);
 void AddScriptGoto(LO *, int, int, float);
 void *func_001F4C58(STEPGUARD *, int, int);

@@ -2,7 +2,7 @@
 extern "C" {
 s128 PosLoWorld(s32);
 s32 PpoSwFocusBase(void *);
-struct Focus { char pad[0x90]; s128 position; };
+struct Focus { u8 unknown_0x0[0x90]; s128 position; };
 extern Focus B_002DDF40;
 extern char B_003DD490;
 

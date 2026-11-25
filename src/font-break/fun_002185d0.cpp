@@ -1,6 +1,6 @@
-struct Spr { char pad[0x28]; void *inst; };
-extern "C" void func_002185F8(Spr *, int, int);
-void func_002185D0(Spr *spr)
+#include "fbsprite.h"
+extern "C" void func_002185F8(SPRITE *, int, int);
+void func_002185D0(SPRITE *sprite)
 {
-    if (spr->inst) func_002185F8(spr, 0, 0);
+    if (sprite->fRoot) func_002185F8(sprite, 0, 0);
 }

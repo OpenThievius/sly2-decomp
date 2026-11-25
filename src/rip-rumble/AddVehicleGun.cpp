@@ -1,6 +1,6 @@
 #include "sly2.h"
-struct GUN { int pad0; int pad4; char pad8[4]; char *vt; char pad10[4]; int f14; int f18; char pad1C[0x2C - 0x1C]; int f2C; char pad30[8]; int f38; };
-struct VEHICLE { char pad[0x4F8]; unsigned count; GUN *guns[8]; };
+struct GUN { int pad0; int pad4; u8 unknown_0x8[4]; char *vt; u8 unknown_0x10[4]; int f14; int f18; u8 unknown_0x1C[0x2C - 0x1C]; int f2C; u8 unknown_0x30[8]; int f38; };
+struct VEHICLE { u8 unknown_0x0[0x4F8]; unsigned count; GUN *guns[8]; };
 extern "C" void *__builtin_new(unsigned int);
 extern "C" void InitVehicleGun(GUN *, VEHICLE *);
 extern "C" char D_002C94A0;

@@ -1,5 +1,6 @@
-struct Owner_17CDB8 { char pad[0xF84]; int curve; float limit; int flag; };
-struct Obj_17CDB8 { char pad0[0x10]; Owner_17CDB8 *owner; char pad14[0x28]; float value; };
+#include "types.h"
+struct Owner_17CDB8 { u8 unknown_0x0[0xF84]; int curve; float limit; int flag; };
+struct Obj_17CDB8 { u8 unknown_0x0[0x10]; Owner_17CDB8 *owner; u8 unknown_0x14[0x28]; float value; };
 extern "C" {
 float SMaxCrv(int);
 float SMinCrv(int);

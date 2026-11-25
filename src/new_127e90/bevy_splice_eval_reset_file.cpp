@@ -189,7 +189,7 @@ struct Links_1286E0 {
 struct FrameNode_1286E0 {
     int pad0;
     Links_1286E0 links;
-    char pad8[0x20];
+    u8 unknown_0x8[0x20];
 };
 struct Ref_1286E0 {
     int tagk;

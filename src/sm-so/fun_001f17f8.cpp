@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
 #include "stepguard.h"
-struct RIGOBJ { char pad[0x16C]; void *psma; };
+struct RIGOBJ { u8 unknown_0x0[0x16C]; void *psma; };
 struct CLOCK { float t; float dt; };
 extern "C" CLOCK g_2dded0;
 extern "C" int D_002C3738[];

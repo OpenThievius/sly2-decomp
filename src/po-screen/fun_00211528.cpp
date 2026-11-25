@@ -1,13 +1,13 @@
 #include "sly2.h"
-struct GIFS_211528 { char pad[0x30]; };
+struct GIFS_211528 { u8 unknown_0x0[0x30]; };
 extern "C" {
-void AddPrimBulk__4GIFSiiiUlPP2QW(GIFS_211528 *, int, int, int, unsigned long, QW **);
+void AddPrimBulk__4GIFSiiiUlPP2QW(GIFS_211528 *, int, int, int, u64, QW **);
 void AddPrimEnd__4GIFS(GIFS_211528 *);
-void AddPrimPack__4GIFSiiUl(GIFS_211528 *, int, int, unsigned long);
+void AddPrimPack__4GIFSiiUl(GIFS_211528 *, int, int, u64);
 void AllocStatic__4DMASiP2QW(GIFS_211528 *, int, void *);
-void PackAD__4GIFSll(GIFS_211528 *, long, long);
+void PackAD__4GIFSll(GIFS_211528 *, s64, s64);
 void __4GIFS(GIFS_211528 *);
-extern long B_002DEBF0;
+extern s64 B_002DEBF0;
 extern char B_004421B0[];
 extern char B_00442210[];
 extern char B_00442240[];
@@ -17,7 +17,7 @@ extern char B_004424F0[];
 extern char B_00442520[];
 extern char B_00442560[];
 extern char B_004425A0[];
-extern long g_2dece0;
+extern s64 g_2dece0;
 extern int g_2dedb0;
 }
 extern "C" void func_00211528(void)
@@ -25,9 +25,9 @@ extern "C" void func_00211528(void)
     GIFS_211528 gifsBulk;
     __4GIFS(&gifsBulk);
     char *pb = B_004421B0;
-    long *tag = (long *)(pb - 0x10);
+    s64 *tag = (s64 *)(pb - 0x10);
     AllocStatic__4DMASiP2QW(&gifsBulk, 7, pb);
-    *(long *)(pb - 0x10) = 0x8000L << 45;
+    *(s64 *)(pb - 0x10) = 0x8000L << 45;
     tag[1] = 5;
     AddPrimBulk__4GIFSiiiUlPP2QW(&gifsBulk, 0x44, 0, 1, 1, 0);
     tag[2] |= 1;
@@ -60,8 +60,8 @@ extern "C" void func_00211528(void)
 
     GIFS_211528 gifsDither;
     __4GIFS(&gifsDither);
-    long *pdimx = (g_2dedb0 & 1) ? &g_2dece0 : &B_002DEBF0;
-    long dimx = *pdimx;
+    s64 *pdimx = (g_2dedb0 & 1) ? &g_2dece0 : &B_002DEBF0;
+    s64 dimx = *pdimx;
     AllocStatic__4DMASiP2QW(&gifsDither, 3, B_00442210);
     AddPrimPack__4GIFSiiUl(&gifsDither, 0, 1, 0xE);
     PackAD__4GIFSll(&gifsDither, 0x3F, 0);

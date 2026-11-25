@@ -1,11 +1,12 @@
+#include "types.h"
 // SPDX-License-Identifier: GPL-3.0-or-later
 struct Bytes8 {
     char bytes[8];
 };
 struct CLoSub1564E8 {
-    char pad0[0x40];
+    u8 unknown_0x0[0x40];
     int flags;
-    char pad44[0x54 - 0x44];
+    u8 unknown_0x44[0x10];
     float unk0x54;
     Bytes8 unk0x58;
     float unk0x60;

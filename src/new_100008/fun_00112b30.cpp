@@ -5,9 +5,9 @@ struct Element { char bytes[0x20]; };
 struct Holder {
     s32 first;
     s32 second;
-    s32 pad8;
+    s32 unknown_0x8;
     void *vtable;
-    char pad10[0x50];
+    u8 unknown_0x10[0x50];
     Element elements[6];
 };
 extern char D_002D5120[];

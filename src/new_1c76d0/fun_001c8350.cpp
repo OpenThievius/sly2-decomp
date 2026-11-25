@@ -1,43 +1,43 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-struct VAULT1C8350 { char pad0[0x180]; int state; char pad1[0x198 - 0x184]; int target; int jsg; char pad2[0x1F0 - 0x1A0]; int goal; };
+#include "keypad.h"
 extern "C" {
 int FIsJsgActive(int);
 void SetVaultOpen(int);
-void UpdateSo(VAULT1C8350 *);
-void func_001C84D8(VAULT1C8350 *);
-void func_001C8730(VAULT1C8350 *, int);
-void func_001C8350(VAULT1C8350 *vault)
+void UpdateSo(KEYPAD *);
+void func_001C84D8(KEYPAD *);
+void func_001C8730(KEYPAD *, int);
+void func_001C8350(KEYPAD *keypad)
 {
-    UpdateSo(vault);
+    UpdateSo(keypad);
     int state;
     do {
-        state = vault->state;
+        state = keypad->state;
         switch (state) {
         case 1:
-            if (vault->jsg == 0 || FIsJsgActive(vault->jsg) == 0)
-                func_001C8730(vault, 2);
+            if (keypad->jsg == 0 || FIsJsgActive(keypad->jsg) == 0)
+                func_001C8730(keypad, 2);
             break;
         case 2:
-            if (vault->jsg == 0 || FIsJsgActive(vault->jsg) == 0) {
-                if (vault->target == vault->goal)
-                    func_001C8730(vault, 3);
+            if (keypad->jsg == 0 || FIsJsgActive(keypad->jsg) == 0) {
+                if (keypad->target == keypad->field_0x1F0)
+                    func_001C8730(keypad, 3);
                 else
-                    func_001C8730(vault, 4);
+                    func_001C8730(keypad, 4);
             } else {
-                func_001C84D8(vault);
+                func_001C84D8(keypad);
             }
             break;
         case 4:
-            if (vault->jsg == 0 || FIsJsgActive(vault->jsg) == 0)
-                func_001C8730(vault, 0);
+            if (keypad->jsg == 0 || FIsJsgActive(keypad->jsg) == 0)
+                func_001C8730(keypad, 0);
             break;
         case 3:
-            if (vault->jsg == 0 || FIsJsgActive(vault->jsg) == 0) {
+            if (keypad->jsg == 0 || FIsJsgActive(keypad->jsg) == 0) {
                 SetVaultOpen(1);
-                func_001C8730(vault, 5);
+                func_001C8730(keypad, 5);
             }
             break;
         }
-    } while (vault->state != state);
+    } while (keypad->state != state);
 }
 }

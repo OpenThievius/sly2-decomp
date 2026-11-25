@@ -1,6 +1,6 @@
 #include "sly2.h"
 #include "alloc.h"
-struct LASER { char pad[0x198]; int count; void *beams; };
+#include "laser.h"
 extern "C" void * CStackFrame_Construct(void *);
 extern "C" void *PvAllocStackClearImpl__Fi(ALLOCREQ *);
 extern "C" void CSo_LoadFromBrx(LASER *, void *);
@@ -15,10 +15,10 @@ extern "C" void LoadLaserFromBrx(LASER *laser, void *bis)
     ALLOCREQ *preq = &req;
     req.cb = 0x5400;
     preq->cbAlign = align;
-    laser->beams = PvAllocStackClearImpl__Fi(preq);
+    laser->abeam = (BEAM *)PvAllocStackClearImpl__Fi(preq);
     CSo_LoadFromBrx(laser, bis);
-    req.cb = laser->count * 0x150;
+    req.cb = laser->cbeam * sizeof(BEAM);
     preq->cbAlign = align;
-    laser->beams = PvAllocSwCopyImpl__FiPv(preq, laser->beams);
+    laser->abeam = (BEAM *)PvAllocSwCopyImpl__FiPv(preq, laser->abeam);
     CStackFrame_Destructor(frame, 2);
 }

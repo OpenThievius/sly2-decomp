@@ -2,14 +2,14 @@
 #include "types.h"
 
 struct FilterOwner {
-    char pad0[0x60];
+    u8 unknown_0x0[0x60];
     void *activeObject;
 };
 
 struct FilterObject {
-    char pad0[0xEC];
+    u8 unknown_0x0[0xEC];
     FilterOwner *owner;
-    char padF0[0x1C0 - 0xF0];
+    u8 unknown_0xF0[0x1C0 - 0xF0];
     float result;
     float fraction;
     s32 mode;

@@ -1,4 +1,5 @@
-struct Obj { char pad[0x10]; void *parent; char pad14[0x20]; int guard; };
+#include "types.h"
+struct Obj { u8 unknown_0x0[0x10]; void *parent; u8 unknown_0x14[0x20]; int guard; };
 extern "C" void func_001EEF68(Obj *);
 extern "C" void AddGuardSgs(void *, int);
 void func_001753D8(Obj *obj)

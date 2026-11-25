@@ -1,15 +1,16 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "types.h"
 extern "C" {
 struct SndCall {
-    void (*function)(int, long);
-    long argument;
+    void (*function)(int, s64);
+    s64 argument;
 };
 extern int D_002C4640;
 extern int D_002C4654;
 extern int D_002C4688;
 extern int D_002C465C;
-extern void (*D_002C46A4)(int, long);
-extern long D_002C46A8;
+extern void (*D_002C46A4)(int, s64);
+extern s64 D_002C46A8;
 extern int B_00443844;
 extern int D_002C4680;
 extern int *D_002C4660[];
@@ -48,8 +49,8 @@ int snd_FlushSoundCommands(void) {
         FlushCache(0);
         if (B_00448480 != 0xFFFFFFFF) {
             if (D_002C4690.function != 0) {
-                void (*function)(int, long) = D_002C4690.function;
-                long argument = D_002C4690.argument;
+                void (*function)(int, s64) = D_002C4690.function;
+                s64 argument = D_002C4690.argument;
                 D_002C4690.function = 0;
                 D_002C4690.argument = 0;
                 function(B_00448480, argument);

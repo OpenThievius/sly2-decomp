@@ -1,4 +1,5 @@
-struct Epsel { char pad[0x110]; int f110; int f114; int f118; int f11C; int f120; };
+#include "types.h"
+struct Epsel { u8 unknown_0x0[0x110]; int f110; int f114; int f118; int f11C; int f120; };
 extern Epsel *B_003E1C04;
 void InitLo();
 extern "C" void InitEpsel(Epsel *self) {

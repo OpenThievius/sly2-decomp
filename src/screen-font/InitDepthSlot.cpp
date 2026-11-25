@@ -1,7 +1,8 @@
+#include "types.h"
 struct DepthSlot2156B8 {
-    unsigned a0; unsigned a4; char pad8[0x28];
+    unsigned a0; unsigned a4; u8 unknown_0x8[0x28];
     int f30; int f34; int f38; unsigned f3c; unsigned f40; const void *f44; int f48;
-    unsigned f4c; unsigned f50; int f54; int f58; int f5c; char pad60[4]; int f64; char sle[16];
+    unsigned f4c; unsigned f50; int f54; int f58; int f5c; u8 unknown_0x60[0x4]; int f64; char sle[16];
 };
 extern "C" {
 extern const char RO_002A3A10[];

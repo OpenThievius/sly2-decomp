@@ -4,10 +4,12 @@
 #include "so.h"
 #include "xf.h"
 #include "murray.h"
-struct IKLIMB { int id; int a; int b; char pad[0x94]; QW q; char pada[0x1C]; float f; };
-struct PEAH { char pad[0x14]; void *aseg; char pad18[4]; float time; char pad20[0x20]; float dur; };
-struct CARRY { char pad[0x180]; SO *so; char pad184[0xC]; LO *a190; char pad194[4]; LO *a198; };
-struct GADGETSTATE { char pad[0x1C]; int flag; };
+#include "carry.h"
+struct IKLIMB { int id; int a; int b; u8 unknown_0xC[0x94]; QW q; u8 unknown_0xB0[0x1C]; float f; };
+struct PEAH { u8 unknown_0x0[0x14]; void *aseg; u8 unknown_0x18[4]; float time; u8 unknown_0x20[0x20]; float dur; };
+/* local view of the carry object past what carry.h declares (g++ 2.95 starts a derived class's fields at 0x188, after CARRY's 0x184): the two objects the lift's IK limbs follow, read here only */
+struct CARRYLIFT : CARRY { u8 unknown_0x188[0x8]; LO *ploLimbA; u8 unknown_0x194[4]; LO *ploLimbB; };
+struct GADGETSTATE { u8 unknown_0x0[0x1C]; int flag; };
 static inline float Now(const float *pclock) { return *pclock; }
 extern "C" {
 void func_0012E460(void *);
@@ -49,7 +51,7 @@ void SetMurrayLiftState(MURRAY *self, int state)
         break;
     case 1: {
         SO *so;
-        if (self->ploCarried && (so = ((CARRY *)self->ploCarried)->so, ((int)(so->grfo >> 60) & 1))) {
+        if (self->ploCarried && (so = ((CARRYLIFT *)self->ploCarried)->pso, ((int)(so->grfo >> 60) & 1))) {
             SetSoCnstrForce(so, 0);
             self->field_0x1404 = so->pxfLinear->kind;
             self->field_0x1408 = so->pxfAngular->kind;
@@ -73,7 +75,7 @@ void SetMurrayLiftState(MURRAY *self, int state)
     }
     case 2: {
         SO *so;
-        if (self->ploCarried == 0 || (so = ((CARRY *)self->ploCarried)->so, ((int)(so->grfo >> 60) & 1) == 0)) {
+        if (self->ploCarried == 0 || (so = ((CARRYLIFT *)self->ploCarried)->pso, ((int)(so->grfo >> 60) & 1) == 0)) {
 detach:
             DetachMurrayObject(self);
             self->ploCarried = 0;
@@ -85,7 +87,7 @@ detach:
             func_001B72B0(self, (int)((SO *)held)->pxfRoot, &RO_002A2D30, &sp[1], &sp[0]);
             self->field_0x13F8 = func_0012DC18(so, so->pxfAngular, 5, 7, 2, sp[1]);
             self->field_0x13F4 = func_0012DC18(so, so->pxfLinear, 5, 7, 2, sp[0]);
-            LO *a190 = ((CARRY *)self->ploCarried)->a190;
+            LO *a190 = ((CARRYLIFT *)self->ploCarried)->ploLimbA;
             if (a190) {
                 IKLIMB *ref = self->pikLimbA;
                 ref->id = (int)a190->Slot32(&sp[2]);
@@ -95,7 +97,7 @@ detach:
                 self->field_0x161C = func_0012DD28(self, ref->b, 5, ref);
                 self->field_0x1604 = func_0012DDB0(self, (int)self->field_0x15F4, 5, 5, ref->id, &sp[2]);
             }
-            LO *a198 = ((CARRY *)self->ploCarried)->a198;
+            LO *a198 = ((CARRYLIFT *)self->ploCarried)->ploLimbB;
             if (a198) {
                 IKLIMB *ref = self->pikLimbB;
                 ref->id = (int)a198->Slot32(&sp[2]);

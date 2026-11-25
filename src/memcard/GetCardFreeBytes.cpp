@@ -1,10 +1,10 @@
 #include "sly2.h"
-struct SAVE { int port; int slot; int unk8; int unkC; int unk10; int unk14; int cardType; int cFree; int formatted; char pad[0xFD5C - 0x24]; char mc[4]; };
+#include "memcard.h"
 extern "C" int sceMcGetInfo(int, int, int *, int *, int *);
 extern "C" int McSync(void *, int, int, int *);
 int GetCardFreeBytes(SAVE *psave, int *pcbFree)
 {
-    char *pmc = psave->mc;
+    MEMCARD *pmc = &psave->mc;
     int nStart = sceMcGetInfo(psave->port, psave->slot, &psave->cardType, &psave->cFree, &psave->formatted);
     int nError = McSync(pmc, nStart, 1, 0);
     switch (nError) {

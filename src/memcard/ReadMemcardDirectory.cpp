@@ -1,6 +1,5 @@
 #include "sly2.h"
-struct SAVE { int port; int slot; char pad[0xFD5C - 8]; char mc[4]; };
-struct MCFILEINFO { char b[0x5C]; };
+#include "memcard.h"
 extern "C" {
 int sceMcGetDir(int, int, const char *, int, int, void *);
 int McSync(void *, int, int, int *);
@@ -26,7 +25,7 @@ int ReadMemcardDirectory(SAVE *psave, const char *pchzPattern, int cMax, MCFILEI
         pchzPattern = B_002E6500;
     }
     memset(B_002E6080, 0, 0x480);
-    char *pmc = psave->mc;
+    MEMCARD *pmc = &psave->mc;
     int nStart = sceMcGetDir(psave->port, psave->slot, pchzPattern, fContinue, cMax, B_002E6080);
     int nError = McSync(pmc, nStart, 0xD, pcFound);
     if (nError != 0)

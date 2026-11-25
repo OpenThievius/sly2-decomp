@@ -1,15 +1,13 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "gadgetmenu.h"
+#include "jt.h"
 struct RGBA {
     unsigned char r, g, b, a;
     RGBA() {}
     RGBA(unsigned int rgba) { *(unsigned int *)this = rgba; }
 };
 struct CTextBox;
-struct MT_1DAC58 { char pad[0xA0]; };
-struct GADGETENTRY { int id; char pad4[0x10]; float x; float y; char pad1c[4]; };
-struct GADGETMENU { char pad0[0x24]; int hmovie; char pad28[0x24]; int centry; GADGETENTRY *pentry; };
-struct FOCUSSLOT { int id; char pad4[8]; };
-struct FOCUS { char pad0[0x1180]; FOCUSSLOT aslot[3]; };
+struct MT_1DAC58 { u8 unknown_0x0[0xA0]; };
 extern "C" {
 void CTextBox_SetPos(CTextBox *, float, float);
 void CTextBox_SetSize(CTextBox *, float, float);
@@ -45,20 +43,20 @@ struct CTextBox {
 };
 extern "C" void GadgetMenu_DrawSlotLabels(GADGETMENU *self)
 {
-    if (self->hmovie == 0 || FDrawBlotMovie(self->hmovie) == 0)
+    if (self->pblot == 0 || FDrawBlotMovie(self->pblot) == 0)
         return;
-    FOCUS *pfocus = (FOCUS *)PpoSwFocusBase(B_003DD490);
+    JT *pfocus = (JT *)PpoSwFocusBase(B_003DD490);
     if (pfocus == 0 || FIsBasicDerivedFrom(pfocus, 0x34) == 0)
         return;
-    for (int ientry = 0; ientry < self->centry; ientry++) {
-        GADGETENTRY *pentry = &self->pentry[ientry];
+    for (int ientry = 0; ientry < self->cgme; ientry++) {
+        GADGETMENUENTRY *pentry = &self->agme[ientry];
         for (int islot = 0; islot < 3; islot++) {
-            if (pentry->id == pfocus->aslot[islot].id) {
+            if (pentry->id == pfocus->aslot[islot].gadget) {
                 CTextBox textBox(0.0f, 0.0f, 640.0f, 492.80002f, 0xFF808080);
                 MT_1DAC58 text;
                 func_00215AC0(&text, D_002C3268[islot], D_002C3264);
-                float xText = pentry->x;
-                float yText = pentry->y;
+                float xText = pentry->low;
+                float yText = pentry->high;
                 textBox.y = yText;
                 textBox.x = xText;
                 textBox.dx = 32.0f;

@@ -144,9 +144,9 @@ extern "C" ACT *PactNew(s32 kind) {
 
 extern "C" {
 struct ACTVTABLE {
-    char pad0[0x30];
+    u8 unknown_0x0[0x30];
     s16 dpActThis;
-    s16 pad32;
+    s16 unknown_0x32;
     void (*pfnClone)(void *, ACT *, s32, s32);
 };
 

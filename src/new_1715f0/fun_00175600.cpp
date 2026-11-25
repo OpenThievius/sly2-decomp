@@ -1,9 +1,9 @@
 #include "sly2.h"
 #include "goal.h"
 struct GOAL_175600 : GOAL {
-    char pad_30[0x4];
+    u8 unknown_0x30[0x4];
     int state;
-    char pad_38[0x8];
+    u8 unknown_0x38[0x8];
     int target;
 };
 extern "C" void func_001EEF98();

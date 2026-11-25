@@ -21,7 +21,7 @@ struct LIGHT : LO {
     /* 0x120 */ s32 block[12];           /* the 0x30-byte block RebuildLight fills (its first word is the mode) and func_001A4AD8 copies to the packet */
     /* 0x150 */ float strength;          /* RebuildLight, func_001A3610 */
     /* 0x154 */ float cone;              /* RebuildLight, func_001A3630 */
-    u8 unknown_0x158[0x4];
+    /* 0x158 */ s32 field_0x158;         /* InitLight (the constructor, slot 7) sets 1 */
     /* 0x15C */ s32 fExcludeDynamicObjects; /* SetLightFExcludeDynamicObjects; func_001A3B38 */
     /* 0x160 */ s32 fDynamic;            /* SetLightDynamic; func_001A3B38, func_001A3260 (finds a light that is not dynamic) */
     /* 0x164 */ float rangeA;            /* RebuildLight; SetLightFallOff copies the pair (rangeA, rangeB) */

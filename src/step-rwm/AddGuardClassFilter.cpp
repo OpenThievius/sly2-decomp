@@ -1,13 +1,11 @@
-struct Guard {
-    char pad0[0x3C0];
-    unsigned count;
-    int items[8];
-};
-void AddGuardClassFilter(Guard *guard, int value)
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "sly2.h"
+#include "stepguard.h"
+void AddGuardClassFilter(STEPGUARD *guard, int value)
 {
-    unsigned count = guard->count;
+    unsigned count = guard->cclassFilter;
     if (count < 2) {
-        guard->items[count] = value;
-        guard->count = count + 1;
+        guard->aclassFilter[count] = value;
+        guard->cclassFilter = count + 1;
     }
 }

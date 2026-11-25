@@ -1,6 +1,8 @@
-struct CMD { int op; int pad4; float duration; };
-struct ACTOR { char pad[0xF80]; int state; };
-struct BEH { char pad0[0x10]; ACTOR *pactor; char pad1[0x18 - 0x14]; void *pgoal; char pad2[0x38 - 0x1C]; CMD *pcmd; float tStart; int fWaiting; char pad3[0x48 - 0x44]; float yaw; };
+#include "sly2.h"
+#include "goal.h"
+#include "stepguard.h"
+struct CMD { int op; u8 unknown_0x4[4]; float duration; };
+struct BEH : GOAL { u8 unknown_0x30[8]; CMD *pcmd; float tStart; int fWaiting; u8 unknown_0x44[4]; float yaw; };
 extern "C" {
 int func_0017EE78(void *, CMD *);
 int func_0017CE30(void *, CMD *);
@@ -22,17 +24,17 @@ extern "C" int FGuardScriptWaiting(BEH *pbeh)
     switch (pbeh->pcmd->op) {
     case 6: {
         CMD *pcmd = pbeh->pcmd;
-        switch (pbeh->pactor->state) {
+        switch (((STEPGUARD *)pbeh->pstep)->modePath) {
         case -1:
-            if (func_0017EE78(pbeh->pgoal, pcmd))
+            if (func_0017EE78(pbeh->pgoalChild, pcmd))
                 pbeh->fWaiting = 0;
             break;
         case 0:
-            if (func_0017CE30(pbeh->pgoal, pcmd))
+            if (func_0017CE30(pbeh->pgoalChild, pcmd))
                 pbeh->fWaiting = 0;
             break;
         case 1:
-            if (func_0017D188(pbeh->pgoal, pcmd))
+            if (func_0017D188(pbeh->pgoalChild, pcmd))
                 pbeh->fWaiting = 0;
             break;
         }
@@ -40,9 +42,9 @@ extern "C" int FGuardScriptWaiting(BEH *pbeh)
     }
     case 7: {
         CMD *pcmd = pbeh->pcmd;
-        if (GoalGoto_FArrived(pbeh->pgoal, pcmd)) {
+        if (GoalGoto_FArrived(pbeh->pgoalChild, pcmd)) {
             pbeh->fWaiting = 0;
-            func_00209818((char *)pbeh->pactor + 0xFD0, pbeh->yaw);
+            func_00209818(&((STEPGUARD *)pbeh->pstep)->heading, pbeh->yaw);
         }
         break;
     }
@@ -53,12 +55,12 @@ extern "C" int FGuardScriptWaiting(BEH *pbeh)
     case 13:
     case 14: {
         CMD *pcmd = pbeh->pcmd;
-        if (FGoalAnimDone(pbeh->pgoal, pcmd))
+        if (FGoalAnimDone(pbeh->pgoalChild, pcmd))
             pbeh->fWaiting = 0;
         break;
     }
     }
     if (pbeh->fWaiting == 0)
-        Goal_Pop(&pbeh->pgoal);
+        Goal_Pop(&pbeh->pgoalChild);
     return pbeh->fWaiting;
 }

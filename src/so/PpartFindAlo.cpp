@@ -1,9 +1,5 @@
+#include "geom.h"
 #include "so.h"
-struct GEOM {
-    char pad0[0xC];
-    int alo;
-    char pad1[0xA0];
-};
 extern "C" GEOM *PpartFindAlo(SO *so, int alo)
 {
     for (int index = 0; index < so->cgeom; index++) {

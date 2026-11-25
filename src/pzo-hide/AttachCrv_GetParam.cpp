@@ -1,6 +1,6 @@
 #include "sly2.h"
-struct Crv { char pad[0xE4]; int closed; };
-struct Jt { char pad[0x218]; QW *pole; };
+struct Crv { u8 unknown_0x0[0xE4]; int closed; };
+struct Jt { u8 unknown_0x0[0x218]; QW *pole; };
 extern "C" void FindCrvClosestPointAll(Crv *, QW, void *, QW *, void *, void *, float *);
 extern "C" float SMaxCrv(Crv *);
 

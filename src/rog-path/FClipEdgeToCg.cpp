@@ -1,9 +1,9 @@
 #include "types.h"
 struct ClipResult {
-    char pad0[0x40];
+    u8 unknown_0x0[0x40];
     f32 low;
     f32 high;
-    char pad1[0x78];
+    u8 unknown_0x48[0x78];
 };
 extern "C" {
 s32 ClsgClipEdgeToCg(s32, s32, s32, s32, ClipResult *, s32);

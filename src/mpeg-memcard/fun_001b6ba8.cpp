@@ -3,7 +3,7 @@
 #include "so.h"
 #include "sly2.h"
 #include "murray.h"
-struct JOY { char pad[0x18]; float rad; float mag; };
+#include "joy.h"
 extern "C" int FAsegaGone(int);
 extern "C" int FJtStuck(MURRAY *, void *, float);
 extern "C" void SetMurrayState(MURRAY *, int);
@@ -33,7 +33,7 @@ extern "C" void func_001B6BA8(MURRAY *pmurray)
     if (flops < 2) {
         if (flops >= 0) {
             JOY *pjoy = pmurray->pjoy;
-            pmurray->velGoal = SetVectorCylind__FP6VECTORfff(pjoy->rad + 3.1415927f, D_002C09A0 * D_002BF730 * pjoy->mag, 0.0f);
+            pmurray->velGoal = SetVectorCylind__FP6VECTORfff(pjoy->radStick + 3.1415927f, D_002C09A0 * D_002BF730 * pjoy->uStick, 0.0f);
         }
     }
 }

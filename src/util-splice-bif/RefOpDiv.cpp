@@ -12,7 +12,7 @@ struct VU_VECTOR { QW m_q; VU_VECTOR(const VECTOR &vector); };
 VU_VECTOR operator*(VU_FLOAT vuf, VU_VECTOR vuv);
 extern "C" {
 CRef *SetF32__4CReff(CRef *pref, float g);
-CRef *CRef_RefClone(CRef *pref, CRef *ref, CFrame *pframe, unsigned long ulArg);
+CRef *CRef_RefClone(CRef *pref, CRef *ref, CFrame *pframe, u64 ulArg);
 VECTOR *__as__6VECTORG9VU_VECTOR(VECTOR *pvector, VU_VECTOR vuv);
 }
 

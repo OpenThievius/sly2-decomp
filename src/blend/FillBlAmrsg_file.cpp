@@ -64,7 +64,7 @@ void FillBlAmrsg(int cbBl, int cbl, void *abl, int ibMrsg, int coid, OID *aoid)
     }
 }
 
-/* a blend's record of one section: where it starts and how long it is, in the aseg's own time */
+/* a blend's record of one section: where it starts and its length, in the aseg's own time */
 struct MRSG { float gStart; float gLength; };
 
 float GModPositive__Fff(float, float);

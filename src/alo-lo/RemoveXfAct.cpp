@@ -1,29 +1,27 @@
-struct VT { char pad[8]; short d1; short i1; void (*f1)(void *); short d2; short i2; void (*f2)(void *); short d3; short i3; void (*f3)(void *); };
-struct ACT { char pad0[0x10]; ACT *next; int unk; VT *vt; };
+#include "act.h"
 struct ALO;
-#include "xf.h"
 void InvalidateXfSegment(ALO *, XF *);
-static inline void CallF1(ACT *a) { a->vt->f1((char *)a + a->vt->d1); }
-static inline void CallF2(ACT *a) { a->vt->f2((char *)a + a->vt->d2); }
-static inline void CallF3(ACT *a) { a->vt->f3((char *)a + a->vt->d3); }
+static inline void CallSlot1(ACT *pact) { ACTVT *vt = (ACTVT *)pact->vtable; vt->slot1.fn((char *)pact + vt->slot1.delta); }
+static inline void CallSlot2(ACT *pact) { ACTVT *vt = (ACTVT *)pact->vtable; vt->slot2.fn((char *)pact + vt->slot2.delta); }
+static inline void CallSlot3(ACT *pact) { ACTVT *vt = (ACTVT *)pact->vtable; vt->slot3.fn((char *)pact + vt->slot3.delta); }
 
 extern "C" void RemoveXfAct(ALO *palo, XF *pxf, ACT *pact)
 {
     ACT *pactTopOld = pxf->pactFirst;
     ACT **ppactLink = &pxf->pactFirst;
-    for (ACT *pactCur = pactTopOld; pactCur != 0; pactCur = pactCur->next) {
+    for (ACT *pactCur = pactTopOld; pactCur != 0; pactCur = pactCur->pactNext) {
         if (pactCur == pact) {
-            *ppactLink = pactCur->next;
+            *ppactLink = pactCur->pactNext;
             if (pxf->pactFirst != pactTopOld) {
                 InvalidateXfSegment(palo, pxf);
-                CallF2(pactTopOld);
+                CallSlot2(pactTopOld);
                 if (pxf->pactFirst != 0)
-                    CallF1(pxf->pactFirst);
+                    CallSlot1(pxf->pactFirst);
             } else if (pactTopOld != 0) {
-                CallF3(pactTopOld);
+                CallSlot3(pactTopOld);
             }
             return;
         }
-        ppactLink = &pactCur->next;
+        ppactLink = &pactCur->pactNext;
     }
 }

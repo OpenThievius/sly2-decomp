@@ -38,7 +38,8 @@ struct ACTVTENTRY {
 struct ACTVT {
     u8 unknown_0x0[0x8];
     /* 0x08 */ struct ACTVTENTRY slot1;
-    u8 unknown_0x10[0x10];
+    /* 0x10 */ struct ACTVTENTRY slot2; /* reader: InsertXfAct, RemoveXfAct, ResortXfActList call it on the act that stops being the top one */
+    /* 0x18 */ struct ACTVTENTRY slot3; /* reader: the same three call it on a top act that stays the top one */
     /* 0x20 */ struct ACTVTENTRY slot4;
 };
 

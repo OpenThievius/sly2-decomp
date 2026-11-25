@@ -25,24 +25,44 @@ struct TASK {
 #endif
     /* 0x50 */ s32 field_0x50;      /* FTaskRunning: a task with it set is not running; AddTaskAnim adds nothing then */
     /* 0x54 */ s32 state;           /* FTaskComplete: -1 = not set (then the save value, if any), 2 and up = complete */
-    u8 unknown_0x58[0x4];
+    /* 0x58 */ f32 tState;          /* readers: ApplyTaskState stores the clock when the state changes, UpdateTask measures the time limit from it */
     /* 0x5C */ s32 labelId;         /* EnterTask shows the HUD label (ShowHudLabel), LeaveTask clears it */
     /* 0x60 */ s32 labelFlag;       /* EnterTask, LeaveTask: the label is only used when set */
-    /* 0x64 */ s32 cEnter;          /* EnterTask counts */
-    u8 unknown_0x68[0x14];
+    /* 0x64 */ s32 cEnter;          /* EnterTask counts; readers: PostLoadTask and RestoreTaskStateFromSave (from the save), ApplyTaskState clears it */
+    /* 0x68 */ s32 cComplete;       /* readers: PostLoadTask (from the save), ApplyTaskState counts it on state 2 */
+    /* 0x6C */ s32 field_0x6C;      /* reader: FTaskPrerequisitesDone (a task in state 1 with it set counts as done) */
+    /* 0x70 */ s32 field_0x70;      /* reader: ApplyTaskState (state 1 with it set switches to the task) */
+    /* 0x74 */ s32 field_0x74;      /* reader: ApplyTaskState (state 1 with it set records the task's id) */
+    /* 0x78 */ f32 tLimit;          /* readers: PostLoadTask, UpdateTask (the time limit; SendTaskTimeLimit fires when it runs out) */
     /* 0x7C */ struct JOB *job;     /* EnterTask, RefuseTaskState (virtual calls on it), PostTaskJobEvent */
-    u8 unknown_0x80[0x28];
+    /* 0x80 */ struct LO *ploMarker; /* readers: PostLoadTask (tested), UpdateTask (Add while the task is in state 1, else Remove) */
+    u8 unknown_0x84[0xC];
+    /* 0x90 */ s32 *aoidPrereq;     /* readers: LoadTaskFromBrx (reads the ids), PostLoadTask (resolves them into aprereq) */
+    /* 0x94 */ s32 cprereq;         /* readers: LoadTaskFromBrx, PostLoadTask, CollectTaskPrerequisites, FTaskPrerequisitesDone, ... */
+    /* 0x98 */ struct TASK **aprereq; /* the same */
+    /* 0x9C */ s32 *aoidDep;        /* readers: LoadTaskFromBrx, PostLoadTask (resolves them into adep) */
+    /* 0xA0 */ s32 cdep;            /* readers: LoadTaskFromBrx, PostLoadTask, SetTaskStateCascade, VisitTaskInOrder */
+    /* 0xA4 */ struct TASK **adep;  /* the same */
     /* 0xA8 */ s32 ctoggle;         /* EnterTask, LeaveTask pass ctoggle and atoggle to ApplyTaskToggles */
     /* 0xAC */ void *atoggle;
     /* 0xB0 */ s32 canim;           /* AddTaskAnim (limit 0x20), EnterTask, LeaveTask pass canim and aanim to ApplyTaskAnims */
     /* 0xB4 */ struct ANIMREC *aanim;
     /* 0xB8 */ s32 oidSpawn;        /* EnterTask: when not -1 the task is the world's restart task (NotifyJobTaskState reads it) */
-    u8 unknown_0xBC[0x8];
+    /* 0xBC */ s32 levelRow;        /* readers: RestartAtTask (level row of the restart), InitTask (-1) */
+    /* 0xC0 */ s32 field_0xC0;      /* readers: RestartAtTask, func_00165280 (a value other than -1 goes through func_001D8B20), InitTask (-1) */
     /* 0xC4 */ struct LO *plo;      /* EnterTask: the warp it starts (Warp_Start) after marking its entry */
-    u8 unknown_0xC8[0x10];
+    /* 0xC8 */ s32 pathEnter[2];    /* readers: PostLoadTask (its first word non-zero: cEnter comes from the save) */
+    /* 0xD0 */ s32 pathComplete[2]; /* readers: PostLoadTask (the same for cComplete) */
     /* 0xD8 */ s32 pathSave[2];    /* FTaskComplete: its first word non-zero means a path into the game save */
-    u8 unknown_0xE0[0x14];
-    /* 0xF4 */ s32 field_0xF4;      /* FTaskRunning: 2 and 3 are not running; EnterTask and LeaveTask pass it to ApplyTaskAnims */
+    /* 0xE0 */ s32 pathState[2];    /* reader: RestoreTaskStateFromSave (the saved state) */
+    /* 0xE8 */ s32 pathForced[2];   /* reader: RestoreTaskStateFromSave (the forced flag) */
+    /* 0xF0 */ s32 pending;         /* readers: CollectTaskPrerequisites (-1 = not queued, else the state it is queued for), UpdateDependentTaskState, InitTask (-1) */
+    /* 0xF4 */ s32 cause;           /* FTaskRunning: 2 and 3 are not running; EnterTask and LeaveTask pass it to ApplyTaskAnims; the CAUSESCOPE of
+                                       ForceTaskState, RequestTaskState, VisitTaskInOrder saves and sets it (the JOB has the pair at 0xF0) */
+    /* 0xF8 */ s32 causeArg;        /* the same scope's argument */
+    /* 0xFC */ s32 cVisit;          /* readers: OrderTasks (clears it), VisitTaskInOrder (counts the visits against cprereq) */
+    /* 0x100 */ s32 depthMax;       /* reader: VisitTaskInOrder */
+    /* 0x104 */ s32 jobDepthMax;    /* reader: VisitTaskInOrder */
 };
 
 /* One animation request of a job's table (0x18 bytes); names from func_00162250, which reads them. */
@@ -93,5 +113,6 @@ struct JOB {
     /* 0xB8 */ void *field_0xB8;        /* BeginJobComplete: non-null starts the end sequence */
     u8 unknown_0xBC[0x34];
     /* 0xF0 */ s32 cause;               /* readers: StartJob, StopJob (the last argument of ApplyTaskAnims) */
+    /* 0xF4 */ s32 causeArg;            /* readers: ForceTaskState, RequestTaskState (the CAUSESCOPE's job half saves and sets the pair) */
 };
 #endif

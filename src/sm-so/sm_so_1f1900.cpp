@@ -8,7 +8,7 @@
 struct RIGOBJ { u8 unknown_0x0[0x158]; int unk158; };
 
 
-extern "C" unsigned long GrfsgsFromSgs(int);
+extern "C" u64 GrfsgsFromSgs(int);
 
 extern "C" void *PpoSwFocusBase(void *);
 
@@ -28,7 +28,7 @@ void func_001F1900(STEPGUARD *pguard)
     if (!pguard->prig->unk158) {
         state = -1;
     } else {
-        unsigned long grfsgsAlert = GrfsgsFromSgs(0x1D) | GrfsgsFromSgs(0x20) | GrfsgsFromSgs(5) | GrfsgsFromSgs(6) |
+        u64 grfsgsAlert = GrfsgsFromSgs(0x1D) | GrfsgsFromSgs(0x20) | GrfsgsFromSgs(5) | GrfsgsFromSgs(6) |
                                     GrfsgsFromSgs(7) | GrfsgsFromSgs(0x17) | GrfsgsFromSgs(0x16);
         if (pguard->grfsgs & grfsgsAlert) {
             state = 0;

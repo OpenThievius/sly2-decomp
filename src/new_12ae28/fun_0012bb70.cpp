@@ -1,10 +1,9 @@
-struct Key_12BB70 { char pad0[0xC]; float time; char pad10[0x10]; };
-struct Acrb_12BB70 { int pad0; int count; Key_12BB70 *keys; };
-extern "C" int func_0012BB70(Acrb_12BB70 *pacrb, float time) {
-    int last = pacrb->count - 1;
+#include "acr.h"
+extern "C" int func_0012BB70(ACRBL *pacrb, float time) {
+    int last = pacrb->ckey - 1;
     int index;
     for (index = 1; index < last; index++) {
-        if (time < pacrb->keys[index].time)
+        if (time < pacrb->akey[index].t)
             break;
     }
     return index;

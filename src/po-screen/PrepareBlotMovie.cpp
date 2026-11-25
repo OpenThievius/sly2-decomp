@@ -12,10 +12,10 @@ struct CFileLocation { unsigned hash; unsigned slot; unsigned kind; unsigned fie
         return slotNew != 0;
     }
 };
-struct BLOTX { char pad0[0x58]; int state; int pad5C; int time; };
-struct NODE { char pad0[0x40]; BLOTX *blot; int first; int last; NODE *next; };
-struct BLOT { char pad0[0x50]; int field50; int field54; char pad58[0x68]; MOVIE *movie; };
-struct COUNTERS { char pad[0xC]; int limit; };
+struct BLOTX { u8 unknown_0x0[0x58]; int state; int pad5C; int time; };
+struct NODE { u8 unknown_0x0[0x40]; BLOTX *blot; int first; int last; NODE *next; };
+struct BLOT { u8 unknown_0x0[0x50]; int field50; int field54; u8 unknown_0x58[0x68]; MOVIE *movie; };
+struct COUNTERS { u8 unknown_0x0[0xC]; int limit; };
 struct STREAM { char bytes[0x70]; };
 extern "C" {
 void *CStackFrame_Construct(void *);

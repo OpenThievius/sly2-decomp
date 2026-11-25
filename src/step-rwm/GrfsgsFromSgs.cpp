@@ -1,4 +1,5 @@
-extern "C" unsigned long GrfsgsFromSgs(int sgs)
+#include "types.h"
+extern "C" u64 GrfsgsFromSgs(int sgs)
 {
     if (sgs == -1)
         return 0;

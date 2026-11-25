@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "amb.h"
 #include "sly2.h"
 #include "ps2inline.h"
 
-struct AMB { char pad0[0x1C]; void *palo; QW pos; };
 extern "C" {
 int FFloatsNear__Ffff(float, float, float);
 void SetAmbGrf(AMB *, int, int);

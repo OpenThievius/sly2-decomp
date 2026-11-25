@@ -32,9 +32,7 @@ extern "C" void PredictXfTransform(void *pa0, void *pa1, float t, float *pm0, fl
     PredictXfTransformAdjust(pa0, pa1, t, pm0, pm1);
 }
 
-struct PREDNODE { char pad[0xA0]; PREDNODE *pnext; };
-
-extern "C" void PredictXfLocal(PREDNODE *, MATRIX4 *, MATRIX4 *, float);
+extern "C" void PredictXfLocal(XF *, MATRIX4 *, MATRIX4 *, float);
 
 MATRIX4 operator*(const MATRIX4 &, const MATRIX4 &);
 
@@ -44,7 +42,7 @@ static inline void AddMatrix(MATRIX4 *sum, const MATRIX4 &first, const MATRIX4 &
         sum->row[row] = VectorAdd(first.row[row], second.row[row]);
 }
 
-void PredictXfTransformAdjust(PREDNODE *pfirst, PREDNODE *plast, MATRIX4 *pmatA, MATRIX4 *pmatB, float dt)
+void PredictXfTransformAdjust(XF *pfirst, XF *plast, MATRIX4 *pmatA, MATRIX4 *pmatB, float dt)
 {
     MATRIX4 local;
     MATRIX4 delta;
@@ -64,7 +62,7 @@ void PredictXfTransformAdjust(PREDNODE *pfirst, PREDNODE *plast, MATRIX4 *pmatA,
         pelement[5] = 1.0f;
         matA.mat[0][0] = 1.0f;
     }
-    for (PREDNODE *pnode = pfirst; pnode != plast; pnode = pnode->pnext) {
+    for (XF *pnode = pfirst; pnode != plast; pnode = pnode->pxfParent) {
         PredictXfLocal(pnode, &local, &delta, dt);
         {
             MATRIX4 sum;

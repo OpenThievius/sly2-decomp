@@ -1,10 +1,6 @@
 #include "sly2.h"
+#include "emitter.h"
 int memcmp(const void *, const void *, unsigned int);
-struct EMITB {
-    int f0; int emitpk; void *ref; char pad0[4]; int f10; char pad1[0xC]; int oidReference; char pad2[0xC]; int oidCurve;
-    char pad3[0x94]; int oidA; int oidB; int oidC; int oidSpline;
-};
-struct EMITTER { char pad[0xE4]; EMITB *emitb; };
 #include "alloc.h"
 extern "C" {
 void PostLoLoad(EMITTER *);
@@ -18,10 +14,10 @@ void PostSuvLoad(EMITTER *emitter)
 {
     void *apv[5];
     PostLoLoad(emitter);
-    int oidReference = emitter->emitb->oidReference;
+    int oidReference = emitter->pemitb->oidReference;
     int oidCurve = -1;
-    if (emitter->emitb->f10 == 2)
-        oidCurve = emitter->emitb->oidCurve;
+    if (emitter->pemitb->emitok == 2)
+        oidCurve = emitter->pemitb->field_0x30;
     memset(apv, 0, 0x14);
     if (oidReference != -1)
         apv[0] = PloFindSwObject_thunk(B_003DD490, 4, oidReference, emitter);
@@ -29,13 +25,13 @@ void PostSuvLoad(EMITTER *emitter)
         apv[1] = PloFindSwObject_thunk(B_003DD490, 4, oidCurve, emitter);
         apv[0] = 0;
     }
-    EMITB *emitb = emitter->emitb;
+    EMITB *emitb = emitter->pemitb;
     int emitpk = emitb->emitpk;
     if (emitpk != 0) {
         if (emitpk == 1) {
-            int oidA = emitb->oidA;
-            int oidB = emitb->oidB;
-            int oidC = emitb->oidC;
+            int oidA = emitb->params.oidA;
+            int oidB = emitb->params.oidB;
+            int oidC = emitb->params.oidC;
             if (oidA != -1)
                 apv[2] = PloFindSwObject_thunk(B_003DD490, 4, oidA, emitter);
             if (oidB != -1)
@@ -44,18 +40,18 @@ void PostSuvLoad(EMITTER *emitter)
                 apv[4] = PloFindSwObject_thunk(B_003DD490, 4, oidC, emitter);
         }
     } else {
-        int oid = emitb->oidSpline;
+        int oid = emitb->params.oidSpline;
         if (oid != -1)
             apv[2] = PloFindSwObject_thunk(B_003DD490, 4, oid, emitter);
     }
-    if (emitter->emitb->ref == 0)
-        emitter->emitb->ref = D_002CE4B8;
-    if (memcmp(emitter->emitb->ref, apv, 0x14) != 0) {
+    if (emitter->pemitb->pinfo == 0)
+        emitter->pemitb->pinfo = (EMITBINFO *)D_002CE4B8;
+    if (memcmp(emitter->pemitb->pinfo, apv, 0x14) != 0) {
         func_002590F0(emitter, 1);
         ALLOCREQ req;
         ALLOCREQ *preq = &req;
         preq->cb = 0x14;
         preq->cbAlign = 0x10;
-        emitter->emitb->ref = PvAllocSwCopyImpl__FiPv(preq, apv);
+        emitter->pemitb->pinfo = (EMITBINFO *)PvAllocSwCopyImpl__FiPv(preq, apv);
     }
 }

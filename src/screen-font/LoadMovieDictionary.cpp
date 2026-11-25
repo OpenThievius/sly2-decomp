@@ -1,6 +1,6 @@
 #include "sly2.h"
 struct SLOTHEAP;
-struct BLOT { char pad[0xC4]; SLOTHEAP *heap; };
+struct BLOT { u8 unknown_0x0[0xC4]; SLOTHEAP *heap; };
 struct CBinaryInputStream { unsigned short U16Read(); };
 extern int D_002C40A4;
 extern void *PvAllocSlotheapClearImpl__FP8SLOTHEAP(SLOTHEAP *, int, int);

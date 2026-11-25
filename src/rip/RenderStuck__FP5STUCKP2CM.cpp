@@ -1,7 +1,7 @@
 #include "sly2.h"
 struct Rows3 { QW row[3]; };
 struct XF;
-struct STUCK { char pad0[0x40]; Rows3 mat; QW pos; char pad1[0xF0 - 0x80]; int xf; };
+struct STUCK { u8 unknown_0x0[0x40]; Rows3 mat; QW pos; u8 unknown_0x80[0x70]; int xf; };
 struct RIP;
 extern "C" {
 QW ConvertXfPos(int, XF *, QW);

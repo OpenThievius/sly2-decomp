@@ -4,7 +4,7 @@
 #include "m2c_macros.h"
 #include "types.h"
 
-struct GIFS { char pad[0x30]; };
+struct GIFS { u8 unknown_0x0[0x30]; };
 
 struct sceDmaChan;
 
@@ -18,11 +18,11 @@ extern "C" void AddDmaEnd__4DMAS(GIFS *);
 
 extern "C" void EndDmaCnt__4DMAS(GIFS *);
 
-extern "C" void AddPrimPack__4GIFSiiUl(GIFS *, int, int, unsigned long);
+extern "C" void AddPrimPack__4GIFSiiUl(GIFS *, int, int, u64);
 
 extern "C" void AddPrimEnd__4GIFS(GIFS *);
 
-extern "C" void PackAD__4GIFSll(GIFS *, long, long);
+extern "C" void PackAD__4GIFSll(GIFS *, s64, s64);
 
 extern "C" void PackUV__4GIFSii(GIFS *, int, int);
 
@@ -40,9 +40,9 @@ extern "C" int g_2dedb0;
 
 extern "C" int g_2dedb8;
 
-extern "C" unsigned long B_002DEBE0;
+extern "C" u64 B_002DEBE0;
 
-extern "C" unsigned long g_2decd0;
+extern "C" u64 g_2decd0;
 
 extern "C" void BlendPrevFrame__Fv(void)
 {
@@ -57,7 +57,7 @@ extern "C" void BlendPrevFrame__Fv(void)
     AddPrimPack__4GIFSiiUl(&gifs, 0, 1, 0xE);
     PackAD__4GIFSll(&gifs, 0x3F, 0);
 
-    unsigned long *frame;
+    u64 *frame;
     if (g_2dedb0 & 1)
         frame = &B_002DEBE0;
     else

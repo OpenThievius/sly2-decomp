@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly.h"
-struct JOY { char pad[0x30]; unsigned grfbtn; };
+#include "joy.h"
 extern "C" {
 int FButtonPressedWithin(JOY *pjoy, int grfbtn, float dt);
 void SetJmpState(void *pjmp, int jmps, int arg1, int arg2);
@@ -41,7 +41,7 @@ extern "C" void UpdateJtCaneInput(SLY *psly)
                 return;
             } else {
                 if (!(psly->pjoy->grfbtn & 0x80)) {
-                    if (*(s32 *)psly->unknown_0x18E8) {
+                    if (psly->field_0x18E8) {
                         SetJtState(psly, 5, 8);
                     } else {
                         SetJtState(psly, 5, 4);

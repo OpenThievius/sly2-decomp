@@ -1,14 +1,7 @@
-struct MOVIE { char pad[0x40]; };
-struct CMpeg {
-    int cmovie;
-    MOVIE amovie[4];
-    char pad[0x104 - 4 - 0x100];
-    void *psubtitle;
-    int fRepeat;
-    void Execute(MOVIE *);
-};
+#include "types.h"
+#include "cmpeg.h"
 extern "C" unsigned int func_001AE150(int);
-extern "C" void *func_001B2820(MOVIE *);
+extern "C" SUBTITLE *func_001B2820(MOVIE *);
 
 int FPlayQueuedMovies(CMpeg *pmpeg)
 {
@@ -23,7 +16,7 @@ int FPlayQueuedMovies(CMpeg *pmpeg)
         pmpeg->psubtitle = func_001B2820(pmovie);
         do {
             pmpeg->Execute(pmovie);
-        } while (pmpeg->fRepeat != 0);
+        } while (pmpeg->fSkippable != 0);
         pmpeg->psubtitle = 0;
     }
     pmpeg->cmovie = 0;

@@ -1,10 +1,10 @@
 #include "sly2.h"
+#include "job.h"
 struct CRefX { int tagk; int n; int pad[2]; };
-struct TASK { char pad0[0x18]; int oid; char pad1c[0x7C - 0x1C]; TASK *pparent; char pad80[0xB8 - 0x80]; int fB8; char padBC[4]; int fC0; char padC4[0xF0 - 0xC4]; int fF0; int fF4; int fF8; };
-struct JOBMGR { char pad0[0x10]; int fieldA; int fieldB; int oid; };
+struct JOBMGR { u8 unknown_0x0[0x10]; int fieldA; int fieldB; int oid; };
 #include "sw.h"
 struct CTaskHold {
-    TASK *pother;
+    JOB *pother;
     TASK *ptask;
     int saveF4;
     int saveF8;
@@ -13,21 +13,21 @@ struct CTaskHold {
         pother = 0;
         ptask = task;
         if (ptask != 0) {
-            saveF4 = ptask->fF4;
-            ptask->fF4 = value;
-            saveF8 = ptask->fF8;
-            ptask->fF8 = 0;
+            saveF4 = ptask->cause;
+            ptask->cause = value;
+            saveF8 = ptask->causeArg;
+            ptask->causeArg = 0;
         }
     }
     ~CTaskHold()
     {
         if (pother != 0) {
-            pother->fF0 = saveF4;
-            pother->fF4 = saveF8;
+            pother->cause = saveF4;
+            pother->causeArg = saveF8;
         }
         if (ptask != 0) {
-            ptask->fF4 = saveF4;
-            ptask->fF8 = saveF8;
+            ptask->cause = saveF4;
+            ptask->causeArg = saveF8;
         }
     }
 };
@@ -59,12 +59,12 @@ extern "C" void func_00165280(JOBMGR *self)
         RestoreTaskStateFromSave(ptask);
     }
     TASK *pjob = PloFindSwObject_thunk(&B_003DD490, 0x105, self->oid, 0);
-    self->fieldA = pjob->pparent->oid;
+    self->fieldA = pjob->job->oid;
     self->fieldB = pjob->oid;
     {
     CTaskHold holdJob(pjob, 3);
     SetTaskState(pjob, 1);
-    int value = pjob->fC0;
+    int value = pjob->field_0xC0;
     if (value != -1) {
         CRefX result;
         CRefX arg;
@@ -79,7 +79,7 @@ extern "C" void func_00165280(JOBMGR *self)
         CTaskHold hold(ptask, 3);
         ApplyTaskState(ptask, -1);
     }
-    B_003DD490.loadreq.field_0x44 = pjob->fB8;
+    B_003DD490.loadreq.field_0x44 = pjob->oidSpawn;
     B_003DD490.loadreq.field_0x48 = -1;
     B_003DD490.loadreq.grf = (B_003DD490.loadreq.grf & ~8) | 4;
     }

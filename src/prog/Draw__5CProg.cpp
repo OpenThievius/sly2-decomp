@@ -1,7 +1,7 @@
 #include "sly2.h"
 #include "rgba.h"
-struct GIFS { char pad[0x30]; };
-struct CPROG { int f0; int max; int total; int remaining; char pad10[0x40]; int mode; RGBA c54; RGBA c58; RGBA c5c; RGBA c60; };
+struct GIFS { u8 unknown_0x0[0x30]; };
+struct CPROG { int f0; int max; int total; int remaining; u8 unknown_0x10[0x40]; int mode; RGBA c54; RGBA c58; RGBA c5c; RGBA c60; };
 extern "C" {
 void __4GIFS(GIFS *);
 void AllocStatic__4DMASiP2QW(GIFS *, int, QW *);

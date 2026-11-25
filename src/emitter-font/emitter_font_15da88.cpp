@@ -5,7 +5,7 @@
 #include "sw.h"
 #include "m2c_macros.h"
 
-struct TARGET { char pad[0x128]; int stage; };
+struct TARGET { u8 unknown_0x0[0x128]; int stage; };
 
 extern SW B_003DD490;
 

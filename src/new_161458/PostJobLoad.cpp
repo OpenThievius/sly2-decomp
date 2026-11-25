@@ -1,6 +1,6 @@
 #include "sly2.h"
 #include "cref.h"
-struct JOB { char pad0[0x7C]; int cStart; char pad1[0xC]; int ctoggle; void *atoggle; int canim; void *aanim; char pad2[8]; float tJob; int saveVar; int oidAseg; char pad3[8]; int ploAseg; int ploAsegDone; char pad4[0x10]; char pathStart[0x10]; char pathTime[8]; char pathVar[8]; };
+struct JOB { u8 unknown_0x0[0x7C]; int cStart; u8 unknown_0x80[0xC]; int ctoggle; void *atoggle; int canim; void *aanim; u8 unknown_0x9C[8]; float tJob; int saveVar; int oidAseg; u8 unknown_0xB0[8]; int ploAseg; int ploAsegDone; u8 unknown_0xC0[0x10]; char pathStart[0x10]; char pathTime[8]; char pathVar[8]; };
 extern "C" char B_003E0EA8[];
 extern "C" int B_003D4A60;
 extern "C" void PostLoLoad(JOB *);

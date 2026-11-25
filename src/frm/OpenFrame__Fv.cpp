@@ -1,10 +1,10 @@
 #include "sly2.h"
-struct FRM { char pad0[8]; QW *p8; int cC; char pad10[8]; QW *p18; int c1C; char pad20[4]; int f24; char pad28[4]; int f2c; int f30; char pad34[0x18]; int f4c; };
+#include "frm.h"
 struct DMAS;
 extern int B_003D3980;
 extern int g_2deb1c;
 extern unsigned B_002DEB10;
-extern char B_002DEA50[];
+extern FRM B_002DEA50[2];
 extern FRM *g_2dea4c;
 extern int g_2ddf54;
 extern char B_002DEA00[];
@@ -22,16 +22,16 @@ void OpenFrame__Fv()
     WaitSema(g_2deb1c);
     unsigned i = B_002DEB10;
     B_002DEB10 = i + 1;
-    g_2dea4c = (FRM *)(B_002DEA50 + i * 0x50);
+    g_2dea4c = &B_002DEA50[i];
     if (B_002DEB10 >= 2) B_002DEB10 = 0;
     ClearPendingFrame(g_2dea4c);
     FRM *f = g_2dea4c;
-    f->f4c = g_2ddf54;
-    f->f30 = 1;
-    f->f2c = 0;
-    f->f24 = 0;
-    AllocStatic__4DMASiP2QW(B_002DEA00, f->cC, f->p8);
-    AllocStatic__4DMASiP2QW(g_2dea28, g_2dea4c->c1C, g_2dea4c->p18);
+    f->field_0x4C = g_2ddf54;
+    f->grf = 1;
+    f->grfFontLoaded = 0;
+    f->pqwVifSend = 0;
+    AllocStatic__4DMASiP2QW(B_002DEA00, f->cqwGifBuffer, f->pqwGifBuffer);
+    AllocStatic__4DMASiP2QW(g_2dea28, g_2dea4c->cqwVifBuffer, g_2dea4c->pqwVifBuffer);
     AddDmaRefs__4DMASiP2QW(B_002DEA00, 12, (QW *)B_002DF740);
     AddDmaCnt__4DMAS(B_002DEA00);
 }

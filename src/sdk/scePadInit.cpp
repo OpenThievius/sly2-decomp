@@ -1,5 +1,6 @@
+#include "types.h"
 extern "C" {
-struct PadClient { char pad0[0x24]; int serverReady; };
+struct PadClient { u8 unknown_0x0[0x24]; int serverReady; };
 int sceSifBindRpc(PadClient *client, int serverId, int mode);
 int func_00243C40();
 int func_00242E90(int arg);

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "bentley.h"
-struct ACT { u8 unknown_0x0[0x148]; unsigned long flags; };
+struct ACT { u8 unknown_0x0[0x148]; u64 flags; };
 /* what the player stands on, as func_001942F0 reads it (STEP::psoSurface is declared a SO, its fields are those of a geometry) */
 struct SURFACE { u8 unknown_0x0[0x40]; int field_0x40; u8 unknown_0x44[8]; ACT *act; u8 unknown_0x50[0x10]; QW pos; u8 unknown_0x70[0x18]; float field_0x88; };
 extern "C" void AddSafePointOnGeom(void *, int, QW);

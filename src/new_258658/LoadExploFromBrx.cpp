@@ -2,8 +2,8 @@
 #include "alloc.h"
 struct EMITMESH;
 struct CBinaryInputStream;
-struct EMITB { char pad0[0x10]; int emitok; char pad1[0x1C]; EMITMESH *pemitmesh; };
-struct EMITTER { char pad[0xE4]; EMITB *pemitb; };
+struct EMITB { u8 unknown_0x0[0x10]; int emitok; u8 unknown_0x14[0x1C]; EMITMESH *pemitmesh; };
+struct EMITTER { u8 unknown_0x0[0xE4]; EMITB *pemitb; };
 extern "C" void *PvAllocSwImpl__Fi(ALLOCREQ *);
 extern "C" void InitEmitb(void *);
 extern "C" void LoadXfmFromBrx(EMITTER *, CBinaryInputStream *);

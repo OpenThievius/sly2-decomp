@@ -4,18 +4,11 @@
 #include "vu0inline.h"
 #include "so.h"
 #include "xf.h"
+#include "hbsk.h"
 
 struct ROWS3 { VECTOR row[3]; };
-struct NODE { char pad[0x70]; QW pos; };
-struct TARGET : LO { char pad50[0x60 - 0x50]; NODE *pnode60; char pad64[0x10BC - 0x64]; NODE *pnode10BC; };
-struct HBSK : SO {
-    char pad150[0x17C - 0x150];
-    int hbsks;
-    float uFade;
-    char pad184[0x18C - 0x184];
-    int fLocked;
-    TARGET *ptarget;
-};
+struct NODE { u8 unknown_0x0[0x70]; QW pos; };
+struct TARGET : LO { u8 unknown_0x50[0x60 - 0x50]; NODE *pnode60; u8 unknown_0x64[0x10BC - 0x64]; NODE *pnode10BC; };
 
 extern "C" {
 void func_001A58D0(HBSK *, int, int);
@@ -32,7 +25,6 @@ QW ConvertXfPos(int, XF *, QW);
 extern char B_003DD490;
 extern QW g_2a2dd0;
 extern QW g_2be8f0;
-extern float g_2dded0;
 }
 
 void SetHbskHbsks(HBSK *phbsk, int hbsks)
@@ -54,13 +46,13 @@ void SetHbskHbsks(HBSK *phbsk, int hbsks)
             }
             phbsk->HandleSpliceEvent(6, 0, 0, 0, 0);
             func_00147F40(&B_003DD490);
-            phbsk->ptarget = 0;
+            phbsk->pjt = 0;
         }
         if (hbsks == 2) {
             if (phbsk->fLocked != 0) {
                 SetSoCnstrForce(phbsk, 1);
                 SetSoCnstrTorque(phbsk, 1);
-                TARGET *ptarget = phbsk->ptarget;
+                TARGET *ptarget = (TARGET *)phbsk->pjt;
                 NODE *pnode = ptarget->pnode10BC;
                 if (pnode == 0)
                     pnode = ptarget->pnode60;
@@ -85,6 +77,6 @@ void SetHbskHbsks(HBSK *phbsk, int hbsks)
         } else {
             phbsk->hbsks = hbsks;
         }
-        phbsk->uFade = g_2dded0;
+        phbsk->uFade = g_2dded0.t;
     }
 }

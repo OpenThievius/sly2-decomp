@@ -1,10 +1,10 @@
-struct CRV { char pad[0xE4]; int fClosed; };
+#include "crv.h"
 extern "C" float SWrapCrv(CRV *, float);
 extern "C" float SMinCrv(CRV *);
 extern "C" float SMaxCrv(CRV *);
 extern "C" float func_001E6728(CRV *pcrv, float s)
 {
-    if (pcrv->fClosed != 0)
+    if (pcrv->closed != 0)
         return SWrapCrv(pcrv, s);
     float sMin = SMinCrv(pcrv);
     float sMax = SMaxCrv(pcrv);

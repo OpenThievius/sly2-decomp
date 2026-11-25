@@ -9,14 +9,26 @@
 #include "types.h"
 
 struct LO;
+struct EMITMESH;
 
 /* One parameter block of an EMITB, 16-byte aligned: a kind word, then the payload at +0x30 (the func_002596F8 family returns
    &payload when the kind matches). */
 struct EMITPARAMS {
     /* 0x00 */ s32 kind;
-    u8 unknown_0x4[0x10];
-    /* 0x14 */ f32 field_0x14;  /* EMITB 0xD4: SetRipgEmitb copies it to the group */
-    u8 unknown_0x18[0x18];
+    u8 unknown_0x4[0x4];
+    /* 0x8 */ s32 oidA;         /* EMITB 0xC8: PostSuvLoad (SUV slot 15) and BindEmitter (emitpk 1): the object ids of a kind-1 block */
+    union {
+        /* 0xC */ s32 oidB;     /* EMITB 0xCC: PostSuvLoad, BindEmitter (emitpk 1) */
+        s32 colorRanges;        /* EMITB 0xCC, the blip kind: LoadEmitblipColors and LoadEmitblipColorsFromBrx store the number of colour ranges */
+    };
+    /* 0x10 */ s32 oidC;        /* EMITB 0xD0: PostSuvLoad, BindEmitter */
+    union {
+        f32 field_0x14;         /* EMITB 0xD4: SetRipgEmitb copies it to the group */
+        s32 oidSpline;          /* EMITB 0xD4: PostSuvLoad and BindEmitter (emitpk 0), for a kind-0 block */
+    };
+    u8 unknown_0x18[0x4];
+    /* 0x1C */ s32 *table;      /* EMITB 0xDC, the blip kind: LoadEmitblipColors and LoadEmitblipColorsFromBrx allocate it (a count word, then the colours) */
+    u8 unknown_0x20[0x10];
     /* 0x30 */ s32 payload;     /* EMITB 0xF0: PostFlyingEmit and PostRemitEmit read its first word */
     /* 0x34 */ f32 field_0x34;  /* EMITB 0xF4: PostRemitEmit */
     u8 unknown_0x38[0x8];
@@ -36,8 +48,14 @@ struct EMITB {
     /* 0x08 */ struct EMITBINFO *pinfo; /* PostFlyingEmit, PostDropletEmit, PostRemitEmit */
     u8 unknown_0xC[0x4];
     /* 0x10 */ s32 emitok;              /* SetEmitterEmitok */
-    u8 unknown_0x14[0x1C];
-    /* 0x30 */ s32 field_0x30;          /* SetEmitterEmitok writes it, func_00258B00 and func_00259598 read it */
+    u8 unknown_0x14[0xC];
+    /* 0x20 */ s32 oidReference;        /* PostSuvLoad (SUV slot 15), BindEmitter: the object the emitter follows (the first entry of pinfo's pointers) */
+    u8 unknown_0x24[0xC];
+    union {
+        /* 0x30 */ s32 field_0x30;      /* SetEmitterEmitok writes it, func_00258B00 and func_00259598 read it */
+        s32 oidCurve;                    /* BindEmitter: the curve, looked up when emitok is 2 */
+        struct EMITMESH *pemitmesh;      /* LoadEmitterFromBrx hands it to LoadEmitmeshFromBrx when emitok is 3 */
+    };
     u8 unknown_0x34[0x8C];
     /* 0xC0 */ struct EMITPARAMS params;
 };

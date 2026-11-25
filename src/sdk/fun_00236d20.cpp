@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "types.h"
 struct EntryTable {
-    char pad0[0x1C];
+    u8 unknown_0x0[0x1C];
     char *entries;
     int count;
 };

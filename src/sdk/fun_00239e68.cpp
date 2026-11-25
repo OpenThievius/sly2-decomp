@@ -1,7 +1,7 @@
 #include "types.h"
 extern "C" {
 struct SortNode_239E68 { SortNode_239E68 *next; SortNode_239E68 *prev; s32 pad[2]; u64 a; u64 b; u64 c; };
-struct SortList_2C5A30 { char pad[0x18]; SortNode_239E68 *head; };
+struct SortList_2C5A30 { u8 unknown_0x0[0x18]; SortNode_239E68 *head; };
 extern SortList_2C5A30 D_002C5A30;
 void func_00239E68(SortNode_239E68 *node) {
     SortNode_239E68 *prev = 0;

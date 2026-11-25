@@ -1,12 +1,11 @@
 #include "sly2.h"
-struct GIFS { char pad[0x30]; };
-struct CFontBrx { char pad[0x50]; long tex0; };
-extern "C" void AddPrimPack__4GIFSiiUl(GIFS *, int, int, unsigned long);
-extern "C" void PackAD__4GIFSll(GIFS *, long, long);
-extern "C" void AddPrimList__4GIFSiUl(GIFS *, int, unsigned long);
-extern "C" int FEnsureLoaded__8CFontBrxP4GIFS(CFontBrx *, GIFS *);
+#include "cfont.h"
+extern "C" void AddPrimPack__4GIFSiiUl(GIFS *, int, int, u64);
+extern "C" void PackAD__4GIFSll(GIFS *, s64, s64);
+extern "C" void AddPrimList__4GIFSiUl(GIFS *, int, u64);
+extern "C" int FEnsureLoaded__8CFontBrxP4GIFS(CFONT *, GIFS *);
 
-extern "C" void SwitchTex0__8CFontBrxP4GIFS(CFontBrx *pfont, GIFS *pgifs)
+extern "C" void SwitchTex0__8CFontBrxP4GIFS(CFONT *pfont, GIFS *pgifs)
 {
     int fLoaded = FEnsureLoaded__8CFontBrxP4GIFS(pfont, pgifs);
     AddPrimPack__4GIFSiiUl(pgifs, 6, 1, 0xE);

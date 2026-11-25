@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-struct PALETTE { int id; unsigned char kind; signed char ccond; char pad6[2]; unsigned short cword; char pad0A[2]; unsigned *pdata; int cqw; };
+#include "palette.h"
 #include "alloc.h"
 extern "C" void CBinaryInputStream_Read_thunk(void *, int, void *);
 extern "C" void CBinaryInputStream_Skip(void *, int);

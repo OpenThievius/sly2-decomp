@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-struct World { char pad[0x1024]; int f1024; };
-struct JTPART { World *world; char pad[0x28]; int hfdk; float timer; int mode; char pad2[0x18]; int f50; char pad3[0x14]; int f68; };
+#include "types.h"
+struct World { u8 unknown_0x0[0x1024]; int f1024; };
+struct JTPART { World *world; u8 unknown_0x4[0x28]; int hfdk; float timer; int mode; u8 unknown_0x38[0x18]; int f50; u8 unknown_0x54[0x14]; int f68; };
 enum HFDK { HFDK_NONE = 0 };
 extern float g_2dded0;
 void SetJtHfdk(JTPART *jt, HFDK hfdk)

@@ -1,5 +1,6 @@
+#include "types.h"
 struct Request { int zero; int value; };
-struct Owner { char pad0[0xC]; int ready; char pad10[0x858]; void *target; };
+struct Owner { u8 unknown_0x0[0xC]; int ready; u8 unknown_0x10[0x858]; void *target; };
 extern "C" {
 void func_0024B670(void *, Request *);
 void func_0024F8C0(int);

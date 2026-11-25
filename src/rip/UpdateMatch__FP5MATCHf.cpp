@@ -1,6 +1,7 @@
+#include "types.h"
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "lo.h"
-struct MATCH { char pad[0x14]; float tCreated; float dtLifetime; LO *plo; char pad2[0x104 - 0x20]; int paloLaunch; };
+struct MATCH { u8 unknown_0x0[0x14]; float tCreated; float dtLifetime; LO *plo; u8 unknown_0x20[0xE4]; int paloLaunch; };
 struct RIP;
 void LaunchMatch(MATCH *);
 extern "C" {

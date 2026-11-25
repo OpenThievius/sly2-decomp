@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-struct CRV { char pad0[0xE8]; int ccv; float *mpicvu; char pad1[0x88]; int icvHint; };
+#include "crv.h"
 extern "C" float UWrapCrv(CRV *, float);
 
 extern "C" int IcvFindCrvU(CRV *pcrv, float u, float *pdu, float *pduSeg)
 {
     u = UWrapCrv(pcrv, u);
     int icv = pcrv->icvHint;
-    float *mpicvu = pcrv->mpicvu;
+    float *mpicvu = pcrv->au;
     if (mpicvu[icv] < u) {
         int icvLast = pcrv->ccv - 1;
         for (; icv < icvLast; icv++) {
@@ -21,11 +21,11 @@ extern "C" int IcvFindCrvU(CRV *pcrv, float u, float *pdu, float *pduSeg)
             icv--;
         }
     }
-    float uSeg = pcrv->mpicvu[icv];
+    float uSeg = pcrv->au[icv];
     if (pdu != 0)
         *pdu = u - uSeg;
     if (pduSeg != 0)
-        *pduSeg = pcrv->mpicvu[icv + 1] - uSeg;
+        *pduSeg = pcrv->au[icv + 1] - uSeg;
     pcrv->icvHint = icv;
     return icv;
 }

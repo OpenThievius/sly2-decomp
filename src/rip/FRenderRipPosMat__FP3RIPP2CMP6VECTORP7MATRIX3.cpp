@@ -5,10 +5,10 @@
 struct MATRIX44 { float mat[4][4]; } __attribute__((aligned(16)));
 struct ROWS3 { VECTOR row[3]; };
 struct LM { float lo; float hi; };
-struct CMDATA { char pad[0x90]; QW pos; };
-struct RIPOBJECT { char pad[0x38]; float radius; };
+struct CMDATA { u8 unknown_0x0[0x90]; QW pos; };
+struct RIPOBJECT { u8 unknown_0x0[0x38]; float radius; };
 struct COEFFS { float c0, c1, c2; };
-struct RIP { char pad[0x14]; float tStart; float duration; RIPOBJECT *object; COEFFS radius; char pad2c[4]; COEFFS scale; };
+struct RIP { u8 unknown_0x0[0x14]; float tStart; float duration; RIPOBJECT *object; COEFFS radius; u8 unknown_0x2C[0x4]; COEFFS scale; };
 extern "C" LM g_2bbb60;
 extern "C" float g_2dded0;
 extern "C" CMDATA D_2DDF40;

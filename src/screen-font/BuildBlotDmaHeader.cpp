@@ -1,7 +1,7 @@
 #include "types.h"
-struct DMAS { char pad[0xC]; int *cur; };
+struct DMAS { u8 unknown_0x0[0xC]; int *cur; };
 struct Slot { int kind; float scale; int tagAddress; int zero; };
-struct BLOT { char pad[0xA4]; int shift; };
+struct BLOT { u8 unknown_0x0[0xA4]; int shift; };
 extern "C" {
 void CopyAqw__FPvT0i(void *, void *, int);
 Slot *OnGameLoad__FP4GAME(void);
@@ -21,7 +21,7 @@ static inline void Bulk(DMAS *dmas, int tag, void *source, int count) {
 }
 static inline int *PartA(DMAS *dmas, void *source) {
     int *tag = dmas->cur;
-    *(long *)tag = 0x10000000;
+    *(s64 *)tag = 0x10000000;
     dmas->cur = dmas->cur + 4;
     Flush(dmas);
     Pad(dmas, 0xC);
@@ -45,7 +45,7 @@ static inline void PartC(DMAS *dmas) {
 }
 static inline void PartD(DMAS *dmas, int *tag) {
     *tag |= (((sptr)dmas->cur - (sptr)tag) >> 4) - 1;
-    *(long *)dmas->cur = 0x60000000;
+    *(s64 *)dmas->cur = 0x60000000;
     dmas->cur = dmas->cur + 4;
 }
 extern "C" void BuildBlotDmaHeader(BLOT *self)

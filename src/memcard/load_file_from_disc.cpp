@@ -2,16 +2,8 @@
 #include "sly2.h"
 struct SAVE;
 #include "alloc.h"
-struct CFileLocation { unsigned a; unsigned b; unsigned c; unsigned d; char pad[0x100]; void Clear(); int Set(const unsigned *record)
-    {
-        if (record == 0) return 0;
-        c = 2;
-        b = record[1] ^ record[0xF];
-        a = (record[0] ^ record[0xD]) + 0xCA0;
-        return b != 0;
-    }
-};
-struct STREAM { char pad[0x70]; };
+#include "cfilelocation.h"
+struct STREAM { u8 unknown_0x0[0x70]; };
 extern "C" {
 void CStackFrame_Construct(void *);
 void CStackFrame_Destructor(void *, int);
@@ -27,7 +19,7 @@ void CBinaryFileStream_Close(STREAM *);
 void CBinaryFileStream_Destructor(STREAM *, int);
 extern const char RO_002A6CB8[];
 }
-extern "C" int load_file_from_disc(SAVE *psave, const char *dir, const unsigned *record, const char *file)
+extern "C" int load_file_from_disc(SAVE *psave, const char *dir, const MOVIE *record, const char *file)
 {
     char frame[0x10];
     char path[0x50];
@@ -38,7 +30,7 @@ extern "C" int load_file_from_disc(SAVE *psave, const char *dir, const unsigned 
     if (error == 0) {
         CFileLocation location;
         CFileLocation *loc = &location;
-        loc->c = 2;
+        loc->kind = 2;
         loc->Clear();
         ALLOCREQ request;
         ALLOCREQ *req = &request;

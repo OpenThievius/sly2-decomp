@@ -1,6 +1,6 @@
-struct Spr { char pad[0x28]; void *inst; };
-extern "C" void StopSpriteInstance(Spr *, int);
-void StopRootSprite(Spr *spr)
+#include "fbsprite.h"
+extern "C" void StopSpriteInstance(SPRITE *, int);
+void StopRootSprite(SPRITE *sprite)
 {
-    if (spr->inst) StopSpriteInstance(spr, 0);
+    if (sprite->fRoot) StopSpriteInstance(sprite, 0);
 }

@@ -1,10 +1,11 @@
-struct Dancer_1533B0 { char pad[0x150]; int pad150; };
-struct Entry_1533B0 { Dancer_1533B0 *target; int f4; int f8; float fC; char pad10[0xC]; int f1C; int f20; };
-struct Cell_1533B0 { float f0; char pad4[0x1C]; int f20; char pad24[0xC]; };
+#include "types.h"
+struct Dancer_1533B0 { u8 unknown_0x0[0x150]; int pad150; };
+struct Entry_1533B0 { Dancer_1533B0 *target; int f4; int f8; float fC; u8 unknown_0x10[0xC]; int f1C; int f20; };
+struct Cell_1533B0 { float f0; u8 unknown_0x4[0x1C]; int f20; u8 unknown_0x24[0xC]; };
 struct RhythmFull_1533B0 {
-    char pad0[0x58]; float f58; char pad5C[4]; int cellCount; char pad64[0xC]; Cell_1533B0 cells[7];
-    int entryCount; Entry_1533B0 entries[1]; char pad[0x230 - 0x1C4 - 0x24]; int f230;
-    char pad234[0x298 - 0x234]; float f298; float f29C; float f2A0;
+    u8 unknown_0x0[0x58]; float f58; u8 unknown_0x5C[4]; int cellCount; u8 unknown_0x64[0xC]; Cell_1533B0 cells[7];
+    int entryCount; Entry_1533B0 entries[1]; u8 unknown_0x1E8[0x230 - 0x1C4 - 0x24]; int f230;
+    u8 unknown_0x234[0x298 - 0x234]; float f298; float f29C; float f2A0;
 };
 extern "C" {
 void AddRhythmScore(void *, float);

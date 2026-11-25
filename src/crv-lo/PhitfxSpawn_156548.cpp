@@ -1,8 +1,8 @@
 #include "sly2.h"
 struct HITFX;
 struct VTE { short delta; short index; void (*fn)(void *, ...); };
-struct VT { char pad[8]; VTE entry[4]; };
-struct PARMS { int frame; char pad[0x60]; int param64; };
+struct VT { u8 unknown_0x0[8]; VTE entry[4]; };
+struct PARMS { int frame; u8 unknown_0x4[0x60]; int param64; };
 struct HITFX {
     int f0; int f4; int f8; VT *vt; int refs; PARMS *parms; int f18; int f1c;
     QW pos20; QW pos30; int owner; int f44; int id; float time; int f50; int f54;

@@ -2,10 +2,10 @@
 #include "asega.h"
 #include "sw.h"
 
-struct UL { unsigned long v; } __attribute__((packed));
+struct UL { u64 v; } __attribute__((packed));
 extern "C" {
 void PostLoLoad();
-void QueueSwCallback(SW *, ASEG *, unsigned long, int);
+void QueueSwCallback(SW *, ASEG *, u64, int);
 extern SW B_003DD490;
 extern const UL RO_002A46C8;
 void PostAsegLoad(ASEG *paseg)

@@ -1,23 +1,23 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-struct ROPESIM { char pad[0x4C]; int nMode; };
-struct CRV { char pad0[0x40]; unsigned grfField; char pad1[0x17C - 0x44]; ROPESIM *prope; };
+#include "crv.h"
+struct ROPESIM { u8 unknown_0x0[0x4C]; s32 nMode; };
 extern "C" void *PattachCrv(CRV *, int);
 extern "C" void func_001A6CA8(CRV *, int);
 
 static inline void SetFlags(CRV *pcrv, unsigned mask)
 {
-    if (((pcrv->grfField ^ 1) & 1) != 0)
-        *(unsigned *)pcrv->grfField |= mask;
+    if (((pcrv->grfSw ^ 1) & 1) != 0)
+        *(unsigned *)pcrv->grfSw |= mask;
     else
-        pcrv->grfField |= mask;
+        pcrv->grfSw |= mask;
 }
 
 static inline void ClearFlags(CRV *pcrv, unsigned mask)
 {
-    if (((pcrv->grfField ^ 1) & 1) != 0)
-        *(unsigned *)pcrv->grfField &= ~mask;
+    if (((pcrv->grfSw ^ 1) & 1) != 0)
+        *(unsigned *)pcrv->grfSw &= ~mask;
     else
-        pcrv->grfField &= ~mask;
+        pcrv->grfSw &= ~mask;
 }
 
 extern "C" void SetCrvRopeMode(CRV *pcrv, int nMode)
@@ -32,6 +32,6 @@ extern "C" void SetCrvRopeMode(CRV *pcrv, int nMode)
         SetFlags(pcrv, 0x20u);
         ClearFlags(pcrv, 0xCu);
     }
-    if (pcrv->prope != 0)
-        pcrv->prope->nMode = nMode;
+    if (pcrv->pattach != 0)
+        pcrv->pattach->nMode = nMode;
 }

@@ -1,5 +1,5 @@
 #include "sly2.h"
-struct CMovieText { char pad[8]; void* font; char pad2[0x88 - 0xC]; float gScale; };
+struct CMovieText { u8 unknown_0x0[0x8]; void* font; u8 unknown_0xC[0x7C]; float gScale; };
 extern "C" void CMovieText_Reset(CMovieText*, int);
 extern "C" int CMovieText_ChNext(CMovieText*);
 extern "C" float DxFromFontCh(void*, int);

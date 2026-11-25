@@ -6,8 +6,8 @@
 #include "sw.h"
 #include "clock.h"
 #include "asega.h"
-
-struct CHN { int pad; int value; };
+#include "chn.h"
+#include "wkr.h"
 
 /* an animation segment (PasegaFindAlo, PasegaApplyAseg, PchnFindAseg take it) */
 
@@ -41,11 +41,11 @@ void func_001DEDB0(LASER *plaser)
         }
         CHN *pchn = PchnFindAseg(paseg, plo, 0xC, 1);
         if (pchn != 0)
-            pfx->pchn = (void *)pchn->value;
+            pfx->pchn = pchn->curve;
     }
 }
 
-struct UL { unsigned long v; } __attribute__((packed));
+struct UL { u64 v; } __attribute__((packed));
 
 extern "C" const UL RO_002A7AC0;
 
@@ -53,7 +53,7 @@ void func_001F5988(LASER *, void *);
 
 void FreeSwMqList(SW *, MQ *);
 
-void QueueSwCallbackOnce(void *, LASER *, unsigned long, int);
+void QueueSwCallbackOnce(void *, LASER *, u64, int);
 
 void NotifyLaserXpEnded(LASER *plaser, void *psoOther)
 {
@@ -65,9 +65,8 @@ void NotifyLaserXpEnded(LASER *plaser, void *psoOther)
         MQ *pmq = *ppmqLink;
         if (pmq != 0) {
             do {
-                int n = (pmq->pso == plaser);
-                SIDE *sd = (SIDE *)((char *)pmq + (n << 6));
-                if (psoOther == sd->pso) {
+                int n = (pmq->aside[0].pso == plaser);
+                if (psoOther == pmq->aside[n].pso) {
                     *ppmqLink = pmq->pmqNext;
                     pmq->pmqNext = pmqFree;
                     pmqFree = pmq;
@@ -84,8 +83,6 @@ void NotifyLaserXpEnded(LASER *plaser, void *psoOther)
 INCLUDE_ASM(0X1DEF98);
 
 INCLUDE_ASM(0X1DF0A0);
-
-struct WKR { int ploSource; int ppartSource; int ploTarget; int grftak; int nDamage; char pad[0xC]; QW pos; char pad2[0x30]; };
 
 extern "C" {
 void GetLaserBeamPoints(LASER *, BEAM *, QW *, float *);
@@ -115,12 +112,12 @@ void ClipLaserBeams(LASER *plaser)
             }
             WKR wkr;
             memset(&wkr, 0, 0x60);
-            wkr.ploSource = (sptr)plaser;
-            wkr.ppartSource = pmqNearest->plo;
-            wkr.ploTarget = pmqNearest->pgeom;
+            wkr.psoSource = plaser;
+            wkr.ppartSource = (void *)pmqNearest->aside[0].plo;
+            wkr.ploTarget = (LO *)pmqNearest->aside[1].pgeom;
             wkr.grftak = 0x1000;
-            wkr.nDamage = -10;
-            wkr.pos = pmqNearest->pos;
+            wkr.damage = -10;
+            wkr.pos = pmqNearest->aside[0].pos;
             PaloAbsorbWkr(&wkr);
             pbeam->sClipped = sNearest;
         }
@@ -161,9 +158,9 @@ void AdvanceLaserBeams(LASER *plaser)
                 pkey->t = t;
             }
             pseg->s = pkey->a + pkey->b * pkey->t + pkey->c * pkey->t * pkey->t * 0.5f;
-            if ((plaser->powner->grf & 2) == 0) {
-                plaser->powner->grf |= 2;
-                AppendDlEntry(B_003E11C4, plaser->powner);
+            if ((plaser->poxa->grf & 2) == 0) {
+                plaser->poxa->grf |= 2;
+                AppendDlEntry(B_003E11C4, plaser->poxa);
             }
             fActive = 1;
             }

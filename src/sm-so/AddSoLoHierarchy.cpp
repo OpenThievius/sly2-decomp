@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
 #include "so.h"
+#include "pathzone.h"
 #include "phys.h"
 #include "sw.h"
-struct PZGRAPH { char pad[0x2C]; int field2C; };
-struct UL { unsigned long v; } __attribute__((packed));
+struct UL { u64 v; } __attribute__((packed));
 extern "C" {
 void AddLoHierarchy(SO *);
 void UpdateAloXfWorld(SO *);
 void AddSoGeomsToOxa(SO *);
-void QueueSwCallback(SW *, SO *, unsigned long, int);
+void QueueSwCallback(SW *, SO *, u64, int);
 QW PosLoWorld(void *);
 void func_001F37C8(SO *, int);
 int PpathzoneFindPos(QW, int);
@@ -41,7 +41,7 @@ extern "C" void AddSoLoHierarchy(SO *pso)
     }
     if (hasXr != 0) {
         PZGRAPH *pgraph = B_003DD490.ppzgraph;
-        if (pgraph != 0 && pgraph->field2C != 0) {
+        if (pgraph != 0 && pgraph->fHookedUp != 0) {
             func_001F37C8(pso, PpathzoneFindPos(PosLoWorld(pso), 1));
         } else {
             QueueSwCallback(&B_003DD490, pso, RO_002A8270.v, 0);

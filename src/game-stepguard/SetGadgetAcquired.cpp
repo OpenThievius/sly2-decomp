@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
 #include "cref.h"
-struct GAME { char pad[0xC]; int arg; };
+/* the camera follow manager at 0x2DEB30 as bevy_camera_follow_activity reads it: the argument of the event this function raises is at 0xC */
+struct GAME { u8 unknown_0x0[0xC]; s32 arg; };
 extern "C" {
 CRef func_001D8B20(const CRef &value, const char *first, ...);
 int sprintf(char *, const char *, ...);

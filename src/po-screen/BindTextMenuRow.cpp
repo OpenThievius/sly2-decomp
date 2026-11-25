@@ -1,6 +1,6 @@
 #include "sly2.h"
 struct MENUFRAME { int citem; char *aitem; int unk8; int unkC; int unk10; int iitemSel; int unk18; };
-struct MENUITEM { int idString; char pad[0x1C]; };
+struct MENUITEM { int idString; u8 unknown_0x4[0x1C]; };
 extern "C" {
 extern int B_003D9EF4;
 extern MENUFRAME B_003D9EDC[];

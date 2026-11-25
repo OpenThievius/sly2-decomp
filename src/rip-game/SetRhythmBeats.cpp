@@ -1,8 +1,8 @@
 #include "sly2.h"
 void CopyAb(void *, void *, unsigned int);
 extern "C" void SetRhythmState(void *, int);
-struct BEAT { float time; char pad[0xC]; VECTOR pos; int hit; char pad2[0xC]; };
-struct RHYTHM { char pad[0x60]; int count; char pad2[0xC]; BEAT beat[6]; char pad3[0x190 - 0x70 - 6 * 0x30]; int cursorState; int cursorBeat; char pad4[8]; VECTOR cursor; };
+struct BEAT { float time; u8 unknown_0x4[0xC]; VECTOR pos; int hit; u8 unknown_0x24[0xC]; };
+struct RHYTHM { u8 unknown_0x0[0x60]; int count; u8 unknown_0x64[0xC]; BEAT beat[6]; u8 unknown_0x190[0x190 - 0x70 - 6 * 0x30]; int cursorState; int cursorBeat; u8 unknown_0x198[8]; VECTOR cursor; };
 extern "C" void SetRhythmBeats(RHYTHM *rhythm, int state, int count, void *beats)
 {
     rhythm->count = count;

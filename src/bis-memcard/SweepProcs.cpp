@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "types.h"
 struct LinksProc257948 {
     unsigned prevIndex : 13;
     unsigned prevPool : 2;
@@ -8,9 +9,9 @@ struct LinksProc257948 {
     unsigned mark : 1;
 };
 struct ProcNode257948 {
-    int pad0;
+    u8 unknown_0x0[4];
     LinksProc257948 links;
-    char pad8[0x14];
+    u8 unknown_0x8[0x14];
 };
 struct SlotHeap257948;
 extern "C" {

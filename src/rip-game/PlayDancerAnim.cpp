@@ -1,5 +1,5 @@
 #include "sly2.h"
-struct Dancer { char pad[0x408]; char handle[4]; };
+struct Dancer { u8 unknown_0x0[0x408]; char handle[4]; };
 extern "C" void ApplyAsegToHandle(float, float, void *, Dancer *, unsigned, char *);
 void PlayDancerAnim(Dancer *dancer, void *aseg, unsigned flags)
 {

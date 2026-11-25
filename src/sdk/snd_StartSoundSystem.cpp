@@ -1,19 +1,20 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "types.h"
 extern "C" {
 struct SndCall {
-    void (*function)(int, long);
-    long argument;
+    void (*function)(int, s64);
+    s64 argument;
 };
 struct SndRpcClient {
-    char pad0[0x24];
+    u8 unknown_0x0[0x24];
     int serverReady;
-    char pad28[0x18];
+    u8 unknown_0x28[0x18];
 };
 struct SndReturnBuffer {
     volatile int field0; // volatile-ok: IOP-side 989snd writes this return word over SIF DMA
-    char pad4[0xC];
+    u8 unknown_0x4[0xC];
     volatile int field10; // volatile-ok: IOP-side 989snd writes this return word over SIF DMA
-    char pad14[0x2C];
+    u8 unknown_0x14[0x2C];
 };
 struct SndStartCommand {
     SndReturnBuffer *returns;

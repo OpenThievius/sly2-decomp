@@ -1,14 +1,15 @@
-struct GuardAnim { char pad0[0x10]; long key; char pad1[8]; };
-struct GuardOwner { char pad[0x4C0]; int count; char pad2[0xC]; GuardAnim anims[1]; };
-GuardAnim *PguardanimFind(GuardOwner *owner, long key)
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "sly2.h"
+#include "stepguard.h"
+GUARDANIM *PguardanimFind(STEPGUARD *owner, u64 key)
 {
     int index = 0;
-    int count = owner->count;
+    int count = owner->canim;
     if (index < count) {
-        GuardAnim *anim = owner->anims;
+        GUARDANIM *anim = owner->aanim;
         do {
             index++;
-            if (anim->key == key) return anim;
+            if (anim->grf == key) return anim;
             anim++;
         } while (index < count);
     }

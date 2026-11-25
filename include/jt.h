@@ -45,10 +45,10 @@ struct JT : STEP {
     virtual void SetFocus(int prioNear, struct STEPGUARD *pguardNear, int prioBest, struct STEPGUARD *pguardBest); /* 95: SetJtFocus; UpdateJtFocus */
     virtual void PredictLead(struct LEAD *plead, float dt); /* 96: PredictLoLead; GoalAnimLeap_SetState passes a 0x30-byte LEAD; the lead comes first (PredictSlyLead(self, plead, dt), func_0017ABC8) */
     virtual void Slot97(float *ppos);   /* 97: func_00141588; GetJtCpdefi passes a four-float output */
-    virtual void Slot98();              /* 98: func_001409B8 */
+    virtual int Slot98();               /* 98: func_001409B8; func_00140750 uses the int it returns (0, 1, 2 or -1) */
     virtual int FCanUseGadget(int gadget); /* 99: func_00141C00, FBentleyCanUseGadget; UpdateLookRig */
     virtual void UseGadget(int gadget); /* 100: func_00141D38, UseBentleyGadget; SetJtGadgetSlotState */
-    virtual void DrainGadget();         /* 101: DrainJtGadget */
+    virtual void DrainGadget(void *pslot); /* 101: DrainJtGadget; UpdateJtGadgets passes the slot it drains (signature from that caller) */
     virtual void Slot102(int gadget);   /* 102: func_00141E28; SetJtGadgetSlotState when a gadget slot leaves state 1 */
     virtual const char *Slot103();      /* 103: LoadJtGadgetSlots reads the name it returns */
     virtual void Slot104();             /* 104: func_00141E30 */
@@ -149,7 +149,8 @@ struct JT : STEP {
     u8 unknown_0x10BC[0x8];
     /* 0x10C4 */ void *hitfxParms; /* readers: func_001409E8 (hit-effect spawn probe), func_00140750 (passes it to PhitfxSpawn_156548); two agree */
     /* 0x10C8 */ s32 field_0x10C8; /* InitJt sets -1; UpdateSndMix */
-    u8 unknown_0x10CC[0x8];
+    /* 0x10CC */ f32 field_0x10CC; /* func_00140750 (calls slot 98 on the object): eased toward 0 or 1 by the hit-effect probe func_001409E8 */
+    /* 0x10D0 */ f32 field_0x10D0; /* func_00140750: eased by slot 98's result, spawns the hit effect at 1 */
     /* 0x10D4 */ f32 field_0x10D4; /* InitJt sets 1 */
     /* 0x10D8 */ f32 field_0x10D8; /* InitJt sets 1 */
     /* 0x10DC */ sptr field_0x10DC; /* a STEPGUARD address: SetJtFocus (JT slot 95) stores pguardNear in it; bevy_player_input_from_pad_cm; func_001431D0 takes its goal stack */

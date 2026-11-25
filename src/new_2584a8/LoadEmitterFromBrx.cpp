@@ -1,9 +1,7 @@
 #include "sly2.h"
 #include "alloc.h"
-struct EMITMESH;
+#include "emitter.h"
 struct CBinaryInputStream;
-struct EMITB { char pad0[0x10]; int emitok; char pad1[0x1C]; EMITMESH *pemitmesh; };
-struct EMITTER { char pad[0xE4]; EMITB *pemitb; };
 extern "C" void *PvAllocSwImpl__Fi(ALLOCREQ *);
 extern "C" void InitEmitb(void *);
 extern "C" void LoadXfmFromBrx(EMITTER *, CBinaryInputStream *);

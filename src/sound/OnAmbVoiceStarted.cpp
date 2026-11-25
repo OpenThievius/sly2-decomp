@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "amb.h"
-extern "C" void OnAmbVoiceStarted(int voice, long arg)
+extern "C" void OnAmbVoiceStarted(int voice, s64 arg)
 {
     AMB *pamb = (AMB *)arg;
     pamb->voice = voice;

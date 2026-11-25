@@ -1,6 +1,6 @@
 #include "jt.h"
 /* The loot object GiveJtLoot leases: its thief at 0x160, as Crfodb_OnGrab reads it. */
-struct LOOT { char pad0[0x160]; JT *pjt; };
+struct LOOT { u8 unknown_0x0[0x160]; JT *pjt; };
 extern "C" int LootId(LOOT *);
 extern "C" void DropJtLoot(JT *);
 extern "C" LO *PloLeaseCloneObject(void *, int);

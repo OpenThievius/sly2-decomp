@@ -1,8 +1,6 @@
 #include "sly2.h"
 #include "alloc.h"
-struct SWITCHENTRY { int kind; void *pv; };
-struct SWITCHGROUP { char pad[8]; int count; SWITCHENTRY *entries; };
-struct STGSWITCH { char pad0[0x150]; int cEntry; void *table; int field_0x158; int field_0x15C; int cGroup; SWITCHGROUP *groups; };
+#include "stgswitch.h"
 extern "C" void *CStackFrame_Construct(void *);
 extern "C" void *PvAllocStackImpl__Fi(ALLOCREQ *);
 extern "C" void *PvAllocStackClearImpl__Fi(ALLOCREQ *);
@@ -20,25 +18,25 @@ void LoadStgSwitchFromBrx(STGSWITCH *pstgsw, void *pbis)
     CStackFrame_Construct(frame);
     ALLOCREQ req;
     req.cb = 0x40;
-    pstgsw->table = PvAllocStackImpl__Fi(Aligned(&req));
+    pstgsw->aclass = (STGCLASS *)PvAllocStackImpl__Fi(Aligned(&req));
     req.cb = 0x200;
-    pstgsw->groups = (SWITCHGROUP *)((char *)PvAllocStackClearImpl__Fi(Aligned(&req)) + 0x10);
+    pstgsw->anode = (STGNODE *)((char *)PvAllocStackClearImpl__Fi(Aligned(&req)) + 0x10);
     CSo_LoadFromBrx(pstgsw, pbis);
-    void *table = pstgsw->table;
-    pstgsw->field_0x15C = 0;
-    req.cb = pstgsw->cEntry * 8;
-    pstgsw->table = PvAllocSwCopyImpl__FiPv(Aligned(&req), table);
-    if (pstgsw->cGroup != 0) {
+    STGCLASS *table = pstgsw->aclass;
+    pstgsw->istage = 0;
+    req.cb = pstgsw->cclass * 8;
+    pstgsw->aclass = (STGCLASS *)PvAllocSwCopyImpl__FiPv(Aligned(&req), table);
+    if (pstgsw->cstage != 0) {
         req.cbAlign = 0x10;
-        req.cb = pstgsw->cGroup * 0x10 + 0x10;
-        pstgsw->groups = (SWITCHGROUP *)((char *)PvAllocSwCopyImpl__FiPv(&req, (char *)pstgsw->groups - 0x10) + 0x10);
-        for (int iGroup = -1; iGroup < pstgsw->cGroup; iGroup++) {
-            SWITCHGROUP *pgroup = pstgsw->groups + iGroup;
-            SWITCHENTRY *entries = pgroup->entries;
+        req.cb = pstgsw->cstage * 0x10 + 0x10;
+        pstgsw->anode = (STGNODE *)((char *)PvAllocSwCopyImpl__FiPv(&req, (char *)pstgsw->anode - 0x10) + 0x10);
+        for (int iGroup = -1; iGroup < pstgsw->cstage; iGroup++) {
+            STGNODE *pgroup = pstgsw->anode + iGroup;
+            STGENT *entries = pgroup->aent;
             req.cb = pgroup->count * 8;
-            pgroup->entries = (SWITCHENTRY *)PvAllocSwCopyImpl__FiPv(Aligned(&req), entries);
+            pgroup->aent = (STGENT *)PvAllocSwCopyImpl__FiPv(Aligned(&req), entries);
             for (int iEntry = 0; iEntry < pgroup->count; iEntry++) {
-                SWITCHENTRY *pentry = pgroup->entries + iEntry;
+                STGENT *pentry = pgroup->aent + iEntry;
                 if (pentry->kind == 0xC) {
                     void *value = pentry->pv;
                     req.cb = 8;
@@ -47,7 +45,7 @@ void LoadStgSwitchFromBrx(STGSWITCH *pstgsw, void *pbis)
             }
         }
     } else {
-        pstgsw->groups = 0;
+        pstgsw->anode = 0;
     }
     CStackFrame_Destructor(frame, 2);
 }

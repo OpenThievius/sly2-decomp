@@ -1,6 +1,6 @@
 #include "types.h"
 struct Curve {
-    char pad[0x38];
+    u8 unknown_0x0[0x38];
     f32 radius;
 };
 extern "C" {

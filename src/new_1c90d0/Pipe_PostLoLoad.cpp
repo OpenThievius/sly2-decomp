@@ -2,7 +2,7 @@
 
 extern "C" {
 struct Pipe {
-    char pad0[0x38];
+    u8 unknown_0x0[0x38];
     f32 radius;
 };
 

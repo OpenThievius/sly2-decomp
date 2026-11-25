@@ -1,6 +1,6 @@
 #include "cref.h"
-struct JB { char pad[0x100C]; int a; int b; };
-struct SLOTHOLDER { char pad[0x8000 + 0x7D54]; int pslot; };
+struct JB { u8 unknown_0x0[0x100C]; int a; int b; };
+struct SLOTHOLDER { u8 unknown_0x0[0x8000 + 0x7D54]; int pslot; };
 #include "sw.h"
 extern JB B_002DFC00;
 extern SLOTHOLDER B_002E65E0;

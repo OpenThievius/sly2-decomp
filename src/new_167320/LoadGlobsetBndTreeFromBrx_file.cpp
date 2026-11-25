@@ -18,11 +18,11 @@ struct BND_167870 {
     float pos[3];
     float sRadius;
     float sMax;
-    long bndk : 4;
-    unsigned long cb : 8;
-    unsigned long ib : 6;
-    unsigned long fFlag : 1;
-    unsigned long isubglob : 13;
+    s64 bndk : 4;
+    u64 cb : 8;
+    u64 ib : 6;
+    u64 fFlag : 1;
+    u64 isubglob : 13;
     void *pv;
     int pad1C;
 };
@@ -529,7 +529,7 @@ static inline void *PvAllocSwClear(ALLOCREQ *preq, int cb)
     return PvAllocSwClearImpl__Fi_16CAA0(preq);
 }
 
-struct GLOB_16CAA0 { u8 unknown_0x0[0x50]; unsigned long flags; };
+struct GLOB_16CAA0 { u8 unknown_0x0[0x50]; u64 flags; };
 
 extern "C" void LoadGlobStreamedFromBrx(GLOB_16CAA0 *glob, REC *rec, REC2 *rec2, int unused, int arg4, int arg5, BIS *stream)
 {
@@ -653,11 +653,11 @@ void func_0016D698(short tag, Src *src, Entry **cursor)
 
 struct GIFS;
 
-extern "C" void AddPrimPack__4GIFSiiUl(GIFS *, int, int, unsigned long);
+extern "C" void AddPrimPack__4GIFSiiUl(GIFS *, int, int, u64);
 
-extern "C" void PackAD__4GIFSll(GIFS *, int, long);
+extern "C" void PackAD__4GIFSll(GIFS *, int, s64);
 
-extern "C" void AddPrimList__4GIFSiUl(GIFS *, int, unsigned long);
+extern "C" void AddPrimList__4GIFSiUl(GIFS *, int, u64);
 
 extern "C" void ListUV__4GIFSii(GIFS *, int, int);
 
@@ -689,7 +689,7 @@ extern "C" void func_0016D6C8(GIFS *pgifs, int flags, void **pcursor)
             mask &= 0xFFFF7FFF;
         if (flags & 0x10000)
             mask &= 0xFFFFBFFF;
-        PackAD__4GIFSll(pgifs, 0x4D, ((long)mask << 32) | 0x02000000);
+        PackAD__4GIFSll(pgifs, 0x4D, ((s64)mask << 32) | 0x02000000);
     }
     func_0016D698((flags & 1) ? 6 : 7, pgifs, pcursor);
     PackAD__4GIFSll(pgifs, 7, 0xEA82L << 20);
@@ -733,9 +733,9 @@ extern "C" void AddDmaCall__4DMASP2QW_16DA48(void *, void *);
 
 extern "C" void AddDmaCnt__4DMAS_16DA48(void *);
 
-extern "C" void AddPrimList__4GIFSiUl_16DA48(GIFS *, int, unsigned long);
+extern "C" void AddPrimList__4GIFSiUl_16DA48(GIFS *, int, u64);
 
-extern "C" void AddPrimPack__4GIFSiiUl_16DA48(GIFS *, int, int, unsigned long);
+extern "C" void AddPrimPack__4GIFSiiUl_16DA48(GIFS *, int, int, u64);
 
 extern "C" void AddVifBaseOffset__4VIFSii_16DA48(void *, int, int);
 
@@ -755,7 +755,7 @@ extern "C" void EndPrim__4GIFSi_16DA48(GIFS *, int);
 
 extern "C" void EnsureVu1Code__FP4VIFSPvT1_16DA48(void *, void *, void *);
 
-extern "C" void PackAD__4GIFSll_16DA48(GIFS *, long, long);
+extern "C" void PackAD__4GIFSll_16DA48(GIFS *, s64, s64);
 
 extern "C" void UnpackHelper__4VIFS3UPKiiPiPPUi_16DA48(void *, int, int, int, int *, void **);
 
@@ -799,9 +799,9 @@ extern "C" void func_0016DA48(void *arg0, int arg1, int arg2) {
     AddPrimPack__4GIFSiiUl_16DA48(&gifs, 0, 1, 0xE);
     func_0016D698_16DA48(0, &gifs, &cursor);
     if (arg1 == 7 || arg2 != 7) {
-        PackAD__4GIFSll_16DA48(&gifs, 0x4C, (long)(int)0x807F8000 << 17);
+        PackAD__4GIFSll_16DA48(&gifs, 0x4C, (s64)(int)0x807F8000 << 17);
     } else {
-        PackAD__4GIFSll_16DA48(&gifs, 0x4C, (long)(int)0x80FF0000 << 16);
+        PackAD__4GIFSll_16DA48(&gifs, 0x4C, (s64)(int)0x80FF0000 << 16);
     }
     PackAD__4GIFSll_16DA48(&gifs, 0x46, 0);
     PackAD__4GIFSll_16DA48(&gifs, 0x47, 0x31001);
@@ -826,7 +826,7 @@ extern "C" void func_0016DA48(void *arg0, int arg1, int arg2) {
     if (arg1 == 8 && arg2 == 7) {
         AddPrimPack__4GIFSiiUl_16DA48(&gifs, 0, 1, 0xE);
         func_0016D698_16DA48(0, &gifs, &cursor);
-        PackAD__4GIFSll_16DA48(&gifs, 0x4C, (long)(int)0x807F8000 << 17);
+        PackAD__4GIFSll_16DA48(&gifs, 0x4C, (s64)(int)0x807F8000 << 17);
     }
     EndPrim__4GIFSi_16DA48(&gifs, 1);
     func_0016D698_16DA48(-1, &gifs, &cursor);
@@ -843,9 +843,9 @@ extern "C" void AddDmaCall__4DMASP2QW_16DD58(void *, void *);
 
 extern "C" void AddDmaCnt__4DMAS_16DD58(void *);
 
-extern "C" void AddPrimList__4GIFSiUl_16DD58(GIFS *, int, unsigned long);
+extern "C" void AddPrimList__4GIFSiUl_16DD58(GIFS *, int, u64);
 
-extern "C" void AddPrimPack__4GIFSiiUl_16DD58(GIFS *, int, int, unsigned long);
+extern "C" void AddPrimPack__4GIFSiiUl_16DD58(GIFS *, int, int, u64);
 
 extern "C" void AddVifBaseOffset__4VIFSii_16DD58(void *, int, int);
 
@@ -865,7 +865,7 @@ extern "C" void GIFS_ListXYZ(GIFS *, int, int, int);
 
 extern "C" void ListUV__4GIFSii_16DD58(GIFS *, int, int);
 
-extern "C" void PackAD__4GIFSll_16DD58(GIFS *, long, long);
+extern "C" void PackAD__4GIFSll_16DD58(GIFS *, s64, s64);
 
 extern "C" void UnpackHelper__4VIFS3UPKiiPiPPUi_16DD58(void *, int, int, int, int *, void **);
 
@@ -885,7 +885,7 @@ extern "C" char B_002DFA80[];
 
 extern "C" SW_16DD58 B_003DD490;
 
-extern "C" long B_003E1330;
+extern "C" s64 B_003E1330;
 
 extern "C" char *g_2dea4c;
 
@@ -907,7 +907,7 @@ extern "C" void func_0016DD58(void *arg0, int unused, int arg2) {
         if (g_2deb74 != 0) {
             AddPrimPack__4GIFSiiUl_16DD58(&gifs, 0, 1, 0xE);
             func_0016D698_16DD58(0, &gifs, &cursor);
-            PackAD__4GIFSll_16DD58(&gifs, 0x4C, (long)(int)0xBFC00000 << 10);
+            PackAD__4GIFSll_16DD58(&gifs, 0x4C, (s64)(int)0xBFC00000 << 10);
             PackAD__4GIFSll_16DD58(&gifs, 0x47, 0x31001);
             PackAD__4GIFSll_16DD58(&gifs, 0x42, (0x8000L << 18) | 0xA9);
             PackAD__4GIFSll_16DD58(&gifs, 1, 0x8000L << 17);
@@ -1139,7 +1139,7 @@ struct GS {
     BND *abnd;
 };
 
-struct ALO { u8 unknown_0x0[0x148]; unsigned long grf; };
+struct ALO { u8 unknown_0x0[0x148]; u64 grf; };
 
 struct GLOBSET { ALO *palo; u8 unknown_0x4[0xC]; VECTOR center; float radius; u8 unknown_0x24[0x20]; BND *abnd; };
 

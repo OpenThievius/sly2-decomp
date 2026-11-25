@@ -2,8 +2,8 @@
 #include "sly2.h"
 struct SO; struct CM; struct RIP;
 struct VEC3_1D04E8 { float x, y, z; };
-struct SMACKI_1D04E8 { char pad0[0x20]; float vmin[3]; char pad1[4]; float vmax[3]; char pad2[0x50 - 0x3C]; QW scale; };
-struct SMACK_1D04E8 { char pad0[0x18]; float lifetime; char pad1[0x20 - 0x1C]; QW scale; QW alpha; char pad2[0x90 - 0x40]; VEC3_1D04E8 v; char pad3[0xF0 - 0x9C]; SMACKI_1D04E8 *table; char pad4[0x100 - 0xF4]; QW screen; };
+struct SMACKI_1D04E8 { u8 unknown_0x0[0x20]; float vmin[3]; u8 unknown_0x2C[0x4]; float vmax[3]; u8 unknown_0x3C[0x14]; QW scale; };
+struct SMACK_1D04E8 { u8 unknown_0x0[0x18]; float lifetime; u8 unknown_0x1C[0x4]; QW scale; QW alpha; u8 unknown_0x40[0x50]; VEC3_1D04E8 v; u8 unknown_0x9C[0x54]; SMACKI_1D04E8 *table; u8 unknown_0xF4[0xC]; QW screen; };
 extern "C" float GRandInRange(float, float);
 extern "C" QW ConvertCmWorldToScreen(CM *, QW);
 extern "C" void InitRip__FP3RIPP6VECTORfP2SO(RIP *, QW, float, SO *);

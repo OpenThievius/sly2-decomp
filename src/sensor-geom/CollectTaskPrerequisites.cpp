@@ -1,10 +1,4 @@
-struct JOB { char pad[0x78]; int unk78; };
-struct TASK {
-    char pad0[0x54]; int state;
-    char pad1[0x7C - 0x58]; JOB *job;
-    char pad2[0x94 - 0x80]; int cprereq; TASK **aprereq;
-    char pad3[0xF0 - 0x9C]; int pending;
-};
+#include "job.h"
 extern "C" void CollectTaskPrerequisites(TASK *ptask, int nState, int *pctask, TASK **aptask) __attribute__((weak));
 extern "C" void CollectTaskPrerequisites(TASK *ptask, int nState, int *pctask, TASK **aptask)
 {
@@ -15,7 +9,7 @@ extern "C" void CollectTaskPrerequisites(TASK *ptask, int nState, int *pctask, T
             JOB *job = prereq->job;
             if (job == 0) goto three;
             if (job != ptask->job) {
-                if (job->unk78 == 0) {
+                if (job->field_0x78 == 0) {
                 three:
                     nStatePrereq = 3;
                 }

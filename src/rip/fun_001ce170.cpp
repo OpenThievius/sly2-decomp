@@ -4,7 +4,7 @@ extern "C" {
 void func_001F4BA8(void *);
 extern int B_003E115C;
 }
-struct Obj_1CE170 { char pad0[0xEC]; Dest_1CE170 *dest; char pad1[0x170 - 0xF0]; QW q0; QW q1; QW q2; float f; };
+struct Obj_1CE170 { u8 unknown_0x0[0xEC]; Dest_1CE170 *dest; u8 unknown_0xF0[0x80]; QW q0; QW q1; QW q2; float f; };
 extern "C" void func_001CE170(Obj_1CE170 *obj)
 {
     obj->dest->a = obj->q0;

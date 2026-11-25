@@ -1,16 +1,15 @@
-struct GME { char pad[0x1C]; unsigned grf; };
-struct GADGET { int a; int b; int c; int d; int e; int sidName; int sidDesc; int sidHint; };
-struct GADGETMENU { char pad0[0x30]; int dialog; int pad1; int msgDialog; char pad2[0x48 - 0x3C]; int gadget; };
+#include "gadgetmenu.h"
+#include "shopmenu.h"
 extern GADGETMENU B_003DA0F0;
 extern char B_003DD490;
-extern GADGET D_002BCD00[];
+extern GADGETDEF D_002BCD00[];
 extern const char *D_002C3268[];
 extern "C" const char RO_002A7A10[];
 extern "C" const char RO_002A7A18[];
 extern "C" const char RO_002A7A28[];
 extern "C" int sprintf(char *, const char *, ...);
 extern "C" char *strcpy(char *, const char *);
-extern "C" GME *GadgetMenu_PgmeFind(GADGETMENU *, int);
+extern "C" GADGETMENUENTRY *GadgetMenu_PgmeFind(GADGETMENU *, int);
 extern "C" void *PpoSwFocusBase(void *);
 extern "C" int IslotJtGadget(void *, int);
 const char *PchzStringFromId(void *, int);
@@ -27,9 +26,9 @@ void GetGadgetMenuText(char *pchz)
         strcpy(pchz, PchzStringFromId(&B_003DD490, 0xDD));
         return;
     }
-    GME *pgme = GadgetMenu_PgmeFind(&B_003DA0F0, B_003DA0F0.gadget);
+    GADGETMENUENTRY *pgme = GadgetMenu_PgmeFind(&B_003DA0F0, B_003DA0F0.gadget);
     int islot = IslotJtGadget(PpoSwFocusBase(&B_003DD490), B_003DA0F0.gadget);
-    if ((pgme->grf & 1) != 0 && islot < 0) {
+    if ((pgme->flags & 1) != 0 && islot < 0) {
         strcpy(achzHint, PchzStringFromId(&B_003DD490, 0xE1));
         pchzDesc = RO_002A7A10;
     } else {

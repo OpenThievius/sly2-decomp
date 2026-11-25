@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
-struct Anim { char pad[0x60]; float low; float high; char pad2[0x58]; struct Clip *clip; };
-struct Clip { char pad[0xC]; int flags; };
+struct Anim { u8 unknown_0x0[0x60]; float low; float high; u8 unknown_0x68[0x58]; struct Clip *clip; };
+struct Clip { u8 unknown_0x0[0xC]; int flags; };
 struct Obj {
-    char pad0[0xF00];
+    u8 unknown_0x0[0xF00];
     Anim *playing;
     float timer;
 };

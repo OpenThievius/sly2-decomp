@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
-struct P12 { char pad[12]; };
+struct P12 { u8 unknown_0x0[12]; };
 struct VA : P12 {
     virtual void f0();
     virtual void f1();
@@ -91,8 +91,8 @@ struct VB : VBB {
     int id;
 };
 #include "xf.h"
-struct SMAREC { int oid; int pad[5]; };
-struct SLOT { char pad[16]; };
+struct SMAREC { int oid; int unknown_0x4[5]; };
+struct SLOT { u8 unknown_0x0[16]; };
 struct CLOCK { float t; float dt; };
 struct MBASE : P12 {
     virtual void f0();
@@ -133,16 +133,17 @@ struct MBASE : P12 {
     virtual void setB(QW);
 };
 struct MOUNT : MBASE {
-    char pad10[0x54 - 0x10];
+    u8 unknown_0x10[0x54 - 0x10];
     XF *pxfA; XF *pxfB; XF *pxfC;
-    char pad60[0x1C0 - 0x60];
+    u8 unknown_0x60[0x1C0 - 0x60];
     int state;
     float timer;
-    char pad1C8[0x230 - 0x1C8];
+    SLOT aslot[5]; /* the per-state animation entries (ANIMENTRY, 0x10 bytes each) */
+    u8 unknown_0x218[0x230 - 0x218];
     int csma;
-    char pad234[0x248 - 0x234];
+    u8 unknown_0x234[0x248 - 0x234];
     int asma[1];
-    char pad24C[0x294 - 0x24C];
+    u8 unknown_0x24C[0x294 - 0x24C];
     VB *pobjB;
     int hA;
     int hB;
@@ -262,5 +263,5 @@ extern "C" void Mount_SetState(MOUNT *self, int newState)
         bevy_camera_follow_activity(&B_002DEB30, 0x10, self);
         break;
     }
-    func_0017F4C0(self, newState != -1 ? (SLOT *)((char *)self + (newState * 0x10 + 0x1C8)) : 0);
+    func_0017F4C0(self, newState != -1 ? &self->aslot[newState] : 0);
 }

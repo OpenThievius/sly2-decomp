@@ -1,19 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 struct CBinaryInputStream;
 #include "alloc.h"
-struct TASK {
-    char pad0[0x90];
-    int *list90;
-    int count94;
-    void *clear98;
-    int *list9C;
-    int countA0;
-    void *clearA4;
-    int countA8;
-    void *allocAC;
-    int countB0;
-    void *allocB4;
-};
+#include "job.h"
 extern "C" {
 void *CStackFrame_Construct(void *);
 void CStackFrame_Destructor(void *, int);
@@ -47,31 +35,31 @@ extern "C" void LoadTaskFromBrx(TASK *task, CBinaryInputStream *stream)
     int secondIndex;
     CStackFrame_Construct(frame);
     req.cb = 0x200;
-    task->allocAC = PvAllocStackImpl__Fi(Aligned(&req));
+    task->atoggle = PvAllocStackImpl__Fi(Aligned(&req));
     req.cb = 0x300;
-    task->allocB4 = PvAllocStackImpl__Fi(Aligned(&req));
+    task->aanim = (ANIMREC *)PvAllocStackImpl__Fi(Aligned(&req));
     LoadLoFromBrx(task, stream);
-    req.cb = task->countA8 * 0x10;
-    task->allocAC = PvAllocSwCopyImpl__FiPv(Aligned(&req), task->allocAC);
-    req.cb = task->countB0 * 0x18;
-    task->allocB4 = PvAllocSwCopyImpl__FiPv(Aligned(&req), task->allocB4);
+    req.cb = task->ctoggle * 0x10;
+    task->atoggle = PvAllocSwCopyImpl__FiPv(Aligned(&req), task->atoggle);
+    req.cb = task->canim * 0x18;
+    task->aanim = (ANIMREC *)PvAllocSwCopyImpl__FiPv(Aligned(&req), task->aanim);
     int count = U8Read__18CBinaryInputStream(stream);
-    task->count94 = count;
+    task->cprereq = count;
     req.cb = count * 4;
-    task->clear98 = PvAllocSwClearImpl__Fi(Aligned(&req));
-    req.cb = task->count94 * 4;
-    task->list90 = (int *)PvAllocSwImpl__Fi(Aligned(&req));
-    for (index = 0; index < task->count94; index++) {
-        task->list90[index] = S32Read__18CBinaryInputStream(stream);
+    task->aprereq = (TASK **)PvAllocSwClearImpl__Fi(Aligned(&req));
+    req.cb = task->cprereq * 4;
+    task->aoidPrereq = (s32 *)PvAllocSwImpl__Fi(Aligned(&req));
+    for (index = 0; index < task->cprereq; index++) {
+        task->aoidPrereq[index] = S32Read__18CBinaryInputStream(stream);
     }
     int secondCount = U8Read__18CBinaryInputStream(stream);
-    task->countA0 = secondCount;
+    task->cdep = secondCount;
     req.cb = secondCount * 4;
-    task->clearA4 = PvAllocSwClearImpl__Fi(Aligned(&req));
-    req.cb = task->countA0 * 4;
-    task->list9C = (int *)PvAllocSwImpl__Fi(Aligned(&req));
-    for (secondIndex = 0; secondIndex < task->countA0; secondIndex++) {
-        task->list9C[secondIndex] = S32Read__18CBinaryInputStream(stream);
+    task->adep = (TASK **)PvAllocSwClearImpl__Fi(Aligned(&req));
+    req.cb = task->cdep * 4;
+    task->aoidDep = (s32 *)PvAllocSwImpl__Fi(Aligned(&req));
+    for (secondIndex = 0; secondIndex < task->cdep; secondIndex++) {
+        task->aoidDep[secondIndex] = S32Read__18CBinaryInputStream(stream);
     }
     Unknown1__18CBinaryInputStream(stream);
     CStackFrame_Destructor(frame, 2);

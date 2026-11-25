@@ -12,7 +12,7 @@ s32 FTaskRunning(TASK *task) {
     if (task->field_0x50 != 0) {
         return 0;
     }
-    state = task->field_0xF4;
+    state = task->cause;
     if (state == 2) {
         return 0;
     }

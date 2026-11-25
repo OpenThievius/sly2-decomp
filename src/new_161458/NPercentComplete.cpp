@@ -1,6 +1,6 @@
 #include "sly2.h"
 #include "alloc.h"
-struct TASK { char pad0[0x54]; int state; char pad1[0x48]; int dependents; };
+struct TASK { u8 unknown_0x0[0x54]; int state; u8 unknown_0x58[0x48]; int dependents; };
 extern "C" void CStackFrame_Construct(void *);
 extern "C" void CStackFrame_Destructor(void *, int);
 extern "C" void *PvAllocStackClearImpl__Fi(ALLOCREQ *);

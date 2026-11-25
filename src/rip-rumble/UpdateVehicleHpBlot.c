@@ -1,4 +1,5 @@
-struct Vehicle { char pad0[0x55C]; int maximum; int current; int inverted; int blot; };
+#include "types.h"
+struct Vehicle { u8 unknown_0x0[0x55C]; int maximum; int current; int inverted; int blot; };
 int SeekBlotLabel(int, int, float);
 void UpdateVehicleHpBlot(struct Vehicle *vehicle) {
     int blot = vehicle->blot;

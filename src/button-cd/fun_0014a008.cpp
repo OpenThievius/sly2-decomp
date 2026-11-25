@@ -1,5 +1,5 @@
 #include "alloc.h"
-struct PATH { char pad0[0x54]; int cnode; int anode; };
+struct PATH { u8 unknown_0x0[0x54]; int cnode; int anode; };
 extern "C" void *CStackFrame_Construct(void *);
 extern "C" void CStackFrame_Destructor(void *, int);
 extern "C" void *PvAllocStackClearImpl__Fi(ALLOCREQ *);

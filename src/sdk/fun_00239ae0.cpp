@@ -1,6 +1,6 @@
 #include "types.h"
 extern "C" {
-struct AlarmBlock_44C300 { AlarmBlock_44C300 *next; char pad[0x3C]; };
+struct AlarmBlock_44C300 { AlarmBlock_44C300 *next; u8 unknown_0x4[0x3C]; };
 struct AlarmState_2C5A30 { s64 ticks; s32 handlerId; s32 pad0C; s32 field10; AlarmBlock_44C300 *pool; };
 s32 AddIntcHandler2(s32, void *, s32, s32);
 s32 EnableIntc(s32);

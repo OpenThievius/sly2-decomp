@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "types.h"
 struct HDR_1D7D30 { int count; unsigned char *pb; };
-struct LAYOUT_1D7D30 { char pad[0x5400]; int last; int sum; };
+struct LAYOUT_1D7D30 { u8 unknown_0x0[0x5400]; int last; int sum; };
 static inline int SumBytes(unsigned char *pb, int cb)
 {
     int sum = 0;

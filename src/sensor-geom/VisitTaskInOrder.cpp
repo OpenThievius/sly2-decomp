@@ -1,10 +1,5 @@
 #include "sly2.h"
-struct TASK;
-struct JOB { char pad0[0x68]; TASK *endTask; char pad1[0x84]; int cause; int causeArg; };
-struct TASK {
-    char pad0[0x7C]; JOB *job; char pad1[0x14]; int cPrereq; char pad2[0x8]; int cDependent; TASK **aDependent;
-    char pad3[0x4C]; int cause; int causeArg; int cVisit; int depthMax; int jobDepthMax;
-};
+#include "job.h"
 extern "C" void VisitTaskInOrder_self(TASK *, int *, TASK **, int, int);
 struct CAUSESCOPE {
     JOB *job;
@@ -46,16 +41,16 @@ void VisitTaskInOrder(TASK *task, int *count, TASK **tasks, int depth, int jobDe
     task->depthMax = depthMax;
     task->jobDepthMax = jobDepthMax;
     task->cVisit = visits;
-    if (visits < task->cPrereq)
+    if (visits < task->cprereq)
         return;
     int index = *count;
     tasks[index] = task;
     *count = index + 1;
     depth++;
-    if (task->job != 0 && task->job->endTask == task)
+    if (task->job != 0 && task->job->ptaskEnd == task)
         jobDepth++;
-    for (int dependent = 0; dependent < task->cDependent; dependent++) {
-        TASK *next = task->aDependent[dependent];
+    for (int dependent = 0; dependent < task->cdep; dependent++) {
+        TASK *next = task->adep[dependent];
         CAUSESCOPE scope(next, task->cause, task->causeArg);
         VisitTaskInOrder_self(next, count, tasks, depth, jobDepth);
     }

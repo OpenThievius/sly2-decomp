@@ -5,7 +5,7 @@
 #include "types.h"
 #include "m2c_macros.h"
 
-struct Guard { char pad[0x4A4]; int flag; };
+struct Guard { u8 unknown_0x0[0x4A4]; int flag; };
 
 void InitGuard(Guard *);
 
@@ -17,9 +17,9 @@ void func_0014FAC8(Guard *self)
 
 extern "C" {
 typedef struct GUARDOWNER {
-    char pad[0x208];
+    u8 unknown_0x0[0x208];
     s32 field_0x208;
-    char pad2[0xF80 - 0x20C];
+    u8 unknown_0x20C[0xD74];
     s32 field_0xF80;
 } GUARDOWNER;
 

@@ -1,6 +1,5 @@
-struct Pair { int first; int second; };
-struct Holder { char pad[0x150]; int count; Pair *items; };
-extern "C" void AddStgSwitchClass(Holder *self, int first, int second)
+#include "stgswitch.h"
+extern "C" void AddStgSwitchClass(STGSWITCH *self, int cid, int field_0x4)
 {
- int n = self->count; if (n < 8) { Pair *e = self->items + n; self->count = n + 1; e->first = first; e->second = second; }
+ int count = self->cclass; if (count < 8) { STGCLASS *entry = self->aclass + count; self->cclass = count + 1; entry->cid = cid; entry->field_0x4 = field_0x4; }
 }

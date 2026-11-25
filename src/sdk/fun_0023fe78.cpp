@@ -18,7 +18,7 @@ struct ParseResult {
 } __attribute__((aligned(8)));
 struct ParseWorkspace {
     ParseResult head;
-    long long trailer;
+    s64 trailer;
 };
 EHFDE *func_0023F850(unsigned);
 unsigned func_0023F938(EHFDE *, ParseState *);

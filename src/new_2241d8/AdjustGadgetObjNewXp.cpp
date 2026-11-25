@@ -1,4 +1,5 @@
-struct Gadget { char pad[0x98]; float xp; };
+#include "types.h"
+struct Gadget { u8 unknown_0x0[0x98]; float xp; };
 extern "C" void func_001F4FB0(void *, Gadget *);
 void AdjustGadgetObjNewXp(void *obj, Gadget *gadget)
 {

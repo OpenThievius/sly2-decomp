@@ -1,4 +1,5 @@
-struct RIPG { char pad[0x15C]; int dl; };
+#include "types.h"
+struct RIPG { u8 unknown_0x0[0x15C]; int dl; };
 struct RIP { int pad0, pad1; RIPG *pripg; };
 #include "sw.h"
 void AddRipRef(RIP *);

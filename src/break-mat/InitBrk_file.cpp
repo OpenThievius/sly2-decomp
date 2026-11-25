@@ -80,7 +80,7 @@ void UpdateSwXaList(SW *sw, XA **first)
     while (xa) {
         SO *so = xa->so;
         XA *next = xa->next;
-        long grf = so->grfso;
+        s64 grf = so->grfso;
         int was = (int)(grf >> 31) & 1;
         int is = (int)(grf >> 32) & 1;
         if (was != is) {
@@ -97,7 +97,7 @@ void UpdateSwXaList(SW *sw, XA **first)
             freeList = xa;
         }
         SO *so2 = xa->so;
-        unsigned long g = so2->grfso;
+        u64 g = so2->grfso;
         g &= ~(0x8000L << 17);
         g &= ~(0x8000L << 16);
         so2->grfso = g;
@@ -254,7 +254,7 @@ void func_002297F0(void) {
 
 INCLUDE_ASM(0X2297F8);
 
-struct WATERBITS { unsigned long long low : 50; unsigned long long flag : 1; unsigned long long high : 13; };
+struct WATERBITS { u64 low : 50; u64 flag : 1; u64 high : 13; };
 
 /* the object func_00229D60 tests: a flag bit of its word at 0x10 */
 struct WATERTARGET { u8 unknown_0x0[0x10]; WATERBITS bits; };

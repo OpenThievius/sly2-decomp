@@ -1,13 +1,13 @@
 #include "sly2.h"
 #include "cref.h"
-struct CPair { int cref; int pad4; CRef ref; CPair *next; };
+#include "timedcall.h"
 struct PairHandle { CPair *p; int pad[3]; };
 struct SLOTHEAP;
 struct CFrame;
 extern "C" {
 CPair *PpairNew(void);
 void PairHandle_Assign(CPair **, CPair *);
-void PpairClone(PairHandle *, int, CFrame *, unsigned long);
+void PpairClone(PairHandle *, int, CFrame *, u64);
 void CRef_Destruct(CRef *);
 void CPairPtr_Destructor(CPair **, int);
 void UnlinkPairNode(CPair *);
@@ -40,7 +40,7 @@ extern "C" CRef *RefOpAppend(CRef *pret, int carg, CRef *aref)
     }
     CPair *tail;
     result.p = 0;
-    for (CPair *node = (CPair *)aref->m_tag.m_n; node != 0; node = node->next) {
+    for (CPair *node = aref->m_tag.m_ppair; node != 0; node = node->next) {
         if (node->ref.m_tagk == 0x1F) {
             copy.p = 0;
             if (node->next != 0) {
@@ -48,7 +48,7 @@ extern "C" CRef *RefOpAppend(CRef *pret, int carg, CRef *aref)
                 PairHandle_Assign(&copy.p, clone.p);
                 ReleasePair(clone.p);
             } else {
-                PairHandle_Assign(&copy.p, (CPair *)node->ref.m_tag.m_n);
+                PairHandle_Assign(&copy.p, node->ref.m_tag.m_ppair);
             }
             if (result.p == 0) {
                 PairHandle_Assign(&result.p, PpairNew());
@@ -66,7 +66,7 @@ extern "C" CRef *RefOpAppend(CRef *pret, int carg, CRef *aref)
         SetTag__4CRef4TAGK(pret, 0);
         ReleasePair(result.p);
     } else {
-        CRef_ConstructPair(pret, (CPair *)result.p->ref.m_tag.m_n);
+        CRef_ConstructPair(pret, result.p->ref.m_tag.m_ppair);
         ReleasePair(result.p);
     }
     return pret;

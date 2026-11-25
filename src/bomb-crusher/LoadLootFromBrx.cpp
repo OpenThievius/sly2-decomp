@@ -1,6 +1,5 @@
-#include "sly2.h"
+#include "loot.h"
 #include "alloc.h"
-struct LOOT { char pad[0x150]; int count; void *table; };
 extern "C" void * CStackFrame_Construct(void *);
 extern "C" void *PvAllocStackClearImpl__Fi(ALLOCREQ *);
 extern "C" void CSo_LoadFromBrx(LOOT *, void *);
@@ -16,11 +15,11 @@ void LoadLootFromBrx(LOOT *loot, void *bis)
     ALLOCREQ *preq = &req;
     req.cb = 0x580;
     preq->cbAlign = align;
-    loot->table = PvAllocStackClearImpl__Fi(preq);
+    loot->alootdef = (LOOTDEF *)PvAllocStackClearImpl__Fi(preq);
     CSo_LoadFromBrx(loot, bis);
     func_0013C440(loot);
-    req.cb = loot->count * 0x2C;
+    req.cb = loot->clootdef * 0x2C;
     preq->cbAlign = align;
-    loot->table = PvAllocSwCopyImpl__FiPv(preq, loot->table);
+    loot->alootdef = (LOOTDEF *)PvAllocSwCopyImpl__FiPv(preq, loot->alootdef);
     CStackFrame_Destructor(frame, 2);
 }

@@ -1,25 +1,13 @@
 #include "sly2.h"
-#include "rgba.h"
-struct AFF { float a, b, c, d, e, f, u6, u7; } __attribute__((aligned(16)));
-struct MOVIECHAR;
-struct TMP { union { AFF dummy; struct { RGBA t0; char p0[12]; RGBA t1; char p1[12]; } c; } v; union { AFF lerped; struct { RGBA t2; char p2[12]; RGBA t3; } c; } u; };
-struct SLOT {
-    RGBA rgbaAdd; RGBA rgbaMul; char pad08[8];
-    AFF xf;
-    MOVIECHAR *pchar; int maskMode; float tFrom; RGBA rgbaAddFrom; RGBA rgbaMulFrom; AFF *pxfFrom;
-    float tTo; RGBA rgbaAddTo; RGBA rgbaMulTo; AFF *pxfTo; int iinst; float tUpdated;
-    unsigned char fTween; char pad61[0x68 - 0x61]; void *pslNext; char pad6c[4];
-};
-struct INST { int cslot; SLOT *aslot; short ilabel; short ikeyNext; float t; int fPaused; int pamb; };
-struct SPRITE { char pad0[8]; INST *insts; };
-struct LABEL { char pad0[0x10]; SPRITE *psprite; };
+#include "fbsprite.h"
+struct TMP { union { AFFINE2D dummy; struct { RGBA t0; char p0[12]; RGBA t1; char p1[12]; } c; } v; union { AFFINE2D lerped; struct { RGBA t2; char p2[12]; RGBA t3; } c; } u; };
 extern "C" void ClearSle(void *);
 extern "C" void CombineColorTransforms(RGBA *, RGBA *, RGBA *, RGBA *, RGBA *, RGBA *);
-extern "C" void func_00215850(MOVIECHAR *, SLOT *, float, AFF *, RGBA *, RGBA *);
+extern "C" void func_00215850(MOVIECHAR *, SLOT *, float, AFFINE2D *, RGBA *, RGBA *);
 
-static inline AFF Mult(const AFF &child, const AFF &parent)
+static inline AFFINE2D Mult(const AFFINE2D &child, const AFFINE2D &parent)
 {
-    AFF product;
+    AFFINE2D product;
     float ca = child.a, cb = child.b, cc = child.c, cd = child.d, ce = child.e, cf = child.f;
     product.a = ca * parent.a + cb * parent.c;
     product.b = ca * parent.b + cb * parent.d;
@@ -38,9 +26,9 @@ static inline char LerpByte(int from, int to, float u)
     float inv = 1.0f - u;
     return to + (int)(inv * (ItoF(from) + 0.999f - ItoF(to)));
 }
-extern "C" void RefreshSpriteInstance(float dt, LABEL *label, int iinst, AFF *pxf, RGBA *prgbaAdd, RGBA *prgbaMul)
+extern "C" void RefreshSpriteInstance(float dt, SPRITELABEL *label, int iinst, AFFINE2D *pxf, RGBA *prgbaAdd, RGBA *prgbaMul)
 {
-    INST *inst = (INST *)(iinst * sizeof(INST) + (uptr)label->psprite->insts);
+    SPRITEINST *inst = (SPRITEINST *)(iinst * sizeof(SPRITEINST) + (uptr)label->psprite->insts);
     SLOT *aslot = inst->aslot;
     int cslot = inst->cslot;
     float t = inst->t;
@@ -51,7 +39,7 @@ extern "C" void RefreshSpriteInstance(float dt, LABEL *label, int iinst, AFF *px
             ClearSle(&slot->pslNext);
             continue;
         }
-        AFF xf;
+        AFFINE2D xf;
         RGBA outAdd, outMul;
         RGBA mulSlot, addSlot;
         TMP tmp;

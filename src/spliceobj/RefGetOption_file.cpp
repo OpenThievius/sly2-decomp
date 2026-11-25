@@ -27,55 +27,50 @@ CRef RefGetOption(BASIC *pbasic, int optid)
     }
 }
 
-struct OPTIONOWNER {
-    char pad[4];
-    s32 field_0x4;
-};
+extern "C" void CSidebag_RefSetBinding(s32, CSidebag *, s32, s32);
 
-extern "C" void CSidebag_RefSetBinding(s32, s32, s32, s32);
+extern "C" s32 PeopidFind__FP5BASICi_200C28(BASIC *, s32);
 
-extern "C" s32 PeopidFind__FP5BASICi_200C28(OPTIONOWNER *, s32);
+extern "C" void RefSetPeopid(s32, BASIC *, s32, s32);
 
-extern "C" void RefSetPeopid(s32, OPTIONOWNER *, s32, s32);
-
-extern "C" s32 RefSetOption__FP5BASICiP4CRef(s32 arg0, OPTIONOWNER *arg1, s32 arg2, s32 arg3) {
+extern "C" s32 RefSetOption__FP5BASICiP4CRef(s32 arg0, BASIC *arg1, s32 arg2, s32 arg3) {
     if (arg2 < 0x4D1) {
         RefSetPeopid(arg0, arg1, PeopidFind__FP5BASICi_200C28(arg1, arg2), arg3);
     } else {
-        CSidebag_RefSetBinding(arg0, arg1->field_0x4, arg2, arg3);
+        CSidebag_RefSetBinding(arg0, arg1->psidebag, arg2, arg3);
     }
     return arg0;
 }
 
 extern "C" {
-void CSidebag_RefAddBinding(s32, s32, s32, s32);
+void CSidebag_RefAddBinding(s32, CSidebag *, s32, s32);
 
-void func_00132B78(struct OPTIONOWNER *);
+void func_00132B78(BASIC *);
 
-s32 RefAddOption__FP5BASICiP4CRef(s32 arg0, struct OPTIONOWNER *arg1, s32 arg2, s32 arg3) {
+s32 RefAddOption__FP5BASICiP4CRef(s32 arg0, BASIC *arg1, s32 arg2, s32 arg3) {
     func_00132B78(arg1);
-    CSidebag_RefAddBinding(arg0, arg1->field_0x4, arg2, arg3);
+    CSidebag_RefAddBinding(arg0, arg1->psidebag, arg2, arg3);
     return arg0;
 }
 }
 
 extern "C" {
-void CSidebag_RefSetBinding(s32, s32, s32, s32);
+void CSidebag_RefSetBinding(s32, CSidebag *, s32, s32);
 
-s32 FFindBinding__8CSidebagiP4CRef_200D10(s32, s32, s32);
+s32 FFindBinding__8CSidebagiP4CRef_200D10(CSidebag *, s32, s32);
 
-s32 RefEnsureOption__FP5BASICiP4CRef(s32 arg0, struct OPTIONOWNER *arg1, s32 arg2, s32 arg3) {
+s32 RefEnsureOption__FP5BASICiP4CRef(s32 arg0, BASIC *arg1, s32 arg2, s32 arg3) {
     func_00132B78(arg1);
-    if (FFindBinding__8CSidebagiP4CRef_200D10(arg1->field_0x4, arg2, 0) != 0) {
-        CSidebag_RefSetBinding(arg0, arg1->field_0x4, arg2, arg3);
+    if (FFindBinding__8CSidebagiP4CRef_200D10(arg1->psidebag, arg2, 0) != 0) {
+        CSidebag_RefSetBinding(arg0, arg1->psidebag, arg2, arg3);
     } else {
-        CSidebag_RefAddBinding(arg0, arg1->field_0x4, arg2, arg3);
+        CSidebag_RefAddBinding(arg0, arg1->psidebag, arg2, arg3);
     }
     return arg0;
 }
 }
 
-struct CPAIR { int refcount; int pad4; char ref[8]; CPAIR *next; };
+struct CPAIR { int refcount; u8 unknown_0x4[4]; char ref[8]; CPAIR *next; };
 
 struct EOPID { int otyp; int grfeopid; int ibGet; int fieldC[7]; };
 
@@ -264,7 +259,7 @@ extern "C" void *RefSetArgsFromSplice__FiP4CRefP4OTYPe(void *pret, int carg, voi
     return pret;
 }
 
-struct NODE { char pad[8]; int ref[2]; NODE *next; };
+struct NODE { u8 unknown_0x0[8]; int ref[2]; NODE *next; };
 
 struct LIST { int carg; NODE *first; };
 

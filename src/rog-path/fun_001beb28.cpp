@@ -1,18 +1,18 @@
 #include "sly2.h"
 struct VT {
-    char pad0[0x18]; short delta18; short index18; void (*fn18)(void *, int, int, int, int, int);
-    char pad1[0x40 - 0x20]; short delta40; short index40; void (*fn40)(void *);
+    u8 unknown_0x0[0x18]; short delta18; short index18; void (*fn18)(void *, int, int, int, int, int);
+    u8 unknown_0x20[0x20]; short delta40; short index40; void (*fn40)(void *);
     short delta48; short index48; void (*fn48)(void *);
-    char pad2[0xA8 - 0x50]; short deltaA8; short indexA8; void (*fnA8)(void *, int);
-    char pad3[0xB8 - 0xB0]; short deltaB8; short indexB8; void (*fnB8)(void *);
+    u8 unknown_0x50[0x58]; short deltaA8; short indexA8; void (*fnA8)(void *, int);
+    u8 unknown_0xB0[0x8]; short deltaB8; short indexB8; void (*fnB8)(void *);
 };
-struct ROOT { char pad[0xC]; VT *vt; };
-struct OBJ { char pad[0xC]; VT *vt; char pad1[0x14 - 0x10]; ROOT *root; char pad2[0x28 - 0x18]; unsigned long grf; char pad3[0x40 - 0x30]; unsigned *pgrf; };
-struct SLOT { char pad[0x20]; void *owner; char pad2[4]; };
+struct ROOT { u8 unknown_0x0[0xC]; VT *vt; };
+struct OBJ { u8 unknown_0x0[0xC]; VT *vt; u8 unknown_0x10[0x4]; ROOT *root; u8 unknown_0x18[0x10]; u64 grf; u8 unknown_0x30[0x10]; unsigned *pgrf; };
+struct SLOT { u8 unknown_0x0[0x20]; void *owner; u8 unknown_0x24[0x4]; };
 struct RTALO {
-    char pad[0xC]; VT *vt;
-    char pad1[0xE0 - 0x10]; int count; OBJ *children[4]; unsigned flags[4];
-    char pad2[0x128 - 0x104]; SLOT *slot;
+    u8 unknown_0x0[0xC]; VT *vt;
+    u8 unknown_0x10[0xD0]; int count; OBJ *children[4]; unsigned flags[4];
+    u8 unknown_0xF8[0x24]; SLOT *slot;
 };
 extern "C" {
 extern SLOT B_003E1A78[];

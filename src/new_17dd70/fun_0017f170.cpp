@@ -1,13 +1,7 @@
-#include "sly2.h"
+#include "sohit.h"
 extern "C" void func_001CB518(void *);
-#include "goal.h"
-struct GOAL_17F170 : GOAL {
-    char pad_30[0x150];
-    int a;
-    int b;
-};
-void func_0017F170(GOAL_17F170 *pgoal)
+void func_0017F170(SOHIT *pso)
 {
-    func_001CB518(pgoal);
-    pgoal->b = pgoal->a;
+    func_001CB518(pso);
+    pso->hp = pso->hpMax;
 }

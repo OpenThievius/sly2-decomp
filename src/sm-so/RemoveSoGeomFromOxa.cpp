@@ -1,15 +1,16 @@
 #include "sly2.h"
 #include "so.h"
-struct GEOM { char pad[0x10]; unsigned long grf; char pad2[0xB0 - 0x18]; };
-struct OXA { char pad[0x34]; char dl[0x2C]; SO *powner; };
-extern "C" int FFindDlEntry(void *, void *);
-extern "C" void RemoveDlEntry(void *, void *);
-extern "C" int FIsDlEmpty__FP2DL(void *);
-extern "C" void RemoveSafePointsOfLo(void *, int, GEOM *);
+#include "oxa.h"
+#include "geom.h"
+#include "sw.h"
+extern "C" int FFindDlEntry(DL *, GEOM *);
+extern "C" void RemoveDlEntry(DL *, GEOM *);
+extern "C" int FIsDlEmpty__FP2DL(DL *);
+extern "C" void RemoveSafePointsOfLo(SW *, int, GEOM *);
 extern "C" void DiscardSoXps(SO *);
-extern "C" void FreeSwPoxa(void *, OXA *);
+extern "C" void FreeSwPoxa(SW *, OXA *);
 extern "C" void func_001F5078(SO *);
-extern "C" char B_003DD490;
+extern "C" SW B_003DD490;
 
 // Retail: the geometry scan is not rotated (bltz at the loop top, the back branch is the
 // FFindDlEntry test with igeom-- in its delay slot), the "none found" store falls into the
@@ -20,23 +21,23 @@ extern "C" char B_003DD490;
 // (addu a1, s1, a1); &ageom[igeom] and ageom + igeom put the base first.
 void RemoveSoGeomFromOxa(SO *pso, GEOM *pgeom)
 {
-    if (pso->poxa == 0 || FFindDlEntry(pso->poxa->dl, pgeom) == 0)
+    if (pso->poxa == 0 || FFindDlEntry(&pso->poxa->dlGeom, pgeom) == 0)
         return;
-    RemoveDlEntry(pso->poxa->dl, pgeom);
+    RemoveDlEntry(&pso->poxa->dlGeom, pgeom);
     if (pgeom->grf & (0x8000UL << 36))
         RemoveSafePointsOfLo(&B_003DD490, 0, pgeom);
     DiscardSoXps(pso);
-    if (FIsDlEmpty__FP2DL(pso->poxa->dl) != 0) {
+    if (FIsDlEmpty__FP2DL(&pso->poxa->dlGeom) != 0) {
         OXA *poxa = pso->poxa;
-        poxa->powner->poxa = 0;
+        poxa->owner->poxa = 0;
         pso->poxa = 0;
         FreeSwPoxa(&B_003DD490, poxa);
-    } else if (pso->poxa->powner != pso) {
+    } else if (pso->poxa->owner != pso) {
         int igeom = pso->cgeom;
         for (;;) {
             igeom--;
             if (igeom >= 0) {
-                if (FFindDlEntry(pso->poxa->dl, (GEOM *)(igeom * sizeof(GEOM) + (uptr)pso->ageom)) == 0)
+                if (FFindDlEntry(&pso->poxa->dlGeom, (GEOM *)(igeom * sizeof(GEOM) + (uptr)pso->ageom)) == 0)
                     continue;
                 break;
             } else {

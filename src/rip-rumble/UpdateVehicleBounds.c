@@ -2,7 +2,7 @@
 #include "vehicle.h"
 
 struct SO;
-QW ConvertAloPos(struct SO *, long, QW);
+QW ConvertAloPos(struct SO *, s64, QW);
 void ExtendSoBounds(struct SO *, QW, f32);
 void UpdateSoBounds(struct SO *);
 

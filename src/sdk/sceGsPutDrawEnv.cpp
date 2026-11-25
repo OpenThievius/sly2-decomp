@@ -1,7 +1,7 @@
 #include "types.h"
 extern "C" {
 int func_00236960(const char *, ...);
-int sceGsPutDrawEnv(unsigned long *draw) {
+int sceGsPutDrawEnv(u64 *draw) {
     unsigned int count = 0;
     while (*(volatile unsigned int *)0x1000A000 & 0x100) {
         if (count++ > 0x1000000) {

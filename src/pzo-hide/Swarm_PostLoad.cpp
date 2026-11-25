@@ -19,17 +19,17 @@ struct SWSLOT {
     s32 pad8;
     s32 link;
     u64 flags;
-    char pad18[0x98];
+    u8 unknown_0x18[0x98];
 };
 struct SWHOLDER {
-    char pad0[0x28];
+    u8 unknown_0x0[0x28];
     u64 flagsHigh;
-    char pad30[0x30];
+    u8 unknown_0x30[0x30];
     s32 id;
-    char pad64[0x7C];
+    u8 unknown_0x64[0x7C];
     s32 slotCount;
     SWSLOT *slots;
-    char padE8[0xE0];
+    u8 unknown_0xE8[0xE0];
     s32 partCount;
     SWPART parts[1];
 };

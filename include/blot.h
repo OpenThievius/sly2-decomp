@@ -23,7 +23,9 @@ struct BLOT : LO {
     /* 0x54 */ s32 field_0x54;          /* the same */
     /* 0x58 */ s32 blots;               /* SetBlotBlots' state: LoadBlotFromBrx sets 0 (streamed) or 1 (movie); Blot_Show, bevy_jobs_restart_current test 2 */
     /* 0x5C */ f32 time;                /* bevy_jobs_restart_current: the prompt waits 0.5 s after it */
-    u8 unknown_0x60[0xD];
+    /* 0x60 */ s32 tagState;           /* reader: SetBlotBlots (the blot's own state setter) stores B_002BE538's tag */
+    /* 0x64 */ s32 field_0x64;          /* readers: func_001DD780 (the menu's blot is ready when it and blots are 2), MemcardMenu_Update (MENUOBJECT) */
+    u8 unknown_0x68[0x5];
     /* 0x6D */ u8 field_0x6D;           /* PostBlotLoad selects -1 when it is set */
     u8 unknown_0x6E[0x2];
     /* 0x70 */ s32 labelVisible;        /* Blot_Show, LoadBlotFromBrx (0x310) */
@@ -44,7 +46,8 @@ struct BLOT : LO {
                                           func_00217298 shifts it left by 18 into a DMA record's depth */
     /* 0xA8 */ s32 field_0xA8;          /* PostBlotLoad sets -1 */
     /* 0xAC */ s32 modal;               /* readers: PlayBlotLabel, StopBlotLabel (SetBlotModal when set) */
-    u8 unknown_0xB0[0xC];
+    /* 0xB0 */ s32 fSlowsClock;         /* reader: SetBlotBlots slows the game clock while the blot is active; func_001DD690, JobMenu_PostLoad, MemcardMenu_PostLoad set it to 1 on the menu's blot */
+    u8 unknown_0xB4[0x8];
     /* 0xBC */ s32 field_0xBC;          /* LoadBlotFromBrx reads it from the stream; PostBlotLoad finds the world's font when it is set */
     /* 0xC0 */ BLOTSTREAM *pstream;     /* LoadBlotFromBrx: the streamed record */
     /* 0xC4 */ void *palloc;            /* LoadBlotFromBrx: B_003E1C70 (streamed) or B_003E1C80 (movie) */

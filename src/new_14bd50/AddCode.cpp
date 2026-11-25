@@ -1,4 +1,5 @@
-struct Entry { int *pvalue; char pad4[0xC]; int flag; };
+#include "types.h"
+struct Entry { int *pvalue; u8 unknown_0x4[0xC]; int flag; };
 extern "C" {
 int FFindSlEntry();
 void AppendSlEntry(int, Entry *);

@@ -1,5 +1,4 @@
-#include "dl.h"
-struct JSG { char pad0[0x40]; unsigned grf; char pad1[0x18]; DL dlSeqnode; char pad2[8]; float tRun; int fRunning; };
+#include "jsg.h"
 extern "C" {
 void UpdateLo(JSG *);
 void RunSeqnode(void *);
@@ -18,14 +17,14 @@ void UpdateJsg(JSG *pjsg, float dt)
     UpdateLo(pjsg);
     if (pjsg->fRunning == 0)
         return;
-    unsigned grf = pjsg->grf;
+    unsigned grf = pjsg->grfSw;
     if (((grf ^ 1) & 1) != 0)
         grf = *(unsigned *)grf;
     pjsg->tRun = ((grf & 0x100) != 0) ? pjsg->tRun + g_2ddf10 : pjsg->tRun + g_2dded4;
 
     DLI dli;
     PushDli(&dli, &pjsg->dlSeqnode);
-    for (char *pseqnode = (char *)PvStep(&dli); pseqnode != 0; pseqnode = (char *)PvStep(&dli))
+    for (void *pseqnode = PvStep(&dli); pseqnode != 0; pseqnode = PvStep(&dli))
         RunSeqnode(pseqnode);
     if (FIsDlEmpty__FP2DL(&pjsg->dlSeqnode) != 0)
         StopJsg(pjsg);

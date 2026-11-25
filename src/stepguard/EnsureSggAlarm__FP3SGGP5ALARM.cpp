@@ -1,6 +1,7 @@
+#include "types.h"
 struct ALARM;
 struct SGG {
-    char pad[0x84];
+    u8 unknown_0x0[0x84];
     int calarm;
     ALARM *aalarm[8];
 };

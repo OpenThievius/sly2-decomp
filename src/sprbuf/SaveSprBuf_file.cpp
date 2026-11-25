@@ -40,12 +40,12 @@ extern "C" void SaveSprBuf__FPve(void *pvDest, ...)
     ientry = psprbuf->centry - ientry;
     int ipvDest = 0;
     while (ientry < psprbuf->centry - 1) {
-        *(unsigned long *)(psprbuf->aentry[ientry].pvSpr - 0x10) = (unsigned long)(psprbuf->aentry[ientry].cb >> 4) | 0x10000000UL | ((unsigned long)apvDest[ipvDest] << 32);
+        *(u64 *)(psprbuf->aentry[ientry].pvSpr - 0x10) = (u64)(psprbuf->aentry[ientry].cb >> 4) | 0x10000000UL | ((u64)apvDest[ipvDest] << 32);
         ientry++;
         ipvDest++;
     }
     DMACHANNEL *channel = g_2de59c;
-    *(unsigned long *)(psprbuf->aentry[ientry].pvSpr - 0x10) = (unsigned long)(psprbuf->aentry[ientry].cb >> 4) | 0x70000000UL | ((unsigned long)apvDest[ipvDest] << 32);
+    *(u64 *)(psprbuf->aentry[ientry].pvSpr - 0x10) = (u64)(psprbuf->aentry[ientry].cb >> 4) | 0x70000000UL | ((u64)apvDest[ipvDest] << 32);
     channel->control = channel->control & ~0x40;
     channel->scratchAddress = (psprbuf->pvSpr & 0x0FFFFFFF) | 0x80000000;
     func_002417A0(channel);

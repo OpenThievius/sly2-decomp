@@ -1,10 +1,11 @@
-extern unsigned long *func_002405F0();
+#include "types.h"
+extern u64 *func_002405F0();
 
 short sceGszbufaddr(short psm, short width, short height)
 {
     int blocksWide;
     int blocksHigh;
-    unsigned long *mode;
+    u64 *mode;
 
     mode = func_002405F0();
     blocksWide = (width + 63) / 64;

@@ -1,10 +1,11 @@
+#include "types.h"
 typedef struct Unit {
-    char pad0[0x14C];
+    u8 unknown_0x0[0x14C];
     int field14C;
-    char pad150[0x34];
+    u8 unknown_0x150[0x34];
     int field184;
     int field188;
-    char pad18C[8];
+    u8 unknown_0x18C[8];
     int field194;
     int pad198;
     int first[3];

@@ -1,17 +1,11 @@
-#include "types.h"
+#include "lo.h"
 extern "C" {
-struct Obj_258040;
-struct VT_258040 {
-    char pad0[8]; s16 d8; s16 pa; void (*fnC)(char *);
-    s16 d10; s16 p12; void (*fn14)(char *);
-};
-struct Obj_258040 { char pad[0xC]; VT_258040 *vt; };
-void func_00259B48(Obj_258040 **arg0, Obj_258040 *arg1) {
+void func_00259B48(BASIC **arg0, BASIC *arg1) {
     if (arg1 != 0)
-        arg1->vt->fnC((char *)arg1 + arg1->vt->d8);
-    Obj_258040 *old = *arg0;
+        arg1->OnAdd();
+    BASIC *old = *arg0;
     if (old != 0)
-        old->vt->fn14((char *)old + old->vt->d10);
+        old->Slot2();
     *arg0 = arg1;
 }
 }

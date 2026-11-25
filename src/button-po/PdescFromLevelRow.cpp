@@ -1,5 +1,5 @@
 #include "sly2.h"
-struct PDESC { char pad[64]; };
+struct PDESC { u8 unknown_0x0[0x40]; };
 extern PDESC* B_003E1C40;
 PDESC* PdescFromLevelRow(int row)
 {

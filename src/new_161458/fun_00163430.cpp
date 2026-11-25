@@ -1,5 +1,6 @@
-struct Sub { char pad[0x54]; int value; };
-struct Obj { char pad[0x64]; Sub *a; Sub *b; };
+#include "types.h"
+struct Sub { u8 unknown_0x0[0x54]; int value; };
+struct Obj { u8 unknown_0x0[0x64]; Sub *a; Sub *b; };
 int func_00163430(Obj *obj)
 {
     int v = obj->a->value;

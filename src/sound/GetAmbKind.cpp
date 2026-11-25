@@ -1,4 +1,4 @@
-struct AMB { char pad[0x60]; int sfxid; };
+#include "amb.h"
 struct E { int kind; };
 extern "C" char B_003DD040;
 extern "C" E *func_001FD028(void *, int);

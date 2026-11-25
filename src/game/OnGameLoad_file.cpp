@@ -9,8 +9,8 @@
 #include "rgba.h"
 
 struct GIFS {
-    void AddPrimPack(int cqw, int nloop, unsigned long tag);
-    void PackAD(long addr, long data);
+    void AddPrimPack(int cqw, int nloop, u64 tag);
+    void PackAD(s64 addr, s64 data);
     void PackRGBA(unsigned int rgba);
     void PackXYZF(int x, int y, int z, int f);
 };

@@ -1,17 +1,12 @@
-struct SC { float x, y; };
-struct CFont {
-    char pad[0x10];
-    float m_sx;
-    float m_sy;
-    int m_csc;
-    SC m_asc[8];
+#include "cfont.h"
+struct CFont : CFONT {
     void PushScaling(float rx, float ry);
 };
 void CFont::PushScaling(float rx, float ry)
 {
-    SC *psc = &m_asc[m_csc++];
-    psc->x = m_sx;
-    psc->y = m_sx;
-    m_sx = m_asc[0].x * rx;
-    m_sy = m_asc[0].y * ry;
+    CFONTSCALE *psc = &ascale[scaleDepth++];
+    psc->sx = scaleX;
+    psc->sy = scaleX;
+    scaleX = ascale[0].sx * rx;
+    scaleY = ascale[0].sy * ry;
 }

@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
 #include "jt.h"
-struct GLOBS { char pad0[0x260]; JT *pjt; char pad1[0x300 - 0x264]; int f300; };
-extern GLOBS B_002DDF40;
+#include "cm.h"
 extern "C" void func_0019E9D8(void *);
 extern "C" QW PosLoWorld(JT *);
 void func_00141588(JT *pjt, VECTOR *ppos)
@@ -16,7 +15,7 @@ void func_00141588(JT *pjt, VECTOR *ppos)
     if (pjt->psoSurface != 0) {
         z = pjt->vecWorld.z + pjt->field_0x1048;
     } else {
-        if (pjt->jmpState == 0x14 || B_002DDF40.f300 != 0 || B_002DDF40.pjt != pjt) {
+        if (pjt->jmpState == 0x14 || B_002DDF40.fCut != 0 || B_002DDF40.psoCpdefi != pjt) {
             ppos->z = ppos->z + (pjt->vecLocal.z + pjt->field_0x1048);
             return;
         }

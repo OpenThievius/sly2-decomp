@@ -4,7 +4,7 @@
    UFromCrvS), closed (func_001CBA68, func_001CBAC0, UWrapCrv; pzo_hide.h's AttachCrv_FGetWrapRange and AttachCrv_GetParam read the same
    word), ccv (the control-point count: ConstructRopeSim, func_0017C3E8, func_00155AE0), au and as (the u and s of each control point:
    UMinCrv, UMaxCrv, UWrapCrv; SMinCrv, SMaxCrv), apos (the point array: the same three as ccv, plus func_0014AA30), field_0x148 and
-   field_0x178 (InitCrv and InvalidateCrvCache both write them), pattach (PattachCrv makes it, CloneCrv drops it, func_001E6340
+   icvHint (InitCrv and InvalidateCrvCache both write them), pattach (PattachCrv makes it, CloneCrv drops it, func_001E6340
    updates it). InitCrv, UWrapCrv and the other readers named here are methods of the curve. C and C++. */
 #ifndef SLY2_CRV_H
 #define SLY2_CRV_H
@@ -14,7 +14,9 @@ struct ROPESIM;
 #ifdef __cplusplus
 #include "lo.h"
 struct CRV : LO {
-    u8 unknown_0x50[0x90];
+    u8 unknown_0x50[0x10];
+    /* 0x60 */ f32 mat[16];      /* PcrvNew (the constructor) sets it to the identity: the curve's own matrix (the name is a guess) */
+    u8 unknown_0xA0[0x40];
 #else
 struct CRV {
     u8 unknown_0x0[0xE0];
@@ -26,10 +28,12 @@ struct CRV {
     /* 0xEC */ f32 *au;          /* UMinCrv reads the first, UMaxCrv the last, UWrapCrv both */
     /* 0xF0 */ f32 *as;          /* SMinCrv reads the first, SMaxCrv the last */
     /* 0xF4 */ QW *apos;
-    u8 unknown_0xF8[0x50];
+    u8 unknown_0xF8[0x48];
+    /* 0x140 */ QW *field_0x140; /* LoadCrvFromBrx allocates and reads ccv vectors into it when crvk is not 0 */
+    /* 0x144 */ QW *field_0x144; /* the same: the second array */
     /* 0x148 */ s32 field_0x148; /* InitCrv and InvalidateCrvCache set -1 */
-    u8 unknown_0x14C[0x2C];
-    /* 0x178 */ s32 field_0x178; /* InitCrv sets 1, InvalidateCrvCache 0 */
+    /* 0x14C */ f32 mpisamps[11]; /* the cache FillCrvcCache fills for a curve segment: SFromCrvU and UFromCrvS read the arc-length samples (11 of 0x2C bytes, agreed by the two readers) */
+    /* 0x178 */ s32 icvHint;     /* the last segment found: IcvFindCrvS and IcvFindCrvU read and write it; InitCrv sets 1, InvalidateCrvCache 0 */
     /* 0x17C */ struct ROPESIM *pattach; /* the rope simulation PattachCrv makes; CloneCrv drops it, func_001E6340 updates it */
 };
 

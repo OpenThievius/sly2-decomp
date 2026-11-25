@@ -2,14 +2,14 @@
 
 struct SmoothParam { float a; float b; float c; };
 struct RenderObject {
-    char pad0[0x2D]; unsigned char grfo;
-    char pad1[0x80 - 0x2E]; char globset[0xAC];
-    float uFade; char pad2[4]; void *prenderOptions;
-    char pad3[0x4C8 - 0x138]; int kind;
-    char pad4[0xF04 - 0x4CC]; int binoUse;
-    char pad5[0xF20 - 0xF08]; int binoMode;
-    char pad6[0x10D4 - 0xF24]; float uFadeA; float uFadeB;
-    char pad7[0x19A0 - 0x10DC]; RenderObject *ppartA; RenderObject *ppartB;
+    u8 unknown_0x0[0x2D]; unsigned char grfo;
+    u8 unknown_0x2E[0x80 - 0x2E]; char globset[0xAC];
+    float uFade; u8 unknown_0x130[4]; void *prenderOptions;
+    u8 unknown_0x138[0x4C8 - 0x138]; int kind;
+    u8 unknown_0x4CC[0xF04 - 0x4CC]; int binoUse;
+    u8 unknown_0xF08[0xF20 - 0xF08]; int binoMode;
+    u8 unknown_0xF24[0x10D4 - 0xF24]; float uFadeA; float uFadeB;
+    u8 unknown_0x10DC[0x19A0 - 0x10DC]; RenderObject *ppartA; RenderObject *ppartB;
 };
 
 extern "C" {

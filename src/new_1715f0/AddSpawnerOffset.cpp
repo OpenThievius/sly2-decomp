@@ -3,7 +3,7 @@
 
 struct Spawner
 {
-    char pad0[0x98];
+    u8 unknown_0x0[0x98];
     int offsetCount;
     QW *offsets;
 };

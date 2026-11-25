@@ -6,20 +6,17 @@
 #include "m2c_macros.h"
 #include "include_asm.h"
 #include "rgba.h"
-
-struct Glyph_15F8A8 { unsigned short code; unsigned short pad[3]; };
-
-struct FontBrx_15F8A8 { char pad[0x138]; int count; Glyph_15F8A8 *glyphs; };
+#include "cfont.h"
 
 extern "C" unsigned short D_002BE338[];
 
-extern "C" Glyph_15F8A8 *PglyffFromCh__8CFontBrxc(FontBrx_15F8A8 *self, int ch) {
+extern "C" GLYPH *PglyffFromCh__8CFontBrxc(CFONT *self, int ch) {
     int code = D_002BE338[ch & 0xFF];
     int low = 0;
-    int high = self->count - 1;
+    int high = self->cglyff - 1;
     while (low <= high) {
         int mid = (high + low) / 2;
-        Glyph_15F8A8 *glyph = (Glyph_15F8A8 *)(mid * 8 + (long)self->glyphs);
+        GLYPH *glyph = (GLYPH *)(mid * 8 + (s64)self->aglyff);
         int diff = code - glyph->code;
         if (diff == 0) return glyph;
         if (diff > 0) low = mid + 1;
@@ -28,54 +25,54 @@ extern "C" Glyph_15F8A8 *PglyffFromCh__8CFontBrxc(FontBrx_15F8A8 *self, int ch) 
     return 0;
 }
 
+/* CRichText, the rich text the font code draws (its methods are the functions below): the text and the cursor, the current font and the
+   base font, the markup state and the four colours. The word at 0x150 says the next glyph needs the font's TEX0 again. */
+union RICHCOLOR {
+    u32 word;
+    RGBA rgba;
+};
 struct CRichText {
-    s32 text;
-    char pad0[0x8];
-    s32 font;
-    char pad1[0x144];
-    u32 color0;
-    u32 color1;
-    u32 color2;
-    u32 color3;
+    /* 0x00 */ s32 start;       /* the text, a pointer held in an s32 */
+    /* 0x04 */ s32 cur;         /* the cursor in it */
+    /* 0x08 */ CFONT *pfont;    /* the font in use: Reset takes pfontBase again */
+    /* 0x0C */ CFONT *pfontBase;
+    u8 unknown_0x10[0x140];
+    /* 0x150 */ s32 fSwitchTex;
+    /* 0x154 */ RICHCOLOR rgbaCur;
+    /* 0x158 */ RICHCOLOR rgbaMarkup;
+    /* 0x15C */ RICHCOLOR rgbaBase;
+    /* 0x160 */ RICHCOLOR rgbaField160; /* the constructor sets it with the other three */
+    void Reset();
+    char ChNext();
+    float DxMaxLine();
 };
 
 extern "C" void Reset__9CRichText_15F928(CRichText *richText);
 
-extern "C" CRichText *__9CRichTextPcP5CFont(CRichText *richText, s32 text, s32 font) {
-    richText->text = text;
-    richText->color3 = 0xFF808080;
-    richText->font = font;
-    richText->color2 = 0xFF808080;
-    richText->color1 = 0xFF808080;
-    richText->color0 = 0xFF808080;
+extern "C" CRichText *__9CRichTextPcP5CFont(CRichText *richText, s32 text, CFONT *font) {
+    richText->start = text;
+    richText->rgbaField160.word = 0xFF808080;
+    richText->pfontBase = font;
+    richText->rgbaBase.word = 0xFF808080;
+    richText->rgbaMarkup.word = 0xFF808080;
+    richText->rgbaCur.word = 0xFF808080;
     Reset__9CRichText_15F928(richText);
     return richText;
 }
 
-struct Word { char b[4]; };
-
-struct CRichText_15F970 {
-    int start; int cur; int base; int baseFont;
-    char pad[0x150 - 0x10];
-    int flag; Word rgbaCur; Word rgbaMarkup; Word rgbaBase;
-};
-
-extern "C" void Reset__9CRichText(CRichText_15F970 *self)
+extern "C" void Reset__9CRichText(CRichText *self)
 {
     self->cur = self->start;
-    self->base = self->baseFont;
-    self->rgbaMarkup = self->rgbaBase;
-    self->rgbaCur = self->rgbaMarkup;
-    self->flag = 0;
+    self->pfont = self->pfontBase;
+    self->rgbaMarkup.rgba = self->rgbaBase.rgba;
+    self->rgbaCur.rgba = self->rgbaMarkup.rgba;
+    self->fSwitchTex = 0;
 }
 
-
-struct CRichText_15F9A8 { char pad0[0x154]; RGBA colorA; char pad1[4]; RGBA colorB; };
-
-extern "C" void SetBaseColor__9CRichTextP4RGBA(CRichText_15F9A8 *self, RGBA *color)
+extern "C" void SetBaseColor__9CRichTextP4RGBA(CRichText *self, RGBA *color)
 {
-    self->colorB = *color;
-    self->colorA = self->colorB;
+    self->rgbaBase.rgba = *color;
+    self->rgbaCur.rgba = self->rgbaBase.rgba;
 }
 
 INCLUDE_ASM(0X15F9D0);
@@ -85,36 +82,21 @@ INCLUDE_ASM(0X15FD58);
 INCLUDE_ASM(0X15FD68);
 
 extern "C" {
-struct Metrics { char pad0[0xC]; int lineUnits; char pad10[4]; float scale; };
-
-struct RichText { char pad0[0xC]; struct Metrics *metrics; };
-
 int ClineWrap__9CRichTextf();
 
-float CRichText_DyWrap(struct RichText *text) {
-    struct Metrics *metrics = text->metrics;
-    float lineHeight = (float)metrics->lineUnits * metrics->scale;
+float CRichText_DyWrap(CRichText *text) {
+    CFONT *font = text->pfontBase;
+    float lineHeight = (float)font->lineHeight * font->scaleY;
     return lineHeight * (float)ClineWrap__9CRichTextf();
 }
 }
 
-struct CFontBrx;
-
-class CRichText_15FF40 {
-public:
-    char pad[8];
-    CFontBrx *font;
-    void Reset();
-    char ChNext();
-    float DxMaxLine();
-};
-
-class CFontBrx {
+class CFontBrx : public CFONT {
 public:
     float DxFromCh(char ch);
 };
 
-float CRichText_15FF40::DxMaxLine() {
+float CRichText::DxMaxLine() {
     float dxMax = 0.0f;
     float dxLine = 0.0f;
     char ch;
@@ -124,81 +106,66 @@ float CRichText_15FF40::DxMaxLine() {
             dxMax = (dxMax > dxLine) ? dxMax : dxLine;
             dxLine = 0.0f;
         } else {
-            dxLine = dxLine + ((CFontBrx *)this->font)->DxFromCh(ch);
+            dxLine = dxLine + ((CFontBrx *)this->pfont)->DxFromCh(ch);
         }
     }
     dxMax = (dxMax > dxLine) ? dxMax : dxLine;
     return dxMax;
 }
 
+struct GIFS;
 
-struct CFontBrx_15FFD0 { char pad0[0xC]; int dyUnscaled; char pad1[0x14 - 0x10]; float ryScale; };
+extern "C" void SetupDraw__8CFontBrxP8CTextBoxP4GIFS(CFONT *, CTextBox *, GIFS *);
 
-struct CTextBox_15FFD0 { float x; float y; float dx; float dy; RGBA rgba; int jh; int jv; };
+extern "C" void SwitchTex0__8CFontBrxP4GIFS(CFONT *, GIFS *);
 
-struct GIFS_15FFD0;
+extern "C" float DxDrawCh__8CFontBrxcffUiP4GIFS(CFONT *, char, float, float, unsigned, GIFS *);
 
-struct CRichText_15FFD0 { int unk0; int unk4; CFontBrx_15FFD0 *pfont; CFontBrx_15FFD0 *pfontBase; char pad[0x150 - 0x10]; int fSwitchTex; unsigned rgbaCur; };
+extern "C" void CleanupDraw__5CFontP8CTextBoxP4GIFS(CFONT *, CTextBox *, GIFS *);
 
-extern "C" void Reset__9CRichText_15FFD0(CRichText_15FFD0 *);
-
-extern "C" char ChNext__9CRichText(CRichText_15FFD0 *);
-
-extern "C" float DxFromCh__8CFontBrxc(CFontBrx_15FFD0 *, char);
-
-extern "C" void SetBaseColor__9CRichTextP4RGBA_15FFD0(CRichText_15FFD0 *, RGBA *);
-
-extern "C" void SetupDraw__8CFontBrxP8CTextBoxP4GIFS(CFontBrx_15FFD0 *, CTextBox_15FFD0 *, GIFS_15FFD0 *);
-
-extern "C" void SwitchTex0__8CFontBrxP4GIFS(CFontBrx_15FFD0 *, GIFS_15FFD0 *);
-
-extern "C" float DxDrawCh__8CFontBrxcffUiP4GIFS(CFontBrx_15FFD0 *, char, float, float, unsigned, GIFS_15FFD0 *);
-
-extern "C" void CleanupDraw__5CFontP8CTextBoxP4GIFS(CFontBrx_15FFD0 *, CTextBox_15FFD0 *, GIFS_15FFD0 *);
-
-extern "C" void Draw__9CRichTextP8CTextBoxT1P4GIFS(CRichText_15FFD0 *self, CTextBox_15FFD0 *ptb, CTextBox_15FFD0 *ptbClip, GIFS_15FFD0 *pgifs)
+extern "C" void Draw__9CRichTextP8CTextBoxT1P4GIFS(CRichText *self, CTextBox *ptb, CTextBox *ptbClip, GIFS *pgifs)
 {
     float adx[64];
     int fNewLine = 1;
     int iline = 0;
     char ch;
     memset(adx, 0, sizeof(adx));
-    Reset__9CRichText_15FFD0(self);
-    while ((ch = ChNext__9CRichText(self)) != 0) {
+    self->Reset();
+    while ((ch = self->ChNext()) != 0) {
         if (ch == '\n')
             iline++;
         else
-            adx[iline] += DxFromCh__8CFontBrxc(self->pfont, ch);
+            adx[iline] += ((CFontBrx *)self->pfont)->DxFromCh(ch);
     }
     float y;
-    if (ptb->jv == 0) {
+    if (ptb->justV == 0) {
         y = ptb->y;
     } else {
-        float dyText = (float)(iline + 1) * ((float)self->pfontBase->dyUnscaled * self->pfontBase->ryScale);
-        if (ptb->jv == 2)
+        float dyText = (float)(iline + 1) * ((float)self->pfontBase->lineHeight * self->pfontBase->scaleY);
+        if (ptb->justV == 2)
             y = ptb->y + ptb->dy - dyText;
         else
             y = ptb->y + (ptb->dy - dyText) * 0.5f;
     }
-    RGBA rgba = ptb->rgba;
-    SetBaseColor__9CRichTextP4RGBA_15FFD0(self, &rgba);
-    CFontBrx_15FFD0 *pfontSetup = 0;
+    RGBA rgba = *(RGBA *)ptb->rgba;
+    SetBaseColor__9CRichTextP4RGBA(self, &rgba);
+    CFONT *pfontSetup = 0;
     float x;
-    Reset__9CRichText_15FFD0(self);
+    self->Reset();
     float *pdx = adx;
-    while ((ch = ChNext__9CRichText(self)) != 0) {
+    while ((ch = self->ChNext()) != 0) {
         if (ch == '\n') {
             fNewLine = 1;
             pdx++;
-            y += (float)self->pfontBase->dyUnscaled * self->pfontBase->ryScale;
+            y += (float)self->pfontBase->lineHeight * self->pfontBase->scaleY;
             continue;
         }
         if (fNewLine) {
-            if (ptb->jh == 0)
+            if (ptb->justH == 0)
                 x = ptb->x;
             else {
                 float dxLine = *pdx;
-                if (ptb->jh == 2)
+                if (ptb->justH == 2)
                     x = ptb->x + ptb->dx - dxLine;
                 else
                     x = ptb->x + (ptb->dx - dxLine) * 0.5f;
@@ -212,7 +179,7 @@ extern "C" void Draw__9CRichTextP8CTextBoxT1P4GIFS(CRichText_15FFD0 *self, CText
             SwitchTex0__8CFontBrxP4GIFS(self->pfont, pgifs);
             self->fSwitchTex = 0;
         }
-        x += DxDrawCh__8CFontBrxcffUiP4GIFS(self->pfont, ch, x, y, self->rgbaCur, pgifs);
+        x += DxDrawCh__8CFontBrxcffUiP4GIFS(self->pfont, ch, x, y, self->rgbaCur.word, pgifs);
     }
     CleanupDraw__5CFontP8CTextBoxP4GIFS(self->pfont, ptbClip, pgifs);
 }

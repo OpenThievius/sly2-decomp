@@ -5,45 +5,25 @@
 #include "lo.h"
 #include "m2c_macros.h"
 #include "include_asm.h"
+#include "recon.h"
 
 INCLUDE_ASM(0X202D38);
 
 extern "C" {
-typedef struct Object203568 {
-    char pad[0xF4];
-    s32 field_0xF4;
-    s32 field_0xF8;
-    s32 field_0xFC;
-    char pad2[0x110 - 0x100];
-    s32 field_0x110;
-} Object203568;
-
 void InitXfm();
 
-void func_00203568(Object203568 *object) {
+void func_00203568(RECON *object) {
     InitXfm();
     object->field_0xF4 = -1;
     object->field_0x110 = -1;
-    object->field_0xFC = -1;
-    object->field_0xF8 = -2;
+    object->stream = -1;
+    object->idList = -2;
 }
 }
 
-struct XfmObject {
-    char pad0[0xE0];
-    float radius;
-    float radiusDefault;
-    float radiusScale;
-    char pad1[0xF4 - 0xEC];
-    s32 limitDefault;
-    s32 limit;
-    char pad2[0x104 - 0xFC];
-    float range;
-};
+extern "C" void LoadXfmFromBrx(RECON *);
 
-extern "C" void LoadXfmFromBrx(XfmObject *);
-
-extern "C" void func_002035A8(XfmObject *object)
+extern "C" void func_002035A8(RECON *object)
 {
     *(s32 *)&object->radiusDefault = 0;
     object->radius = 75.0f;
@@ -53,17 +33,10 @@ extern "C" void func_002035A8(XfmObject *object)
     if (object->radiusDefault == 0.0f) {
         object->radiusDefault = object->radius;
     }
-    if (object->limit == -2) {
-        object->limit = object->limitDefault;
+    if (object->idList == -2) {
+        object->idList = object->field_0xF4;
     }
 }
-
-// RECON: an ALO subclass (class 46 of retail's table, 0x120 bytes; InitRecon, LoadReconFromBrx above, SetReconTargetDone, FReconTargetDone below), not a guard: the
-// function that Sly 1's match named OnStepguardAdd subscribes it to its task. The padding stands for the ALO's fields (0xE0 bytes).
-struct RECON : LO {
-    u8 unknown_0x50[0x9C];
-    /* 0xEC */ void *ptask;     /* OnReconAdd (0x203638), SetReconTargetDone, FReconTargetDone: the task the recon belongs to */
-};
 
 extern "C" {
 void PostLoLoad();
@@ -82,7 +55,7 @@ void OnStepguardAdd__FP9STEPGUARD(RECON *recon) {
 }
 
 struct Object203670 {
-    char pad[0xF38];
+    u8 unknown_0x0[0xF38];
     s32 field_0xF38;
 };
 
@@ -115,57 +88,48 @@ extern "C" void func_00203670(s32 arg0, s32 arg1) {
     }
 }
 
-struct TASK_2036E8;
-
-struct RECON_2036E8 { char pad[0xEC]; TASK_2036E8 *ptask; int fDone; };
-
 extern int B_003DD490_2036E8;
 
-extern "C" void RequestTaskState(TASK_2036E8 *, int, RECON_2036E8 *);
+extern "C" void RequestTaskState(TASK *, int, RECON *);
 
 extern "C" char *PpoSwFocusBase_2036E8(int *);
 
 extern "C" int FIsBasicDerivedFrom_2036E8(char *, int);
 
-extern "C" void func_0019D948(char *);
+extern "C" void func_0019D948(u8 *);
 
-extern "C" void SetReconTargetDone(RECON_2036E8 *precon, int fDone)
+/* local view: 0xF24 of the player lies in JT's unknown bytes and only SetReconTargetDone reads it */
+struct JTVIEW_F24 { u8 unknown_0x0[0xF24]; u8 field_0xF24[0x4]; };
+
+extern "C" void SetReconTargetDone(RECON *precon, int fDone)
 {
     if (precon->ptask != 0) {
         RequestTaskState(precon->ptask, 2, precon);
         char *ppo = PpoSwFocusBase_2036E8(&B_003DD490_2036E8);
         if (ppo != 0 && FIsBasicDerivedFrom_2036E8(ppo, 0x34))
-            func_0019D948(ppo + 0xF24);
+            func_0019D948(((JTVIEW_F24 *)ppo)->field_0xF24);
     } else {
         precon->fDone = fDone;
     }
 }
 
-struct TARGET { char pad[0xEC]; void *ptask; int done; };
+extern "C" int FTaskComplete(TASK *);
 
-extern "C" int FTaskComplete(void *);
-
-extern "C" int FReconTargetDone(TARGET *ptarget)
+extern "C" int FReconTargetDone(RECON *ptarget)
 {
     if (ptarget->ptask != 0) return FTaskComplete(ptarget->ptask);
-    return ptarget->done;
+    return ptarget->fDone;
 }
 
-struct Link_203790 { char pad0[0x54]; int state; };
-
-struct Obj_203790 { char pad0[0x28]; unsigned long grf; };
-
-struct Recon_203790 { char pad0[0x28]; unsigned long grf; char pad1[0xEC - 0x30]; Link_203790 *plink; char pad2[0x100 - 0xF0]; Obj_203790 *pother; };
-
-extern "C" int FReconTargetPickable(Recon_203790 *recon)
+extern "C" int FReconTargetPickable(RECON *recon)
 {
-    if (((int)(recon->grf >> 60) & 1) == 0)
+    if (((int)(recon->grfo >> 60) & 1) == 0)
         return 0;
-    Obj_203790 *pother = recon->pother;
-    if (pother != 0 && ((int)(pother->grf >> 60) & 1) != 0)
+    LO *plink = recon->plink;
+    if (plink != 0 && ((int)(plink->grfo >> 60) & 1) != 0)
         return 0;
-    Link_203790 *plink = recon->plink;
-    if (plink != 0 && plink->state != 1)
+    TASK *ptask = recon->ptask;
+    if (ptask != 0 && ptask->state != 1)
         return 0;
     return 1;
 }

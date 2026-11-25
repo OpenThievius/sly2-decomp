@@ -1,4 +1,5 @@
-struct Owner { int unk0; char pad[0x8C]; int unk0x90; float unk0x94; float unk0x98; };
+#include "types.h"
+struct Owner { int unk0; u8 unknown_0x4[0x8C]; int unk0x90; float unk0x94; float unk0x98; };
 void func_0020B840(Owner *owner, int first, int second)
 {
 owner->unk0 = first;

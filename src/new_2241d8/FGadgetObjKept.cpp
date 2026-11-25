@@ -1,7 +1,7 @@
 #include "sly2.h"
-struct GADGET { char pad[0x15C]; int kind; };
-extern "C" int FGadgetObjKept(GADGET *pgadget)
+#include "gadgetobj.h"
+extern "C" int FGadgetObjKept(GADGETOBJ *pgadget)
 {
- int kind = pgadget->kind;
- if (kind != 7 && kind != 0xb) return 0; return 1;
+ int gadget = pgadget->gadget;
+ if (gadget != 7 && gadget != 0xb) return 0; return 1;
 }

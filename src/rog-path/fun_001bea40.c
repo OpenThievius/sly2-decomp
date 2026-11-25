@@ -1,5 +1,6 @@
+#include "types.h"
 // SPDX-License-Identifier: GPL-3.0-or-later
-struct Object { char pad0[0x11C]; float field11C; float field120; float field124; };
+struct Object { u8 unknown_0x0[0x11C]; float field11C; float field120; float field124; };
 void InitXfm();
 void func_001BEA40(struct Object *object) {
     InitXfm();

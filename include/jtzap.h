@@ -11,7 +11,7 @@ struct JTZAP {
     /* 0x00 */ JT *pjt;          /* func_001A1FA8, func_001A2080: SetJmpState gets pjt->PvJmp(); WarpZapToSafePoint passes it on */
     /* 0x04 */ s32 state;        /* AdjustJtZapNewXp (switch), func_001A2160 (switch), func_001A23C0 (-1 test) */
     /* 0x08 */ f32 tState;       /* UpdateZapPost: time of the last state change (state 7 waits 0.25 s, FJtStuck takes it); certain, zap part's own function */
-    u8 unknown_0xC[0x4];
+    /* 0x0C */ s32 field_0xC;   /* InitJtZap sets 0x28 (the zap part's own initialiser) */
     /* 0x10 */ s32 *phealth;     /* func_001A1FA8, func_001A2080 test it > 0; func_001A23C0 tests it <= 0 (guess: reader is the zap part, certain) */
     u8 unknown_0x14[0x8];
     /* 0x1C */ BYTES8 continuation;  /* SetZapContinuation stores the 8 bytes (an unaligned member-function pointer), ZapContinue takes and clears it; certain */

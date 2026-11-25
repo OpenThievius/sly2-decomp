@@ -1,6 +1,6 @@
 #include "sly2.h"
-struct GEOM { char pad[0x10]; int lo; int hi; };
 #include "xf.h"
+#include "geom.h"
 #include "phys.h"
 #include "so.h"
 extern "C" {
@@ -15,8 +15,8 @@ void ProjectSoTransform(SO *pso)
     int index;
     func_001F3900(pso);
     for (index = 0; index < pso->cgeom; index++) {
-        GEOM *pgeom = (GEOM *)((char *)pso->ageom + index * 0xB0);
-        if (pgeom->lo != 0) IntegrateCloth(pgeom, g_2dded0[1]);
+        GEOM *pgeom = &pso->ageom[index];
+        if ((u32)pgeom->grf != 0) IntegrateCloth(pgeom, g_2dded0[1]);
     }
     PHYS *pphys = pso->pphys;
     if (pphys != 0) {
@@ -42,8 +42,8 @@ void ProjectSoTransform(SO *pso)
     }
     bevy_physics_driven_22de88(pso);
     for (index = 0; index < pso->cgeom; index++) {
-        GEOM *pgeom = (GEOM *)((char *)pso->ageom + index * 0xB0);
-        if ((*(unsigned long *)&pgeom->lo & 0x4000000000000UL) == 0) func_001F38A8(pgeom);
+        GEOM *pgeom = &pso->ageom[index];
+        if ((pgeom->grf & 0x4000000000000UL) == 0) func_001F38A8(pgeom);
     }
 }
 }

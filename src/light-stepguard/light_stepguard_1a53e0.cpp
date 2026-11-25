@@ -76,7 +76,7 @@ void AddLo(LO *plo)
     if (plo->psoParent == 0 || ((int)(plo->psoParent->grfo >> 60) & 1) != 0) {
         plo->AddHierarchy();
     }
-    if (plo->psoParent == 0 && (((long)plo->grfo << 8) >> 60) != 2)
+    if (plo->psoParent == 0 && (((s64)plo->grfo << 8) >> 60) != 2)
         ReinsertSwRoot_1A5478(&B_003DD490, plo->proot);
     LO **achild;
     int cchild = plo->CReturnZero(&achild);
@@ -116,7 +116,7 @@ void RemoveLo(LO *plo)
     }
     if (plo->psoParent == 0)
         RemoveSwRoot_1A5630(&B_003DD490, plo->proot);
-    unsigned long active = (plo->grfo >> 60) & 1;
+    u64 active = (plo->grfo >> 60) & 1;
     void *pdl;
     void **pfirst;
     func_001A5448_1A5630(plo->psoParent, &pdl, &pfirst);
@@ -140,7 +140,7 @@ extern "C" s32 RemoveDlEntry_1A57A8(s32, LO *);
 
 extern "C" s32 func_001A5448_1A57A8(s32, s8 *, s32 **);
 
-struct Buf1A57A8 { s32 first; s32 *second; s32 pad[2]; };
+struct Buf1A57A8 { s32 first; s32 *second; s32 unknown_0x8[2]; };
 
 extern "C" void func_001A57A8(LO *lo) {
     Buf1A57A8 buf;
@@ -162,8 +162,8 @@ extern "C" char B_003DD490_1A5848[];
 
 extern "C" void RemoveLoHierarchy(LO *plo)
 {
-    unsigned long mask = 0xEFFFFFFFFFFFFFFFUL;
-    unsigned long grfo = plo->grfo & mask;
+    u64 mask = 0xEFFFFFFFFFFFFFFFUL;
+    u64 grfo = plo->grfo & mask;
     plo->grfo = grfo;
     if (grfo & 0x800000000000000UL)
         RemoveSafePointsOfLo(B_003DD490_1A5848, plo, 0);
@@ -190,9 +190,9 @@ extern "C" char B_003DD490_1A5900;
 extern "C" void SetLoParent(LO *plo, LO *ploParent, void *pv, int grf);
 
 void SetLoParent(LO *plo, LO *ploParent, void *pv, int grf) {
-    unsigned long newActive;
-    unsigned long grfo = plo->grfo;
-    unsigned long wasActive = (grfo >> 60) & 1;
+    u64 newActive;
+    u64 grfo = plo->grfo;
+    u64 wasActive = (grfo >> 60) & 1;
     void *oldList;
     LO **oldFirst;
     void *newList;
@@ -300,7 +300,7 @@ void PostLoLoad(LO *plo) {
     plo->HandleSpliceEvent(0, 1, 0, 0, 0);
     CFrame *frame = plo->pframe;
     if (frame && frame->PrefFindBinding(1, 1)) {
-        if ((((long)plo->grfo << 8) >> 60) == 2) func_001A6CA8_1A5C48(plo, 0);
+        if ((((s64)plo->grfo << 8) >> 60) == 2) func_001A6CA8_1A5C48(plo, 0);
         unsigned p = plo->grfSw;
         if ((p ^ 1) & 1) plo->pgrfentry->grf |= 2;
         else plo->grfSw = p | 2;
@@ -843,7 +843,7 @@ extern "C" void ReinsertSwRoot_1A6CA8(char *, int);
 
 extern "C" char B_003DD490_1A6CA8[];
 
-struct S6CA8 { u8 unknown_0x0[0x10]; int field10; int field14; u8 unknown_0x18[0x10]; unsigned long low:52; long nib:4; unsigned long mid:4; unsigned top:4; };
+struct S6CA8 { u8 unknown_0x0[0x10]; int field10; int field14; u8 unknown_0x18[0x10]; u64 low:52; s64 nib:4; u64 mid:4; unsigned top:4; };
 
 extern "C" void func_001A6CA8(S6CA8 *self, int arg1) {
     if (arg1 == self->nib) return;
@@ -852,7 +852,7 @@ extern "C" void func_001A6CA8(S6CA8 *self, int arg1) {
     if (self->top & 1) ReinsertSwRoot_1A6CA8(B_003DD490_1A6CA8, self->field14);
 }
 
-struct ROOT { u8 unknown_0x0[0x28]; unsigned long grfo; };
+struct ROOT { u8 unknown_0x0[0x28]; u64 grfo; };
 
 struct LO_1A6D28;
 
@@ -899,13 +899,13 @@ extern "C" void func_001A6DC8(SO *lo, s32 value) {
 
 void func_001A6E38(LO *plo, int flag)
 {
-    unsigned long *word = &plo->grfo;
-    *word = (*word & 0xFBFFFFFFFFFFFFFFUL) | ((unsigned long)(flag & 1) << 58);
+    u64 *word = &plo->grfo;
+    *word = (*word & 0xFBFFFFFFFFFFFFFFUL) | ((u64)(flag & 1) << 58);
 }
 
 int func_001A6E70(LO *plo)
 {
-    unsigned long flags = plo->grfo;
+    u64 flags = plo->grfo;
     return (int)(flags >> 58) & 1;
 }
 

@@ -1,20 +1,18 @@
 #include "types.h"
 #include "vu0inline.h"
 #include "sly2.h"
-struct AFF { float a, b, c, d, e, f, u6, u7; } __attribute__((aligned(16)));
+#include "fbsprite.h"
 struct CM;
-struct BLOT { char pad0[0xF4]; void *plo; AFF *pxf; };
-struct SPRITE { char pad0[0x24]; BLOT *pmovie; int fRoot; };
-extern "C" const AFF RO_002A3A10;
+extern "C" const AFFINE2D RO_002A3A10;
 extern CM B_002DDF40;
 extern "C" QW PosLoWorld(void *);
 extern "C" QW ConvertCmWorldToScreen(CM *, QW);
-extern "C" void UpdateSpriteInstance(SPRITE *, float, int, AFF *, unsigned *, unsigned *);
+extern "C" void UpdateSpriteInstance(SPRITE *, float, int, AFFINE2D *, unsigned *, unsigned *);
 #include "ps2inline.h"
 
-static inline AFF Mult(const AFF &child, const AFF &parent)
+static inline AFFINE2D Mult(const AFFINE2D &child, const AFFINE2D &parent)
 {
-    AFF product;
+    AFFINE2D product;
     float ca = child.a, cb = child.b, cc = child.c, cd = child.d, ce = child.e, cf = child.f;
     product.a = ca * parent.a + cb * parent.c;
     product.b = ca * parent.b + cb * parent.d;
@@ -27,7 +25,7 @@ static inline AFF Mult(const AFF &child, const AFF &parent)
 extern "C" void UpdateRootSprite(float dt, SPRITE *sprite)
 {
     if (sprite->fRoot == 0) return;
-    AFF xf = RO_002A3A10;
+    AFFINE2D xf = RO_002A3A10;
     if (sprite->pmovie->plo != 0) {
         QW pos = PosLoWorld(sprite->pmovie->plo);
         QW screen = ConvertCmWorldToScreen(&B_002DDF40, pos);

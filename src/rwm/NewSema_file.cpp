@@ -11,7 +11,7 @@ struct SemaParams {
     s32 field_0x0;
     s32 field_0x4;
     s32 field_0x8;
-    char pad[0x20 - 0xC];
+    u8 unknown_0xC[0x14];
 };
 
 extern "C" int CreateSema(SemaParams *);
@@ -66,7 +66,7 @@ void LeaveCritSect(CRITSECT *pcritsect)
 
 INCLUDE_ASM(0X21F0F8);
 
-struct THREADPARAM { int unk0; void *entry; void *stack; int stackSize; void *gp; int priority; char pad[0x30 - 0x18]; };
+struct THREADPARAM { int unk0; void *entry; void *stack; int stackSize; void *gp; int priority; u8 unknown_0x18[0x18]; };
 
 struct TIDS { int startup; int render; };
 

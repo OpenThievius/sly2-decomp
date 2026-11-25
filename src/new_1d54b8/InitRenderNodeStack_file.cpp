@@ -5,6 +5,7 @@
 #include "types.h"
 #include "sly2.h"
 #include "alloc.h"
+#include "so.h"
 #include "include_asm.h"
 #include "vu0inline.h"
 #include "ps2inline.h"
@@ -39,47 +40,39 @@ INCLUDE_ASM(0X1D5808);
 
 #define NULL 0
 
+// One render tree entry (0x20 bytes). Its signed 4-bit field at bit 32 of the doubleword at +0x10 is the entry's state:
+// AddSphereToRenderTree reads it with dsll 28 / dsra32 28 and treats -1 as a free entry; RemoveAloFromRenderTree frees one
+// by or-ing 0xF << 32 in.
+struct RTE {
+    u8 unknown_0x0[0x10];
+    s64 field10 : 32;
+    s64 rtet : 4;
+    u8 unknown_0x18[8];
+};
+
+/* RemoveAloFromRenderTree's view of the object: its render tree entry at 0x144 (so.h leaves the word undeclared: one reader) */
+struct SORENDER { u8 unknown_0x0[0x144]; RTE *prte; };
+
 extern "C" {
-struct RenderNode {
-    char pad0[0x10];
-    s64 field_0x10;
-};
-struct AloObject {
-    char pad0[0x40];
-    s32 field_0x40;
-    char pad44[0x140 - 0x44];
-    s32 field_0x140;
-    RenderNode *field_0x144;
-};
-void RemoveAloFromRenderTree(AloObject *object) {
+void RemoveAloFromRenderTree(SO *object) {
     s32 flags;
-    RenderNode *node;
-    node = object->field_0x144;
+    RTE *node;
+    node = ((SORENDER *)object)->prte;
     if (node != NULL) {
-        node->field_0x10 = (s64) (node->field_0x10 | (0xF000L << 0x14));
+        node->rtet = -1;
         object->field_0x140 = -1;
-        flags = object->field_0x40;
-        object->field_0x144 = NULL;
+        flags = object->grfSw;
+        ((SORENDER *)object)->prte = NULL;
         if ((flags ^ 1) & 1) {
             *(s32 *)flags = (s32) (*(s32 *)flags & ~0x80);
             return;
         }
-        object->field_0x40 = (s32) (flags & ~0x80);
+        object->grfSw = (s32) (flags & ~0x80);
     }
 }
 }
 
 INCLUDE_ASM(0X1D6378);
-
-// One render tree entry (0x20 bytes). Its signed 4-bit field at bit 32 of the doubleword at +0x10 is the entry's state:
-// AddSphereToRenderTree reads it with dsll 28 / dsra32 28 and treats -1 as a free entry; RemoveAloFromRenderTree frees one
-// by or-ing 0xF << 32 in.
-struct RTE {
-    char field0[0x10];
-    long field10 : 32;
-    long rtet : 4;
-    char field18[8];
-};
 
 struct RTN { RTE arte[4]; };
 
@@ -102,11 +95,11 @@ RTN *AllocRenderTreeNode()
 struct RTB_1D6508;
 
 struct BITS_1D6508 {
-    unsigned long low : 32;
-    long kind : 4;
-    long grf : 8;
-    unsigned long flag : 1;
-    unsigned long rest : 19;
+    u64 low : 32;
+    s64 kind : 4;
+    s64 grf : 8;
+    u64 flag : 1;
+    u64 rest : 19;
 };
 
 struct RTE_1D6508 {
@@ -116,12 +109,12 @@ struct RTE_1D6508 {
         BITS_1D6508 bits;
     };
     RTB_1D6508 *child;
-    int pad;
+    s32 unknown_0x1C;
 };
 
-struct RTB_1D6508 { RTE_1D6508 aentry[3]; float x, y, z, radius; unsigned long bits; RTB_1D6508 *child; RTB_1D6508 *next; };
+struct RTB_1D6508 { RTE_1D6508 aentry[3]; float x, y, z, radius; u64 bits; RTB_1D6508 *child; RTB_1D6508 *next; };
 
-struct TREE_1D6508 { char pad[0x3E5C]; RTB_1D6508 *root; };
+struct TREE_1D6508 { u8 unknown_0x0[0x3E5C]; RTB_1D6508 *root; };
 
 extern "C" RTB_1D6508 *AllocRenderTreeNode(TREE_1D6508 *);
 
@@ -137,7 +130,7 @@ extern "C" RTE_1D6508 *AddSphereToRenderTree(TREE_1D6508 *tree, QW pos, int grf,
     RTB_1D6508 *pb;
     if (pblock == 0)
         return 0;
-    long newGrf = grf & 0xFF;
+    s64 newGrf = grf & 0xFF;
     while (pblock != 0) {
         float best = g_2a7870;
         RTB_1D6508 *pnext = 0;

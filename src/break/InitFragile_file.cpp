@@ -9,7 +9,7 @@
 extern "C" {
 struct Tail { float scale; int first; int second; };
 
-struct Fragile { char pad0[0x170]; struct Tail tail; char pad17C[8]; float field184; };
+struct Fragile { u8 unknown_0x0[0x170]; struct Tail tail; u8 unknown_0x17C[8]; float field184; };
 
 void InitSo();
 
@@ -24,7 +24,7 @@ void InitFragile__FP7FRAGILE(struct Fragile *fragile) {
 }
 }
 
-struct So { char pad[0x15C]; void *hier; };
+struct So { u8 unknown_0x0[0x15C]; void *hier; };
 
 extern "C" void AddSoLoHierarchy(So *);
 
@@ -77,13 +77,13 @@ INCLUDE_ASM(0X21C1C8);
 
 INCLUDE_ASM(0X21C340);
 
-struct GLOB { char pad[0x14]; };
+struct GLOB { u8 unknown_0x0[0x14]; };
 
 struct CENTER { float x, y, z; float pad[3]; };
 
 struct NODE { GLOB *glob; int pad; int pad2; NODE *next; };
 
-struct SO_21C5F8 { char pad[0xBC]; GLOB *globs; char pad2[4]; CENTER *centers; char pad3[0xDC - 0xC4 - 4]; NODE *first; };
+struct SO_21C5F8 { u8 unknown_0x0[0xBC]; GLOB *globs; u8 unknown_0xC0[4]; CENTER *centers; u8 unknown_0xC8[0x14]; NODE *first; };
 
 extern "C" float func_00259D98(VECTOR *);
 

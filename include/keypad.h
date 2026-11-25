@@ -15,7 +15,7 @@ struct KEYPAD : PO {
     u8 unknown_0x188[0x8];
     /* 0x190 */ PO *ppoUser;      /* func_001C8730: the object using it (a PO); func_001C8730 calls its SetPlayable(1) and clears it in states 0 and 5 */
     /* 0x194 */ s32 cnt;          /* func_001C8730 sets 5 in state 2 */
-    u8 unknown_0x198[0x4];
+    /* 0x198 */ s32 target;      /* func_001C8350 (the keypad's update) compares it with field_0x1F0 (the code) in state 2 */
     /* 0x19C */ s32 jsg;          /* func_001C8730 starts and stops it; func_001C8350 */
     u8 unknown_0x1A0[0x4];
     /* 0x1A4 */ s32 stream;       /* func_001C8730: the playing stream, stopped on every state change */

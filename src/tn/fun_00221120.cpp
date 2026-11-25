@@ -1,8 +1,7 @@
-#include "sly2.h"
-struct A { char pad[0x10C]; int f10C; };
-int func_00221120(A* a, int** out)
+#include "tn.h"
+int func_00221120(TN *tn, void **out)
 {
-    if (!a->f10C) return 0;
-    *out = &a->f10C;
+    if (!tn->pcrv) return 0;
+    *out = &tn->pcrv;
     return 1;
 }

@@ -94,7 +94,13 @@ struct HOME {
     /* 0xC */ f32 yaw;        /* OnGuardAdd */
 };
 
-struct FALLCHECK;
+/* a guard's fall check, 0x10 bytes (STEPGUARD::pfallcheck; PostGuardLoad allocates it): UpdateFallCheck, FGuardOffGround and SetFallCheckState agree on the fields */
+struct FALLCHECK {
+    /* 0x0 */ struct STEPGUARD *pguard; /* the guard: FGuardOffGround reads its surface, mode and sgs; UpdateFallCheck calls its FInvulnerable (slot 76) */
+    /* 0x4 */ s32 state;                /* UpdateFallCheck switches on it (0 on ground, 1 off ground, 2 falling), SetFallCheckState */
+    /* 0x8 */ f32 tState;               /* the clock time of the last state change: UpdateFallCheck compares the clock with it */
+    /* 0xC */ s32 fEnabled;             /* UpdateFallCheck returns while it is 0 */
+};
 
 /* a guard's aim object (STEPGUARD::paimstate): a LO that plays an animation at a target for the guard. Its methods: the init
    func_0020AD38 (slot 7), PostGuardAimLoad (15), CloneGuardAim (41). UpdateGuard waits for its animation reference to finish. */

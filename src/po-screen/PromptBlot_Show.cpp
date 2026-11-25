@@ -1,4 +1,5 @@
-struct Blot { char pad0[0x7C]; int state; char pad80[0x110 - 0x80]; int fHandsOff; };
+#include "types.h"
+struct Blot { u8 unknown_0x0[0x7C]; int state; u8 unknown_0x80[0x110 - 0x80]; int fHandsOff; };
 struct SW;
 extern "C" {
 void Blot_Show(Blot *, int);

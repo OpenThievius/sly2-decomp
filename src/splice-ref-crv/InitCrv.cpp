@@ -5,5 +5,5 @@ extern "C" void InitCrv(CRV *crv)
 {
     InitXfm(crv);
     crv->field_0x148 = -1;
-    crv->field_0x178 = 1;
+    crv->icvHint = 1;
 }

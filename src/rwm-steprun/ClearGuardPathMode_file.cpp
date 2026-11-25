@@ -18,7 +18,7 @@ void ClearGuardPathMode(GUARD *pguard)
 
 typedef STEPGUARD Guard;
 
-struct Obj { char pad[0x124]; int f124; };
+struct Obj { u8 unknown_0x0[0x124]; int f124; };
 
 extern "C" int FIsBasicDerivedFrom(void *, int);
 
@@ -87,7 +87,7 @@ void RemoveGuardBusyGoal(STEPGUARD *owner)
 }
 
 struct Object20B4A8 {
-    char pad[0x40];
+    u8 unknown_0x0[0x40];
     s32 field_0x40;
 };
 
@@ -107,7 +107,7 @@ extern "C" void func_0020B4A8(Object20B4A8 *object) {
     func_001A6CA8_20B4A8(object, 1);
 }
 
-struct PLO { char pad[0x50]; int count; void *array; };
+struct PLO { u8 unknown_0x0[0x50]; int count; void *array; };
 
  extern "C" char B_003DD490[];
 
@@ -130,7 +130,7 @@ void PostGuardRespawnerLoad(PLO *plo)
     CploFindSwObjectsByClass(B_003DD490, 0x405, 0x38, 0, plo->count, array);
 }
 
-struct LIST { char pad[0x50]; int count; STEPGUARD **pguards; };
+struct LIST { u8 unknown_0x0[0x50]; int count; STEPGUARD **pguards; };
 
 void *memset(void *, int, unsigned int);
 

@@ -1,5 +1,5 @@
 #include "alloc.h"
-struct JSG { char pad0[0x50]; int cjsge; int ajsge; int cjsgeMax; char pad1[0x20]; int fPendingCut; };
+#include "jsg.h"
 extern "C" {
 int CStackFrame_Construct(void *);
 void CStackFrame_Destructor(void *, int);

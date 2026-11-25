@@ -1,69 +1,44 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "sly2.h"
+#include "stepguard.h"
 extern "C" const float RO_002A8610;
 extern "C" int D_002C3CF0;
-struct Guard {
-    char pad0[0x2DC];
-    char block[0xC];
-    int f2E8;
-    char pad2EC[0x330 - 0x2EC];
-    int f330;
-    char pad334[0x360 - 0x334];
-    float f360;
-    char pad364[0x390 - 0x364];
-    int f390;
-    char pad394[0x484 - 0x394];
-    int f484, f488, f48C, f490;
-    char pad494[0x4A0 - 0x494];
-    int f4A0;
-    char pad4A4[0xE94 - 0x4A4];
-    int fE94;
-    char padE98[0xF64 - 0xE98];
-    struct Sub { char p[0xF0]; int fF0; int fF4; } *pSub;
-    int fF68;
-    char padF6C[0xF94 - 0xF6C];
-    int fF94;
-    char padF98[0xFA8 - 0xF98];
-    int fFA8;
-    char padFAC[0xFC8 - 0xFAC];
-    int fFC8, fFCC;
-    char padFD0[0xFF4 - 0xFD0];
-    float fFF4;
-    char padFF8[0x1000 - 0xFF8];
-    int f1000;
-};
+/* local view: 0xF0 and 0xF4 of the guard's SENSOR lie in its unknown block and only OnGuardRemove reads them */
+struct SENSORVIEW_F0 { u8 unknown_0x0[0xF0]; s32 field_0xF0; s32 field_0xF4; };
 void *memset(void *, int, unsigned int);
 extern "C" void func_001CB5D0();
-void ClearGuardPathMode(Guard *);
-void ClearGuardSensing(Guard *);
-void SetGuardMode(Guard *, int);
-extern "C" void func_00208540(Guard *, int);
-extern "C" void func_001F17F8(Guard *, int);
+void ClearGuardPathMode(STEPGUARD *);
+void ClearGuardSensing(STEPGUARD *);
+void SetGuardMode(STEPGUARD *, int);
+extern "C" void func_00208540(STEPGUARD *, int);
+extern "C" void func_001F17F8(STEPGUARD *, int);
 
-void OnGuardRemove(Guard *g)
+void OnGuardRemove(STEPGUARD *guard)
 {
     func_001CB5D0();
-    ClearGuardPathMode(g);
-    g->f2E8 = 0;
-    memset(g->block, 0, 0xC);
-    g->fE94 = 0;
-    g->pSub->fF0 = 0;
-    g->pSub->fF4 = 0;
-    g->f484 = 0;
-    g->f488 = 0;
-    g->f48C = 0;
-    g->f490 = 0;
-    g->fF94 = 0;
-    g->fFA8 = 0;
-    g->f390 = 0;
-    func_00208540(g, 0);
-    ClearGuardSensing(g);
-    g->f330 = 0;
-    g->fF68 = 0;
-    g->fFC8 = 0;
-    g->fFCC = 0;
-    g->f360 = -10.0f;
-    g->f4A0 = 1;
-    g->fFF4 = RO_002A8610;
-    g->f1000 = D_002C3CF0;
-    func_001F17F8(g, -1);
-    SetGuardMode(g, -1);
+    ClearGuardPathMode(guard);
+    guard->field_0x2E8 = 0;
+    memset(guard->scratch, 0, 0xC);
+    guard->field_0xE94 = 0;
+    ((SENSORVIEW_F0 *)guard->psensor)->field_0xF0 = 0;
+    ((SENSORVIEW_F0 *)guard->psensor)->field_0xF4 = 0;
+    guard->cguardact = 0;
+    guard->iguardactCur = 0;
+    guard->fActionDone = 0;
+    guard->fEnabled = 0;
+    guard->field_0xF94 = 0;
+    guard->field_0xFA8 = 0;
+    guard->field_0x390 = 0;
+    func_00208540(guard, 0);
+    ClearGuardSensing(guard);
+    guard->field_0x330 = 0;
+    guard->ptargetGoto = 0;
+    guard->field_0xFC8 = 0;
+    guard->field_0xFCC = 0;
+    guard->field_0x360 = -10.0f;
+    guard->field_0x4A0 = 1;
+    guard->field_0xFF4 = RO_002A8610;
+    guard->field_0x1000 = D_002C3CF0;
+    func_001F17F8(guard, -1);
+    SetGuardMode(guard, -1);
 }

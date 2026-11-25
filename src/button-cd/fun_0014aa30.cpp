@@ -2,10 +2,10 @@
 #include "sly2.h"
 struct LM { float gMin; float gMax; };
 struct CM;
-struct CRV_14AA30 { char pad[0xF0]; float *ag; QW *apos; };
+struct CRV_14AA30 { u8 unknown_0x0[0xF0]; float *ag; QW *apos; };
 struct ENTRY_14AA30 { int n0; int n4; int fActive; };
-struct PATH_14AA30 { char pad[0x50]; int n50; int c; ENTRY_14AA30 *a; CRV_14AA30 *pcrv; };
-struct OBJ_14AA30 { char pad[0x38]; PATH_14AA30 *ppath; };
+struct PATH_14AA30 { u8 unknown_0x0[0x50]; int n50; int c; ENTRY_14AA30 *a; CRV_14AA30 *pcrv; };
+struct OBJ_14AA30 { u8 unknown_0x0[0x38]; PATH_14AA30 *ppath; };
 extern "C" {
 void *PpoSwFocusBase(void *);
 QW PosLoWorld(void *);

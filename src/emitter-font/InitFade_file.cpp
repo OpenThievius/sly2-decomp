@@ -43,7 +43,7 @@ extern "C" void UpdateFade(FADE *self) {
     }
 }
 
-struct Dmas { char pad[0xC]; s32 mark; };
+struct Dmas { u8 unknown_0x0[0xC]; s32 mark; };
 
 struct Dli { s32 word0; f32 value; s32 mark; };
 

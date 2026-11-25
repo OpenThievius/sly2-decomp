@@ -1,13 +1,11 @@
 #include "sly2.h"
 #include "cref.h"
-struct CPair { int cref; int pad4; CRef ref; CPair *next; };
+#include "timedcall.h"
+#include "geom.h"
+#include "so.h"
 struct PairHandle;
 struct SLOTHEAP;
 struct CLIP { QW pos; QW normal; QW rest[4]; };
-struct ELEM { char pad0[0x10]; long flags; char pad18[0xB0 - 0x18]; };
-struct OBJ { char pad0[0xE0]; int count; ELEM *elems; };
-struct CNode { int pad0; int pad4; CRef ref; CNode *next; };
-struct CRefList { int tagk; CNode *pnode; CRef start; CRef end; };
 extern "C" {
 CPair *PpairNew(void);
 void PairHandle_Assign(CPair **, CPair *);
@@ -16,7 +14,7 @@ void UnlinkPairNode(CPair *);
 void FreeSlotheapPv(SLOTHEAP *, void *);
 void CRef_SetVectorPtr(CRef *, QW *);
 CRef *bevy_splice_value_list_ref(CRef *, CPair *);
-int ClsgClipEdgeToObject(ELEM *, QW, QW, int, CLIP *);
+int ClsgClipEdgeToObject(GEOM *, QW, QW, int, CLIP *);
 extern SLOTHEAP B_004520A8;
 }
 static inline void ReleasePair_1249A8(CPair *held)
@@ -36,30 +34,30 @@ struct PairHandle {
     PairHandle(CPair *) asm("PairHandle_Init");
     ~PairHandle() { ReleasePair_1249A8(p); }
 };
-extern "C" CRef RefOpHitTestObjectsImpl(int op, int unused, CRefList *aref)
+extern "C" CRef RefOpHitTestObjectsImpl(int op, int unused, CRef *aref)
 {
     CRef result;
     result.m_tagk = TAGK_Nil;
-    if (aref->tagk == 0) {
-        result = *(CRef *)aref;
+    if (aref[0].m_tagk == 0) {
+        result = aref[0];
     } else {
         PairHandle first(0);
         PairHandle last(0);
         CLIP clip;
-        for (CNode *node = aref->pnode; node != 0; node = node->next) {
-            CRef *pend = &aref->end;
-            OBJ *pobj = (OBJ *)node->ref.m_tag.m_n;
+        for (CPair *node = aref[0].m_tag.m_ppair; node != 0; node = node->next) {
+            CRef *pend = &aref[2];
+            SO *pobj = (SO *)node->ref.m_tag.m_pbasic;
             if (pobj != 0) {
-                for (int index = 0; index < pobj->count; index++) {
-                    ELEM *pelem = &pobj->elems[index];
-                    CRef *pstart = &aref->start;
-                    if (!(pelem->flags & (0x8000L << 35)) &&
+                for (int index = 0; index < pobj->cgeom; index++) {
+                    GEOM *pelem = &pobj->ageom[index];
+                    CRef *pstart = &aref[1];
+                    if (!(pelem->grf & (0x8000L << 35)) &&
                         ClsgClipEdgeToObject(pelem, *(QW *)pstart->m_tag.m_pvector, *(QW *)pend->m_tag.m_pvector, 1, &clip) > 0) {
                         CPair *pnewA = PpairNew();
                         PairHandle pairA(pnewA);
                         CPair *pnewB = PpairNew();
                         PairHandle pairB(pnewB);
-                        pairA.p->ref.SetBasic((BASIC *)pobj);
+                        pairA.p->ref.SetBasic(pobj);
                         PairHandle_Assign(&pairA.p->next, pairB.p);
                         if (op == 0x7B) {
                             CPair *pnewC = PpairNew();

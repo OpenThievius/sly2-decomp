@@ -2,7 +2,7 @@
 extern const char D_002C40C8[];
 void CopyAb(void *, void *, unsigned int);
 
-int CchAchFromUl(char *buffer, int size, unsigned long value, unsigned int radix)
+int CchAchFromUl(char *buffer, int size, u64 value, unsigned int radix)
 {
     char *end = buffer + size;
     char *cursor = end;

@@ -104,8 +104,12 @@ struct LIFTPT {
 
 /* an attach zone: an XFM with a MEMBER at +0x130 (the constructor func_001843C0; AttachZone_OnAdd and AttachZone_OnRemove keep it in B_003E1438) */
 struct ATTACHZONE {
-    u8 unknown_0x0[0x130];
+    u8 unknown_0x0[0x110];
+    /* 0x110 */ QW field_0x110;    /* AttachZone_GetAimPos converts it to world space (a method of the class) */
+    u8 unknown_0x120[0x10];
     /* 0x130 */ struct MEMBER member;
+    u8 unknown_0x154[0x8];
+    /* 0x15C */ void *field_0x15C; /* AttachZone_GetAimPos: the object whose world position it returns (a method of the class) */
 };
 
 /* One animation entry of a SOHIT subclass (0x10 bytes): SoHit_SetAnimEntry (func_0017F4C0) plays aseg and sm with flags; Chaser_SetStateAnim and

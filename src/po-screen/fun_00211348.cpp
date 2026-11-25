@@ -5,7 +5,7 @@ char *strcpy(char *, char *);
 extern s32 B_003DD490;
 
 struct T211348 {
-    char pad0[0xCC];
+    u8 unknown_0x0[0xCC];
     s32 ids[4];
 };
 

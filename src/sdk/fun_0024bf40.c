@@ -1,13 +1,14 @@
+#include "types.h"
 struct PIC {
-    int f0; int f4; int f8; int fC; int f10; int pad14; long f18; long f20; int f28; int f2C; int f30; int f34; int f38;
+    int f0; int f4; int f8; int fC; int f10; int pad14; s64 f18; s64 f20; int f28; int f2C; int f30; int f34; int f38;
     int f3C; int f40; int f44; int f48; int pad4C; int f50; int f54; int pad58; int f5C; int f60;
 };
-struct PKT { long r0; long r8; long dispfb1; long display1; long pmode1; long dispfb2; long display2; long pmode2; };
+struct PKT { s64 r0; s64 r8; s64 dispfb1; s64 display1; s64 pmode1; s64 dispfb2; s64 display2; s64 pmode2; };
 struct CTX {
-    char pad0[8]; int f8; char padC[0x8C - 0xC]; int f8C; long f90; int f98; int f9C; long fA0; char padA8[0xC0 - 0xA8];
-    int fC0; int fC4; int fC8; int fCC; int fD0; int fD4; int fD8; int fDC; int fE0; int fE4; char padE8[0xF0 - 0xE8];
-    int fF0; int fF4; int fF8; int fFC; long f100; int f108; char pad10C[0x128 - 0x10C]; int f128; char pad12C[0x184 - 0x12C];
-    int f184; char pad188[0x834 - 0x188]; int f834; char pad838[0x868 - 0x838]; struct PKT *pkt;
+    u8 unknown_0x0[8]; int f8; u8 unknown_0xC[0x8C - 0xC]; int f8C; s64 f90; int f98; int f9C; s64 fA0; u8 unknown_0xA8[0xC0 - 0xA8];
+    int fC0; int fC4; int fC8; int fCC; int fD0; int fD4; int fD8; int fDC; int fE0; int fE4; u8 unknown_0xE8[0xF0 - 0xE8];
+    int fF0; int fF4; int fF8; int fFC; s64 f100; int f108; u8 unknown_0x10C[0x128 - 0x10C]; int f128; u8 unknown_0x12C[0x184 - 0x12C];
+    int f184; u8 unknown_0x188[0x834 - 0x188]; int f834; u8 unknown_0x838[0x868 - 0x838]; struct PKT *pkt;
 };
 extern char RO_002AC438[];
 int func_00236918(char *, int, const char *, ...);
@@ -15,12 +16,12 @@ void func_0024FA38(struct CTX *, char *);
 void func_0024C670(struct CTX *, struct PIC *);
 void func_0024B9F0(struct CTX *, struct PIC *);
 
-static inline void SetCircuit(struct CTX *p, long *pdispfb, long *pdisplay, long *ppmode, struct PIC *pic)
+static inline void SetCircuit(struct CTX *p, s64 *pdispfb, s64 *pdisplay, s64 *ppmode, struct PIC *pic)
 {
     if (p->f8C != 0 && pic->f18 < 0 && p->f98 >= 0) {
         int field = p->fA0;
-        long odd = field & 1;
-        long f90odd = p->f90 & 1;
+        s64 odd = field & 1;
+        s64 f90odd = p->f90 & 1;
         int bit = odd & (p->f9C & 1) & f90odd;
         int half = (p->f90 * field) >> 1;
         *pdispfb = p->f98 + (half + bit);
@@ -35,7 +36,7 @@ static inline void SetCircuit(struct CTX *p, long *pdispfb, long *pdisplay, long
         p->f100 = -1;
     }
     *pdisplay = pic->f20;
-    *ppmode = (long)pic->f34 << 8 | (long)pic->f38 << 7 | (long)pic->f3C << 6 | (long)pic->f40 << 5 | (long)pic->f30 << 3 | (long)pic->f2C;
+    *ppmode = (s64)pic->f34 << 8 | (s64)pic->f38 << 7 | (s64)pic->f3C << 6 | (s64)pic->f40 << 5 | (s64)pic->f30 << 3 | (s64)pic->f2C;
 }
 
 /* whether the frame buffer holds the picture; reports it when it does not */

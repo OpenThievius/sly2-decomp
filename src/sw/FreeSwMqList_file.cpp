@@ -80,11 +80,11 @@ void RecalcSwXpMovement(SW *psw, int cpxp, XP **apxp) {
     }
 }
 
-struct LSG { char pad[0x54]; void *pedge; char pad2[0x60 - 0x58]; };
+struct LSG { u8 unknown_0x0[0x54]; void *pedge; u8 unknown_0x58[0x8]; };
 
-struct EDGE { unsigned short ipos0; unsigned short ipos1; int pad[3]; };
+struct EDGE { u16 ipos0; u16 ipos1; s32 unknown_0x4[3]; };
 
-struct SOGEOM { char pad[0x94]; QW *apos; int unk98; int unk9c; int cedge; EDGE *aedge; };
+struct SOGEOM { u8 unknown_0x0[0x94]; QW *apos; s32 unknown_0x98; s32 unknown_0x9C; s32 cedge; EDGE *aedge; };
 
 struct SW;
 

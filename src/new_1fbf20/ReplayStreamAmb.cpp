@@ -1,11 +1,11 @@
-struct Obj_1FC270 { char pad0[0x40]; int f40; char pad1[0x50 - 0x44]; unsigned short f50; unsigned short f52; char pad2[0x68 - 0x54]; long f68; char pad3[0x3BC - 0x70]; int f3bc; };
+#include "streamamb.h"
 extern "C" {
 void func_001FB0C0(void *);
-void ReplayStreamAmb(Obj_1FC270 *self) {
-    int active = 0; if (self->f40 == 0) { int x = self->f52 != 0 || (self->f50 & 1) != 0; active = x ^ 1; } if (active) {
+void ReplayStreamAmb(STREAMAMB *self) {
+    int active = 0; if (self->voice == 0) { int x = self->fPending != 0 || (self->grf & 1) != 0; active = x ^ 1; } if (active) {
         func_001FB0C0(self);
-        self->f68 = 0;
-        self->f3bc = 0xF;
+        self->played = 0;
+        self->mask = 0xF;
     }
 }
 }

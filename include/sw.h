@@ -106,7 +106,8 @@ struct TGT {
 /* An entry of the world's HUD blot table (0xC bytes, four of them from 0x3BA0): InitSwHudBlots fills the first word. */
 struct HUDBLOT {
     /* 0x0 */ struct LO *plo; /* the blot object InitSwHudBlots found */
-    u8 unknown_0x4[0x8];
+    /* 0x4 */ f32 velocity;   /* UpdateSwHudBlots: the smoothing velocity of the blot's value (GSmoothA's last argument) */
+    /* 0x8 */ s32 fresh;      /* UpdateSwHudBlots: set while the blot is not drawn, then the next drawn frame jumps its value */
 };
 
 struct SW : BASIC {
@@ -315,10 +316,12 @@ struct SW : BASIC {
     u8 unknown_0x4760[0x4];
     /* 0x4764 */ s32 cclueFound; /* InitSwHudBlots stores CcluesFound() */
     /* 0x4768 */ s32 field_0x4768; /* InitSwHudBlots stores func_001C7D00()'s result */
-    /* 0x476C */ f32 tEmit; /* HideCountdownBlot clears it; UpdateSwHudBlots (local view, tEmit) */
-    u8 unknown_0x4770[0x4];
+    /* 0x476C */ f32 tEmit; /* HideCountdownBlot clears it; UpdateSwHudBlots */
+    /* 0x4770 */ s32 emitStamp; /* UpdateSwHudBlots: the last whole second it played an emitter for */
     /* 0x4774 */ struct TARGET *ptarget; /* func_0015DA88 */
-    u8 unknown_0x4778[0x18];
+    /* 0x4778 */ s32 cemitter; /* func_001C4848 (adds an emitter, at most 4), func_001C48C0 (walks them): two readers that agree */
+    /* 0x477C */ struct EMITTER *aemitter[4]; /* the same two: the emitters the focus changes make follow it */
+    u8 unknown_0x478C[0x4];
 };
 
 #if defined(__mips__)

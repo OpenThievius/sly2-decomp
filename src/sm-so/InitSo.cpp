@@ -9,11 +9,11 @@ void InitSo(SO *so)
     InitLo(so);
     func_001A6CA8(so, 0);
     InitDl(&so->dlChild, 0x24);
-    *(char *)&so->grfso = -10;
-    *((char *)&so->grfso + 1) = -20;
+    so->bGrfso[0] = -10;
+    so->bGrfso[1] = -20;
     so->uFade = 1.0f;
     so->field_0x13C = D_FLT_002C3B90;
-    unsigned long bit;
+    u64 bit;
     if (so->psoParent) bit = (so->psoParent->grfso >> 35) & 1;
     else bit = 1;
     so->field_0x140 = -1;

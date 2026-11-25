@@ -1,5 +1,5 @@
 // g_2deb20 is set by the render thread (FrameRenderLoop) and polled here, hence volatile (the only volatile)
-struct FRM { char pad0[0x30]; unsigned grf; char pad1[0x50 - 0x34]; };
+#include "frm.h"
 extern "C" int WaitSema(int);
 extern "C" int SignalSema(int);
 extern "C" void func_001C2BA8(int);

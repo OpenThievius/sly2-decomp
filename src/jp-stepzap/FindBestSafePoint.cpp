@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
 #include "vu0inline.h"
+#include "step.h"
 struct SAFEPOINT { QW a; QW b; };
-struct SAFEPOINTLIST { void *pjt; int count; int pad[2]; SAFEPOINT items[1]; };
+struct SAFEPOINTLIST { STEP *pjt; int count; u8 unknown_0x8[8]; SAFEPOINT items[1]; };
 struct SW;
 extern "C" char B_003DD490[];
 extern "C" const float RO_002A66A0;
 extern "C" int CploFindSwObjectsByClass(void *, int, int, int, int, void **);
 extern "C" float ScoreSafePoint(SAFEPOINTLIST *, SAFEPOINT *, int, void **);
 extern "C" QW PosLoWorld(void *);
-struct JTV { char pad[0x240]; QW grab; };
 
 extern "C" void FindBestSafePoint(SAFEPOINTLIST *list, SAFEPOINT *out)
 {
@@ -29,6 +29,6 @@ extern "C" void FindBestSafePoint(SAFEPOINTLIST *list, SAFEPOINT *out)
     if (best == RO_002A66A0) {
         memset(out, 0, 0x20);
         QW pos = PosLoWorld(list->pjt);
-        out->b = VectorAdd(pos, ((JTV *)list->pjt)->grab);
+        out->b = VectorAdd(pos, list->pjt->posLocal);
     }
 }

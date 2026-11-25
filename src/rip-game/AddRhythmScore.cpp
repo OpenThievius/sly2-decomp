@@ -9,7 +9,7 @@ extern "C" float GetSuck(void *);
 float GLimitLm(LM *, float);
 extern "C" float GMeanRhythmScore(void *);
 extern "C" void bevy_camera_follow_activity(void *, int, void *);
-struct RHYTHM { char pad[0x234]; char lm[8]; int count; float score[16]; float gap; float mean; };
+struct RHYTHM { u8 unknown_0x0[0x234]; char lm[8]; int count; float score[16]; float gap; float mean; };
 extern "C" void AddRhythmScore(RHYTHM *rhythm, float score)
 {
     if (score < 0.0f) {

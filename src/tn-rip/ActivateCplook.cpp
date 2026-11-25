@@ -1,19 +1,12 @@
 #include "sly2.h"
+#include "cplcy.h"
+#include "clock.h"
 struct B8 { char b[8]; };
-struct Plook {
-    void *psoFocus; char pad4[0xC]; float radPan; float radTilt; int swPan; int swTilt; int uZoom; int svuZoom;
-    float rZoomMax; float radFovMin; float radFovMax; void *pambZoom; void *pambBinoc; float lim[4];
-    float panSaved; float tiltSaved; int cActivate;
-};
 extern "C" {
-struct Cm { char pad[0x24]; float fov; char pad28[0x60 - 0x28]; char mat[0x30]; };
-extern Cm B_002DDF40;
 extern const B8 D_002BD950, D_002BD958, D_002BD968, D_002BD970;
 extern char D_002BD960[];
 extern float B_FLT_003E1BE0;
-struct CLOCK { float t; float dt; };
-extern CLOCK g_2dded0;
-void ActivateCplcy(Plook *);
+void ActivateCplcy(CPLOOK *);
 void *NewEmitter(int);
 void SetEmitterUnpositioned(void *, void *);
 void VirtualRefPtr_Assign(void *, void *);
@@ -24,44 +17,44 @@ void *PmatLoWorld(void *);
 float GLimitLm__FP2LMf(void *, float);
 void SetCmNearClip(void *, float);
 }
-extern "C" void ActivateCplook(Plook *pcplook)
+extern "C" void ActivateCplook(CPLOOK *pcplook)
 {
     ActivateCplcy(pcplook);
     void *emitterZoom = NewEmitter(0x26);
     SetEmitterUnpositioned(emitterZoom, 0);
-    VirtualRefPtr_Assign(&pcplook->pambZoom, emitterZoom);
+    VirtualRefPtr_Assign(&pcplook->ambience, emitterZoom);
     void *emitterBinoc = NewEmitter(0x25);
     SetEmitterUnpositioned(emitterBinoc, 0);
-    VirtualRefPtr_Assign(&pcplook->pambBinoc, emitterBinoc);
-    PauseAmb(pcplook->pambZoom);
-    Cm *pcmView = &B_002DDF40;
-    DecomposeRotateMatrixPanTilt__FP7MATRIX3PfT1(pcmView->mat, &pcplook->radPan, &pcplook->radTilt);
-    if (FIsBasicDerivedFrom(pcplook->psoFocus, 0x34)) {
-        *(B8 *)&pcplook->lim[0] = D_002BD950;
-        *(B8 *)&pcplook->lim[2] = D_002BD958;
+    VirtualRefPtr_Assign(&pcplook->field_0x38, emitterBinoc);
+    PauseAmb(pcplook->ambience);
+    CM *pcmView = &B_002DDF40;
+    DecomposeRotateMatrixPanTilt__FP7MATRIX3PfT1(&pcmView->mat, &pcplook->radPan, &pcplook->radTilt);
+    if (FIsBasicDerivedFrom((void *)pcplook->active, 0x34)) {
+        *(B8 *)&pcplook->radPanMin = D_002BD950;
+        *(B8 *)&pcplook->radTiltMin = D_002BD958;
     } else {
-        *(B8 *)&pcplook->lim[0] = D_002BD968;
-        *(B8 *)&pcplook->lim[2] = D_002BD970;
-        pcplook->panSaved = pcplook->radPan;
-        pcplook->tiltSaved = pcplook->radTilt;
-        void *viewer = PmatLoWorld(pcplook->psoFocus);
+        *(B8 *)&pcplook->radPanMin = D_002BD968;
+        *(B8 *)&pcplook->radTiltMin = D_002BD970;
+        pcplook->radPanSaved = pcplook->radPan;
+        pcplook->radTiltSaved = pcplook->radTilt;
+        void *viewer = PmatLoWorld((void *)pcplook->active);
         DecomposeRotateMatrixPanTilt__FP7MATRIX3PfT1(viewer, &pcplook->radPan, &pcplook->radTilt);
         float radTilt = GLimitLm__FP2LMf(D_002BD960, pcplook->radTilt);
         pcplook->radTilt = radTilt;
-        pcplook->lim[0] += pcplook->radPan;
-        pcplook->lim[1] += pcplook->radPan;
-        pcplook->lim[2] += radTilt;
-        pcplook->lim[3] += radTilt;
-        pcplook->lim[2] = GLimitLm__FP2LMf(D_002BD960, radTilt);
-        pcplook->lim[3] = GLimitLm__FP2LMf(D_002BD960, pcplook->radTilt);
+        pcplook->radPanMin += pcplook->radPan;
+        pcplook->radPanMax += pcplook->radPan;
+        pcplook->radTiltMin += radTilt;
+        pcplook->radTiltMax += radTilt;
+        pcplook->radTiltMin = GLimitLm__FP2LMf(D_002BD960, radTilt);
+        pcplook->radTiltMax = GLimitLm__FP2LMf(D_002BD960, pcplook->radTilt);
     }
-    Cm *pcm = &B_002DDF40;
-    pcplook->swPan = 0;
-    pcplook->swTilt = 0;
-    pcplook->uZoom = 0;
-    pcplook->svuZoom = 0;
-    pcplook->radFovMin = pcm->fov / pcplook->rZoomMax;
-    pcplook->radFovMax = pcm->fov;
+    CM *pcm = &B_002DDF40;
+    pcplook->dradPan = 0;
+    pcplook->dradTilt = 0;
+    pcplook->u = 0;
+    pcplook->du = 0;
+    pcplook->fovMin = pcm->radFovTarget / pcplook->field_0x28;
+    pcplook->fovMax = pcm->radFovTarget;
     SetCmNearClip(pcm, 49.0f);
     pcplook->cActivate = pcplook->cActivate + 1;
     B_FLT_003E1BE0 = g_2dded0.t;

@@ -3,20 +3,20 @@
 #include "rgba.h"
 struct AFF { float a, b, c, d, e, f, u6, u7; } __attribute__((aligned(16)));
 struct MOVIECHAR;
-struct P16 { RGBA v; char pad[12]; };
-struct TMP { union { AFF dummy; struct { RGBA t0; char p0[12]; RGBA t1; char p1[12]; } c; } v; union { AFF lerped; struct { RGBA t2; char p2[12]; RGBA t3; } c; } u; };
+struct P16 { RGBA v; u8 unknown_0x4[12]; };
+struct TMP { union { AFF dummy; struct { RGBA t0; u8 unknown_0x4[12]; RGBA t1; u8 unknown_0x14[12]; } c; } v; union { AFF lerped; struct { RGBA t2; u8 unknown_0x4[12]; RGBA t3; } c; } u; };
 struct FRAME { AFF xf; P16 outAdd, outMul, s40, s50, s60; TMP tmp; };
 struct SLOT {
-    RGBA rgbaAdd; RGBA rgbaMul; char pad08[8];
+    RGBA rgbaAdd; RGBA rgbaMul; u8 unknown_0x8[8];
     AFF xf;
     MOVIECHAR *pchar; int maskMode; float tFrom; RGBA rgbaAddFrom; RGBA rgbaMulFrom; AFF *pxfFrom;
     float tTo; RGBA rgbaAddTo; RGBA rgbaMulTo; AFF *pxfTo; int iinst; float tUpdated;
-    unsigned char fTween; char pad61[0x68 - 0x61]; void *pslNext; char pad6c[4];
+    unsigned char fTween; u8 unknown_0x61[7]; void *pslNext; u8 unknown_0x6C[4];
 };
 struct INST { int cslot; SLOT *aslot; short ilabel; short ikeyNext; float t; int fPaused; int pamb; };
-struct SPRITE { char pad0[8]; INST *insts; };
-struct KEY { float t; char pad[0x1C]; };
-struct LABEL { unsigned short ckey; char pad2[2]; KEY *akey; char pad0[8]; SPRITE *psprite; };
+struct SPRITE { u8 unknown_0x0[8]; INST *insts; };
+struct KEY { float t; u8 unknown_0x4[0x1C]; };
+struct LABEL { unsigned short ckey; u8 unknown_0x2[2]; KEY *akey; u8 unknown_0x8[8]; SPRITE *psprite; };
 extern "C" void ClearSle(void *);
 extern "C" void ApplySpriteKeySounds(LABEL *, int, int);
 extern "C" void func_002190F8(LABEL *, int, int);

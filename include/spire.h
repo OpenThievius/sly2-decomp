@@ -9,7 +9,13 @@
 struct TN;
 
 struct SPIRE {
-    u8 unknown_0x0[0x100];
+    u8 unknown_0x0[0xE0];
+    /* 0xE0 */ s32 cvert;       /* LoadSpireFromBrx (the class's own loader): the vertex count */
+    /* 0xE4 */ QW *avert;       /* LoadSpireFromBrx: the vertices, read as vectors of 16 bytes */
+    /* 0xE8 */ s32 ctri;        /* LoadSpireFromBrx: the triangle count */
+    /* 0xEC */ s32 *atri;       /* LoadSpireFromBrx: three vertex indices a triangle */
+    /* 0xF0 */ s32 *aneighbor;  /* LoadSpireFromBrx: three neighbour triangles a triangle */
+    u8 unknown_0xF4[0xC];
     /* 0x100 */ struct DLE dle; /* the link of the world's spire list (B_003E142C) */
     /* 0x108 */ f32 dzMax;      /* InitSpire sets FLT_MAX; the 0x19B110 module's closest-point search reads it */
     u8 unknown_0x10C[0x4];
