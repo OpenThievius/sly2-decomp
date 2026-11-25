@@ -1,18 +1,18 @@
-#include "types.h"
+#include "so.h"
 extern "C" {
-struct Q_2022D8 { char pad[0x28]; u64 flags; };
-struct P_2022D8 { char pad[0x28]; u64 flags; char pad1[0xD0]; Q_2022D8 *other; };
-struct O_2022D8 { char pad[0x30]; s32 count; P_2022D8 *items[1]; };
-s32 bevy_ui_binoc_recon_2022d8(O_2022D8 *arg0) {
-    if (*(s32 *)((char *)arg0 + 0xB8) != 0)
+/* the targets' view as in ShowReconLinks: SO word 0x100 is an LO (one reader on a guessed class) */
+struct SORECON { u8 unknown_0x0[0x100]; LO *plo; };
+struct RECON { u8 unknown_0x0[0x30]; s32 ctarget; SO *aptarget[16]; u8 unknown_0x74[0x44]; s32 field_0xB8; }; /* field_0xB8: reader bevy_ui_binoc_recon_2022d8 only */
+s32 bevy_ui_binoc_recon_2022d8(RECON *arg0) {
+    if (arg0->field_0xB8 != 0)
         return 1;
-    for (s32 i = 0; i < arg0->count; i++) {
-        P_2022D8 *p = arg0->items[i];
-        if ((s32)(p->flags >> 60) & 1) {
-            Q_2022D8 *q = p->other;
+    for (s32 i = 0; i < arg0->ctarget; i++) {
+        SO *p = arg0->aptarget[i];
+        if ((s32)(p->grfo >> 60) & 1) {
+            LO *q = ((SORECON *)p)->plo;
             if (q == 0)
                 return 1;
-            if ((s32)(q->flags >> 60) & 1) {
+            if ((s32)(q->grfo >> 60) & 1) {
             } else {
                 return 1;
             }

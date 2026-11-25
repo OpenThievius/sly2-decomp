@@ -1,9 +1,11 @@
-extern "C" void CRef_Destruct(char *);
+#include "cref.h"
+struct CProc { int cref; }; /* the reference count first, as Splice's other heap values */
+extern "C" void CRef_Destruct(CRef *);
 
-char *CRef_SetProc(char *arg0, int *arg1) {
-    *arg1 += 1;
-    CRef_Destruct(arg0);
-    *(int **)(arg0 + 4) = arg1;
-    *(int *)arg0 = 0x20;
-    return arg0;
+CRef *CRef_SetProc(CRef *pref, CProc *pproc) {
+    pproc->cref += 1;
+    CRef_Destruct(pref);
+    pref->m_tag.m_pproc = pproc;
+    pref->m_tagk = TAGK_Proc;
+    return pref;
 }

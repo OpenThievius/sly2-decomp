@@ -1,7 +1,6 @@
 #include "sly2.h"
 #include "lo.h"
-struct XFM { char pad[0x10]; };
-struct ROPE { char pad0[0x10]; void *plo[2]; char pad1[8]; QW anchor[2]; void *xf[2]; void *crv; };
+struct ROPE { u8 unknown_0x0[0x10]; void *plo[2]; u8 unknown_0x20_gap[8]; QW anchor[2]; void *xf[2]; void *crv; };
 extern "C" char D_002C44F0;
 extern "C" float UMinCrv(void *);
 extern "C" float UMaxCrv(void *);
@@ -12,7 +11,7 @@ extern "C" void SetRopeSimEnd(ROPE *rope, int end, LO *plo)
     if (plo) {
         QW mat[4];
         rope->xf[end] = plo->Slot32(mat);
-        *(QW *)((char *)rope + 0x20 + end * 16) = mat[3];
+        *(rope->anchor + end) = mat[3];
     } else {
         rope->xf[end] = &D_002C44F0;
         float u;

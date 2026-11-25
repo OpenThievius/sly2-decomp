@@ -5,16 +5,12 @@
 #include "m2c_macros.h"
 #include "sly2.h"
 #include "dl.h"
+#include "sl.h"
 #include "include_asm.h"
 
 extern "C" {
-typedef struct SlList {
-    char pad_0x0[8];
-    s32 field_0x8;
-} SlList;
-
-void InitSl(SlList *list, s32 offset) {
-    list->field_0x8 = offset;
+void InitSl(SL *psl, s32 ibSle) {
+    psl->ibSle = ibSle;
 }
 }
 
@@ -25,13 +21,11 @@ void ClearSle(s32 *arg0) {
 }
 
 // ClearSl
-void ClearSl(void* psl)
+void ClearSl(SL *psl)
 {
-    *(void**)((char*)psl + 4) = 0;
-    *(void**)psl = 0;
+    psl->pvLast = 0;
+    psl->pvFirst = 0;
 }
-
-struct SL { void *pvFirst; void *pvLast; int ibSle; };
 
 extern "C" void AppendSlEntry(SL *psl, void *pv)
 {
@@ -56,28 +50,22 @@ extern "C" void PrependSlEntry(SL *psl, void *pv)
     psl->pvFirst = pv;
 }
 
-struct SlList_11A0C0 {
-    char pad_0x0[4];
-    s32 field_0x4;
-    s32 field_0x8;
-};
+extern "C" void AppendSlEntry_11A0C0(SL *, void *);
 
-extern "C" void AppendSlEntry_11A0C0(SlList_11A0C0 *, s32);
+extern "C" void PrependSlEntry_11A0C0(SL *, void *);
 
-extern "C" void PrependSlEntry_11A0C0(SlList_11A0C0 *, s32);
-
-extern "C" void InsertSlEntryAfter(SlList_11A0C0 *list, s32 entry, s32 newEntry) {
-    s32 offset;
-    s32 *previous;
-    if (entry == 0) {
-        PrependSlEntry_11A0C0(list, newEntry);
-    } else if (entry == list->field_0x4) {
-        AppendSlEntry_11A0C0(list, newEntry);
+extern "C" void InsertSlEntryAfter(SL *psl, void *pv, void *pvNew) {
+    s32 ibSle;
+    void **ppvPrevious;
+    if (pv == 0) {
+        PrependSlEntry_11A0C0(psl, pvNew);
+    } else if (pv == psl->pvLast) {
+        AppendSlEntry_11A0C0(psl, pvNew);
     } else {
-        offset = list->field_0x8;
-        previous = (s32 *)(entry + offset);
-        *(s32 *)(newEntry + offset) = *previous;
-        *previous = newEntry;
+        ibSle = psl->ibSle;
+        ppvPrevious = (void **)((char *)pv + ibSle);
+        *(void **)((char *)pvNew + ibSle) = *ppvPrevious;
+        *ppvPrevious = pvNew;
     }
 }
 

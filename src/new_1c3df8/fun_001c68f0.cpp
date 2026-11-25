@@ -54,8 +54,7 @@ void func_001C68F0(DPRIZECHARM *pcharm, int dprizes)
             int *msg = loc.aw;
             msg[0] = 1;
             msg[1] = (sptr)pcharm;
-            const MSGSINKVT *vt = psink->vt;
-            vt->fn((char *)psink + vt->delta, msg);
+            psink->Notify(msg);
         }
         dprizes = 2;
         pcharm->HandleSpliceEvent(5, 0, 0, 0, 0);

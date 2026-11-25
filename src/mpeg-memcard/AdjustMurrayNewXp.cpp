@@ -26,7 +26,7 @@ extern "C" void AdjustMurrayNewXp(MURRAY *m, XP *pxp, int iside)
     AdjustStepNewXp(m, pxp, iside);
     switch (m->state) {
     case 0xE:
-        AdjustJtZapNewXp((char *)m + 0xDF0, pxp, iside);
+        AdjustJtZapNewXp(m->PvZap(), pxp, iside);
         break;
     case 0xC: {
         int charges = m->field_0x1840;

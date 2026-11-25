@@ -1,7 +1,7 @@
-#include "sly2.h"
+#include "sohit.h"
 extern "C" void func_0017F090(void *);
-void func_00180188(void *pgoal)
+void func_00180188(SOHIT *pmissile)
 {
-    func_0017F090(pgoal);
-    *(int *)((char *)pgoal + 0x188) = 10;
+    func_0017F090(pmissile);
+    pmissile->dhp = 10;
 }

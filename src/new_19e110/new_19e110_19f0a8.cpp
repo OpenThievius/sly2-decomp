@@ -4,11 +4,8 @@
 #include "types.h"
 #include "sw.h"
 #include "stepguard.h"
+#include "jt.h"
 #include "m2c_macros.h"
-
-struct VT { char pad[0x340]; short delta; short index; void (*fn)(void *); };
-
-struct Obj { char pad[0xC]; VT *vptr; };
 
 extern char B_003DD490;
 
@@ -16,26 +13,20 @@ extern "C" int CploFindSwObjectsByClass(void *, int, int, int, int, void *);
 
 extern "C" void func_0019F0A8(void)
 {
-    Obj *found[8];
+    JT *found[8];
     int count = CploFindSwObjectsByClass(&B_003DD490, 5, 0x34, 0, 8, found);
-    for (int index = 0; index < count; index++) { Obj *obj = found[index]; VT *vt = obj->vptr; vt->fn((char *)obj + vt->delta); }
+    for (int index = 0; index < count; index++) found[index]->Slot104();
 }
 
-struct SwGuards {
-    char pad0[0x4748];
-    s32 frozen;
-    f32 frozenTime;
-};
-
-extern "C" void SetSwGuardsFrozen_19F120(SwGuards *, s32);
+extern "C" void SetSwGuardsFrozen_19F120(SW *, s32);
 
 extern "C" f32 RO_002BF938;
 
 extern "C" f32 g_2dded0;
 
-extern "C" void UpdateSwGuardsFrozen(SwGuards *guards) {
-    if (guards->frozen != 0) {
-        if (RO_002BF938 < (g_2dded0 - guards->frozenTime)) {
+extern "C" void UpdateSwGuardsFrozen(SW *guards) {
+    if (guards->fGuardsFrozen != 0) {
+        if (RO_002BF938 < (g_2dded0 - guards->tGuardsFrozen)) {
             SetSwGuardsFrozen_19F120(guards, 0);
         }
     }

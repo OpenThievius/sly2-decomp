@@ -2,6 +2,11 @@
 #include "stepguard.h"
 #include "goals.h"
 #include "clock.h"
+/* a GOALREACT seen as this goal fills it: the word at 0x3C (GOALREACT::pxf) holds a range here */
+struct GOALREACTRANGEVIEW {
+    u8 unknown_0x0[0x3C];
+    GOALREACTRANGE *prange;
+};
 extern "C" {
 float GRandInRange(float, float);
 void Goal_Pop(GOAL **);
@@ -34,7 +39,7 @@ void GoalNotice_SetState(GOALNOTICE *self, unsigned state) {
         case 1: {
             GOALREACT *obj = (GOALREACT *)func_00205438(GOAL_GUARD(self), 0xA4);
             obj->ptarget = self->ptarget;
-            *(GOALREACTRANGE **)((char *)obj + 0x3C) = self->prange; /* GOALREACT::pxf is at 0x3C: this goal keeps a range there */
+            ((GOALREACTRANGEVIEW *)obj)->prange = self->prange;
             GOAL_GUARD(self)->tCooldown = 3.4028235e38f;
             obj->Activate();
             SetAlertState(GOAL_GUARD(self)->palert, 3);

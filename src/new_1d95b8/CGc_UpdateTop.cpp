@@ -1,8 +1,22 @@
 #include "sly2.h"
-struct VE { short delta; short idx; void (*fn)(void *, int, void *); };
-struct VT { char p[0x48]; VE e; };
-struct SCR { char p0[0xC]; VT *vt; void *pjoy; };
-struct CGC { SCR *pnew; char p[8]; SCR *ptop; };
+/* A screen of the controller's list (CGC): vtable pointer at 0xC, the controller block it reads at 0x10. Slot 9 is the focus
+   change (CGc_UpdateTop calls it with 0 when the screen loses the top and 1 when it gains it, and the screen it replaces). */
+struct SCRBASE {
+    u8 unknown_0x0[0xC];
+    virtual void Slot1();
+    virtual void Slot2();
+    virtual void Slot3();
+    virtual void Slot4();
+    virtual void Slot5();
+    virtual void Slot6();
+    virtual void Slot7();
+    virtual void Slot8();
+    virtual void SetFocus(int fFocus, struct SCR *pscrOther); /* 9: CGc_UpdateTop */
+};
+struct SCR : SCRBASE {
+    /* 0x10 */ void *pjoy;
+};
+struct CGC { SCR *pnew; u8 unknown_0x4[8]; SCR *ptop; };
 extern char B_002DFC00;
 void CGc_UpdateTop(CGC *g)
 {
@@ -11,14 +25,12 @@ void CGc_UpdateTop(CGC *g)
         return;
     if (g->ptop) {
         g->ptop->pjoy = 0;
-        VE *e = &g->ptop->vt->e;
-        e->fn((char *)g->ptop + e->delta, 0, pnew);
+        g->ptop->SetFocus(0, pnew);
     }
     SCR *pold = g->ptop;
     g->ptop = pnew;
     if (pnew) {
         pnew->pjoy = &B_002DFC00;
-        VE *e = &pnew->vt->e;
-        e->fn((char *)pnew + e->delta, 1, pold);
+        pnew->SetFocus(1, pold);
     }
 }

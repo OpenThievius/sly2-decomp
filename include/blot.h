@@ -30,9 +30,11 @@ struct BLOT : LO {
     /* 0x74 */ s32 labelAppear;         /* the same (0x30F) */
     /* 0x78 */ s32 labelDisappear;      /* the same (0x311) */
     /* 0x7C */ s32 cur;                 /* Blot_Construct, LoadBlotFromBrx set -1 */
-    u8 unknown_0x80[0x4];
+    /* 0x80 */ u16 csprite;             /* readers: SeekBlotLabel, func_00212F80, func_00213CD8 (the count of the sprites asprite points at) */
+    u8 unknown_0x82[0x2];
     /* 0x84 */ s32 asprite;             /* Blot_Show passes it to FSpriteHasLabel */
-    u8 unknown_0x88[0x8];
+    u8 unknown_0x88[0x4];
+    /* 0x8C */ s32 field_0x8C;         /* reader: ShowCountdownBlot clears it (it calls this blot's Select(-1) next) */
     /* 0x90 */ f32 dwell;               /* LoadBlotFromBrx reads it from the stream */
     /* 0x94 */ s32 height;              /* LoadBlotFromBrx, PostBlotLoad */
     /* 0x98 */ s32 width;               /* the same */
@@ -41,7 +43,8 @@ struct BLOT : LO {
     /* 0xA4 */ s32 order;              /* reader: FBlotObscured (a blot is obscured by one with a larger value), func_00215BA8 copies it;
                                           func_00217298 shifts it left by 18 into a DMA record's depth */
     /* 0xA8 */ s32 field_0xA8;          /* PostBlotLoad sets -1 */
-    u8 unknown_0xAC[0x10];
+    /* 0xAC */ s32 modal;               /* readers: PlayBlotLabel, StopBlotLabel (SetBlotModal when set) */
+    u8 unknown_0xB0[0xC];
     /* 0xBC */ s32 field_0xBC;          /* LoadBlotFromBrx reads it from the stream; PostBlotLoad finds the world's font when it is set */
     /* 0xC0 */ BLOTSTREAM *pstream;     /* LoadBlotFromBrx: the streamed record */
     /* 0xC4 */ void *palloc;            /* LoadBlotFromBrx: B_003E1C70 (streamed) or B_003E1C80 (movie) */

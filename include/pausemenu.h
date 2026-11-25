@@ -24,7 +24,8 @@ struct PAUSEITEM {
     PAUSEITEM *aitemSub;   /* func_001B06D8: the sub-page's items */
     PFNPAUSEITEM pfnUpdate;
     PFNPAUSEITEM pfnEnter;
-    u8 unknown_0x18[0x4];
+    PAUSELABELS *plabelsSub; /* 0x18: func_001B0688 passes it to PauseMenu_Push as the sub-page's labels (the push's last argument,
+                                PAUSELABELS * in PauseMenu_Push's own signature); one reader on a certain struct */
     u32 grf; /* bit 1: the item closes nothing itself; bit 2: leave the menu open */
 };
 

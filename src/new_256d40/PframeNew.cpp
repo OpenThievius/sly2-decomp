@@ -1,6 +1,11 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later */
 #include "sly2.h"
 #include "sw.h"
+struct FRAMENODE {
+    u8 unknown_0x0[0xC];
+    /* 0xC */ s32 aiWord[4]; /* reader: PframeNew (zeroed) */
+    /* 0x1C */ s32 iWord1C;  /* reader: PframeNew (zeroed) */
+};
 extern "C" {
 void *PvAllocSlotheapImpl(SLOTHEAP *);
 void FreeSlotheapPv(SLOTHEAP *, void *);
@@ -21,12 +26,12 @@ void *PframeNew(void)
             B_004520E8[B_002DD2A4++] = chunk;
         }
     }
-    char *p = (char *)PvAllocSlotheapImpl(&B_004520F8);
+    FRAMENODE *p = (FRAMENODE *)PvAllocSlotheapImpl(&B_004520F8);
     InitFrameNode(p);
-    int *q = (int *)(p + 0xC);
+    int *q = p->aiWord;
     int n = 3;
     do { *q++ = 0; } while (--n != -1);
-    *(int *)(p + 0x1C) = 0;
+    p->iWord1C = 0;
     return p;
 }
 }

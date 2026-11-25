@@ -1,12 +1,13 @@
 #include "vu0inline.h"
-struct LM { float gMin; float gMax; };
-struct LSG { QW pos; char rest[0x50]; };
-struct VCALL { short delta; short index; int (*fn)(void *); };
-struct ACTOR { char pad0[0xEC]; void *poxa; char padF0[0xF00 - 0xF0]; int field_0xF00; char padF04[0xF48 - 0xF04]; LM lmYaw; LM lmPitch; LM lmRoll; char padF60[0xFE8 - 0xF60]; unsigned grf; };
-struct TARGET { char pad0[0xC]; char *vtable; char pad10[0x28 - 0x10]; u64 grf; char pad30[0x2DC - 0x30]; int field_0x2DC; char pad2E0[0x4C8 - 0x2E0]; int field_0x4C8; int field_0x4CC; char pad4D0[0xF54 - 0x4D0]; int field_0xF54; char padF58[0x18C8 - 0xF58]; int field_0x18C8; };
-struct HITOBJ { char pad[0x14]; TARGET **pptarget; };
-struct HIT { char pad[4]; HITOBJ *pobj; };
-struct CHECK { char pad0[0x10]; ACTOR *pactor; char pad14[0x30 - 0x14]; TARGET *ptarget; int field_0x34; float field_0x38; int field_0x3C; };
+#include "stepguard.h"
+#include "sly.h"
+#include "clq.h"
+/* The guard's sight limits, read only here (the class is a guess from grf, paimstate and poxa): a local view. */
+struct GUARDSIGHTVIEW { u8 unknown_0x0[0xF48]; LM lmDistance; LM lmYaw; LM lmPitch; };
+struct LSG { QW pos; u8 unknown_0x10[0x50]; };
+struct HITOBJ { u8 unknown_0x0[0x14]; JT **pptarget; };
+struct HIT { u8 unknown_0x0[4]; HITOBJ *pobj; };
+struct GUARDCHECK { u8 unknown_0x0[0x10]; STEPGUARD *pactor; u8 unknown_0x14[0x30 - 0x14]; JT *ptarget; int field_0x34; float field_0x38; int field_0x3C; };
 extern "C" {
 void CStackFrame_Construct(void *);
 void CStackFrame_Destructor(void *, int);
@@ -24,35 +25,34 @@ extern float g_2dded0;
 }
 int FCheckLm(LM *, float);
 float RadNormalize(float);
-extern "C" int func_00175D00(CHECK *pcheck)
+extern "C" int func_00175D00(GUARDCHECK *pcheck)
 {
-    ACTOR *pactor = pcheck->pactor;
-    if (!(pactor->grf & 8) || pactor->field_0xF00 || pcheck->field_0x3C)
+    STEPGUARD *pactor = pcheck->pactor;
+    if (!(pactor->grf & 8) || pactor->paimstate || pcheck->field_0x3C)
         return 0;
     if (!pcheck->ptarget)
         return 0;
-    if (((pcheck->ptarget->grf >> 60) & 1) == 0)
+    if (((pcheck->ptarget->grfo >> 60) & 1) == 0)
         return 0;
     if (FIsBasicDerivedFrom(pcheck->ptarget, 0x32)) {
-        VCALL *pcall = (VCALL *)(pcheck->ptarget->vtable + 0x268);
-        if (pcall->fn((char *)pcheck->ptarget + pcall->delta) == 2)
+        if (pcheck->ptarget->NAlertLevel() == 2)
             return 0;
     }
     int fForce = 0;
     if (FIsBasicDerivedFrom(pcheck->ptarget, 0x34)) {
-        TARGET *ptarget = pcheck->ptarget;
+        JT *ptarget = pcheck->ptarget;
         if (ptarget->field_0x4CC != -1) {
-            if (ptarget->field_0x4C8 < 5)
-                fForce = ptarget->field_0x4C8 >= 3;
+            if (ptarget->attachKind < 5)
+                fForce = ptarget->attachKind >= 3;
         }
-        if (ptarget->field_0x2DC != -1) {
-            if ((ptarget->field_0x2DC ^ 0x11) == 0)
+        if (ptarget->jmpState != -1) {
+            if ((ptarget->jmpState ^ 0x11) == 0)
                 fForce = 1;
         }
         if (~ptarget->field_0xF54 != 0)
             fForce = 1;
         if (FIsBasicDerivedFrom(ptarget, 0x35)) {
-            switch (ptarget->field_0x18C8) {
+            switch (((SLY *)ptarget)->jts) {
             case 3:
             case 0x15:
             case 0x16:
@@ -70,14 +70,14 @@ extern "C" int func_00175D00(CHECK *pcheck)
     QW delta = VectorSub(posTarget, posActor);
     float yawSo = RadYawSo(pcheck->pactor);
     DecomposeSphere(delta, &yaw, &pitch, &dist);
-    if (!FCheckLm(&pcheck->pactor->lmYaw, dist))
+    if (!FCheckLm(&((GUARDSIGHTVIEW *)pcheck->pactor)->lmDistance, dist))
         return 0;
     float yawDiff = RadNormalize(yaw - yawSo);
-    if (!FCheckLm(&pcheck->pactor->lmPitch, yawDiff))
+    if (!FCheckLm(&((GUARDSIGHTVIEW *)pcheck->pactor)->lmYaw, yawDiff))
         return 0;
     CalculateVectorPanTilt__FP6VECTORPfT1(*PmatLoWorld(pcheck->pactor), 0, &pan);
     float pitchDiff = RadNormalize(pitch - pan);
-    if (!FCheckLm(&pcheck->pactor->lmRoll, pitchDiff))
+    if (!FCheckLm(&((GUARDSIGHTVIEW *)pcheck->pactor)->lmPitch, pitchDiff))
         return 0;
     if (!fForce) {
         if (pcheck->field_0x34 == 0) {

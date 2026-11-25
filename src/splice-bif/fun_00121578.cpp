@@ -2,7 +2,7 @@
 #include "sly2.h"
 #include "cref.h"
 struct CPair;
-struct CPair { int cref; int pad4; CRef ref; CPair *next; };
+struct CPair { int cref; u8 unknown_0x4[4]; CRef ref; CPair *next; };
 struct PairHandle { CPair *p; };
 struct SLOTHEAP;
 extern "C" {
@@ -24,7 +24,7 @@ extern "C" PairHandle *func_00121578(PairHandle *pret, CRef **pprefCallee, CRef 
     PairHandle_Init(&outer, PpairNew());
     CRef *prefOuter = &outer.p->ref;
     bevy_splice_value_list_ref(prefOuter, PpairNew());
-    CPair *call = (CPair *)((CRef*)((char*)outer.p+8))->m_tag.m_n;
+    CPair *call = (CPair *)outer.p->ref.m_tag.m_n;
     CRef *prefCall = &call->ref;
     bevy_splice_value_list_ref(prefCall, PpairNew());
     tmp = PpairNew(); PairHandle_Assign(&call->next, tmp);
@@ -33,7 +33,7 @@ extern "C" PairHandle *func_00121578(PairHandle *pret, CRef **pprefCallee, CRef 
     CRef_Destruct(prefCallee);
     SetTag__4CRef4TAGK(prefCallee, 0x12);
     tmp = PpairNew(); PairHandle_Assign(&callee->next, tmp);
-    *pprefCallee = &((CPair *)*(int *)((char *)callee + 0x10))->ref;
+    *pprefCallee = &callee->next->ref;
     CRef *prefArgForm = &call->next->ref;
     bevy_splice_value_list_ref(prefArgForm, PpairNew());
     CPair *arg = (CPair *)prefArgForm->m_tag.m_n;

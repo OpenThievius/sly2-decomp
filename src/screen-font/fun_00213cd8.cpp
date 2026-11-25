@@ -1,23 +1,21 @@
+#include "blot.h"
+#include "blotsprite.h"
+#include "heapalloc.h"
 #include "sly2.h"
-struct SUB { char pad[0x14]; int id; };
-struct ENT { unsigned short count; unsigned short itemCount; SUB *subs; char pad[0x2C - 8]; QW *transform; };
-struct VT { char pad[8]; short delta; short index; void *(*fn)(void *, int, int); };
-struct HEAP { VT *vt; };
-struct OBJ { char pad[0x80]; unsigned short count; unsigned short pad2; ENT *entries; char pad3[0xC4 - 0x88]; HEAP *heap; };
 
-void func_00213CD8(OBJ *obj, int id, QW *src)
+void func_00213CD8(BLOT *blot, int id, QW *src)
 {
-    for (int i = 0; i < obj->count; i++) {
-        ENT *ent = &obj->entries[i];
-        for (int j = 0; j < ent->count; j++) {
-            SUB *sub = &ent->subs[j];
-            if (sub->id != id)
+    for (int i = 0; i < blot->csprite; i++) {
+        BLOTSPRITE *sprite = &((BLOTSPRITE *)blot->asprite)[i];
+        for (int j = 0; j < sprite->clabel; j++) {
+            BLOTSPRITELABEL *plabel = &sprite->alabel[j];
+            if (plabel->id != id)
                 continue;
-            if (ent->transform == 0) {
-                HEAP *heap = obj->heap;
-                ent->transform = (QW *)heap->vt->fn((char *)heap + heap->vt->delta, 0x20, 0x1F);
+            if (sprite->transform == 0) {
+                HEAPALLOC *heap = (HEAPALLOC *)blot->palloc;
+                sprite->transform = (QW *)heap->Alloc(0x20, 0x1F);
             }
-            QW *dst = ent->transform;
+            QW *dst = sprite->transform;
             dst[0] = src[0];
             dst[1] = src[1];
             return;

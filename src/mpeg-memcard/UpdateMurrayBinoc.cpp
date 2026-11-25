@@ -1,13 +1,14 @@
-extern "C" int FButtonPressedWithin(int, int, float);
-extern "C" int StopBinoc(char *);
-extern "C" void UpdateBinoc(char *);
+#include "murray.h"
+extern "C" int FButtonPressedWithin(JOY *, int, float);
+extern "C" int StopBinoc(void *);
+extern "C" void UpdateBinoc(void *);
 extern "C" int bevy_player_p15_binoc_active();
 
-extern "C" void UpdateMurrayBinoc(char *obj) {
+extern "C" void UpdateMurrayBinoc(MURRAY *obj) {
     if (bevy_player_p15_binoc_active() != 0) {
-        char *binoc = obj + 0xF00;
-        if (*(int *)(obj + 0xF04) == 1 && *(int *)(obj + 0xF20) == 0 &&
-            FButtonPressedWithin(*(int *)(obj + 0x150), 0x4F0, 0.25f) != 0) {
+        void *binoc = obj->PvBinoc();
+        if (obj->binocState == 1 && obj->binocPhase == 0 &&
+            FButtonPressedWithin(obj->pjoy, 0x4F0, 0.25f) != 0) {
             StopBinoc(binoc);
         }
         UpdateBinoc(binoc);

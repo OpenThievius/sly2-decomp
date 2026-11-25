@@ -175,6 +175,8 @@ struct CHASER : SOHIT {
     u8 unknown_0x368[0x8];
     /* 0x370 */ f32 field_0x370;    /* Chaser_Init sets -FLT_MAX */
     /* 0x374 */ f32 field_0x374;    /* Chaser_Init sets FLT_MAX */
+    u8 unknown_0x378[0xC];
+    /* 0x384 */ f32 speedGain;     /* reader: Chaser_SetSpeedGain (func_001813F0), a method of the class, so certain */
 };
 
 /* a Swarm rider (0x64+ bytes; the swarm keeps them in its groups' lists and its dead list, linked through the DLE at 0x60) */

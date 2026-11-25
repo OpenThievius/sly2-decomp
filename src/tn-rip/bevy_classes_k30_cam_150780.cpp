@@ -1,13 +1,12 @@
-#include "types.h"
+#include "cm.h"
 extern "C" {
-struct Cam_2DDF40 { char pad[0x90]; s128 position; };
-extern Cam_2DDF40 B_002DDF40;
+extern CM B_002DDF40;
 extern char B_003DD490;
 s128 PosLoWorld(int);
 int PpoSwFocus(char *);
-s128 bevy_classes_k30_cam_150780(char *self) {
+s128 bevy_classes_k30_cam_150780(K30CAM *self) {
     s128 position;
-    int target = *(int *)(self + 0x10);
+    int target = self->field_0x10;
     if (target != 0) {
         position = PosLoWorld(target);
     } else {
@@ -16,7 +15,7 @@ s128 bevy_classes_k30_cam_150780(char *self) {
             position = PosLoWorld(focus);
             ((float *)&position)[2] += 150.0f;
         } else {
-            position = B_002DDF40.position;
+            position = B_002DDF40.mat.row[3];
         }
     }
     return position;

@@ -14,5 +14,7 @@ typedef struct DMACHANNEL {
     s32 quadwords;    /* 0x20 */
     u8 unknown_0x24[0xC];
     s32 tagAddress;   /* 0x30 */
+    u8 unknown_0x34[0x4C];
+    s32 scratchAddress; /* 0x80: the scratchpad address (SADR); reader: SaveSprBuf */
 } DMACHANNEL;
 #endif

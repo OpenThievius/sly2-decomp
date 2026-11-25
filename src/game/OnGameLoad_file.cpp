@@ -31,7 +31,7 @@ void FillScreenRectImpl(RGBA *prgba, GIFS *pgifs, float x0, float y0, float x1, 
 
 INCLUDE_ASM(0X1CD780);
 
-struct Slot_1CD998 { char pad[8]; char data[8]; };
+struct Slot_1CD998 { u8 unknown_0x0[8]; char data[8]; };
 
 extern "C" Slot_1CD998 *B_003D4A50;
 
@@ -54,7 +54,7 @@ extern "C" void func_001CD9E0(SW *sw)
         if (!(bits & 1))
             bits = *(unsigned *)bits;
         if ((bits & 8) && so->islot != sw->frame)
-            func_001681F8((char *)so + 0x80);
+            func_001681F8(&so->field_0x80);
     }
 }
 

@@ -1,6 +1,7 @@
 #include "sly2.h"
 #include "vu0inline.h"
 struct CRef { int tagk; void *pv; CRef(int tag); ~CRef(); };
+struct CPair { int cref; u8 unknown_0x4[4]; CRef ref; CPair *next; }; /* a Splice list node, as RefOpMatrix and func_00121578 read it */
 struct Rows { QW row[3]; };
 struct Vec { QW q; };
 extern "C" {
@@ -20,7 +21,7 @@ CRef *RefOpMatrixLookAt(CRef *result, int count, CRef *args)
     if (args[2].tagk == 0)
         up = &g_2a2dc0;
     else
-        up = *(QW **)((char *)args[2].pv + 0xC);
+        up = (QW *)((CPair *)args[2].pv)->ref.pv;
     direction[0] = VectorSub(*(QW *)args[1].pv, *(QW *)args[0].pv);
     CRef temp(0x1B);
     QW *dest = (QW *)temp.pv;

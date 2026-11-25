@@ -1,24 +1,32 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+/* no cfont.h: it brings types.h, whose QW is a typedef, and the DMA methods below mangle a struct QW (P2QW) */
 struct QW;
 struct DMAS { void AddDmaCnt(); void AddDmaRefs(int, QW *); void EndDmaCnt(); };
-struct GIFS : DMAS { char pad[8]; };
+struct GIFS : DMAS {};
+/* the bitmap font: fontk (CFONT's first field), then the DMA blocks FEnsureLoaded sends (read by this method only) */
 struct CFontBrx {
-    int fontk; char pad0[0x58 - 4];
-    int cbBmp; QW *pqwBmp; char pad1[0xC0 - 0x60];
-    int cbBmp2; QW *pqwBmp2; int cbClut; QW *pqwClut; char pad2[0x130 - 0xD0];
-    int cb3; QW *pqw3;
+    /* 0x00 */ int fontk;
+    unsigned char unknown_0x4[0x58 - 4];
+    /* 0x58 */ int cbBmp; QW *pqwBmp;
+    unsigned char unknown_0x60[0xC0 - 0x60];
+    /* 0xC0 */ int cbBmp2; QW *pqwBmp2;
+    /* 0xC8 */ int cbClut; QW *pqwClut;
+    unsigned char unknown_0xD0[0x130 - 0xD0];
+    /* 0x130 */ int cb3; QW *pqw3;
     int FEnsureLoaded(GIFS *);
 };
+/* the frame being built (FRM, frm.h): FEnsureLoaded keeps a bit per font loaded into it at 0x2C (one reader, so a view) */
+struct FRMFONTS { unsigned char unknown_0x0[0x2C]; unsigned fontsLoaded; };
 extern GIFS B_002DEA00;
-extern "C" char *g_2dea4c;
+extern "C" FRMFONTS *g_2dea4c;
 int CFontBrx::FEnsureLoaded(GIFS *pgifs)
 {
     int fLoad;
     if (pgifs == &B_002DEA00) {
         unsigned bit = 1u << fontk;
-        unsigned loaded = *(unsigned *)(g_2dea4c + 0x2C);
+        unsigned loaded = g_2dea4c->fontsLoaded;
         fLoad = (loaded & bit) == 0;
-        *(unsigned *)(g_2dea4c + 0x2C) = loaded | bit;
+        g_2dea4c->fontsLoaded = loaded | bit;
     } else
         fLoad = 1;
     if (fLoad) {

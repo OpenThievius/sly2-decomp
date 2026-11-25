@@ -32,7 +32,7 @@ extern "C" void UpdateMurrayStandOn(MURRAY *self)
             if (0.7f < level) {
                 if (!(pcontact->pso->grfso & 0x20000000UL)) {
                     if (((MURRAYSTANDVIEW *)self)->field_0x108C == 0)
-                        AddSafePointOnGeom((char *)self + 0x9E0, pcontact->field_0x40, pcontact->pos);
+                        AddSafePointOnGeom(self->PvPart9E0(), pcontact->field_0x40, pcontact->pos);
                 }
             }
         }

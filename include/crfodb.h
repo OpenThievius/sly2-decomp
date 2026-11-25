@@ -9,7 +9,8 @@
 struct LOOT;
 
 struct CRFODB : LO {
-    u8 unknown_0x50[0x134];
+    u8 unknown_0x50[0x130];
+    /* 0x180 */ u32 oid; /* readers: PostCrfodbLoad stores the next object id from the world (B_003DD490.oidNext); PpathCrfodbLoot reads its low half (lhu) as the last symbol of the crate's save path */
     /* 0x184 */ s32 idLootDefault; /* IdlootCrfodb: the loot id the crate carries when the save has none */
     /* 0x188 */ s32 kind;       /* Crfodb_OnGrab (compared with the held loot's kind) */
     /* 0x18C */ f32 field_0x18C; /* reader: InitCrfodb (sets 15.0f) */

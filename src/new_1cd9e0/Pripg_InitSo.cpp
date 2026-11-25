@@ -2,6 +2,8 @@
 
 struct PRIPG : SO {
     /* 0x150 */ s32 unk150;
+    u8 unknown_0x154[8];
+    /* 0x15C */ DL dlMembers; /* reader: Pripg_InitSo (InitDl) */
 };
 void InitDl(DL *, int);
 extern "C" {
@@ -13,7 +15,7 @@ void SetSoNoXpsAll(SO *, int);
 extern "C" void Pripg_InitSo(PRIPG *so)
 {
     InitSo(so);
-    InitDl((DL *)((char *)so + 0x15C), 0xC);
+    InitDl(&so->dlMembers, 0xC);
     func_001A6CA8(so, 1);
     unsigned bits = so->grfSw;
     if (!(bits & 1)) {

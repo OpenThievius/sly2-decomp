@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "guard.h"
 #include "attach.h"
 #include "stepguard.h"
 #include "vu0inline.h"
@@ -27,7 +28,7 @@ extern "C" void ForgetJtGuards(ATTACH *pattach)
     QW posTarget;
     for (STEPGUARD *pguard = (STEPGUARD *)B_003E1444.head; pguard != 0; pguard = pguard->pnext) {
         SENSORENTRY *pentry = PentryFindSensorLo(pguard->psensor, pattach->pjt);
-        if (pentry != 0 && pentry->state != 0 && (*(int *)((char *)pguard->psensor + 0xF8) & 1) == 0) {
+        if (pentry != 0 && pentry->state != 0 && (pguard->psensor->grfSensing & 1) == 0) {
             posGuard = PosLoWorld(pguard);
             posTarget = PosLoWorld(pattach->pjt);
             float distance = LaneX(SqrtX(SquaredLength(VectorSub(posGuard, posTarget))));

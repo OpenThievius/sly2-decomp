@@ -9,7 +9,7 @@
 
 extern "C" {
 typedef struct ACCMISS {
-    char pad0[0x100];
+    u8 unknown_0x0[0x100];
     s128 field_0x100;
     s128 field_0x110;
 } ACCMISS;
@@ -27,14 +27,16 @@ void InitAccmiss__FP7ACCMISS(ACCMISS *accmiss) {
 }
 }
 
-struct CAMOBJ {
-    char pad0[0x28];
-    u64 field_0x28;
-    char pad30[0xF4];
-    s32 field_0x124;
-    char pad128[4];
-    s32 field_0x12C;
-    f32 field_0x130;
+/* The camera object, an LO (grfo at 0x28, vtable at 0xC); the fields past it are the ones its policy and slots read. */
+struct CAMOBJ : LO {
+    u8 unknown_0x50[0x90];
+    /* 0xE0 */ void *target; /* reader: CplcyCamobj_Update looks at it instead of taking its own orientation */
+    u8 unknown_0xE4[0x3C];
+    /* 0x120 */ s32 fReset; /* reader: bevy_classes_k30_cam_deactivate */
+    /* 0x124 */ s32 fActive; /* Camobj_PostLoLoad sets it; Camobj_AddLoHierarchy and Camobj_RemoveLoHierarchy test it */
+    /* 0x128 */ f32 focal; /* Camobj_PgFocalLength returns its address; CplcyCamobj_Update */
+    /* 0x12C */ s32 cFovUsers; /* Camobj_AddFocalUser and Camobj_RemoveFocalUser count it; CplcyCamobj_Update tests it */
+    /* 0x130 */ f32 fov; /* reader: bevy_classes_k30_cam_activate, a nonzero one is passed to SetCmFov */
 };
 
 extern "C" f32 PostLoLoad();
@@ -44,62 +46,52 @@ void RevokeCmPolicy(CM *, int, CPP, CPLCY *, SO *, void *);
 
 extern "C" void Camobj_PostLoLoad(CAMOBJ *camobj) {
     PostLoLoad();
-    camobj->field_0x124 = 1;
-    if ((int)(camobj->field_0x28 >> 0x3C) & 1) {
+    camobj->fActive = 1;
+    if ((int)(camobj->grfo >> 0x3C) & 1) {
         SetCmPolicy(&B_002DDF40, CPP_CAMOBJ, &B_002DDF40.cplcyCamobj, 0, camobj);
     }
 }
 
-extern "C" void AddLoHierarchy(char *arg0);
+extern "C" void AddLoHierarchy(CAMOBJ *camobj);
 
-extern "C" void Camobj_AddLoHierarchy(char *arg0) {
-    AddLoHierarchy(arg0);
-    if (*(int *)(arg0 + 0x124) != 0) {
-        SetCmPolicy(&B_002DDF40, CPP_CAMOBJ, &B_002DDF40.cplcyCamobj, 0, arg0);
+extern "C" void Camobj_AddLoHierarchy(CAMOBJ *camobj) {
+    AddLoHierarchy(camobj);
+    if (camobj->fActive != 0) {
+        SetCmPolicy(&B_002DDF40, CPP_CAMOBJ, &B_002DDF40.cplcyCamobj, 0, camobj);
     }
 }
 
 extern "C" void RemoveLoHierarchy();
 
-extern "C" void Camobj_RemoveLoHierarchy(char *arg0)
+extern "C" void Camobj_RemoveLoHierarchy(CAMOBJ *camobj)
 {
     RemoveLoHierarchy();
-    if (*(int *)(arg0 + 0x124) != 0) {
-        RevokeCmPolicy(&B_002DDF40, 0xF, CPP_CAMOBJ, &B_002DDF40.cplcyCamobj, 0, arg0);
+    if (camobj->fActive != 0) {
+        RevokeCmPolicy(&B_002DDF40, 0xF, CPP_CAMOBJ, &B_002DDF40.cplcyCamobj, 0, camobj);
     }
 }
 
 extern "C" {
-s32 Camobj_PgFocalLength(s32 arg0) {
-    return arg0 + 0x128;
+f32 *Camobj_PgFocalLength(CAMOBJ *camobj) {
+    return &camobj->focal;
 }
 }
 
 extern "C" {
-typedef struct CAMOBJ_12E740 {
-    char pad0[0x12C];
-    s32 field_0x12C;
-} CAMOBJ_12E740;
-
-void Camobj_AddFocalUser(CAMOBJ_12E740 *camobj) {
-    camobj->field_0x12C = camobj->field_0x12C + 1;
+void Camobj_AddFocalUser(CAMOBJ *camobj) {
+    camobj->cFovUsers = camobj->cFovUsers + 1;
 }
 }
 
 extern "C" {
-typedef struct CAMOBJ_12E750 {
-    char pad0[0x12C];
-    s32 field_0x12C;
-} CAMOBJ_12E750;
-
-void Camobj_RemoveFocalUser(CAMOBJ_12E750 *camobj) {
-    camobj->field_0x12C = camobj->field_0x12C - 1;
+void Camobj_RemoveFocalUser(CAMOBJ *camobj) {
+    camobj->cFovUsers = camobj->cFovUsers - 1;
 }
 }
 
 extern "C" {
 typedef struct CAMOBJ_12E760 {
-    char pad0[0xC];
+    u8 unknown_0x0[0xC];
     void *field_0xC;
 } CAMOBJ_12E760;
 
@@ -114,18 +106,16 @@ CAMOBJ_12E760 *InitCplcyCamobj(CAMOBJ_12E760 *camobj) {
 }
 }
 
-/* The camera object as the policy reads it (CPLCYCAMOBJ::pcamobj, the third argument of the policy's Activate). */
-struct Camobj { char pad[0xE0]; void *target; char pad1[0x44]; float focal; int hasFov; float fov; };
 
 extern "C" void ActivateCplcy();
 
 extern "C" void SetCmFov(CM *, f32);
 
-extern "C" void bevy_classes_k30_cam_activate(CPLCYCAMOBJ *self, s32 arg1, Camobj *target) {
+extern "C" void bevy_classes_k30_cam_activate(CPLCYCAMOBJ *self, s32 arg1, CAMOBJ *target) {
     f32 fov;
 
     ActivateCplcy();
-    self->pcamobj = (LO *)target;
+    self->pcamobj = target;
     fov = target->fov;
     if (fov != 0.0f) {
         SetCmFov(&B_002DDF40, fov);
@@ -133,10 +123,6 @@ extern "C" void bevy_classes_k30_cam_activate(CPLCYCAMOBJ *self, s32 arg1, Camob
 }
 
 extern "C" {
-struct CMLIKE {
-    char pad[0x120];
-    s32 fReset;
-};
 
 s32 DeactivateCplcy(void *, s32, void *);       /* extern */
 
@@ -144,8 +130,8 @@ s32 SetResetFlag__FP2CM_12E7F0(s32 *);             /* extern */
 
 extern s32 B_002DDF40_12E7F0;
 
-void bevy_classes_k30_cam_deactivate(CPLCYCAMOBJ *pk30cam, s32 arg1, struct CMLIKE *pcm) {
-    if ((struct CMLIKE *)pk30cam->pcamobj == pcm) {
+void bevy_classes_k30_cam_deactivate(CPLCYCAMOBJ *pk30cam, s32 arg1, CAMOBJ *pcm) {
+    if (pk30cam->pcamobj == pcm) {
         if (pcm->fReset != 0) {
             SetResetFlag__FP2CM_12E7F0(&B_002DDF40_12E7F0);
         }
@@ -185,7 +171,7 @@ static inline float GClamp(float g, float lo, float hi)
 
 extern "C" void CplcyCamobj_Update(CPLCYCAMOBJ *self)
 {
-    Camobj *camobj = (Camobj *)self->pcamobj;
+    CAMOBJ *camobj = (CAMOBJ *)self->pcamobj;
     if (camobj->target) {
         QW eye = PosLoWorld(camobj);
         QW tgt = PosLoWorld(camobj->target);
@@ -218,7 +204,7 @@ extern "C" void CplcyCamobj_Update(CPLCYCAMOBJ *self)
         ((float *)&mat->row[3])[3] = 1.0f;
         SetCmPosMat(&B_002DDF40, mat);
     }
-    if (camobj->hasFov > 0) {
+    if (camobj->cFovUsers > 0) {
         float fov = GClamp(2.0f * atanf(17.995901f / camobj->focal), 0.01f, 3.0f);
         SetCmFov(&B_002DDF40, fov);
     }

@@ -1,22 +1,17 @@
-#include "types.h"
-#define NULL 0
+#include "sly2.h"
+#include "cref.h"
+struct CFrame;
 extern "C" {
+void CRef_ConstructMatrix(CRef *ref, MATRIX4 *matrix);
+void TransposeMatrix4(MATRIX4 *dest, MATRIX4 *src);
 
-void CRef_ConstructMatrix(void *ref, void *matrix);
-void CRef_CopyConstruct(s32 dest, void *ref);
-void CRef_Destruct(void *ref);
-void TransposeMatrix4(void *dest, s32 src);
+CRef RefOpMatrixTranspose(int carg, CRef *aref, CFrame *pframe) {
+    CRef refTranspose;
+    MATRIX4 matrix;
 
-s32 RefOpMatrixTranspose(s32 arg0, s32 unused_a1, void *arg2) {
-    char sp[0x50];
-    char *matrix;
-
-    matrix = sp + 0x10;
-    TransposeMatrix4(matrix, *(s32 *)((char *)arg2 + 4));
-    CRef_ConstructMatrix(sp, matrix);
-    CRef_CopyConstruct(arg0, sp);
-    CRef_Destruct(sp);
-    return arg0;
+    TransposeMatrix4(&matrix, aref[0].m_tag.m_pmatrix);
+    CRef_ConstructMatrix(&refTranspose, &matrix);
+    return refTranspose;
 }
 
 }

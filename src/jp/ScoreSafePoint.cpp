@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
 #include "sw.h"
+#include "step.h"
 #include "ps2inline.h"
 #include "vu0inline.h"
 
@@ -12,11 +13,10 @@ struct LSG {
     int unk48;
     int aiface[2];
     void *pedge;
-    char pad58[0x60 - 0x58];
+    u8 unknown_0x58[0x60 - 0x58];
 };
 struct SAFEPOINT { void *pbasic; int field4; int field8; int fieldC; QW pos; };
-struct SAFEPOINTLIST { void *pjt; };
-struct LOPOS { char pad[0x218]; QW *ppos; };
+struct SAFEPOINTLIST { STEP *pjt; };
 struct ALO;
 extern "C" {
 void CStackFrame_Construct(void *);
@@ -43,7 +43,7 @@ static inline float GClamp(float g, float gMin, float gMax)
     return g;
 }
 
-extern "C" float ScoreSafePoint(SAFEPOINTLIST *plist, SAFEPOINT *ppoint, int cplo, LOPOS **aplo)
+extern "C" float ScoreSafePoint(SAFEPOINTLIST *plist, SAFEPOINT *ppoint, int cplo, STEP **aplo)
 {
     char frame[0x10];
     VU_VECTOR start;
@@ -56,7 +56,7 @@ extern "C" float ScoreSafePoint(SAFEPOINTLIST *plist, SAFEPOINT *ppoint, int cpl
     pos = func_0019F3F8(plist->pjt, ppoint, score);
     if (ppoint->field8 != 0) {
         CStackFrame_Construct(frame);
-        IntersectSwBoundingSphere(&B_003DD490, pos, FFilterOxa, *(void **)((char *)plist->pjt + 0xEC), &calo, g_2bf944, &apalo);
+        IntersectSwBoundingSphere(&B_003DD490, pos, FFilterOxa, plist->pjt->poxa, &calo, g_2bf944, &apalo);
         start.v = *(VECTOR *)&pos;
         end.v = *(VECTOR *)&pos;
         start.v.z += 125.0f;

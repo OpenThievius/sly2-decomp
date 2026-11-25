@@ -67,16 +67,23 @@ struct JOB : LO {
 struct JOB {
     u8 unknown_0x0[0x50];
 #endif
-    u8 unknown_0x50[0x14];
+    /* 0x50 */ s32 disabled;            /* reader: OnJobEvent (JOB's own event handler): a job with it set restarts on event 0x10 */
+    /* 0x54 */ s32 cevFail;             /* reader: OnJobEvent: the events that fail the job */
+    /* 0x58 */ s32 *aevFail;            /* the same, the list */
+    /* 0x5C */ s32 cevComplete;         /* reader: OnJobEvent: the events that complete the job */
+    /* 0x60 */ s32 *aevComplete;        /* the same, the list */
     /* 0x64 */ struct TASK *ptaskStart; /* NotifyJobTaskState activates the job when this task reports; bevy_jobs_162df8 restarts at it */
     /* 0x68 */ struct TASK *ptaskEnd;   /* NotifyJobTaskState begins the completion; FEndTaskComplete, PublishJobEnd */
     /* 0x6C */ s32 field_0x6C;          /* InitJob sets -1 */
     /* 0x70 */ s32 field_0x70;          /* InitJob sets -1 */
     u8 unknown_0x74[0x4];
     /* 0x78 */ s32 field_0x78;          /* PublishJobEnd: when 0 it sets the end task's state and autosaves */
-    u8 unknown_0x7C[0x4];
+    /* 0x7C */ s32 count;               /* reader: StartJob adds 1 (JOB's own function) */
     /* 0x80 */ struct SLLIST sllist;    /* InitJob */
-    u8 unknown_0x8C[0x10];
+    /* 0x8C */ s32 ctoggle;             /* readers: StartJob, StopJob pass ctoggle and atoggle to ApplyTaskToggles (two agree) */
+    /* 0x90 */ void *atoggle;
+    /* 0x94 */ s32 canim;               /* readers: StartJob, StopJob pass canim, aanim and cause to ApplyTaskAnims (two agree) */
+    /* 0x98 */ void *aanim;
     /* 0x9C */ f32 field_0x9C;          /* InitJob sets 480.0f */
     /* 0xA0 */ f32 field_0xA0;          /* InitJob sets 720.0f */
     u8 unknown_0xA4[0x8];
@@ -84,5 +91,7 @@ struct JOB {
     /* 0xB0 */ s32 field_0xB0;          /* same */
     /* 0xB4 */ s32 field_0xB4;          /* same */
     /* 0xB8 */ void *field_0xB8;        /* BeginJobComplete: non-null starts the end sequence */
+    u8 unknown_0xBC[0x34];
+    /* 0xF0 */ s32 cause;               /* readers: StartJob, StopJob (the last argument of ApplyTaskAnims) */
 };
 #endif

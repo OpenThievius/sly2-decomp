@@ -33,14 +33,14 @@ extern "C" void func_0012C768(ACRAXIS *pacr, XF *pxf) {
     float *outB = (float *)&pxf->velGoal;
     float *outA = (float *)&pxf->posGoal;
     do {
-        char *base = (char *)pacr->aaxis[axis];
+        float *base = pacr->aaxis[axis];
         if (base != 0) {
-            char *previous = base + previousOffset;
-            char *current = base + offset;
-            *outA = *(float *)previous;
-            *outB = *(float *)(previous + 4);
-            *outC = *(float *)current;
-            *outD = *(float *)(current + 4);
+            float *previous = (float *)((char *)base + previousOffset);
+            float *current = (float *)((char *)base + offset);
+            *outA = previous[0];
+            *outB = previous[1];
+            *outC = current[0];
+            *outD = current[1];
         } else {
             *outA = pacr->adefault[axis];
             *(int *)outB = 0;

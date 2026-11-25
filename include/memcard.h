@@ -33,7 +33,11 @@ typedef struct MCFILEINFO {
 } MCFILEINFO;
 
 /* a pointer to member function as g++ 2.95 stores it (8 bytes), copied as a whole */
-typedef struct MCPMF { char b[8]; } MCPMF;
+typedef struct MCPMF {
+    /* 0x0 */ s16 delta; /* reader: MemcardThreadMain adds it to the object's address (g++ 2.95 pointer to member) */
+    /* 0x2 */ s16 index;
+    /* 0x4 */ int (*pfn)(void *); /* reader: MemcardThreadMain calls it */
+} MCPMF;
 typedef struct MEMCARD {
     /* 0x00 */ s32 semaphoreId;
     /* 0x04 */ s32 threadId; /* -1 when there is no thread */

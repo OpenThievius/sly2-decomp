@@ -1,10 +1,12 @@
 #include "types.h"
-void func_00257038(void* a0, void* a1)
+struct REFCOUNTED {
+    s32 cRef; /* reader: func_00257038 (incremented when a reference is taken) */
+};
+void func_00257038(REFCOUNTED **ppDestination, REFCOUNTED *pSource)
 {
-    if (a1 != 0)
+    if (pSource != 0)
     {
-        int* v0 = (int*)a1;
-        *(int*)((char*)v0 + 0) = *(int*)((char*)v0 + 0) + 1;
+        pSource->cRef = pSource->cRef + 1;
     }
-    *(int*)a0 = (sptr)a1;
+    *ppDestination = pSource;
 }

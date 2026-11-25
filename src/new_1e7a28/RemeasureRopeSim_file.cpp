@@ -8,16 +8,16 @@
 
 extern "C" {
 struct RopeSimData {
-    char pad0[0xE8];
+    u8 unknown_0x0[0xE8];
     s32 field_0xE8;
-    char pad_0xEC[4];
+    u8 unknown_0xEC[4];
     s32 field_0xF0;
 };
 
 struct RopeSim {
-    char pad0[0x48];
+    u8 unknown_0x0[0x48];
     struct RopeSimData *field_0x48;
-    char pad4C[0x5C - 0x4C];
+    u8 unknown_0x4C[0x5C - 0x4C];
     s32 field_0x5C;
 };
 
@@ -40,18 +40,22 @@ INCLUDE_ASM(0X1E9AC0);
 extern "C" {
 
 s32 PvAllocSwClearImpl__Fi(s32 *info);
-s32 BuildCrvExcludedRanges(s32 ranges, char *owner);
+struct CRVHOLDER {
+    u8 unknown_0x0[0x180];
+    /* 0x180 */ s32 ranges; /* reader: EnsureCrvExcludedRanges (the allocated CRVEX block), BuildCrvExcludedRanges */
+};
+s32 BuildCrvExcludedRanges(s32 ranges, struct CRVHOLDER *owner);
 
-void EnsureCrvExcludedRanges(char *arg0) {
+void EnsureCrvExcludedRanges(struct CRVHOLDER *arg0) {
     /* Two-word argument block; the frame keeps the full 16 bytes. */
     s32 info[4];
     s32 allocated;
 
-    if (*(s32 *)(arg0 + 0x180) == 0) {
+    if (arg0->ranges == 0) {
         info[0] = 0x9C;
         info[1] = 0x10;
         allocated = PvAllocSwClearImpl__Fi(info);
-        *(s32 *)(arg0 + 0x180) = allocated;
+        arg0->ranges = allocated;
         BuildCrvExcludedRanges(allocated, arg0);
     }
 }
@@ -83,7 +87,7 @@ INCLUDE_ASM(0X1EA000);
 
 struct RANGE { float lo; float hi; };
 
-struct CRVEX { char pad[0xC]; int crange; RANGE arange[1]; };
+struct CRVEX { u8 unknown_0x0[0xC]; int crange; RANGE arange[1]; };
 
 extern "C" RANGE *PgFindCrvExcludedRange(CRVEX *crv, float s)
 {

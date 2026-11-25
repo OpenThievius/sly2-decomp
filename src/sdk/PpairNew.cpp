@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
 #include "sw.h"
+#include "pairnode.h"
 extern "C" {
 void *PvAllocSlotheapImpl(SLOTHEAP *);
 void FreeSlotheapPv(SLOTHEAP *, void *);
@@ -21,10 +22,10 @@ void *PpairNew(void)
             B_00452098[B_002DD284++] = chunk;
         }
     }
-    char *p = (char *)PvAllocSlotheapImpl(&B_004520A8);
+    PAIRNODE *p = (PAIRNODE *)PvAllocSlotheapImpl(&B_004520A8);
     func_002550A0(p);
-    *(int *)(p + 8) = -1;
-    *(int *)(p + 0x10) = 0;
+    p->field_0x8 = -1;
+    p->field_0x10 = 0;
     return p;
 }
 }

@@ -6,6 +6,12 @@ struct MATRIX44 { float mat[4][4]; } __attribute__((aligned(16)));
 struct ROWS3 { VECTOR row[3]; };
 // local view: the blend duration sits inside LOOT's unknown span, read here only
 struct LOOTBLENDVIEW { u8 unknown_0x0[0x180]; float dtBlend; };
+/* RenderLoot's stack frame: the scale vector, the matrix it hands to func_001A5EE8 and the one LoadMatrixFromPosRotScale builds */
+struct LOOTRENDERFRAME {
+    QW scale;
+    MATRIX44 matRender;
+    MATRIX44 matBuilt;
+};
 struct LM { float lo; float hi; };
 extern "C" LM g_2bbb60;
 extern const float RO_002A4B30[4];
@@ -26,26 +32,26 @@ static inline float GLimitLm(LM *plm, float g)
 }
 extern "C" void RenderLoot(LOOT *ploot)
 {
-    char buf[0x90] __attribute__((aligned(16)));
+    LOOTRENDERFRAME frame;
     switch (ploot->state) {
     case 4: {
         float dtBlend = ((LOOTBLENDVIEW *)ploot)->dtBlend;
         float elapsed = g_2dded0.t - ploot->tState;
         if (dtBlend <= elapsed) {
-            *(QW *)buf = ploot->vHeld;
+            frame.scale = ploot->vHeld;
         } else {
             float u = elapsed / dtBlend;
             float gBlend = GLimitLm(&g_2bbb60, RO_002A4B30[0] + u * (RO_002A4B30[1] + u * RO_002A4B30[2]));
             float *pheld = (float *)&ploot->vHeld;
-            float *pscale = (float *)buf;
+            float *pscale = (float *)&frame.scale;
             for (int iaxis = 0; iaxis < 3; iaxis++)
                 pscale[iaxis] = (1.0f - gBlend) + gBlend * pheld[iaxis];
         }
-        MATRIX44 *pmat = (MATRIX44 *)(buf + 0x50);
+        MATRIX44 *pmat = &frame.matBuilt;
         QW pos = PosLoWorld(ploot);
-        LoadMatrixFromPosRotScale(pmat, pos, PmatLoWorld(ploot), (float *)buf);
-        *(MATRIX44 *)(buf + 0x10) = *(MATRIX44 *)(buf + 0x50);
-        func_001A5EE8(ploot, (MATRIX44 *)(buf + 0x10), 1.0f, 1.0f);
+        LoadMatrixFromPosRotScale(pmat, pos, PmatLoWorld(ploot), (float *)&frame.scale);
+        frame.matRender = frame.matBuilt;
+        func_001A5EE8(ploot, &frame.matRender, 1.0f, 1.0f);
         break;
     }
     case 1:

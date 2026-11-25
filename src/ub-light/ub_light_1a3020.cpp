@@ -25,24 +25,6 @@ void func_001A3070(s32 *pvalue) {
 }
 }
 
-struct VT { u8 unknown_0x0[0x188]; short delta; short index; void (*fn)(void *, int); };
-
-struct Obj { u8 unknown_0x0[0xC]; VT *vptr; };
-
-extern "C" void func_00227788(void *);
-
-extern char B_004435F0[];
-
-extern "C" void func_001A3078(Obj **slot)
-{
-    if (*slot) {
-        func_00227788(B_004435F0);
-        Obj *obj = *slot;
-        VT *vt = obj->vptr;
-        vt->fn((char *)obj + vt->delta, -1);
-    }
-}
-
 struct Obj_1A30D0 {
     u8 unknown_0x0[0xC];
     virtual void v0();
@@ -93,9 +75,21 @@ struct Obj_1A30D0 {
     virtual void v45();
     virtual void v46();
     virtual void v47();
-    virtual void v48();
+    virtual void v48(int arg); /* slot 49: func_001A3078 calls it with -1 */
     virtual void Target();
 };
+
+extern "C" void func_00227788(void *);
+
+extern char B_004435F0[];
+
+extern "C" void func_001A3078(Obj_1A30D0 **slot)
+{
+    if (*slot) {
+        func_00227788(B_004435F0);
+        (*slot)->v48(-1);
+    }
+}
 
 void func_001A30D0(Obj_1A30D0 **holder)
 {

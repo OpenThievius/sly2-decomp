@@ -2,7 +2,7 @@
 #include "sly2.h"
 struct B12 { int w[3]; };
 struct KEYB { float pos[3]; float t; QW in; QW out; };
-struct ACRB { int pad0; int pad4; KEYB *akey; };
+struct ACRB { u8 unknown_0x0[8]; KEYB *akey; };
 extern "C" int IkeyFindAcrb(ACRB *, float);
 extern "C" void EvaluateBezierPos__FfffP6VECTORN63(float, float, float, QW, QW, QW, QW, QW *, QW *, QW *);
 extern "C" void EvaluateAcrb(ACRB *pacrb, float t, float svt, QW *pvecPos, QW *pvecVel)

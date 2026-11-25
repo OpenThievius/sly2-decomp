@@ -12,10 +12,16 @@ extern "C" void func_00256528(void *, void *, void *);
 
 extern "C" char func_00119BC0[];
 
-void func_00119BD0(void *self, void *owner)
+/* the object func_00119BD0 builds: Vector_Init fills its start, func_00256528 appends a cursor to the list kept at 0x34 */
+struct CURSORHOLDER {
+    u8 unknown_0x0[0x34];
+    u8 field_0x34; /* reader: func_00119BD0 passes its address as the list */
+};
+
+void func_00119BD0(CURSORHOLDER *self, void *owner)
 {
     Vector_Init(self, owner);
-    func_00256528((char *)self + 0x34, self, func_00119BC0 + 8);
+    func_00256528(&self->field_0x34, self, func_00119BC0 + 8);
 }
 
 extern "C" void func_00118380(void *pbis, void **ppchz, void *pallocator, int grfAlloc);

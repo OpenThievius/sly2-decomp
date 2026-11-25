@@ -51,7 +51,7 @@ extern "C" void func_001B5D30(MURRAY *m, int focus)
         break;
     case 1:
         paseg = view->pasegFocus1;
-        ResetRunBlendFootsteps((char *)m + 0x1630);
+        ResetRunBlendFootsteps(m->runBlendD);
         grfapl = 9;
         break;
     }

@@ -4,8 +4,19 @@
 #include "sly2.h"
 #include "types.h"
 #include "m2c_macros.h"
+#include "so.h"
+#include "sw.h"
 
-struct BARRIER { char pad[0x148]; unsigned long grfso; };
+/* a barrier: an SO that lets through or stops the objects and classes it lists (FIgnoreBarrierIntersection) */
+struct BARRIER : SO {
+    /* 0x150 */ s32 coid;     /* reader: AddBarrierObject (count), FIgnoreBarrierIntersection */
+    /* 0x154 */ s32 aoid[4];  /* AddBarrierObject appends, FIgnoreBarrierIntersection passes each to FLoHasOid */
+    /* 0x164 */ s32 ccid;     /* AddBarrierClass (count), FIgnoreBarrierIntersection */
+    /* 0x168 */ s32 acid[4];  /* AddBarrierClass appends, FIgnoreBarrierIntersection passes each to FIsBasicDerivedFrom */
+    /* 0x178 */ s32 fAllow;   /* FIgnoreBarrierIntersection: the lists name what may pass instead of what is stopped */
+    /* 0x17C */ s32 psoToucher; /* NotifyBarrierImpact stores the object that touched it before each event */
+};
+
 
 extern "C" void InitSo(BARRIER *);
 
@@ -15,32 +26,26 @@ extern "C" void InitBarrier(BARRIER *pbarrier)
     pbarrier->grfso |= 0x400000000UL;
 }
 
-struct BARRIER_132100 { char pad[0xE8]; int pphys; };
+extern "C" SW B_003DD490;
 
-extern "C" char B_003DD490;
+extern "C" void PostSoLoad(BARRIER *);
 
-extern "C" void PostSoLoad(BARRIER_132100 *);
+extern "C" void RecalcSwOxfFilterForObject(SW *, BARRIER *);
 
-extern "C" void RecalcSwOxfFilterForObject(char *, BARRIER_132100 *);
-
-extern "C" void PostBarrierLoad(BARRIER_132100 *pbarrier)
+extern "C" void PostBarrierLoad(BARRIER *pbarrier)
 {
     PostSoLoad(pbarrier);
     if (pbarrier->pphys != 0)
         RecalcSwOxfFilterForObject(&B_003DD490, pbarrier);
 }
 
-struct SO;
-
-struct BARRIER_132140 { char pad[0x150]; int coid; int aoid[4]; int ccid; int acid[4]; int fAllow; };
-
 extern "C" int FLoHasOid(SO *, int);
 
 extern "C" int FIsBasicDerivedFrom(SO *, int);
 
-extern "C" int FIgnoreSoIntersection(BARRIER_132140 *, SO *);
+extern "C" int FIgnoreSoIntersection(BARRIER *, SO *);
 
-int FIgnoreBarrierIntersection(BARRIER_132140 *pbarrier, SO *psoOther)
+int FIgnoreBarrierIntersection(BARRIER *pbarrier, SO *psoOther)
 {
     int fMatched = 0;
     for (int ioid = 0; ioid < pbarrier->coid; ioid++) {
@@ -84,24 +89,20 @@ extern "C" void AdjustBarrierNewXp(s32 *arg0) {
     }
 }
 
-struct SIDE { int pad0[2]; int pso; char pad[0x34]; };
+struct SIDE { u8 unknown_0x0[8]; int pso; u8 unknown_0xC[0x34]; };
 
-struct XP { SIDE side[2]; char pad[0xAC - 0x80]; XP *pxpNext; };
+struct XP { SIDE side[2]; u8 unknown_0x80[0xAC - 0x80]; XP *pxpNext; };
 
 struct NODE { XP *pxpChain; NODE *pnodeNext; };
 
-struct OXA { char pad[0x64]; NODE *pnode; };
+struct OXA { u8 unknown_0x0[0x64]; NODE *pnode; };
 
-struct BARRIERVT { char pad[0x18]; short delta; short idx; void (*fn)(void *, int, int, int, int, int); };
-
-struct BARRIER_132298 { char pad0[0xC]; BARRIERVT *vt; char pad1[0xDC]; OXA *poxa; char pad2[0x8C]; int psoToucher; };
-
-extern "C" void NotifyBarrierImpact(BARRIER_132298 *pbarrier)
+extern "C" void NotifyBarrierImpact(BARRIER *pbarrier)
 {
     int apso[16];
     int cpso = 0;
     int ipso;
-    for (NODE *pnode = pbarrier->poxa->pnode; pnode != 0; pnode = pnode->pnodeNext) {
+    for (NODE *pnode = ((OXA *)pbarrier->poxa)->pnode; pnode != 0; pnode = pnode->pnodeNext) {
         for (XP *pxp = pnode->pxpChain; pxp != 0; pxp = pxp->pxpNext) {
             int fNotSelf = pxp->side[0].pso != (sptr)pbarrier;
             int pso = pxp->side[1 - fNotSelf].pso;
@@ -119,29 +120,25 @@ extern "C" void NotifyBarrierImpact(BARRIER_132298 *pbarrier)
 done:
     for (ipso = 0; ipso < cpso; ipso++) {
         pbarrier->psoToucher = apso[ipso];
-        pbarrier->vt->fn((char *)pbarrier + pbarrier->vt->delta, 5, 0, 0, 0, 0);
+        pbarrier->HandleSpliceEvent(5, 0, 0, 0, 0);
     }
 }
 
-struct S { char pad0[0x150]; unsigned count; void *items[4]; };
-
-void AddBarrierObject(S *self, void *item)
+void AddBarrierObject(BARRIER *self, s32 oid)
 {
-    unsigned count = self->count;
+    unsigned count = self->coid;
     if (count < 4) {
-        self->items[count] = item;
-        self->count = count + 1;
+        self->aoid[count] = oid;
+        self->coid = count + 1;
     }
 }
 
-struct S_1323F0 { char pad0[0x164]; unsigned count; void *items[4]; };
-
-void AddBarrierClass(S_1323F0 *self, void *item)
+void AddBarrierClass(BARRIER *self, s32 cid)
 {
-    unsigned count = self->count;
+    unsigned count = self->ccid;
     if (count < 4) {
-        self->items[count] = item;
-        self->count = count + 1;
+        self->acid[count] = cid;
+        self->ccid = count + 1;
     }
 }
 

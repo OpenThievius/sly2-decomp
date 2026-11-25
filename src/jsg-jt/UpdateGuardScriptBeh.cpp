@@ -1,22 +1,30 @@
-struct Guard_1713E8;
-struct GuardVt_1713E8 { char pad0[0x78]; short delta; short pad1; void (*fn)(char *, void *); };
-struct GuardNode_1713E8 { char pad[0x18]; GuardNode_1713E8 *next; };
-struct Guard_1713E8 { char pad0[0xC]; GuardVt_1713E8 *vt; char pad1[0x28]; GuardNode_1713E8 *node; };
+#include "goal.h"
+/* a command of a script (script.h PCMD): the link to the next one is at 0x18 */
+struct PCMDNODE {
+    u8 unknown_0x0[0x18];
+    PCMDNODE *next;
+};
+/* a guard's script behaviour (a GOAL, GUARDSCRIPTBEH of guardscriptbeh.h with its virtuals): pcmd is the current command */
+struct GUARDSCRIPTBEHV : GOAL {
+    u8 unknown_0x30[0x38 - 0x30];
+    /* 0x38 */ PCMDNODE *pcmd;
+    virtual void ExecuteCmd(PCMDNODE *pcmd); /* 15 */
+};
 extern "C" {
-int FGuardScriptWaiting(Guard_1713E8 *);
+int FGuardScriptWaiting(GUARDSCRIPTBEHV *);
 void func_001EEF98();
-void UpdateGuardScriptBeh(Guard_1713E8 *self) {
+void UpdateGuardScriptBeh(GUARDSCRIPTBEHV *self) {
     func_001EEF98();
-    if (self->node != 0) {
+    if (self->pcmd != 0) {
         do {
             if (FGuardScriptWaiting(self) != 0)
                 break;
-            GuardNode_1713E8 *next = self->node->next;
-            self->node = next;
+            PCMDNODE *next = self->pcmd->next;
+            self->pcmd = next;
             if (next == 0)
                 break;
-            self->vt->fn((char *)self + self->vt->delta, next);
-        } while (self->node != 0);
+            self->ExecuteCmd(next);
+        } while (self->pcmd != 0);
     }
 }
 }

@@ -16,8 +16,7 @@ void func_001C5098(DPRIZE *pdprize, int msgid, SMAMSG *pmsg)
                     int amsg[16];
                     amsg[0] = 1;
                     amsg[1] = (sptr)pdprize;
-                    const MSGSINKVT *vt = psink->vt;
-                    vt->fn((char *)psink + vt->delta, amsg);
+                    psink->Notify(amsg);
                 }
                 pdprize->SetDprizes(2);
             }

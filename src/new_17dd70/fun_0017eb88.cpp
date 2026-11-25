@@ -1,13 +1,18 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
-struct VT { char pad[0x40]; short delta; short index; void (*fn)(void *); };
-struct OBJ { char pad[0xC]; VT *vt; };
 #include "goal.h"
+struct GOALCRV : GOAL {
+    u8 unknown_0x30[0x78];
+    int g0;
+    int g1;
+    u8 unknown_0xB0[0xC];
+    int g2;
+};
 struct GOAL_17EB88 : GOAL {
     void *pcrv;
-    char pad_34[0x4];
+    u8 unknown_0x34[0x4];
     float s;
-    char pad_3C[0x4];
+    u8 unknown_0x3C[0x4];
     QW pos;
     int g0;
     int g1;
@@ -18,9 +23,8 @@ extern "C" QW PosLoWorld(void *);
 extern "C" char B_003DD020;
 extern "C" void FindCrvClosestPointFromS(void *, QW, float, void *, QW *, void *, void *, float *);
 extern "C" void FindCrvClosestPointAll(void *, QW, void *, QW *, void *, void *, float *);
-extern "C" OBJ *func_00205438(void *, int);
+extern "C" GOALCRV *func_00205438(void *, int);
 extern "C" void func_0017ECF0(GOAL_17EB88 *, int);
-#define F(o, off, T) (*(T *)((char *)(o) + (off)))
 void func_0017EB88(GOAL_17EB88 *pgoal)
 {
     func_001EEF70();
@@ -32,11 +36,10 @@ void func_0017EB88(GOAL_17EB88 *pgoal)
         posGuard = PosLoWorld(((void *)pgoal->pstep));
         FindCrvClosestPointAll(pgoal->pcrv, posGuard, &B_003DD020, &pgoal->pos, 0, 0, &pgoal->s);
     }
-    OBJ *pobj = func_00205438(((void *)pgoal->pstep), 0xBA);
-    F(pobj, 0xA8, int) = pgoal->g0;
-    F(pobj, 0xAC, int) = pgoal->g1;
-    F(pobj, 0xBC, int) = pgoal->g2;
+    GOALCRV *pobj = func_00205438(((void *)pgoal->pstep), 0xBA);
+    pobj->g0 = pgoal->g0;
+    pobj->g1 = pgoal->g1;
+    pobj->g2 = pgoal->g2;
     func_0017ECF0(pgoal, 1);
-    VT *vt = pobj->vt;
-    vt->fn((char *)pobj + vt->delta);
+    pobj->Activate();
 }

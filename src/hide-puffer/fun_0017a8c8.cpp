@@ -1,20 +1,18 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "stepguard.h"
-#include "goal.h"
+#include "goals.h"
 struct GOAL_17A8C8 : GOAL {
     int state;
     float tState;
 };
-struct VT { char pad[0x40]; short delta; short index; void (*fn)(void *); };
-struct OBJ { char pad[0xC]; VT *vt; char pad2[0x2C]; int kind; };
 struct B8 { char b[8]; };
-struct KT { B8 a; B8 b; int c; };
+struct KT { union { struct { B8 a; B8 b; int c; }; int sgs[5]; }; };
 extern "C" const KT RO_002A55A0;
 struct CLOCK { float t; float dt; };
 extern "C" CLOCK g_2dded0;
 extern "C" void Goal_Pop(void *);
 extern "C" void func_001EF038(GOAL_17A8C8 *);
-extern "C" OBJ *func_00205438(STEPGUARD *, int);
+extern "C" GOALANIM *func_00205438(STEPGUARD *, int);
 void func_0017A8C8(GOAL_17A8C8 *pgoal, int nState)
 {
     if (pgoal->state == nState)
@@ -25,12 +23,10 @@ void func_0017A8C8(GOAL_17A8C8 *pgoal, int nState)
     if (nState != -1) {
         if (nState > -2) {
             if (nState < 5) {
-                OBJ *pobj = func_00205438(((STEPGUARD *)pgoal->pstep), 0x9D);
+                GOALANIM *pobj = func_00205438(((STEPGUARD *)pgoal->pstep), 0x9D);
                 KT kinds = RO_002A55A0;
-                int scaled = pgoal->state << 2;
-                pobj->kind = *(int *)((char *)&kinds + scaled);
-                VT *vt = pobj->vt;
-                vt->fn((char *)pobj + vt->delta);
+                pobj->sgs = kinds.sgs[pgoal->state];
+                pobj->Activate();
                 ((STEPGUARD *)pgoal->pstep)->fDown = (unsigned)pgoal->state < 2;
             }
         }

@@ -1,33 +1,36 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
-struct QUERY { int fFound; char pad[0x2C]; };
+#include "jt.h"
 #include "xf.h"
 #include "so.h"
-struct ACT { char pad[0x1C]; float t; };
-#include "goal.h"
-struct GOAL_17ABC8 : GOAL {
-    char pad_30[0x2C];
-    void *ptarget;
-    int fHeld;
-    ACT *pact;
+#include "act.h"
+#include "stepguard.h"
+#include "goals.h"
+/* the 0x30-byte lead the player's goals pass (JT::PredictLead); only its kind is read here (0: nothing found) */
+struct LEAD {
+    s32 kind;
+    u8 unknown_0x4[0x2C];
 };
-struct VT { char pad[0x300]; short delta; short index; void (*fn)(void *, QUERY *, float); };
-struct OBJ { char pad[0xC]; VT *vptr; };
+/* GoalGrab (goals.h GOALGRAB) with the actuator of 0x64, which only this function reads: a view of the class past GOALANIM */
+struct GOAL_17ABC8 : GOALANIM {
+    u8 unknown_0x50[0xC];
+    /* 0x5C */ JT *ptarget;
+    /* 0x60 */ int fHeld;
+    /* 0x64 */ ACTVAL *pact;
+};
 extern "C" float g_2dded0;
-extern "C" void func_0017AA78(GOAL_17ABC8 *, QUERY *, QW *, QW *);
+extern "C" void func_0017AA78(GOAL_17ABC8 *, LEAD *, QW *, QW *);
 extern "C" QW ConvertXfPos(int, XF *, QW);
 extern "C" QW ConvertXfVec(int, XF *, QW);
-extern "C" void SetActvalGoal(ACT *, QW, QW);
+extern "C" void SetActvalGoal(ACTVAL *, QW, QW);
 void func_0017ABC8(GOAL_17ABC8 *pgoal)
 {
-    QUERY query;
+    LEAD query;
     QW posAim, vecAim;
     if (pgoal->fHeld == 0)
         return;
-    OBJ *target = (OBJ *)pgoal->ptarget;
-    VT *vt = target->vptr;
-    vt->fn((char *)target + vt->delta, &query, pgoal->pact->t - g_2dded0);
-    if (query.fFound == 0) {
+    pgoal->ptarget->PredictLead(&query, pgoal->pact->tGoal - g_2dded0);
+    if (query.kind == 0) {
         pgoal->fHeld = 0;
         return;
     }

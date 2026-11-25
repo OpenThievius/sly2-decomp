@@ -17,7 +17,7 @@ struct MSGHIT {
     u8 unknown_0x14[0x30];
     /* 0x44 */ s32 grfHitFx;
 };
-/* the effect object it spawns: a slot at 0x198 of its vtable takes the packet (the class is not known) */
+/* the effect object it spawns: slot 51 of its vtable takes the packet (the class is not known) */
 /* what the effect's slot 0x198 takes: 0x40 bytes, cleared, kind 5 and a position */
 struct HITFXPACKET {
     /* 0x0 */ s32 kind;
@@ -25,8 +25,12 @@ struct HITFXPACKET {
     /* 0x20 */ QW pos;
     u8 unknown_0x30[0x10];
 };
-struct HITFXVT { char unknown_0x0[0x198]; short delta; short index; void (*fn)(void *, HITFXPACKET *); };
-struct HITFXOBJ { char unknown_0x0[0xC]; HITFXVT *vptr; };
+/* an LO whose class declares slots 49 to 51 (51 takes the packet; it is not an SO, whose slot 51 is PxfFromRef) */
+struct HITFXOBJ : LO {
+    virtual void Slot49();
+    virtual void Slot50();
+    virtual void SetPacket(HITFXPACKET *packet);
+};
 extern "C" int D_002BE6D0[];
 extern "C" int D_002BE6E8[];
 extern "C" int GoalAnim_FHandleMessage(GOALANIM *, int, void *);
@@ -97,7 +101,7 @@ extern "C" int GoalAnimLeap_FHandleMessage(GOALGRAB *pgoal, int message, void *p
         memset(&packet, 0, sizeof(packet));
         packet.kind = 5;
         packet.pos = PosLoWorld(pgoal->pstep);
-        effect->vptr->fn((char *)effect + effect->vptr->delta, &packet);
+        effect->SetPacket(&packet);
     }
     total = ((STEPGUARD *)pgoal->pstep)->field_0x33C + ((MSGHIT *)pargs)->cHit;
     ((STEPGUARD *)pgoal->pstep)->field_0x33C = total > 4 ? total : 5;

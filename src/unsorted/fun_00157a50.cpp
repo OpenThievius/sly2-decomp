@@ -1,16 +1,23 @@
+// qsort comparator of SortRenderRecords' sorted pointer array: far to near by depth, ties by record address
+struct RENDER_RECORD {
+    int bucket;
+    float depth;
+    int field8;
+    int fieldC;
+};
+
 extern "C" {
-#include "types.h"
-s32 func_00157A50(s8 **arg0, s8 **arg1) {
-    s8 *left = *arg0;
-    s8 *right = *arg1;
-    f32 leftKey = *(f32 *)(left + 4);
-    f32 rightKey = *(f32 *)(right + 4);
+int func_00157A50(RENDER_RECORD **arg0, RENDER_RECORD **arg1) {
+    RENDER_RECORD *left = *arg0;
+    RENDER_RECORD *right = *arg1;
+    float leftKey = left->depth;
+    float rightKey = right->depth;
     if (rightKey < leftKey) {
         return -1;
     }
     if (leftKey < rightKey) {
         return 1;
     }
-    return (s32)(left - right) >> 4;
+    return (int)(left - right);
 }
 }

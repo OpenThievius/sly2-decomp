@@ -32,8 +32,7 @@ void SetCoinState(COIN *coin, int state)
             SINKMSG notice;
             notice.aw[0] = state;
             notice.aw[1] = (int)coin;
-            const MSGSINKVT *vt = psink->vt;
-            vt->fn((char *)psink + vt->delta, notice.aw);
+            psink->Notify(notice.aw);
         }
         state = 2;
         coin->HandleSpliceEvent(5, 0, 0, 0, 0);

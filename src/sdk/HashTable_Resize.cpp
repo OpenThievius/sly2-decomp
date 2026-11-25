@@ -1,9 +1,8 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "heapalloc.h"
 #include "sly2.h"
-struct ENTRY { unsigned key; int pad4; int pad8; ENTRY *next; };
-struct ALLOCVT { char pad[0x10]; short delta; short index; void *(*realloc)(void *, void *, int, int); };
-struct ALLOC { ALLOCVT *vt; };
-struct HASHTABLE { int count; ENTRY **buckets; int unk8; ALLOC *alloc; };
+struct ENTRY { unsigned key; int unknown_0x4; int unknown_0x8; ENTRY *next; };
+struct HASHTABLE { int count; ENTRY **buckets; int unk8; HEAPALLOC *alloc; };
 void HashTable_Resize(HASHTABLE *table, int newCount)
 {
     ENTRY *cur; ENTRY *chain; int index; cur = chain = 0;
@@ -16,8 +15,8 @@ void HashTable_Resize(HASHTABLE *table, int newCount)
         }
     }
     table->count = newCount;
-    ALLOC *alloc = table->alloc;
-    void *fresh = alloc->vt->realloc((char *)alloc + alloc->vt->delta, table->buckets, newCount << 2, 3);
+    HEAPALLOC *alloc = table->alloc;
+    void *fresh = alloc->Realloc(table->buckets, newCount << 2, 3);
     table->buckets = (ENTRY **)fresh;
     memset(fresh, 0, table->count << 2);
     cur = chain;

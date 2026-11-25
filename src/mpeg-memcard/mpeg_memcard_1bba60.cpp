@@ -99,10 +99,15 @@ void AddStgActionEnablePart(s32 stage, s32 argument) {
 
 extern "C" int *PactAddStgAction_1BBC60(void *, int);
 
-extern "C" void AddStgActionHide(char *self, int value)
+struct STGHIDETARGET {
+    u8 unknown_0x0[0x18];
+    s32 argumentDefault; /* reader: AddStgActionHide, the argument it uses when asked for -1 */
+};
+
+extern "C" void AddStgActionHide(STGHIDETARGET *self, int value)
 {
     if (value == -1)
-        value = *(int *)(self + 0x18);
+        value = self->argumentDefault;
     int *action = PactAddStgAction_1BBC60(self, 1);
     action[1] = value;
 }
@@ -165,7 +170,7 @@ struct STGACTION_1BBDB0 {
 };
 
 struct STGSWITCH {
-    char pad0[8];
+    u8 unknown_0x0[8];
     s32 field_0x8;
     STGACTION_1BBDB0 *field_0xC;
 };
@@ -195,7 +200,7 @@ extern "C" STGACTION_1BBDB0 *PactAddStgAction(s32 stage, s32 kind) {
 
 extern "C" {
 typedef struct STAGE {
-    char pad0[0x15C];
+    u8 unknown_0x0[0x15C];
     s32 field_0x15C;
     s32 field_0x160;
 } STAGE;
@@ -223,7 +228,7 @@ s32 FStgSwitchDone(void) {
 
 extern "C" {
 typedef struct STAGE_1BBE68 {
-    char pad0[0x15C];
+    u8 unknown_0x0[0x15C];
     s32 field_0x15C;
     s32 field_0x160;
     s32 field_0x164;
@@ -240,7 +245,7 @@ s32 PstageStgSwitchCur(STAGE_1BBE68 *stage) {
 }
 
 struct STGOBJECT {
-    char pad0[0xE8];
+    u8 unknown_0x0[0xE8];
     s32 field_0xE8;
 };
 

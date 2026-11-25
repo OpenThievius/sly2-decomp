@@ -1,9 +1,8 @@
 #include "sly2.h"
-struct SLOT { short delta; short index; void (*fn)(void *, int); };
-struct VT { char pad[0x188]; SLOT slot; };
-struct BLOT { char pad[0xC]; VT *vt; };
-struct TARGET { char pad[0xDFC]; int maximum; int *current; char pad2[0x1300 - 0xE04]; int powerMaximum; };
-struct METER { char pad[0x20]; float fill; float fillCopy; float power; float powerCopy; int zero; TARGET *target; BLOT *blot; int ids[5]; };
+#include "blot.h"
+#include "jt.h"
+#include "sw.h"
+struct METER { u8 unknown_0x0[0x20]; float fill; float fillCopy; float power; float powerCopy; int zero; JT *target; BLOT *blot; int ids[5]; };
 static inline void SetMeterIds(METER *self, int first, int second, int third, int fourth, int fifth)
 {
     self->ids[0] = first;
@@ -13,13 +12,12 @@ static inline void SetMeterIds(METER *self, int first, int second, int third, in
     self->ids[4] = fifth;
 }
 extern "C" {
-struct SW;
 extern SW B_003DD490;
 BLOT *PloFindSwObject_thunk(SW *, int, int, int);
-TARGET *PpoSwFocusBase(SW *);
+PO *PpoSwFocusBase(SW *);
 int FIsBasicDerivedFrom(void *, int);
-int GetJtPower(TARGET *);
-void SeekBlotLabel(BLOT *, int, float);
+int GetJtPower(JT *);
+void SeekBlotLabel(float, BLOT *, int);
 void func_00213B00(BLOT *, int);
 void InitMeter(METER *meter)
 {
@@ -27,16 +25,16 @@ void InitMeter(METER *meter)
     meter->zero = 0;
     meter->target = 0;
     meter->blot = blot;
-    TARGET *focus = PpoSwFocusBase(&B_003DD490);
+    PO *focus = PpoSwFocusBase(&B_003DD490);
     if (focus != 0 && FIsBasicDerivedFrom(focus, 0x34) != 0)
-        meter->target = focus;
+        meter->target = (JT *)focus;
     if (meter->target == 0) {
         meter->power = meter->powerCopy = meter->fill = meter->fillCopy = 0.0f;
     } else {
-        float fill = (float)*meter->target->current / (float)meter->target->maximum;
+        float fill = (float)*meter->target->pnHealth / (float)meter->target->field_0xDFC;
         meter->fillCopy = fill;
         meter->fill = fill;
-        float power = (float)GetJtPower(meter->target) / (float)meter->target->powerMaximum;
+        float power = (float)GetJtPower(meter->target) / (float)meter->target->nPowerMax;
         meter->powerCopy = power;
         meter->power = power;
         if (FIsBasicDerivedFrom(meter->target, 0x37) != 0)
@@ -47,12 +45,11 @@ void InitMeter(METER *meter)
             SetMeterIds(meter, 0x33D, 0x33E, 0x33F, 0x340, 0x341);
         BLOT *target = meter->blot;
         if (target != 0) {
-            SLOT *slot = &target->vt->slot;
-            slot->fn((char *)target + slot->delta, meter->ids[0]);
+            target->Select(meter->ids[0]);
             func_00213B00(meter->blot, 0x34F);
             func_00213B00(meter->blot, 0x350);
-            SeekBlotLabel(meter->blot, 0x34F, 1.0f - meter->fill);
-            SeekBlotLabel(meter->blot, 0x350, 1.0f - meter->power);
+            SeekBlotLabel(1.0f - meter->fill, meter->blot, 0x34F);
+            SeekBlotLabel(1.0f - meter->power, meter->blot, 0x350);
         }
     }
 }

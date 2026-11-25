@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
-struct VT { char pad[0x60]; short delta; short index; int (*fn)(void *); };
-struct OBJ { char pad[0xC]; VT *vptr; };
+struct VT { u8 unknown_0x0[0x60]; short delta; short index; int (*fn)(void *); };
+struct OBJ { u8 unknown_0x0[0xC]; VT *vptr; };
 #include "stepguard.h"
 extern "C" unsigned long GrfsgsFromSgs(int);
 extern "C" int func_002040F8(STEPGUARD *);
