@@ -1,4 +1,4 @@
-struct AMB { char pad[0x10]; float volume; };
+#include "amb.h"
 struct LM;
 extern LM g_2bbb60;
 extern "C" float GLimitLm__FP2LMf(LM *);

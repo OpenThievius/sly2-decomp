@@ -7,12 +7,12 @@
 #include "xf.h"
 
 struct KP {
-    char pad0[0x188];
+    u8 unknown_0x0[0x188];
     int state; float tState; void *jt; int icell;
-    char pad1[8];
-    void *handle; char pad2[4];
-    void *cells[8]; char pad3[4];
-    void *asegs[8]; char pad4[0x204 - 0x1EC];
+    u8 unknown_0x198[8];
+    void *handle; u8 unknown_0x1A4[4];
+    void *cells[8]; u8 unknown_0x1C8[4];
+    void *asegs[8]; u8 unknown_0x1EC[0x204 - 0x1EC];
     XF *xf; void *camera;
 };
 
@@ -67,15 +67,15 @@ void func_001C8918(KP *kp, int state)
     }
 }
 
-struct GAME_1C8AF0 { char pad[0x4764]; int cclue; int cclueMax; };
+#include "sw.h"
 
-struct CLUE_1C8AF0 { char pad[0x190]; int n; char pad2[0x1F8 - 0x194]; int stream; };
+struct CLUE_1C8AF0 { u8 unknown_0x0[0x190]; int n; u8 unknown_0x194[0x1F8 - 0x194]; int stream; };
 
-extern GAME_1C8AF0 B_003DD490;
+extern SW B_003DD490;
 
 extern int B_003DD040;
 
-extern "C" void ShowClueBlot(GAME_1C8AF0 *, int);
+extern "C" void ShowClueBlot(SW *, int);
 
 extern "C" void StartStream(int *, int, int);
 
@@ -83,7 +83,7 @@ extern "C" void func_001C8730(CLUE_1C8AF0 *, int);
 
 extern "C" void func_001C8AF0(CLUE_1C8AF0 *pclue, int n)
 {
-    if (B_003DD490.cclue >= B_003DD490.cclueMax) {
+    if (B_003DD490.cclueFound >= B_003DD490.field_0x4768) {
         pclue->n = n;
         func_001C8730(pclue, 1);
         return;

@@ -18,7 +18,9 @@ struct ALOSFX {
 
 #ifdef __cplusplus
 struct ALO : SO {
-    u8 unknown_0x150[0x1680];
+    u8 unknown_0x150[0x150];
+    /* 0x2A0 */ s32 arefSmKind[6]; /* RetainAloSmKinds, ReleaseAloSmKinds (they agree): how many users hold each of the six SM kinds */
+    u8 unknown_0x2B8[0x1518];
     /* 0x17D0 */ ALOSFX sfx;
 };
 #else

@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "types.h"
 struct Varb;
 struct VarbPtr { Varb *p; };
-struct Varb { int count; char pad4[8]; char ref[8]; VarbPtr next; };
+struct Varb { int count; u8 unknown_0x4[8]; char ref[8]; VarbPtr next; };
 extern "C" {
 void VarbPtr_Destructor(VarbPtr *, int);
 void CRef_Destruct(void *);

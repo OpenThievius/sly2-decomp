@@ -1,11 +1,11 @@
-struct Job { char pad[0x18]; int id; };
-struct World { char pad[0x3B0C]; Job *job; };
+#include "job.h"
+#include "sw.h"
 extern "C" int B_002DEB40;
-extern "C" void SetSwCurrentJob(World *world, Job *job)
+extern "C" void SetSwCurrentJob(SW *psw, JOB *pjob)
 {
-    world->job = job;
-    if (job)
-        B_002DEB40 = job->id;
+    psw->pjobCurrent = pjob;
+    if (pjob)
+        B_002DEB40 = pjob->oid;
     else
         B_002DEB40 = -1;
 }

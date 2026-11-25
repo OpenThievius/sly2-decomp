@@ -1,6 +1,7 @@
+#include "types.h"
 // SPDX-License-Identifier: GPL-3.0-or-later
-struct TASK_162940 { char pad[0x64]; int state; char pad2[0x84 - 0x68]; TASK_162940 *ptaskNext; };
-struct JOB_162940 { char pad[0x7C]; int state; TASK_162940 *ptaskFirst; };
+struct TASK_162940 { u8 unknown_0x0[0x64]; int state; u8 unknown_0x68[0x84 - 0x68]; TASK_162940 *ptaskNext; };
+struct JOB_162940 { u8 unknown_0x0[0x7C]; int state; TASK_162940 *ptaskFirst; };
 extern "C" void SaveTaskVariables(TASK_162940 *);
 extern "C" void SaveJobVariables(JOB_162940 *);
 extern "C" void ResetJob(JOB_162940 *pjob)

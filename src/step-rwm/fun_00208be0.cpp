@@ -1,9 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
-struct VOL { char pad[0x28]; unsigned long flags; };
 #include "stepguard.h"
-struct TARGET { char pad[0x50]; int kind; };
-struct STIM { char pad0[0x14]; TARGET *target; char pad1[8]; QW pos; char pad2[0x40 - 0x30]; void *emitter; void *source; char pad3[0x54 - 0x48]; int level; };
+struct TARGET { u8 unknown_0x0[0x50]; int kind; };
+struct STIM { u8 unknown_0x0[0x14]; TARGET *target; u8 unknown_0x18[8]; QW pos; u8 unknown_0x30[0x40 - 0x30]; void *emitter; void *source; u8 unknown_0x48[0x54 - 0x48]; int level; };
 extern "C" {
 int func_00208D70(STEPGUARD *);
 void *PentryFindSensorLo(SENSOR *, void *);
@@ -37,9 +36,9 @@ int func_00208BE0(STEPGUARD *guard, STIM *stim)
     } else {
         return FHitFxCoversPos(stim, PosLoWorld(guard));
     }
-    VOL *volume = (VOL *)guard->psensor->pvolume;
+    LO *volume = (LO *)guard->psensor->pvolume;
     if (volume == 0) return 0;
-    if (((volume->flags >> 60) & 1) == 0) return 0;
+    if (((volume->grfo >> 60) & 1) == 0) return 0;
     if (func_00227C90(volume, posStim) == 0) return 0;
     struct { char frame[4]; int cpso; int apso; } l;
     CStackFrame_Construct(&l);

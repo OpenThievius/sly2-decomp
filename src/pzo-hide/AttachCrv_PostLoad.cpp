@@ -1,9 +1,9 @@
 #include "types.h"
 
 struct AttachCrv {
-    char pad0[0x38];
+    u8 unknown_0x0[0x38];
     f32 radius;
-    char pad3C[0x190 - 0x3C];
+    u8 unknown_0x3C[0x190 - 0x3C];
     s32 transformOverride;
 };
 

@@ -1,7 +1,7 @@
 #include "sly2.h"
 #include "cref.h"
 #include "sw.h"
-struct OBJ { char pad[0xC]; LO *plo; };
+struct OBJ { u8 unknown_0x0[0xC]; LO *plo; };
 extern SW B_003DD490;
 extern "C" void *PloFindSwObject(SW *, int, int, LO *, SCOPE *);
 

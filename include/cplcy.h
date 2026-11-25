@@ -68,16 +68,25 @@ struct CPTN CPLCY_BASE {
 /* CPLOOK, the look policy, 0x58 bytes */
 struct CPLOOK CPLCY_BASE {
     CPLCY_C_HEADER
-    u8 unknown_0x10[0x10];
+    /* 0x10 */ f32 radPan;     /* the pan the look camera aims at: ActivateCplook decomposes the camera's matrix into it, UpdateCplook integrates it, DeactivateCplook turns the camera back by it */
+    /* 0x14 */ f32 radTilt;    /* the same for the tilt */
+    /* 0x18 */ f32 dradPan;    /* the pan speed: UpdateCplook smooths it, ActivateCplook clears it */
+    /* 0x1C */ f32 dradTilt;   /* the tilt speed */
     /* 0x20 */ f32 u;  /* UpdateCplook's u */
     /* 0x24 */ f32 du; /* its du */
-    /* 0x28 */ f32 field_0x28; /* InitCplook: 7.0 */
-    /* 0x2C */ f32 fovMin;
-    u8 unknown_0x30[4];
+    /* 0x28 */ f32 field_0x28; /* InitCplook: 7.0; ActivateCplook divides the camera's fov by it (the zoom factor) */
+    /* 0x2C */ f32 fovMin;     /* UpdateCplook mixes it with fovMax by u; ActivateCplook sets it to the camera's fov / field_0x28 */
+    /* 0x30 */ f32 fovMax;     /* ActivateCplook sets it to the camera's fov */
     /* 0x34 */ void *ambience; /* reference pointer (UpdateCplook's pamb); InitCplook and bevy_camera_looks_reset clear it;
                                   CM_Destruct releases it */
     /* 0x38 */ void *field_0x38; /* reference pointer, cleared and released the same way */
-    u8 unknown_0x3C[0x1C];
+    /* 0x3C */ f32 radPanMin;  /* the pan limits: ActivateCplook sets the four limits from retail's data (the focus a STEP) or around the focus's heading */
+    /* 0x40 */ f32 radPanMax;
+    /* 0x44 */ f32 radTiltMin; /* the tilt limits, clamped by GLimitLm */
+    /* 0x48 */ f32 radTiltMax;
+    /* 0x4C */ f32 radPanSaved;  /* ActivateCplook saves the camera's pan, DeactivateCplook turns the camera back to it (not for a STEP) */
+    /* 0x50 */ f32 radTiltSaved;
+    /* 0x54 */ s32 cActivate;  /* ActivateCplook increments it */
 };
 
 /* CPLCYCAMOBJ, the policy of a camera object, 0x18 bytes: InitCplcyCamobj (vtable D_002CAB90) */
@@ -90,9 +99,10 @@ struct CPLCYCAMOBJ CPLCY_BASE {
 /* CPCLOSE, 0x40 bytes: func_00151208 (vtable D_002CD450, bevy_camera_looks_*) */
 struct CPCLOSE CPLCY_BASE {
     CPLCY_C_HEADER
-    u8 unknown_0x10[4];
+    /* 0x10 */ s32 xf;    /* bevy_camera_looks_activate (the class's own activate, slot 2) stores its third argument, the transform it aims */
     /* 0x14 */ s32 lookat; /* func_0012E460 frees it; bevy_camera_looks_activate stores it */
-    u8 unknown_0x18[0x28];
+    /* 0x18 */ f32 tJiggle; /* bevy_camera_looks_activate sets it to -1 */
+    u8 unknown_0x1C[0x24];
 };
 
 struct CPVTABLE {
@@ -136,16 +146,22 @@ struct K30CAM CPLCY_BASE {
     u8 unknown_0x1C[4];
     /* 0x20 */ QW position;      /* bevy_classes_k30_cam_150ef0 stores bevy_classes_k30_cam_150780's result; func_00150F58 compares it with that result */
     /* 0x30 */ QW target;        /* bevy_classes_k30_cam_150ef0 stores bevy_classes_k30_cam_1507f8's result; func_00151018 compares it */
-    /* 0x40 */ s32 active; /* its own flag (bevy_classes_k30_cam_set, func_00150E60, func_00150EA0), not CPLCY::active */
-    u8 unknown_0x44[0x3C];
+    /* 0x40 */ s32 active; /* its own flag (bevy_classes_k30_cam_set, func_00150E60, func_00150EA0), not CPLCY::active; bevy_classes_k30_cam_update tests it */
+    u8 unknown_0x44[0xC];
+    /* 0x50 */ QW previousPosition; /* bevy_classes_k30_cam_150ef0 copies currentPosition to it; bevy_classes_k30_cam_update smooths it */
+    /* 0x60 */ QW previousTarget;   /* the same, with currentTarget */
+    /* 0x70 */ f32 previousDistance; /* the same, with currentDistance (update smooths it as the fov) */
+    u8 unknown_0x74[0xC];
     /* 0x80 */ s128 currentPosition; /* bevy_classes_k30_cam_150ef0 */
     /* 0x90 */ s128 currentTarget;
     /* 0xA0 */ f32 currentDistance;
-    u8 unknown_0xA4[8];
-    /* 0xAC */ f32 distance;     /* bevy_classes_k30_cam_150ef0 sets it to minDistance; func_001510D8 compares it */
-    u8 unknown_0xB0[4];
+    /* 0xA4 */ f32 radPan;       /* bevy_classes_k30_cam_activate_2 and bevy_classes_k30_cam_update decompose the camera's matrix into the pair */
+    /* 0xA8 */ f32 radTilt;
+    /* 0xAC */ f32 distance;     /* bevy_classes_k30_cam_150ef0 sets it to minDistance; func_001510D8 compares it; update smooths it toward minDistance and clamps it to 0..1 */
+    /* 0xB0 */ f32 rate;         /* bevy_classes_k30_cam_update: the speed of distance, it drives the ambience; activate_2 clears it */
     /* 0xB4 */ f32 field_0xB4; /* func_00150728: 7.0 */
-    u8 unknown_0xB8[8];
+    /* 0xB8 */ f32 fovMin;       /* bevy_classes_k30_cam_activate_2 sets it to the camera's fov / field_0xB4; update mixes it with fovMax */
+    /* 0xBC */ f32 fovMax;       /* the same with the camera's fov */
     /* 0xC0 */ void *field_0xC0; /* reference pointers, cleared by bevy_classes_k30_cam_reset, released by CM_Destruct */
     /* 0xC4 */ void *field_0xC4;
     u8 unknown_0xC8[0x8];

@@ -1,7 +1,8 @@
-struct PATH { char pad0[0x58]; char *anode; };
+#include "types.h"
+struct PATH { u8 unknown_0x0[0x58]; char *anode; };
 #include "goal.h"
 struct GOAL_14AD70 : GOAL {
-    char pad_30[0x8];
+    u8 unknown_0x30[0x8];
     PATH *path;
     int inodeCur;
     int inodeTarget;

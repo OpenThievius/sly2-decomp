@@ -2,10 +2,10 @@
 #include "sly2.h"
 #include "cref.h"
 struct CFrame {
-    char pad0[8];
+    u8 unknown_0x0[8];
     int cpframeParent;
     CFrame *pframeParent;
-    char pad1[0x14];
+    u8 unknown_0x10[0x14];
     int unk0x24;
     CRef *PrefFindBinding(unsigned, int);
 };

@@ -6,7 +6,7 @@ extern "C" void func_001F1448(void *, void *, int, int, void *);
 extern "C" int OidFromICheer(int);
 void SetSmaGoal(SMA *, OID);
 struct CROWD { int oid; int oidCheer; SMA *link; int level; float threshold[3]; };
-struct RHYTHM { char pad[0x288]; float smooth; char pad2[0x2A8 - 0x28C]; int count; CROWD crowd[1]; };
+struct RHYTHM { u8 unknown_0x0[0x288]; float smooth; u8 unknown_0x28C[0x2A8 - 0x28C]; int count; CROWD crowd[1]; };
 extern "C" void UpdateRhythmCrowd(RHYTHM *rhythm)
 {
     for (int i = 0; i < rhythm->count; i++) {

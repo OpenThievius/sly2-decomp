@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "types.h"
 #include "mpeg.h"
 extern "C" {
 struct MpegReference {
     u8 *base;
-    u8 pad4[0x10 - 0x4];
+    u8 unknown_0x4[0x10 - 0x4];
     int width;
 };
 extern void (*D_002C8478[])(MPEGBLOCK *);

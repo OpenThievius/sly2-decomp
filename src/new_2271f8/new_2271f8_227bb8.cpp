@@ -13,7 +13,7 @@ struct BSP;
 
 #include "alloc.h"
 
-struct VOLUME { char pad0[0xE4]; int cnode; int unkE8; BSP *pbsp; };
+struct VOLUME { u8 unknown_0x0[0xE4]; int cnode; u8 unknown_0xE8[4]; BSP *pbsp; };
 
 extern "C" int func_00227C90(VOLUME *, QW);
 

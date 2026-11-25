@@ -1,19 +1,16 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // source:sly1-decomp HandlePauseMenuInput (src/main/pause_menu.cpp, AGPL-3.0, same maintainers): display register types, a draft
 #include "types.h"
+#include "pausemenu.h"
 struct LM { float gMin; float gMax; };
-struct SNDBANKS { char pad[0x14C]; float gVolumeMusic; float gVolumeFx; };
+struct SNDBANKS { u8 unknown_0x0[0x14C]; float gVolumeMusic; float gVolumeFx; };
 struct DisplayReg64 { u64 lo : 12; u64 mid : 11; u64 rest : 41; };
 struct DisplayReg32 { u32 lo : 12; u32 mid : 11; u32 rest : 9; u32 hi; } __attribute__((aligned(8)));
-struct DisplayRegs { u8 pad0[0x18]; DisplayReg32 f18; u8 pad20[0x20]; DisplayReg64 f40; };
-struct BLOT;
-struct ITEM { int kind; };
-struct PAGE { int citem; ITEM *aitem; BLOT *pblot; };
-struct PAUSEMENU { char pad0[0x10]; void *pjoy; };
+struct DisplayRegs { u8 unknown_0x0[0x18]; DisplayReg32 f18; u8 unknown_0x20[0x20]; DisplayReg64 f40; };
 extern "C" {
 float GLimitLm__FP2LMf(LM *, float);
 void SetSndbankVolumeFactor(SNDBANKS *, int, float, int);
-void SeekBlotLabel(BLOT *, int, float);
+void SeekBlotLabel(PAUSEBLOT *, int, float);
 int UpdateJoyNavX(void *);
 int UpdateJoyNavY(void *);
 s32 func_0023E1C8(float);
@@ -34,7 +31,7 @@ static inline float ClampFloat(float value, float low, float high)
         return high;
     return value;
 }
-extern "C" void PauseMenu_AdjustOption(PAUSEMENU *pmenu, PAGE *ppage, ITEM *pitem)
+extern "C" void PauseMenu_AdjustOption(PAUSEMENU *pmenu, PAUSEPAGE *ppage, PAUSEITEM *pitem)
 {
     float g;
     switch (pitem->kind) {

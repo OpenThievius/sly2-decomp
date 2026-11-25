@@ -1,4 +1,5 @@
-struct Option_13F810 { int pad0; unsigned int flags; char pad8[0x20]; };
+#include "types.h"
+struct Option_13F810 { int pad0; unsigned int flags; u8 unknown_0x8[0x20]; };
 extern "C" {
 void LoadOptionFromBrx(void *, Option_13F810 *, unsigned int, void *);
 int S16Read__18CBinaryInputStream(void *);

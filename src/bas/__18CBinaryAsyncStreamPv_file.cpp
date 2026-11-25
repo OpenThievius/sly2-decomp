@@ -171,7 +171,7 @@ void CBinaryAsyncStream_132710::StartSpooling()
 }
 
 typedef struct CBinaryAsyncStream_1327D0 {
-    char pad[0xC];
+    u8 unknown_0x0[0xC];
     s32 field_0xC;
 } CBinaryAsyncStream_1327D0;
 
@@ -185,7 +185,7 @@ struct CBinaryAsyncStream_1327E0 {
     int pad8;
     int pbSpooling;
     int cbSpooling;
-    char pad14[8];
+    u8 unknown_0x14[8];
     int cbAvail;
     int pad20;
     int cbConsumed;
@@ -234,7 +234,7 @@ struct CBinaryAsyncStream_1328A8 {
     int isector;
     int cbSpooling;
     int pbSpooling;
-    char pad14[8];
+    u8 unknown_0x14[8];
     int cbAvail;
     int pbCur;
     int cbConsumed;
@@ -278,7 +278,7 @@ void Spool__18CBinaryAsyncStream(s32 *arg0) {
 }
 
 typedef struct CBinaryAsyncStream_132998 {
-    char pad[0x24];
+    u8 unknown_0x0[0x24];
     s32 field_0x24;
 } CBinaryAsyncStream_132998;
 

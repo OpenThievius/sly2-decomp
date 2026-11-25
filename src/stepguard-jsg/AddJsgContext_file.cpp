@@ -17,6 +17,10 @@
 #include "clock.h"
 #include "pzo_hide.h"
 #include "goal.h"
+#include "cm.h"
+#include "asega.h"
+#include "crv.h"
+#include "tn.h"
 
 /* a record of the sequence's step list (0x50 bytes, PjsgeAllocJsg): the kind, whether it is asynchronous, then the arguments the
    AddSeqRecord function stored: a word each, an integer or a float according to the kind */
@@ -25,9 +29,20 @@ struct JSGE {
     s32 fAsync;
     u8 unknown_0x8[0x8];
     union {
-        s32 n;
-        f32 f;
-    } arg[16];
+        union {
+            s32 n;
+            f32 f;
+        } arg[16];
+        /* kinds 0x38, 0x39 and 0x3F (AddSeqRecordConfrontCamera, AddSeqRecordEndConfrontCamera, AddSeqRecordBinocPos) start with a
+           position and three angles in radians; their other arguments follow as arg[8] on */
+        struct {
+            QW pos;
+            union {
+                f32 rad[3];
+                QW rot; /* the three angles read as one quadword: kind 0x3F (StartNextSeqnodeRecord) */
+            };
+        } posrot;
+    };
 };
 
 struct JSG;
@@ -79,21 +94,6 @@ extern "C" void AddSeqRecordWait(JSG *jsg, int n0, int n1)
     record->arg[0].n = n0;
     record->arg[1].n = n1;
 }
-
-struct JsgRecord {
-    char pad[0x10];
-    union {
-        s32 field_0x10;
-        f32 float_0x10;
-    };
-    s32 field_0x14;
-    s32 field_0x18;
-    union {
-        s32 field_0x1C;
-        f32 float_0x1C;
-    };
-    s32 field_0x20;
-};
 
 
 extern "C" void AddSeqRecordSignalSequence(JSG *jsg, s32 n0, s32 n1)
@@ -220,8 +220,6 @@ extern "C" void AddSeqRecordSeek(JSG *jsg, int n0)
 }
 
 
-struct JSGREC_1E0790 { char pad[0x10]; int nAt10; int nAt14; };
-
 extern "C" void func_001E0790(JSG *jsg, int n0, int n1)
 {
     JSGE *record = PjsgeAllocJsg(jsg, 0x15, 1);
@@ -292,8 +290,6 @@ extern "C" void AddSeqRecordReach(JSG *jsg, s32 n0, s32 n1)
     record->arg[0].n = n0;
     record->arg[1].n = n1;
 }
-
-struct SEQRECORD_1E09D0 { char pad0[0x10]; int iA; int iB; int iC; };
 
 
 extern "C" void AddSeqRecordToss(JSG *jsg, int n0, int n1, int n2)
@@ -382,8 +378,6 @@ extern "C" void func_001E0C98(JSG *jsg)
 {
     PjsgeAllocJsg(jsg, 38, 1);
 }
-
-#define FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
 
 
 extern "C" void func_001E0CB8(JSG *jsg, int n0, int n1, int n2, int n4, int n5, float g3)
@@ -521,8 +515,6 @@ extern "C" void AddSeqRecordSetEyes(JSG *jsg, int n0, int n1, float g2)
     record->arg[2].f = g2;
 }
 
-struct JSGE_1E1178 { char pad[0x10]; int n[4]; float g[3]; };
-
 
 extern "C" void AddSeqRecordSoundEffect(JSG *jsg, int n0, int n1, int n2, int n3, float g4, float g5, float g6)
 {
@@ -543,32 +535,28 @@ extern "C" void AddSeqRecordStopSoundEffect(JSG *jsg, int n0)
     record->arg[0].n = n0;
 }
 
-struct JSGE_1E1238 { char pad[0x10]; QW position; float radiansX, radiansY, radiansZ, pad2; float field_0x30; char pad3[0xC]; float field_0x40; int field_0x44; };
-
 void AddSeqRecordConfrontCamera(JSG *pjsg, QW position, QW degrees, int field44, float field30, float field40)
 {
-    JSGE_1E1238 *pjsge = (JSGE_1E1238 *)PjsgeAllocJsg(pjsg, 0x38, 1);
-    pjsge->field_0x44 = field44;
-    pjsge->position = position;
-    pjsge->field_0x30 = field30;
-    pjsge->field_0x40 = field40;
-    pjsge->radiansX = LaneX(degrees) * 0.017453294f;
-    pjsge->radiansY = LaneYInGeneralRegister((degrees)) * 0.017453294f;
-    pjsge->radiansZ = LaneZInGeneralRegister(degrees) * 0.017453294f;
+    JSGE *pjsge = PjsgeAllocJsg(pjsg, 0x38, 1);
+    pjsge->arg[13].n = field44;
+    pjsge->posrot.pos = position;
+    pjsge->arg[8].f = field30;
+    pjsge->arg[12].f = field40;
+    pjsge->posrot.rad[0] = LaneX(degrees) * 0.017453294f;
+    pjsge->posrot.rad[1] = LaneYInGeneralRegister((degrees)) * 0.017453294f;
+    pjsge->posrot.rad[2] = LaneZInGeneralRegister(degrees) * 0.017453294f;
 }
-
-struct JSGE_1E12E0 { char pad[0x10]; QW position; float radiansX, radiansY, radiansZ, pad2; float field_0x30; char pad3[0xC]; int field_0x40; int field_0x44; };
 
 void AddSeqRecordEndConfrontCamera(JSG *pjsg, QW position, QW degrees, int field40, int field44, float field30)
 {
-    JSGE_1E12E0 *pjsge = (JSGE_1E12E0 *)PjsgeAllocJsg(pjsg, 0x39, 1);
-    pjsge->field_0x44 = field44;
-    pjsge->position = position;
-    pjsge->field_0x30 = field30;
-    pjsge->field_0x40 = field40;
-    pjsge->radiansX = LaneX(degrees) * 0.017453294f;
-    pjsge->radiansY = LaneYInGeneralRegister((degrees)) * 0.017453294f;
-    pjsge->radiansZ = LaneZInGeneralRegister(degrees) * 0.017453294f;
+    JSGE *pjsge = PjsgeAllocJsg(pjsg, 0x39, 1);
+    pjsge->arg[13].n = field44;
+    pjsge->posrot.pos = position;
+    pjsge->arg[8].f = field30;
+    pjsge->arg[12].n = field40;
+    pjsge->posrot.rad[0] = LaneX(degrees) * 0.017453294f;
+    pjsge->posrot.rad[1] = LaneYInGeneralRegister((degrees)) * 0.017453294f;
+    pjsge->posrot.rad[2] = LaneZInGeneralRegister(degrees) * 0.017453294f;
 }
 
 
@@ -607,19 +595,17 @@ extern "C" void AddSeqRecordBinocFocus(JSG *jsg, int n0, int fAsync)
     record->arg[0].n = n0;
 }
 
-struct JSGE_1E1488 { char pad[0x10]; QW pos; float rot[3]; char pad2[4]; float extra; };
-
 extern "C" void AddSeqRecordBinocPos(JSG *jsg, QW pos, QW rot, float extra)
 {
-    JSGE_1E1488 *item = (JSGE_1E1488 *)PjsgeAllocJsg(jsg, 0x3F, 1);
+    JSGE *item = PjsgeAllocJsg(jsg, 0x3F, 1);
     float x = LaneX(rot) * 0.017453294f;
     float y = LaneYInGeneralRegister(rot) * 0.017453294f;
     float z = LaneZInGeneralRegister(rot) * 0.017453294f;
-    item->extra = extra;
-    item->pos = pos;
-    item->rot[0] = x;
-    item->rot[1] = y;
-    item->rot[2] = z;
+    item->arg[8].f = extra;
+    item->posrot.pos = pos;
+    item->posrot.rad[0] = x;
+    item->posrot.rad[1] = y;
+    item->posrot.rad[2] = z;
 }
 
 
@@ -646,8 +632,6 @@ extern "C" void AddSeqRecordWaitForButton(JSG *jsg, int n0, int n1)
     record->arg[0].n = n0;
 }
 
-
-struct JSGREC_1E15B0 { char pad[0x10]; int nAt10; int nAt14; };
 
 extern "C" void func_001E15B0(JSG *jsg, int n0, int n1)
 {
@@ -835,142 +819,30 @@ extern "C" void func_001E1B10(JSG *jsg, s32 n0, s32 n1, s32 fAsync)
     record->arg[2].n = 0;
 }
 
-extern "C" {
-struct SeqnodeOwner {
-    char pad0[0x18];
-    s32 field_0x18;
-};
-
-struct Seqnode {
-    char pad0[0x10];
-    s32 field_0x10;
-    s32 field_0x14;
-    s32 field_0x18;
-    char pad1[0x14];
-    struct SeqnodeOwner *field_0x30;
-    char pad2[0xC];
-    s32 field_0x40;
-    s32 field_0x44;
-    char pad3[0x8];
-    s32 field_0x50;
-    char pad4[0x4];
-    s32 field_0x58;
-    s32 field_0x5C;
-    char pad5[0x40];
-    s32 field_0xA0;
-};
-
-void Seqnode_AddRef(struct Seqnode *node) {
-    node->field_0x10 = node->field_0x10 + 1;
-}
-}
-
-struct Seqnode_1E1B68 {
-    /* 0x0 */ void *pframe;      /* CFramePtr_Assign clears it (BASIC::pframe) */
-    /* 0x4 */ void *psidebag;    /* SidebagPtr_Assign clears it (BASIC::psidebag) */
-    u8 unknown_0x8[0x8];
-    s32 field_0x10;
-    s32 field_0x14;
-    s32 field_0x18;
-    u8 unknown_0x1C[0x14];
-    SeqnodeOwner *field_0x30;
-    u8 unknown_0x34[0xC];
-    s32 field_0x40;
-    s32 field_0x44;
-    u8 unknown_0x48[0x8];
-    s32 field_0x50;
-    u8 unknown_0x54[0x4];
-    s32 field_0x58;
-    s32 field_0x5C;
-    u8 unknown_0x60[0x40];
-    s32 field_0xA0;
-};
-
-extern "C" void Basic_FreeSubscribers(Seqnode_1E1B68 *node);
-
-extern "C" void CFramePtr_Assign(void *target, s32 value);
-
-extern "C" void FreeSlotheapPv(void *slotheap, void *pointer);
-
-extern "C" void SidebagPtr_Assign(void *target, s32 value);
-
-extern "C" s32 B_003E1560;
-
-extern "C" void Seqnode_Release(Seqnode_1E1B68 *node) {
-    s32 remaining = node->field_0x10 - 1;
-    node->field_0x10 = remaining;
-    if (remaining <= 0) {
-        CFramePtr_Assign(node, 0);
-        SidebagPtr_Assign(&node->psidebag, 0);
-        Basic_FreeSubscribers(node);
-        FreeSlotheapPv(&B_003E1560, node);
-    }
-}
-
-struct Seqnode_1E1BC8 {
-    char pad0[0x10];
-    s32 field_0x10;
-    s32 field_0x14;
-    s32 field_0x18;
-    char pad1[0x14];
-    SeqnodeOwner *field_0x30;
-    char pad2[0xC];
-    s32 field_0x40;
-    s32 field_0x44;
-    char pad3[0x8];
-    s32 field_0x50;
-    char pad4[0x4];
-    s32 field_0x58;
-    s32 field_0x5C;
-    char pad5[0x40];
-    s32 field_0xA0;
-};
-
-struct SeqnodeMessage {
-    s32 field_0x0;
-    s32 field_0x4;
-    s32 field_0x8;
-};
-
-extern "C" void HandleLoMessage(Seqnode_1E1BC8 *node, s32 message, SeqnodeMessage *data);
-
-extern "C" void HandleSeqnodeMessage(Seqnode_1E1BC8 *node, s32 message, SeqnodeMessage *data) {
-    HandleLoMessage(node, message, data);
-    if ((message == 0xA) && (data->field_0x0 == node->field_0x58)) {
-        if (data->field_0x8 == node->field_0x30->field_0x18) {
-            node->field_0x5C = 1;
-        }
-    }
-}
-
-/* record fields: one 0x50-byte record per sequence step */
-struct REC {
-    int kind;
-    int fChild;
-    u8 unknown_0x8[0x8];
-    union {
-        s32 n;
-        f32 f;
-    } arg[16]; /* the arguments, as JSGE::arg: UpdateSeqnodeDrive reads arg[0] of a kind 0x1D record */
-};
 
 struct LO;
 struct TN;
-struct SEQVT { char pad[8]; short deltaAddRef; short idxAddRef; void (*fnAddRef)(void *); short deltaRelease; short idxRelease; void (*fnRelease)(void *); };
+/* the node's vtable, as RunSeqnode and StartNextSeqnodeRecord call it: two 8-byte entries (delta, index, function) after the
+   type-info one */
+struct SEQVT { u8 unknown_0x0[0x8]; short deltaAddRef; short idxAddRef; void (*fnAddRef)(void *); short deltaRelease; short idxRelease; void (*fnRelease)(void *); };
 struct SEQNODE {
-    char pad0[0xC]; SEQVT *vt; int pad10;
+    /* 0x0 */ void *pframe;   /* CFramePtr_Assign clears it (BASIC::pframe): Seqnode_Release */
+    /* 0x4 */ void *psidebag; /* SidebagPtr_Assign clears it (BASIC::psidebag): Seqnode_Release */
+    u8 unknown_0x8[0x4];
+    /* 0xC */ SEQVT *vt;
+    /* 0x10 */ s32 cref;      /* the reference count: Seqnode_AddRef adds one, Seqnode_Release frees the node when it reaches 0 */
     LO *psw;        /* 0x14 */
     LO *ploCtx;     /* 0x18 */
     LO *plo1C;      /* 0x1C */
     LO *plo20;      /* 0x20 */
     LO *psubject;   /* 0x24 */
-    REC *precFirst; /* 0x28 */
-    REC *precLast;  /* 0x2C */
-    REC *precCur;   /* 0x30 */
+    JSGE *precFirst; /* 0x28 */
+    JSGE *precLast;  /* 0x2C */
+    JSGE *precCur;   /* 0x30 */
     float rClock;   /* 0x34 */
     int fHandsOff;  /* 0x38 */
     int grfHandsOff;/* 0x3C */
-    REC *precDrive; /* 0x40 */
+    JSGE *precDrive; /* 0x40 */
     LO *ploDrive;   /* 0x44 */
     int fVjoyHold;  /* 0x48 */
     LO *pasega;     /* 0x4C */
@@ -980,7 +852,7 @@ struct SEQNODE {
     int fSmaCur;    /* 0x5C */
     LO *ploShown;   /* 0x60 */
     LO *ploSw;      /* 0x64 */
-    REC *precStream;/* 0x68 */
+    JSGE *precStream;/* 0x68 */
     TN *ptn;        /* 0x6C */
     int fTnAdded;   /* 0x70 */
     LO *ploLook;    /* 0x74 */
@@ -999,12 +871,55 @@ struct SEQNODE {
     LO *ploD8;      /* 0xD8 */
     LO *ploDC;      /* 0xDC */
     int fE0;        /* 0xE0 */
-    char padE4[0xEC - 0xE4];
+    u8 unknown_0xE4[0x8];
     void *pamb;     /* 0xEC */
 };
 
+extern "C" {
+void Seqnode_AddRef(SEQNODE *node) {
+    node->cref = node->cref + 1;
+}
+}
 
-struct CM { char pad[0x90]; QW pos; };
+extern "C" void Basic_FreeSubscribers(SEQNODE *node);
+
+extern "C" void CFramePtr_Assign(void *target, s32 value);
+
+extern "C" void FreeSlotheapPv(void *slotheap, void *pointer);
+
+extern "C" void SidebagPtr_Assign(void *target, s32 value);
+
+extern "C" s32 B_003E1560;
+
+extern "C" void Seqnode_Release(SEQNODE *node) {
+    s32 remaining = node->cref - 1;
+    node->cref = remaining;
+    if (remaining <= 0) {
+        CFramePtr_Assign(node, 0);
+        SidebagPtr_Assign(&node->psidebag, 0);
+        Basic_FreeSubscribers(node);
+        FreeSlotheapPv(&B_003E1560, node);
+    }
+}
+
+/* the data of message 0xA: an object and two words */
+struct SeqnodeMessage {
+    LO *plo;
+    s32 field_0x4;
+    s32 field_0x8;
+};
+
+extern "C" void HandleLoMessage(SEQNODE *node, s32 message, SeqnodeMessage *data);
+
+extern "C" void HandleSeqnodeMessage(SEQNODE *node, s32 message, SeqnodeMessage *data) {
+    HandleLoMessage(node, message, data);
+    if ((message == 0xA) && (data->plo == node->psma)) {
+        if (data->field_0x8 == node->precCur->arg[2].n) {
+            node->fSmaCur = 1;
+        }
+    }
+}
+
 
 extern "C" void StartNextSeqnodeRecord(SEQNODE *);
 
@@ -1012,7 +927,7 @@ extern "C" int FSeqnodeStopped_1E1C40(SEQNODE *);
 
 extern "C" void UpdateSeqnodeDrive_1E1C40(SEQNODE *);
 
-extern "C" int FSeqnodeRecordDone(SEQNODE *, REC *);
+extern "C" int FSeqnodeRecordDone(SEQNODE *, JSGE *);
 
 extern "C" void StopSeqnode_1E1C40(SEQNODE *);
 
@@ -1031,7 +946,7 @@ extern "C" void RunSeqnode(SEQNODE *pseqnode)
         if (FSeqnodeStopped_1E1C40(pseqnode))
             return;
     }
-    while (!(pseqnode->precCur > pseqnode->precLast) && (pseqnode->precCur->fChild != 0 || FSeqnodeRecordDone(pseqnode, pseqnode->precCur))) {
+    while (!(pseqnode->precCur > pseqnode->precLast) && (pseqnode->precCur->fAsync != 0 || FSeqnodeRecordDone(pseqnode, pseqnode->precCur))) {
         UpdateSeqnodeDrive_1E1C40(pseqnode);
         StartNextSeqnodeRecord(pseqnode);
         if (FSeqnodeStopped_1E1C40(pseqnode))
@@ -1042,16 +957,16 @@ extern "C" void RunSeqnode(SEQNODE *pseqnode)
         StopSeqnode_1E1C40(pseqnode);
 }
 
-extern "C" int FSeqnodeRecordDone_1E1D48(SEQNODE *, REC *);
+extern "C" int FSeqnodeRecordDone_1E1D48(SEQNODE *, JSGE *);
 
-extern "C" void SetSeqnodeDrive_1E1D48(SEQNODE *, REC *, LO *);
+extern "C" void SetSeqnodeDrive_1E1D48(SEQNODE *, JSGE *, LO *);
 
 extern "C" void UpdateSeqnodeDrive(SEQNODE *self)
 {
-    REC *record = self->precDrive;
+    JSGE *record = self->precDrive;
     if (record != 0 && FSeqnodeRecordDone_1E1D48(self, record) != 0) {
         int drive = 1;
-        if (self->precDrive->kind == 0x1D) drive = self->precDrive->arg[0].n == -1;
+        if (self->precDrive->jsgek == 0x1D) drive = self->precDrive->arg[0].n == -1;
         if (drive != 0) {
             SetSeqnodeDrive_1E1D48(self, 0, 0);
         }
@@ -1090,7 +1005,8 @@ extern "C" LO *PloFindSeqnodeObject(SEQNODE *node, int id) {
 
 #define RP(p, off) (*(void **)((char *)(p) + (off)))
 
-struct BEAT { float t; int n; char pad[0x28]; };
+/* one beat SetRhythmBeats takes (0x30 bytes): the time and the word of a kind 0x4A record (AddSeqRecordDanceMove) */
+struct BEAT { float t; int n; u8 unknown_0x8[0x28]; };
 
 struct WARP { LO *plo; MEMBER *pmember; int pad[2]; VECTOR pos; };
 
@@ -1106,8 +1022,6 @@ struct SWF : LO {
 
 extern char B_003DD490[], B_002DE460[], B_002DEB30[], B_002DFC00[], B_003DA0C0[], B_003DA530[], B_003DD040[], B_004435F0[];
 
-extern CM B_002DDF40;
-
 extern void *B_002DE570;
 
 extern int B_004435F8;
@@ -1119,7 +1033,7 @@ extern "C" LO *PloFindSeqnodeObject(SEQNODE *, int);
 
 extern "C" int FIsBasicDerivedFrom(LO *, int);
 
-extern "C" SEQNODE *PseqnodeNew(LO *, REC *, SEQNODE *);
+extern "C" SEQNODE *PseqnodeNew(LO *, JSGE *, SEQNODE *);
 
 extern "C" void RunSeqnode(SEQNODE *);
 
@@ -1159,7 +1073,7 @@ extern "C" void StartAttach(void *, int, LO *, int);
 
 extern "C" void SetAttachSubstate(void *, int);
 
-extern "C" void SetSeqnodeDrive(SEQNODE *, REC *, LO *);
+extern "C" void SetSeqnodeDrive(SEQNODE *, JSGE *, LO *);
 
 extern "C" void GetSeqnodeObjectPosRad(SEQNODE *, LO *, VECTOR *, float *);
 
@@ -1233,9 +1147,9 @@ extern "C" void StartSwAmbSfx(void *, int, int, int, int, float, float, float, i
 
 extern "C" void StopSwAmbSfx(void *, int, LO *, void *);
 
-extern "C" float DtSeqnodeRecord(SEQNODE *, REC *);
+extern "C" float DtSeqnodeRecord(SEQNODE *, JSGE *);
 
-extern "C" void StartSeqnodeCameraMove(SEQNODE *, REC *, REC *, float);
+extern "C" void StartSeqnodeCameraMove(SEQNODE *, JSGE *, JSGE *, float);
 
 extern "C" void StopSeqnodeCameraMove(SEQNODE *, int);
 
@@ -1298,7 +1212,7 @@ static inline LO *PloSubject(SEQNODE *psn, int oid)
         if (plo == 0) {
             plo = psn->plo1C;
             if (plo == 0)
-                plo = (LO *)RP(psn->psw, 0x6C);
+                plo = (LO *)static_cast<JSG *>(psn->psw)->psoSubject;
         }
         return plo;
     }
@@ -1315,17 +1229,17 @@ static inline LO *PsggFind(SEQNODE *psn, int oid)
     return 0;
 }
 
-static inline REC *PrecFindLabel(SEQNODE *psn, REC *prec)
+static inline JSGE *PrecFindLabel(SEQNODE *psn, JSGE *prec)
 {
-    REC *precEnd = psn->precLast;
-    REC *precFound = 0;
+    JSGE *precEnd = psn->precLast;
+    JSGE *precFound = 0;
     int depth = 0;
-    for (REC *p = psn->precFirst + 1; p < precEnd; p++) {
-        switch (p->kind) {
+    for (JSGE *p = psn->precFirst + 1; p < precEnd; p++) {
+        switch (p->jsgek) {
         case 0: depth++; break;
         case 1: depth--; break;
         case 0x13:
-            if (depth == 0 && RI(p, 0x10) == RI(prec, 0x10)) {
+            if (depth == 0 && p->arg[0].n == prec->arg[0].n) {
                 precFound = p;
                 p = precEnd;
             }
@@ -1337,7 +1251,7 @@ static inline REC *PrecFindLabel(SEQNODE *psn, REC *prec)
 
 static inline unsigned GrfSw(LO *psw)
 {
-    unsigned grf = RI(psw, 0x40);
+    unsigned grf = psw->grfSw;
     unsigned grfT;
     if (!(grf & 1))
         grfT = *(unsigned *)grf;
@@ -1359,23 +1273,23 @@ extern "C" void StartNextSeqnodeRecord(SEQNODE *pseqnode)
     if (pseqnode->precCur > pseqnode->precLast)
         return;
     REF ref(pseqnode);
-    REC *prec = pseqnode->precCur;
+    JSGE *prec = pseqnode->precCur;
     int oid;
-    switch (prec->kind) {
+    switch (prec->jsgek) {
     case 0x16: case 0x1A: case 0x1C: case 0x1E: case 0x23:
-        oid = RI(prec, 0x18);
+        oid = prec->arg[2].n;
         break;
     case 0x27: case 0x28:
-        oid = RI(prec, 0x20);
+        oid = prec->arg[4].n;
         break;
     case 0x22: case 0x24: case 0x29: case 0x2A: case 0x2B: case 0x4A:
-        oid = RI(prec, 0x1C);
+        oid = prec->arg[3].n;
         break;
     case 0x1B: case 0x47: case 0x48: case 0x4F: case 0x50: case 0x51: case 0x57:
-        oid = RI(prec, 0x10);
+        oid = prec->arg[0].n;
         break;
     case 0xB: case 0x18: case 0x19: case 0x1D: case 0x1F: case 0x20: case 0x21: case 0x43: case 0x4B: case 0x58: case 0x59: case 0x5A:
-        oid = RI(prec, 0x14);
+        oid = prec->arg[1].n;
         break;
     default:
         oid = -1;
@@ -1388,13 +1302,13 @@ extern "C" void StartNextSeqnodeRecord(SEQNODE *pseqnode)
         else if (pseqnode->plo1C != 0)
             plo = pseqnode->plo1C;
         else
-            plo = (LO *)RP(pseqnode->psw, 0x6C);
+            plo = (LO *)static_cast<JSG *>(pseqnode->psw)->psoSubject;
     } else {
         plo = PloFindSeqnodeObject(pseqnode, oid);
     }
     pseqnode->psubject = plo;
 
-    switch (prec->kind) {
+    switch (prec->jsgek) {
     case 0: {
         SEQNODE *pnew = PseqnodeNew(pseqnode->psw, prec, pseqnode);
         pseqnode->precCur = pnew->precLast;
@@ -1402,7 +1316,7 @@ extern "C" void StartNextSeqnodeRecord(SEQNODE *pseqnode)
         break;
     }
     case 2: {
-        int oidT = RI(prec, 0x10);
+        int oidT = prec->arg[0].n;
         SEQNODE *psn;
         if (oidT == -1)
             psn = pseqnode;
@@ -1413,28 +1327,28 @@ extern "C" void StartNextSeqnodeRecord(SEQNODE *pseqnode)
         break;
     }
     case 5: {
-        LO *psgg = PsggFind(pseqnode, RI(prec, 0x14));
+        LO *psgg = PsggFind(pseqnode, prec->arg[1].n);
         if (psgg != 0)
-            EnsureSggAlarm__FP3SGGP5ALARM(psgg, RP(prec, 0x10));
+            EnsureSggAlarm__FP3SGGP5ALARM(psgg, (void *)prec->arg[0].n);
         break;
     }
     case 6: {
-        LO *psgg = PsggFind(pseqnode, RI(prec, 0x10));
+        LO *psgg = PsggFind(pseqnode, prec->arg[0].n);
         if (psgg != 0)
             StopJsg(psgg);
         break;
     }
     case 7: {
-        LO *pso = PloFindSeqnodeObject(pseqnode, RI(prec, 0x10));
+        LO *pso = PloFindSeqnodeObject(pseqnode, prec->arg[0].n);
         if (pso != 0 && FIsBasicDerivedFrom(pso, 0x32) != 0)
             ((PO *)pso)->SetPlayable(1);
         break;
     }
     case 8:
-        pseqnode->plo20 = PloFindSeqnodeObject(pseqnode, RI(prec, 0x10));
+        pseqnode->plo20 = PloFindSeqnodeObject(pseqnode, prec->arg[0].n);
         break;
     case 9: {
-        void *pparams = &RI(prec, 0x10);
+        void *pparams = &prec->arg[0].n;
         RP(pseqnode->psw, 0x68) = pseqnode;
         LO *psw = pseqnode->psw;
         psw->HandleSpliceEvent(4, 0, 1, (int)&pparams, 0);
@@ -1442,21 +1356,21 @@ extern "C" void StartNextSeqnodeRecord(SEQNODE *pseqnode)
         break;
     }
     case 0xA: {
-        LO *palo = PloFindSeqnodeObject(pseqnode, RI(prec, 0x14));
+        LO *palo = PloFindSeqnodeObject(pseqnode, prec->arg[1].n);
         if (palo != 0) {
             if (FIsBasicDerivedFrom(palo, 0x34) != 0) {
-                JT_StartPose(palo, RI(prec, 0x10), RI(prec, 0x18) | 1, 5);
-                if (prec->fChild == 0)
+                JT_StartPose(palo, prec->arg[0].n, prec->arg[2].n | 1, 5);
+                if (prec->fAsync == 0)
                     pseqnode->pjtPose = palo;
                 break;
             }
             if (FIsBasicDerivedFrom(palo, 0x30) == 0)
                 palo = 0;
         }
-        LO *pasegd = PloFindSeqnodeObject(pseqnode, RI(prec, 0x10));
+        LO *pasegd = PloFindSeqnodeObject(pseqnode, prec->arg[0].n);
         if (pasegd != 0 && FIsBasicDerivedFrom(pasegd, 0x6D) != 0) {
-            LO *pasega = PasegaApplyAseg(pasegd, palo, 0.0f, 1.0f, RI(prec, 0x18));
-            if (prec->fChild == 0) {
+            LO *pasega = PasegaApplyAseg(pasegd, palo, 0.0f, 1.0f, prec->arg[2].n);
+            if (prec->fAsync == 0) {
                 pseqnode->pasega = pasega;
                 pasega->OnAdd();
             }
@@ -1464,16 +1378,16 @@ extern "C" void StartNextSeqnodeRecord(SEQNODE *pseqnode)
         break;
     }
     case 0xB: {
-        LO *pjsg = PloFindSeqnodeObject(pseqnode, RI(prec, 0x10));
+        LO *pjsg = PloFindSeqnodeObject(pseqnode, prec->arg[0].n);
         if (pjsg != 0 && FIsBasicDerivedFrom(pjsg, 0x72) != 0) {
             StartJsg(pjsg, plo);
-            if (prec->fChild == 0)
+            if (prec->fAsync == 0)
                 pseqnode->pjsg = pjsg;
         }
         break;
     }
     case 0xC: {
-        LO *pctx = PloFindSeqnodeObject(pseqnode, RI(prec, 0x10));
+        LO *pctx = PloFindSeqnodeObject(pseqnode, prec->arg[0].n);
         pseqnode->ploCtx = pctx;
         if (pctx == 0)
             pseqnode->ploCtx = pseqnode->psw;
@@ -1481,30 +1395,30 @@ extern "C" void StartNextSeqnodeRecord(SEQNODE *pseqnode)
     }
     case 0xD: {
         int aentry[4];
-        aentry[0] = RI(prec, 0x10);
-        aentry[1] = RI(prec, 0x14);
-        aentry[2] = RI(prec, 0x18);
+        aentry[0] = prec->arg[0].n;
+        aentry[1] = prec->arg[1].n;
+        aentry[2] = prec->arg[2].n;
         aentry[3] = -1;
         int mode = 1;
-        if (RI(prec, 0x1C) != 0)
+        if (prec->arg[3].n != 0)
             mode = 3;
         TriggerRsmgEntry(B_003DD490, aentry, pseqnode->ploCtx, mode, pseqnode, &pseqnode->psma);
-        if (prec->fChild != 0) {
+        if (prec->fAsync != 0) {
             ReleaseSeqnodeSma(pseqnode);
         } else {
             LO *psma = pseqnode->psma;
-            if (psma != 0 && pseqnode->fSmaCur == 0 && FSmaRetracted(psma) == 0 && GetSmaCur(pseqnode->psma) == RI(prec, 0x18))
+            if (psma != 0 && pseqnode->fSmaCur == 0 && FSmaRetracted(psma) == 0 && GetSmaCur(pseqnode->psma) == prec->arg[2].n)
                 pseqnode->fSmaCur = 1;
         }
         break;
     }
     case 0xE:
     case 0xF: {
-        LO *pso = PloFindSwObject_thunk(B_003DD490, 0x405, RI(prec, 0x10), 0);
+        LO *pso = PloFindSwObject_thunk(B_003DD490, 0x405, prec->arg[0].n, 0);
         if (pso != 0 && FIsBasicDerivedFrom(pso, 0x7E) != 0) {
-            if (prec->kind == 0xE) {
-                ((SWF *)pso)->Show(RI(prec, 0x14));
-                if (prec->fChild == 0)
+            if (prec->jsgek == 0xE) {
+                ((SWF *)pso)->Show(prec->arg[1].n);
+                if (prec->fAsync == 0)
                     pseqnode->ploSw = pso;
             } else {
                 ((SWF *)pso)->Hide();
@@ -1513,42 +1427,42 @@ extern "C" void StartNextSeqnodeRecord(SEQNODE *pseqnode)
         break;
     }
     case 0x10: {
-        SetClockRate(&g_2dded0, 6, RF(prec, 0x10));
-        if (RF(prec, 0x10) == 0.0f) {
+        SetClockRate(&g_2dded0, 6, prec->arg[0].f);
+        if (prec->arg[0].f == 0.0f) {
             LO *psw = pseqnode->psw;
-            int grf = RI(psw, 0x40);
+            int grf = psw->grfSw;
             if ((grf ^ 1) & 1)
                 *(int *)grf |= 0x100;
             else
-                RI(psw, 0x40) = grf | 0x100;
+                psw->grfSw = grf | 0x100;
         } else {
             LO *psw = pseqnode->psw;
-            int grf = RI(psw, 0x40);
+            int grf = psw->grfSw;
             if ((grf ^ 1) & 1)
                 *(int *)grf &= ~0x100;
             else
-                RI(psw, 0x40) = grf & ~0x100;
+                psw->grfSw = grf & ~0x100;
         }
         break;
     }
     case 0x11:
-        ApplyTaskStateRequests(B_002DEB30, 1, &RI(prec, 0x10), pseqnode->ploCtx);
+        ApplyTaskStateRequests(B_002DEB30, 1, &prec->arg[0].n, pseqnode->ploCtx);
         break;
     case 0x12:
-        SetSeqnodeHandsOff(pseqnode, RI(prec, 0x10), RI(prec, 0x14));
+        SetSeqnodeHandsOff(pseqnode, prec->arg[0].n, prec->arg[1].n);
         break;
     case 0x14:
     case 0x15:
-        if (prec->kind != 0x15 || func_00210B68() == RI(prec, 0x14)) {
-            REC *precGoto = prec;
-            REC *precLabel = 0;
+        if (prec->jsgek != 0x15 || func_00210B68() == prec->arg[1].n) {
+            JSGE *precGoto = prec;
+            JSGE *precLabel = 0;
             int depth = 0;
             for (prec = pseqnode->precFirst + 1; prec < pseqnode->precLast; prec++) {
-                switch (prec->kind) {
+                switch (prec->jsgek) {
                 case 0: depth++; break;
                 case 1: depth--; break;
                 case 0x13:
-                    if (depth == 0 && RI(prec, 0x10) == RI(precGoto, 0x10)) {
+                    if (depth == 0 && prec->arg[0].n == precGoto->arg[0].n) {
                         precLabel = prec;
                         prec = pseqnode->precLast;
                     }
@@ -1560,7 +1474,7 @@ extern "C" void StartNextSeqnodeRecord(SEQNODE *pseqnode)
         }
         break;
     case 0x16: {
-        LO *ptarget = PloFindSeqnodeObject(pseqnode, RI(prec, 0x10));
+        LO *ptarget = PloFindSeqnodeObject(pseqnode, prec->arg[0].n);
         if (ptarget != 0 && FIsBasicDerivedFrom(ptarget, 0x29) != 0) {
             func_00228170(ptarget);
             break;
@@ -1603,7 +1517,7 @@ extern "C" void StartNextSeqnodeRecord(SEQNODE *pseqnode)
             QW posT2 = *(QW *)&pos;
             QW result = ScaleAddX(posT2, up, height);
             RQ(pjt, 0x1060) = result;
-            if (RI(prec, 0x14) == 0 && RI(pjt, 0x12F4) == 0) {
+            if (prec->arg[1].n == 0 && RI(pjt, 0x12F4) == 0) {
                 SetJmpState(((JT *)pjt)->PvJmp(), 0xB, 0, 0);
                 DiscardSoXps(pjt);
             }
@@ -1619,20 +1533,20 @@ extern "C" void StartNextSeqnodeRecord(SEQNODE *pseqnode)
         SetResetFlag__FP2CM(&B_002DDF40);
         break;
     case 0x18: {
-        LO *pso = PloFindSeqnodeObject(pseqnode, RI(prec, 0x10));
+        LO *pso = PloFindSeqnodeObject(pseqnode, prec->arg[0].n);
         if (pso != 0 && FIsBasicDerivedFrom(pso, 0xF) != 0)
             func_001E4F20(pseqnode, pso);
         break;
     }
     case 0x19:
-        func_001E5000(pseqnode, PloFindSeqnodeObject(pseqnode, RI(prec, 0x10)));
+        func_001E5000(pseqnode, PloFindSeqnodeObject(pseqnode, prec->arg[0].n));
         break;
     case 0x1A:
         if (pseqnode->psubject != 0 && FIsBasicDerivedFrom(pseqnode->psubject, 0x34) != 0) {
             LO *pjt = pseqnode->psubject;
             if (RI(pjt, 0xF54) != -1) {
                 VECTOR pos;
-                GetSeqnodeObjectPosRad(pseqnode, PloFindSeqnodeObject(pseqnode, RI(prec, 0x10)), &pos, 0);
+                GetSeqnodeObjectPosRad(pseqnode, PloFindSeqnodeObject(pseqnode, prec->arg[0].n), &pos, 0);
                 FindCrvClosestPointAll(RP(pjt, 0xF5C), *(QW *)&pos, 0, 0, 0, 0, &pseqnode->sCrv7C);
                 SetSeqnodeDrive(pseqnode, prec, pjt);
             }
@@ -1641,7 +1555,7 @@ extern "C" void StartNextSeqnodeRecord(SEQNODE *pseqnode)
     case 0x1C:
         if (pseqnode->psubject != 0 && FIsBasicDerivedFrom(pseqnode->psubject, 0x35) != 0) {
             LO *pjt = pseqnode->psubject;
-            switch (RI(prec, 0x14)) {
+            switch (prec->arg[1].n) {
             case 2: SetJtJtcs(pjt, 3); break;
             case 4: SetJtState(pjt, 0xD, -1); break;
             case 8: SetJtState(pjt, 9, -1); break;
@@ -1651,46 +1565,46 @@ extern "C" void StartNextSeqnodeRecord(SEQNODE *pseqnode)
     case 0x1D:
         if (pseqnode->psubject != 0 && FIsBasicDerivedFrom(pseqnode->psubject, 0x34) != 0) {
             LO *pjt = pseqnode->psubject;
-            SetJtAttach5(pjt, PloFindSeqnodeObject(pseqnode, RI(prec, 0x10)));
+            SetJtAttach5(pjt, PloFindSeqnodeObject(pseqnode, prec->arg[0].n));
             SetSeqnodeDrive(pseqnode, prec, pjt);
         }
         break;
     case 0x1E:
         if (pseqnode->psubject != 0 && FIsBasicDerivedFrom(pseqnode->psubject, 0x34) != 0) {
             LO *pjt = pseqnode->psubject;
-            LO *pcarry = PloFindSeqnodeObject(pseqnode, RI(prec, 0x10));
-            StartJtCarry(pjt, pcarry, PloFindSeqnodeObject(pseqnode, RI(prec, 0x14)));
+            LO *pcarry = PloFindSeqnodeObject(pseqnode, prec->arg[0].n);
+            StartJtCarry(pjt, pcarry, PloFindSeqnodeObject(pseqnode, prec->arg[1].n));
             SetSeqnodeDrive(pseqnode, prec, pjt);
         }
         break;
     case 0x1F:
         if (pseqnode->psubject != 0 && FIsBasicDerivedFrom(pseqnode->psubject, 0x34) != 0) {
             LO *pjt = pseqnode->psubject;
-            SetJtAttach9(pjt, PloFindSeqnodeObject(pseqnode, RI(prec, 0x10)));
+            SetJtAttach9(pjt, PloFindSeqnodeObject(pseqnode, prec->arg[0].n));
             SetSeqnodeDrive(pseqnode, prec, pjt);
         }
         break;
     case 0x20:
         if (pseqnode->psubject != 0 && FIsBasicDerivedFrom(pseqnode->psubject, 0x34) != 0) {
             LO *pjt = pseqnode->psubject;
-            func_001421A0(pjt, PloFindSeqnodeObject(pseqnode, RI(prec, 0x10)));
+            func_001421A0(pjt, PloFindSeqnodeObject(pseqnode, prec->arg[0].n));
         }
         break;
     case 0x21:
         if (pseqnode->psubject != 0 && FIsBasicDerivedFrom(pseqnode->psubject, 0x34) != 0) {
             LO *pjt = pseqnode->psubject;
-            func_001421F8(pjt, PloFindSeqnodeObject(pseqnode, RI(prec, 0x10)));
+            func_001421F8(pjt, PloFindSeqnodeObject(pseqnode, prec->arg[0].n));
             SetSeqnodeDrive(pseqnode, prec, pjt);
         }
         break;
     case 0x22:
         if (pseqnode->psubject != 0 && FIsBasicDerivedFrom(pseqnode->psubject, 0x34) != 0) {
             LO *pjt = pseqnode->psubject;
-            LO *pso = PloFindSwObject_thunk(B_003DD490, 1, RI(prec, 0x10), pjt);
-            int oidT = RI(prec, 0x14);
+            LO *pso = PloFindSwObject_thunk(B_003DD490, 1, prec->arg[0].n, pjt);
+            int oidT = prec->arg[1].n;
             LO *pother;
             if (oidT == 3) {
-                QW posCm = B_002DDF40.pos;
+                QW posCm = B_002DDF40.mat.row[3];
                 QW posJt = PosLoWorld(pjt);
                 QW dir = VectorSub(posCm, posJt);
                 SetStepRadTargetDir(pjt, dir);
@@ -1698,20 +1612,20 @@ extern "C" void StartNextSeqnodeRecord(SEQNODE *pseqnode)
             } else {
                 pother = PloFindSeqnodeObject(pseqnode, oidT);
             }
-            func_001424E0(pjt, pso, pother, RI(prec, 0x18));
+            func_001424E0(pjt, pso, pother, prec->arg[2].n);
             SetSeqnodeDrive(pseqnode, prec, pjt);
         }
         break;
     case 0x23:
-        if (PloFindSeqnodeObject(pseqnode, RI(prec, 0x14)) != 0 && pseqnode->psubject != 0 && FIsBasicDerivedFrom(pseqnode->psubject, 0x34) != 0)
+        if (PloFindSeqnodeObject(pseqnode, prec->arg[1].n) != 0 && pseqnode->psubject != 0 && FIsBasicDerivedFrom(pseqnode->psubject, 0x34) != 0)
             SetSeqnodeDrive(pseqnode, prec, pseqnode->psubject);
         break;
     case 0x24:
         if (pseqnode->psubject != 0 && FIsBasicDerivedFrom(pseqnode->psubject, 0x34) != 0) {
             LO *pjt = pseqnode->psubject;
-            if (RI(prec, 0x20) != -1)
-                JT_StartPose(pjt, RI(prec, 0x20), 9, 6);
-            LO *pground = PloFindSeqnodeObject(pseqnode, RI(prec, 0x10));
+            if (prec->arg[4].n != -1)
+                JT_StartPose(pjt, prec->arg[4].n, 9, 6);
+            LO *pground = PloFindSeqnodeObject(pseqnode, prec->arg[0].n);
             if (pground != 0) {
                 if (FIsBasicDerivedFrom(pground, 0x22) != 0 || FIsBasicDerivedFrom(pground, 0xC) != 0 || FIsBasicDerivedFrom(pground, 0x26) != 0 ||
                     FIsBasicDerivedFrom(pground, 0x58) != 0 || FIsBasicDerivedFrom(pground, 0xB) != 0 || FIsBasicDerivedFrom(pground, 0x13) != 0) {
@@ -1740,16 +1654,16 @@ extern "C" void StartNextSeqnodeRecord(SEQNODE *pseqnode)
         break;
     case 0x27:
         if (pseqnode->psubject != 0 && FIsBasicDerivedFrom(pseqnode->psubject, 0x34) != 0) {
-            LO *pcrv = PloFindSeqnodeObject(pseqnode, RI(prec, 0x10));
+            LO *pcrv = PloFindSeqnodeObject(pseqnode, prec->arg[0].n);
             if (pcrv != 0 && FIsBasicDerivedFrom(pcrv, 0xA) != 0) {
                 LO *pjt = pseqnode->psubject;
-                if (RI(prec, 0x24) != -1)
-                    JT_StartPose(pjt, RI(prec, 0x24), 9, 6);
+                if (prec->arg[5].n != -1)
+                    JT_StartPose(pjt, prec->arg[5].n, 9, 6);
                 LO *pgoal = func_00205438(pjt, 0xA8);
                 RI(pgoal, 0x40) = pseqnode->fE0;
-                RI(pgoal, 0xCC) = RI(prec, 0x18);
-                RF(pgoal, 0xD0) = RF(prec, 0x1C);
-                GoalFollowCrv_SetCrv(pgoal, pcrv, RI(prec, 0x14) == 0);
+                RI(pgoal, 0xCC) = prec->arg[2].n;
+                RF(pgoal, 0xD0) = prec->arg[3].f;
+                GoalFollowCrv_SetCrv(pgoal, pcrv, prec->arg[1].n == 0);
                 ((GOAL *)pgoal)->Activate();
             }
         }
@@ -1758,14 +1672,14 @@ extern "C" void StartNextSeqnodeRecord(SEQNODE *pseqnode)
         if (pseqnode->psubject != 0 && FIsBasicDerivedFrom(pseqnode->psubject, 0x34) != 0) {
             LO *pjt = pseqnode->psubject;
             VECTOR pos;
-            GetSeqnodeObjectPosRad(pseqnode, PloFindSeqnodeObject(pseqnode, RI(prec, 0x10)), &pos, 0);
-            if (RI(prec, 0x24) != -1)
-                JT_StartPose(pjt, RI(prec, 0x24), 9, 6);
+            GetSeqnodeObjectPosRad(pseqnode, PloFindSeqnodeObject(pseqnode, prec->arg[0].n), &pos, 0);
+            if (prec->arg[5].n != -1)
+                JT_StartPose(pjt, prec->arg[5].n, 9, 6);
             LO *pgoal = func_00205438(pjt, 0xC1);
             RI(pgoal, 0x30) = pseqnode->fE0;
-            RF(pgoal, 0x34) = RF(prec, 0x14);
-            RI(pgoal, 0x38) = RI(prec, 0x18);
-            RF(pgoal, 0x3C) = RF(prec, 0x1C);
+            RF(pgoal, 0x34) = prec->arg[1].f;
+            RI(pgoal, 0x38) = prec->arg[2].n;
+            RF(pgoal, 0x3C) = prec->arg[3].f;
             GoalGotoPos_SetPos(pgoal, *(QW *)&pos);
             ((GOAL *)pgoal)->Activate();
         }
@@ -1780,7 +1694,7 @@ extern "C" void StartNextSeqnodeRecord(SEQNODE *pseqnode)
     case 0x2A:
         if (pseqnode->psubject != 0 && FIsBasicDerivedFrom(pseqnode->psubject, 0x34) != 0) {
             LO *pjt = pseqnode->psubject;
-            LO *pdest = PloFindSeqnodeObject(pseqnode, RI(prec, 0x10));
+            LO *pdest = PloFindSeqnodeObject(pseqnode, prec->arg[0].n);
             WARP warp;
             memset(&warp, 0, sizeof(warp));
             if (pdest == 0) {
@@ -1802,70 +1716,70 @@ extern "C" void StartNextSeqnodeRecord(SEQNODE *pseqnode)
                 }
             }
             WarpJtToSafePoint(pjt, &warp);
-            if (RI(prec, 0x14) == 1)
-                RI(pjt, 0x2E8) = RI(prec, 0x14);
+            if (prec->arg[1].n == 1)
+                RI(pjt, 0x2E8) = prec->arg[1].n;
             if (FIsBasicDerivedFrom(pjt, 0x35) != 0)
-                RI(pjt, 0x18F0) = RI(prec, 0x18);
+                RI(pjt, 0x18F0) = prec->arg[2].n;
             SetSeqnodeDrive(pseqnode, prec, pjt);
         }
         break;
     case 0x2B:
         if (pseqnode->psubject != 0 && FIsBasicDerivedFrom(pseqnode->psubject, 0x34) != 0) {
-            LO *pso = PloFindSeqnodeObject(pseqnode, RI(prec, 0x10));
+            LO *pso = PloFindSeqnodeObject(pseqnode, prec->arg[0].n);
             LO *pjt = pseqnode->psubject;
             VECTOR pos;
             GetSeqnodeObjectPosRad(pseqnode, pso, &pos, 0);
-            func_00141968(pjt, *(QW *)&pos, RF(prec, 0x14), RF(prec, 0x18));
+            func_00141968(pjt, *(QW *)&pos, prec->arg[1].f, prec->arg[2].f);
         }
         break;
     case 0x2C:
     case 0x2D: {
-        LO *pso = ShowHideLo(B_003DD490, prec->kind == 0x2C, RI(prec, 0x10), RF(prec, 0x14), pseqnode->ploCtx, pseqnode->psw);
-        if (pso != 0 && prec->fChild == 0 && FIsBasicDerivedFrom(pso, 0x30) != 0)
+        LO *pso = ShowHideLo(B_003DD490, prec->jsgek == 0x2C, prec->arg[0].n, prec->arg[1].f, pseqnode->ploCtx, pseqnode->psw);
+        if (pso != 0 && prec->fAsync == 0 && FIsBasicDerivedFrom(pso, 0x30) != 0)
             pseqnode->ploShown = pso;
         break;
     }
     case 0x2E:
     case 0x2F:
-        ShowHideLoGlob(B_003DD490, prec->kind == 0x2E, RI(prec, 0x10), RI(prec, 0x14), 0, pseqnode->ploCtx, pseqnode->psw);
+        ShowHideLoGlob(B_003DD490, prec->jsgek == 0x2E, prec->arg[0].n, prec->arg[1].n, 0, pseqnode->ploCtx, pseqnode->psw);
         break;
     case 0x30:
     case 0x31:
-        EnableDisableLoPart(B_003DD490, prec->kind == 0x30, RI(prec, 0x10), RI(prec, 0x14), 0, pseqnode->ploCtx, pseqnode->psw);
+        EnableDisableLoPart(B_003DD490, prec->jsgek == 0x30, prec->arg[0].n, prec->arg[1].n, 0, pseqnode->ploCtx, pseqnode->psw);
         break;
     case 0x32:
-        JoltCm(&B_002DDF40, RI(prec, 0x10));
+        JoltCm(&B_002DDF40, prec->arg[0].n);
         break;
     case 0x33:
-        TriggerJoyRumbleRumk__FP3JOY4RUMKf(B_002DFC00, RI(prec, 0x14), RF(prec, 0x10));
+        TriggerJoyRumbleRumk__FP3JOY4RUMKf(B_002DFC00, prec->arg[1].n, prec->arg[0].f);
         break;
     case 0x34:
-        func_00210538(B_003DD490, RI(prec, 0x10), RI(prec, 0x14), RI(prec, 0x18), pseqnode->ploCtx, pseqnode->psw, RF(prec, 0x1C));
+        func_00210538(B_003DD490, prec->arg[0].n, prec->arg[1].n, prec->arg[2].n, pseqnode->ploCtx, pseqnode->psw, prec->arg[3].f);
         break;
     case 0x35:
-        SetEyesClosedByOid(B_003DD490, RI(prec, 0x10), RI(prec, 0x14), pseqnode->ploCtx, pseqnode->psw, RF(prec, 0x18));
+        SetEyesClosedByOid(B_003DD490, prec->arg[0].n, prec->arg[1].n, pseqnode->ploCtx, pseqnode->psw, prec->arg[2].f);
         break;
     case 0x36:
-        StartSwAmbSfx(B_003DD490, RI(prec, 0x10), RI(prec, 0x14), RI(prec, 0x18), RI(prec, 0x1C), RF(prec, 0x20), RF(prec, 0x24), RF(prec, 0x28), 0,
+        StartSwAmbSfx(B_003DD490, prec->arg[0].n, prec->arg[1].n, prec->arg[2].n, prec->arg[3].n, prec->arg[4].f, prec->arg[5].f, prec->arg[6].f, 0,
                       pseqnode->ploCtx, pseqnode->psw, &pseqnode->pamb);
         break;
     case 0x37:
-        StopSwAmbSfx(B_003DD490, RI(prec, 0x10), pseqnode->psw, &pseqnode->pamb);
+        StopSwAmbSfx(B_003DD490, prec->arg[0].n, pseqnode->psw, &pseqnode->pamb);
         break;
     case 0x38: {
         float dt;
         int fAccum;
-        if (RF(prec, 0x40) == 0.0f) {
+        if (prec->arg[12].f == 0.0f) {
             dt = 0.0f;
             fAccum = 1;
         } else {
-            dt = RF(prec, 0x40);
+            dt = prec->arg[12].f;
             fAccum = 0;
         }
-        REC *pmove = 0;
+        JSGE *pmove = 0;
         int depth = 0;
-        for (REC *p = prec + 1; p < pseqnode->precLast && pmove == 0; p++) {
-            switch (p->kind) {
+        for (JSGE *p = prec + 1; p < pseqnode->precLast && pmove == 0; p++) {
+            switch (p->jsgek) {
             case 0: depth++; break;
             case 1: depth--; break;
             case 0x39:
@@ -1884,21 +1798,21 @@ extern "C" void StartNextSeqnodeRecord(SEQNODE *pseqnode)
     }
     case 0x39:
         if (pseqnode->tCam == 3.4028235e38f) {
-            if (RI(prec, 0x40) != 0)
-                StopSeqnodeCameraMove(pseqnode, RI(prec, 0x44));
+            if (prec->arg[12].n != 0)
+                StopSeqnodeCameraMove(pseqnode, prec->arg[13].n);
             else
                 pseqnode->fCamMove = 0;
         }
         break;
     case 0x3A:
-        StopSeqnodeCameraMove(pseqnode, RI(prec, 0x10));
+        StopSeqnodeCameraMove(pseqnode, prec->arg[0].n);
         break;
     case 0x3B: {
-        LO *pfocus = PloFindSeqnodeObject(pseqnode, RI(prec, 0x14));
+        LO *pfocus = PloFindSeqnodeObject(pseqnode, prec->arg[1].n);
         if (pfocus != 0)
             FIsBasicDerivedFrom(pfocus, 0x33);
-        LO *panchor = PloFindSwObject_thunk(B_003DD490, 0x405, RI(prec, 0x18), 0);
-        LO *pjt = PloFindSeqnodeObject(pseqnode, RI(prec, 0x10));
+        LO *panchor = PloFindSwObject_thunk(B_003DD490, 0x405, prec->arg[2].n, 0);
+        LO *pjt = PloFindSeqnodeObject(pseqnode, prec->arg[0].n);
         if (pjt != 0 && FIsBasicDerivedFrom(pjt, 0x34) != 0) {
             pseqnode->pjtBinoc = pjt;
             StartBinoc(((JT *)pjt)->PvBinoc(), 1, pfocus, panchor);
@@ -1910,33 +1824,33 @@ extern "C" void StartNextSeqnodeRecord(SEQNODE *pseqnode)
         break;
     case 0x3D:
     {
-        LO *pso = PloFindSeqnodeObject(pseqnode, RI(prec, 0x10));
+        LO *pso = PloFindSeqnodeObject(pseqnode, prec->arg[0].n);
         bevy_classes_k30_cam_set(B_002DE460, pso);
     }
         break;
     case 0x3E:
     {
-        LO *pso = PloFindSeqnodeObject(pseqnode, RI(prec, 0x10));
+        LO *pso = PloFindSeqnodeObject(pseqnode, prec->arg[0].n);
         func_00150E60(B_002DE460, pso);
     }
         break;
     case 0x3F:
-        func_00150EA0(B_002DE460, RQ(prec, 0x10), RQ(prec, 0x20), RF(prec, 0x30));
+        func_00150EA0(B_002DE460, prec->posrot.pos, prec->posrot.rot, prec->arg[8].f);
         break;
     case 0x40:
-        func_00150EE8(B_002DE460, RF(prec, 0x10));
+        func_00150EE8(B_002DE460, prec->arg[0].f);
         break;
     case 0x41:
         bevy_classes_k30_cam_150ef0(B_002DE460);
         break;
     case 0x42:
-        B_004435F8 = RI(prec, 0x10) & 0xF0;
+        B_004435F8 = prec->arg[0].n & 0xF0;
         break;
     case 0x44:
         func_001DD820(B_003DA530);
         break;
     case 0x45:
-        StartStream(B_003DD040, RI(prec, 0x10), RI(prec, 0x14));
+        StartStream(B_003DD040, prec->arg[0].n, prec->arg[1].n);
         pseqnode->precStream = prec;
         break;
     case 0x46:
@@ -1944,26 +1858,26 @@ extern "C" void StartNextSeqnodeRecord(SEQNODE *pseqnode)
         break;
     case 0x47:
         if (plo != 0)
-            AttachSeqnodeObject(pseqnode, plo, RI(prec, 0x14), RI(prec, 0x18));
+            AttachSeqnodeObject(pseqnode, plo, prec->arg[1].n, prec->arg[2].n);
         break;
     case 0x48:
         if (plo != 0)
-            DetachSeqnodeObject(pseqnode, plo, RI(prec, 0x14), RI(prec, 0x18));
+            DetachSeqnodeObject(pseqnode, plo, prec->arg[1].n, prec->arg[2].n);
         break;
     case 0x49:
         if (B_002DE570 != 0) {
             BEAT abeat[6];
             unsigned int cbeat = 0;
             int depth = 0;
-            for (REC *p = prec + 1; p < pseqnode->precLast; p++) {
-                switch (p->kind) {
+            for (JSGE *p = prec + 1; p < pseqnode->precLast; p++) {
+                switch (p->jsgek) {
                 case 0: depth++; break;
                 case 1: depth--; break;
                 case 0x4A:
                     if (depth == 0 && cbeat < 6) {
                         BEAT *pbeat = &abeat[cbeat++];
-                        pbeat->t = RF(p, 0x10);
-                        pbeat->n = RI(p, 0x14);
+                        pbeat->t = p->arg[0].f;
+                        pbeat->n = p->arg[1].n;
                     }
                     break;
                 case 0x49:
@@ -1972,17 +1886,17 @@ extern "C" void StartNextSeqnodeRecord(SEQNODE *pseqnode)
                     break;
                 }
             }
-            SetRhythmBeats(B_002DE570, RI(prec, 0x10), cbeat, abeat);
+            SetRhythmBeats(B_002DE570, prec->arg[0].n, cbeat, abeat);
         }
         break;
     case 0x4A:
         if (pseqnode->psubject != 0 && FIsBasicDerivedFrom(pseqnode->psubject, 0x44) != 0 && B_002DE570 != 0)
-            QueueRhythmCue(B_002DE570, pseqnode->psubject, RI(prec, 0x14), RI(prec, 0x18), RF(prec, 0x10));
+            QueueRhythmCue(B_002DE570, pseqnode->psubject, prec->arg[1].n, prec->arg[2].n, prec->arg[0].f);
         break;
     case 0x4B:
         if (pseqnode->psubject != 0 && FIsBasicDerivedFrom(pseqnode->psubject, 0x44) != 0) {
             LO *pdancer = pseqnode->psubject;
-            int oidT = RI(prec, 0x10);
+            int oidT = prec->arg[0].n;
             LO *pso;
             if (oidT == -1)
                 pso = 0;
@@ -1992,19 +1906,19 @@ extern "C" void StartNextSeqnodeRecord(SEQNODE *pseqnode)
         }
         break;
     case 0x4C:
-        QueueStream(B_003DD040, RI(prec, 0x10));
+        QueueStream(B_003DD040, prec->arg[0].n);
         break;
     case 0x4D:
-        DequeueStream(B_003DD040, RI(prec, 0x10));
+        DequeueStream(B_003DD040, prec->arg[0].n);
         break;
     case 0x4F:
         if (pseqnode->psubject != 0 && FIsBasicDerivedFrom(pseqnode->psubject, 0x36) != 0) {
             LO *pmurray = pseqnode->psubject;
-            LO *pso = PloFindSeqnodeObject(pseqnode, RI(prec, 0x14));
+            LO *pso = PloFindSeqnodeObject(pseqnode, prec->arg[1].n);
             if (pso != 0) {
                 void *psma = PsmaFindAlo(pso, -1);
                 if (psma != 0)
-                    StartMurrayMash(pmurray, psma, RI(prec, 0x1C), RI(prec, 0x18), RI(prec, 0x20));
+                    StartMurrayMash(pmurray, psma, prec->arg[3].n, prec->arg[2].n, prec->arg[4].n);
             }
         }
         break;
@@ -2014,24 +1928,24 @@ extern "C" void StartNextSeqnodeRecord(SEQNODE *pseqnode)
             SetSeqnodeDrive(pseqnode, prec, pseqnode->psubject);
         break;
     case 0x53:
-        ShowHudLabel(B_003DA0C0, RI(prec, 0x10), RF(prec, 0x14));
+        ShowHudLabel(B_003DA0C0, prec->arg[0].n, prec->arg[1].f);
         break;
     case 0x54:
-        ClearHudLabel(B_003DA0C0, RI(prec, 0x10));
+        ClearHudLabel(B_003DA0C0, prec->arg[0].n);
         break;
     case 0x55: {
-        LO *pa = PloFindSeqnodeObject(pseqnode, RI(prec, 0x10));
-        LO *pb = PloFindSeqnodeObject(pseqnode, RI(prec, 0x14));
+        LO *pa = PloFindSeqnodeObject(pseqnode, prec->arg[0].n);
+        LO *pb = PloFindSeqnodeObject(pseqnode, prec->arg[1].n);
         func_00171CF8(pa, pb);
-        if (prec->fChild == 0) {
+        if (prec->fAsync == 0) {
             pseqnode->ploD8 = pa;
             pseqnode->ploDC = pb;
         }
         break;
     }
     case 0x56: {
-        LO *pa = PloFindSeqnodeObject(pseqnode, RI(prec, 0x10));
-        func_00171D58(pa, PloFindSeqnodeObject(pseqnode, RI(prec, 0x14)));
+        LO *pa = PloFindSeqnodeObject(pseqnode, prec->arg[0].n);
+        func_00171D58(pa, PloFindSeqnodeObject(pseqnode, prec->arg[1].n));
         break;
     }
     case 0x57:
@@ -2041,7 +1955,7 @@ extern "C" void StartNextSeqnodeRecord(SEQNODE *pseqnode)
     case 0x58:
         if (pseqnode->psubject != 0 && FIsBasicDerivedFrom(pseqnode->psubject, 0x37) != 0) {
             LO *pjt = pseqnode->psubject;
-            LO *pso = PloFindSeqnodeObject(pseqnode, RI(prec, 0x10));
+            LO *pso = PloFindSeqnodeObject(pseqnode, prec->arg[0].n);
             if (pso != 0 && FIsBasicDerivedFrom(pso, 0x36) != 0) {
                 SetJmpState(((JT *)pjt)->PvJmp(), (RI(pjt, 0x2DC) == 0x11) ? 3 : 1, 0, 0);
                 SetSeqnodeDrive(pseqnode, prec, pjt);
@@ -2053,7 +1967,7 @@ extern "C" void StartNextSeqnodeRecord(SEQNODE *pseqnode)
             LO *pjt = pseqnode->psubject;
             int state = RI(pjt, 0x1914);
             if (state < 7) if (state >= 4) {
-                LO *pso = PloFindSeqnodeObject(pseqnode, RI(prec, 0x10));
+                LO *pso = PloFindSeqnodeObject(pseqnode, prec->arg[0].n);
                 if (pso != 0)
                     func_00220508(((MURRAY *)pjt)->PvCarry(), pso);
             }
@@ -2064,8 +1978,8 @@ extern "C" void StartNextSeqnodeRecord(SEQNODE *pseqnode)
             LO *pjt = pseqnode->psubject;
             int state = RI(pjt, 0x1914);
             if (state < 7) if (state >= 4) {
-                RI(prec, 0x18) = RI(pjt, 0x1910);
-                LO *pso = PloFindSeqnodeObject(pseqnode, RI(prec, 0x10));
+                prec->arg[2].n = RI(pjt, 0x1910);
+                LO *pso = PloFindSeqnodeObject(pseqnode, prec->arg[0].n);
                 if (pso != 0) {
                     func_00220508(((MURRAY *)pjt)->PvCarry(), pso);
                     SetSeqnodeDrive(pseqnode, prec, pjt);
@@ -2083,7 +1997,7 @@ extern "C" void StartNextSeqnodeRecord(SEQNODE *pseqnode)
         pseqnode->rClock = g_2dded0.t;
 }
 
-/* SEQVT, REC and SEQNODE as the whole file (src/stepguard-jsg/AddJsgContext_file.cpp) declares them for RunSeqnode, which calls this
+/* SEQVT, JSGE and SEQNODE as the whole file (src/stepguard-jsg/AddJsgContext_file.cpp) declares them for RunSeqnode, which calls this
    function; RECDONE and SEQNODEDONE below are the fuller views of the same objects this function reads */
 
 /* a record argument word: an object id, a count, a time or a distance, by record kind */
@@ -2306,7 +2220,7 @@ static inline float DistToObject(LO *plo, QW *ppos) {
     return LaneX(SqrtX(SumXyInX(VectorMultiplyXy(offset, offset))));
 }
 
-extern "C" int FSeqnodeRecordDone(SEQNODE *pseqnodeBase, REC *precBase) {
+extern "C" int FSeqnodeRecordDone(SEQNODE *pseqnodeBase, JSGE *precBase) {
     SEQNODEDONE *pseqnode = (SEQNODEDONE *)pseqnodeBase;
     RECDONE *prec = (RECDONE *)precBase;
     QW pos;
@@ -2750,10 +2664,6 @@ extern "C" int FSeqnodeRecordDone(SEQNODE *pseqnodeBase, REC *precBase) {
     return fDone;
 }
 
-struct Record_1E4530 { int kind; int skip; char pad[8]; union { int id; float value; } a; union { int sub; float value; } b; int state; };
-
-struct Seq_1E4530 { char pad[0x74]; float a74; float a78; char pad2[0x80 - 0x7C]; float c0; float c1; float c2; char pad3[0x90 - 0x8C]; float low; float high; };
-
 extern "C" float DtSmaReachState(void *, int);
 
 extern "C" float FFindLevel(void *, int, SEQNODE *);
@@ -2768,35 +2678,34 @@ extern char B_003DD040[];
 
 extern float RO_002BD850;
 
-extern "C" float DtSeqnodeRecord(SEQNODE *node, REC *prec) {
-    Record_1E4530 *record = (Record_1E4530 *)prec;
+extern "C" float DtSeqnodeRecord(SEQNODE *node, JSGE *prec) {
     float result = 0.0f;
-    if (record->skip == 0) {
-        switch (record->kind) {
+    if (prec->fAsync == 0) {
+        switch (prec->jsgek) {
         case 0xA: {
-            Seq_1E4530 *seq = (Seq_1E4530 *)PloFindSeqnodeObject(node, record->a.id);
-            if (seq != 0) {
+            ASEG *paseg = static_cast<ASEG *>(PloFindSeqnodeObject(node, prec->arg[0].n));
+            if (paseg != 0) {
                 float suck = GetSuck(B_002DE578);
-                float *coefficient = &seq->c0;
-                float low = seq->low;
-                float high = seq->high;
-                float curve = coefficient[0] + suck * (coefficient[1] + suck * coefficient[2]);
+                CLQ *pclq = &paseg->clqSpeed;
+                float low = paseg->lmSpeed.gMin;
+                float high = paseg->lmSpeed.gMax;
+                float curve = pclq->g0 + suck * (pclq->g1 + suck * pclq->g2);
                 if (curve < low) {
                     curve = low;
                 } else if (high < curve) {
                     curve = high;
                 }
-                result = seq->a74 / (seq->a78 * curve);
+                result = paseg->tLength / (paseg->svtMaster * curve);
             }
             break;
         }
         case 0xD:
-            if (record->state != -1) {
-                LO *object = PloFindSwObject_thunk(B_003DD490, 4, record->a.id, node->ploCtx);
+            if (prec->arg[2].n != -1) {
+                LO *object = PloFindSwObject_thunk(B_003DD490, 4, prec->arg[0].n, node->ploCtx);
                 if (object != 0) {
-                    void *alo = PsmaFindAlo(object, record->b.sub);
+                    void *alo = PsmaFindAlo(object, prec->arg[1].n);
                     if (alo != 0) {
-                        result = DtSmaReachState(alo, record->state);
+                        result = DtSmaReachState(alo, prec->arg[2].n);
                     }
                 }
             }
@@ -2806,24 +2715,20 @@ extern "C" float DtSeqnodeRecord(SEQNODE *node, REC *prec) {
             break;
         case 0x23:
         case 0x33:
-            result = record->a.value;
+            result = prec->arg[0].f;
             break;
         case 0x45:
-            result = FFindLevel(B_003DD040, record->a.id, node);
+            result = FFindLevel(B_003DD040, prec->arg[0].n, node);
             break;
         case 0x2C:
         case 0x2D:
         case 0x53:
-            result = record->b.value;
+            result = prec->arg[1].f;
             break;
         }
     }
     return result;
 }
-
-struct CRV { char pad[0xE4]; int closed; };
-
-struct VJOY { char pad[0x10]; float xLeft; float yLeft; float radLeft; float sLeft; char pad2[0x30 - 0x20]; unsigned grfbtn; };
 
 extern "C" float atan2f(float, float);
 
@@ -2839,11 +2744,11 @@ extern "C" void GetPathPosFromS(CRV *, void *, int, float);
 
 extern "C" void EvaluateCrvFromU(CRV *, void *, void *, float);
 
-extern "C" QW bevy_player_p14_1c4768(VJOY *, QW);
+extern "C" QW bevy_player_p14_1c4768(JOY *, QW);
 
 extern "C" QW bevy_camera_follow_track_heading_weight(void *, void *, QW);
 
-extern "C" void UpdateVjoyPressTimes(VJOY *);
+extern "C" void UpdateVjoyPressTimes(JOY *);
 
 extern "C" QW g_2a2da0;
 
@@ -2853,7 +2758,7 @@ extern "C" float g_2bbb60[2];
 
 extern "C" float g_2c3640;
 
-void UpdateSeqnodeVjoy(SEQNODE *pseqnode, VJOY *pvjoy)
+void UpdateSeqnodeVjoy(SEQNODE *pseqnode, JOY *pvjoy)
 {
     struct { QW q0; QW q1; QW q2; QW q3; } l;
     int *prec = (int *)pseqnode->precDrive;
@@ -2869,7 +2774,7 @@ void UpdateSeqnodeVjoy(SEQNODE *pseqnode, VJOY *pvjoy)
         QW dir = bevy_player_p14_1c4768(pvjoy, VectorSub(l.q0, l.q1));
         float x = LaneX(dir);
         float y = LaneX(RotateWords3(dir));
-        pvjoy->radLeft = atan2f(y, x);
+        pvjoy->radStick = atan2f(y, x);
         pvjoy->xLeft = x;
         pvjoy->yLeft = y;
         CRV *pcrv = pso->pcrvPipe;
@@ -2889,16 +2794,16 @@ void UpdateSeqnodeVjoy(SEQNODE *pseqnode, VJOY *pvjoy)
                 fBackward = 1;
         }
         if (fBackward) {
-            pvjoy->radLeft = RadNormalize__Ff(pvjoy->radLeft + 3.1415927f);
+            pvjoy->radStick = RadNormalize__Ff(pvjoy->radStick + 3.1415927f);
             pvjoy->xLeft = -pvjoy->xLeft;
             pvjoy->yLeft = -pvjoy->yLeft;
         }
-        pvjoy->sLeft = 1.0f;
+        pvjoy->uStick = 1.0f;
         break;
     }
     case 0x1d: case 0x1e: case 0x1f: case 0x20: case 0x21: case 0x22:
     group:
-        pvjoy->sLeft = 0.0f;
+        pvjoy->uStick = 0.0f;
         if (pso->field_0x4CC != -1)
             pvjoy->grfbtn |= 0x20;
         break;
@@ -2907,12 +2812,12 @@ void UpdateSeqnodeVjoy(SEQNODE *pseqnode, VJOY *pvjoy)
         if (ptarget != 0) {
             GetSeqnodeObjectPosRad(pseqnode, ptarget, 0, (float *)&l.q3);
             SetStepRadTarget((LO *)pso, *(float *)&l.q3);
-            pvjoy->radLeft = *(float *)&l.q3;
+            pvjoy->radStick = *(float *)&l.q3;
         }
     }
         goto group;
     case 0x24: {
-        pvjoy->sLeft = __builtin_fabsf(((float *)prec)[5]);
+        pvjoy->uStick = __builtin_fabsf(((float *)prec)[5]);
         if (prec[9] != 0)
             pvjoy->grfbtn |= 8;
         LO *ptarget = PloFindSeqnodeObject(pseqnode, prec[4]);
@@ -2931,7 +2836,7 @@ void UpdateSeqnodeVjoy(SEQNODE *pseqnode, VJOY *pvjoy)
                     length = ScaleByReciprocalX(tangent, length);
                 l.q1 = length;
                 int fBackward = 0;
-                pvjoy->radLeft = atan2f(((float *)&l.q1)[1], ((float *)&l.q1)[0]);
+                pvjoy->radStick = atan2f(((float *)&l.q1)[1], ((float *)&l.q1)[0]);
                 if (pcrv->closed != 0) {
                     float uBackward, uForward;
                     if (pseqnode->sCrv78 < pso->uAttach) {
@@ -2948,13 +2853,13 @@ void UpdateSeqnodeVjoy(SEQNODE *pseqnode, VJOY *pvjoy)
                         fBackward = 1;
                 }
                 if (fBackward)
-                    pvjoy->radLeft = RadNormalize__Ff(pvjoy->radLeft + 3.1415927f);
+                    pvjoy->radStick = RadNormalize__Ff(pvjoy->radStick + 3.1415927f);
             } else {
                 GetSeqnodeObjectPosRad(pseqnode, ptarget, (VECTOR *)&l.q0, 0);
                 QW posTarget = l.q0;
                 QW posSo = PosLoWorld((LO *)pso);
                 l.q1 = VectorSub(posTarget, posSo);
-                pvjoy->radLeft = atan2f(((float *)&l.q1)[1], ((float *)&l.q1)[0]);
+                pvjoy->radStick = atan2f(((float *)&l.q1)[1], ((float *)&l.q1)[0]);
                 float len = LaneX(SqrtX(SquaredLengthXy(l.q1)));
                 float gSpeed = g_2c3630[0] + len * (g_2c3630[1] + len * g_2c3630[2]);
                 float gMin = g_2bbb60[0];
@@ -2963,7 +2868,7 @@ void UpdateSeqnodeVjoy(SEQNODE *pseqnode, VJOY *pvjoy)
                     gSpeed = gMin;
                 else if (gMax < gSpeed)
                     gSpeed = gMax;
-                pvjoy->sLeft = pvjoy->sLeft * gSpeed;
+                pvjoy->uStick = pvjoy->uStick * gSpeed;
             }
         }
         if (pso->field_0x4CC == -1)
@@ -2974,7 +2879,7 @@ void UpdateSeqnodeVjoy(SEQNODE *pseqnode, VJOY *pvjoy)
         break;
     }
     case 0x29: {
-        pvjoy->sLeft = __builtin_fabsf(((float *)prec)[5]);
+        pvjoy->uStick = __builtin_fabsf(((float *)prec)[5]);
         LO *ptarget = PloFindSeqnodeObject(pseqnode, prec[4]);
         if (ptarget == 0 || pso->field_0x4CC == -1)
             break;
@@ -2986,7 +2891,7 @@ void UpdateSeqnodeVjoy(SEQNODE *pseqnode, VJOY *pvjoy)
         l.q1 = VectorSub(posTarget, posSo);
         ((int *)&l.q1)[2] = 0;
         QW local = bevy_camera_follow_track_heading_weight(0, pso, l.q1);
-        float sLeft = pvjoy->sLeft;
+        float sLeft = pvjoy->uStick;
         l.q2 = ScaleByReciprocalX(local, SqrtX(SquaredLength(local)));
         float ux = ((float *)&l.q2)[0];
         float uy = -((float *)&l.q2)[1];
@@ -2995,7 +2900,7 @@ void UpdateSeqnodeVjoy(SEQNODE *pseqnode, VJOY *pvjoy)
         break;
     }
     case 0x58:
-        pvjoy->sLeft = 0.0f;
+        pvjoy->uStick = 0.0f;
         pvjoy->grfbtn |= 0x20;
         UpdateVjoyPressTimes(pvjoy);
         goto tail;
@@ -3009,12 +2914,12 @@ void UpdateSeqnodeVjoy(SEQNODE *pseqnode, VJOY *pvjoy)
             fNear = FFloatsNear__Ffff(LaneZInGeneralRegister(b), LaneZInGeneralRegister(a), eps) != 0;
         if (fNear)
             pvjoy->grfbtn |= 0x40;
-        pvjoy->sLeft = 0.0f;
+        pvjoy->uStick = 0.0f;
         UpdateVjoyPressTimes(pvjoy);
         goto tail;
     }
     case 0x2a:
-        pvjoy->sLeft = 0.0f;
+        pvjoy->uStick = 0.0f;
         break;
     case 0x50:
         pseqnode->fVjoyHold = 1;
@@ -3084,7 +2989,7 @@ void GetSeqnodeObjectPosRad(SEQNODE_1E4D40 *pseqnode, LO *plo, QW *ppos, f32 *pr
 extern "C" {
 void func_00143DE8(LO *target, SEQNODE *owner);
 
-void SetSeqnodeDrive(SEQNODE *node, REC *precDrive, LO *ploDrive) {
+void SetSeqnodeDrive(SEQNODE *node, JSGE *precDrive, LO *ploDrive) {
     LO *current;
 
     if (precDrive != node->precDrive) {
@@ -3103,10 +3008,6 @@ void SetSeqnodeDrive(SEQNODE *node, REC *precDrive, LO *ploDrive) {
 }
 }
 
-struct TNVT { char pad[0x40]; short deltaAdd; short idxAdd; void (*fnAdd)(void *); short deltaRemove; short idxRemove; void (*fnRemove)(void *); };
-
-struct TN { char pad0[0xC]; TNVT *vt; char pad1[0x18]; unsigned long flags; char pad2[0xB0]; void *pfollow; };
-
 extern "C" void SetTnTnsOverride(TN *, int);
 
 extern "C" int FIsBasicDerivedFrom_1E4F20(void *, int);
@@ -3117,26 +3018,26 @@ extern char B_003DD490_1E4F20[];
 
 extern "C" void func_001E4F20(SEQNODE *pseqnode, LO *plo)
 {
-    TN *ptn = (TN *)plo;
+    TN *ptn = static_cast<TN *>(plo);
     if (pseqnode->ptn != 0) {
         SetTnTnsOverride(pseqnode->ptn, -1);
-        pseqnode->ptn->pfollow = 0;
+        pseqnode->ptn->psoFocus = 0;
         if (pseqnode->fTnAdded != 0)
-            pseqnode->ptn->vt->fnRemove((char *)pseqnode->ptn + pseqnode->ptn->vt->deltaRemove);
+            pseqnode->ptn->Remove();
         pseqnode->ptn = 0;
     }
     if (ptn != 0) {
         pseqnode->ptn = ptn;
-        unsigned bit = (ptn->flags >> 60) & 1; int fAdd = (unsigned char)bit < 1;
+        unsigned bit = (ptn->grfo >> 60) & 1; int fAdd = (unsigned char)bit < 1;
         pseqnode->fTnAdded = fAdd;
         if (fAdd)
-            ptn->vt->fnAdd((char *)ptn + ptn->vt->deltaAdd);
+            ptn->Add();
         void *pfollow;
         if (pseqnode->psubject != 0 && FIsBasicDerivedFrom_1E4F20(pseqnode->psubject, 0x30) != 0)
             pfollow = pseqnode->psubject;
         else
             pfollow = PpoSwFocus(B_003DD490_1E4F20);
-        ptn->pfollow = pfollow;
+        ptn->psoFocus = (SO *)pfollow;
         SetTnTnsOverride(ptn, 1);
     }
 }
@@ -3253,11 +3154,11 @@ extern "C" void ReleaseSeqnodeAnim(SEQNODE *self)
 extern "C" {
 void StopJsg(LO *jsg);
 
-void func_001E53D8(struct Seqnode *node) {
-    s32 jsg = node->field_0x50;
+void func_001E53D8(SEQNODE *node) {
+    LO *jsg = node->pjsg;
     if (jsg != 0) {
-        StopJsg((LO *)jsg);
-        node->field_0x50 = 0;
+        StopJsg(jsg);
+        node->pjsg = 0;
     }
 }
 }
@@ -3306,42 +3207,38 @@ extern "C" void DetachAllSeqnodeObjects(SEQNODE *seq)
     }
 }
 
-struct SEQ_1E5570 { char pad[0x24]; char *subject; int *lo; int *hi; int *cur; };
-
 extern "C" int FIsBasicDerivedFrom_1E5570(void *, int);
 
 extern "C" void GoalStack_Clear(void *);
 
-extern "C" void func_001E5570(SEQ_1E5570 *seq)
+extern "C" void func_001E5570(SEQNODE *pseqnode)
 {
-    int *cur = seq->cur;
-    if (seq->lo < cur && cur < seq->hi) {
-        int k = *cur;
+    JSGE *prec = pseqnode->precCur;
+    if (pseqnode->precFirst < prec && prec < pseqnode->precLast) {
+        int k = prec->jsgek;
         if (k == 0x27) goto a;
         if (k == 0x28) goto b;
         return;
     a:
-        if (seq->subject != 0) {
-            if (FIsBasicDerivedFrom_1E5570(seq->subject, 0x34))
-                GoalStack_Clear(seq->subject + 0x26C);
+        if (pseqnode->psubject != 0) {
+            if (FIsBasicDerivedFrom_1E5570(pseqnode->psubject, 0x34))
+                GoalStack_Clear(static_cast<JT *>(pseqnode->psubject)->pgoalstack());
         }
         return;
     b:
-        if (seq->subject != 0) {
-            if (FIsBasicDerivedFrom_1E5570(seq->subject, 0x34))
-                GoalStack_Clear(seq->subject + 0x26C);
+        if (pseqnode->psubject != 0) {
+            if (FIsBasicDerivedFrom_1E5570(pseqnode->psubject, 0x34))
+                GoalStack_Clear(static_cast<JT *>(pseqnode->psubject)->pgoalstack());
         }
     }
 }
 
-struct SVT { char pad0[8]; short d8; short i8; void (*fn8)(char *); short d10; short i10; void (*fn10)(char *); };
-
-struct SEQNODE_1E5628 { u8 unknown_0x0[0xC]; SVT *vt; u8 unknown_0x10[0x4]; char *powner; u8 unknown_0x18[0x84]; int fCamMove; u8 unknown_0xA0[0x4C]; void *pamb; };
+struct SEQNODE_1E5628 { u8 unknown_0x0[0xC]; SEQVT *vt; u8 unknown_0x10[0x4]; char *powner; u8 unknown_0x18[0x84]; int fCamMove; u8 unknown_0xA0[0x4C]; void *pamb; };
 
 struct SeqnodeScope {
     SEQNODE_1E5628 *node;
     SeqnodeScope(SEQNODE_1E5628 *seqnode) : node(seqnode) {}
-    ~SeqnodeScope() { node->vt->fn10((char *)node + node->vt->d10); }
+    ~SeqnodeScope() { node->vt->fnRelease((char *)node + node->vt->deltaRelease); }
 };
 
 
@@ -3383,7 +3280,7 @@ void StopSeqnode(SEQNODE_1E5628 *pseqnode)
         return;
     SeqnodeScope scope(pseqnode);
     void **pamb = &pseqnode->pamb;
-    pseqnode->vt->fn8((char *)pseqnode + pseqnode->vt->d8);
+    pseqnode->vt->fnAddRef((char *)pseqnode + pseqnode->vt->deltaAddRef);
     RemoveDlEntry(pseqnode->powner + 0x5C, pseqnode);
     ReleaseSeqnodeAnim_1E5628(pseqnode);
     func_001E53D8_1E5628(pseqnode);
@@ -3403,14 +3300,15 @@ void StopSeqnode(SEQNODE_1E5628 *pseqnode)
     }
     if (pseqnode->fCamMove != 0)
         StopSeqnodeCameraMove_1E5628(pseqnode, 1);
-    pseqnode->vt->fn10((char *)pseqnode + pseqnode->vt->d10);
+    pseqnode->vt->fnRelease((char *)pseqnode + pseqnode->vt->deltaRelease);
 }
 
 extern "C" {
-s32 FFindDlEntry(s32 list, struct Seqnode *entry);
+s32 FFindDlEntry(DL *pdl, SEQNODE *entry);
 
-s32 FSeqnodeStopped(struct Seqnode *node) {
-    return FFindDlEntry(node->field_0x14 + 0x5C, node) == 0;
+/* a node is stopped once it is off its owner's list (psw is the JSG that owns the node: PseqnodeNew) */
+s32 FSeqnodeStopped(SEQNODE *node) {
+    return FFindDlEntry(&static_cast<JSG *>(node->psw)->dlSeqnode, node) == 0;
 }
 }
 
@@ -3418,16 +3316,12 @@ INCLUDE_ASM(0X1E57A0);
 
 extern "C" void RevokeCmPolicy(CM *, int, int, void *, void *, void *);
 
-extern CM B_002DDF40;
-
 extern "C" void StopSeqnodeCameraMove(SEQNODE *pseqnode, int arg1)
 {
     pseqnode->field_0x90 = arg1;
     pseqnode->fCamMove = 0;
-    RevokeCmPolicy(&B_002DDF40, 2, 0xA, (char *)&B_002DDF40 + 0x500, 0, pseqnode->unknown_0x84);
+    RevokeCmPolicy(&B_002DDF40, 2, 0xA, &B_002DDF40.cppolicy, 0, pseqnode->unknown_0x84);
 }
-
-struct SVT_1E5AE0 { char pad0[8]; short d8; short i8; void (*fn8)(char *); };
 
 /* the JSG that owns the node (jsg.h: its records and the node list at 0x5C) */
 struct OWNER {
@@ -3438,10 +3332,21 @@ struct OWNER {
     /* 0x5C */ DL dlSeqnode; /* JSG::dlSeqnode */
 };
 
+/* SEQNODE as PseqnodeNew builds it: the owner typed as OWNER and the records as JSGE */
 struct SEQNODE_1E5AE0 {
-    int unk0; int unk4; int unk8; SVT_1E5AE0 *vt; int unk10; OWNER *powner; OWNER *pownerRoot; int plo;
-    char pad[0x28 - 0x20]; JSGE *prec; JSGE *precEnd;
-    char pad2[0xEC - 0x30]; int pamb;
+    /* 0x0 */ void *pframe;
+    /* 0x4 */ void *psidebag;
+    u8 unknown_0x8[0x4];
+    /* 0xC */ SEQVT *vt;
+    /* 0x10 */ s32 cref;
+    /* 0x14 */ OWNER *powner;     /* SEQNODE::psw */
+    /* 0x18 */ OWNER *pownerRoot; /* SEQNODE::ploCtx */
+    /* 0x1C */ int plo;           /* SEQNODE::plo1C */
+    u8 unknown_0x20[0x8];
+    /* 0x28 */ JSGE *prec;        /* SEQNODE::precFirst */
+    /* 0x2C */ JSGE *precEnd;     /* SEQNODE::precLast */
+    u8 unknown_0x30[0xBC];
+    /* 0xEC */ int pamb;
 };
 
 
@@ -3461,9 +3366,9 @@ SEQNODE_1E5AE0 *PseqnodeNew(OWNER *powner, JSGE *prec, SEQNODE_1E5AE0 *pparent)
 {
     SEQNODE_1E5AE0 *pseqnode = (SEQNODE_1E5AE0 *)PvAllocSlotheapImpl(&B_003E1560_1E5AE0);
     memset(pseqnode, 0, 0xF0);
-    pseqnode->unk0 = 0;
-    pseqnode->unk4 = 0;
-    pseqnode->vt = (SVT_1E5AE0 *)&D_002D8C08;
+    pseqnode->pframe = 0;
+    pseqnode->psidebag = 0;
+    pseqnode->vt = (SEQVT *)&D_002D8C08;
     pseqnode->pamb = 0;
     pseqnode->powner = powner;
     if (pparent != 0)
@@ -3494,7 +3399,7 @@ SEQNODE_1E5AE0 *PseqnodeNew(OWNER *powner, JSGE *prec, SEQNODE_1E5AE0 *pparent)
     pseqnode->precEnd = pseqnode->prec;
 done:
     PrependDlEntry(pdl, pseqnode);
-    pseqnode->vt->fn8((char *)pseqnode + pseqnode->vt->d8);
+    pseqnode->vt->fnAddRef((char *)pseqnode + pseqnode->vt->deltaAddRef);
     return pseqnode;
 }
 

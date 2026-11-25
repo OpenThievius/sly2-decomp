@@ -16,11 +16,11 @@ struct AMBSLOTSOURCE {
 
 struct STREAMAMB : AMB {
     /* 0x70 */ f32 vol[6];              /* InitStreamAmb sets all 1.0 */
-    u8 unknown_0x88[0x18];
+    /* 0x88 */ s32 slotPan[6];         /* ApplyStreamAmbParams (reader) */
     /* 0xA0 */ s32 count[6];            /* AddAmbSlotSource: sources in each slot */
     /* 0xB8 */ AMBSLOTSOURCE src[6][8]; /* AddAmbSlotSource */
     /* 0x3B8 */ s32 grfStart;           /* InitStreamAmb stores its third argument; GetStreamAmbKind tests bit 4 */
-    u8 unknown_0x3BC[4];
+    /* 0x3BC */ u32 mask;              /* ApplyStreamAmbParams tests and clears it; ReplayStreamAmb sets 0xF */
 };
 
 #if defined(__mips__)

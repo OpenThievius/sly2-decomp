@@ -4,43 +4,37 @@
 #include "types.h"
 #include "m2c_macros.h"
 
+struct CQueueInput { virtual int CbRead(int cb, void *pv); };
+struct CQueueOutput { virtual int CbWrite(int cb, void *pv); virtual int FHold(); };
+
+/* the byte ring queue (0x20 bytes): Init, Reset, CbFill (two overloads), CbDrain and FreeDrain are its own functions */
 struct CByteQueue {
-    void *pv0;
-    int cb4;
-    int n8, nC, p10, n14, n18, n1C;
+    char *pbBuffer; int cbBuffer; int ibFill; int ibDrain; int cbFree; int cbData; int cbHeld; int cbTotal;
     void Init(int cb, void *pv);
     void Reset();
+    int CbFill(int cbMax, CQueueInput *pinput);
+    int CbFill(int cb, unsigned char *pb);
+    int CbDrain(int cbMax, CQueueOutput *poutput);
 };
 
 void CByteQueue::Init(int cb, void *pv)
 {
-    cb4 = cb;
-    pv0 = pv;
+    cbBuffer = cb;
+    pbBuffer = (char *)pv;
     Reset();
 }
 
-struct CByteQueue_13D580 {
- void *pv0; int cb4; int n8,nC,n10,n14,n18,n1C; void Reset();
-};
-
-void CByteQueue_13D580::Reset()
+void CByteQueue::Reset()
 {
-    n10 = cb4;
-    n18 = 0;
-    n14 = 0;
-    nC = 0;
-    n8 = 0;
-    n1C = 0;
+    cbFree = cbBuffer;
+    cbHeld = 0;
+    cbData = 0;
+    ibDrain = 0;
+    ibFill = 0;
+    cbTotal = 0;
 }
 
-struct CQueueInput { virtual int CbRead(int cb, void *pv); };
-
-struct CByteQueue_13D5A0 {
-    char *pbBuffer; int cbBuffer; int ibFill; int ibDrain; int cbFree; int cbData; int cbHeld; int cbTotal;
-    int CbFill(int cbMax, CQueueInput *pinput);
-};
-
-int CByteQueue_13D5A0::CbFill(int cbMax, CQueueInput *pinput)
+int CByteQueue::CbFill(int cbMax, CQueueInput *pinput)
 {
     int cbDone = 0;
     int cbWanted = cbMax;
@@ -67,14 +61,7 @@ int CByteQueue_13D5A0::CbFill(int cbMax, CQueueInput *pinput)
     return cbDone;
 }
 
-struct CQueueOutput { virtual int CbWrite(int cb, void *pv); virtual int FHold(); };
-
-struct CByteQueue_13D6A8 {
-    char *pbBuffer; int cbBuffer; int ibFill; int ibDrain; int cbFree; int cbData; int cbHeld; int cbTotal;
-    int CbDrain(int cbMax, CQueueOutput *poutput);
-};
-
-int CByteQueue_13D6A8::CbDrain(int cbMax, CQueueOutput *poutput)
+int CByteQueue::CbDrain(int cbMax, CQueueOutput *poutput)
 {
     int cbDone = 0;
     int cbWanted = cbMax;
@@ -105,17 +92,9 @@ int CByteQueue_13D6A8::CbDrain(int cbMax, CQueueOutput *poutput)
 
 struct INPUT_13D7D0 { void *vt; unsigned char *pb; int cb; int pos; int cbLeft; };
 
-struct CQueueInput;
-
 extern char D_002CBE20[];
 
-struct CByteQueue_13D7D0 {
-    char pad[0x20];
-    int CbFill(int cbMax, CQueueInput *pinput);
-    int CbFill(int cb, unsigned char *pb);
-};
-
-int CByteQueue_13D7D0::CbFill(int cb, unsigned char *pb)
+int CByteQueue::CbFill(int cb, unsigned char *pb)
 {
     int result;
     if (cb == 0)
@@ -133,29 +112,23 @@ int CByteQueue_13D7D0::CbFill(int cb, unsigned char *pb)
 }
 
 extern "C" {
-typedef struct CByteQueue_13D818 {
-    char pad[0x10];
-    s32 field_0x10;
-    s32 pad_0x14;
-    s32 field_0x18;
-} CByteQueue_13D818;
 
-void FreeDrain__10CByteQueuei(CByteQueue_13D818 *queue, s32 count) {
+void FreeDrain__10CByteQueuei(CByteQueue *queue, s32 count) {
     s32 amount;
 
     amount = count;
-    if ((amount != 0) || (amount = queue->field_0x18, (amount != 0))) {
-        queue->field_0x10 = queue->field_0x10 + amount;
-        queue->field_0x18 = queue->field_0x18 - amount;
+    if ((amount != 0) || (amount = queue->cbHeld, (amount != 0))) {
+        queue->cbFree = queue->cbFree + amount;
+        queue->cbHeld = queue->cbHeld - amount;
     }
 }
 }
 
 extern "C" {
 typedef struct CQueueInputMemory {
-    char pad[4];
+    u8 unknown_0x0[4];
     s32 field_0x4;
-    s32 pad_0x8;
+    s32 field_0x8;
     s32 field_0xC;
     s32 field_0x10;
 } CQueueInputMemory;

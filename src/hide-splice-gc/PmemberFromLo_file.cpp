@@ -4,12 +4,11 @@
 #include "m2c_macros.h"
 #include "vu0inline.h"
 #include "sly2.h"
-
-struct Alo { char pad[0x110]; QW point; };
+#include "pzo_hide.h"
 
 extern "C" float GRandInRange(float, float);
 
-extern "C" QW ConvertAloPos(Alo *, int, QW);
+extern "C" QW ConvertAloPos(ATTACHZONE *, int, QW);
 
 extern "C" QW SetVectorCylind__FP6VECTORfff(float, float, float);
 
@@ -17,11 +16,11 @@ extern float g_2be90c;
 
 extern QW g_2a2dc0;
 
-extern "C" void AttachZone_GetRandomPos(Alo *zone, QW *pos, QW *normal)
+extern "C" void AttachZone_GetRandomPos(ATTACHZONE *zone, QW *pos, QW *normal)
 {
     float angle = GRandInRange(-3.1415927f, 3.1415927f);
     float radius = GRandInRange(0.0f, g_2be90c);
-    QW center = ConvertAloPos(zone, 0, zone->point);
+    QW center = ConvertAloPos(zone, 0, zone->field_0x110);
     QW offset = SetVectorCylind__FP6VECTORfff(angle, radius, 0.0f);
     *pos = VectorAdd(center, offset);
     *normal = g_2a2dc0;

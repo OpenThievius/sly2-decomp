@@ -1,11 +1,6 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later */
 #include "sly2.h"
-struct CByteQueue { void Init(int, void *); };
-struct CMpegAudio { void Init(); };
-struct CMpeg {
-    char pad0[0x10C]; int s10C; char *pbBuffer; int pbas; char sdk[0x160 - 0x118];
-    CByteQueue queue; char pad1[0x180 - 0x160 - 1]; CMpegAudio audio;
-};
+#include "cmpeg.h"
 extern "C" {
 extern int B_002E1E54;
 extern int g_2dedbc;
@@ -20,12 +15,12 @@ void FMpegDecodeVideo__FP7sceMpegP13sceMpegCbDataP5CMpeg();
 void FMpegBackground();
 void func_001B3508();
 }
-void CMpeg_Start(CMpeg *mpeg, int pbas)
+void CMpeg_Start(CMpeg *mpeg, CBinaryAsyncStream *pbas)
 {
     mpeg->pbas = pbas;
-    mpeg->s10C = 0;
+    mpeg->tPicture = 0;
     void *sdk = mpeg->sdk;
-    mpeg->queue.Init(0x40000, (void *)((sptr)(mpeg->pbBuffer + 0x245A80) | 0x20000000));
+    mpeg->qVideo.Init(0x40000, (void *)((sptr)(mpeg->pbBuffer + 0x245A80) | 0x20000000));
     mpeg->audio.Init();
     sceMpegInit();
     sceMpegCreate(sdk, (sptr)(mpeg->pbBuffer + 0x98000), 0x1ADA60);

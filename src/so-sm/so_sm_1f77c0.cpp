@@ -8,8 +8,11 @@
 #include "xf.h"
 #include "dl.h"
 #include "sw.h"
-
-struct WKR_1F77C0 { char pad[0x4C]; float t; };
+#include "oxa.h"
+#include "wkr.h"
+#include "phys.h"
+#include "act.h"
+#include "rows3.h"
 
 extern float g_2dded0;
 
@@ -21,8 +24,8 @@ void ExpireSwWkrs(SW *psw)
 {
     DLI dli;
     PushDli(&dli, &psw->dlWkr);
-    for (WKR_1F77C0 *pwkr = (WKR_1F77C0 *)PvStep(&dli); pwkr != 0; pwkr = (WKR_1F77C0 *)PvStep(&dli)) {
-        if (g_2dded0 < pwkr->t + 0.25f) {
+    for (WKR *pwkr = (WKR *)PvStep(&dli); pwkr != 0; pwkr = (WKR *)PvStep(&dli)) {
+        if (g_2dded0 < pwkr->tAbsorb + 0.25f) {
         } else {
             RemoveDlEntry(&psw->dlWkr, pwkr);
             FreeSlotheapPv(&psw->slotheapWkr, pwkr);
@@ -42,9 +45,9 @@ extern "C" int func_001F78A0(unsigned mask)
     return index;
 }
 
-int GrficFromAlo(int palo, int grftak)
+int GrficFromAlo(SO *palo, int grftak)
 {
-    const unsigned char *table = (const unsigned char *)(palo + 0x110);
+    const unsigned char *table = palo->ainteract;
     int grfic = 0;
     int index = 0;
     int bit = 1;
@@ -58,30 +61,24 @@ int GrficFromAlo(int palo, int grftak)
     return grfic;
 }
 
-struct ALO {
-    char pad[0x110];
-    unsigned char interact[0x1A];
-};
-
-extern "C" void SetAloInteract(ALO *alo, unsigned mask, unsigned value)
+extern "C" void SetAloInteract(SO *alo, unsigned mask, unsigned value)
 {
     int index;
     unsigned bit;
     for (index = 0, bit = 1; index < 0x1A; index++, bit <<= 1) {
         if ((bit & mask) != 0)
-            alo->interact[index] = value;
+            alo->ainteract[index] = value;
     }
 }
 
-struct OXA { char pad[0x6C]; void *pcontact; };
+/* the view of a collision element these functions read: damage and take flags (the same words as PARTX in func_001F7410) */
+struct GEOM { u8 unknown_0x0[0x14]; short dmg; int grftak; u8 unknown_0x1C[0xB0 - 0x1C]; };
 
-struct WKR { void *source; void *partsource; void *target; int grftak; int damage; char pad[0x20 - 0x14]; QW pos; QW vel; char pad2[0x60 - 0x40]; };
-
-extern "C" void *g_2f7900;
+extern "C" SO *g_2f7900;
 
 extern "C" void func_001F7A68_1F7950(SO *, int);
 
-extern "C" void *PaloAbsorbWkr(WKR *);
+extern "C" SO *PaloAbsorbWkr(WKR *);
 
 QW PosLoWorld(SO *);
 
@@ -98,24 +95,22 @@ void func_001F7950(SO *pso)
     func_001F7A68_1F7950(pso, 0);
     WKR wkr;
     memset(&wkr, 0, sizeof(WKR));
-    wkr.target = pso;
+    wkr.ploTarget = pso;
     wkr.pos = PosLoWorld(pso);
     wkr.vel = pso->GetVelocityVec();
     if (kind == 3 && FIsBasicDerivedFrom(pso, 0x38) != 0) {
         wkr.grftak = 0x40000;
         wkr.damage = -50;
-        wkr.source = g_2f7900;
+        wkr.psoSource = g_2f7900;
     } else {
         wkr.grftak = 0x20000;
-        wkr.damage = *((signed char *)pso + 0x149);
-        wkr.source = pso;
+        wkr.damage = ((signed char *)&pso->grfso)[1];
+        wkr.psoSource = pso;
     }
     PaloAbsorbWkr(&wkr);
 }
 
-struct GEOM { char pad[0x14]; short dmg; int grftak; char pad1c[0xB0 - 0x1C]; };
-
-void func_001F7A68(SO *so, long kind, int unused2, int unused3, int to, int damage, int from)
+void func_001F7A68(SO *so, s64 kind, int unused2, int unused3, int to, int damage, int from)
 {
     if (kind == (((int)(so->grfso >> 24)) & 3)) return;
     switch (kind) {
@@ -139,13 +134,13 @@ void func_001F7A68(SO *so, long kind, int unused2, int unused3, int to, int dama
             part->dmg = damage;
         }
     }
-    so->grfso = (so->grfso & ~0x3000000L) | ((long)((((unsigned long)kind << 32 >> 32) & 3) << 24));
+    so->grfso = (so->grfso & ~0x3000000L) | ((s64)((((u64)kind << 32 >> 32) & 3) << 24));
 }
 
 // 0x1F7B40 GetSoImpactKind
 int func_001F7B40(SO *pso)
 {
-    long grfso = pso->grfso;
+    s64 grfso = pso->grfso;
     return (int)((grfso << 8) >> 32) & 3;
 }
 
@@ -184,13 +179,8 @@ void func_001F7B98(s32 arg0) {
 }
 
 extern "C" {
-typedef struct Object1F7BF0 {
-    char pad[0xE8];
-    s32 field_0xE8;
-} Object1F7BF0;
-
-s32 func_001F7BF0(Object1F7BF0 *object) {
-    return object->field_0xE8;
+struct PHYS *func_001F7BF0(SO *object) {
+    return object->pphys;
 }
 }
 
@@ -207,18 +197,11 @@ extern "C" void FadeAloOut(s32 alo, f32 duration) {
     SetAloFadeRate_1F7BF8(alo, -1.0f / duration);
 }
 
-/* an ALO as far as the fade functions read it: alpha at 0x12C (FadeAloIn, SetAloAlpha) and the fade rate at 0x130 (SetAloFadeRate) */
-struct ALOFADE : LO {
-    u8 unknown_0x50[0xDC];
-    /* 0x12C */ float alpha;    /* FadeAloIn zeroes it, SetAloAlpha sets it */
-    /* 0x130 */ float fadeRate; /* SetAloFadeRate sets it */
-};
+extern "C" void SetAloFadeRate_1F7C68(SO *, float);
 
-extern "C" void SetAloFadeRate_1F7C68(ALOFADE *, float);
+extern "C" void SetAloAlpha_1F7C68(SO *, float);
 
-extern "C" void SetAloAlpha_1F7C68(ALOFADE *, float);
-
-extern "C" void FadeAloIn(ALOFADE *palo, float dt)
+extern "C" void FadeAloIn(SO *palo, float dt)
 {
     if (dt <= 0.0f) {
         SetAloFadeRate_1F7C68(palo, 0.0f);
@@ -227,14 +210,14 @@ extern "C" void FadeAloIn(ALOFADE *palo, float dt)
     }
     if (palo->grfo & 0x100000000000000UL) {
         palo->Add();
-        palo->alpha = 0.0f;
+        palo->uFade = 0.0f;
     }
     SetAloFadeRate_1F7C68(palo, 1.0f / dt);
 }
 
-extern "C" int FIsBasicDerivedFrom_1F7D10(ALOFADE *, int);
+extern "C" int FIsBasicDerivedFrom_1F7D10(SO *, int);
 
-extern "C" void SetAloAlpha(ALOFADE *alo, float alpha)
+extern "C" void SetAloAlpha(SO *alo, float alpha)
 {
     if (alpha <= 0.0f) {
         if (FIsBasicDerivedFrom_1F7D10(alo, 0x69) == 0)
@@ -242,32 +225,28 @@ extern "C" void SetAloAlpha(ALOFADE *alo, float alpha)
     } else {
         alo->Add();
     }
-    alo->alpha = alpha;
+    alo->uFade = alpha;
 }
 
-extern "C" void SetAloFadeRate(ALOFADE *object, f32 fadeRate) {
+extern "C" void SetAloFadeRate(SO *object, f32 fadeRate) {
     s32 flags;
     if (fadeRate != 0.0f) {
         object->Add();
         flags = object->grfSw;
         if ((flags ^ 1) & 1) {
-            *(s32 *)flags = (s32) (*(s32 *)flags | 2);
+            object->pgrfentry->grf |= 2;
         } else {
             object->grfSw = (s32) (flags | 2);
         }
     }
-    object->fadeRate = fadeRate;
+    object->duFade = fadeRate;
 }
 
-struct PART;
-
-struct ALO_1F7E08 { char pad[0xE0]; int cpart; char *apart; };
-
-int CpartCollectAlo(ALO_1F7E08 *palo, int (*pfn)(void *, PART *), void *ctx, PART **appart)
+int CpartCollectAlo(SO *palo, int (*pfn)(void *, GEOM *), void *ctx, GEOM **appart)
 {
     int count = 0;
-    for (int i = 0; i < palo->cpart; i++) {
-        PART *p = (PART *)(palo->apart + i * 0xB0);
+    for (int i = 0; i < palo->cgeom; i++) {
+        GEOM *p = &palo->ageom[i];
         if (pfn == 0 || pfn(ctx, p) != 0) {
             appart[count] = p;
             count++;
@@ -293,7 +272,7 @@ int func_001F7EF0(SO *pso)
 
 int GetSoNoSafePoint(SO *pso)
 {
-    long grfso = pso->grfso;
+    s64 grfso = pso->grfso;
     return (int)((grfso << 3) >> 32) & 1;
 }
 
@@ -306,42 +285,38 @@ extern "C" void RecalcSoLocked(SO *);
 
 extern "C" void func_001F7F48(SO *self, int enable)
 {
-    unsigned long flags = self->grfso;
+    u64 flags = self->grfso;
     if (enable != ((int)(flags >> 34) & 1)) {
-        self->grfso = (flags & ~(1UL << 34)) | ((unsigned long)(enable & 1) << 34);
+        self->grfso = (flags & ~(1UL << 34)) | ((u64)(enable & 1) << 34);
         RecalcSoLocked(self);
     }
 }
 
 struct BASIC;
 
-struct ALO_1F7FA0 { char pad[0xA4]; int count; BASIC **items; };
-
 struct SCROLLER;
 
-extern "C" int FIsBasicDerivedFrom_1F7FA0(BASIC *, int);
+extern "C" int FIsBasicDerivedFrom_1F7FA0(LO *, int);
 
 void SetScrollerMasterSpeeds(SCROLLER *, float, float);
 
-void SetAloScrollingMasterSpeeds(ALO_1F7FA0 *alo, float du, float dv)
+void SetAloScrollingMasterSpeeds(SO *alo, float du, float dv)
 {
-    for (int i = 0; i < alo->count; i++) {
-        BASIC *item = alo->items[i];
+    for (int i = 0; i < alo->cplo; i++) {
+        LO *item = alo->aplo[i];
         if (FIsBasicDerivedFrom_1F7FA0(item, 0x8F))
             SetScrollerMasterSpeeds((SCROLLER *)item, du, dv);
     }
 }
 
-struct ALO_1F8038 { char pad[0xA4]; int count; BASIC **items; };
-
-extern "C" int FIsBasicDerivedFrom_1F8038(BASIC *, int);
+extern "C" int FIsBasicDerivedFrom_1F8038(LO *, int);
 
 extern "C" void SetSaiDuDv(SCROLLER *, float, float);
 
-void func_001F8038(ALO_1F8038 *alo, float du, float dv)
+void func_001F8038(SO *alo, float du, float dv)
 {
-    for (int i = 0; i < alo->count; i++) {
-        BASIC *item = alo->items[i];
+    for (int i = 0; i < alo->cplo; i++) {
+        LO *item = alo->aplo[i];
         if (FIsBasicDerivedFrom_1F8038(item, 0x8F))
             SetSaiDuDv((SCROLLER *)item, du, dv);
     }
@@ -349,54 +324,39 @@ void func_001F8038(ALO_1F8038 *alo, float du, float dv)
 
 struct EYES;
 
-struct ALO_1F80D0 { char pad0[0x24]; ALO_1F80D0 *next; char pad28[0x3C]; ALO_1F80D0 *child; char pad68[8]; ALO_1F80D0 *end; char pad74[0x30]; int count; EYES **items; };
-
 extern "C" int FIsBasicDerivedFrom_1F80D0(void *, int);
 
 void SetEyesClosed__FP4EYESf(EYES *, float);
 
-extern "C" void SetAloEyesClosed(ALO_1F80D0 *, float);
-
-extern "C" void SetAloEyesClosed(ALO_1F80D0 *alo, float closed)
+extern "C" void SetAloEyesClosed(SO *alo, float closed)
 {
-    for (int index = 0; index < alo->count; index++) {
-        EYES *eyes = alo->items[index];
+    for (int index = 0; index < alo->cplo; index++) {
+        LO *eyes = alo->aplo[index];
         if (FIsBasicDerivedFrom_1F80D0(eyes, 0x8E)) {
-            SetEyesClosed__FP4EYESf(eyes, closed);
+            SetEyesClosed__FP4EYESf((EYES *)eyes, closed);
         }
     }
-    for (ALO_1F80D0 *child = alo->child; child != alo->end; child = child->next) {
+    for (LO *child = (LO *)alo->dlChild.head; child != alo->ploChildEnd; child = child->ploNext) {
         if (FIsBasicDerivedFrom_1F80D0(child, 0x30)) {
-            SetAloEyesClosed(child, closed);
+            SetAloEyesClosed((SO *)child, closed);
         }
     }
 }
 
-struct ITEM_1F8198 { char pad[0x18]; int key; };
-
-struct HOLDER_1F8198 { char pad[0xA4]; int count; ITEM_1F8198 **items; };
-
-extern "C" ITEM_1F8198 *func_001F8198(HOLDER_1F8198 *holder, int key) {
-    for (int index = 0; index < holder->count; index++) {
-        ITEM_1F8198 *item = holder->items[index];
-        if (item->key == key) return item;
+extern "C" LO *func_001F8198(SO *holder, int key) {
+    for (int index = 0; index < holder->cplo; index++) {
+        LO *item = holder->aplo[index];
+        if (item->oid == key) return item;
     }
     return 0;
 }
 
-struct AloOidList1F81E0 {
-    char pad0[0xAC];
-    int count;
-    int *oids;
-    int selected;
-};
-
-extern "C" void SetAloSelectedOid(AloOidList1F81E0 *alo, int oid)
+extern "C" void SetAloSelectedOid(SO *alo, int oid)
 {
     if (oid == -1) { alo->selected = 0; return; }
     int index = 0;
-    while (index < alo->count) {
-        if (oid == alo->oids[index]) {
+    while (index < alo->coid) {
+        if (oid == alo->aoid[index]) {
             alo->selected = -(index + 3);
             return;
         }
@@ -406,20 +366,15 @@ extern "C" void SetAloSelectedOid(AloOidList1F81E0 *alo, int oid)
 }
 
 extern "C" {
-typedef struct Object1F8238 {
-    char pad[0xB4];
-    s32 field_0xB4;
-} Object1F8238;
-
-void func_001F8238(Object1F8238 *object) {
-    object->field_0xB4 = 0;
+void func_001F8238(SO *object) {
+    object->selected = 0;
 }
 }
 
 struct ALERT {
-    char pad0[0xC];
+    u8 unknown_0x0[0xC];
     int key;
-    char pad1[0x10];
+    u8 unknown_0x10[0x10];
     ALERT *next;
 };
 
@@ -451,7 +406,7 @@ void PalertEnsure(s32 arg0) {
 struct Bytes8 { u8 bytes[8]; };
 
 struct PALERT {
-    char pad[0x10];
+    u8 unknown_0x0[0x10];
     s32 field_0x10;
     Bytes8 field_0x14;
 };
@@ -467,146 +422,112 @@ extern "C" void func_001F82B8(s32 arg0, s32 value, Bytes8 *bytes) {
     }
 }
 
-struct OWNER { char pad[0xDC]; float *light; };
-
-struct ALO_1F8300 { char pad[0xE8]; OWNER *owner; };
+/* the region link of a solid object's PHYS (PHYS::plink): the object, a radius, a scale and, from 0x10, the region (func_001F37C8) */
+struct LINK {
+    SO *pso;
+    float v4;
+    float v8;
+    float vC;
+    u8 unknown_0x10[0x60];
+};
 
 extern "C" void *PvAllocSwClearImpl__Fi(void *);
 
 extern "C" int FIsBasicDerivedFrom_1F8300(void *, int);
 
-float *func_001F8300(ALO_1F8300 *palo)
+LINK *func_001F8300(SO *palo)
 {
-    if (palo->owner == 0)
+    if (palo->pphys == 0)
         return 0;
-    if (palo->owner->light == 0) {
+    if (palo->pphys->plink == 0) {
         ALLOCREQ req;
         req.cb = 0x70;
         req.cbAlign = 0x10;
-        float *plight = (float *)PvAllocSwClearImpl__Fi(&req);
-        *(ALO_1F8300 **)plight = palo;
+        LINK *plink = (LINK *)PvAllocSwClearImpl__Fi(&req);
+        plink->pso = palo;
         if (FIsBasicDerivedFrom_1F8300(palo, 0x34) != 0)
-            plight[2] = 150.0f;
+            plink->v8 = 150.0f;
         else
-            plight[2] = 75.0f;
-        plight[3] = 1.0f;
-        palo->owner->light = plight;
+            plink->v8 = 75.0f;
+        plink->vC = 1.0f;
+        palo->pphys->plink = plink;
     }
-    return palo->owner->light;
+    return palo->pphys->plink;
 }
 
-struct ALO;
+extern "C" LINK *func_001F8300_1F83B0(SO *);
 
-struct LIGHT {
-    float v0;
-    float v4;
-    float v8;
-    float vC;
-};
-
-extern "C" LIGHT *func_001F8300_1F83B0(ALO *);
-
-extern "C" void func_001F83B0(ALO *alo, float value)
+extern "C" void func_001F83B0(SO *alo, float value)
 {
-    LIGHT *light = func_001F8300_1F83B0(alo);
+    LINK *light = func_001F8300_1F83B0(alo);
     if (light)
         light->v8 = value;
 }
 
-struct OWNER_1F83E0 {
-    char pad[0xDC];
-    LIGHT *light;
-};
-
-struct ALO_1F83E0 {
-    char pad[0xE8];
-    OWNER_1F83E0 *owner;
-};
-
-extern "C" float func_001F83E0(ALO_1F83E0 *alo)
+extern "C" float func_001F83E0(SO *alo)
 {
-    OWNER_1F83E0 *owner = alo->owner;
-    LIGHT *light = 0;
+    PHYS *owner = alo->pphys;
+    LINK *light = 0;
     if (owner)
-        light = owner->light;
+        light = owner->plink;
     if (light)
         return light->v8;
     return 0.0f;
 }
 
-extern "C" LIGHT *func_001F8300_1F8410(ALO *);
+extern "C" LINK *func_001F8300_1F8410(SO *);
 
-extern "C" void func_001F8410(ALO *alo, float value)
+extern "C" void func_001F8410(SO *alo, float value)
 {
-    LIGHT *light = func_001F8300_1F8410(alo);
+    LINK *light = func_001F8300_1F8410(alo);
     if (light)
         light->vC = value;
 }
 
-struct OWNER_1F8440 {
-    char pad[0xDC];
-    LIGHT *light;
-};
-
-struct ALO_1F8440 {
-    char pad[0xE8];
-    OWNER_1F8440 *owner;
-};
-
-extern "C" float func_001F8440(ALO_1F8440 *alo)
+extern "C" float func_001F8440(SO *alo)
 {
-    OWNER_1F8440 *owner = alo->owner;
-    LIGHT *light = 0;
+    PHYS *owner = alo->pphys;
+    LINK *light = 0;
     if (owner)
-        light = owner->light;
+        light = owner->plink;
     if (light)
         return light->vC;
     return 0.0f;
 }
 
-extern "C" LIGHT *func_001F8300_1F8470(ALO *);
+extern "C" LINK *func_001F8300_1F8470(SO *);
 
-extern "C" void func_001F8470(ALO *alo, float value)
+extern "C" void func_001F8470(SO *alo, float value)
 {
-    LIGHT *light = func_001F8300_1F8470(alo);
+    LINK *light = func_001F8300_1F8470(alo);
     if (light)
         light->v4 = value;
 }
 
-struct B { char pad[0xDC]; struct C *c; };
-
-struct C { int unk0; float value; };
-
-struct A_1F84A0 { char pad[0xE8]; B *b; };
-
-extern "C" float func_001F84A0(A_1F84A0 *self)
+extern "C" float func_001F84A0(SO *self)
 {
-    C *c = 0;
-    if (self->b) c = self->b->c;
-    if (c) return c->value;
+    LINK *c = 0;
+    if (self->pphys) c = self->pphys->plink;
+    if (c) return c->v4;
     return 0.0f;
 }
 
-struct A_1F84D0 { char pad[0x148]; unsigned long : 33; unsigned long flag : 1; };
+struct A_1F84D0 { u8 unknown_0x0[0x148]; u64 : 33; u64 flag : 1; };
 
 extern "C" void func_001F84D0(A_1F84D0 *self, int flag)
 {
     self->flag = flag;
 }
 
-unsigned long func_001F8500(SO *pso)
+u64 func_001F8500(SO *pso)
 {
-    unsigned long flags = pso->grfso;
+    u64 flags = pso->grfso;
     return (flags >> 33) & 1;
 }
 
 struct SLOTHEAP;
 
-struct ENTRY { char pad[0x94]; int id; int pad98; int sub; char padA0[0x100 - 0xA0]; };
-
-struct ALO_1F8510 { char pad[0x50]; int count; ENTRY *entries; };
-
-struct HANDLE { int a; int b; char pad8[4]; void *vtable; char pad10[0x10]; ALO_1F8510 *alo; ENTRY *entry; char pad28[8]; };
+struct HANDLE { int a; int b; u8 unknown_0x8[4]; void *vtable; u8 unknown_0x10[0x10]; SO *alo; XF *entry; u8 unknown_0x28[8]; };
 
 extern SLOTHEAP B_003E15CC;
 
@@ -616,12 +537,12 @@ extern "C" void *PvAllocSlotheapImpl(SLOTHEAP *);
 
 void *memset(void *, int, unsigned int);
 
-HANDLE *func_001F8510(ALO_1F8510 *alo, int sub, int id)
+HANDLE *func_001F8510(SO *alo, int id, int dof)
 {
-    for (int index = 0; index < alo->count; index++) {
-        ENTRY *entry = &alo->entries[index];
-        if (entry->id != id) continue;
-        if (sub != -1 && entry->sub != sub) continue;
+    for (int index = 0; index < alo->cxf; index++) {
+        XF *entry = &alo->axf[index];
+        if (entry->dof != dof) continue;
+        if (id != -1 && entry->id != id) continue;
         HANDLE *handle = (HANDLE *)PvAllocSlotheapImpl(&B_003E15CC);
         memset(handle, 0, 0x30);
         handle->vtable = D_002CA2C0;
@@ -634,7 +555,7 @@ HANDLE *func_001F8510(ALO_1F8510 *alo, int sub, int id)
     return 0;
 }
 
-struct Node { Node *next; Node *prev; char pad[4]; void *vtable; char pad2[0x10]; void *owner; void *part; char pad3[0x8]; };
+struct Node { Node *next; Node *prev; u8 unknown_0x8[4]; void *vtable; u8 unknown_0x10[0x10]; void *owner; void *part; u8 unknown_0x28[0x8]; };
 
 extern char D_002CA280[];
 
@@ -654,7 +575,7 @@ extern "C" Node *func_001F85E0(void *owner)
     return node;
 }
 
-struct ALO_1F8668 { char pad0[0x24]; ALO_1F8668 *next; char pad28[0x3C]; ALO_1F8668 *child; char pad68[0x148 - 0x68]; unsigned long low : 35; unsigned long hid : 1; unsigned long high : 28; };
+struct ALO_1F8668 { u8 unknown_0x0[0x24]; ALO_1F8668 *next; u8 unknown_0x28[0x3C]; ALO_1F8668 *child; u8 unknown_0x68[0x148 - 0x68]; u64 low : 35; u64 hid : 1; u64 high : 28; };
 
 extern "C" void AddAloToRenderTree(ALO_1F8668 *);
 
@@ -664,9 +585,9 @@ extern "C" int FIsBasicDerivedFrom_1F8668(void *, int);
 
 extern int B_003E12EC[];
 
-extern "C" void func_001F8668(ALO_1F8668 *, long);
+extern "C" void func_001F8668(ALO_1F8668 *, s64);
 
-extern "C" void func_001F8668(ALO_1F8668 *alo, long hidden)
+extern "C" void func_001F8668(ALO_1F8668 *alo, s64 hidden)
 {
     if (hidden == alo->hid) return;
     alo->hid = hidden;
@@ -681,21 +602,16 @@ extern "C" void func_001F8668(ALO_1F8668 *alo, long hidden)
     }
 }
 
-extern "C" {
-typedef struct PartHandle {
-    char pad[0x10];
-    s32 referenceCount;
-} PartHandle;
-
-void PartHandle_AddRef(PartHandle *handle) {
-    handle->referenceCount = handle->referenceCount + 1;
-}
-}
-
 /* a reference-counted BASIC from a slot heap (B_003E15CC): its count follows the vtable pointer */
 struct Sm : BASIC {
     /* 0x10 */ s32 referenceCount;
 };
+
+extern "C" {
+void PartHandle_AddRef(Sm *handle) {
+    handle->referenceCount = handle->referenceCount + 1;
+}
+}
 
 extern "C" void Basic_FreeSubscribers(Sm *);
 
@@ -722,7 +638,7 @@ extern "C" void Sm_Release(Sm *sm) {
    at 0x24 (WakeXf, RemoveXfAct, SetXfKind take the two). */
 struct XFREF {
     u8 unknown_0x0[0x20];
-    /* 0x20 */ int alo;
+    /* 0x20 */ SO *alo;
     /* 0x24 */ XF *xf;
 };
 
@@ -731,7 +647,7 @@ extern "C" float func_001F87A0(XFREF *self)
     return (float)self->xf->limitLo * 0.001f;
 }
 
-extern "C" void WakeXf(int, XF *);
+extern "C" void WakeXf(SO *, XF *);
 
 extern "C" void func_001F87C8(XFREF *arg0, float arg1) {
     s16 scaled = (s16)(arg1 * 1000.0f);
@@ -744,7 +660,7 @@ extern "C" float func_001F8808(XFREF *self)
     return (float)self->xf->limitHi * 0.001f;
 }
 
-extern "C" void WakeXf_1F8830(s32, XF *, f32);
+extern "C" void WakeXf_1F8830(SO *, XF *, f32);
 
 extern "C" void func_001F8830(XFREF *arg0, f32 fparg0) {
     XF *target = arg0->xf;
@@ -757,7 +673,7 @@ extern "C" float func_001F8870(XFREF *self)
     return (float)self->xf->limitLo * 0.001f;
 }
 
-extern "C" void WakeXf_1F8898(int a0, XF *a1, float a2);
+extern "C" void WakeXf_1F8898(SO *a0, XF *a1, float a2);
 
 void func_001F8898(XFREF *arg0, float arg1)
 {
@@ -768,33 +684,25 @@ void func_001F8898(XFREF *arg0, float arg1)
 }
 
 extern "C" {
-typedef struct Object1F88D8 {
-    char pad[0x20];
-    s32 field_0x20;
-    s32 field_0x24;
-} Object1F88D8;
+void WakeXf_1F88D8(SO *, XF *);
 
-void WakeXf_1F88D8(s32, s32);
-
-s32 func_001F88D8(Object1F88D8 *object, s32 arg1) {
+XF *func_001F88D8(XFREF *object, s32 arg1) {
     if (arg1 == 1) {
-        WakeXf_1F88D8(object->field_0x20, object->field_0x24);
+        WakeXf_1F88D8(object->alo, object->xf);
     }
-    return object->field_0x24;
+    return object->xf;
 }
 }
 
-struct ACT { int kind; char pad4[8]; int priority; ACT *next; };
-
-extern "C" void RemoveXfAct(int, XF *, ACT *);
+extern "C" void RemoveXfAct(SO *, XF *, ACT *);
 
 extern "C" void FreeAct(ACT *);
 
-extern "C" void ResortXfActList(int, XF *);
+extern "C" void ResortXfActList(SO *, XF *);
 
-extern "C" void SetXfKind(int, XF *, int);
+extern "C" void SetXfKind(SO *, XF *, int);
 
-extern "C" void WakeXf_1F8910(int, XF *);
+extern "C" void WakeXf_1F8910(SO *, XF *);
 
 ACT *func_001F8910(XFREF *ref, int kind, int xfk, int priority)
 {
@@ -817,25 +725,21 @@ ACT *func_001F8910(XFREF *ref, int kind, int xfk, int priority)
                 }
                 return act;
             }
-            act = act->next;
+            act = act->pactNext;
         } while (act);
     }
     return 0;
 }
 
-struct ACT_1F89E0 { char pad[0x14]; int xfk; };
+extern "C" ACT *func_001F8910_1F89E0(XFREF *, int, int, int);
 
-struct XFREF_1F89E0 { char pad[0x20]; void *alo; void *xf; };
+extern "C" void func_0012D108(ACT *, QW);
 
-extern "C" ACT_1F89E0 *func_001F8910_1F89E0(XFREF_1F89E0 *, int, int, int);
+extern "C" void func_0012DC18(SO *, XF *, int, int, int, QW);
 
-extern "C" void func_0012D108(ACT_1F89E0 *, QW);
-
-extern "C" void func_0012DC18(void *, void *, int, int, int, QW);
-
-void func_001F89E0(XFREF_1F89E0 *ref, int xfk, int prio, QW pos)
+void func_001F89E0(XFREF *ref, int xfk, int prio, QW pos)
 {
-    ACT_1F89E0 *act = func_001F8910_1F89E0(ref, 1, xfk, prio);
+    ACT *act = func_001F8910_1F89E0(ref, 1, xfk, prio);
     if (act) {
         act->xfk = xfk;
         func_0012D108(act, pos);
@@ -846,79 +750,69 @@ void func_001F89E0(XFREF_1F89E0 *ref, int xfk, int prio, QW pos)
 
 extern "C" QW ConvertXfPos__Fiii(int, int, QW);
 
-extern "C" void func_001F89E0__FPviii(void *, int, int, QW);
+extern "C" void func_001F89E0__FPviii(XFREF *, int, int, QW);
 
 extern "C" void func_001F8A78__FPvii(XFREF *arg0, int arg1, int arg2, QW arg3) {
     QW result = ConvertXfPos__Fiii(0, (int)arg0->xf->pxfParent, arg3);
     func_001F89E0__FPviii(arg0, arg1, arg2, result);
 }
 
-struct Rows3 { QW row[3]; };
+extern "C" ROWS3 ConvertXfMat(int, int);
 
-struct Xf_1F8AD8 { char pad[0xA0]; int field; };
+extern "C" QW DecomposeRotateMatrixEuler(ROWS3 *);
 
-struct Obj_1F8AD8 { char pad[0x24]; Xf_1F8AD8 *xf; };
+extern "C" void func_001F89E0_1F8AD8(XFREF *, int, int, QW);
 
-extern "C" Rows3 ConvertXfMat(int, int);
-
-extern "C" QW DecomposeRotateMatrixEuler(Rows3 *);
-
-extern "C" void func_001F89E0_1F8AD8(void *, int, int, QW);
-
-extern "C" void func_001F8AD8(Obj_1F8AD8 *obj, int a, int b)
+extern "C" void func_001F8AD8(XFREF *obj, int a, int b)
 {
-    Rows3 copy;
-    Rows3 matrix = ConvertXfMat(0, obj->xf->field);
+    ROWS3 copy;
+    ROWS3 matrix = ConvertXfMat(0, (int)obj->xf->pxfParent);
     copy = matrix;
     QW euler = DecomposeRotateMatrixEuler(&copy);
     func_001F89E0_1F8AD8(obj, a, b, euler);
 }
 
-struct ACT_1F8B58 { char pad[0x14]; int xfk; char pad2[0x1C - 0x18]; float ga; float gb; };
+extern "C" ACT *func_001F8910_1F8B58(XFREF *, int, int, int);
 
-struct XFREF_1F8B58 { char pad[0x20]; void *alo; void *xf; };
+extern "C" void CreateXfActbank(SO *, XF *, int, int, float, float);
 
-extern "C" ACT_1F8B58 *func_001F8910_1F8B58(XFREF_1F8B58 *, int, int, int);
-
-extern "C" void CreateXfActbank(void *, void *, int, int, float, float);
-
-void func_001F8B58(XFREF_1F8B58 *ref, int xfk, int prio, float ga, float gb)
+void func_001F8B58(XFREF *ref, int xfk, int prio, float ga, float gb)
 {
-    ACT_1F8B58 *act = func_001F8910_1F8B58(ref, 4, xfk, prio);
+    ACT4 *act = (ACT4 *)func_001F8910_1F8B58(ref, 4, xfk, prio);
     if (act) {
-        act->xfk = xfk;
-        act->ga = ga;
-        act->gb = gb;
+        act->act.xfk = xfk;
+        act->field_0x1C = ga;
+        act->field_0x20 = gb;
     } else if (xfk != -1) {
         CreateXfActbank(ref->alo, ref->xf, prio, xfk, ga, gb);
     }
 }
 
 struct Object1F8BF0Inner2 {
-    char pad[8];
+    u8 unknown_0x0[8];
     s32 field_0x8;
     f32 field_0xC;
     f32 field_0x10;
     f32 field_0x14;
     f32 angle;
-    char pad2[0x20 - 0x1C];
+    u8 unknown_0x1C[0x20 - 0x1C];
     s128 field_0x20;
 };
 
 struct Object1F8BF0Inner1 {
-    char pad[0x60];
+    u8 unknown_0x0[0x60];
     Object1F8BF0Inner2 *field_0x60;
 };
 
 struct Object1F8BF0Inner0 {
-    char pad[0x98];
+    u8 unknown_0x0[0x98];
     s16 field_0x98;
-    char pad2[0xA8 - 0x9A];
+    u8 unknown_0x9A[0xA8 - 0x9A];
     Object1F8BF0Inner1 *field_0xA8;
 };
 
 struct Object1F8BF0 {
-    char pad[0x24];
+    u8 unknown_0x0[0x24];
     Object1F8BF0Inner0 *field_0x24;
 };
 
@@ -939,7 +833,7 @@ extern "C" void func_001F8BF0(Object1F8BF0 *object, s32 arg1, s128 arg2, f32 fpa
     }
 }
 
-struct CONSTR { QW normal; int ct; int pad[3]; } __attribute__((aligned(16)));
+struct CONSTR { QW normal; int ct; int unknown_0x14[3]; } __attribute__((aligned(16)));
 
 extern "C" void CreateSlotheapSwAlign(void *, int, int, int);
 

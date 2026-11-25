@@ -1,12 +1,17 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-struct GIFS { char pad[0x30]; };
-struct VIFS { char pad[0x30]; };
+// QW is a class in retail (the symbols say P2QW): types.h's 128-bit integer would change this function's mangled name, so its
+// typedef is renamed away for this file.
+#define QW QW_TYPEDEF_UNUSED
+#include "types.h"
+#undef QW
+struct GIFS { u8 unknown_0x0[0x30]; };
+struct VIFS { u8 unknown_0x0[0x30]; };
 struct QW { char b[16]; } __attribute__((aligned(16)));
 extern "C" {
 void __4GIFS(GIFS *);
 void AllocStatic__4DMASiP2QW(GIFS *, int, QW *);
-void AddPrimPack__4GIFSiiUl(GIFS *, int, int, unsigned long);
-void PackAD__4GIFSll(GIFS *, long, long);
+void AddPrimPack__4GIFSiiUl(GIFS *, int, int, u64);
+void PackAD__4GIFSll(GIFS *, s64, s64);
 void AddPrimEnd__4GIFS(GIFS *);
 void AddDmaCnt__4DMAS(VIFS *);
 void AddVifFlush__4VIFS(VIFS *);

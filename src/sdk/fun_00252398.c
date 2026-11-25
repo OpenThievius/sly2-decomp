@@ -1,12 +1,13 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "types.h"
 typedef struct Decoder_252398 {
-    char pad0[0x160];
+    u8 unknown_0x0[0x160];
     int pictureType;
-    char pad164[0x20];
+    u8 unknown_0x164[0x20];
     int pictureStructure;
-    char pad188[0x38];
+    u8 unknown_0x188[0x38];
     int field1C0;
-    char pad1C4[0x65C];
+    u8 unknown_0x1C4[0x65C];
     int rowSelector;
 } Decoder_252398;
 

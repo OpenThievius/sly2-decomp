@@ -1,5 +1,6 @@
+#include "types.h"
 extern "C" int sprintf(char *, const char *, ...);
-struct TXT { char pad[0x4764]; int cur; int max; };
+struct TXT { u8 unknown_0x0[0x4764]; int cur; int max; };
 extern TXT B_003DD490;
 void BindTextCounts(char *text)
 {

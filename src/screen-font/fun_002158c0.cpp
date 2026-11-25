@@ -1,9 +1,9 @@
 #include "sly2.h"
-struct SPRITE { char pad[0x30]; };
-struct BLOT { char pad[0x84]; SPRITE* sprites; };
-struct HANDLE { char pad[0x20]; void* held; };
+struct SPRITE { u8 unknown_0x0[0x30]; };
+struct BLOT { u8 unknown_0x0[0x84]; SPRITE* sprites; };
+struct HANDLE { u8 unknown_0x0[0x20]; void* held; };
 struct CHAR { int unk0; int type; BLOT* blot; int unkC; int isprite; HANDLE* handle; };
-struct SLOT { char pad[0x58]; int instance; };
+struct SLOT { u8 unknown_0x0[0x58]; int instance; };
 extern "C" void StopSpriteInstance(SPRITE*, int);
 extern "C" void func_001BED18(void*);
 extern "C" void InitDepthSlot(SLOT*);

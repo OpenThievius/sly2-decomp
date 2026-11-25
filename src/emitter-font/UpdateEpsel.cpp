@@ -1,8 +1,9 @@
+#include "types.h"
 struct CRef_15CF30 { int tag; union { float g; int n; }; int p2; int p3; };
 struct EPSEL {
-    char pad0[0x110]; int episode; int target; int last; int mode; int sub; int pad124; int replay; int hintState; float hintSince;
+    u8 unknown_0x0[0x110]; int episode; int target; int last; int mode; int sub; int pad124; int replay; int hintState; float hintSince;
 };
-struct SW_15CF30 { char pad0[0x3B58]; int asaveWarp[9]; int asaveCoins[9]; };
+struct SW_15CF30 { u8 unknown_0x0[0x3B58]; int asaveWarp[9]; int asaveCoins[9]; };
 extern "C" {
 int CGc_FFindScreen(void *);
 void CRef_Destruct(CRef_15CF30 *);

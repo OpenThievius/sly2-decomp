@@ -1,18 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-struct TFT {
-    int fLeft;      // 0x00
-    int fPlus;      // 0x04
-    int fSpace;     // 0x08
-    int pad0C;
-    int fZero;      // 0x10
-    int fPrec;      // 0x14
-    int cchWidth;   // 0x18
-    int cchPrec;    // 0x1C
-    int pad20[3];
-    unsigned char chType;    // 0x2C
-    char pad2D[3];
-    int fUpper;     // 0x30
-};
+#include "tft.h"
 extern const unsigned char D_002C40C8[];
 unsigned char ChDigitFromG(double g, int first, int exp);
 extern "C" {
@@ -27,7 +14,7 @@ int strlen(const char *);
 
 int CchAchFromDouble__FPciP3TFTd(char *pch, int cch, TFT *ptft, double d)
 {
-    union { double d; unsigned long u; } bits;
+    union { double d; u64 u; } bits;
     bits.d = d;
     if ((bits.u & 0x7FF0000000000000UL) == 0x7FF0000000000000UL) {
         strcpy(pch, (bits.u & 0xFFFFFFFFFFFFFUL) ? "(nan)" : "(inf)");

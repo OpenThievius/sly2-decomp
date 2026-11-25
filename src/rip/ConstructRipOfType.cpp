@@ -3,7 +3,7 @@
 
 struct RIP {
     int ript;
-    char pad4[0xE8];
+    u8 unknown_0x4[0xE8];
     void **pvtrip;
 };
 

@@ -4,7 +4,7 @@
 #include "sly2.h"
 #include "m2c_macros.h"
 
-struct DESC { char pad0[8]; char *pbufA; int cbA; char pad1[0x18 - 0x10]; char *pbufB; int cbB; char pad2[0x50 - 0x20]; };
+struct DESC { u8 unknown_0x0[8]; char *pbufA; int cbA; u8 unknown_0x10[0x18 - 0x10]; char *pbufB; int cbB; u8 unknown_0x20[0x50 - 0x20]; };
 
 extern "C" int B_003D3980;
 

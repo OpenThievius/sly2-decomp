@@ -4,14 +4,14 @@
 #include "vu0inline.h"
 
 struct XPR {
-    char pad0[8];
+    u8 unknown_0x0[8];
     void *plo;
-    char pad1[0x34];
+    u8 unknown_0xC[0x34];
 };
 struct MQ {
     XPR side[2];
     QW normal;
-    char pad[4];
+    u8 unknown_0x90[4];
     float friction;
     float bounce;
 };
@@ -20,14 +20,14 @@ union VU_SCALE {
     VECTOR v;
 };
 struct UL {
-    unsigned long v;
+    u64 v;
 } __attribute__((packed));
 
 extern "C" char B_003DD490[];
 extern "C" const UL RO_002A7840;
 void func_001F4FB0(SO *, MQ *, int);
 int FIsBasicDerivedFrom(void *, int);
-void QueueSwCallbackOnce(void *, SO *, unsigned long, int);
+void QueueSwCallbackOnce(void *, SO *, u64, int);
 
 void AdjustVehicleNewXp(SO *pvehicle, MQ *pcontact, int side)
 {

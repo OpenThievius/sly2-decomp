@@ -1,4 +1,5 @@
-struct Obj { char pad[0x90]; int count; int *items; };
+#include "types.h"
+struct Obj { u8 unknown_0x0[0x90]; s32 count; s32 *items; };
 void func_00173398(Obj *obj, int item)
 {
     int n = obj->count;

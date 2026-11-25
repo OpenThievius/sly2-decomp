@@ -1,7 +1,7 @@
 #include "sly2.h"
 #include "cref.h"
-struct CPair { char pad[0x10]; CPair *next; };
-struct CProc { char pad[0x18]; CPair *code; };
+#include "timedcall.h"
+struct CProc { u8 unknown_0x0[0x18]; CPair *code; };
 struct CFrame;
 extern "C" CRef RefEval(CPair *, CFrame *);
 

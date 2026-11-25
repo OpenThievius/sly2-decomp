@@ -1,8 +1,15 @@
 #include "sly2.h"
-struct PLOVT { short delta; short index; void (*fn)(void *); };
-struct PLO { char pad0[0x54]; int unk54; char pad58[8]; float unk60; float unk64; char pad68[4]; int unk6c; };
-struct PLOV { char pad[0xC]; PLOVT *vt; };
-struct LEVEL { char pad[0x3E60]; PLO *plo; };
+#include "lo.h"
+struct PLO : LO {
+    u8 unknown_0x50[4];
+    s32 unk54;
+    u8 unknown_0x58[8];
+    f32 unk60;
+    f32 unk64;
+    u8 unknown_0x68[4];
+    s32 unk6c;
+};
+struct LEVEL { u8 unknown_0x0[0x3E60]; PLO *plo; };
 extern "C" PLO *PloNew(int, int, int, int);
 
 void func_0020E338(LEVEL *plevel)
@@ -12,7 +19,5 @@ void func_0020E338(LEVEL *plevel)
     plevel->plo->unk64 = 0.25f;
     plevel->plo->unk54 = 0x80200000;
     plevel->plo->unk6c = 1;
-    PLOV *pplo = (PLOV *)plevel->plo;
-    PLOVT *vt = pplo->vt;
-    vt[9].fn((char *)pplo + vt[9].delta);
+    plevel->plo->Remove();
 }

@@ -2,8 +2,8 @@
 #include "types.h"
 
 extern "C" {
-void snd_SendIOPCommandNoWait__FiiPcPFiUl_vUl(int, int, char *, void (*)(int, unsigned long), unsigned long);
-void func_002330D0(int a0, int a1, int a2, int a3, int t0, int t1, int t2, void (*t3)(int, unsigned long), unsigned long stack0) {
+void snd_SendIOPCommandNoWait__FiiPcPFiUl_vUl(int, int, char *, void (*)(int, u64), u64);
+void func_002330D0(int a0, int a1, int a2, int a3, int t0, int t1, int t2, void (*t3)(int, u64), u64 stack0) {
     int buf[7];
     buf[0] = a0;
     buf[1] = a1;

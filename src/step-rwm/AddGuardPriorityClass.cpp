@@ -1,10 +1,12 @@
-struct G { char pad0[0x394]; unsigned count; int items[8]; };
-void AddGuardPriorityClass(G *guard, int value)
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "sly2.h"
+#include "stepguard.h"
+void AddGuardPriorityClass(STEPGUARD *guard, int value)
 {
-    unsigned c = guard->count;
-    if (c < 3) {
-        int *p = &guard->items[c];
-        guard->count = c + 1;
-        *p = value;
+    unsigned count = guard->cgroup;
+    if (count < 3) {
+        int *slot = &guard->agroup[count];
+        guard->cgroup = count + 1;
+        *slot = value;
     }
 }

@@ -1,5 +1,7 @@
 #include "vu0inline.h"
 #include "ps2inline.h"
+#include "sly2.h"
+#include "stepguard.h"
 extern "C" {
 QW PosLoWorld(void *);
 int FIsBasicDerivedFrom(void *, int);
@@ -9,33 +11,22 @@ int func_00208B38(void *, void *);
 extern float D_FLT_002C3D70[3];
 extern float D_FLT_002C3D80[3];
 }
-struct ENTRY_2082D0 { void *object; int flag; int pad[2]; };
-struct LIST_2082D0 { char pad[0xFC]; int count; ENTRY_2082D0 entry[1]; };
-struct SELF_2082D0 {
-    char pad0[0x38C];
-    void *special;
-    struct { char pad[0x28]; unsigned long bits; } *current;
-    char pad1[0xF64 - 0x394];
-    LIST_2082D0 *list;
-    char pad2[0xFBC - 0xF68];
-    int state;
-};
-
-extern "C" void *func_002082D0(SELF_2082D0 *self)
+extern "C" void *func_002082D0(STEPGUARD *self)
 {
     void *best = 0;
-    if (self->current != 0 && ((int)(self->current->bits >> 60) & 1)) {
-        best = self->current;
+    LO *current = (LO *)self->field_0x390;
+    if (current != 0 && ((int)(current->grfo >> 60) & 1)) {
+        best = current;
     } else {
         float bestDistance = 3.4028235e38f;
         QW origin = PosLoWorld(self);
-        for (int index = 0; index < self->list->count; index++) {
-            ENTRY_2082D0 *entry = &self->list->entry[index];
-            void *object = entry->object;
+        for (int index = 0; index < self->psensor->centry; index++) {
+            SENSORENTRY *entry = &self->psensor->aentry[index];
+            LO *object = entry->plo;
             if (object == 0)
                 continue;
-            if (entry->flag == 0) {
-                if (self->state != 0x22 && self->state != 0x25)
+            if (entry->state == 0) {
+                if (self->mode != 0x22 && self->mode != 0x25)
                     continue;
                 if (FIsBasicDerivedFrom(object, 0x38) == 0)
                     continue;
@@ -47,9 +38,9 @@ extern "C" void *func_002082D0(SELF_2082D0 *self)
             QW position = PosLoWorld(object);
 
             float distance = LaneX(SqrtX(SquaredLength(VectorSub(origin, position))));
-            if (object == self->special)
+            if (object == self->pbasicAlert)
                 distance = D_FLT_002C3D70[0] + distance * (D_FLT_002C3D70[1] + distance * D_FLT_002C3D70[2]);
-            if (self->state == 0x22 || self->state == 0x25) {
+            if (self->mode == 0x22 || self->mode == 0x25) {
                 if (FIsBasicDerivedFrom(object, 0x38) != 0)
                     distance = D_FLT_002C3D80[0] + distance * (D_FLT_002C3D80[1] + distance * D_FLT_002C3D80[2]);
             }

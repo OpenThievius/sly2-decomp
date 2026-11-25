@@ -1,9 +1,9 @@
 #include "sly2.h"
 #include "cref.h"
+#include "timedcall.h"
 struct Frame;
-struct Pair;
 struct SLOTHEAP;
-struct HP { Pair *p; int pad[3]; };
+struct HP { CPair *p; int pad[3]; };
 struct Proc { int cref; };
 extern "C" {
 void CRef_ConstructVector(CRef *, void *);
@@ -11,20 +11,19 @@ void CRef_ConstructMatrix(CRef *, void *);
 void CRef_ConstructClq(CRef *, void *);
 void CRef_ConstructLm(CRef *, void *);
 void CRef_ConstructSmp(CRef *, void *);
-void CRef_ConstructPair(CRef *, Pair *);
+void CRef_ConstructPair(CRef *, CPair *);
 void CRef_ConstructProc(CRef *, Proc *);
 void CRef_ConstructBasic(CRef *, void *);
 void CRef_CopyConstruct(CRef *, CRef *);
-void PpairClone(HP *, void *, Frame *, unsigned long);
+void PpairClone(HP *, void *, Frame *, u64);
 void PprocClone(Proc **, void *, Frame *);
-void CPairPtr_Destructor(Pair **, int);
-void UnlinkPairNode(Pair *);
+void CPairPtr_Destructor(CPair **, int);
+void UnlinkPairNode(CPair *);
 void FreeSlotheapPv(SLOTHEAP *, void *);
 void CProc_DeletingDestructor(Proc *, int);
 extern SLOTHEAP B_004520A8;
 }
-struct PairView { int cref; int pad4; CRef ref; Pair *next; };
-extern "C" CRef *CRef_RefClone(CRef *pref, CRef *ref, Frame *pframe, unsigned long ulArg)
+extern "C" CRef *CRef_RefClone(CRef *pref, CRef *ref, Frame *pframe, u64 ulArg)
 {
     switch (ref->m_tagk) {
     case TAGK_Vector:
@@ -46,12 +45,12 @@ extern "C" CRef *CRef_RefClone(CRef *pref, CRef *ref, Frame *pframe, unsigned lo
         HP clone;
         PpairClone(&clone, (void *)ref->m_tag.m_n, pframe, ulArg);
         CRef_ConstructPair(pref, clone.p);
-        PairView *held = (PairView *)clone.p;
+        CPair *held = clone.p;
         if (held) {
             if (--held->cref == 0) {
                 CPairPtr_Destructor(&held->next, 2);
                 held->ref.Decref();
-                UnlinkPairNode((Pair *)held);
+                UnlinkPairNode(held);
                 FreeSlotheapPv(&B_004520A8, held);
             }
         }

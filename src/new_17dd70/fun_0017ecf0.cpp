@@ -1,13 +1,18 @@
 #include "sly2.h"
-struct CRV { char pad[0xE4]; int closed; char pad2[0x180 - 0xE8]; void *ranges; };
 #include "goal.h"
+#include "crv.h"
+/* the curve as Advance reads it: its excluded ranges sit past CRV's declared bytes */
+struct CRVRANGES : CRV {
+    /* 0x180 */ void *ranges; /* reader: func_0017ECF0 (GoalFollowCurve's Advance) */
+};
+/* GoalFollowCurve (goals.h GOALFOLLOWCURVE) with the curve held as a pointer: the shared field is an s32 (guess) */
 struct GOAL_17ECF0 : GOAL {
-    CRV *crv;
+    CRVRANGES *crv;
     int fwd;
     float s;
-    char pad_3C[0x4];
+    u8 unknown_0x3C[0x4];
     QW pos;
-    char pad_50[0x8];
+    u8 unknown_0x50[0x8];
     int param;
 };
 struct TARGET { int a[4]; QW pos; };
@@ -16,12 +21,12 @@ extern float D_FLT_002BE7C0;
 extern float D_FLT_002BE7C4;
 extern "C" {
 int FIsBasicDerivedFrom(void *, int);
-float SMinCrv(CRV *);
-float SMaxCrv(CRV *);
-float SWrapCrv(CRV *, float);
+float SMinCrv(CRVRANGES *);
+float SMaxCrv(CRVRANGES *);
+float SWrapCrv(CRVRANGES *, float);
 void UpdateCrvExcludedRanges(void *);
 float *PgFindCrvExcludedRange(void *, float);
-void GetPathPosFromS(CRV *, QW *, void *, float);
+void GetPathPosFromS(CRVRANGES *, QW *, void *, float);
 void func_002562A8(TARGET *);
 void SetGoalTarget(void *, TARGET *);
 }

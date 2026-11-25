@@ -1,13 +1,13 @@
 #include "types.h"
 typedef struct Unit {
-    char pad0[0x828];
+    u8 unknown_0x0[0x828];
     int field828;
     u32 field82C;
-    char pad830[0x18];
+    u8 unknown_0x830[0x18];
     int field848;
     int field84C;
 } Unit;
-extern long func_00251FC8(Unit *unit);
+extern s64 func_00251FC8(Unit *unit);
 extern void func_00252358(void);
 void func_002522C0(Unit *unit, u32 flags) {
     func_00252358();

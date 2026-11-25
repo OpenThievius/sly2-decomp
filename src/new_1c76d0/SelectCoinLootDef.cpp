@@ -1,6 +1,5 @@
 #include "sly2.h"
-struct LOOTDEF { int id; char pad[0x18]; int cmesh; int ameshShown[3]; };
-struct COIN { char pad[0x23C]; int cloot; LOOTDEF *aloot; LOOTDEF *cur; };
+#include "coin.h"
 extern "C" void func_001F6A68(COIN *);
 extern "C" void func_001F6978(COIN *, int);
 // Retail: a search loop over coin->aloot (stride 0x2C) whose fall-through stores aloot[0] to cur
@@ -17,7 +16,7 @@ extern "C" void SelectCoinLootDef(COIN *coin, int id)
             coin->cur = coin->aloot;
             break;
         }
-        LOOTDEF *loot = &coin->aloot[iloot];
+        COINLOOTDEF *loot = &coin->aloot[iloot];
         if (id == loot->id) {
             coin->cur = loot;
             break;

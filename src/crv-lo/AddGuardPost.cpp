@@ -1,6 +1,6 @@
 #include "sly2.h"
-struct Post { int postA; int pad4; int zoneA; int pad0xC; int postB; int pad0x14; int zoneB; char pad[0x24 - 0x1C]; };
-struct Guard { char pad[0x1010]; int count; Post *posts; };
+struct Post { int postA; int pad4; int zoneA; int pad0xC; int postB; int pad0x14; int zoneB; u8 unknown_0x1C[0x8]; };
+struct Guard { u8 unknown_0x0[0x1010]; int count; Post *posts; };
 void AddGuardPost(Guard *guard, int postA, int zoneA, int postB, int zoneB)
 {
     int index = guard->count;

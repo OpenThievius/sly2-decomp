@@ -1,4 +1,6 @@
-struct Laser { char pad0[0x40]; int f40; char pad44[0x148 - 0x44]; long f148; char pad150[0x1C0 - 0x150]; float f1C0; };
+#include "types.h"
+/* a laser seen as an LO (lo.h: the word at 0x40 is its grf flags or its world-table entry), with the 64-bit word at 0x148 no other source reads */
+struct Laser { u8 unknown_0x0[0x40]; int f40; u8 unknown_0x44[0x148 - 0x44]; s64 f148; u8 unknown_0x150[0x1C0 - 0x150]; float f1C0; };
 extern "C" void func_001DE2A0(Laser *);
 extern "C" void InitLaser(Laser *self) {
     func_001DE2A0(self);

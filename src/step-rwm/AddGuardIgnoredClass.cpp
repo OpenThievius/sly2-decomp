@@ -1,13 +1,11 @@
-struct Guard {
-    char pad0[0x3A8];
-    unsigned count;
-    int items[8];
-};
-void AddGuardIgnoredClass(Guard *guard, int value)
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "sly2.h"
+#include "stepguard.h"
+void AddGuardIgnoredClass(STEPGUARD *guard, int value)
 {
-    unsigned count = guard->count;
+    unsigned count = guard->cignoredClass;
     if (count < 5) {
-        guard->items[count] = value;
-        guard->count = count + 1;
+        guard->aignoredClass[count] = value;
+        guard->cignoredClass = count + 1;
     }
 }

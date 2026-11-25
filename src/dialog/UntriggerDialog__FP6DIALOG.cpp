@@ -1,6 +1,6 @@
 #include "sly2.h"
 #include "so.h"
-struct DIALOG { char pad[0x1C8]; SO *pso; };
+struct DIALOG { u8 unknown_0x0[0x1C8]; SO *pso; };
 int FIgnoreSoIntersection(DIALOG *, SO *);
 int UntriggerDialog(DIALOG *pdialog, SO *psoOther)
 {

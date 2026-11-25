@@ -1,6 +1,7 @@
-struct Point { int kind; int oid; void *plo; void *ploAux; void *auxData; char pad14[8]; };
-struct Aux { char pad0[0x54]; void *data; };
-struct Spawner { char pad0[0x40]; unsigned flags; char pad44[0xC]; int count; Point *points; char pad58[4]; int slotCount; void *slots; };
+#include "types.h"
+struct Point { int kind; int oid; void *plo; void *ploAux; void *auxData; u8 unknown_0x14[8]; };
+struct Aux { u8 unknown_0x0[0x54]; void *data; };
+struct Spawner { u8 unknown_0x0[0x40]; unsigned flags; u8 unknown_0x44[0xC]; int count; Point *points; u8 unknown_0x58[4]; int slotCount; void *slots; };
 extern "C" char B_003DD490;
 extern "C" void PostLoLoad(Spawner *);
 extern "C" void *PloFindSwObject_thunk(void *, int, int, int);

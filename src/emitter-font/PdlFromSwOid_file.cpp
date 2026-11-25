@@ -5,7 +5,7 @@
 #include "sly2.h"
 #include "include_asm.h"
 
-struct Entry { char pad[12]; };
+struct Entry { u8 unknown_0x0[12]; };
 
 extern "C" Entry *PdlFromSwOid(char *base, int oid)
 {
@@ -14,7 +14,7 @@ extern "C" Entry *PdlFromSwOid(char *base, int oid)
 
 typedef struct Pdl { s32 a, b, c; } Pdl;
 
-typedef struct Sw { char pad[0x3038]; Pdl pdls[1]; } Sw;
+typedef struct Sw { u8 unknown_0x0[0x3038]; Pdl pdls[1]; } Sw;
 
 extern "C" Pdl *PdlFromSwCid(Sw *arg0, s32 arg1) {
     return &arg0->pdls[arg1];
@@ -28,11 +28,11 @@ extern "C" Entry *func_0015E3C0(char *base, int oid)
 struct LO_15E3E8 {
     int oid;
     LO_15E3E8 *pnext;
-    char pad0[0x10 - 0x8];
+    u8 unknown_0x8[8];
     LO_15E3E8 *paloParent;
-    char pad1[0x28 - 0x14];
+    u8 unknown_0x14[0x14];
     union {
-        unsigned long grf;
+        u64 grf;
         struct { int unk28; signed char depth; };
     };
 };
@@ -43,7 +43,7 @@ extern "C" void MatchSwObject(void *psw, LO_15E3E8 *plo, LO_15E3E8 *ploMatch, un
                               LO_15E3E8 *plst, int cploMax, int *pcploMatch, LO_15E3E8 **aplo, int *pipsl)
 {
     if (!(grffso & 0x400)) {
-        switch ((long)(plo->grf << 12) >> 60) {
+        switch ((s64)(plo->grf << 12) >> 60) {
         case 0: {
             LO_15E3E8 *p = plst;
             for (;;) {
@@ -139,14 +139,14 @@ extern "C" void MatchSwObject(void *psw, LO_15E3E8 *plo, LO_15E3E8 *ploMatch, un
 // An object in the world's oid hash chains (PdlFromSwOid): its parent at 0x10, oid at 0x18, next in the chain at 0x1C, the
 // depth MatchSwObject reads at 0x2C and the object it matches against at 0x3C.
 struct LO_15E678 {
-    char pad0[0x10];
+    u8 unknown_0x0[0x10];
     LO_15E678 *paloParent;
     int pad14;
     int oid;
     LO_15E678 *ploNextOid;
-    char pad20[0xC];
+    u8 unknown_0x20[0xC];
     signed char depth;
-    char pad2D[0xF];
+    u8 unknown_0x2D[0xF];
     LO_15E3E8 *ploMatch;
 };
 
@@ -260,7 +260,7 @@ extern "C" LO *PloFindSwObject(SW *sw, unsigned flags, int oid, LO *context, voi
     return 0;
 }
 
-struct CLSDEF_15E988 { CLSDEF_15E988 *pclsdefBase; int cid; char pad[0xC]; };
+struct CLSDEF_15E988 { CLSDEF_15E988 *pclsdefBase; int cid; u8 unknown_0x8[0xC]; };
 
 extern CLSDEF_15E988 D_002BAAE8[];
 

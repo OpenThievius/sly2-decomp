@@ -3,16 +3,16 @@
 #include "po.h"
 struct CLIPEDGE { char data[0x180]; };
 struct OBJ : PO {
-    char pad180[0x240 - 0x180];
+    u8 unknown_0x180[0x240 - 0x180];
     QW offset;
-    char pad250[0x11AC - 0x250];
+    u8 unknown_0x250[0x11AC - 0x250];
     int field11AC;
 };
-struct NODE { int hit; NODE *next; char pad8[4]; OBJ *pobj; };
-struct SENSORSET { char pad[0x64]; NODE *pnodes; };
-struct BSP { char pad[0xEC]; void *pclip; char pad0xf0[0x130 - 0xF0]; BSP *pnext; };
+struct NODE { int hit; NODE *next; u8 unknown_0x8[4]; OBJ *pobj; };
+struct SENSORSET { u8 unknown_0x0[0x64]; NODE *pnodes; };
+struct BSP { u8 unknown_0x0[0xEC]; void *pclip; u8 unknown_0xF0[0x130 - 0xF0]; BSP *pnext; };
 struct SENSOR {
-    char pad0[0xE4];
+    u8 unknown_0x0[0xE4];
     SENSORSET *pset;
     void *pvolume;
     void *pvolumeExtra;

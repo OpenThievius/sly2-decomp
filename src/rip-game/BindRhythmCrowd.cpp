@@ -5,7 +5,7 @@ extern "C" void func_001F1448(void *, void *, int, int, void *);
 extern "C" int ICheerFromOid(int);
 extern "C" float GRandInRange(float, float);
 struct CROWD { int oid; int oidCheer; int link; int level; float threshold[3]; };
-struct RHYTHM { char pad[0x234]; float scoreMin; float scoreMax; char pad2[0x2A8 - 0x23C]; int count; CROWD crowd[1]; };
+struct RHYTHM { u8 unknown_0x0[0x234]; float scoreMin; float scoreMax; u8 unknown_0x23C[0x2A8 - 0x23C]; int count; CROWD crowd[1]; };
 extern "C" void BindRhythmCrowd(RHYTHM *rhythm)
 {
     float third = __builtin_fabsf(rhythm->scoreMax - rhythm->scoreMin) * 0.33333334f;

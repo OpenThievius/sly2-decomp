@@ -1,12 +1,13 @@
+#include "types.h"
 typedef struct {
-    char pad0[0x12C];
+    u8 unknown_0x0[0x12C];
     int error;
-    char pad130[0xC];
+    u8 unknown_0x130[0xC];
     int field13C;
-    char pad140[0x80];
+    u8 unknown_0x140[0x80];
     int field1C0;
     int field1C4;
-    char pad1C8[0x6B0];
+    u8 unknown_0x1C8[0x6B0];
     int field878;
 } MpegContext;
 

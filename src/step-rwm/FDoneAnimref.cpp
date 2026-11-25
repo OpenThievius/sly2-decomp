@@ -1,42 +1,44 @@
-struct Inst { char pad[0x30]; int f30; };
-struct Animref { int kind; void *pv; Inst *pinst; int n; };
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "sly2.h"
+#include "stepguard.h"
+#include "sma.h"
 extern "C" {
-int FAsegaGone(Inst *);
-int FSmaRetracted(Inst *);
-int FJumperDone(Inst *);
-int func_0020CA98(Inst *);
+int FAsegaGone(ASEGA *);
+int FSmaRetracted(SMA *);
+int FJumperDone(JUMPER *);
+int func_0020CA98(void *);
 }
 
-int FDoneAnimref(Animref *ref)
+int FDoneAnimref(ANIMREF *ref)
 {
-    int r;
+    int result;
     switch (ref->kind) {
     case 0:
-        r = 0;
-        if (ref->pinst != 0) { if (!FAsegaGone(ref->pinst)) goto out; }
-        r = 1;
+        result = 0;
+        if (ref->pinst != 0) { if (!FAsegaGone((ASEGA *)ref->pinst)) goto out; }
+        result = 1;
         break;
     case 1:
-        r = 0;
+        result = 0;
         if (ref->pinst != 0) {
-            if (!FSmaRetracted(ref->pinst)) { if (ref->pinst->f30 != 0) goto out; }
+            if (!FSmaRetracted((SMA *)ref->pinst)) { if (((SMA *)ref->pinst)->pasega != 0) goto out; }
         }
-        r = 1;
+        result = 1;
         break;
     case 2:
-        r = 0;
-        if (ref->pinst != 0) { if (!FJumperDone(ref->pinst)) goto out; }
-        r = 1;
+        result = 0;
+        if (ref->pinst != 0) { if (!FJumperDone((JUMPER *)ref->pinst)) goto out; }
+        result = 1;
         break;
     case 3:
-        r = 0;
+        result = 0;
         if (ref->pinst != 0) { if (!func_0020CA98(ref->pinst)) goto out; }
-        r = 1;
+        result = 1;
         break;
     case -1:
     default:
-        r = 1;
+        result = 1;
     }
 out:
-    return r;
+    return result;
 }

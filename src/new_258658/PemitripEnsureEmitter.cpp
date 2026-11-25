@@ -1,6 +1,6 @@
 #include "sly2.h"
 struct BLK { char b[0x40]; } __attribute__((aligned(16)));
-struct EMITB { int pad0; int emitpk; char pad[0xB8]; BLK blk; };
+struct EMITB { int pad0; int emitpk; u8 unknown_0x8[0xB8]; BLK blk; };
 struct EMITTER;
 extern "C" BLK D_002BDE70;
 extern "C" BLK B_002DE720;

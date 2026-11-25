@@ -20,9 +20,9 @@ struct DISPENV { GsPmode pmode; u64 smode2; GsDispFb dispfb; GsDisplay display; 
 extern DISPENV B_002DEB80[2];
 
 struct GsPrivRegs {
-    GsPmode pmode; u8 pad0[0x70 - 8];
-    GsDispFb dispfb2; u8 pad1[8];
-    GsDisplay display2; u8 pad2[0x1000 - 0x88];
+    GsPmode pmode; u8 unknown_0x8[0x70 - 8];
+    GsDispFb dispfb2; u8 unknown_0x78[8];
+    GsDisplay display2; u8 unknown_0x88[0x1000 - 0x88];
     u32 csr;
 };
 
@@ -130,9 +130,9 @@ struct DRAWENV {
     s64 zbuf; s64 pad1;
     s64 xyoffset; s64 pad2;
     s64 scissor; s64 pad3;
-    char pad4[0x70 - 0x40];
+    u8 unknown_0x40[0x70 - 0x40];
     s64 test; s64 pad5;
-    char pad6[0xF0 - 0x80];
+    u8 unknown_0x80[0xF0 - 0x80];
 };
 
 extern DRAWENV B_002DEBE0;
@@ -264,7 +264,7 @@ extern "C" void SendDmaSyncGsFinish__FP10sceDmaChanP2QW(sceDmaChan *chan, QW *pa
 {
     EnterCritSect(&B_002DFB40);
     B_002DFB54 = 1;
-    *(volatile unsigned long *)0x12001000 |= 2;
+    *(volatile u64 *)0x12001000 |= 2;
     sceGsPutIMR(sceGsGetIMR() & ~0x200);
     FlushCache(0);
     func_00241728(chan, packet);
@@ -272,20 +272,20 @@ extern "C" void SendDmaSyncGsFinish__FP10sceDmaChanP2QW(sceDmaChan *chan, QW *pa
     LeaveCritSect(&B_002DFB40);
 }
 
-struct DMAS { char pad[0x20]; };
+struct DMAS { u8 unknown_0x0[0x20]; };
 
-struct GIFS : DMAS { char pad2[0x10]; };
+struct GIFS : DMAS { u8 unknown_0x20[0x10]; };
 
-struct VIFS : DMAS { char pad2[0x10]; };
+struct VIFS : DMAS { u8 unknown_0x20[0x10]; };
 
 
 extern "C" void __4GIFS(GIFS *);
 
 extern "C" void AllocStatic__4DMASiP2QW(DMAS *, int, QW *);
 
-extern "C" void AddPrimPack__4GIFSiiUl(GIFS *, int, int, unsigned long);
+extern "C" void AddPrimPack__4GIFSiiUl(GIFS *, int, int, u64);
 
-extern "C" void PackAD__4GIFSll(GIFS *, long, long);
+extern "C" void PackAD__4GIFSll(GIFS *, s64, s64);
 
 extern "C" void AddPrimEnd__4GIFS(GIFS *);
 
@@ -296,8 +296,8 @@ extern "C" void BuildClearGifs__FP2QWG4RGBAi(QW *pqw, RGBA *rgba, int clear)
     AllocStatic__4DMASiP2QW(&gifs, 0x25, pqw);
     int prim = ((s8)rgba->a >= 0) ? 0x46 : 6;
     AddPrimPack__4GIFSiiUl(&gifs, prim, 1, 0xE);
-    PackAD__4GIFSll(&gifs, 1, (unsigned long)rgba->r | ((unsigned long)rgba->g << 8) | ((unsigned long)rgba->b << 16) | ((unsigned long)rgba->a << 24));
-    long test;
+    PackAD__4GIFSll(&gifs, 1, (u64)rgba->r | ((u64)rgba->g << 8) | ((u64)rgba->b << 16) | ((u64)rgba->a << 24));
+    s64 test;
     switch (clear) {
     case 1: test = 0x31001; break;
     case 2: test = 0x32001; break;
@@ -355,18 +355,18 @@ extern "C" void BuildFrameTextureGifs(void)
 }
 
 struct GSTEX0 {
-    unsigned long TBP0 : 14;
-    unsigned long TBW : 6;
-    unsigned long PSM : 6;
-    unsigned long TW : 4;
-    unsigned long TH : 4;
-    unsigned long TCC : 1;
-    unsigned long TFX : 2;
-    unsigned long CBP : 14;
-    unsigned long CPSM : 4;
-    unsigned long CSM : 1;
-    unsigned long CSA : 5;
-    unsigned long CLD : 3;
+    u64 TBP0 : 14;
+    u64 TBW : 6;
+    u64 PSM : 6;
+    u64 TW : 4;
+    u64 TH : 4;
+    u64 TCC : 1;
+    u64 TFX : 2;
+    u64 CBP : 14;
+    u64 CPSM : 4;
+    u64 CSM : 1;
+    u64 CSA : 5;
+    u64 CLD : 3;
 };
 
 struct VIFBUF { int frame[2]; int tex0[2]; int frame16[2]; int tex016[2]; };
@@ -400,13 +400,13 @@ extern "C" void BuildDrawEnvGifs(int cqwGifs, QW *aqwGifs, int cqwVifs, QW *aqwV
     __4GIFS(&gifs);
     AllocStatic__4DMASiP2QW(&gifs, cqwGifs, aqwGifs);
     AddPrimPack__4GIFSiiUl(&gifs, 0, 1, 0xE);
-    PackAD__4GIFSll(&gifs, 0x4C, penv->frame.f.FBP | (penv->frame.f.FBW << 16) | (penv->frame.f.PSM << 24) | ((unsigned long)fbmsk << 32));
+    PackAD__4GIFSll(&gifs, 0x4C, penv->frame.f.FBP | (penv->frame.f.FBW << 16) | (penv->frame.f.PSM << 24) | ((u64)fbmsk << 32));
     PackAD__4GIFSll(&gifs, 0x4E, penv->zbuf);
     PackAD__4GIFSll(&gifs, 0x18, penv->xyoffset);
     PackAD__4GIFSll(&gifs, 0x40, penv->scissor);
     PackAD__4GIFSll(&gifs, 0x47, penv->test);
     AddPrimPack__4GIFSiiUl(&gifs, 0x200, 1, 0xE);
-    PackAD__4GIFSll(&gifs, 0x4D, penv->frame.f.FBP | (penv->frame.f.FBW << 16) | (penv->frame.f.PSM << 24) | ((unsigned long)fbmsk << 32));
+    PackAD__4GIFSll(&gifs, 0x4D, penv->frame.f.FBP | (penv->frame.f.FBW << 16) | (penv->frame.f.PSM << 24) | ((u64)fbmsk << 32));
     PackAD__4GIFSll(&gifs, 0x4F, penv->zbuf);
     PackAD__4GIFSll(&gifs, 0x19, penv->xyoffset);
     PackAD__4GIFSll(&gifs, 0x41, penv->scissor);
@@ -672,9 +672,9 @@ extern "C" void AddImage__4GIFSi(GIFS *, int);
 void BuildImageGifs(int dbp, int dbw, int dpsm, int w, int h, int cqw, GIFS *pgifs)
 {
     AddPrimPack__4GIFSiiUl(pgifs, 0, 1, 0xE);
-    PackAD__4GIFSll(pgifs, 0x50, (long)dbp << 32 | (long)dbw << 48 | (long)dpsm << 56);
+    PackAD__4GIFSll(pgifs, 0x50, (s64)dbp << 32 | (s64)dbw << 48 | (s64)dpsm << 56);
     PackAD__4GIFSll(pgifs, 0x51, 0);
-    PackAD__4GIFSll(pgifs, 0x52, (long)w | (long)h << 32);
+    PackAD__4GIFSll(pgifs, 0x52, (s64)w | (s64)h << 32);
     PackAD__4GIFSll(pgifs, 0x53, 0);
     AddImage__4GIFSi(pgifs, cqw);
 }

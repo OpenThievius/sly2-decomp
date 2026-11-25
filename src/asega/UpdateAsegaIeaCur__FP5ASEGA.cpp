@@ -1,26 +1,26 @@
-#include "sly2.h"
-struct EA { float tLocal; int pad[3]; };
-struct ASEG { char pad[0xA0]; int cea; EA *aea; };
-struct ASEGA { char pad[0x14]; ASEG *paseg; char pad18[4]; float tLocal; char pad20[0x20]; float svtLocal; char pad44[0xC]; int ieaCur; };
+#include "asega.h"
+/* The event table of an ASEG as these functions read it: a count at 0xA0 and the events at 0xA4 (asega.h names the two words iea and paea) */
+struct ASEGEVENTTABLE { u8 unknown_0x0[0xA0]; s32 cea; ASEGEVENT *aea; };
+static inline ASEGEVENTTABLE *PtableOf(ASEGA *pasega) { return (ASEGEVENTTABLE *)pasega->paseg; }
 
 extern "C" void UpdateAsegaIeaCur__FP5ASEGA(ASEGA *pasega)
 {
-    int cea = pasega->paseg->cea;
+    int cea = PtableOf(pasega)->cea;
     if (cea == 0)
         return;
     int iea = cea;
     if (pasega->svtLocal >= 0.0f) {
-        for (iea = 0; iea < pasega->paseg->cea; iea++) {
-            if (pasega->tLocal <= pasega->paseg->aea[iea].tLocal)
+        for (iea = 0; iea < PtableOf(pasega)->cea; iea++) {
+            if (pasega->tLocal <= PtableOf(pasega)->aea[iea].tLocal)
                 break;
         }
-        pasega->ieaCur = iea;
+        pasega->iea = iea;
         return;
     }
     for (iea--;; iea--) {
-        if (iea < 0 || pasega->paseg->aea[iea].tLocal <= pasega->tLocal)
+        if (iea < 0 || PtableOf(pasega)->aea[iea].tLocal <= pasega->tLocal)
             goto found;
     }
 found:
-    pasega->ieaCur = iea + 1;
+    pasega->iea = iea + 1;
 }

@@ -1,8 +1,7 @@
 #include "sly2.h"
-struct TASK { char pad[0xF4]; int cause; int arg; };
-struct JOBX { char pad[0xF0]; int f0; int f4; };
+#include "job.h"
 #include "sw.h"
-struct JOBSCOPE { JOBX *job; TASK *task; int savedCause; int savedArg; };
+struct JOBSCOPE { JOB *job; TASK *task; int savedCause; int savedArg; };
 extern SW B_003DD490;
 extern "C" int FIsCurrentTask(TASK *);
 extern "C" void LeaveTaskIfCurrent(TASK *);
@@ -17,19 +16,19 @@ void SwitchCurrentTask(TASK *task)
         scope.job = 0;
         scope.task = old;
         int c = task->cause;
-        int a = task->arg;
+        int a = task->causeArg;
         scope.savedCause = old->cause;
         old->cause = c;
-        scope.savedArg = scope.task->arg;
-        scope.task->arg = a;
+        scope.savedArg = scope.task->causeArg;
+        scope.task->causeArg = a;
         LeaveTaskIfCurrent(B_003DD490.ptaskCurrent);
         if (scope.job != 0) {
-            scope.job->f0 = scope.savedCause;
-            scope.job->f4 = scope.savedArg;
+            scope.job->cause = scope.savedCause;
+            scope.job->causeArg = scope.savedArg;
         }
         if (scope.task != 0) {
             scope.task->cause = scope.savedCause;
-            scope.task->arg = scope.savedArg;
+            scope.task->causeArg = scope.savedArg;
         }
     }
     EnterTask(task);

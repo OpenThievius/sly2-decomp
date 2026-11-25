@@ -1,6 +1,6 @@
 #include "sly2.h"
 #include "alloc.h"
-struct TASK { char pad[0x94]; int cprereq; char pad2[0xFC - 0x98]; int visit; };
+#include "job.h"
 #include "sw.h"
 extern "C" int CStackFrame_Construct(void *);
 extern "C" void CStackFrame_Destructor(void *, int);
@@ -23,7 +23,7 @@ void OrderTasks(int *pctask, TASK ***paptask)
     TASK **all = (TASK **)PvAllocStackClearImpl__Fi(&req);
     int found = CploFindSwObjectsByClass(&B_003DD490, 5, 0x85, 0, B_003DD490.ctask, all);
     for (int i = 0; i < found; i++)
-        all[i]->visit = 0;
+        all[i]->cVisit = 0;
     for (int i = 0; i < found; i++) {
         TASK *task = all[i];
         if (task->cprereq == 0)

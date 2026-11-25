@@ -1,12 +1,13 @@
+#include "types.h"
 struct GIFS;
 struct BMP {
-    short x0, y0;
-    char pad4[4];
-    unsigned short w;
-    unsigned short h;
-    unsigned char b0xC;
-    unsigned char b0xD;
-    char pad0xE[2];
+    s16 x0, y0;
+    u8 unknown_0x4[4];
+    u16 w;
+    u16 h;
+    u8 b0xC;
+    u8 b0xD;
+    u8 unknown_0xE[2];
     int unk0x10;
     int unk0x14;
     int count;

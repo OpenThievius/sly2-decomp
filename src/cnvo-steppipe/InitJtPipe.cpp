@@ -1,10 +1,11 @@
+#include "types.h"
 struct Limit { float first; int second; float third; };
 struct JtPipe {
     int field0;
     int field4;
-    char pad8[0x28];
+    u8 unknown_0x8[0x28];
     Limit limitA;
-    char pad3C[4];
+    u8 unknown_0x3C[4];
     Limit limitB;
 };
 void InitJtPipe(JtPipe *pipe, int owner)

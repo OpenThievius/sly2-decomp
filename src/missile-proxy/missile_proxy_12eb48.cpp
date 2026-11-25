@@ -53,9 +53,22 @@ extern "C" void func_0012EB78(ALO_12EB48 *plo, void *pbis)
     CStackFrame_Destructor(frame, 2);
 }
 
+/* One sound or slot of a proxy (SND is 0x14 bytes, SLOT is its first 0x10): the range in which it is heard, its volume and pitch. */
 struct SLOT { int sfxid; float sStart; float sFull; float uVolume; };
+struct SND { int sfxid; float sStart; float sFull; float uVolume; float uPitch; };
+struct AMB;
 
-struct PROXY { char pad[0xE4]; int csnd; void *asnd; void *aref; int cslot; SLOT *aslot; };
+/* the proxy object (0xF8 bytes), seen by the six functions of this file: psndDefault is Proxy_PsndDefault's pick, asnd and aslot
+   are the arrays AddProxySnd and AddProxySlotSource fill (up to 8), aref the live ambient sources CloneProxy allocates, one per sound */
+struct PROXY {
+    u8 unknown_0x0[0xE0];
+    /* 0xE0 */ SND *psndDefault;
+    /* 0xE4 */ int csnd;
+    /* 0xE8 */ SND *asnd;
+    /* 0xEC */ void **aref;
+    /* 0xF0 */ int cslot;
+    /* 0xF4 */ SLOT *aslot;
+};
 
 extern "C" void PostLoLoad(PROXY *);
 
@@ -65,7 +78,7 @@ extern "C" int func_001FE990(void *, int);
 
 extern "C" void AddAmbSlotSource(void *, int, float, PROXY *, float *);
 
-struct BANK { char pad[0x228]; void *pmgr; };
+struct BANK { u8 unknown_0x0[0x228]; void *pmgr; };
 
 extern "C" BANK B_003DD040;
 
@@ -75,7 +88,7 @@ extern "C" void CloneProxy__FP5PROXYT0(PROXY *pproxy, PROXY *pproxySource)
     ALLOCREQ allocreq;
     allocreq.cb = pproxy->csnd << 2;
     allocreq.cbAlign = 0x10;
-    pproxy->aref = PvAllocSwClearImpl__Fi(&allocreq);
+    pproxy->aref = (void **)PvAllocSwClearImpl__Fi(&allocreq);
     void *pmgr = B_003DD040.pmgr;
     if (pmgr != 0) {
         for (int islot = 0; islot < pproxy->cslot; islot++) {
@@ -86,15 +99,12 @@ extern "C" void CloneProxy__FP5PROXYT0(PROXY *pproxy, PROXY *pproxySource)
     }
 }
 
-struct SND { int sfxid; float sStart; float sFull; float uVolume; float uPitch; };
 
-struct PROXY_12ED20 { char pad[0xE4]; int csnd; SND *asnd; void **aref; };
-
-extern "C" void func_001A6178(PROXY_12ED20 *);
+extern "C" void func_001A6178(PROXY *);
 
 extern "C" void *NewEmitter(int);
 
-extern "C" void SetEmitterUnpositioned(void *, PROXY_12ED20 *);
+extern "C" void SetEmitterUnpositioned(void *, PROXY *);
 
 extern "C" void SetAmbRange(void *, float, float);
 
@@ -104,7 +114,7 @@ extern "C" void SetAmbPitch(void *, float);
 
 extern "C" void VirtualRefPtr_Assign(void **, void *);
 
-extern "C" void Proxy_AddAloHierarchy(PROXY_12ED20 *pproxy)
+extern "C" void Proxy_AddAloHierarchy(PROXY *pproxy)
 {
     func_001A6178(pproxy);
     for (int isnd = 0; isnd < pproxy->csnd; isnd++) {
@@ -118,21 +128,18 @@ extern "C" void Proxy_AddAloHierarchy(PROXY_12ED20 *pproxy)
     }
 }
 
-struct AMB;
 
-struct PROXY_12EDE8 { char pad[0xE4]; int count; int pad2; AMB **slots; };
-
-extern "C" void RemoveAloHierarchy(PROXY_12EDE8 *);
+extern "C" void RemoveAloHierarchy(PROXY *);
 
 extern "C" void StopAmb(AMB *, float);
 
 extern "C" void VirtualRefPtr_Assign_12EDE8(AMB **, AMB *);
 
-extern "C" void Proxy_RemoveAloHierarchy(PROXY_12EDE8 *pproxy)
+extern "C" void Proxy_RemoveAloHierarchy(PROXY *pproxy)
 {
     RemoveAloHierarchy(pproxy);
-    for (int index = 0; index < pproxy->count; index++) {
-        AMB **pslot = (AMB **)(index * 4 + (sptr)pproxy->slots);
+    for (int index = 0; index < pproxy->csnd; index++) {
+        AMB **pslot = (AMB **)(index * 4 + (sptr)pproxy->aref);
         if (pslot != 0 && *pslot != 0) {
             StopAmb(*pslot, 0.0f);
             VirtualRefPtr_Assign_12EDE8(pslot, 0);
@@ -140,63 +147,38 @@ extern "C" void Proxy_RemoveAloHierarchy(PROXY_12EDE8 *pproxy)
     }
 }
 
-struct ProxySound {
-    char pad_0x0[0xE0];
-    s32 field_0xE0;
-    s32 field_0xE4;
-    s32 field_0xE8;
-};
+extern "C" void AddProxySnd_12EE78(PROXY *, s32, s32, s32, f32, f32); /* extern */
 
-extern "C" void AddProxySnd_12EE78(ProxySound *, s32, s32, s32, f32, f32); /* extern */
-
-extern "C" s32 Proxy_PsndDefault(ProxySound *proxy) {
-    if (proxy->field_0xE0 == 0) {
-        proxy->field_0xE0 = proxy->field_0xE8 + proxy->field_0xE4 * 0x14;
+extern "C" s32 Proxy_PsndDefault(PROXY *proxy) {
+    if (proxy->psndDefault == 0) {
+        proxy->psndDefault = proxy->asnd + proxy->csnd;
         AddProxySnd_12EE78(proxy, -1, 0x12C, 0xBB8, 1.0f, 0.0f);
     }
-    return proxy->field_0xE0;
+    return (s32)proxy->psndDefault;
 }
 
-struct ProxySound_12EEE0 {
-    s32 id;
-    f32 volume;
-    f32 pitch;
-    f32 positionX;
-    f32 positionY;
-};
-
-struct ProxySoundOwner {
-    char pad0[0xE4];
-    s32 count;
-    ProxySound_12EEE0 *sounds;
-};
-
-extern "C" void AddProxySnd(ProxySoundOwner *owner, s32 id, s32 volume, s32 pitch, f32 positionX, f32 positionY) {
-    s32 count = owner->count;
+extern "C" void AddProxySnd(PROXY *owner, s32 sfxid, s32 sStart, s32 sFull, f32 uVolume, f32 uPitch) {
+    s32 count = owner->csnd;
     if (count < 8) {
-        ProxySound_12EEE0 *entry = owner->sounds + count;
-        owner->count = count + 1;
-        entry->id = id;
-        entry->volume = (f32) volume;
-        entry->pitch = (f32) pitch;
-        entry->positionX = positionX;
-        entry->positionY = positionY;
+        SND *entry = owner->asnd + count;
+        owner->csnd = count + 1;
+        entry->sfxid = sfxid;
+        entry->sStart = (f32) sStart;
+        entry->sFull = (f32) sFull;
+        entry->uVolume = uVolume;
+        entry->uPitch = uPitch;
     }
 }
 
-struct Slot { int source; float x; float y; float w; };
-
-struct Proxy { char pad[0xF0]; int count; Slot *slots; };
-
-extern "C" void AddProxySlotSource(Proxy *self, int source, int x, int y, float w) {
-    int count = self->count;
+extern "C" void AddProxySlotSource(PROXY *self, int sfxid, int sStart, int sFull, float uVolume) {
+    int count = self->cslot;
     if (count < 8) {
-        Slot *slot = &self->slots[count];
-        self->count = count + 1;
-        slot->source = source;
-        slot->x = (float)x;
-        slot->y = (float)y;
-        slot->w = w;
+        SLOT *slot = &self->aslot[count];
+        self->cslot = count + 1;
+        slot->sfxid = sfxid;
+        slot->sStart = (float)sStart;
+        slot->sFull = (float)sFull;
+        slot->uVolume = uVolume;
     }
 }
 

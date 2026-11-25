@@ -6,7 +6,7 @@ struct GUARDSUB : STEPGUARD { int cunk; };
 struct GOAL_177BA0 : GOAL {
     int kindRunning;
 };
-struct CMD { int kind; char pad[0xC]; int arg; float g; char pad2[0x58]; };
+struct CMD { int kind; u8 unknown_0x4[0xC]; int arg; float g; u8 unknown_0x18[0x58]; };
 #include "sw.h"
 extern SW B_003DD490;
 extern "C" {

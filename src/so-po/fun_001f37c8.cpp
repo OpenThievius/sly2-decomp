@@ -1,28 +1,27 @@
 #include "sly2.h"
-struct LINK { char pad[0x10]; void *region; char pad2[0xC]; char sub[1]; };
+#include "pathzone.h"
+struct LINK { u8 unknown_0x0[0x10]; PATHZONE *region; u8 unknown_0x14[0xC]; char sub[1]; };
 #include "phys.h"
 #include "so.h"
-struct REGION { char pad[0x118]; char dl[1]; };
-struct DL;
 int FFindDlEntry(void *, void *);
 void RemoveDlEntry(void *, void *);
 void AppendDlEntry(void *, void *);
 void ResetPathzoneQuery(void *, void *);
-void func_001F37C8(SO *so, REGION *region)
+void func_001F37C8(SO *so, PATHZONE *region)
 {
     LINK *link = so->pphys->plink;
-    REGION *old = (REGION *)link->region;
+    PATHZONE *old = link->region;
     if (old == region) return;
     if (old) {
-        if (FFindDlEntry(old->dl, link))
-            RemoveDlEntry(old->dl, link);
+        if (FFindDlEntry(&old->dlItem, link))
+            RemoveDlEntry(&old->dlItem, link);
     }
     if (region) {
-        if (FFindDlEntry(region->dl, link)) {
+        if (FFindDlEntry(&region->dlItem, link)) {
             link->region = region;
             return;
         }
-        AppendDlEntry(region->dl, link);
+        AppendDlEntry(&region->dlItem, link);
         ResetPathzoneQuery(region, link->sub);
     }
     link->region = region;

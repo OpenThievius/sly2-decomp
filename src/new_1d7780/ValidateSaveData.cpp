@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
-struct REC { char pad[4]; unsigned short ib; char pad1[4]; };
+struct REC { u8 unknown_0x0[4]; unsigned short ib; u8 unknown_0x6[4]; };
 struct SAVEVARS { int crec; REC *arec; };
-struct SAVEDATA { char pad[0x5400]; int nLayout; int nChecksum; };
+struct SAVEDATA { u8 unknown_0x0[0x5400]; int nLayout; int nChecksum; };
 void *memset(void *, int, unsigned int);
 inline int NChecksum(unsigned char *pb, int cb)
 {

@@ -1,11 +1,12 @@
+#include "types.h"
 // SPDX-License-Identifier: GPL-3.0-or-later
 extern unsigned char RO_002AA6A1[];
 
-long func_00234350(int *perrno, const char *nptr, char **endptr, int base)
+s64 func_00234350(int *perrno, const char *nptr, char **endptr, int base)
 {
     const char *s = nptr;
-    unsigned long acc;
-    unsigned long cutoff;
+    u64 acc;
+    u64 cutoff;
     int c;
     int neg = 0;
     int any;
@@ -28,9 +29,9 @@ long func_00234350(int *perrno, const char *nptr, char **endptr, int base)
     }
     if (base == 0)
         base = c == '0' ? 8 : 10;
-    cutoff = neg ? (-1L << 63) : ((unsigned long)-1 >> 1);
-    cutlim = cutoff % (unsigned long)base;
-    cutoff /= (unsigned long)base;
+    cutoff = neg ? (-1L << 63) : ((u64)-1 >> 1);
+    cutlim = cutoff % (u64)base;
+    cutoff /= (u64)base;
     any = 0;
     acc = 0;
     for (;; c = *s++) {
@@ -51,7 +52,7 @@ long func_00234350(int *perrno, const char *nptr, char **endptr, int base)
         }
     }
     if (any < 0) {
-        acc = neg ? (-1L << 63) : ((unsigned long)-1 >> 1);
+        acc = neg ? (-1L << 63) : ((u64)-1 >> 1);
         *perrno = 0x22;
     } else if (neg)
         acc = -acc;

@@ -1,6 +1,7 @@
+#include "types.h"
 struct JobEntry { int job; int unk0x4; };
 struct Blot {
-    char pad0[0x110];
+    u8 unknown_0x0[0x110];
     unsigned count;
     JobEntry jobs[16];
 };

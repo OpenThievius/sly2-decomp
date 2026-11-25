@@ -1,32 +1,15 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-struct GIFS;
-struct GlyphBrx {
-    char pad0[2];
-    unsigned short u;
-    unsigned short v;
-    unsigned short width;
-};
-struct CFontBrx {
-    char pad0[8];
-    int dxSpace;
-    int lineHeight;
-    float scaleX;
-    float scaleY;
-    char pad18[0x48 - 0x18];
-    int depth;
-    char pad4C[4];
-    unsigned long tex0;
-};
+#include "cfont.h"
 extern "C" {
 void ListRGBAQ__4GIFSUif(GIFS *, unsigned int, float);
 void ListUV__4GIFSii(GIFS *, int, int);
 void ListXYZF__4GIFSiiii(GIFS *, int, int, int, int);
-GlyphBrx *PglyffFromCh__8CFontBrxc(CFontBrx *, int);
-float DxDrawCh__8CFontBrxcffUiP4GIFS(CFontBrx *font, int character, unsigned int color, GIFS *gifs, float x, float y)
+GLYPH *PglyffFromCh__8CFontBrxc(CFONT *, int);
+float DxDrawCh__8CFontBrxcffUiP4GIFS(CFONT *font, int character, unsigned int color, GIFS *gifs, float x, float y)
 {
-    GlyphBrx *glyph = PglyffFromCh__8CFontBrxc(font, character & 0xFF);
+    GLYPH *glyph = PglyffFromCh__8CFontBrxc(font, character & 0xFF);
     if (glyph != 0) {
-        int textureHeight = 1 << (int)((font->tex0 >> 0x1E) & 0xF);
+        int textureHeight = 1 << (int)(((u64)font->tex0 >> 0x1E) & 0xF);
         float right = x + (float)glyph->width * font->scaleX;
         float bottom = y + (float)font->lineHeight * font->scaleY;
         if ((right >= 0.0f) && (x <= 640.0f) && (bottom >= 0.0f) && (y <= 492.80002f)) {

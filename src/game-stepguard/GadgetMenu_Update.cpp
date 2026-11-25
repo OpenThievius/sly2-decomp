@@ -1,10 +1,4 @@
-struct GME { char pad[0x1C]; unsigned grf; };
-struct GADGETMENU {
-    char pad0[0x10]; int pjoy;
-    char pad1[0x24 - 0x14]; int pblot;
-    char pad2[0x30 - 0x28]; int dialog;
-    char pad3[0x40 - 0x34]; int page; int pad4; int gadget;
-};
+#include "gadgetmenu.h"
 extern "C" {
 extern int D_002C3258[];
 extern char B_003DD490[];
@@ -14,7 +8,7 @@ void *PpoSwFocusBase(void *);
 int FIsBasicDerivedFrom(void *, int);
 void GadgetMenu_SetPage(GADGETMENU *, int);
 void Menu_UpdateStick(GADGETMENU *);
-GME *GadgetMenu_PgmeFind(GADGETMENU *, int);
+GADGETMENUENTRY *GadgetMenu_PgmeFind(GADGETMENU *, int);
 void Menu_SetDialog(GADGETMENU *, int, int);
 void *NewEmitter(int);
 void SetEmitterUnpositioned(void *, int);
@@ -37,18 +31,18 @@ void GadgetMenu_Update(GADGETMENU *menu)
     }
     Menu_UpdateStick(menu);
     if (FJoyButtonPressed(menu->pjoy, 0x7E8) != 0) {
-        GME *pgme = GadgetMenu_PgmeFind(menu, menu->gadget);
-        if (pgme == 0 || (pgme->grf & 1) == 0)
+        GADGETMENUENTRY *pgme = GadgetMenu_PgmeFind(menu, menu->gadget);
+        if (pgme == 0 || (pgme->flags & 1) == 0)
             Menu_SetDialog(menu, 1, 0xE2);
         else
             Menu_SetDialog(menu, 1, 0x31);
     }
     for (int islot = 0; islot < 3; islot++) {
         if (FJoyButtonPressed(menu->pjoy, D_002C3258[islot]) != 0) {
-            GME *pgme = GadgetMenu_PgmeFind(menu, menu->gadget);
-            if (pgme == 0 || (pgme->grf & 4) == 0) {
+            GADGETMENUENTRY *pgme = GadgetMenu_PgmeFind(menu, menu->gadget);
+            if (pgme == 0 || (pgme->flags & 4) == 0) {
                 Menu_SetDialog(menu, 1, 0x32);
-            } else if ((pgme->grf & 1) == 0) {
+            } else if ((pgme->flags & 1) == 0) {
                 Menu_SetDialog(menu, 1, 0x33);
             } else {
                 SetEmitterUnpositioned(NewEmitter(0x34), 0);

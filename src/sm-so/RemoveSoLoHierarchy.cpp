@@ -3,11 +3,11 @@
 #include "so.h"
 #include "phys.h"
 #include "sw.h"
-struct UL { unsigned long v; } __attribute__((packed));
+struct UL { u64 v; } __attribute__((packed));
 extern "C" {
 void RemoveLoHierarchy(SO *);
 void RemoveSoGeomsFromOxa(SO *);
-void CancelSwCallbacks(SW *, unsigned, SO *, unsigned long, int);
+void CancelSwCallbacks(SW *, unsigned, SO *, u64, int);
 void func_001F37C8(SO *, int);
 extern SW B_003DD490;
 extern const UL RO_002A8270;

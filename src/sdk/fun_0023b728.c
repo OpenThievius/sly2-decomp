@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "types.h"
 typedef void (*CtorFn)(void);
 extern CtorFn D_002C85C0[];
 
@@ -7,9 +8,9 @@ extern CtorFn D_002C85C0[];
    loop level it adds weights the allocator's reference counts the way retail's registers need. */
 #define RUN_CONSTRUCTOR_LIST(list)                                      \
     do {                                                                \
-        unsigned long count = (unsigned long)(list)[0];                 \
+        u64 count = (u64)(list)[0];                 \
         unsigned int index;                                             \
-        if (count == (unsigned long)-1) {                               \
+        if (count == (u64)-1) {                               \
             for (count = 0; (list)[count + 1] != 0; count++) {          \
             }                                                           \
         }                                                               \

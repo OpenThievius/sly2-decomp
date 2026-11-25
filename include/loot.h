@@ -9,7 +9,7 @@
    are in that function's own view: one reader) */
 struct LOOTDEF {
     /* 0x0 */ s32 id;             /* SelectLootDef compares it, func_0013C3B8 sets it */
-    u8 unknown_0x4[0x28];
+    u8 unknown_0x4[0x28];          /* UpdatePickLoot reads a flag at 0xC, func_0013C448 a count at 0x1C and three words at 0x20 (one reader each: their own views) */
 };
 
 struct LOOT : SO {
@@ -17,10 +17,12 @@ struct LOOT : SO {
     /* 0x154 */ struct LOOTDEF *alootdef; /* the same two functions */
     /* 0x158 */ struct LOOTDEF *plootdefSel; /* SelectLootDef, func_0013C440 (clears), LootId (reads its id), UpdatePickLoot, ReturnLootToGuard */
     /* 0x15C */ void *pguard;   /* Crfodb_SpawnLoot sets it to the guard that carries it; Crfodb_OnGrab, GiveJtLoot */
-    u8 unknown_0x160[0x10];
+    /* 0x160 */ s32 idThief;   /* UpdatePickLoot (a LOOT method) passes it to DropJtLoot; guess: the id of the thief that carries it */
+    u8 unknown_0x164[0xC];
     /* 0x170 */ QW vHeld;       /* InitPickLoot (from RO_002A2DE0), RenderLoot (scale source) */
     u8 unknown_0x180[0x4];
     /* 0x184 */ s32 state;      /* AdjustLootNewXp (tests 5); HandleLootMessage, UpdatePickLoot */
     /* 0x188 */ f32 tState;     /* UpdatePickLoot (time since state 5 began), RenderLoot (time since state 4 began) */
+    /* 0x18C */ void *psender;  /* HandleLootMessage (LOOT's message handler): the sender of message 8 it acts on; guess */
 };
 #endif

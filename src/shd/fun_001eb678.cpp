@@ -1,28 +1,26 @@
 #include "sly2.h"
 #include "alloc.h"
-struct U4 { char b[4]; };
-struct TEX { char pad[6]; unsigned char cframe; };
-struct SHD { int oid; char pad4; unsigned char b5; unsigned char b6; char pad7; U4 color; char pad0c[12]; TEX *atex; };
-struct FRAMES { int oid; int b6; int b5; U4 color; int cframe; long *atex0; };
+#include "shd.h"
+#include "shdframes.h"
 extern "C" void *PvAllocSwClearImpl__Fi(ALLOCREQ *);
-extern "C" long func_001EA6C8(TEX *, int, int);
+extern "C" s64 func_001EA6C8(TEX *, int, int);
 
-void func_001EB678(SHD *pshd, FRAMES *pframes)
+void func_001EB678(SHD *pshd, SHDFRAMES *pframes)
 {
     ALLOCREQ allocreq;
     pframes->oid = pshd->oid;
-    pframes->b6 = pshd->b6;
-    pframes->b5 = pshd->b5;
-    pframes->color = pshd->color;
+    pframes->field_0x6 = pshd->field_0x6;
+    pframes->grf = pshd->grf;
+    pframes->rgba8 = pshd->rgba8;
     TEX *atex = pshd->atex;
-    int cframe = atex->cframe;
+    int cframe = atex->cbmp;
     allocreq.cb = cframe * 8;
     allocreq.cbAlign = 0x10;
     pframes->cframe = cframe;
-    pframes->atex0 = (long *)PvAllocSwClearImpl__Fi(&allocreq);
+    pframes->aframe = (s64 *)PvAllocSwClearImpl__Fi(&allocreq);
     for (int iframe = 0; iframe < pframes->cframe; iframe++)
     {
-        long *slot = (long *)(iframe * 8 + (sptr)pframes->atex0);
+        s64 *slot = (s64 *)(iframe * 8 + (sptr)pframes->aframe);
         *slot = func_001EA6C8(atex, iframe, 0);
     }
 }

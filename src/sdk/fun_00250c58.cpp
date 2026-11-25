@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "types.h"
 #include "mpeg.h"
 extern "C" {
 void func_0024B6E8(int);
@@ -13,7 +14,7 @@ static inline int SyncDisplay(MPEGDEC *decoder)
 {
     int ok;
     int value;
-    long wide;
+    s64 wide;
     ok = 1;
     func_00252358(decoder);
     func_00252358(decoder);
@@ -35,7 +36,7 @@ static inline int SyncDisplay(MPEGDEC *decoder)
         }
     }
     value = *(volatile int *)0x10002020;
-    wide = *(volatile long *)0x10002030;
+    wide = *(volatile s64 *)0x10002030;
     decoder->topBits = (int)wide;
     if (wide < 0) {
         int low = value & 0x1F;

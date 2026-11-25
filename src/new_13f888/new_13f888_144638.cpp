@@ -7,30 +7,26 @@
 #include "sly2.h"
 #include "ps2inline.h"
 #include "vu0inline.h"
+#include "jt.h"
+#include "oxa.h"
 
 void func_00144638(s32 *arg0, s32 arg1) {
     *arg0 = arg1;
 }
 
-struct Side_144640 { char pad0[8]; void *obj; char pad1[0x40 - 0xC]; };
+struct Side_144640 { u8 unknown_0x0[8]; void *obj; u8 unknown_0xC[0x40 - 0xC]; };
 
-struct Item_144640 { Side_144640 sides[2]; char pad2[0xAC - 0x80]; Item_144640 *next; };
+struct Item_144640 { Side_144640 sides[2]; u8 unknown_0x80[0xAC - 0x80]; Item_144640 *next; };
 
-struct Chain_144640 { Item_144640 *head; Chain_144640 *next; };
+struct NODE { Item_144640 *head; NODE *next; };
 
-struct Goal_144640 { char pad[0x40]; int *kind; };
+struct Goal_144640 { u8 unknown_0x0[0x40]; int *kind; };
 
-struct World_144640 { char pad[0x64]; Chain_144640 *chain; };
+struct Act_144640 { JT *jt; u8 unknown_0x4[0x10 - 4]; QW pos; float distance; float tNext; int flag; };
 
-struct Jt_144640 { char pad0[0xEC]; World_144640 *world; char pad1[0x2DC - 0xF0]; int f2DC; char pad2[0x1084 - 0x2E0]; Goal_144640 *goal; };
+struct Ent_144640 { u8 unknown_0x0[0x4C]; int f4C; };
 
-struct Act_144640 { Jt_144640 *jt; char pad0[0x10 - 4]; QW pos; float distance; float tNext; int flag; };
-
-struct Alo_144640 { char pad[0x130]; float f130; };
-
-struct Ent_144640 { char pad[0x4C]; int f4C; };
-
-extern "C" int bevy_player_p4_144068(Jt_144640 *);
+extern "C" int bevy_player_p4_144068(JT *);
 
 extern "C" int FSwHandsOff(void *);
 
@@ -42,13 +38,13 @@ extern "C" void bevy_camera_follow_activity(void *, int, void *);
 
 extern "C" void FadeAloOut(void *, float);
 
-extern "C" QW PosLoWorld(Jt_144640 *);
+extern "C" QW PosLoWorld(JT *);
 
 extern "C" int FFindSurfaceAlongUp(void *, int, int, float, float);
 
 extern "C" int func_0017D608(void *);
 
-extern "C" void WarpJtToPoint(Jt_144640 *, QW);
+extern "C" void WarpJtToPoint(JT *, QW);
 
 extern "C" char B_002DEB30[];
 
@@ -63,7 +59,7 @@ extern "C" float g_2dded0;
 extern "C" void func_00144640(Act_144640 *self) {
     QW sp0;
     if (self->flag != 0) {
-        if (self->jt->f2DC == -1) {
+        if (self->jt->jmpState == -1) {
             self->flag = 0;
         }
     } else if (bevy_player_p4_144068(self->jt) != 0) {
@@ -72,14 +68,14 @@ extern "C" void func_00144640(Act_144640 *self) {
             self->tNext = g_2dded0 + D_002BD2D0;
             if (FSwHandsOff(B_003DD490) != 0) {
                 int found = 0;
-                for (Chain_144640 *chain = self->jt->world->chain; chain != 0; chain = chain->next) {
+                for (NODE *chain = self->jt->poxa->first; chain != 0; chain = chain->next) {
                     for (Item_144640 *item = chain->head; item != 0; item = item->next) {
                         int diff = ((void *)self->jt != item->sides[0].obj);
                         void *other = item->sides[1 - diff].obj;
                         if (FIsBasicDerivedFrom(other, 0x38) != 0) {
                             Ent_144640 *ent = func_00205458(other, 0xA9);
                             if (ent == 0 || ent->f4C == 0) {
-                                if (((Alo_144640 *)other)->f130 >= 0.0f) {
+                                if (((SO *)other)->duFade >= 0.0f) {
                                     bevy_camera_follow_activity(B_002DEB30, 0x17, other);
                                 }
                                 found = 1;
@@ -90,7 +86,7 @@ extern "C" void func_00144640(Act_144640 *self) {
                 }
                 if (found != 0) return;
             }
-            Goal_144640 *goal = self->jt->goal;
+            Goal_144640 *goal = (Goal_144640 *)self->jt->pseqnode;
             if (goal != 0) {
                 if (*goal->kind != 0x24) return;
             } else {
@@ -122,7 +118,7 @@ extern "C" void func_00144640(Act_144640 *self) {
 INCLUDE_ASM(0X1448F0);
 
 typedef struct CBinaryAsyncStream {
-    char pad[0x28];
+    u8 unknown_0x0[0x28];
     s32 field_0x28;
 } CBinaryAsyncStream;
 

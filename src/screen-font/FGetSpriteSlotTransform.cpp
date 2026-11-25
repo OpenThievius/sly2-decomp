@@ -2,10 +2,10 @@
 struct B4 { char b[4]; };
 
 struct Char { int pad0; int type; int pad8; int padC; int sprite; };
-struct Slot { B4 add; B4 mul; char pad[8]; QW mat0; QW mat1; Char *chr; char pad34[0x24]; int instIndex; char pad5c[0x14]; };
+struct Slot { B4 add; B4 mul; u8 unknown_0x8[0x8]; QW mat0; QW mat1; Char *chr; u8 unknown_0x34[0x24]; int instIndex; u8 unknown_0x5C[0x14]; };
 struct Inst { int count; Slot *slots; int pad[4]; };
-struct Sprite { int pad0; int pad4; Inst *insts; char pad[0x24]; };
-struct Root { char pad[0x84]; Sprite *sprites; };
+struct Sprite { int pad0; int pad4; Inst *insts; u8 unknown_0xC[0x24]; };
+struct Root { u8 unknown_0x0[0x84]; Sprite *sprites; };
 
 extern "C" int FGetSpriteSlotTransform(Root *blot, int isprite, QW *mat, B4 *add, B4 *mul, int count, Slot *slots)
 {

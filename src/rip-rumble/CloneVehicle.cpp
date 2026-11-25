@@ -1,7 +1,7 @@
 #include "sly2.h"
 struct VEHICLE; struct PO;
-struct GUN { int pad0; int pad4; char pad8[4]; char *vt; };
-struct VEHICLE { char pad[0x4F8]; int count; GUN *guns[8]; };
+struct GUN { int pad0; int pad4; u8 unknown_0x8[4]; char *vt; };
+struct VEHICLE { u8 unknown_0x0[0x4F8]; int count; GUN *guns[8]; };
 extern "C" void *__builtin_new(unsigned int);
 extern "C" void ClonePo(VEHICLE *, VEHICLE *);
 extern "C" void InitVehicleGun(GUN *, VEHICLE *);

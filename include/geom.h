@@ -8,7 +8,8 @@
 struct GEOM {
     /* 0x00 */ struct XF *pxf;          /* the transform the shape follows: func_001F3900, func_001F38A8 */
     /* 0x04 */ struct SO *pso;          /* its owner: func_001F38A8 passes it to func_001F4BF8; GetBombVictims reads it too */
-    u8 unknown_0x8[0x8];
+    u8 unknown_0x8[0x4];
+    /* 0xC */ s32 alo;                  /* PpartFindAlo compares it with the id it is given; func_001F6AC8, func_001F6B48 match it with their argument */
     /* 0x10 */ u64 grf;                 /* func_001F3900 tests bit 50; FFilterOxa and ProjectSoTransform read the same word */
     u8 unknown_0x18[0x8];
     /* 0x20 */ struct MATRIX4 matWorld; /* func_001F3900 copies the XF's world matrix here */

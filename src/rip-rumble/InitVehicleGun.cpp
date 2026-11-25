@@ -1,7 +1,7 @@
 #include "sly2.h"
 struct B8 { char b[8]; };
 struct VEHICLE;
-struct GUN { char pad0[0x10]; VEHICLE *vehicle; char pad14[0x40 - 0x14]; B8 f40; B8 f48; VECTOR f50; B8 f60; float f68; char pad6C[0x88 - 0x6C]; float f88; float f8C; int f90; float f94; float f98; float f9C; };
+struct GUN { u8 unknown_0x0[0x10]; VEHICLE *vehicle; u8 unknown_0x14[0x40 - 0x14]; B8 f40; B8 f48; VECTOR f50; B8 f60; float f68; u8 unknown_0x6C[0x88 - 0x6C]; float f88; float f8C; int f90; float f94; float f98; float f9C; };
 extern "C" const B8 D_002C2218;
 extern "C" const B8 D_002C2220;
 extern "C" const VECTOR D_002C2230;

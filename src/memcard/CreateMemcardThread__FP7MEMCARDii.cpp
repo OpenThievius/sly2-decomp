@@ -1,14 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "types.h"
 
-/* The memory card manager object: lives inside SAVE at 0xFD5C. */
-struct B8 { char b[8]; };
-struct MEMCARD {
-    /* 0x00 */ s32 semaphoreId;
-    /* 0x04 */ s32 threadId; /* -1 when there is no thread */
-    /* 0x08 */ B8 pmf; /* the thread's start callback, 8 bytes copied from a constant */
-    /* 0x10 */ s32 busy; /* 0x20 after InitMemcard, 0x21 once the thread is created */
-};
+#include "memcard.h"
 struct THREADPARAM { int attr; void *entry; void *stack; int stackSize; void *gp; int priority; int pad[6]; };
 extern "C" void SetMemcardThreadHighPrio__FP7MEMCARD(MEMCARD *);
 extern "C" void MemcardThreadMain();
@@ -18,12 +11,12 @@ void *memset(void *, int, unsigned int);
 extern char B_002E2080[], B_002E5270[];
 extern int B_004425D8;
 
-void CreateMemcardThread__FP7MEMCARDii(MEMCARD *card, long pmfArg)
+void CreateMemcardThread__FP7MEMCARDii(MEMCARD *card, s64 pmfArg)
 {
-    struct F { long pmf; long pad; THREADPARAM param; } f;
+    struct F { s64 pmf; s64 pad; THREADPARAM param; } f;
     f.pmf = pmfArg;
     SetMemcardThreadHighPrio__FP7MEMCARD(card);
-    card->pmf = *(B8 *)&f.pmf;
+    card->pmf = *(MCPMF *)&f.pmf;
     card->busy = 0x21;
     memset(&f.param, 0, 0x30);
     f.param.entry = (void *)MemcardThreadMain;

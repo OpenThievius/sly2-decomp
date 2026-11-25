@@ -1,7 +1,8 @@
-struct OXA { char pad[0x70]; unsigned long grf; };
+#include "types.h"
+struct OXA { u8 unknown_0x0[0x70]; u64 grf; };
 #include "so.h"
-struct SOGEOM { char pad0[4]; SO *psoOwner; char pad1[8]; unsigned long grf; };
-struct SENSOR { char pad[0x14]; int root; };
+struct SOGEOM { u8 unknown_0x0[4]; SO *psoOwner; u8 unknown_0x8[8]; u64 grf; };
+struct SENSOR { u8 unknown_0x0[0x14]; int root; };
 extern "C" int FIsBasicDerivedFrom(void *, int);
 int FFilterSensorSight(SENSOR *sensor, SOGEOM *geom)
 {

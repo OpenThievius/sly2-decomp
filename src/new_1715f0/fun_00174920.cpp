@@ -1,4 +1,5 @@
-struct Obj { char pad[0x30]; int a; char pad34[8]; int b; };
+#include "types.h"
+struct Obj { u8 unknown_0x0[0x30]; int a; u8 unknown_0x34[8]; int b; };
 extern "C" void func_001EEF68(Obj *);
 void func_00174920(Obj *obj)
 {

@@ -1,10 +1,7 @@
-struct Player_1D9DF8 {
-    char pad0[0xDFC]; int maxHealth; int *health;
-    char pad1[0x10C8 - 0xE04]; int x10C8; char pad2[0x10EC - 0x10CC]; int x10EC;
-    char pad3[0x1300 - 0x10F0]; int powerMax;
-};
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "jt.h"
 struct Meter_1D9DF8 {
-    char pad0[0x20]; float f20; float f24; float f28; float f2C; unsigned state; Player_1D9DF8 *player; void *blot;
+    u8 unknown_0x0[0x20]; float f20; float f24; float f28; float f2C; unsigned state; JT *player; void *blot;
     int id3C; int id40; int id44; int id48; int id4C;
 };
 extern "C" int FBlotLabelPlaying(void *, int);
@@ -30,9 +27,9 @@ extern "C" void UpdateMeter(Meter_1D9DF8 *self) {
     if (self->blot == 0) {
         return;
     }
-    Player_1D9DF8 *previous = self->player;
+    JT *previous = self->player;
     self->player = 0;
-    Player_1D9DF8 *focus = (Player_1D9DF8 *)PpoSwFocusBase(B_003DD490);
+    JT *focus = (JT *)PpoSwFocusBase(B_003DD490);
     if (focus != 0 && FIsBasicDerivedFrom(focus, 0x34) != 0) {
         self->player = focus;
     }
@@ -59,11 +56,11 @@ extern "C" void UpdateMeter(Meter_1D9DF8 *self) {
             SetMeterIds(self, 0x347, 0x348, 0x349, 0x34A, 0x34B);
         else if (FIsBasicDerivedFrom(self->player, 0x36) != 0)
             SetMeterIds(self, 0x342, 0x343, 0x344, 0x345, 0x346);
-        Player_1D9DF8 *player = self->player;
-        float health = (float)*player->health / (float)player->maxHealth;
+        JT *player = self->player;
+        float health = (float)*player->pnHealth / (float)player->field_0xDFC;
         self->f24 = health;
         self->f20 = health;
-        float power = (float)GetJtPower(player) / (float)self->player->powerMax;
+        float power = (float)GetJtPower(player) / (float)self->player->nPowerMax;
         self->f2C = power;
         self->f28 = power;
     }
@@ -71,11 +68,11 @@ extern "C" void UpdateMeter(Meter_1D9DF8 *self) {
     case 1:
     case 6:
     case 7: {
-        Player_1D9DF8 *player = self->player;
-        self->f24 = (float)*player->health / (float)player->maxHealth;
-        float power = (float)GetJtPower(player) / (float)self->player->powerMax;
+        JT *player = self->player;
+        self->f24 = (float)*player->pnHealth / (float)player->field_0xDFC;
+        float power = (float)GetJtPower(player) / (float)self->player->nPowerMax;
         self->f2C = power;
-        if (*self->player->health <= 0) {
+        if (*self->player->pnHealth <= 0) {
             SetMeterState(self, 0);
             break;
         }
@@ -87,9 +84,9 @@ extern "C" void UpdateMeter(Meter_1D9DF8 *self) {
             SetMeterState(self, 3);
         } else if (FFloatsNear__Ffff(self->f28, power, 0.0001f) == 0) {
             SetMeterState(self, 4);
-        } else if (self->player->x10EC == 4) {
+        } else if (self->player->focusMode == 4) {
             SetMeterState(self, 7);
-        } else if (self->player->x10C8 != -1) {
+        } else if (self->player->field_0x10C8 != -1) {
             SetMeterState(self, 6);
         } else {
             SetMeterState(self, 1);
@@ -107,9 +104,9 @@ extern "C" void UpdateMeter(Meter_1D9DF8 *self) {
         }
         break;
     case 0: {
-        Player_1D9DF8 *player = self->player;
-        self->f24 = (float)*player->health / (float)player->maxHealth;
-        self->f2C = (float)GetJtPower(player) / (float)self->player->powerMax;
+        JT *player = self->player;
+        self->f24 = (float)*player->pnHealth / (float)player->field_0xDFC;
+        self->f2C = (float)GetJtPower(player) / (float)self->player->nPowerMax;
         if (self->f20 < self->f24) {
             self->f20 = self->f24;
             SeekBlotLabel(self->blot, 0x34F, 1.0f - self->f24);
@@ -121,9 +118,9 @@ extern "C" void UpdateMeter(Meter_1D9DF8 *self) {
         break;
     }
     case 3: {
-        Player_1D9DF8 *player = self->player;
+        JT *player = self->player;
         float shown = self->f20;
-        float goal = (float)*player->health / (float)player->maxHealth;
+        float goal = (float)*player->pnHealth / (float)player->field_0xDFC;
         self->f24 = goal;
         if (shown < goal) {
             self->f20 = goal;
@@ -137,7 +134,7 @@ extern "C" void UpdateMeter(Meter_1D9DF8 *self) {
         break;
     }
     case 4: {
-        float goal = (float)GetJtPower(self->player) / (float)self->player->powerMax;
+        float goal = (float)GetJtPower(self->player) / (float)self->player->nPowerMax;
         float shown = self->f28;
         self->f2C = goal;
         if (shown < goal) {

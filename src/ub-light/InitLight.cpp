@@ -1,26 +1,21 @@
-struct Light {
-    char pad0[0x40]; int flags;
-    char pad1[0x9C]; int kind; int lastVersion;
-    char pad2[0x30]; int slot;
-    char pad3[0x38]; float angle; int mode;
-    char pad4[8]; float falloffNear; float falloffFar;
-};
-extern "C" void InitXfm(Light *);
-extern "C" void func_001A6CA8(Light *, int);
-extern "C" void InitLight(Light *light)
+#include "light.h"
+#include "sw.h"
+extern "C" void InitXfm(LIGHT *);
+extern "C" void func_001A6CA8(LIGHT *, int);
+extern "C" void InitLight(LIGHT *light)
 {
     InitXfm(light);
-    light->kind = 0;
-    light->lastVersion = -1;
-    light->slot = -1;
-    light->falloffNear = 200.0f;
-    light->falloffFar = 2000.0f;
-    light->angle = 240.0f;
-    light->mode = 1;
+    light->mode = 0;
+    light->generation = -1;
+    light->index = -1;
+    light->rangeA = 200.0f;
+    light->rangeB = 2000.0f;
+    light->cone = 240.0f;
+    light->field_0x158 = 1;
     func_001A6CA8(light, 1);
-    int flags = light->flags;
-    if (((flags ^ 1) & 1) != 0)
-        *(int *)flags &= ~0x20;
+    int flags = light->grfSw;
+    if (!(flags & 1))
+        *(s32 *)&light->pgrfentry->grf &= ~0x20;
     else
-        light->flags = flags & ~0x20;
+        light->grfSw = flags & ~0x20;
 }

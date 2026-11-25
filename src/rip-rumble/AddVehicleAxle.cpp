@@ -1,6 +1,7 @@
+#include "types.h"
 struct Packed8 { char bytes[8]; };
 struct Axle { int wheel; int pad[2]; Packed8 offset; };
-struct Vehicle { char pad[0x4A4]; unsigned int axleCount; Axle axles[4]; };
+struct Vehicle { u8 unknown_0x0[0x4A4]; unsigned int axleCount; Axle axles[4]; };
 extern "C" {
 void AddVehicleAxle(Vehicle *vehicle, int arg1, Packed8 *arg2) {
     unsigned int count = vehicle->axleCount;

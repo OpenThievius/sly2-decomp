@@ -6,11 +6,11 @@
 
 struct EXPL;
 
-struct RIDER { char pad[0]; QW pos; };
+struct RIDER { u8 unknown_0x0[0]; QW pos; };
 
-struct SWARM { char pad[0x188]; int dhpTouch; int fTouchQueued; EXPL *pexpl; };
+struct SWARM { u8 unknown_0x0[0x188]; int dhpTouch; int fTouchQueued; EXPL *pexpl; };
 
-struct WKR { SWARM *pswarm; int pad4; void *pother; int flags; int dhp; char pad14[0xC]; QW pos; char pad30[0x30]; };
+struct WKR { SWARM *pswarm; int pad4; void *pother; int flags; int dhp; u8 unknown_0x14[0xC]; QW pos; u8 unknown_0x30[0x30]; };
 
 extern "C" QW PosLoWorld(void *);
 
@@ -46,9 +46,9 @@ void Swarm_AbsorbTouch(SWARM *pswarm, void *plo)
     }
 }
 
-struct Group_182AB8 { int id; int a; int b; char pad0C[0x10]; int extra; float rate; char pad24[8]; float timer; };
+struct Group_182AB8 { int id; int a; int b; u8 unknown_0xC[0x10]; int extra; float rate; u8 unknown_0x24[8]; float timer; };
 
-struct Swarm_182AB8 { char pad[0x1C8]; unsigned count; Group_182AB8 groups[4]; };
+struct Swarm_182AB8 { u8 unknown_0x0[0x1C8]; unsigned count; Group_182AB8 groups[4]; };
 
 extern "C" {
 extern int D_002BE8AC;

@@ -1,7 +1,7 @@
 #include "sly2.h"
-struct LABEL { char pad[0x14]; int id; };
-struct SPRITE { unsigned short clabel; short pad; LABEL *alabel; char pad2[0x28]; };
-struct BLOT { char pad[0x7C]; int labelCur; unsigned short csprite; short pad2; SPRITE *asprite; };
+struct LABEL { u8 unknown_0x0[0x14]; int id; };
+struct SPRITE { unsigned short clabel; short pad; LABEL *alabel; u8 unknown_0x8[0x28]; };
+struct BLOT { u8 unknown_0x0[0x7C]; int labelCur; unsigned short csprite; short pad2; SPRITE *asprite; };
 extern "C" {
 int func_00218738(void *);
 int func_00218710(void *);

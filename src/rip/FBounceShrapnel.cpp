@@ -1,7 +1,7 @@
 #include "sly2.h"
-struct XA { char pad[0x60]; void *owner; };
-struct SOX { char pad[0xEC]; XA *xa; };
-struct GEOM { char pad[4]; SOX *so; };
+struct XA { u8 unknown_0x0[0x60]; void *owner; };
+struct SOX { u8 unknown_0x0[0xEC]; XA *xa; };
+struct GEOM { u8 unknown_0x0[0x4]; SOX *so; };
 struct RIP;
 extern "C" {
 int FIsBasicDerivedFrom(void *, int);

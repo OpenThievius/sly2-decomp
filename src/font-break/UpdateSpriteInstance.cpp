@@ -1,12 +1,8 @@
 #include "sly2.h"
-#include "rgba.h"
-struct AFF { float a, b, c, d, e, f, u6, u7; } __attribute__((aligned(16)));
-struct LABEL { char pad0[8]; float dt; char pad1[0x18 - 0xC]; };
-struct INST { char pad0[8]; short ilabel; short ikeyNext; float t; int fPaused; char pad1[0x18 - 0x14]; };
-struct SPRITE { char pad0[4]; LABEL *labels; INST *insts; char pad1[0x2C - 0xC]; AFF *pxf; };
-static inline AFF Mult(const AFF &child, const AFF &parent)
+#include "fbsprite.h"
+static inline AFFINE2D Mult(const AFFINE2D &child, const AFFINE2D &parent)
 {
-    AFF product;
+    AFFINE2D product;
     float ca = child.a, cb = child.b, cc = child.c, cd = child.d, ce = child.e, cf = child.f;
     product.a = ca * parent.a + cb * parent.c;
     product.b = ca * parent.b + cb * parent.d;
@@ -16,15 +12,15 @@ static inline AFF Mult(const AFF &child, const AFF &parent)
     product.f = ce * parent.b + cf * parent.d + parent.f;
     return product;
 }
-extern "C" void AdvanceSpriteInstance(float, LABEL *, int, AFF *, RGBA *, RGBA *);
-extern "C" void RefreshSpriteInstance(float, LABEL *, int, AFF *, RGBA *, RGBA *);
-extern "C" void UpdateSpriteInstance(float dt, SPRITE *sprite, int iinst, AFF *xf, RGBA *rgbaAdd, RGBA *rgbaMul)
+extern "C" void AdvanceSpriteInstance(float, SPRITELABEL *, int, AFFINE2D *, RGBA *, RGBA *);
+extern "C" void RefreshSpriteInstance(float, SPRITELABEL *, int, AFFINE2D *, RGBA *, RGBA *);
+extern "C" void UpdateSpriteInstance(float dt, SPRITE *sprite, int iinst, AFFINE2D *xf, RGBA *rgbaAdd, RGBA *rgbaMul)
 {
-    INST *inst = &sprite->insts[iinst];
+    SPRITEINST *inst = &sprite->insts[iinst];
     int ilabel = inst->ilabel;
     if (ilabel < 0) return;
-    AFF composed;
-    AFF *xfUse;
+    AFFINE2D composed;
+    AFFINE2D *xfUse;
     if (sprite->pxf) {
         composed = Mult(*xf, *sprite->pxf);
         xfUse = &composed;

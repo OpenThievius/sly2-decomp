@@ -1,5 +1,6 @@
+#include "types.h"
 struct Cue { int a; int b; int c; float d; float tick; int z1; int z2; int z3; int z0; };
-struct Rhythm { char pad[0x1C0]; int count; Cue cues[3]; };
+struct Rhythm { u8 unknown_0x0[0x1C0]; int count; Cue cues[3]; };
 extern "C" {
 void *memmove(void *, const void *, unsigned int);
 extern char B_003DD040;

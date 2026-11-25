@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
-struct DMAS { char pad[0xC]; unsigned *pb; };
+struct DMAS { u8 unknown_0x0[0xC]; unsigned *pb; };
 struct COLOR4 { char c[4]; };
 struct MT {
-    char pad0[0x6C];
+    u8 unknown_0x0[0x6C];
     float f6C, f70, f74, f78;
     float rxScale, ryScale, dyLine, gScale; /* names as in CMovieText_DrawAffine */
     int i8C, i90, i94;
@@ -72,7 +72,7 @@ void CMovieText_Draw(MT *pmt, ARGS *pargs, int arg2)
         param.f8 = 16.0f;
         CMovieText_DrawGlyphs(pmt, matrix, &param);
         unsigned *tag = g_2dea28.pb;
-        *(long *)tag = 0x10000000;
+        *(s64 *)tag = 0x10000000;
         DmaSkip(&g_2dea28);
         AddFlush(&g_2dea28);
         AddDirect(&g_2dea28, B_00442210, 3);
@@ -80,7 +80,7 @@ void CMovieText_Draw(MT *pmt, ARGS *pargs, int arg2)
         AddFlush(&g_2dea28);
         PadEnd(&g_2dea28);
         *tag = *tag | (((sptr)g_2dea28.pb - (sptr)tag) >> 4) - 1;
-        *(long *)g_2dea28.pb = 0x60000000;
+        *(s64 *)g_2dea28.pb = 0x60000000;
         g_2dea28.pb += 4;
         PKT *p = OnGameLoad__FP4GAME();
         p->a = 0x15;

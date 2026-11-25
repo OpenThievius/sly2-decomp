@@ -5,7 +5,7 @@
 #include "vu0inline.h"
 #include "sly2.h"
 #include "murray.h"
-struct ASEGA { char pad[0x14]; void *p14; };
+#include "asega.h"
 extern "C" void SetMurrayState(MURRAY *, int);
 extern "C" void SetMurrayAttackState(MURRAY *, int);
 extern "C" QW PosLoWorld(void *);
@@ -15,7 +15,7 @@ static inline int AttackStateToStart(MURRAY *pmurray, int first)
 {
     ASEGA *pfade = pmurray->field_0x190C;
     if (pfade != 0) {
-        void *pa = pfade->p14;
+        void *pa = pfade->paseg;
         if (pa == pmurray->field_0x17FC || pa == pmurray->field_0x1804)
             return first + 1;
         return first;

@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "types.h"
 // Double bits to a rounded integer clamped to 9999; the low word is sign-extended through a 32.32 shift pair.
-long func_002358A0(unsigned long bits)
+s64 func_002358A0(u64 bits)
 {
-    unsigned long mantissa;
-    long exponent;
-    long fixed;
+    u64 mantissa;
+    s64 exponent;
+    s64 fixed;
     mantissa = bits;
     exponent = (mantissa << 1) >> 53;
     exponent -= 0x433;

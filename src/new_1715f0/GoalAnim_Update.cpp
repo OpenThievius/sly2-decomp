@@ -1,7 +1,7 @@
 #include "goal.h"
 struct GOAL_174B68 : GOAL {
     int state;
-    char pad_34[0xC];
+    u8 unknown_0x34[0xC];
     int anim;
 };
 extern "C" void func_001EEF98();

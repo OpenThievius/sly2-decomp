@@ -1,8 +1,5 @@
 #include "sly2.h"
-struct ACT;
-struct VT { char pad[8]; short deltaActivate; short i0; void (*fnActivate)(void *); short deltaDeactivate; short i1; void (*fnDeactivate)(void *); short deltaReselect; short i2; void (*fnReselect)(void *); };
-struct ACT { char pad0[0xC]; int priority; ACT *pactNext; int unk14; VT *vt; };
-#include "xf.h"
+#include "act.h"
 struct ALO;
 extern "C" void InvalidateXfSegment(ALO *, XF *);
 extern "C" void InsertXfAct(ALO *palo, XF *pxf, ACT *pact)
@@ -15,12 +12,17 @@ extern "C" void InsertXfAct(ALO *palo, XF *pxf, ACT *pact)
     *ppactLink = pact;
     if (pxf->pactFirst != pactTopOld) {
         InvalidateXfSegment(palo, pxf);
-        if (pactTopOld)
-            pactTopOld->vt->fnDeactivate((char *)pactTopOld + pactTopOld->vt->deltaDeactivate);
+        if (pactTopOld) {
+            ACTVT *vtOld = (ACTVT *)pactTopOld->vtable;
+            vtOld->slot2.fn((char *)pactTopOld + vtOld->slot2.delta);
+        }
         ACT *pactNew = pxf->pactFirst;
-        pactNew->vt->fnActivate((char *)pactNew + pactNew->vt->deltaActivate);
+        ACTVT *vtNew = (ACTVT *)pactNew->vtable;
+        vtNew->slot1.fn((char *)pactNew + vtNew->slot1.delta);
     } else {
-        if (pactTopOld)
-            pactTopOld->vt->fnReselect((char *)pactTopOld + pactTopOld->vt->deltaReselect);
+        if (pactTopOld) {
+            ACTVT *vtOld = (ACTVT *)pactTopOld->vtable;
+            vtOld->slot3.fn((char *)pactTopOld + vtOld->slot3.delta);
+        }
     }
 }

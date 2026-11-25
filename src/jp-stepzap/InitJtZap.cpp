@@ -1,9 +1,9 @@
-struct Zap { int a; int b; int pad8; int c; char pad[0x80]; int d; char p2[8]; float e; };
-void InitJtZap(Zap *self, int value)
+#include "jtzap.h"
+void InitJtZap(JTZAP *self, JT *pjt)
 {
-    self->a = value;
-    self->b = -1;
-    self->d = -1;
-    self->e = 2.0f;
-    self->c = 0x28;
+    self->pjt = pjt;
+    self->state = -1;
+    self->flash = -1;
+    self->dtFlash = 2.0f;
+    self->field_0xC = 0x28;
 }

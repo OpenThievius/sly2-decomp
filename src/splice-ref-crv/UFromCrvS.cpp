@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-struct CRV { char pad0[0xE0]; int crvk; char pad1[8]; float *mpicvu; char pad2[0x5C]; float mpisamps[10]; };
+#include "crv.h"
 extern "C" int IcvFindCrvS(CRV *, float, float *, float *);
 extern "C" void FillCrvcCache(CRV *, int);
 
@@ -11,7 +11,7 @@ extern "C" float UFromCrvS(CRV *pcrv, float s)
     int icv = IcvFindCrvS(pcrv, s, &ds, &dsSeg);
     if (pcrv->crvk == 0) {
         float u = ds / dsSeg;
-        t = (1.0f - u) * pcrv->mpicvu[icv] + u * pcrv->mpicvu[icv + 1];
+        t = (1.0f - u) * pcrv->au[icv] + u * pcrv->au[icv + 1];
     } else {
         FillCrvcCache(pcrv, icv);
         int isamp;
@@ -24,7 +24,7 @@ extern "C" float UFromCrvS(CRV *pcrv, float s)
         float hi = pcrv->mpisamps[isamp + 1];
         t = (ds - lo) / (hi - lo);
         t = ((float)isamp + t) * 0.1f;
-        t = (1.0f - t) * pcrv->mpicvu[icv] + t * pcrv->mpicvu[icv + 1];
+        t = (1.0f - t) * pcrv->au[icv] + t * pcrv->au[icv + 1];
     }
     return t;
 }

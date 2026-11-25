@@ -2,8 +2,8 @@
 #include "vu0inline.h"
 struct V3_1BE6F0 { char xy[8]; int z; };
 struct V4_1BE6F0 { V3_1BE6F0 v; float w; };
-struct Camobj { char pad[0x118]; Camobj *parent; float fov; float nearPlane; float farPlane; };
-struct Window { int width; int height; char pad[8]; int originX; int originY; char pad1[8]; Camobj *camobj; };
+struct Camobj { u8 unknown_0x0[0x118]; Camobj *parent; float fov; float nearPlane; float farPlane; };
+struct Window { int width; int height; u8 unknown_0x8[0x8]; int originX; int originY; u8 unknown_0x18[0x8]; Camobj *camobj; };
 struct M4 { QW row[4]; };
 union VU_SCALE { QW q; VECTOR v; };
 extern "C" {

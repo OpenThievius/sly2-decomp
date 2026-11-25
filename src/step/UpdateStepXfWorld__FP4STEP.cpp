@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
 struct LM { int unk; };
-struct TNFN { float f0, f4, f8, fC, f10, f14, f18, f1C, f20, f24, f28, f2C, f30; char pad[0x54]; float f88, f8C; };
+struct TNFN { float f0, f4, f8, fC, f10, f14, f18, f1C, f20, f24, f28, f2C, f30; u8 unknown_0x34[0x54]; float f88, f8C; };
 extern LM D_002C41B0;
 float GLimitLm(LM *, float);
 // Sqrt: sqrt.s with an early-clobber output (=&f). Measured on every sqrt.s user (16 sources): none gets worse, six get closer, two reach 0 (a third holds VU0 asm and stays out);

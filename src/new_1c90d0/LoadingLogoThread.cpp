@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "clock.h"
 struct SEMA_1C9190 { int count; int max_count; int init_count; int wait_threads; unsigned int attr; unsigned int option; };
-struct XF2_1C9190 { float a, b, c, d, x, y, pad0, pad1; };
-struct CLOCK_1C9190 { char pad[0x3C]; float tReal; };
-struct DMAS_1C9190 { char pad[0xC]; int mark; char pad10[0x10]; int field20; };
-struct FRM_1C9190 { char pad[0x24]; int mark; char pad28[8]; int grf; };
+struct XF2_1C9190 { float a, b, c, d, x, y, field_0x18, field_0x1C; };
+struct DMAS_1C9190 { u8 unknown_0x0[0xC]; int mark; u8 unknown_0x10[0x10]; int field20; };
+struct FRM_1C9190 { u8 unknown_0x0[0x24]; int mark; u8 unknown_0x28[8]; int grf; };
 extern "C" {
 int WaitSema(int);
 int SignalSema(int);
@@ -13,7 +13,7 @@ void *memset(void *, int, unsigned int);
 void DrawLoadingLogo(void *, XF2_1C9190 *, float);
 void CloseFrame__Fv();
 void OpenFrame__Fv();
-void MarkClockTick__FP5CLOCK(CLOCK_1C9190 *, int);
+void MarkClockTick__FP5CLOCK(CLOCK *, int);
 void AddDmaCnt__4DMAS(DMAS_1C9190 *);
 void AddVifDirect__4VIFSiP2QWi(DMAS_1C9190 *, int, void *, int);
 void EndDmaCnt__4DMAS(DMAS_1C9190 *);
@@ -23,7 +23,6 @@ extern int B_003D3A44;
 extern int g_2deb18;
 extern int g_2dedbc;
 extern int g_2be538;
-extern CLOCK_1C9190 g_2dded0;
 extern float *g_2dd314;
 extern float g_2c10b4;
 extern float g_2c10b0;

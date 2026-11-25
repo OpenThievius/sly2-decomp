@@ -1,5 +1,5 @@
 #include "sly2.h"
-struct TASK { char pad0[0x7C]; void *job; char pad1[0x88 - 0x80]; TASK *next; };
+struct TASK { u8 unknown_0x0[0x7C]; void *job; u8 unknown_0x80[0x88 - 0x80]; TASK *next; };
 #include "sw.h"
 extern SW B_003DD490;
 extern char B_002DE578[];

@@ -1,4 +1,5 @@
-struct EMITTER { char pad[0xE4]; char *pemitb; };
+#include "types.h"
+struct EMITTER { u8 unknown_0x0[0xE4]; char *pemitb; };
 extern "C" void SetEmitterEmitok(EMITTER *, int);
 int * func_00258B38(EMITTER *pemitter, int ensk)
 {

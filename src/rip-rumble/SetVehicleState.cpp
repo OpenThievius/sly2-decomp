@@ -1,15 +1,16 @@
-struct VT { char pad[0x18]; short d18; short i18; void (*f18)(char *, int, int, int, int, int);
- char pad2[0x188 - 0x20]; short d188; short i188; void (*f188)(char *, int); short d190; short i190; void (*f190)(char *); };
-struct OBJ { char pad[0xC]; VT *vt; };
+#include "types.h"
+struct VT { u8 unknown_0x0[0x18]; short d18; short i18; void (*f18)(char *, int, int, int, int, int);
+ u8 unknown_0x20[0x188 - 0x20]; short d188; short i188; void (*f188)(char *, int); short d190; short i190; void (*f190)(char *); };
+struct OBJ { u8 unknown_0x0[0xC]; VT *vt; };
 struct VEH {
-    char pad0[0xC]; VT *vt;
-    char pad1[0x180 - 0x10];
+    u8 unknown_0x0[0xC]; VT *vt;
+    u8 unknown_0x10[0x180 - 0x10];
     int state; float tState;
-    char pad2[0x568 - 0x188];
+    u8 unknown_0x188[0x568 - 0x188];
     OBJ *pblot;
-    char pad3[0x570 - 0x56C];
+    u8 unknown_0x56C[0x570 - 0x56C];
     void *psma;
-    char pad4[0x598 - 0x574];
+    u8 unknown_0x574[0x598 - 0x574];
     void *pamb; int sfxid;
 };
 extern "C" {

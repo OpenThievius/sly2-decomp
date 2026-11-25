@@ -1,5 +1,6 @@
+#include "types.h"
 struct Post { int oid0; void *plo0; int oid1; void *plo1; int oid2; void *plo2; int oid3; void *plo3; int pad; };
-struct Guard { char pad[0x1010]; int cpost; Post *apost; };
+struct Guard { u8 unknown_0x0[0x1010]; int cpost; Post *apost; };
 extern "C" {
 extern char B_003DD490;
 void PostGuardLoad(Guard *);

@@ -1,8 +1,8 @@
 #include "sly2.h"
-struct Ctl { int pad0; int f4; int f8; };
-struct Ctx { int pad0[3]; int fC; };
-struct Clut { int id; unsigned char group; char pad5[5]; unsigned short size; int fC; int f10; long f18; };
-struct Bmp { int id; unsigned char group; char pad5[7]; unsigned char fC; char padD; unsigned short size; int f10; int f14; int f18; int pad1C; long f20; };
+struct Ctl { u8 unknown_0x0[4]; int f4; int f8; };
+struct Ctx { u8 unknown_0x0[0xC]; int fC; };
+struct Clut { int id; u8 group; u8 unknown_0x5[5]; u16 size; int fC; int f10; s64 f18; };
+struct Bmp { int id; u8 group; u8 unknown_0x5[7]; u8 fC; u8 unknown_0xD; u16 size; int f10; int f14; int f18; u8 unknown_0x1C[4]; s64 f20; };
 extern "C" {
 void AddDmaRefs__4DMASiP2QW(Ctx *, int, int);
 void AddToIdTableA_1ed470(Bmp *);

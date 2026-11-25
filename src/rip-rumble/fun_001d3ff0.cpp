@@ -1,7 +1,8 @@
+#include "types.h"
 // SPDX-License-Identifier: GPL-3.0-or-later
 struct SLOT_1D3FF0 { int current; int maximum; int unk8; };
-struct OWNER_1D3FF0 { char pad0[0x574]; SLOT_1D3FF0 slots[1]; };
-struct PICKUP_1D3FF0 { char pad0[0x150]; int state; char pad154[0x158 - 0x154]; int index; int amount; };
+struct OWNER_1D3FF0 { u8 unknown_0x0[0x574]; SLOT_1D3FF0 slots[1]; };
+struct PICKUP_1D3FF0 { u8 unknown_0x0[0x150]; int state; u8 unknown_0x154[0x158 - 0x154]; int index; int amount; };
 extern "C" void SetAmmopickupState(PICKUP_1D3FF0 *, int);
 extern "C" void func_001D3FF0(OWNER_1D3FF0 *owner, PICKUP_1D3FF0 *pickup)
 {

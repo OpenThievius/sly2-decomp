@@ -1,6 +1,6 @@
 #include "sly2.h"
-struct FRM { char pad0[4]; void *pqwGif; char pad1[0x1C]; void *pqwVif; char pad2[8]; unsigned grf; };
-extern char B_002DEA50[];
+#include "frm.h"
+extern FRM B_002DEA50[2];
 extern unsigned B_002DEB0C;
 extern int g_2de594;
 extern int g_2de598;
@@ -27,7 +27,7 @@ extern "C" void FrameRenderLoop__FPv(void *pv)
     for (;;) {
         g_2deb20 = 1;
         WaitSema(g_2deb18);
-        g_2deb14 = (FRM *)(B_002DEA50 + B_002DEB0C * 0x50);
+        g_2deb14 = &B_002DEA50[B_002DEB0C];
         g_2deb20 = 0;
         B_002DEB0C = B_002DEB0C + 1;
         if (B_002DEB0C > 1)
@@ -35,7 +35,7 @@ extern "C" void FrameRenderLoop__FPv(void *pv)
         FlushSaaUnpacks();
         RestoreGsBuffers__Fv();
         BuildAllDrawEnvGifs();
-        SendDmaSync_160B70(g_2de594, g_2deb14->pqwVif);
+        SendDmaSync_160B70(g_2de594, g_2deb14->pqwVifSend);
         SendDmaSync_160B70(g_2de598, g_2deb14->pqwGif);
         if ((g_2deb14->grf & 1) != 0)
             BlendPrevFrame__Fv();

@@ -2,12 +2,12 @@
 #include "types.h"
 
 struct AnimSource {
-    char pad0[0x74];
+    u8 unknown_0x0[0x74];
     f32 length;
 };
 
 struct AnimTimes {
-    char pad0[0x1C];
+    u8 unknown_0x0[0x1C];
     f32 elapsed;
 };
 
@@ -19,20 +19,20 @@ struct Animref {
 };
 
 struct GoalActor {
-    char pad0[0x1A4];
+    u8 unknown_0x0[0x1A4];
     s32 pendingState;
-    char pad1A8[0xFD0 - 0x1A8];
+    u8 unknown_0x1A8[0xFD0 - 0x1A8];
     char animList[0x20];
     char savedRate[8];
 };
 
 struct GoalAnim {
-    char pad0[0x10];
+    u8 unknown_0x0[0x10];
     GoalActor *actor;
-    char pad14[0x30 - 0x14];
+    u8 unknown_0x14[0x30 - 0x14];
     s32 state;
     f32 stateTime;
-    char pad38[0x40 - 0x38];
+    u8 unknown_0x38[0x40 - 0x38];
     Animref *animref;
 };
 

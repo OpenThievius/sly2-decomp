@@ -20,7 +20,7 @@ void LeaveTask(TASK *task) {
     if (FTaskRunning(task)) {
         bevy_camera_follow_activity(&B_002DEB30, 0x24, task);
         ApplyTaskToggles(task, 5, task->ctoggle, task->atoggle);
-        ApplyTaskAnims(task, 5, task->canim, task->aanim, task->field_0xF4);
+        ApplyTaskAnims(task, 5, task->canim, task->aanim, task->cause);
         if (task->labelId != -1 && task->labelFlag != 0)
             ClearHudLabel(&B_003DA0C0, task->labelId);
         task->HandleSpliceEvent(0x14, 0, 0, 0, 0);

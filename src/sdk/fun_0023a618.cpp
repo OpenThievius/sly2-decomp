@@ -1,6 +1,6 @@
 #include "types.h"
 extern "C" {
-struct Block_44E300 { Block_44E300 *next; char pad[0xC]; };
+struct Block_44E300 { Block_44E300 *next; u8 unknown_0x4[0xC]; };
 extern Block_44E300 B_0044E300[64];
 extern Block_44E300 *B_0044E700;
 s32 func_0023A618(void) {

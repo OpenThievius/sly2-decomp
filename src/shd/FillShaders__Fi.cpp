@@ -1,4 +1,4 @@
-#include "rgba.h"
+#include "shd.h"
 struct QW;
 
 
@@ -35,33 +35,19 @@ struct DMAREF_1EB960 {
     QW *aqw;
 };
 
-struct SHD_1EB960 {
-    int pad0;
-    unsigned char kind;
-    unsigned char grf;
-    char pad6[6];
-    unsigned char rgba[4];
-    RGBA rgbaTex;
-    char pad14[4];
-    int ishd;
-    char pad1C[4];
-    DMAREF_1EB960 *admaref;
-    char pad24[8];
-};
-
 extern "C" {
 extern int D_003DCFE8;
-extern SHD_1EB960 *D_003DCFEC;
+extern SHD *D_003DCFEC;
 extern unsigned D_002DE18C;
 void GIFS_AddPrimTag(GIFS *, int, int, int, int, int);
-void func_001EA750(int, int, GIFS *);
+void func_001EA750(TEX *, int, GIFS *);
 }
 
 void FillShaders(int grfshd) {
 
     for (int ishd = 0; ishd < D_003DCFE8; ishd++) {
-        SHD_1EB960 *pshd = &D_003DCFEC[ishd];
-        DMAREF_1EB960 *pdmaref = pshd->admaref;
+        SHD *pshd = &D_003DCFEC[ishd];
+        DMAREF_1EB960 *pdmaref = (DMAREF_1EB960 *)pshd->apart;
         switch (pshd->kind) {
         case 0:
         case 4:
@@ -72,7 +58,7 @@ void FillShaders(int grfshd) {
             gifs.AddPrimBulk(0x7C, 0, 4, 0x4F12, 0);
             gifs.AddPrimBulk(0x7D, 0, 4, 0x4F12, 0);
             gifs.AddPrimPack(0, 1, 0xE);
-            func_001EA750(pshd->ishd, 0, &gifs);
+            func_001EA750(pshd->atex, 0, &gifs);
             if (pshd->grf & 0x20) {
                 unsigned long test = (pshd->grf & 4) ? 0x13001 : 0x11001;
                 test |= (pshd->kind != 0) ? 0x20000 : 0x60000;
@@ -110,7 +96,7 @@ void FillShaders(int grfshd) {
                 gifs.AddPrimBulk(0x7C, 0, 4, 0x4F12, 0);
                 gifs.AddPrimBulk(0x7D, 0, 4, 0x4F12, 0);
                 gifs.AddPrimPack(0, 1, 0xE);
-                func_001EA750(pshd->ishd, 0, &gifs);
+                func_001EA750(pshd->atex, 0, &gifs);
                 gifs.PackAD(0x47, 0x71001);
                 {
                 unsigned long sel = (pshd->grf & 1) ? 2 : 1;
@@ -152,10 +138,10 @@ void FillShaders(int grfshd) {
             }
             gifs.PackAD(0x3D, D_002DE18C);
             gifs.PackSTQ(0.0f, 0.0f, 1.0f);
-            rgba[0] = (pshd->rgba[0] + 1) >> 1;
-            rgba[1] = (pshd->rgba[1] + 1) >> 1;
-            rgba[2] = (pshd->rgba[2] + 1) >> 1;
-            rgba[3] = (pshd->rgba[3] + 1) >> 1;
+            rgba[0] = (pshd->rgbaC.r + 1) >> 1;
+            rgba[1] = (pshd->rgbaC.g + 1) >> 1;
+            rgba[2] = (pshd->rgbaC.b + 1) >> 1;
+            rgba[3] = (pshd->rgbaC.a + 1) >> 1;
             gifs.PackRGBA(*(unsigned *)rgba);
             gifs.EndPrim(1);
             gifs.EndDmaCnt();
@@ -218,7 +204,7 @@ void FillShaders(int grfshd) {
             gifs.AddPrimBulk(0x7C, 0, 4, 0x4F12, 0);
             gifs.AddPrimBulk(0x7D, 0, 4, 0x4F12, 0);
             gifs.AddPrimPack(0, 1, 0xE);
-            func_001EA750(pshd->ishd, 1, &gifs);
+            func_001EA750(pshd->atex, 1, &gifs);
             if (pshd->grf & 0x80) {
                 gifs.PackAD(0x47, 0x77000);
                 gifs.PackAD(0x42, 0x54);
@@ -238,7 +224,7 @@ void FillShaders(int grfshd) {
             gifs.AddPrimBulk(0x7C, 0, 4, 0x41F2, 0);
             gifs.AddPrimBulk(0x7D, 0, 4, 0x41F2, 0);
             gifs.AddPrimPack(0, 1, 0xE);
-            func_001EA750(pshd->ishd, 0, &gifs);
+            func_001EA750(pshd->atex, 0, &gifs);
             if (pshd->grf & 0x80) {
                 gifs.PackAD(0x47, 0x57000);
                 gifs.PackAD(0x42, 0x58);
@@ -259,7 +245,7 @@ void FillShaders(int grfshd) {
                 gifs.AddPrimBulk(0x7C, 0, 4, 0x41F2, 0);
                 gifs.AddPrimBulk(0x7D, 0, 4, 0x41F2, 0);
                 gifs.AddPrimPack(0, 1, 0xE);
-                func_001EA750(pshd->ishd, 2, &gifs);
+                func_001EA750(pshd->atex, 2, &gifs);
                 gifs.PackAD(0x47, 0x5000D);
                 gifs.PackAD(0x42, 0x40);
                 gifs.PackAD(0x3D, 0);
@@ -272,7 +258,7 @@ void FillShaders(int grfshd) {
             gifs.AddPrimBulk(0x7C, 0, 4, 0x4F12, 0);
             gifs.AddPrimBulk(0x7D, 0, 4, 0x4F12, 0);
             gifs.AddPrimPack(0, 1, 0xE);
-            func_001EA750(pshd->ishd, 1, &gifs);
+            func_001EA750(pshd->atex, 1, &gifs);
             gifs.PackAD(0x47, 0x53001);
             {
                 unsigned long sel = (pshd->grf & 1) ? 2 : 1;
@@ -286,7 +272,7 @@ void FillShaders(int grfshd) {
             gifs.AddPrimBulk(0x7C, 0, 4, 0x41F2, 0);
             gifs.AddPrimBulk(0x7D, 0, 4, 0x41F2, 0);
             gifs.AddPrimPack(0, 1, 0xE);
-            func_001EA750(pshd->ishd, 0, &gifs);
+            func_001EA750(pshd->atex, 0, &gifs);
             gifs.PackAD(0x47, 0x53001);
             gifs.PackAD(0x42, 0x48);
             gifs.PackAD(0x3D, 0);

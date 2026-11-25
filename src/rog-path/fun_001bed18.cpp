@@ -1,16 +1,16 @@
 #include "sly2.h"
 struct OBJ;
 struct VT {
-    char pad0[0x18]; short delta18; short index18; void (*fn18)(void *, int, int, int, int, int);
-    char pad1[0x48 - 0x20]; short delta48; short index48; void (*fn48)(void *);
-    char pad2[0xA8 - 0x50]; short deltaA8; short indexA8; void (*fnA8)(void *, int);
+    u8 unknown_0x0[0x18]; short delta18; short index18; void (*fn18)(void *, int, int, int, int, int);
+    u8 unknown_0x20[0x28]; short delta48; short index48; void (*fn48)(void *);
+    u8 unknown_0x50[0x58]; short deltaA8; short indexA8; void (*fnA8)(void *, int);
 };
-struct OBJ { char pad[0xC]; VT *vt; };
-struct SLOT { char pad[0x20]; int owner; };
+struct OBJ { u8 unknown_0x0[0xC]; VT *vt; };
+struct SLOT { u8 unknown_0x0[0x20]; int owner; };
 struct RTALO {
-    char pad[0xC]; VT *vt;
-    char pad1[0xE0 - 0x10]; int count; OBJ *children[4]; unsigned flags[4];
-    char pad2[0x128 - 0x104]; SLOT *slot;
+    u8 unknown_0x0[0xC]; VT *vt;
+    u8 unknown_0x10[0xD0]; int count; OBJ *children[4]; unsigned flags[4];
+    u8 unknown_0xF8[0x24]; SLOT *slot;
 };
 void func_001BED18(RTALO *alo)
 {

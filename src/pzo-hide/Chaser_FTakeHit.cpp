@@ -1,5 +1,6 @@
+#include "types.h"
 // SPDX-License-Identifier: GPL-3.0-or-later
-struct CHASER { char pad[0x184]; int health; char pad2[0x38]; int state; };
+struct CHASER { u8 unknown_0x0[0x184]; int health; u8 unknown_0x188[0x38]; int state; };
 extern "C" {
 void Chaser_SetState(CHASER *, int);
 void bevy_camera_follow_activity(void *, int, CHASER *);

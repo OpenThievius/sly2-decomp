@@ -1,9 +1,9 @@
-struct Tn { char pad[0x13C]; int override; };
-extern "C" void UpdateTnCallback(Tn *, int);
-void SetTnTnsOverride(Tn *tn, int value)
+#include "tn.h"
+extern "C" void UpdateTnCallback(TN *, int);
+void SetTnTnsOverride(TN *tn, int value)
 {
-    if (value != tn->override) {
-        tn->override = value;
+    if (value != tn->tnsOverride) {
+        tn->tnsOverride = value;
         UpdateTnCallback(tn, 0);
     }
 }

@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-#include "sly2.h"
 #include "po.h"
-struct TN { char pad[0x128]; int state; };
-struct SW;
+#include "tn.h"
+#include "sw.h"
 extern SW B_003DD490;
 void SetTnTnsOverride(TN *, int);
 void func_001A58D0(TN *, int, int);
@@ -15,7 +14,7 @@ void func_001C4130(PO *po, TN *ptn)
         SetTnTnsOverride(old, 0);
     po->ptn = ptn;
     if (ptn != 0) {
-        ptn->state = -1;
+        ptn->pri = -1;
         func_001A58D0(po->ptn, 0, 0);
         if (PpoSwFocus(&B_003DD490) == po)
             SetTnTnsOverride(po->ptn, 1);

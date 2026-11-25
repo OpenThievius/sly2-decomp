@@ -1,7 +1,8 @@
+#include "types.h"
 extern "C" {
 struct SemaParam_2370A8 { int attr; int initCount; int maxCount; int field0C; int field10; const char *name; };
-struct Packet_2370A8 { char pad0[0x14]; Packet_2370A8 *self; int field18; void *client; int command; };
-struct Client_2370A8 { Packet_2370A8 *packet; int field4; int semaphore; char padC[4]; int field10; char pad14[0x10]; int field24; };
+struct Packet_2370A8 { u8 unknown_0x0[0x14]; Packet_2370A8 *self; int field18; void *client; int command; };
+struct Client_2370A8 { Packet_2370A8 *packet; int field4; int semaphore; u8 unknown_0xC[4]; int field10; u8 unknown_0x14[0x10]; int field24; };
 int CreateSema(SemaParam_2370A8 *);
 void DeleteSema(int);
 void WaitSema(int);

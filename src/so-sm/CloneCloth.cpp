@@ -2,19 +2,19 @@
 #include "sly2.h"
 #include "alloc.h"
 #include "ps2inline.h"
+#include "xf.h"
 
 struct GEOM;
 struct BSPC;
-struct VECSET { int count; QW *avec; int pad[4]; };
-struct XFHOLDER { char pad[0x40]; MATRIX4 matWorld; };
+struct VECSET { s32 count; QW *avec; u8 unknown_0x8[0x10]; };
 struct CLOTH {
-    XFHOLDER *pxf;
-    int pad4;
+    XF *pxf;
+    s32 field_0x4;
     float radius;
-    int padC;
-    char pad10[0xC];
+    s32 field_0xC;
+    u8 unknown_0x10[0xC];
     int cfixed;
-    char pad20[0x68 - 0x20];
+    u8 unknown_0x20[0x68 - 0x20];
     char bspc0[0x10];
     VECSET vecset;
     char bspc1[0x18];
@@ -32,16 +32,16 @@ void CopyAb(void *, void *, unsigned int);
 void CloneBspc(GEOM *, BSPC *, GEOM *, BSPC *);
 static inline float Sqrt(float x) { float r; asm volatile("sqrt.s %0, %1" : "=&f"(r) : "f"(x)); return r; }
 
-void CloneCloth(CLOTH *source, XFHOLDER *pxf, int cadd, CLOTH *dest)
+void CloneCloth(CLOTH *source, XF *pxf, int cadd, CLOTH *dest)
 {
     MATRIX4 matrix;
     VECSET local;
     char frame[0x10];
     ALLOCREQ req;
     CStackFrame_Construct(frame);
-    dest->pxf = (XFHOLDER *)pxf;
-    dest->pad4 = source->pad4;
-    dest->padC = source->padC;
+    dest->pxf = pxf;
+    dest->field_0x4 = source->field_0x4;
+    dest->field_0xC = source->field_0xC;
     dest->cfixed = source->cfixed;
     float maxLengthSquared = 0.0f;
     for (int index = 0; index < source->vecset.count; index++) {

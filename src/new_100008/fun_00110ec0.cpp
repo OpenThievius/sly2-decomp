@@ -1,3 +1,4 @@
+#include "types.h"
 // new() factory of a class with two bases: the primary base keeps its vptr at +0xC after three words (the first two
 // zeroed by its constructor), the second base sits at +0x114 with its vptr at +0x120. The inline constructor of the
 // derived class (compiler-generated, multiple inheritance) gives retail's copy of the new object into $v1.
@@ -15,14 +16,14 @@ struct CPrimary110EC0 {
     virtual void Virtual0();
 };
 struct CPrimaryBody110EC0 : CPrimary110EC0 {
-    char pad[0x104];
+    u8 unknown_0x10[0x104];
 };
 struct CSecondary110EC0 {
     int unk0x0[3];
     virtual void Virtual0();
 };
 struct CObject110EC0 : CPrimaryBody110EC0, CSecondary110EC0 {
-    char pad2[0x1C];
+    u8 unknown_0x124[0x1C];
     virtual void Virtual0();
 };
 void *func_00110EC0(void)

@@ -1,26 +1,26 @@
 #include "sly2.h"
 #include "jt.h"
 struct CRefX_161A58 { int tagk; union { float g; int n; }; int p2; int p3; };
-struct TASK_161A58 { char pad[0xF0]; int fF0; int fF4; int fF8; };
-struct JOB_161A58 { char pad[0x64]; int event; };
-struct CID_161A58 { char pad[8]; int f8; char pad2[0x2C]; int f38; };
+struct TASK_161A58 { u8 unknown_0x0[0xF0]; int fF0; int fF4; int fF8; };
+struct JOB_161A58 { u8 unknown_0x0[0x64]; int event; };
+struct CID_161A58 { u8 unknown_0x0[8]; int f8; u8 unknown_0xC[0x2C]; int f38; };
 struct SW_161A58 {
-    char pad[0x3B0C];
+    u8 unknown_0x0[0x3B0C];
     JOB_161A58 *pjob;
     int ptask;
     int event;
-    char pad3B18[4];
+    u8 unknown_0x3B18[4];
     void *saveRoot;
-    char pad3B20[0xD4];
+    u8 unknown_0x3B20[0xD4];
     int flags;
-    char pad3BF8[0x90];
+    u8 unknown_0x3BF8[0x90];
     int transA;
     int transB;
-    char pad3C90[0x1A8];
+    u8 unknown_0x3C90[0x1A8];
     int transFlag;
 };
-struct GAME_161A58 { char pad[8]; int mode; char pad2[0xFD50 - 0xC]; int pending; void *options; };
-struct JOBMGR_161A58 { char pad[0x10]; int oidJob; int oidTask; int oidRestart; };
+struct GAME_161A58 { u8 unknown_0x0[8]; int mode; u8 unknown_0xC[0xFD50 - 0xC]; int pending; void *options; };
+struct JOBMGR_161A58 { u8 unknown_0x0[0x10]; int oidJob; int oidTask; int oidRestart; };
 struct CTaskHold_161A58 {
     TASK_161A58 *pother;
     TASK_161A58 *ptask;

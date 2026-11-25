@@ -1,5 +1,6 @@
+#include "types.h"
 struct Root { void* top; };
-struct Lo { char pad0[0x14]; Root* root; char pad1[0x200 - 0x18]; Lo* owner; };
+struct Lo { u8 unknown_0x0[0x14]; Root* root; u8 unknown_0x18[0x200 - 0x18]; Lo* owner; };
 extern "C" int FIsBasicDerivedFrom(void*, int);
 extern "C" void* func_00174898(Lo* obj)
 {

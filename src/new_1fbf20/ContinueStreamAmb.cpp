@@ -1,6 +1,6 @@
-struct AMB { char pad[0x40]; int hvoice; };
+#include "streamamb.h"
 extern "C" void func_00233088(int, int, int, int, int, int, int);
-extern "C" void ContinueStreamAmb(AMB *pamb)
+extern "C" void ContinueStreamAmb(STREAMAMB *pamb)
 {
-    func_00233088(0x524B5553, 4, pamb->hvoice, 0, 0, 0, 0);
+    func_00233088(0x524B5553, 4, pamb->voice, 0, 0, 0, 0);
 }

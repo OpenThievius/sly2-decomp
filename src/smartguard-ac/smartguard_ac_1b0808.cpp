@@ -4,6 +4,11 @@
 #include "types.h"
 #include "sly2.h"
 #include "m2c_macros.h"
+#include "pausemenu.h"
+#include "memcard.h"
+#include "memcardmenu.h"
+#include "sw.h"
+#include "job.h"
 
 extern "C" void JobMenu_SetPage(s32 *, s32);
 
@@ -20,13 +25,11 @@ extern "C" void func_001B0808(void) {
     JobMenu_SetPage(&B_003DA3C0, B_003E0F9C != 0);
 }
 
-struct S { int pad[0xFD50/4]; int value; };
-
-extern "C" S B_002E65E0;
+extern "C" SAVE B_002E65E0;
 
 extern "C" void func_001B0848(int *out)
 {
-    if (B_002E65E0.value)
+    if (B_002E65E0.pslotCur)
         *out = 0x47;
     else
         *out = 0x46;
@@ -34,17 +37,11 @@ extern "C" void func_001B0848(int *out)
 
 #include "cref.h"
 
-struct ITEM { char pad[0x1C]; unsigned grf; };
-
-struct SAVE { char pad[0xFD50]; int fHasMemcard; };
-
-struct MCM { char pad[0x4C]; int fPending; };
-
 extern char B_002DEB30_1B0878[];
 
 extern SAVE B_002E65E0_1B0878;
 
-extern MCM B_002E6550;
+extern MEMCARDMENU B_002E6550;
 
 extern int B_003E0FE4;
 
@@ -60,12 +57,12 @@ extern "C" void MemcardMenu_SetState(void *, int);
 
 extern "C" void func_001ABD40(void *);
 
-extern "C" void func_001B0878(ITEM *pitem)
+extern "C" void func_001B0878(PAUSEITEM *pitem)
 {
     bevy_camera_follow_activity_1B0878(B_002DEB30_1B0878, 0x2D, 0);
     bevy_camera_follow_activity_1B0878(B_002DEB30_1B0878, 0x2E, 0);
-    if (B_002E65E0_1B0878.fHasMemcard != 0) {
-        B_002E6550.fPending = 1;
+    if (B_002E65E0_1B0878.pslotCur != 0) {
+        B_002E6550.mode = 1;
         int fSaved;
         {
             CRef ref = RefGetGameSaveValue(B_003E0FE4, &B_003D4A60);
@@ -98,31 +95,21 @@ extern "C" void func_001B0970(void)
     bevy_jobs_162e38(B_003E0F9C_1B0970);
 }
 
-struct TransitionTarget {
-    char pad0[0x1C];
-    s32 flags;
-};
+extern "C" void RequestTransition(SW *, void *, s32, s32, s32, s32);
 
-struct SwGlobals {
-    char pad0[0x3B0C];
-    s32 field_0x3B0C;
-};
+extern "C" void bevy_jobs_162e38_1B09A8(JOB *);
 
-extern "C" void RequestTransition(SwGlobals *, void *, s32, s32, s32, s32);
-
-extern "C" void bevy_jobs_162e38_1B09A8(s32);
-
-extern "C" SwGlobals B_003DD490;
+extern "C" SW B_003DD490;
 
 extern "C" char RO_002A3928[];
 
-extern "C" void func_001B09A8(TransitionTarget *target) {
+extern "C" void func_001B09A8(PAUSEITEM *target) {
     RequestTransition(&B_003DD490, RO_002A3928, 0x189, -1, 0x80, -1);
-    if (B_003DD490.field_0x3B0C != 0) {
-        bevy_jobs_162e38_1B09A8(B_003DD490.field_0x3B0C);
+    if (B_003DD490.pjobCurrent != 0) {
+        bevy_jobs_162e38_1B09A8(B_003DD490.pjobCurrent);
     }
     if (target != 0) {
-        target->flags = target->flags | 2;
+        target->grf = target->grf | 2;
     }
 }
 

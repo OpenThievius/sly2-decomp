@@ -1,33 +1,26 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-struct ROUTE { char pad0[0x120]; int mode; char pad1[0x128 - 0x124]; int pathzone; };
-struct LINK { char pad[0x10]; int zone; };
 #include "phys.h"
 #include "step.h"
-#include "goal.h"
-struct GOAL_17E458 : GOAL {
-    ROUTE *proute;
-    char pad_34[0x4];
-    int state;
-    char pad_3C[0x4];
-    float tTimeout;
-};
+#include "goals.h"
+#include "pathzone.h"
+struct LINK { u8 unknown_0x0[0x10]; PATHZONE *zone; };
 extern "C" {
 void func_001EEF98();
-int func_0017E570(GOAL_17E458 *);
+int func_0017E570(GOALFOLLOWROUTE *);
 int func_0017EAE8(void *);
-int func_0017E5F0(GOAL_17E458 *);
-void func_0017E580(GOAL_17E458 *);
-void func_0017E6B0(GOAL_17E458 *, int);
+int func_0017E5F0(GOALFOLLOWROUTE *);
+void func_0017E580(GOALFOLLOWROUTE *);
+void func_0017E6B0(GOALFOLLOWROUTE *, int);
 int FGoalAnimDone(void *, ROUTE *);
 int GoalFollowCrv_FAtEnd(void *, ROUTE *);
 }
 extern float g_2dded0;
-extern "C" void func_0017E458(GOAL_17E458 *pgoal)
+extern "C" void func_0017E458(GOALFOLLOWROUTE *pgoal)
 {
     ROUTE *proute;
     PHYS *pphys;
     LINK *plink;
-    int zone;
+    PATHZONE *zone;
     func_001EEF98();
     if (func_0017E570(pgoal))
         return;
@@ -38,7 +31,7 @@ extern "C" void func_0017E458(GOAL_17E458 *pgoal)
         goto next;
     case 0: {
         proute = pgoal->proute;
-        switch (proute->mode) {
+        switch (proute->kind) {
         case 1:
             if (FGoalAnimDone(((void *)pgoal->pgoalChild), proute)) {
                 if (func_0017E5F0(pgoal)) {
@@ -50,7 +43,7 @@ extern "C" void func_0017E458(GOAL_17E458 *pgoal)
             }
             break;
         case 0: {
-            if (pgoal->tTimeout < g_2dded0) {
+            if (pgoal->tEnd < g_2dded0) {
             enter:
                 func_0017E6B0(pgoal, 1);
                 return;
@@ -62,7 +55,7 @@ extern "C" void func_0017E458(GOAL_17E458 *pgoal)
             zone = 0;
             if (plink)
                 zone = plink->zone;
-            if (zone == proute->pathzone) {
+            if (zone == proute->ppathzone) {
                 if (GoalFollowCrv_FAtEnd(((void *)pgoal->pgoalChild), proute))
                     func_0017E580(pgoal);
             }

@@ -3,30 +3,30 @@
 #include "vu0inline.h"
 #include "goal.h"
 
-struct ZONEB { char pad0[0x10]; int pzone; };
-struct ZONEA { char pad0[0xDC]; ZONEB *pb; };
-struct DIVISOR { char pad0[0x20]; float gDivisor; };
+struct ZONEB { u8 unknown_0x0[0x10]; int pzone; };
+struct ZONEA { u8 unknown_0x0[0xDC]; ZONEB *pb; };
+struct DIVISOR { u8 unknown_0x0[0x20]; float gDivisor; };
 struct NOTICESTEP {
-    char pad0[0xE8];
+    u8 unknown_0x0[0xE8];
     ZONEA *pa;
-    char padEC[0x314 - 0xEC];
+    u8 unknown_0xEC[0x314 - 0xEC];
     float gNear;
     float gFar;
-    char pad31C[0xF40 - 0x31C];
+    u8 unknown_0x31C[0xF40 - 0x31C];
     int fActive;
     float tMin;
-    char padF48[0xFBC - 0xF48];
+    u8 unknown_0xF48[0xFBC - 0xF48];
     int kind;
-    char padFC0[4];
+    u8 unknown_0xFC0[4];
     DIVISOR *pdivisor;
 };
 struct TARGET { int a[4]; QW pos; };
 struct GOALNOTICE : GOAL {
     void *target;
     int state;
-    char pad38[0xC];
+    u8 unknown_0x38[0xC];
     int pzoneLast;
-    char pad48[0x8];
+    u8 unknown_0x48[0x8];
     QW posLast;
 };
 

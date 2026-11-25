@@ -2,7 +2,7 @@
 #include "cfont.h"
 
 extern "C" {
-void AddPrimList__4GIFSiUl(GIFS *, int, unsigned long);
+void AddPrimList__4GIFSiUl(GIFS *, int, u64);
 void AddPrimPack__4GIFSiiUl(GIFS *, int, int, int);
 int FEnsureLoaded__8CFontBrxP4GIFS(CFONT *, GIFS *);
 void PackAD__4GIFSll(GIFS *, int, s64);

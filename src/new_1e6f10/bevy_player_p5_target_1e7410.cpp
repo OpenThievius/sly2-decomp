@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
-struct CRV { char pad0[0xE8]; int ccv; float *mpicvu; };
+#include "crv.h"
 extern "C" void EvaluateCrvFromU(CRV *, float, QW *, QW *);
 extern "C" float SFromCrvU(CRV *, float);
 extern "C" const float RO_FLT_002A813C;
@@ -11,7 +11,7 @@ extern "C" void bevy_player_p5_target_1e7410(CRV *pcrv, float (*pfnMeasure)(void
     float uBest = 0.0f;
     float gBest = RO_FLT_002A813C;
     for (int icv = 0; icv < pcrv->ccv; icv++) {
-        float u = pcrv->mpicvu[icv];
+        float u = pcrv->au[icv];
         float g = pfnMeasure(pvContext, u);
         if (g < gBest) {
             gBest = g;

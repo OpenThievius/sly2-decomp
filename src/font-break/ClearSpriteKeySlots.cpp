@@ -1,8 +1,8 @@
 #include "sly2.h"
-struct DEPTHSLOT { char pad[0x30]; void *pchar; char pad2[0x3C]; };
-struct SPRITEKEY { char pad[6]; unsigned char cclear; char pad2[13]; unsigned short *aclear; char pad3[8]; };
-struct LABELINST { char pad[4]; DEPTHSLOT *aslot; char pad2[0x10]; };
-struct SPRITELABEL { char pad[4]; SPRITEKEY *akey; char pad2[8]; struct { char pad[8]; LABELINST *ainst; } *pinfo; };
+struct DEPTHSLOT { u8 unknown_0x0[0x30]; void *pchar; u8 unknown_0x34[0x3C]; };
+struct SPRITEKEY { u8 unknown_0x0[6]; unsigned char cclear; u8 unknown_0x7[13]; unsigned short *aclear; u8 unknown_0x18[8]; };
+struct LABELINST { u8 unknown_0x0[4]; DEPTHSLOT *aslot; u8 unknown_0x8[0x10]; };
+struct SPRITELABEL { u8 unknown_0x0[4]; SPRITEKEY *akey; u8 unknown_0x8[8]; struct { u8 unknown_0x0[8]; LABELINST *ainst; } *pinfo; };
 extern "C" {
 void func_002158C0(void *, DEPTHSLOT *);
 void InitDepthSlot(DEPTHSLOT *);

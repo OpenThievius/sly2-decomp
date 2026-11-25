@@ -7,20 +7,20 @@
 struct LO_174490;
 
 struct VT_174490 {
-    char pad[0xE8];
+    u8 unknown_0x0[0xE8];
     short delta1; short index1; void (*fnSetPos)(char *, QW);
     short delta2; short index2; void (*fnSetRot)(char *, int);
 };
 
-struct LO_174490 { char pad0[0xC]; VT_174490 *vt; char pad1[0x2E8 - 0x10]; int unk2E8; char pad2[0x1000 - 0x2EC]; int unk1000; };
+struct LO_174490 { u8 unknown_0x0[0xC]; VT_174490 *vt; u8 unknown_0x10[0x2E8 - 0x10]; int unk2E8; u8 unknown_0x2EC[0x1000 - 0x2EC]; int unk1000; };
 
-struct GOAL_174490 { char pad[8]; int unk8; };
+struct GOAL_174490 { u8 unknown_0x0[8]; int unk8; };
 
 struct SPAWN_174490 { int k; int pad4; LO_174490 *plo; int unkC; GOAL_174490 *pgoal; };
 
-struct GEN_174490 { char pad[0x90]; int clo; LO_174490 **aplo; };
+struct GEN_174490 { u8 unknown_0x0[0x90]; int clo; LO_174490 **aplo; };
 
-struct CMD_174490 { int k; char pad[0x70 - 4]; CMD_174490() { memset(this, 0, sizeof(*this)); } };
+struct CMD_174490 { int k; u8 unknown_0x4[0x70 - 4]; CMD_174490() { memset(this, 0, sizeof(*this)); } };
 
 struct BRAIN_174490;
 
@@ -84,9 +84,9 @@ extern "C" void RemoveLoHierarchy(void*);
 
 extern "C" void func_00173928(void*, void*, int, int);
 
-struct Slot { int owner; char pad[0x2C]; };
+struct Slot { int owner; u8 unknown_0x4[0x2C]; };
 
-struct Spawner { char pad0[0x5C]; int count; Slot* slots; };
+struct Spawner { u8 unknown_0x0[0x5C]; int count; Slot* slots; };
 
 extern "C" void func_001746B8(Spawner* self)
 {

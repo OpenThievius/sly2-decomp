@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "types.h"
 struct StackFrame {
     int value;
     int field04;
@@ -13,14 +14,14 @@ struct RegisterContext {
 };
 extern "C" {
 StackFrame* func_0023FE78(int, int);
-long* get_reg_addr(unsigned short, RegisterContext*, int);
+s64* get_reg_addr(unsigned short, RegisterContext*, int);
 StackFrame* next_stack_level(int unusedFirst, RegisterContext* context, int third) {
     StackFrame* frame = func_0023FE78(unusedFirst, third);
     if (frame == 0) {
         return 0;
     }
     if (context->registerKinds[frame->registerIndex] != 0) {
-        long registerValue = *get_reg_addr(frame->registerIndex, context, 0);
+        s64 registerValue = *get_reg_addr(frame->registerIndex, context, 0);
         frame->value = registerValue;
     } else {
         frame->value = context->firstValue;

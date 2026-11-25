@@ -1,25 +1,25 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
+#include "sw.h"
+#include "rgba.h"
 struct Ctx_216BC8 { QW row[3]; };
 struct Matrix_216BC8 { float scale; int pad4[3]; float x; };
 struct Char_216BC8 {
-    char pad0[8]; int field8; char padC[8]; int kind; int id; char pad1C[4];
+    u8 unknown_0x0[8]; int field8; u8 unknown_0xC[8]; int kind; int id; u8 unknown_0x1C[4];
     float lineHeight; float width; float height;
 };
-struct MT_216BC8 { char *str; char pad4[0x9C]; };
-struct Hud_216BC8 { char pad0[0x10]; int state; float start; char pad18[4]; float limit; };
-struct Rgba_216BC8 { char c[4]; };
-struct Text8_216BC8 { long v; };
-struct Game_216BC8 { char pad0[0x3BE8]; void *font; };
+struct MT_216BC8 { char *str; u8 unknown_0x4[0x9C]; };
+struct Hud_216BC8 { u8 unknown_0x0[0x10]; int state; float start; u8 unknown_0x18[4]; float limit; };
+struct Text8_216BC8 { s64 v; };
 struct Formatter_216BC8 { int id; void (*fn)(char *, int, int); int arg; };
 extern "C" {
-extern Game_216BC8 B_003DD490;
+extern SW B_003DD490;
 extern Formatter_216BC8 B_003E1C88[];
 extern const Text8_216BC8 RO_002A8B80;
 extern char RO_002A8B88[];
 extern Hud_216BC8 B_003DA0C0;
 extern char B_004435F0[];
-extern Rgba_216BC8 B_004435F4;
+extern RGBA B_004435F4;
 extern float g_2dded0;
 extern float D_002C40B8;
 char *PchzStringFromId(void *, int);
@@ -30,7 +30,7 @@ int CMovieText_ClineWrap(MT_216BC8 *);
 void func_00227820(char *, MT_216BC8 *);
 void CMovieText_Reset(MT_216BC8 *, char *);
 int CMovieText_ChNext(MT_216BC8 *);
-void CMovieText_SetBaseColor(MT_216BC8 *, Rgba_216BC8 *);
+void CMovieText_SetBaseColor(MT_216BC8 *, RGBA *);
 float CMovieText_Dx(MT_216BC8 *);
 void CMovieText_DrawAffine(MT_216BC8 *, Matrix_216BC8 *, Ctx_216BC8 *);
 float GModPositive__Fff(float, float);
@@ -46,7 +46,7 @@ extern "C" void DrawMovieTextCharacter(Char_216BC8 *ch, Matrix_216BC8 *mat, Ctx_
 {
     char str[0x400];
     MT_216BC8 text;
-    if (B_003DD490.font == 0) return;
+    if (B_003DD490.pfont == 0) return;
     str[0] = 0;
     if (ch->kind == 1) {
         unsigned index;
@@ -79,7 +79,7 @@ extern "C" void DrawMovieTextCharacter(Char_216BC8 *ch, Matrix_216BC8 *mat, Ctx_
                 if (*p) p++;
             }
             CMovieText_Reset(&text, (char *)p);
-            Rgba_216BC8 color = B_004435F4;
+            RGBA color = B_004435F4;
             CMovieText_SetBaseColor(&text, &color);
             CMovieText_DrawAffine(&text, mat, ctx);
             return;

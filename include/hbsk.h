@@ -18,7 +18,8 @@ struct JT;
     /* 0x150 */ struct MEMBER member; /* InitHbsk passes its address to bevy_player_p6_182c70, then sets member.field_0x8 to 300.0 */ \
     /* 0x174 */ struct DLE dle;       /* OnHbskAdd, OnHbskRemove: the list B_003E13E4 has ibDle 0x174; CloneHbsk keeps it across the clone */ \
     /* 0x17C */ s32 hbsks;            /* the state: InitHbsk, OnHbskPoolClaim clear it; PresetHbskAccel tests it; FAbsorbHbskWkr, SetHbskHbsks */ \
-    u8 unknown_0x180[0xC]; \
+    /* 0x180 */ f32 uFade;           /* SetHbskHbsks stores the clock when the state changes */ \
+    u8 unknown_0x184[0x8]; \
     /* 0x18C */ s32 fLocked;          /* InitHbsk sets 1; PresetHbskAccel tests it */ \
     /* 0x190 */ struct JT *pjt;       /* FAbsorbHbskWkr (SO slot 75 of the class) reads the player's binoculars through it */
 

@@ -1,13 +1,12 @@
-struct Owner { char pad[0x1030]; int asega; };
-struct ZAP { Owner *owner; int state; };
-extern "C" int FAsegaGone(int);
-extern "C" void ZapContinue(ZAP *);
-extern "C" void UpdateZap(ZAP *zap)
+#include "jtzap.h"
+extern "C" int FAsegaGone(void *);
+extern "C" void ZapContinue(JTZAP *);
+extern "C" void UpdateZap(JTZAP *zap)
 {
     int state;
     do {
         state = zap->state;
-        if (FAsegaGone(zap->owner->asega))
+        if (FAsegaGone(zap->pjt->field_0x1030))
             ZapContinue(zap);
     } while (zap->state != -1 && zap->state != state);
 }

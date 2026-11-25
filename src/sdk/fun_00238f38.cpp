@@ -1,6 +1,7 @@
+#include "types.h"
 extern "C" {
 struct Payload_238F38 { unsigned char bytes[0xFC]; };
-struct Command_238F38 { int command; int size; char pad8[0xFC]; Payload_238F38 data; };
+struct Command_238F38 { int command; int size; u8 unknown_0x8[0xFC]; Payload_238F38 data; };
 int func_00238D70(void);
 int func_00238E70(void);
 void *memcpy(void *, const void *, unsigned int);

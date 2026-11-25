@@ -1,6 +1,6 @@
 #include "sly2.h"
 #include "cref.h"
-struct EPSEL { char pad0[0x110]; int episode; int pad1; int last; char pad2[0xC]; int row; };
+struct EPSEL { u8 unknown_0x0[0x110]; int episode; int pad1; int last; u8 unknown_0x11C[0xC]; int row; };
 extern int D_002BE26C;
 extern int D_002BE270;
 extern int B_003E0FE8[];

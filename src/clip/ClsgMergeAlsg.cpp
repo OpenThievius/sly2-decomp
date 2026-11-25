@@ -10,7 +10,7 @@ struct LSG {
     int unk48;
     int aiface[2];
     void *pedge;
-    char pad58[0x60 - 0x58];
+    u8 unknown_0x58[0x8];
 };
 
 extern "C" {

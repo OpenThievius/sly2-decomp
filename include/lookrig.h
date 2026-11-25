@@ -21,7 +21,7 @@ struct LOOKRIG {
     /* 0x08 */ s32 iHigh;     /* SetLookRigState */
     /* 0x0C */ s32 field_0xC; /* HandleLookRigMessage sets it on message 0x242; UpdateLookRig tests it (fCanRestart there) */
     /* 0x10 */ s32 fSnap;     /* HandleLookRigMessage sets it on message 0x16E; SetLookRigState */
-    u8 unknown_0x14[0x4];
+    /* 0x14 */ s32 fReleased; /* reader: UpdateLookRig (a LOOKRIG method) sets it when button 0x80 is up */
     /* 0x18 */ f32 tBlend;    /* SetLookRigState */
     /* 0x1C */ f32 gTarget;   /* SetLookRigState */
     /* 0x20 */ QW vecTarget;  /* SetLookRigState */

@@ -2,7 +2,7 @@
 #include "stepguard.h"
 #include "goal.h"
 struct GOAL_1750E0 : GOAL {
-    char pad_30[0x8];
+    u8 unknown_0x30[0x8];
     int field_38;
     int field_3c;
     void *panim;

@@ -1,5 +1,6 @@
+#include "types.h"
 struct Absorb_176B80 { int a; int pad4; int c; int d; int e; char rest[0x4C]; };
-struct Brain_176B80 { char pad[0x10]; int owner; };
+struct Brain_176B80 { u8 unknown_0x0[0x10]; int owner; };
 extern "C" {
 void PaloAbsorbWkr(Absorb_176B80 *);
 void *memset(void *, int, unsigned);

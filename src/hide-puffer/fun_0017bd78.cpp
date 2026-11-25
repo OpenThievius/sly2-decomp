@@ -2,7 +2,7 @@
 #include "goal.h"
 struct GOAL_17BD78 : GOAL {
     int state;
-    char pad_34[0xC];
+    u8 unknown_0x34[0xC];
     int pick;
 };
 extern "C" {

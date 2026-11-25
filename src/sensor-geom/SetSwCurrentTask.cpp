@@ -1,5 +1,5 @@
 #include "sly2.h"
-struct TASK { char pad[0x18]; int oid; };
+#include "job.h"
 #include "sw.h"
 extern int B_002DEB44;
 void SetSwCurrentTask(SW *psw, TASK *ptask)

@@ -1,6 +1,7 @@
+#include "types.h"
 // SPDX-License-Identifier: GPL-3.0-or-later
-struct RIDER { char pad[0x24]; int state; char pad2[0x14]; float s; float v; char pad3[8]; int hp; char pad4[0x10]; RIDER *next; };
-struct GROUP { char pad[0xC]; int criderAlive; RIDER *first; char pad2[8]; int hpRider; char pad3[4]; int pcrv; };
+struct RIDER { u8 unknown_0x0[0x24]; int state; u8 unknown_0x28[0x14]; float s; float v; u8 unknown_0x44[8]; int hp; u8 unknown_0x50[0x10]; RIDER *next; };
+struct GROUP { u8 unknown_0x0[0xC]; int criderAlive; RIDER *first; u8 unknown_0x14[8]; int hpRider; u8 unknown_0x20[4]; int pcrv; };
 struct SWARM;
 extern "C" void SwarmGroup_LayoutBands(SWARM *, GROUP *);
 extern "C" float SMaxCrv(int);

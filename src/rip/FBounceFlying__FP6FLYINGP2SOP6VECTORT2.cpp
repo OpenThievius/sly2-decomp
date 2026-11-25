@@ -4,7 +4,7 @@ struct VECTOR;
 struct ALO; struct RIP;
 struct SO;
 struct BOUNCEHIT { char *pso; char *basic; };
-struct FLYING { char pad[0xF0]; ALO *alo; };
+struct FLYING { u8 unknown_0x0[0xF0]; ALO *alo; };
 extern "C" int FIsBasicDerivedFrom(void *basic, int cid);
 extern "C" void RemoveRip(RIP *rip);
 extern "C" void CreateStuck__FP3RIPP3ALOP2SOP6VECTORT3PP5STUCK(RIP *, ALO *, SO *, QW, QW);

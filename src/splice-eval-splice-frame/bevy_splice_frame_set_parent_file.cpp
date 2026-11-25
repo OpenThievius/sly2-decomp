@@ -4,11 +4,12 @@
 #include "types.h"
 #include "sly2.h"
 #include "cref.h"
+#include "sidebag.h"
 #include "m2c_macros.h"
 
 extern "C" {
 struct SPLICEFRAME {
-    char pad[8];
+    u8 unknown_0x0[8];
     s32 grfFlags;
     char cframeptr[1];
 };
@@ -59,23 +60,22 @@ extern "C" void CFrame_RemoveParent(CFrame_127B70 *pframe, CFrame_127B70 *pparen
     }
 }
 
-struct Varb { int cref; int pad4; int sym; char ref[8]; Varb *next; };
 
-struct HV { Varb *p; int pad[3]; };
+struct HV { VARB *p; int pad[3]; };
 
-struct Owner { char pad[0x1C]; Varb *varb; };
+struct Owner { u8 unknown_0x0[0x1C]; VARB *varb; };
 
-extern "C" Varb *PvarbNew(void);
+extern "C" VARB *PvarbNew(void);
 
-extern "C" void func_00257430(HV *h, Varb *v);
+extern "C" void func_00257430(HV *h, VARB *v);
 
-extern "C" void VarbPtr_Assign(void *h, Varb *v);
+extern "C" void VarbPtr_Assign(void *h, VARB *v);
 
 extern "C" void VarbPtr_Destructor(void *h, int f);
 
 extern "C" void CRef_Destruct(void *r);
 
-extern "C" void UnlinkVarbNode(Varb *v);
+extern "C" void UnlinkVarbNode(VARB *v);
 
 extern "C" void FreeSlotheapPv(void *heap, void *p);
 
@@ -84,17 +84,17 @@ extern "C" char B_004520D0[];
 extern "C" CRef *CFrame_RefAddBinding(CRef *pref, Owner *powner, int sym, CRef *pvalue)
 {
     HV h;
-    Varb **pvarbHead = &powner->varb;
+    VARB **pvarbHead = &powner->varb;
     func_00257430(&h, PvarbNew());
-    h.p->sym = sym;
-    *(CRef *)h.p->ref = *pvalue;
-    VarbPtr_Assign(&h.p->next, *pvarbHead);
+    h.p->symid = sym;
+    h.p->ref = *pvalue;
+    VarbPtr_Assign(&h.p->pvarbNext, *pvarbHead);
     VarbPtr_Assign(pvarbHead, h.p);
     pref->SetTag(TAGK_Void);
-    Varb *t = h.p;
-    if (t && --t->cref == 0) {
-        VarbPtr_Destructor(&t->next, 2);
-        CRef_Destruct(t->ref);
+    VARB *t = h.p;
+    if (t && --t->node.cref == 0) {
+        VarbPtr_Destructor(&t->pvarbNext, 2);
+        CRef_Destruct(&t->ref);
         UnlinkVarbNode(t);
         FreeSlotheapPv(B_004520D0, t);
     }
@@ -163,11 +163,10 @@ done:
     return found;
 }
 
-struct Varb_127E90 { int cref; int pad4; int symid; char ref[8]; Varb_127E90 *next; };
 
-struct CFrame_127E90 { int cref; char pad4[4]; int slotCount; void *slots[4]; Varb_127E90 *varbs; };
+struct CFrame_127E90 { int cref; u8 unknown_0x4[4]; int slotCount; void *slots[4]; VARB *varbs; };
 
-struct HV_127E90 { Varb_127E90 *p; int pad[3]; };
+struct HV_127E90 { VARB *p; int pad[3]; };
 
 struct HFrame { CFrame_127E90 *p; int pad[3]; };
 
@@ -177,15 +176,15 @@ extern "C" void func_00257058(HFrame *h, CFrame_127E90 *p);
 
 extern "C" void CFramePtr_Assign_127E90(void *dst, void *src);
 
-extern "C" void VarbPtr_Assign_127E90(void *h, Varb_127E90 *v);
+extern "C" void VarbPtr_Assign_127E90(void *h, VARB *v);
 
-extern "C" void UnlinkVarbNode_127E90(Varb_127E90 *v);
+extern "C" void UnlinkVarbNode_127E90(VARB *v);
 
 extern "C" void CFrame_DeletingDestructor(CFrame_127E90 *p, int flags);
 
-extern "C" void func_0012B0E8(HV_127E90 *result, Varb_127E90 *src, CFrame_127E90 *frame, unsigned long arg);
+extern "C" void func_0012B0E8(HV_127E90 *result, VARB *src, CFrame_127E90 *frame, u64 arg);
 
-extern "C" HFrame *PframeClone(HFrame *result, CFrame_127E90 *src, unsigned long arg)
+extern "C" HFrame *PframeClone(HFrame *result, CFrame_127E90 *src, u64 arg)
 {
     HFrame h;
     int i = 0;
@@ -199,10 +198,10 @@ extern "C" HFrame *PframeClone(HFrame *result, CFrame_127E90 *src, unsigned long
         CFrame_127E90 *pframeNew = h.p;
         func_0012B0E8(&varbs, src->varbs, pframeNew, arg);
         VarbPtr_Assign_127E90(&pframeNew->varbs, varbs.p);
-        Varb_127E90 *t = varbs.p;
-        if (t && --t->cref == 0) {
-            VarbPtr_Destructor(&t->next, 2);
-            CRef_Destruct(t->ref);
+        VARB *t = varbs.p;
+        if (t && --t->node.cref == 0) {
+            VarbPtr_Destructor(&t->pvarbNext, 2);
+            CRef_Destruct(&t->ref);
             UnlinkVarbNode_127E90(t);
             FreeSlotheapPv(B_004520D0, t);
         }

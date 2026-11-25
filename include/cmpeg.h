@@ -40,7 +40,7 @@ struct CQueueOutputIop {
     /* 0x04 */ s32 wfmt;
     /* 0x08 */ s32 rate;
     /* 0x0C */ s32 cChannel;
-    u8 unknown_0x10[0x4];
+    /* 0x10 */ s32 cbChunk;  /* reader: CQueueOutputIop_FInit stores the stream header's run, Deinterleave reads it as its chunk size */
     /* 0x14 */ s32 pbIop;
     /* 0x18 */ s32 cbBuffer;  /* Reset copies it to cbFree */
     /* 0x1C */ s32 ibWrite;   /* Reset clears it */
@@ -64,23 +64,43 @@ struct CMpegAudio {
     void Init();
     void Reset();
     void Close();
+    int FAccept(int cb, u8 *pb); /* reader: FMpegAcceptAudio calls it with the chunk's size and data */
     void Update();
 };
 
+/* A queued movie (0x40 bytes: QueueMovie copies it whole); fields are the words Execute and QueueMovie read. */
+struct MOVIE {
+    /* 0x00 */ s32 field_0x0;  /* reader: Execute, with field_0x34 into the location's hash */
+    /* 0x04 */ s32 field_0x4;  /* reader: QueueMovie (a movie with field_0x4 == field_0x3C is not queued), Execute */
+    /* 0x08 */ s32 field_0x8;  /* reader: Execute (movie identity, with field_0x38) */
+    u8 unknown_0xC[0x28];
+    /* 0x34 */ s32 field_0x34;
+    /* 0x38 */ s32 field_0x38;
+    /* 0x3C */ s32 field_0x3C;
+};
+
 struct CMpeg {
-    u8 unknown_0x0[0x104];
+    /* 0x00 */ s32 cmovie;           /* the queue's count: QueueMovie, FPlayQueuedMovies */
+    /* 0x04 */ MOVIE amovie[4];      /* the queued movies */
     /* 0x104 */ SUBTITLE *psubtitle;  /* DrawMpegFrame */
     /* 0x108 */ s32 fSkippable;       /* RunNextBootQueueEntry sets it for a skippable movie; Execute clears it when the player skips */
     /* 0x10C */ f32 tPicture;         /* Update stamps the time of the last picture */
     /* 0x110 */ u8 *pbBuffer;         /* Execute stores the stack buffer, Update reads its picture area at +0x285A80 */
     /* 0x114 */ CBinaryAsyncStream *pbas; /* CMpeg_Start stores the stream, CMpeg::Finish clears it */
-    u8 sdk[0x8];                      /* 0x118: the SDK's decoder state, passed to sceMpegGetPicture and sceMpegIsEnd */
+    union {                           /* 0x118: the SDK's decoder state (sceMpeg), passed to sceMpegGetPicture and sceMpegIsEnd */
+        u8 sdk[0x8];
+        struct {
+            s32 uFrame;               /* reader: BuildMpegGifs, DrawMpegFrame: the picture's width and height, the first words of sceMpeg */
+            s32 vFrame;
+        };
+    };
     /* 0x120 */ s32 skipDraw;         /* Update draws the picture only when it is 0 */
     u8 unknown_0x124[0x3C];
     /* 0x160 */ CByteQueue qVideo;
     /* 0x180 */ CMpegAudio audio;
     /* 0x23C */ s32 sema;
     /* 0x240 */ volatile s32 pending; // volatile-ok: written by MpegDisplayThread (phase 0 to 2) and the demux callback, polled by Update and Finish
+    void Execute(MOVIE *);
     void Update();
     void Finish();
 };

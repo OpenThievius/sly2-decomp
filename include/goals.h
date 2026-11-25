@@ -60,6 +60,8 @@ struct ROUTE {
     u8 unknown_0x54[0xC];
     /* 0x60 */ struct GOALTARGET awaypoint[6]; /* GoalFollowRoute_SetState indexes it by the goal's index; 6 is only the room up to kind */
     /* 0x120 */ s32 kind;                  /* GoalFollowRoute_SetState: 0 walks a two-point curve, 1 goes to the waypoint */
+    u8 unknown_0x124[0x4];
+    /* 0x128 */ struct PATHZONE *ppathzone; /* reader: func_0017E458 (GoalFollowRoute's Update): the walk ends when the guard's zone is this one */
 };
 
 /* a quadword read whole or by lanes */

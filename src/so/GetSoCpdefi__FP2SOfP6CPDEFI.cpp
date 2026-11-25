@@ -1,7 +1,7 @@
 #include "sly2.h"
 #include "xf.h"
 #include "so.h"
-struct CPDEFI { int grfcpd; char pad[0xC]; QW pos; QW vel; float radHome; float sAdjust; float tMoveLast; int cfk; };
+#include "cm.h"
 extern float g_2dded0[];
 extern "C" QW VelocityXfAtPos(XF *, void *, QW);
 void TiltMatUpright(MATRIX3 *, MATRIX3 *, MATRIX3 *);

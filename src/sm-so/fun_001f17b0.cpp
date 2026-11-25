@@ -1,8 +1,8 @@
-struct ENTRY_1F17B0 { int kind; int second; int third; int value; };
-struct OBJ_1F17B0 { char pad[0x404]; ENTRY_1F17B0 entries[8]; int count; int pad2[2]; int enabled; };
-extern "C" void func_001F17B0(OBJ_1F17B0 *obj, int kind) {
-    if (obj->count <= 0 || obj->enabled != 0) {
-        ENTRY_1F17B0 *entry = &obj->entries[obj->count++];
-        entry->kind = kind; entry->third = -1; entry->second = 0; entry->value = 1;
+#include "sly2.h"
+#include "stepguard.h"
+extern "C" void func_001F17B0(STEPGUARD *pguard, int oid) {
+    if (pguard->cguardact <= 0 || pguard->fEnabled != 0) {
+        GUARDACT *pguardact = &pguard->aguardact[pguard->cguardact++];
+        pguardact->oid = oid; pguardact->nArg = -1; pguardact->unk4 = 0; pguardact->unkC = 1;
     }
 }

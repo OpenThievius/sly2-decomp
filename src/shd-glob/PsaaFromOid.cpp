@@ -1,4 +1,11 @@
-struct SAA { char pad0[0x14]; int oid; char pad1[0x30 - 0x18]; int fStop; char pad2[0x40 - 0x34]; SAA *next; };
+struct SAA {
+    unsigned char unknown_0x0[0x14];
+    /* 0x14 */ int oid;
+    unsigned char unknown_0x18[0x18];
+    /* 0x30 */ int fStop;
+    unsigned char unknown_0x34[0xC];
+    /* 0x40 */ SAA *next;
+};
 extern "C" {
 extern SAA *B_003E159C;
 SAA *PsaaFromOid(int oid)

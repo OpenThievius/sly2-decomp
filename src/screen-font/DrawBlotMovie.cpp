@@ -3,11 +3,11 @@
 struct DMAS_213300 { unsigned base; int pad4[2]; char *p; };
 struct Ctx_213300 { int kind; int pad4; float z; int padC; float add[4]; float mul[4]; };
 struct Node_213300 {
-    u8 add[4]; u8 mul[4]; char pad8[8]; char matrix[0x20];
-    void *character; int kind; char pad38[0x29]; u8 flag; char pad62[6];
+    u8 add[4]; u8 mul[4]; u8 unknown_0x8[0x8]; char matrix[0x20];
+    void *character; int kind; u8 unknown_0x38[0x29]; u8 flag; u8 unknown_0x62[0x6];
     Node_213300 *next;
 };
-struct Blot_213300 { char pad0[0x84]; int field84; char pad88[0x74]; Node_213300 *head; };
+struct Blot_213300 { u8 unknown_0x0[0x84]; int field84; u8 unknown_0x88[0x74]; Node_213300 *head; };
 extern "C" {
 void func_001A5ED8(Blot_213300 *);
 int FDrawBlotMovie(Blot_213300 *);

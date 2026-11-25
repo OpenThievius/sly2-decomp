@@ -1,17 +1,10 @@
-struct Obj_1DD6C8;
-struct VT_1DD6C8 {
-    char pad0[0x50]; short delta50; short pad52; void (*fn54)(void *);
-    char pad58[0x188 - 0x58]; short delta188; short pad18A; void (*fn18C)(void *, int);
-};
-struct Obj_1DD6C8 {
-    char pad0[0xC]; VT_1DD6C8 *vt; char pad10[0x24 - 0x10]; Obj_1DD6C8 *child;
-};
+#include "menu.h"
+#include "blot.h"
 extern "C" {
-void func_001DD6C8(Obj_1DD6C8 *arg0) {
-    if (arg0->child) {
-        arg0->vt->fn54((char *)arg0 + arg0->vt->delta50);
-        Obj_1DD6C8 *child = arg0->child;
-        child->vt->fn18C((char *)child + child->vt->delta188, -1);
+void func_001DD6C8(MENU *menu) {
+    if (menu->pblot) {
+        menu->Slot10();
+        menu->pblot->Select(-1);
     }
 }
 }

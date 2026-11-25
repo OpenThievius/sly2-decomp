@@ -1,33 +1,47 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later */
 /* The laser object and its beams (retail 0x1DEDB0 to 0x1DFAD8: LASER, BEAM, SEG, KEY, MQ). Names and meanings are ours, from what
    func_001DEDB0, NotifyLaserXpEnded, ClipLaserBeams and AdvanceLaserBeams do with them: each of those sources used to declare its own
-   view of the object, and two of them declared GetLaserBeamPoints with different types. Offsets are the ones all four agree on. C++. */
+   view of the object, and two of them declared GetLaserBeamPoints with different types. Offsets are the ones all four agree on.
+   A LASER is an SO (0x150 bytes, UpdateSo and CSo_LoadFromBrx take it); its own fields start at 0x150. C++. */
 #ifndef SLY2_LASER_H
 #define SLY2_LASER_H
 #include "types.h"
+#include "so.h"
+#include "oxa.h"
 
 struct KEY { float a, b, c, sDuration, t; };
 
 /* One animated segment of a beam (0xA0 bytes). */
-struct SEG { char pad0[4]; int nState; char pad1[0x14 - 8]; float s; int ckey; KEY akey[6]; int ikey; char pad2[0xA0 - 0x98]; };
+struct SEG {
+    u8 unknown_0x0[4];
+    /* 0x04 */ int nState;   /* AdvanceLaserBeams: 1 while it plays */
+    u8 unknown_0x8[0xC];
+    /* 0x14 */ float s;
+    /* 0x18 */ int ckey;
+    /* 0x1C */ KEY akey[6];
+    /* 0x94 */ int ikey;
+    u8 unknown_0x98[8];
+};
 
-/* One side of a queued contact (0x40 bytes). */
-struct SIDE { char pad0[8]; void *pso; char pad1[0x34]; };
+/* One side of a queued contact (0x40 bytes): the contact holds two. ClipLaserBeams reads the nearest hit's plo and pos from the first
+   side and pgeom from the second; NotifyLaserXpEnded compares pso with the laser and with the other object. */
+struct SIDE {
+    /* 0x00 */ int plo;
+    u8 unknown_0x4[4];
+    /* 0x08 */ void *pso;
+    /* 0x0C */ int pgeom;
+    /* 0x10 */ QW pos;
+    u8 unknown_0x20[0x20];
+};
 
 /* A queued contact of a beam (0xB0 bytes): ClipLaserBeams reads the nearest hit (plo, pos, pgeom, s), NotifyLaserXpEnded walks the chain and
    compares pso with the contact's two sides (SIDE, 0x40 bytes each, the first one starts here). */
 struct MQ {
-    int plo;               /* 0x00 */
-    char pad0[4];
-    void *pso;             /* 0x08, the first side's object */
-    char pad1[0x10 - 0xC];
-    QW pos;                /* 0x10 */
-    char pad2[0x4C - 0x20];
-    int pgeom;             /* 0x4C */
-    char pad3[0xA0 - 0x50];
-    float s;               /* 0xA0 */
-    char pad4[0xAC - 0xA4];
-    MQ *pmqNext;           /* 0xAC */
+    /* 0x00 */ SIDE aside[2];
+    u8 unknown_0x80[0x20];
+    /* 0xA0 */ float s;
+    u8 unknown_0xA4[8];
+    /* 0xAC */ MQ *pmqNext;
 };
 
 struct BEAM {
@@ -35,21 +49,17 @@ struct BEAM {
     float sFull;       /* 0x140 */
     float sClipped;    /* 0x144 */
     MQ *pmqFirst;      /* 0x148 */
-    char pad[0x150 - 0x14C];
+    u8 unknown_0x14C[4];
 };
-
-struct DLOWNER { char pad[0x70]; u64 grf; };
 
 struct LASERFX { void *plo; void *paseg; void *pasega; void *pchn; };
 
-struct LASER {
-    char pad0[0xEC];
-    DLOWNER *powner;   /* 0x0EC */
-    char pad1[0x198 - 0xF0];
-    int cbeam;         /* 0x198 */
-    BEAM *abeam;       /* 0x19C */
-    LASERFX afx[2];    /* 0x1A0 */
-    float dt;          /* 0x1C0 */
+struct LASER : SO {
+    u8 unknown_0x150[0x48];         /* func_001DE2D8 reads an oid and a class filter here (one reader, not a method: its own view) */
+    /* 0x198 */ int cbeam;
+    /* 0x19C */ BEAM *abeam;
+    /* 0x1A0 */ LASERFX afx[2];
+    /* 0x1C0 */ float dt;
 };
 
 #endif

@@ -3,13 +3,13 @@
 struct RHYTHMCROWD {
     s32 a;
     s32 b;
-    char pad[4];
+    u8 unknown_0x8[4];
     s32 c;
-    char pad2[0xC];
+    u8 unknown_0x10[0xC];
 };
 
 struct RHYTHM {
-    char pad[0x2A8];
+    u8 unknown_0x0[0x2A8];
     u32 ccrowd;
     struct RHYTHMCROWD acrowd[0x80];
 };

@@ -1,6 +1,6 @@
 #include "sly2.h"
 #include "sw.h"
-struct G2 { char pad[0x4A4]; int cL3; };
+struct G2 { u8 unknown_0x0[0x4A4]; int cL3; };
 extern "C" SW B_003DD490;
 extern "C" G2 B_002DDF40;
 extern "C" float g_2dded0;

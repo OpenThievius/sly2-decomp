@@ -14,7 +14,7 @@ void func_0014B660(void) {
 
 extern "C" {
 typedef struct CFileLocation {
-    char pad[4];
+    u8 unknown_0x0[4];
     s32 field_0x4;
     s32 kind;
 } CFileLocation;

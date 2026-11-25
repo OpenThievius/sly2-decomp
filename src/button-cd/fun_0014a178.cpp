@@ -1,6 +1,6 @@
 #include "sly2.h"
 struct Entry { int a; int b; int c; };
-struct List { char pad[0x54]; int count; Entry *items; };
+struct List { u8 unknown_0x0[0x54]; int count; Entry *items; };
 void func_0014A178(List *self, int a, int b)
 {
     int count = self->count;

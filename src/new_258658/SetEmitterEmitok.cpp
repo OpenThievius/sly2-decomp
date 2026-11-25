@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
 struct SZ { int size; int align; };
-struct PEMITB { char pad[0x10]; int emitok; char pad2[0x1C]; int p30; };
-struct INNER { char pad[0x10]; int value; };
-struct OBJ { char pad[0xE4]; INNER *inner; };
+struct PEMITB { u8 unknown_0x0[0x10]; int emitok; u8 unknown_0x14[0x1C]; int p30; };
+struct INNER { u8 unknown_0x0[0x10]; int value; };
+struct OBJ { u8 unknown_0x0[0xE4]; INNER *inner; };
 extern "C" void *PvAllocSwClearImpl__Fi(SZ *);
 extern "C" PEMITB *PemitbEnsureEmitter(OBJ *, int);
 static inline int Alloc(int size)

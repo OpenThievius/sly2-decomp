@@ -1,5 +1,5 @@
 #include "sly2.h"
-struct JOB { char pad0[0xB0]; int fB0; int fB4; void *pB8; void *pBC; int fC0; int fC4; int pad; int fCC; };
+struct JOB { u8 unknown_0x0[0xB0]; int fB0; int fB4; void *pB8; void *pBC; int fC0; int fC4; int pad; int fCC; };
 extern "C" void UpdateLo(JOB *);
 extern "C" int FBlotLabelPlaying(void *, int);
 extern "C" void PublishJobEnd(JOB *);

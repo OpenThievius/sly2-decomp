@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "bentley.h"
 #include "sly2.h"
-struct LAUNCH { char pad0[0x50]; QW vecTarget; int unk60; };
-struct GEOM { char pad[0x18]; int grf; };
+struct LAUNCH { u8 unknown_0x0[0x50]; QW vecTarget; s32 field_0x60; };
+struct GEOM { u8 unknown_0x0[0x18]; s32 grf; };
 extern QW g_2a2dd0;
 extern float g_2dded0;
 extern "C" {
@@ -33,7 +33,7 @@ void ThrowBentleyBomb(BENTLEY *pbentley, int grfGeom)
         return;
     pbomb->ageom->grf = grfGeom;
     LAUNCH *plaunch = pbentley->field_0x16E4;
-    plaunch->unk60 = 0;
+    plaunch->field_0x60 = 0;
     plaunch->vecTarget = pbentley->posTarget;
     LaunchSoAtTarget(plaunch, pbomb);
     pbomb->Slot36(g_2a2dd0);

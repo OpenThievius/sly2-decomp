@@ -1,11 +1,11 @@
 #include "types.h"
 
 struct AttachCyl {
-    char pad0[0x38];
+    u8 unknown_0x0[0x38];
     f32 radius;
-    char pad3C[0xE0 - 0x3C];
+    u8 unknown_0x3C[0xE0 - 0x3C];
     s32 transformOverride;
-    char padE4[0x10C - 0xE4];
+    u8 unknown_0xE4[0x10C - 0xE4];
     f32 cylinderRadius;
 };
 

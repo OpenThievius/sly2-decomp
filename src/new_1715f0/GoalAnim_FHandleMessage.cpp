@@ -5,7 +5,7 @@
 #include "ps2inline.h"
 #include "vu0inline.h"
 union VU_SCALE { QW q; VECTOR v; };
-struct VT { char pad[0x118]; short delta; short index; void (*fn)(char *, QW); }; /* STEPGUARD slot 35 (Slot35) */
+struct VT { u8 unknown_0x0[0x118]; short delta; short index; void (*fn)(char *, QW); }; /* STEPGUARD slot 35 (Slot35) */
 
 /* The data of an animation event message (message 9): who it came from, a float argument and the event id. */
 struct ANIMEVENTMSG {

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-struct MOUNT { char pad[0x184]; int hp; char pad2[0x38]; int state; };
+#include "mount.h"
 extern "C" int FSwHandsOff(void *);
 extern "C" void Mount_SetState(MOUNT *, int);
 extern "C" void Mount_UpdateHealthBlot(MOUNT *);

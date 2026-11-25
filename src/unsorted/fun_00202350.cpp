@@ -1,4 +1,5 @@
-struct OBJ { char pad[0x10]; unsigned long flags; char pad2[0x70 - 0x18]; int count; };
+#include "types.h"
+struct OBJ { u8 unknown_0x0[0x10]; u64 flags; u8 unknown_0x18[0x70 - 0x18]; s32 count; };
 extern "C" int func_00202350(void *unused, OBJ *obj)
 {
     int result = 0;

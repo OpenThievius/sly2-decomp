@@ -1,20 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "tft.h"
 struct OSTRM {
     int CbWrite(void *pv, int cb);
-};
-struct TFT {
-    int fLeft;      // 0x00
-    int fPlus;      // 0x04
-    int fSpace;     // 0x08
-    int pad0C;
-    int fZero;      // 0x10
-    int fPrec;      // 0x14
-    int cchWidth;   // 0x18
-    int cchPrec;    // 0x1C
-    int pad20[3];
-    unsigned char chType;    // 0x2C
-    char pad2D[3];
-    int fUpper;     // 0x30
 };
 extern "C" {
 int CchAchFromDouble__FPciP3TFTd(char *pch, int cch, TFT *ptft, double d);

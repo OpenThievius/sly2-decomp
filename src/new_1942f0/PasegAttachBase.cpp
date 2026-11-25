@@ -1,20 +1,20 @@
-struct AttachPaseg1944C8 { char pad[8]; int kind; int sub; char pad2[0x44]; void *a54; void *a58; void *a5c; void *a60; void *a64; };
+#include "attach.h"
 
-extern "C" void *PasegAttachBase(AttachPaseg1944C8 *attach, int *secondary)
+extern "C" void *PasegAttachBase(ATTACH *attach, int *secondary)
 {
     void *paseg;
     int isSecondary = 0;
     switch (attach->kind) {
     case 0:
-        paseg = (attach->sub == 5) ? attach->a60 : attach->a54;
+        paseg = (attach->field_0x0C == 5) ? attach->apaseg[3] : attach->apaseg[0];
         break;
     case 1:
-        paseg = attach->a58;
+        paseg = attach->apaseg[1];
         break;
     case 8:
-        if (attach->sub < 11) {
-            if (attach->sub > 8) {
-                paseg = attach->a64;
+        if (attach->field_0x0C < 11) {
+            if (attach->field_0x0C > 8) {
+                paseg = attach->apaseg[4];
                 isSecondary = 1;
             } else {
                 paseg = 0;

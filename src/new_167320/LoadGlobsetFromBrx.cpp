@@ -1,26 +1,27 @@
+#include "types.h"
 struct BIS_167320;
 struct REQ_167320 { int size; int align; };
-struct GLOB_167320 { char c0; char pad1[2]; char type; float f4; char pad8[0x14 - 8]; };
+struct GLOB_167320 { char c0; u8 unknown_0x1[2]; char type; float f4; u8 unknown_0x8[0x14 - 8]; };
 struct GLOBI_167320 {
     int n0;
     int n4;
-    char pad8[4];
+    u8 unknown_0x8[4];
     unsigned type : 3;
     unsigned c : 5;
     unsigned pad8b : 2;
     unsigned fHasF : 1;
     unsigned fFlag : 1;
-    char pad10[0x28 - 0x10];
+    u8 unknown_0x10[0x28 - 0x10];
 };
 struct VEC_167320 { float x, y, z; };
 struct SUBGLOB_167320 { VEC_167320 pos; float fC; float f10; unsigned u14; };
 struct INFO_167320 { float f0; int pad4; int n8; };
 struct VTE_167320 { short d; short i; int (*pfn)(void *, int); };
 struct VT_167320 { VTE_167320 ae[0x34]; };
-struct ALO_167320 { char pad0[0xC]; VT_167320 *vt; };
+struct ALO_167320 { u8 unknown_0x0[0xC]; VT_167320 *vt; };
 struct GLOBSET_167320 {
     ALO_167320 *palo;
-    char pad4[0x10 - 4];
+    u8 unknown_0x4[0x10 - 4];
     VEC_167320 pos;
     int pad1C;
     float f20;

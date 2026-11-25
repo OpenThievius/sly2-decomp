@@ -72,12 +72,14 @@ struct DPRIZE : SO {
     /* 0x150 */ s32 dprizes;             /* the state: UpdateDprize switches on it, RenderDprizeAll skips state 2 (hidden), InitDprize sets -1 */
     /* 0x154 */ f32 tDprizes;            /* the clock when the state last changed: UpdateDprize (state 4 times out against it) */
     /* 0x158 */ s32 dprizesInitial;      /* PostDprizeLoad passes it to SetDprizes (InitDprize clears it) */
-    u8 unknown_0x15C[0xC];
+    /* 0x15C */ s32 smaGoal;             /* SetDprizeDprizes (a method) reads it as the state-0 animation goal (-1: the default 0x184); InitDprize sets -1 */
+    /* 0x160 */ f32 dtDelay;            /* SetDprizeDprizes: the time SkipSma skips when it starts the animation (func_001C6BD0 sets it) */
+    /* 0x164 */ s32 field_0x164;         /* SetDprizeDprizes hands it to PsmaApplySm as the animation's record */
     /* 0x168 */ struct SMA *psma;        /* the prize's animation: HandleDprizeMessage matches message 10's against it, RenderDprizeAll */
     /* 0x16C */ struct LO *ploShadow;    /* PostDprizeLoad: the class 0x12 object PloFindSwObjectByClass finds, removed at once (slot 9) */
-    u8 unknown_0x170[0x10];
+    /* 0x170 */ QW posSpawn;            /* SetDprizeDprizes (a method) copies the linear transform's position here when it leaves state -1 or 2 */
     /* 0x180 */ struct VECTOR velocity;  /* UpdateDprize: squared length against 10000 in state 0, z in states 3 and 4 */
-    u8 unknown_0x190[0x10];
+    /* 0x190 */ QW field_0x190;         /* SetDprizeDprizes stores a constant per state (g_2a2dd0, D_002C0D60) */
     /* 0x1A0 */ f32 field_0x1A0;         /* InitDprizeCoin 0.25, InitDprizeKey 0.75 */
     /* 0x1A4 */ struct OIDPLO aoidploGlint[3]; /* SetDprizeGlintOids stores the oids, PostDprizeLoad resolves each into plo */
     u8 unknown_0x1BC[0x8];
@@ -94,7 +96,10 @@ struct DPRIZE : SO {
     /* 0x204 */ struct OIDPLO aoidploB[3]; /* PostDprizeLoad resolves each oid into plo, as the glint triple; the objects found at [1] (0x210)
                                              and [2] (0x218) are the collect and expire sinks (MSGSINK): SetDprizeCoinDprizes tells the first
                                              {1, prize}, HandleDprizeMessage the second */
-    u8 unknown_0x21C[0x14];
+    /* 0x21C */ f32 field_0x21C;         /* InitDprize (the class's init) sets 30.0 */
+    u8 unknown_0x220[0x4];
+    /* 0x224 */ s32 field_0x224;         /* InitDprize sets -1 */
+    u8 unknown_0x228[0x8];
 };
 
 struct DPRIZECOIN : DPRIZE {

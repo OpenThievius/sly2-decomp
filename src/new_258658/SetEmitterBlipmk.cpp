@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
-struct EMITB { char pad[0xC0]; int block; };
-struct EMITTER { char pad[0xE4]; EMITB *pemitb; };
+struct EMITB { u8 unknown_0x0[0xC0]; int block; };
+struct EMITTER { u8 unknown_0x0[0xE4]; EMITB *pemitb; };
 struct B16 { char b[16]; };
-struct BLK { int kind; char pad[0x2C]; B16 data; };
+struct BLK { int kind; u8 unknown_0x4[0x2C]; B16 data; };
 extern "C" BLK *PemitblipEnsureEmitter(EMITTER *, int);
 extern float g_2bde00;
 extern B16 D_002BDDF0;

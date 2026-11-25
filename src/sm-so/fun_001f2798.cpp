@@ -1,17 +1,15 @@
-#include "types.h"
-extern "C" {
-struct B_1F2798 { char pad[0xA0]; s32 f_a0; char p1[0x1C]; s32 f_c0; };
-struct A_1F2798 { char pad0[0x10]; A_1F2798 *next; char pad1[0xD4]; B_1F2798 *obj; char pad2[0x5C]; s64 flags; };
-A_1F2798 *func_001F2798(A_1F2798 *arg0) {
-    A_1F2798 *result = 0;
-    for (; arg0 != 0; arg0 = result->next) {
-        result = arg0;
-        B_1F2798 *obj = arg0->obj;
-        if (obj != 0 && !(obj->f_c0 == 3 && obj->f_a0 == obj->f_c0))
+#include "sly2.h"
+#include "so.h"
+#include "phys.h"
+extern "C" SO *func_001F2798(SO *pso) {
+    SO *result = 0;
+    for (; pso != 0; pso = result->psoParent) {
+        result = pso;
+        PHYS *pphys = pso->pphys;
+        if (pphys != 0 && !(pphys->ctForce == 3 && pphys->ctTorque == pphys->ctForce))
             break;
-        if (result->flags & (s64)0x8000 << 19)
+        if (result->grfso & (u64)0x8000 << 19)
             break;
     }
     return result;
-}
 }

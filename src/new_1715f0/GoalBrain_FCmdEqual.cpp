@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
-struct CMD { int type; char pad[0xC]; int value; char pad2[8]; int value2; };
+struct CMD { int type; u8 unknown_0x4[0xC]; int value; u8 unknown_0x14[8]; int value2; };
 int GoalBrain_FCmdEqual(CMD *a, CMD *b)
 {
     int type = a->type;

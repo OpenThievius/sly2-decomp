@@ -1,8 +1,8 @@
 #include "sly2.h"
 struct CBinaryInputStream { int S32Read(); };
 #include "alloc.h"
-struct VT { char pad[0x10]; short d0; short i0; void (*fnClear)(void *); char pad1[0x20 - 0x18]; short d1; short i1; void (*fnRead)(void *, void *, CBinaryInputStream *); short d2; short i2; void (*fnAdd)(void *, void *); };
-struct VEC { char pad[0xC]; VT *vt; char ary[1]; };
+struct VT { u8 unknown_0x0[0x10]; short d0; short i0; void (*fnClear)(void *); u8 unknown_0x18[0x8]; short d1; short i1; void (*fnRead)(void *, void *, CBinaryInputStream *); short d2; short i2; void (*fnAdd)(void *, void *); };
+struct VEC { u8 unknown_0x0[0xC]; VT *vt; char ary[1]; };
 extern "C" int CStackFrame_Construct(void *);
 extern "C" void CStackFrame_Destructor(void *, int);
 extern "C" void *PvAllocStackImpl__Fi(ALLOCREQ *);

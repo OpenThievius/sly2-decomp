@@ -1,3 +1,4 @@
+#include "types.h"
 extern "C" float g_2dded0;
 extern "C" void RemoveRip(void *);
 
@@ -5,12 +6,12 @@ struct B8 { char b[8]; };
 struct OBJ { virtual void v0(); int pad; };
 typedef void (OBJ::*PMF)(void *);
 
-struct SMI { char pad[0x60]; B8 pmf; };
+struct SMI { u8 unknown_0x0[0x60]; B8 pmf; };
 struct SMACK {
-    char pad0[0x14];
+    u8 unknown_0x0[0x14];
     float created;
     float lifetime;
-    char pad1[0xF0 - 0x1C];
+    u8 unknown_0x1C[0xD4];
     SMI *info;
     OBJ *target;
     void *arg;

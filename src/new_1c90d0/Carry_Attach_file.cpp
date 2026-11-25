@@ -7,63 +7,54 @@
 #include "xf.h"
 #include "m2c_macros.h"
 
+#include "carrypart.h"
+#include "rows3.h"
+
 struct M4 { QW row[4]; };
-
-struct VTE { short delta; short index; void *fn; };
-
-struct VTO { char pad0[0x50]; VTE setParent; char pad1[0xF8 - 0x58]; VTE getMat; char pad2[0x100 - 0x100 + 0]; VTE getXf; };
-
-struct OBJ { char pad[0xC]; VTO *vt; };
-
-struct JT;
-
-struct SO_1CD098 { char pad0[0xC]; VTO *vt; char pad1[0x58 - 0x10]; void *pxfLinear; void *pxfAngular; char pad2[0xE8 - 0x60]; int pphys; };
-
-struct CARRY { JT *pjt; char pad0[0x34 - 4]; OBJ *source; char pad1[0x94 - 0x38]; void *act94; void *act98; void *act9C; SO_1CD098 *attached; };
 
 extern "C" void func_0012E460(void *);
 
-extern "C" SO_1CD098 *func_001CCA40(JT *, SO_1CD098 *);
+extern "C" SO *func_001CCA40(JT *, SO *);
 
-extern "C" M4 ConvertAloMat(SO_1CD098 *, SO_1CD098 *, M4 *);
+extern "C" M4 ConvertAloMat(SO *, SO *, M4 *);
 
 extern "C" M4 InvertMatrix4Affine(M4 *);
 
 extern "C" M4 c1CD098__ml__FRC7MATRIX4T0(const M4 &, const M4 &);
 
-extern "C" void SetLoPosMat(SO_1CD098 *, M4 *);
+extern "C" void SetLoPosMat(SO *, M4 *);
 
-extern "C" void SetSoCnstrForce(SO_1CD098 *, int);
+extern "C" void SetSoCnstrForce(SO *, int);
 
-extern "C" void SetSoCnstrTorque(SO_1CD098 *, int);
+extern "C" void SetSoCnstrTorque(SO *, int);
 
 extern "C" QW GetXfDofValue(void *, void *);
 
-extern "C" void *func_0012DC18(SO_1CD098 *, void *, int, int, int, QW);
+extern "C" void *func_0012DC18(SO *, void *, int, int, int, QW);
 
-extern "C" void FadeAloIn(SO_1CD098 *, float);
+extern "C" void FadeAloIn(SO *, float);
 
 // Retail: ConvertAloMat(NULL, so, anchor matrix) returns into a temp at sp+0xC0 that is copied to matAnchor (sp+0x80);
 // InvertMatrix4Affine returns its MATRIX4 by hidden pointer (a0 = sp+0x100, a1 = &matAnchor, as in ConvertAloMat.cpp) and
 // the product's temp reuses sp+0xC0, so the inverse is an argument expression, not an out-parameter local. The two
 // GetXfDofValue/func_0012DC18 pairs read one reused `xf` local: separate locals schedule `por $t1` before `move $a1` in the
 // first pair.
-void Carry_Attach(CARRY *carry, SO_1CD098 *so)
+void Carry_Attach(CARRYPART *carry, SO *so)
 {
     if (so == carry->attached) return;
     func_0012E460(&carry->act94);
     func_0012E460(&carry->act98);
     func_0012E460(&carry->act9C);
     M4 matSource;
-    OBJ *source = carry->source;
-    void *xfSource = ((void *(*)(void *, M4 *))source->vt->getXf.fn)((char *)source + source->vt->getXf.delta, &matSource);
-    ((void (*)(void *, JT *, void *, int))so->vt->setParent.fn)((char *)so + so->vt->setParent.delta, carry->pjt, xfSource, 0);
-    OBJ *source2 = carry->source;
-    M4 matPlace = *((M4 *(*)(void *))source2->vt->getMat.fn)((char *)source2 + source2->vt->getMat.delta);
-    SO_1CD098 *anchor = func_001CCA40(carry->pjt, so);
+    LO *source = carry->source;
+    void *xfSource = source->Slot32(&matSource);
+    so->SetParent((LO *)carry->pjt, xfSource, 0);
+    LO *source2 = carry->source;
+    M4 matPlace = *(M4 *)source2->PmatWorld();
+    SO *anchor = func_001CCA40(carry->pjt, so);
     if (anchor) {
         M4 matAnchor;
-        matAnchor = ConvertAloMat(0, so, ((M4 *(*)(void *))anchor->vt->getMat.fn)((char *)anchor + anchor->vt->getMat.delta));
+        matAnchor = ConvertAloMat(0, so, (M4 *)anchor->PmatWorld());
         matPlace = c1CD098__ml__FRC7MATRIX4T0(matPlace, InvertMatrix4Affine(&matAnchor));
     }
     SetLoPosMat(so, &matPlace);
@@ -80,33 +71,21 @@ void Carry_Attach(CARRY *carry, SO_1CD098 *so)
 }
 
 extern "C" {
-struct CARRY_1CD2C0 {
-    char pad[0x94];
-    s32 field_0x94;
-    s32 field_0x98;
-    s32 field_0x9C;
-    s32 fAttached;
-};
-
 s32 func_0012E460_1CD2C0(void *);                      /* extern */
 
-void Carry_Detach(struct CARRY_1CD2C0 *pcarry) {
-    if (pcarry->fAttached != 0) {
-        func_0012E460_1CD2C0(&pcarry->field_0x94);
-        func_0012E460_1CD2C0(&pcarry->field_0x98);
-        func_0012E460_1CD2C0(&pcarry->field_0x9C);
-        pcarry->fAttached = 0;
+void Carry_Detach(CARRYPART *pcarry) {
+    if (pcarry->attached != 0) {
+        func_0012E460_1CD2C0(&pcarry->act94);
+        func_0012E460_1CD2C0(&pcarry->act98);
+        func_0012E460_1CD2C0(&pcarry->act9C);
+        pcarry->attached = 0;
     }
 }
 }
 
-struct Rows3 { QW row[3]; };
+extern "C" void Carry_SetState(CARRYPART *, int);
 
-struct CARRY_1CD308 { char pad0[0x84]; SO *last; char pad1[0x94 - 0x88]; void *act94; void *act98; void *act9C; SO *attached; };
-
-extern "C" void Carry_SetState(CARRY_1CD308 *, int);
-
-extern "C" void func_001A58D0(SO *, int, int);
+extern "C" void func_001A58D0(LO *, LO *, int);
 
 extern "C" QW PosLoWorld(LO *);
 
@@ -114,11 +93,11 @@ extern "C" QW ConvertXfPos(int, XF *, QW);
 
 extern "C" void *func_0012DE58(float, SO *, XF *, int, QW, QW);
 
-extern "C" Rows3 *PmatLoWorld(LO *);
+extern "C" ROWS3 *PmatLoWorld(LO *);
 
-extern "C" Rows3 ConvertXfMat(int, XF *, Rows3 *);
+extern "C" ROWS3 ConvertXfMat(int, XF *, ROWS3 *);
 
-extern "C" QW DecomposeRotateMatrixEuler(Rows3);
+extern "C" QW DecomposeRotateMatrixEuler(ROWS3);
 
 extern "C" void *func_0012DC18_1CD308(SO *, XF *, int, int, int, QW);
 
@@ -128,7 +107,7 @@ extern "C" float g_2c1ef4;
 
 extern "C" QW g_2a2dd0;
 
-void func_001CD308(CARRY_1CD308 *carry, LO *target)
+void func_001CD308(CARRYPART *carry, LO *target)
 {
     if (!carry->attached) return;
     Carry_SetState(carry, -1);
@@ -147,12 +126,12 @@ void func_001CD308(CARRY_1CD308 *carry, LO *target)
     QW local = ConvertXfPos(0, xfNode->pxfParent, PosLoWorld(target));
     carry->act94 = func_0012DE58(g_2dded0 + g_2c1ef4, carry->attached, xfNode, 5, local, g_2a2dd0);
     xfNode = carry->attached->pxfAngular;
-    Rows3 matLocal;
+    ROWS3 matLocal;
     matLocal = ConvertXfMat(0, xfNode->pxfParent, PmatLoWorld(target));
     QW euler = DecomposeRotateMatrixEuler(matLocal);
     carry->act9C = func_0012DC18_1CD308(carry->attached, xfNode, 5, 7, 2, euler);
     SO *placed = carry->attached;
-    carry->last = placed;
+    carry->plo = placed;
     Carry_SetState(carry, 1);
     carry->attached = 0;
 }

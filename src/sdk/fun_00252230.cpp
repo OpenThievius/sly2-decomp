@@ -1,6 +1,6 @@
 #include "types.h"
 extern "C" {
-long func_00251FC8(char *);
+s64 func_00251FC8(char *);
 void func_00252358(char *);
 struct Ipu_252230 { int pad0[0x20A]; int field828; int field82C; int pad830[6]; unsigned field848; int field84C; };
 unsigned func_00252230(Ipu_252230 *ipu, int count) {

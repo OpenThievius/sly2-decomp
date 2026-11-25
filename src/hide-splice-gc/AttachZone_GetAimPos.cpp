@@ -1,7 +1,7 @@
 #include "vu0inline.h"
 #include "types.h"
 #include "ps2inline.h"
-struct ATTACHZONE { char pad[0x110]; QW field_0x110; char pad2[0x3C]; void *field_0x15C; };
+#include "pzo_hide.h"
 extern "C" {
 QW ConvertAloPos(ATTACHZONE *, void *, QW);
 QW PosLoWorld(void *);

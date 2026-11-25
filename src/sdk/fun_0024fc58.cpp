@@ -1,23 +1,24 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "types.h"
 extern "C" {
 struct MpegSlot {
-    char pad0[0x12C];
+    u8 unknown_0x0[0x12C];
     int predicted;
-    char pad130[0x140 - 0x130];
+    u8 unknown_0x130[0x140 - 0x130];
 };
 struct MpegDecoder {
-    char pad0[0x130];
+    u8 unknown_0x0[0x130];
     int secondField;
-    char pad134[0x160 - 0x134];
+    u8 unknown_0x134[0x160 - 0x134];
     int pictureCodingType;
-    char pad164[0x184 - 0x164];
+    u8 unknown_0x164[0x184 - 0x164];
     int pictureStructure;
-    char pad188[0x1C8 - 0x188];
+    u8 unknown_0x188[0x1C8 - 0x188];
     int forwardFrame;
     int backwardFrame;
-    char pad1D0[0x1D8 - 0x1D0];
+    u8 unknown_0x1D0[0x1D8 - 0x1D0];
     int fieldFrames[2][4];
-    char pad1F8[0x5A0 - 0x1F8];
+    u8 unknown_0x1F8[0x5A0 - 0x1F8];
     MpegSlot slots[2];
     int slotIndex;
 };

@@ -7,29 +7,58 @@
 #include "m2c_macros.h"
 #include "include_asm.h"
 
-struct ALO : LO {
-    f32 field_0x50;
-    char pad54[8];
-    s32 field_0x5C;
-    char pad60[0x6E0 - 0x60];
-    s32 field_0x6E0;
-    char pad6E4[0x8F0 - 0x6E4];
-    char field_0x8F0[0xA0];
+struct WARP {
+    s32 kind;
+    s32 id;
+    u8 unknown_0x8[8];
+    QW pos;
+    u8 unknown_0x20[0x40];
+    s32 state;
+    u8 unknown_0x64[0x6C];
+};
+
+struct BENDWARP {
+    s32 active;
+    u8 unknown_0x4[0xC];
+    s128 rowA;
+    s128 rowB;
+    u8 unknown_0x30[8];
+    f32 half38;
+    u8 unknown_0x3C[0x4C];
+    f32 half88;
+    u8 unknown_0x8C[0x44];
+};
+
+/* WR, the water-ripple object (an LO of 0x990 bytes): up to eight warps, circle or bend, in one 0xD0-byte array. */
+struct WR : LO {
+    /* 0x50 */ f32 field_0x50;     /* func_0022B720 sets -1.0 */
+    /* 0x54 */ s32 cwre;           /* PwreGetWrCur tests it; AddWrCircleWarp, AddWrBendWarp count the warps in it */
+    /* 0x58 */ s32 idNext;         /* AddWrCircleWarp hands out ids from it; AddWrBendWarp counts it up the same way */
+    /* 0x5C */ s32 idPending;      /* func_0022B720 sets -1; AddWrCircleWarp */
+    union {
+        WARP awarp[8];             /* AddWrCircleWarp */
+        BENDWARP abendwarp[8];     /* AddWrBendWarp */
+    };
+    /* 0x6E0 */ s32 iwreCur;       /* func_0022B720 sets -1; AddWrCircleWarp, AddWrBendWarp step it; PwreGetWrCur indexes with it */
+    u8 unknown_0x6E4[0x8F0 - 0x6E4];
+    /* 0x8F0 */ u8 list[0xC];      /* func_0022B720 starts it with InitSl; func_0022B7A0 appends */
+    /* 0x8FC */ s32 fValuesChanged; /* PwreGetWrCur sets it on a write access */
+    u8 unknown_0x900[0x90];
 };
 
 extern "C" void InitLo(LO *);
 
-extern "C" void InitSl(char *, s32);
+extern "C" void InitSl(u8 *, s32);
 
-extern "C" void func_001A6CA8(ALO *, s32);
+extern "C" void func_001A6CA8(WR *, s32);
 
-extern "C" void func_0022B720(ALO *alo) {
+extern "C" void func_0022B720(WR *alo) {
     s32 flags;
     InitLo(alo);
-    alo->field_0x5C = -1;
-    alo->field_0x6E0 = -1;
+    alo->idPending = -1;
+    alo->iwreCur = -1;
     alo->field_0x50 = -1.0f;
-    InitSl(alo->field_0x8F0, 0xA0);
+    InitSl(alo->list, 0xA0);
     func_001A6CA8(alo, 1);
     flags = (s32)alo->grfSw;
     if ((flags ^ 1) & 1) {
@@ -39,11 +68,9 @@ extern "C" void func_0022B720(ALO *alo) {
     alo->grfSw = (u32)(flags | 2);
 }
 
-struct SL { char pad[0xC]; void *owner; };
+struct SL { u8 unknown_0x0[0xC]; void *owner; };
 
-struct WR { char pad[0x8F0]; char list[4]; };
-
-extern "C" void AppendSlEntry(char *, SL *);
+extern "C" void AppendSlEntry(u8 *, SL *);
 
 void func_0022B7A0(WR *wr, SL *entry)
 {
@@ -92,7 +119,7 @@ f32 UBias__Fff(f32 fparg0, f32 fparg1) {
 
 struct ONZE { float uAmpl, gFreq, gPhase, uRandom; };
 
-struct ONZ { float gMin, gMax, uBias; int conze; ONZE aonze[1]; };
+struct ONZ { float gMin, gMax, uBias; int conze; ONZE aonze[4]; };
 
 float UNoise_22BF70(float, float, float);
 
@@ -120,15 +147,11 @@ float GFromOnz(ONZ *ponz)
 
 INCLUDE_ASM(0X22C028);
 
-struct WARP { int kind; int id; char pad0[8]; QW pos; char pad1[0x60 - 0x20]; int state; char pad2[0xD0 - 0x64]; };
-
-struct WR_22C3B0 { u8 unknown_0x0[0x54]; int cwarp; int idNext; int idPending; WARP awarp[8]; int iwreCur; /* 0x6E0: PwreGetWrCur */ };
-
 extern "C" QW g_2a2da0;
 
-extern "C" void AddWrCircleWarp__FP2WR(WR_22C3B0 *pwr)
+extern "C" void AddWrCircleWarp__FP2WR(WR *pwr)
 {
-    WARP *pwarp = &pwr->awarp[pwr->cwarp++];
+    WARP *pwarp = &pwr->awarp[pwr->cwre++];
     pwr->iwreCur += 1;
     pwarp->kind = 0;
     pwarp->pos = g_2a2da0;
@@ -144,40 +167,32 @@ extern "C" void AddWrCircleWarp__FP2WR(WR_22C3B0 *pwr)
     pwarp->state = 0;
 }
 
-struct BENDWARP { s32 active; char pad4[0xC]; s128 rowA; s128 rowB; char pad30[8]; f32 half38; char pad3C[0x4C]; f32 half88; char pad8C[0x44]; };
-
-struct WR_22C430 { char pad0[0x54]; s32 cwarp; s32 cwarpTotal; char pad5C[4]; BENDWARP warps[1]; };
-
-struct WRCOUNT { char pad0[0x6E0]; s32 count; };
-
 extern "C" s128 g_2a2db0;
 
 extern "C" s128 g_2a2dc0;
 
-extern "C" void AddWrBendWarp__FP2WR(WR_22C430 *wr) {
-    BENDWARP *warp = &wr->warps[wr->cwarp++];
-    ((WRCOUNT *)wr)->count++;
+extern "C" void AddWrBendWarp__FP2WR(WR *wr) {
+    BENDWARP *warp = &wr->abendwarp[wr->cwre++];
+    wr->iwreCur++;
     warp->active = 1;
     warp->rowA = g_2a2db0;
     warp->rowB = g_2a2dc0;
     warp->half38 = 0.5f;
     warp->half88 = 0.5f;
-    wr->cwarpTotal = wr->cwarpTotal + 1;
+    wr->idNext = wr->idNext + 1;
 }
 
 enum ENSK { ENSK_Get, ENSK_Set };
 
 enum WREK { WREK_A, WREK_B };
 
-struct WR_22C4A0 { char pad0[0x54]; int cwre; char pad1[0x60 - 0x58]; char awre[0x680]; int iwreCur; char pad2[0x8FC - 0x6E4]; int fValuesChanged; };
-
-void *PwreGetWrCur(WR_22C4A0 *pwr, ENSK ensk, WREK wrek)
+void *PwreGetWrCur(WR *pwr, ENSK ensk, WREK wrek)
 {
     if (pwr->cwre == 0)
         return 0;
     if (ensk == ENSK_Set)
         pwr->fValuesChanged = ensk;
-    return pwr->awre + pwr->iwreCur * 0xD0;
+    return &pwr->awarp[pwr->iwreCur];
 }
 
 extern "C" void* PwreGetWrCur_22C4D8(void* p, int ensk, int wr);
@@ -212,8 +227,6 @@ extern "C" void SetWrWavelength__FP2WRf(s8 *arg0, f32 fparg0) {
     }
 }
 
-struct WR;
-
 extern "C" WrCircle *PwreGetWrCircle__FP2WR4ENSK_22C570(WR *, int);
 
 extern "C" f32 GetWrWavelength__FP2WRPf(WR *pwr, f32 *) {
@@ -225,9 +238,7 @@ extern "C" f32 GetWrWavelength__FP2WRPf(WR *pwr, f32 *) {
     return wavelength;
 }
 
-struct ONZ_22C5B8 { int pad0[3]; unsigned conze; ONZE aonze[4]; };
-
-void AddOnzOnze(ONZ_22C5B8 *ponz, float uAmpl, float gFreq, float gPhase, float uRandom)
+void AddOnzOnze(ONZ *ponz, float uAmpl, float gFreq, float gPhase, float uRandom)
 {
     unsigned conze = ponz->conze;
     if (conze < 4) {

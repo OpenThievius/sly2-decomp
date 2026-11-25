@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "types.h"
-struct PALETTE { int id; unsigned char kind; char pad5[3]; unsigned short cword; char pad0A[2]; unsigned *pdata; int cqw; char pad14[12]; };
-struct MATERIAL { char pad0[4]; unsigned char kind; char pad5[0xF]; int pdata; char pad18[0x10]; };
+#include "palette.h"
 extern "C" int B_003DCFF8;
 extern "C" PALETTE *B_003DCFFC;
 extern "C" int B_003DCFF0;

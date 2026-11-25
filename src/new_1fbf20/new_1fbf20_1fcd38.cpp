@@ -63,9 +63,9 @@ extern "C" SNDSYSTEM *func_001FCD38(SNDSYSTEM *psnd)
 
 extern "C" void snd_StartSoundSystem(int);
 
-extern "C" int func_00233048(int, long, long, long, long, long, long);
+extern "C" int func_00233048(int, s64, s64, s64, s64, s64, s64);
 
-extern "C" long TickReadCount(void *);
+extern "C" s64 TickReadCount(void *);
 
 extern "C" char g_2dded0[];
 
@@ -77,18 +77,18 @@ void InitSndSystem()
     func_00233048(0x524B5553, 0L, 0L, 0L, 0L, 0L, 0L);
     B_003DD040.field_0x1BC = 1.0f;
     int i; int j; for (i = 0; i < 4; i++) { B_003DD040.mix[i] = 1.0f; for (j = 7; j >= 0; j--) B_003DD040.grid[j][i] = 1.0f; }
-    long t = TickReadCount(g_2dded0);
+    s64 t = TickReadCount(g_2dded0);
     B_003DD040.now = t;
     B_003DD040.prev = t;
 }
 
-extern "C" void func_001FCF70(int arg0, long arg1) {
+extern "C" void func_001FCF70(int arg0, s64 arg1) {
     SNDSYSTEM *psnd = (SNDSYSTEM *)(int)arg1;
     *(int *)&psnd->progress = arg0;
     psnd->started = 0;
 }
 
-extern "C" void func_001FCF88(int arg0, long arg1) {
+extern "C" void func_001FCF88(int arg0, s64 arg1) {
     SNDSYSTEM *psnd = (SNDSYSTEM *)(int)arg1;
     psnd->field_0xA4 = arg0;
     psnd->field_0xA0 = 0;
@@ -370,7 +370,7 @@ extern "C" int g_2bd4c0;
 
 extern "C" CLQ RO_002A8288;
 
-extern "C" long TickReadCount_1FD830(CLOCK *);
+extern "C" s64 TickReadCount_1FD830(CLOCK *);
 
 extern "C" void func_001FDA48_1FD830(SNDSYSTEM *);
 

@@ -2,12 +2,12 @@
 #include "sly2.h"
 #include "step.h"
 #include "phys.h"
-struct LINK { char pad[0x10]; void *zone; };
-struct CRV { char pad[0xE8]; int count; char pad1[0xF4 - 0xEC]; QW *nodes; };
+#include "crv.h"
+struct LINK { u8 unknown_0x0[0x10]; void *zone; };
 #include "goal.h"
 struct GOAL_144F48 : GOAL {
     int fSimple;
-    char pad_34[0xC];
+    u8 unknown_0x34[0xC];
     QW posGoal;
 };
 extern "C" QW PosLoWorld(STEP *);
@@ -30,10 +30,10 @@ void GoalGotoPos_SetPos(GOAL_144F48 *goal, QW posGoal)
         zone = pz->zone;
     QW posOwner = PosLoWorld(step);
     if (zone == 0 || goal->fSimple != 0) {
-        crv->count = 2;
-        QW *nodes = crv->nodes;
+        crv->ccv = 2;
+        QW *nodes = crv->apos;
         nodes[0] = posOwner;
-        crv->nodes[1] = goal->posGoal;
+        crv->apos[1] = goal->posGoal;
         MeasureCrv(crv);
     } else {
         FFindPathzoneCrv(zone, posOwner, goal->posGoal, crv);

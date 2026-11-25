@@ -1,7 +1,7 @@
 #include "sly2.h"
 #include "xf.h"
-struct G_1F40A0 { char pad[0x3D58]; int counter; };
-extern G_1F40A0 B_003DD490;
+#include "sw.h"
+extern SW B_003DD490;
 #include "phys.h"
 #include "so.h"
 extern "C" {
@@ -53,7 +53,7 @@ extern "C" void TranslateSoToPos(SO *pso, QW pos)
     XF *pxf = pso->pxfLinear;
     __as__6VECTORG9VU_VECTOR(&pxf->mat.row[3], l.b.row[3]);
     ((float *)&pxf->mat)[15] = 1.0f;
-    int gen = ++B_003DD490.counter;
+    int gen = ++B_003DD490.generation;
     pso->pxfLinear->generation = gen;
     pso->UpdateXfWorldHierarchy();
     DiscardSoXps(pso);

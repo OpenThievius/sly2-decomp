@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "types.h"
 struct VEC4 { float x, y, z, w; };
-#include "xf.h"
-struct ACT { char pad[8]; XF *pxf; };
+#include "act.h"
 extern "C" void func_0012DFE0(ACT *pact, QW *ppos, VEC4 *pvel)
 {
     if (ppos != 0) *ppos = pact->pxf->posGoal;

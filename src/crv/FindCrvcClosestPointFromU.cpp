@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
 struct CONSTR;
-struct CRV { char pad0[0xE4]; int fClosed; int ccv; float *mpicvu; };
+struct CRV { u8 unknown_0x0[0xE4]; int fClosed; int ccv; float *mpicvu; };
 struct CRVMC { CRV *pcrv; CONSTR *pconstr; int pad[2]; QW pos; };
 extern "C" float GMeasureCrvU(CRVMC *, float);
 extern "C" float UWrapCrv(CRV *, float);

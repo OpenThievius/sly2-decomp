@@ -8,8 +8,8 @@ extern float g_2c1f78[];
 extern float g_2c1f80[];
 extern float g_2bbb60[];
 }
-struct EMITB { char pad[0xF0]; float vx, vy, vz; };
-struct SHRAPNEL { char pad0[0x18]; float lifetime; char pad1[0x90 - 0x1C]; QW velocity; char pad2[0xD0 - 0xA0]; float spin[3]; char pad3[0xF0 - 0xDC]; float vx, vy, vz; };
+struct EMITB { u8 unknown_0x0[0xF0]; float vx, vy, vz; };
+struct SHRAPNEL { u8 unknown_0x0[0x18]; float lifetime; u8 unknown_0x1C[0x74]; QW velocity; u8 unknown_0xA0[0x30]; float spin[3]; u8 unknown_0xDC[0x14]; float vx, vy, vz; };
 
 void PostShrapnelEmit(SHRAPNEL *shrapnel, EMITB *emit)
 {

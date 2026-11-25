@@ -1,25 +1,25 @@
+#include "types.h"
+#include "cmpeg.h"
 // SPDX-License-Identifier: GPL-3.0-or-later
-struct GIFS { char pad[0x30]; };
-struct QW;
+struct GIFS { u8 unknown_0x0[0x30]; };
 struct CFont;
 struct RGBA {
     unsigned char r, g, b, a;
     RGBA() {}
     RGBA(unsigned int rgba) { *(unsigned int *)this = rgba; }
 };
-struct CRichText { char pad[0x170]; };
+struct CRichText { u8 unknown_0x0[0x170]; };
 struct CTextBox;
 struct SUBTITLE { int unk0; int istring; };
-struct CMpeg { char pad0[0x104]; SUBTITLE *psubtitle; char pad108[0x110 - 0x108]; int ibDma; char pad114[0x118 - 0x114]; int uFrame; int vFrame; };
 extern "C" {
 GIFS *__4GIFS(GIFS *);
 void AllocStatic__4DMASiP2QW(GIFS *, int, QW *);
 void AddDmaCnt__4DMAS(GIFS *);
 void AddDmaEnd__4DMAS(GIFS *);
 void Detach__4DMASPiPP2QW(GIFS *, int *, QW **);
-void AddPrimPack__4GIFSiiUl(GIFS *, int, int, unsigned long);
+void AddPrimPack__4GIFSiiUl(GIFS *, int, int, u64);
 void AddPrimEnd__4GIFS(GIFS *);
-void PackAD__4GIFSll(GIFS *, long, long);
+void PackAD__4GIFSll(GIFS *, s64, s64);
 void PackUV__4GIFSii(GIFS *, int, int);
 void PackXYZF__4GIFSiiii(GIFS *, int, int, int, int);
 void PushScaling__5CFontff(CFont *, float, float);
@@ -74,7 +74,7 @@ void DrawMpegFrame(CMpeg *self)
 {
     GIFS gifs;
     __4GIFS(&gifs);
-    AllocStatic__4DMASiP2QW(&gifs, 0x200, (QW *)(self->ibDma + 0x41BC00));
+    AllocStatic__4DMASiP2QW(&gifs, 0x200, (QW *)((sptr)self->pbBuffer + 0x41BC00));
     AddDmaCnt__4DMAS(&gifs);
     AddPrimPack__4GIFSiiUl(&gifs, 6, 1, 0xE);
     PackAD__4GIFSll(&gifs, 6, ((0xAA80L << 18) | 0xC600) << 2);
@@ -93,7 +93,7 @@ void DrawMpegFrame(CMpeg *self)
     AddDmaEnd__4DMAS(&gifs);
     Detach__4DMASPiPP2QW(&gifs, 0, 0);
     if (self->psubtitle != 0) {
-        AllocStatic__4DMASiP2QW(&gifs, 0x200, (QW *)(self->ibDma + 0x41DC00));
+        AllocStatic__4DMASiP2QW(&gifs, 0x200, (QW *)((sptr)self->pbBuffer + 0x41DC00));
         AddDmaCnt__4DMAS(&gifs);
         PushScaling__5CFontff(B_002DE760, 0.8f, 0.8f);
         CRichText richText;

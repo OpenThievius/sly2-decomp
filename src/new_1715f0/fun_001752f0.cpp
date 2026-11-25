@@ -1,11 +1,12 @@
+#include "types.h"
 // SPDX-License-Identifier: GPL-3.0-or-later
-struct ANIM { char pad[8]; void *ptarget; };
+struct ANIM { u8 unknown_0x0[8]; void *ptarget; };
 #include "stepguard.h"
 #include "goal.h"
 struct GOAL_1752F0 : GOAL {
-    char pad_30[0x10];
+    u8 unknown_0x30[0x10];
     ANIM *panim;
-    char pad_44[0xC];
+    u8 unknown_0x44[0xC];
     int field_50;
 };
 extern "C" int GoalAnim_FHandleMessage(GOAL_1752F0 *, int, int *);

@@ -1,7 +1,7 @@
 #include "sly2.h"
-struct GIFS { char pad[0x30]; };
+struct GIFS { u8 unknown_0x0[0x30]; };
 struct SFRAME { int a; QW *pqw; int pad[2]; };
-struct Shd { char p0[0x14]; long *ptex0; };
+struct Shd { char p0[0x14]; s64 *ptex0; };
 struct Chr { char p0[4]; int kind; char p1[0x10 - 8]; int oid; char p2[0x1C - 0x14]; int slot; int slotCopy; };
 struct Blot { char p0[0xC4]; void *pheap; };
 extern "C" void CStackFrame_Construct(SFRAME *);
@@ -9,8 +9,8 @@ extern "C" void CStackFrame_Destructor(SFRAME *, int);
 extern "C" Shd *PshdframesFromOid(int);
 extern "C" void __4GIFS(GIFS *);
 extern "C" void AllocStack__4DMASi(GIFS *, int);
-extern "C" void AddPrimPack__4GIFSiiUl(GIFS *, int, int, unsigned long);
-extern "C" void PackAD__4GIFSll(GIFS *, long, long);
+extern "C" void AddPrimPack__4GIFSiiUl(GIFS *, int, int, u64);
+extern "C" void PackAD__4GIFSll(GIFS *, s64, s64);
 extern "C" void AddPrimEnd__4GIFS(GIFS *);
 extern "C" void DMAS_DetachCopy(GIFS *, void *, int *, int, int *);
 void func_002155C0(Blot *pblot, Chr *pchr)

@@ -1,11 +1,11 @@
-struct Sly_189488 { char pad[0x18C8]; int state; };
+#include "sly.h"
 extern "C" {
 int func_001409B8();
-int GetSlyExposeMode(Sly_189488 *self) {
+int GetSlyExposeMode(SLY *self) {
     int result;
     int mode = func_001409B8();
     if (mode == -1) {
-        int state = self->state;
+        int state = self->jts;
         if (state < 7) {
             if (state < 5 && state != 1)
                 { result = -1; goto done; }

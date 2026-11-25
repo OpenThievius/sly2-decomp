@@ -93,12 +93,12 @@ struct LO : BASIC {
     virtual void Slot37(void *pmat);    /* 37: func_001A6450, func_001F4010 (SO); InstantiateClone passes the clone's matrix */
     virtual void SetPosMatFromLo(struct LO *plo);     /* 38: SetLoPosMatFromLo */
     virtual void SetPosMatFromXf();     /* 39: SetLoPosMatFromXf */
-    virtual void CloneVirtual();        /* 40: CloneLoVirtual */
+    virtual void CloneVirtual(struct LO *ploSource); /* 40: CloneLoVirtual; PloCloneLo passes the object it clones (signature from that caller) */
     virtual void Slot41(struct SO *psoSource); /* 41: CloneAloHierarchy passes the source object (an SO) */
     virtual void Slot42(float value);   /* 42: func_001F3118 (SO) stores it in field_0x38 and passes it to each child's slot 42 */
     virtual unsigned FReturnFalse(int ipart); /* 43: FReturnFalseLo; func_00130010 passes a part index and keeps the unsigned the ALO override returns */
     virtual void Slot44(int ipart);     /* 44: ApplyAseg calls it on each part's object with the part index */
-    virtual void Slot45();
+    virtual void Slot45(int ipart);     /* 45: RetractAsega calls it on each part link's object with the part index (the same word ApplyAseg passed to slot 44) */
     virtual void Slot46();
     virtual void SetGrfField(u32 grf);  /* 47: SetLoGrfField; func_001F2FE0 passes a mask to each child */
     virtual void ClearGrfField(u32 grf); /* 48: ClearLoGrfField; func_001F3078 passes a mask to each child */

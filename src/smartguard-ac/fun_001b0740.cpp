@@ -5,10 +5,7 @@ extern char D_002C01D0;
 extern char D_002C01F0;
 extern char D_002C0210;
 
-struct MENUITEM {
-    char pad[0x1C];
-    unsigned grf;
-};
+#include "pausemenu.h"
 
 extern "C" {
 void bevy_camera_follow_activity(void *, int, int);
@@ -17,7 +14,7 @@ int CidGetBasic(void *);
 void PauseMenu_Push(void *, int, int, int, void *);
 }
 
-void func_001B0740(MENUITEM *pitem)
+void func_001B0740(PAUSEITEM *pitem)
 {
     bevy_camera_follow_activity(&B_002DEB30, 0x29, 0);
     void *ppoFocus = PpoSwFocusBase(&B_003DD490);

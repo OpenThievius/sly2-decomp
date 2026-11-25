@@ -6,51 +6,42 @@
 #include "m2c_macros.h"
 #include "include_asm.h"
 
+#include "rumble.h"
+
+/* a rumble pattern: the number of steps, the two actuator bytes SetRumbleRums sends, the step time */
+struct RUMPAT {
+    s32 count;
+    char actuator0;
+    char actuator1;
+    u8 unknown_0x6[0x2];
+    f32 dtStep;
+};
+
+enum RUMS { RUMS_OFF, RUMS_ACTUATE = 2 };
+void SetRumbleRums(RUMBLE *, RUMS);
+
 extern "C" {
-typedef struct RUMPAT {
-    s32 field_0x0;
-    char pad0[4];
-    f32 field_0x8;
-} RUMPAT;
-
-typedef struct RUMBLE {
-    char pad0[8];
-    s32 field_0x8;
-    RUMPAT *field_0xC;
-    s32 field_0x10;
-    f32 field_0x14;
-    f32 field_0x18;
-} RUMBLE;
-
-s32 SetRumbleRums__FP6RUMBLE4RUMS(RUMBLE *, s32);
-
 s32 func_001D55B8();
 
 void TriggerRumbleRumpat__FP6RUMBLEP6RUMPATf(RUMBLE *arg0, RUMPAT *arg1, f32 fparg0) {
-    if ((arg0->field_0x8 != 0) && (arg1->field_0x0 > 0) && (func_001D55B8() != 0)) {
-        arg0->field_0x14 = fparg0;
-        arg0->field_0xC = arg1;
-        arg0->field_0x10 = 0;
-        arg0->field_0x18 = arg1->field_0x8;
-        arg0->field_0x8 = -1;
-        SetRumbleRums__FP6RUMBLE4RUMS(arg0, 2);
+    if ((arg0->rums != 0) && (arg1->count > 0) && (func_001D55B8() != 0)) {
+        arg0->dtRumble = fparg0;
+        arg0->prumpat = arg1;
+        arg0->irumins = 0;
+        arg0->dtRumins = arg1->dtStep;
+        arg0->rums = -1;
+        SetRumbleRums(arg0, RUMS_ACTUATE);
     }
 }
 }
-
-enum RUMS { RUMS_OFF };
-
-struct RUMPAT_1D53C0 { int count; char b0; char b1; };
-
-struct RUMBLE_1D53C0 { int port; int slot; int rums; RUMPAT_1D53C0 *pattern; char pad[8]; float settle; };
 
 extern float g_2ddf10;
 
 extern "C" int scePadSetActDirect(int, int, char *);
 
-void StopRumbleActuators(RUMBLE_1D53C0 *);
+void StopRumbleActuators(RUMBLE *);
 
-void SetRumbleRums(RUMBLE_1D53C0 *rumble, RUMS rums)
+void SetRumbleRums(RUMBLE *rumble, RUMS rums)
 {
     if (rums == rumble->rums)
         return;
@@ -60,27 +51,27 @@ void SetRumbleRums(RUMBLE_1D53C0 *rumble, RUMS rums)
         break;
     case 2: {
         char actuators[2];
-        RUMPAT_1D53C0 *pattern = rumble->pattern;
-        actuators[0] = pattern->b0;
-        actuators[1] = pattern->b1;
-        scePadSetActDirect(rumble->port, rumble->slot, actuators);
+        RUMPAT *pattern = rumble->prumpat;
+        actuators[0] = pattern->actuator0;
+        actuators[1] = pattern->actuator1;
+        scePadSetActDirect(rumble->nPort, rumble->nSlot, actuators);
         break;
     }
     case 3:
     case 4:
         StopRumbleActuators(rumble);
-        rumble->settle = g_2ddf10 * 4.0f;
+        rumble->dtRumins = g_2ddf10 * 4.0f;
         break;
     }
     rumble->rums = rums;
 }
 
-extern "C" void StopRumbleActuators__FP6RUMBLE(int *rumble)
+void StopRumbleActuators(RUMBLE *rumble)
 {
     char actuators[2];
     actuators[0] = 0;
     actuators[1] = 0;
-    scePadSetActDirect(rumble[0], rumble[1], actuators);
+    scePadSetActDirect(rumble->nPort, rumble->nSlot, actuators);
 }
 
 extern "C" {

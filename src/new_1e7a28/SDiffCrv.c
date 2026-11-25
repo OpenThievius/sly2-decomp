@@ -1,9 +1,9 @@
-struct Curve { char pad0[0xE4]; int wraps; };
+#include "crv.h"
 float SMaxCrv();
-float SDiffCrv(struct Curve *curve, float from, float to) {
+float SDiffCrv(struct CRV *curve, float from, float to) {
     float difference = to - from;
     float maximum;
-    if (curve->wraps != 0) {
+    if (curve->closed != 0) {
         maximum = SMaxCrv();
         if ((maximum * 0.5f) < difference) {
             difference -= maximum;

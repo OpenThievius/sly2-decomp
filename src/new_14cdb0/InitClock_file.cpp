@@ -35,25 +35,25 @@ struct CLOCK {
     float scaleC;  // C
     float d10;     // 10
     float t14;     // 14
-    char pad18[0x24 - 0x18];
+    u8 unknown_0x18[0x24 - 0x18];
     float scale24; // 24
-    char pad28[0x3C - 0x28];
+    u8 unknown_0x28[0x3C - 0x28];
     float t3C;     // 3C
     float d40;     // 40
-    char pad44[4];
-    unsigned long ticks; // 48
+    u8 unknown_0x44[4];
+    u64 ticks; // 48
 };
 
 extern "C" char B_002DEB30;
 
-extern "C" unsigned long TickReadCount(void);
+extern "C" u64 TickReadCount(void);
 
 extern "C" void UpdatePlayTime(void *);
 
 void MarkClockTick__FP5CLOCK(CLOCK *clock, int realOnly)
 {
-    unsigned long now = TickReadCount();
-    unsigned long diff = now - clock->ticks;
+    u64 now = TickReadCount();
+    u64 diff = now - clock->ticks;
     float seconds = (float)diff * 3.390842e-9f;
     float hi = 0.033333335f;
     float dt;
@@ -88,10 +88,10 @@ extern "C" void SetClockRate(float *clocks, int index, float rate)
 
 extern "C" {
 struct CLOCK_14D1F8 {
-    char pad[8];
+    u8 unknown_0x0[8];
     f32 rate;
     f32 rateCopy;
-    char pad2[8];
+    u8 unknown_0x10[8];
     f32 arate[9];
 };
 

@@ -1,5 +1,6 @@
-struct ZPR { char pad[0x630]; };
-struct FONT { char pad[0x140]; };
+#include "types.h"
+struct ZPR { u8 unknown_0x0[0x630]; };
+struct FONT { u8 unknown_0x0[0x140]; };
 extern "C" void InitZpr__FP3ZPR3ZPKP2LO(ZPR *, int, int);
 extern "C" void func_0015F710(FONT *, int, ZPR *);
 extern "C" FONT B_002DE770[];

@@ -1,7 +1,5 @@
 #include "sly2.h"
-struct TASK;
-struct JOB { char pad0[0xF0]; int cause; int causeArg; };
-struct TASK { char pad0[0x54]; int state; char pad1[0x24]; JOB *job; char pad2[0x74]; int cause; int causeArg; };
+#include "job.h"
 struct CAUSESCOPE {
     JOB *job;
     TASK *task;

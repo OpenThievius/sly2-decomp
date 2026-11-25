@@ -103,7 +103,7 @@ void AddSwFocusFollower_thunk(s32 arg0) {
 }
 }
 
-struct UL_159500 { unsigned long v; } __attribute__((packed));
+struct UL_159500 { u64 v; } __attribute__((packed));
 
 struct Bytes8_159500 { char b[8]; };
 
@@ -153,7 +153,7 @@ extern "C" char B_003DD490_159500[];
 
 extern "C" void BindEmitter(EMITTER_159500 *);
 
-extern "C" void QueueSwCallback(char *, EMITTER_159500 *, unsigned long, int);
+extern "C" void QueueSwCallback(char *, EMITTER_159500 *, u64, int);
 
 extern "C" float GRandInRange(float, float);
 
@@ -275,12 +275,12 @@ extern "C" void CEmitter_PostLoad(EMITTER_159500 *pemitter)
 
 extern "C" {
 typedef struct EmitterBlock {
-    char pad_0x0[8];
+    u8 unknown_0x0[8];
     s32 *field_0x8;
 } EmitterBlock;
 
 typedef struct EMITTER_159968 {
-    char pad_0x0[0xE4];
+    u8 unknown_0x0[0xE4];
     EmitterBlock *field_0xE4;
 } EMITTER_159968;
 
@@ -316,7 +316,7 @@ void HandleEmitterMessage(EMITTER_1599A8 *pemitter, int msgid, void *pv) {
 
 extern "C" {
 typedef struct EMITTER_159A08 {
-    char pad_0x0[0xE0];
+    u8 unknown_0x0[0xE0];
     s32 field_0xE0;
 } EMITTER_159A08;
 
@@ -626,7 +626,7 @@ LActive:
 
 extern "C" {
 typedef struct EMITTER_15A138 {
-    char pad_0x0[0x148];
+    u8 unknown_0x0[0x148];
     f32 field_0x148;
 } EMITTER_15A138;
 
@@ -645,7 +645,7 @@ void PauseEmitterIndefinite__FP7EMITTER(EMITTER_15A138 *emitter) {
 
 extern "C" {
 typedef struct EMITTER_15A160 {
-    char pad_0x0[0x148];
+    u8 unknown_0x0[0x148];
     f32 field_0x148;
 } EMITTER_15A160;
 
@@ -677,17 +677,17 @@ extern "C" int FPausedEmitter__FP7EMITTER(EMITTER_15A170 *emitter) {
 
 extern "C" {
 typedef struct EMITTER_15A1C0 {
-    char pad_0x0[0xE0];
+    u8 unknown_0x0[0xE0];
     s32 field_0xE0;
     s32 field_0xE4;
-    char pad_0xE8[8];
+    u8 unknown_0xE8[8];
     s32 field_0xF0;
-    char pad_0xF4[4];
+    u8 unknown_0xF4[4];
     f32 field_0xF8;
     f32 field_0xFC;
-    char pad_0x100[0x30];
+    u8 unknown_0x100[0x30];
     f32 field_0x130;
-    char pad_0x134[0x14];
+    u8 unknown_0x134[0x14];
     s32 field_0x148;
     s32 field_0x14C;
     s32 field_0x150;
@@ -725,9 +725,9 @@ void OnEmitterValuesChanged__FP7EMITTER(EMITTER_15A1C0 *emitter) {
 }
 
 struct EMITTER_15A240 {
-    char pad_0x0[0xE0];
+    u8 unknown_0x0[0xE0];
     s32 field_0xE0;
-    char pad_0xE4[0xC];
+    u8 unknown_0xE4[0xC];
     s32 field_0xF0;
     s32 field_0xF4;
 };
@@ -759,9 +759,9 @@ extern "C" void SetEmitterEnabled__FP7EMITTERi(EMITTER_15A240 *emitter, s32 enab
 
 extern "C" {
 typedef struct EMITTER_15A2B0 {
-    char pad_0x0[0xE0];
+    u8 unknown_0x0[0xE0];
     s32 field_0xE0;
-    char pad_0xE4[0x30];
+    u8 unknown_0xE4[0x30];
     s32 field_0x114;
 } EMITTER_15A2B0;
 
@@ -782,7 +782,7 @@ struct XFN { u8 unknown_0x0[0x40]; M4 world; };
 
 struct SUB { int a, b, kind; };
 
-struct EMITO { char pad[8]; LO **pref; char pad2[4]; SUB sub; };
+struct EMITO { u8 unknown_0x0[8]; LO **pref; u8 unknown_0xC[4]; SUB sub; };
 
 struct EMITO;
 
@@ -879,19 +879,19 @@ struct MAT3_15B1B0 { QW r0, r1, r2; };
 
 struct LO_15B1B0;
 
-struct EMITREF_15B1B0 { LO_15B1B0 *plo; int pad4; int unk8; int padC; int unk10; };
+struct EMITREF_15B1B0 { LO_15B1B0 *plo; u8 unknown_0x4[4]; int unk8; u8 unknown_0xC[4]; int unk10; };
 
-struct EMITB_15B1B0 { int unk0; int emitpk; EMITREF_15B1B0 *pemitref; char pad0[0xB0 - 0xC]; QW vec; int ript; int ripgt; char pad1[0xD8 - 0xC8]; float gMin; float gMax; char pad2[0xE4 - 0xE0]; float fE4; float fE8; };
+struct EMITB_15B1B0 { int unk0; int emitpk; EMITREF_15B1B0 *pemitref; u8 unknown_0xC[0xB0 - 0xC]; QW vec; int ript; int ripgt; u8 unknown_0xC8[0xD8 - 0xC8]; float gMin; float gMax; u8 unknown_0xE0[0xE4 - 0xE0]; float fE4; float fE8; };
 
 struct RIPG_15B1B0;
 
 struct EMITG { int unk0; RIPG_15B1B0 **ppripg; LO_15B1B0 *plo; };
 
-struct EMITDV_15B1B0 { char pad[1]; };
+struct EMITDV_15B1B0 { u8 unknown_0x0[1]; };
 
 struct RIP_15B1B0 {
-    char pad0[0x14]; float tc; float td; int unk1C; char pad1[0x24 - 0x20]; float fE4; float fE8; char pad2[0x30 - 0x2C];
-    QW vec; MAT3_15B1B0 mat; char pad3[0x90 - 0x70]; QW v; EMITDV_15B1B0 emitdv[0x4C];
+    u8 unknown_0x0[0x14]; float tc; float td; int unk1C; u8 unknown_0x20[0x24 - 0x20]; float fE4; float fE8; u8 unknown_0x2C[0x30 - 0x2C];
+    QW vec; MAT3_15B1B0 mat; u8 unknown_0x70[0x90 - 0x70]; QW v; EMITDV_15B1B0 emitdv[0x4C];
     // vtable at 0xEC (rip.h's RIP): slot 1 starts the particle, slot 2 hands it the emit block
     virtual void Init(QW pos, float scale, int field);
     virtual void Post(EMITB_15B1B0 *pemitb);
@@ -904,7 +904,7 @@ struct RIPG_15B1B0 : SO {
     DL_15B1B0 dlRip;
 };
 
-struct SWX_15B1B0 { char pad[1]; };
+struct SWX_15B1B0 { u8 unknown_0x0[1]; };
 
 extern SWX_15B1B0 B_003DD490_15B1B0;
 
@@ -968,7 +968,7 @@ INCLUDE_ASM(0X15B7E8);
 
 INCLUDE_ASM(0X15B9F0);
 
-struct EMITB_15BD20 { int a0; int pk; char pad[0xC4 - 8]; int blipmk; };
+struct EMITB_15BD20 { int a0; int pk; u8 unknown_0x8[0xC4 - 8]; int blipmk; };
 
 struct EMITG;
 
@@ -989,7 +989,7 @@ void EmitBlips(EMITB_15BD20 *, EMITG *, int, VECTOR *, VECTOR *, float *, float 
 void EmitParticles(int count, EMITB_15BD20 *pemitb, EMITG *pemitg)
 {
     if (count == 0) return;
-    struct L { EMITGEN gen; char pad[0x20 - sizeof(EMITGEN)]; char frame[0x10]; EMITGEN target; } l;
+    struct L { EMITGEN gen; u8 unknown_0x14[0x20 - sizeof(EMITGEN)]; char frame[0x10]; EMITGEN target; } l;
     CStackFrame_Construct(l.frame);
     l.gen.fconv = 1;
     OriginateParticles(count, pemitb, &l.gen);
@@ -1017,7 +1017,7 @@ struct EMITB_15BE28 {
     int unk0;
     int emitpk;
     int pemitref;
-    char pad0[0x24];
+    u8 unknown_0xC[0x24];
     QW pos;
     QW vec;
     EMITV emitv;
@@ -1051,15 +1051,17 @@ INCLUDE_ASM(0X15BF40);
 
 INCLUDE_ASM(0X15BFD8);
 
-struct EXPL_VT_15C150 { char pad[0x19C]; void (*fn)(char *, char *); };
+struct EXPL_VT_15C150 { u8 unknown_0x0[0x19C]; void (*fn)(char *, char *); };
 
-struct EXPL_OBJ_15C150 { char pad[0x198]; short offset; };
+struct EXPL_OBJ_15C150 { u8 unknown_0x0[0x198]; short offset; };
+
+struct EXPL_15C150 { u8 unknown_0x0[0xC]; char *vtable; };
 
 void ExplodeExpl(char *arg0)
 {
     char sp[0x40];
     memset(sp, 0, 0x40);
-    char *obj = *(char **)(arg0 + 0xC);
+    char *obj = ((EXPL_15C150 *)arg0)->vtable;
     ((EXPL_VT_15C150 *)obj)->fn(arg0 + ((EXPL_OBJ_15C150 *)obj)->offset, sp);
 }
 
@@ -1075,9 +1077,9 @@ struct EXPLP_15C198 {
     QW unk0x30;
 };
 
-struct VTable_15C198 { char pad[0x198]; short delta; short index; void (*fn)(void *, EXPLP_15C198 *); };
+struct VTable_15C198 { u8 unknown_0x0[0x198]; short delta; short index; void (*fn)(void *, EXPLP_15C198 *); };
 
-struct EXPL_15C198 { char pad[0xC]; VTable_15C198 *vtable; };
+struct EXPL_15C198 { u8 unknown_0x0[0xC]; VTable_15C198 *vtable; };
 
 extern "C" void ExplodeExplParams__FP4EXPLUiP3ALOP6VECTORT3ff(EXPL_15C198 *pexpl, unsigned grfexpl, ALO_15C198 *palo,
                                                                QW pos, QW normal, float r1, float r2)
@@ -1099,7 +1101,7 @@ void ExplodeExplExplso(void) {
 }
 }
 
-struct EXPLG { char pad[0xE0]; int cexpl; LO **apexpl; };
+struct EXPLG { u8 unknown_0x0[0xE0]; int cexpl; LO **apexpl; };
 
 struct PLOARRAY { int a; int b; int cplo; LO **aplo; };
 
@@ -1144,7 +1146,7 @@ void LoadExplgFromBrx(EXPLG *pexplg, void *pbis)
 
 extern "C" {
 typedef struct EMITTER_15C310 {
-    char pad_0x0[0xE0];
+    u8 unknown_0x0[0xE0];
     s32 field_0xE0;
     s32 field_0xE4;
 } EMITTER_15C310;
@@ -1155,9 +1157,9 @@ s32 func_0015C310(EMITTER_15C310 *emitter, s32 *out) {
 }
 }
 
-struct LO_15C320 { char pad0[0x10]; void *parent; };
+struct LO_15C320 { u8 unknown_0x0[0x10]; void *parent; };
 
-struct EXPLG_15C320 { char pad0[0x10]; void *parent; char pad[0xCC]; int cexpl; LO_15C320 **apexpl; };
+struct EXPLG_15C320 { u8 unknown_0x0[0x10]; void *parent; u8 unknown_0x14[0xCC]; int cexpl; LO_15C320 **apexpl; };
 
 extern "C" void CloneXfm(EXPLG_15C320 *, EXPLG_15C320 *);
 
@@ -1202,9 +1204,9 @@ extern "C" void HandleExplsMessage(EXPLS_15C5C8 *pexpls, s32 msgid, s32 pv) {
     }
 }
 
-struct VTable { char pad[0x1A0]; short delta; short index; void (*fn)(void *, int); };
+struct VTable { u8 unknown_0x0[0x1A0]; short delta; short index; void (*fn)(void *, int); };
 
-struct Object { char pad[0xC]; VTable *vtable; };
+struct Object { u8 unknown_0x0[0xC]; VTable *vtable; };
 
 extern "C" void ExplodeExplsExplso(Object *self, int arg)
 {
@@ -1214,7 +1216,7 @@ extern "C" void ExplodeExplsExplso(Object *self, int arg)
 
 extern "C" {
 typedef struct PSFX {
-    char pad_0x0[0xF0];
+    u8 unknown_0x0[0xF0];
     s32 field_0xF0;
 } PSFX;
 
@@ -1250,7 +1252,7 @@ struct M3 { QW row[3]; };
 struct XFR { QW pos; M3 mat; };
 
 /* the object an emitter follows: its +0xF4 points at a position (case 2 of EMITB::emitk) */
-struct EMITOBJ { char pad[0xF4]; QW *ppos; };
+struct EMITOBJ { u8 unknown_0x0[0xF4]; QW *ppos; };
 
 struct EMITO_15C690 { void *palo; EMITOBJ *pobj; int unknown8; int unknownC; int unknown10; };
 
@@ -1280,9 +1282,9 @@ struct AMB;
 struct AMBDESC { int sfx; LM_15C690 lmRange; float uVolume; float uPitch; };
 
 struct EXPLS {
-    char pad[0xE4];
+    u8 unknown_0x0[0xE4];
     EMITB_15C690 *pemitb;
-    char padE8[0xF0 - 0xE8];
+    u8 unknown_0xE8[0xF0 - 0xE8];
     AMBDESC *pambdesc;
     LM_15C690 lmcParticle;
     int fEmitg;

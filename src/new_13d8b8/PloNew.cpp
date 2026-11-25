@@ -1,20 +1,20 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
 #include "lo.h"
-struct CLASSREC { char pad[0x10]; LO *(*pfnCreate)(); };
-struct SWLOG { char pad[0x39E4]; LO **plog; };
-extern "C" CLASSREC D_002BAAE8[];
-extern "C" SWLOG B_003DD490;
-extern "C" void *PframeFromSpliceBlock(SWLOG *, int, LO *);
+#include "sw.h"
+#include "classinfo.h"
+extern "C" CLASSINFO D_002BAAE8[];
+extern "C" SW B_003DD490;
+extern "C" void *PframeFromSpliceBlock(SW *, int, LO *);
 extern "C" void CFramePtr_Assign(LO *, void *);
-extern "C" void *PdlFromSwOid(SWLOG *, int);
-extern "C" void *PdlFromSwCid(SWLOG *, int);
+extern "C" void *PdlFromSwOid(SW *, int);
+extern "C" void *PdlFromSwCid(SW *, int);
 extern "C" void AppendSlEntry(void *, LO *);
 extern "C" int FIsLoInWorld(LO *);
 
 extern "C" LO *PloNew(int cid, SO *paloParent, int oid, int isplice)
 {
-    LO *plo = D_002BAAE8[cid].pfnCreate();
+    LO *plo = (LO *)D_002BAAE8[cid].pfnCreate();
     plo->psoParent = paloParent;
     plo->oid = oid;
     CFramePtr_Assign(plo, PframeFromSpliceBlock(&B_003DD490, isplice, plo));
@@ -25,10 +25,10 @@ extern "C" LO *PloNew(int cid, SO *paloParent, int oid, int isplice)
         plo->AddHierarchy();
     if (FIsLoInWorld(plo) != 0)
         plo->Slot23();
-    LO **plog = B_003DD490.plog;
+    LO **plog = B_003DD490.pploPostLoadEnd;
     if (plog != 0) {
         *plog = plo;
-        B_003DD490.plog = plog + 1;
+        B_003DD490.pploPostLoadEnd = plog + 1;
     }
     return plo;
 }

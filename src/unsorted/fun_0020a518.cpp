@@ -1,5 +1,6 @@
+#include "types.h"
 struct Owner {
-    char pad0[0xE94];
+    u8 unknown_0x0[0xE94];
     unsigned count;
     int items[8];
 };

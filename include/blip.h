@@ -10,7 +10,15 @@ struct BLIPG : LO {
     /* 0xE0 */ LO *ploSource;   /* SubscribeBlipgObject: the subscribed object */
     u8 unknown_0xE4[0x7C];
     /* 0x160 */ s32 mode;       /* PblipNew: a blip of a group in mode 2 gets sprite data */
-    u8 unknown_0x164[0x2E4];
+    u8 unknown_0x164[0x3C];
+    /* 0x1A0 */ s32 cqwTexture; /* PropagateBlipgShader: the quadwords of the texture packets, a power of two up to 16; reader: PropagateBlipgShader (a BLIPG method, guess) */
+    u8 unknown_0x1A4[0xC];
+    /* 0x1B0 */ QW aqw[0x20];   /* PropagateBlipgShader fills one 16-byte packet per shader frame (duplicated up to cqwTexture) */
+    /* 0x3B0 */ s32 hasColor;   /* PropagateBlipgShader: set once the colour is taken from the shader */
+    /* 0x3B4 */ u8 color[4];    /* PropagateBlipgShader: half the shader's colour, rounded up */
+    u8 unknown_0x3B8[0x80];
+    /* 0x438 */ void *pgifs;    /* PropagateBlipgShader: the shader's GIF packet template, picked by the shader's flag 1 */
+    u8 unknown_0x43C[0xC];
     /* 0x448 */ DL dlBlips;     /* InitBlipg: InitDl with ibDle 0x1090; PblipNew appends, RemoveBlip, OnBlipgRemove */
     u8 unknown_0x454[0xC];
 };

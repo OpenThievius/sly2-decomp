@@ -1,5 +1,6 @@
+#include "types.h"
 // SPDX-License-Identifier: GPL-3.0-or-later
-struct CMovieText { int unk0; int unk4; void *pfont; char pad[0x88 - 0xC]; float scale; };
+struct CMovieText { int unk0; int unk4; void *pfont; u8 unknown_0xC[0x7C]; float scale; };
 extern "C" void CMovieText_Reset(CMovieText *, int);
 extern "C" int CMovieText_ChNext(CMovieText *);
 extern "C" float DxFromFontCh(void *, int);

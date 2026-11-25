@@ -1,10 +1,10 @@
 #include "sly2.h"
-struct TFT { char pad[0x20]; int size; char pad24[8]; unsigned char chConv; };
+#include "tft.h"
 
-int FNegTftUl__FP3TFTP2UL(TFT *t, unsigned long *pul)
+int FNegTftUl__FP3TFTP2UL(TFT *t, u64 *pul)
 {
     int neg = 0;
-    switch (t->size) {
+    switch (t->cbArg) {
     case 0:
         ((int *)pul)[1] = 0;
         break;
@@ -14,8 +14,8 @@ int FNegTftUl__FP3TFTP2UL(TFT *t, unsigned long *pul)
     case 2:
         break;
     }
-    if (t->chConv == 'd' || t->chConv == 'i') {
-        switch (t->size) {
+    if (t->chType == 'd' || t->chType == 'i') {
+        switch (t->cbArg) {
         case 0: {
             int value = *(int *)pul;
             if (value < 0) {
@@ -33,9 +33,9 @@ int FNegTftUl__FP3TFTP2UL(TFT *t, unsigned long *pul)
             break;
         }
         case 2: {
-            long value = (long)*pul;
+            s64 value = (s64)*pul;
             if (value < 0) {
-                *pul = (unsigned long)-value;
+                *pul = (u64)-value;
                 neg = 1;
             }
             break;

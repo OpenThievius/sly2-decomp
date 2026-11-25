@@ -6,10 +6,10 @@
 #include "goal.h"
 struct SEARCHBEH : GOAL {
     int state;
-    char pad34[4];
+    u8 unknown_0x34[4];
     float tRetarget;
     float tSwitch;
-    char pad40[8];
+    u8 unknown_0x40[8];
     int fRequest;
 };
 struct TARGET {

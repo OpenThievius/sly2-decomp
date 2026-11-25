@@ -1,8 +1,9 @@
-struct Class_175820 { char pad[0x70]; long flags; };
-struct Obj_175820 { char pad[0xEC]; Class_175820 *cls; };
-struct Other_175820 { char pad4[4]; Obj_175820 *obj; };
-struct Arg1_175820 { char pad0[4]; Obj_175820 *obj; char pad8[8]; long flags; };
-struct Arg0_175820 { char pad[0x74]; int field; };
+#include "types.h"
+struct Class_175820 { u8 unknown_0x0[0x70]; s64 flags; };
+struct Obj_175820 { u8 unknown_0x0[0xEC]; Class_175820 *cls; };
+struct Other_175820 { u8 unknown_0x0[4]; Obj_175820 *obj; };
+struct Arg1_175820 { u8 unknown_0x0[4]; Obj_175820 *obj; u8 unknown_0x8[8]; s64 flags; };
+struct Arg0_175820 { u8 unknown_0x0[0x74]; int field; };
 extern "C" {
 int FIsBasicDerivedFrom(Obj_175820 *, int);
 int func_00175820(Arg0_175820 *self, Arg1_175820 *other) {

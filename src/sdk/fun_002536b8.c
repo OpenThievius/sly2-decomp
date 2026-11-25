@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "types.h"
 typedef struct {
     int base;
     int size;
@@ -12,40 +13,40 @@ typedef struct {
     int height;
     int mbWidth;
     int mbHeight;
-    char pad14[0x54];
+    u8 unknown_0x14[0x54];
 } FrameDesc;
 
 typedef struct {
-    char pad0[0x10C];
+    u8 unknown_0x0[0x10C];
     int buffer[3];
     WorkArea workArea;
-    char pad128[0xC];
+    u8 unknown_0x128[0xC];
     int width;
     int height;
     int mbWidth;
     int mbHeight;
-    char pad144[0x8];
+    u8 unknown_0x144[0x8];
     int field14C;
     int field150;
     int field154;
-    char pad158[0x2C];
+    u8 unknown_0x158[0x2C];
     int field184;
-    char pad188[0x4];
+    u8 unknown_0x188[0x4];
     int field18C;
-    char pad190[0x8];
+    u8 unknown_0x190[0x8];
     int field198;
-    char pad19C[0x5C];
+    u8 unknown_0x19C[0x5C];
     FrameDesc frame[9];
-    char pad5A0[0x2B8];
+    u8 unknown_0x5A0[0x2B8];
     int field858;
-    char pad85C[0x20];
+    u8 unknown_0x85C[0x20];
     int field87C;
 } MpegContext;
 
 typedef struct {
     int width;
     int height;
-    char pad8[0x38];
+    u8 unknown_0x8[0x38];
     MpegContext *context;
 } Mpeg;
 

@@ -1,4 +1,5 @@
-struct Blot { char pad0[0xB0]; int unk0xB0; };
+#include "types.h"
+struct Blot { u8 unknown_0x0[0xB0]; int unk0xB0; };
 extern "C" void InitLo(Blot *);
 void PromptBlot_Init(Blot *blot)
 {

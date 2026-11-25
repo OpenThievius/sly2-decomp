@@ -1,10 +1,10 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later */
 #include "sly2.h"
-struct CHAR { int pad0; int kind; char pad1[8]; int isprite; };
-struct SLOT { char pad0[0x10]; char pos[0x20]; CHAR *pchar; char pad1[0x58 - 0x34]; int iinst; char pad2[0x68 - 0x5C]; char sle[8]; };
+struct CHAR { int pad0; int kind; u8 unknown_0x8[0x8]; int isprite; };
+struct SLOT { u8 unknown_0x0[0x10]; char pos[0x20]; CHAR *pchar; u8 unknown_0x34[0x24]; int iinst; u8 unknown_0x5C[0xC]; char sle[8]; };
 struct INST { int cslot; SLOT *aslot; int pad[4]; };
-struct SPRITE { char pad0[8]; INST *ainst; char pad1[0x30 - 0xC]; };
-struct BLOT { char pad[0x84]; SPRITE *psprite; };
+struct SPRITE { u8 unknown_0x0[0x8]; INST *ainst; u8 unknown_0xC[0x24]; };
+struct BLOT { u8 unknown_0x0[0x84]; SPRITE *psprite; };
 extern "C" {
 void StopSpriteInstance(SPRITE *, int);
 void ClearSle(void *);

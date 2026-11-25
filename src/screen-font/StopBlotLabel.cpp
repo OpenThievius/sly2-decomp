@@ -2,11 +2,11 @@
 struct BLOT;
 struct VEnt { short delta; short idx; void (*fn)(void*, int, int, int, int, int); };
 struct VEnt2 { short delta; short idx; void (*fn)(void*, int); };
-struct VTab { char pad0[0x18]; VEnt e18; char pad1[0xA8 - 0x20]; VEnt2 eA8; };
+struct VTab { u8 unknown_0x0[0x18]; VEnt e18; u8 unknown_0x20[0x88]; VEnt2 eA8; };
 struct BLOT {
-    char pad0[0xC]; VTab* vt; char pad1[0x7C - 0x10];
+    u8 unknown_0x0[0xC]; VTab* vt; u8 unknown_0x10[0x6C];
     int unk7C; void* unk80; void* sprite84; int unk88;
-    char pad2[0xAC - 0x8C]; int modal;
+    u8 unknown_0x8C[0x20]; int modal;
 };
 extern "C" void StopRootSprite(void*);
 extern "C" void SetBlotModal(BLOT*, int);

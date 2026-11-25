@@ -1,16 +1,16 @@
 #include "types.h"
 struct V;
 struct VT {
-    char pad0[0x188];
+    u8 unknown_0x0[0x188];
     short delta188; short unused188; void (*fn18C)(void *, int);
     short delta190; short unused190; void (*fn194)(void *);
 };
-struct V { char pad0[0xC]; VT *vt; };
+struct V { u8 unknown_0x0[0xC]; VT *vt; };
 struct OBJ {
-    char pad0[0x40]; int tagged;
-    char pad1[0x68 - 0x44]; OBJ *owner;
-    char pad2[0x94 - 0x6C]; int cdeps; int *deps; char padA[4]; int cmembers; OBJ **members;
-    char pad3[0xB0 - 0xA8]; int seqA; int seqB; V *vB8; V *vBC; OBJ *pick; int state; float timer;
+    u8 unknown_0x0[0x40]; int tagged;
+    u8 unknown_0x44[0x68 - 0x44]; OBJ *owner;
+    u8 unknown_0x6C[0x94 - 0x6C]; int cdeps; int *deps; u8 unknown_0x9C[4]; int cmembers; OBJ **members;
+    u8 unknown_0xA8[0xB0 - 0xA8]; int seqA; int seqB; V *vB8; V *vBC; OBJ *pick; int state; float timer;
 };
 extern "C" {
 void ClearHandsOff(void *, int);

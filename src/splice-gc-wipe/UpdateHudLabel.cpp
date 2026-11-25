@@ -1,15 +1,5 @@
+#include "hudlabel.h"
 #include "sly2.h"
-struct BLOT { char pad0[0x58]; int stateBlot; };
-struct HUDLABEL {
-    char pad0[0x10];
-    int state;
-    float tState;
-    int unk0x18;
-    float tHold;
-    int labelNext;
-    int unk0x24;
-    BLOT *pblot;
-};
 extern "C" {
 void SetHudLabelState(HUDLABEL *, int);
 int FDrawBlotMovie(BLOT *);
@@ -26,7 +16,7 @@ void UpdateHudLabel(HUDLABEL *phudlabel)
     default:
         return;
     case 1:
-        if (phudlabel->pblot->stateBlot != 2)
+        if (phudlabel->pblot->blots != 2)
             return;
         SetHudLabelState(phudlabel, 2);
         return;
@@ -48,7 +38,7 @@ void UpdateHudLabel(HUDLABEL *phudlabel)
         }
         return;
     case 3:
-        if (phudlabel->pblot->stateBlot >= 2)
+        if (phudlabel->pblot->blots >= 2)
             return;
         SetHudLabelState(phudlabel, 0);
         return;

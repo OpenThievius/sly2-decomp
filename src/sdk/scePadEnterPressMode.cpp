@@ -1,4 +1,5 @@
-struct PadSlot_4505D0 { char pad0[0x10]; int opened; char pad14[0x8]; };
+#include "types.h"
+struct PadSlot_4505D0 { u8 unknown_0x0[0x10]; int opened; u8 unknown_0x14[0x8]; };
 struct PadPort_4505D0 { PadSlot_4505D0 slots[4]; };
 extern PadPort_4505D0 B_004505D0[];
 extern "C" {

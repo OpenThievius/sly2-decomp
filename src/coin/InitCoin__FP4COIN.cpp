@@ -1,5 +1,5 @@
 #include "sly2.h"
-struct COIN { char pad[0x1D0]; float f1D0, f1D4, f1D8, f1DC, f1E0, f1E4; char pad2[0x230 - 0x1E8]; float f230, f234; };
+struct COIN { u8 unknown_0x0[0x1D0]; float f1D0, f1D4, f1D8, f1DC, f1E0, f1E4; u8 unknown_0x1E8[0x48]; float f230, f234; };
 extern "C" void InitDprize(COIN *);
 extern "C" void InitCoin__FP4COIN(COIN *coin)
 {

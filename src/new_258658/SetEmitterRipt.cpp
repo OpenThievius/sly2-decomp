@@ -1,6 +1,7 @@
+#include "types.h"
 struct B8 { char b[8]; };
 struct B12 { B8 lo; int hi; };
-struct RIPT { int ript; char pad[0x2C]; B12 payload; };
+struct RIPT { int ript; u8 unknown_0x4[0x2C]; B12 payload; };
 extern "C" {
 RIPT *PemitripEnsureEmitter(void *, int);
 extern const B8 D_002BDE50;

@@ -11,7 +11,7 @@ extern "C" QW g_2a2dd0;
 #include "stepguard.h"
 #include "goal.h"
 struct GOAL_17A730 : GOAL {
-    char pad_30[0xC];
+    u8 unknown_0x30[0xC];
     void* hitter;
 };
 extern "C" void func_0017A730(GOAL_17A730* goal)

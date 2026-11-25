@@ -1,3 +1,4 @@
+#include "types.h"
 // SPDX-License-Identifier: GPL-3.0-or-later
 // The class declares Virtual0 itself (no inline body): it becomes the key function, so gcc leaves the vtable external instead of emitting its own copy.
 // new() factory: a 0x460-byte object with a vptr at +0xC; its constructor zeroes two words and runs an empty
@@ -14,7 +15,7 @@ struct CPrimary1110D8 {
     virtual void Virtual0();
 };
 struct CObject1110D8 : CPrimary1110D8 {
-    char pad[0x450];
+    u8 unknown_0x10[0x450];
     virtual void Virtual0();
     CObject1110D8()
     {

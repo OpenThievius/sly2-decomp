@@ -33,7 +33,7 @@ int func_001C4BD8(SW *psw, int cpmagnetMax, void **apmagnet)
             for (unsigned index = 0; index < 3 && cpmagnet < cpmagnetMax; index++) {
                 STEP *pstepOther = *D_002C0D28[index];
                 if (pstepOther != 0 && pstepOther != ppoFocus && GoalStack_PgoalFind(pstepOther->pgoalstack(), 0xC2) != 0) {
-                    unsigned long fBit = pstepOther->grfo >> 60 & 1;
+                    u64 fBit = pstepOther->grfo >> 60 & 1;
                     if (fBit) {
                         apmagnet[cpmagnet++] = &pstepOther->magnet;
                     }

@@ -1,5 +1,5 @@
-#include "sly2.h"
-struct BOMB { char pad0[0x40]; unsigned flags; char pad1[0x150 - 0x44]; int f150; float f154; float f158; float f15c; float f160; char pad2[0x1E0 - 0x164]; int f1E0; char pad3[8]; int f1EC; int f1F0; char pad4[0x200 - 0x1F4]; BOMB *self; };
+#include "bomb.h"
+#include "sw.h"
 extern "C" const float RO_002BC9C8;
 extern "C" void InitSo(BOMB *);
 extern "C" const float RO_002A4B08;
@@ -7,17 +7,17 @@ extern "C" const float RO_002A4B08;
 extern "C" void InitBomb(BOMB *pbomb)
 {
     InitSo(pbomb);
-    unsigned flags = pbomb->flags;
-    pbomb->f154 = RO_002A4B08;
-    pbomb->f15c = RO_002BC9C8;
-    pbomb->f160 = RO_002BC9C8;
-    pbomb->f1E0 = 1;
-    pbomb->f150 = 0;
-    pbomb->f1EC = 0x100;
-    pbomb->f1F0 = -10;
+    unsigned flags = pbomb->grfSw;
+    pbomb->tDetonate = RO_002A4B08;
+    pbomb->field_0x15C = RO_002BC9C8;
+    pbomb->field_0x160 = RO_002BC9C8;
+    pbomb->field_0x1E0 = 1;
+    pbomb->field_0x150 = 0;
+    pbomb->field_0x1EC = 0x100;
+    pbomb->field_0x1F0 = -10;
     if ((flags ^ 1) & 1)
-        *(unsigned *)flags |= 2;
+        pbomb->pgrfentry->grf |= 2;
     else
-        pbomb->flags = flags | 2;
-    pbomb->self = pbomb;
+        pbomb->grfSw = flags | 2;
+    pbomb->pbombOwner = pbomb;
 }

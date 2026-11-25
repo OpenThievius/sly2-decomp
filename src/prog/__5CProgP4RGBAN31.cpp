@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "types.h"
 #include "rgba.h"
 extern "C" {
 struct CPROG_1C8CC0 {
-    int field0; int field4; int field8; int fieldC; char byte10; char pad0[0x50 - 0x11];
+    int field0; int field4; int field8; int fieldC; char byte10; u8 unknown_0x11[0x50 - 0x11];
     int field50; RGBA color0; RGBA color1; RGBA color2; RGBA color3;
 };
 CPROG_1C8CC0 *__5CProgP4RGBAN31(CPROG_1C8CC0 *prog, const RGBA *rgba0, const RGBA *rgba1, const RGBA *rgba2, const RGBA *rgba3)

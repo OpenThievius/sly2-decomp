@@ -68,11 +68,11 @@ int FIgnoreBarrierIntersection(BARRIER *pbarrier, SO *psoOther)
     return result;
 }
 
-struct Continuation { long value; } __attribute__((packed));
+struct Continuation { s64 value; } __attribute__((packed));
 
 extern "C" s32 PrefFindBinding__6CFrameUii(s32, s32, s32);
 
-extern "C" void QueueSwCallbackOnce(s32 *, s32 *, long, s32);
+extern "C" void QueueSwCallbackOnce(s32 *, s32 *, s64, s32);
 
 extern "C" s32 func_001F4FB0();
 

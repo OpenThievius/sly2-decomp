@@ -1,13 +1,13 @@
 #include "sly2.h"
 #include "cref.h"
+#include "sw.h"
 struct GS;
 extern "C" {
 CRef RefSetGameSaveValue(void *path, const CRef &ref, GS *pgs);
 void PauseMenu_SetState(int, int);
 void ApplyOptionsFromSave(GS *);
 extern GS B_003D4A60;
-struct SWG { char pad[0x3B40]; void *pathA; void *pathB; };
-extern SWG B_003DD490;
+extern SW B_003DD490;
 extern void *B_003E0FC0, *B_003E0FC4, *B_003E0FC8, *B_003E0FCC, *B_003E0FD8, *B_003E0FDC, *B_003E0FE0;
 extern float B_003DD18C, B_003DD190;
 extern float RO_002F6468, RO_002F646C;
@@ -50,8 +50,8 @@ extern "C" void PauseMenu_ApplyOption(int menu, int *option)
         PauseMenu_SetState(menu, 9);
         break;
     case 0x3F:
-        SetSaveF32(B_003DD490.pathA, RO_002F6468 - 636.0f);
-        SetSaveF32(B_003DD490.pathB, RO_002F646C - 50.0f);
+        SetSaveF32(B_003DD490.psavepathDxScreenCenter, RO_002F6468 - 636.0f);
+        SetSaveF32(B_003DD490.psavepathDyScreenCenter, RO_002F646C - 50.0f);
         PauseMenu_SetState(menu, 9);
         break;
     case 0x4E:

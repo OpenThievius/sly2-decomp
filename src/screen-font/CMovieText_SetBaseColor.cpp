@@ -1,6 +1,7 @@
+#include "types.h"
 #include "rgba.h"
 extern "C" {
-struct MOVIETEXT_215D00 { char pad[0x14]; struct RGBA colorShadow; struct RGBA base; };
+struct MOVIETEXT_215D00 { u8 unknown_0x0[0x14]; struct RGBA colorShadow; struct RGBA base; };
 void CMovieText_UpdateFont(void *);
 
 void CMovieText_SetBaseColor(void *pThis, const void *pColor)

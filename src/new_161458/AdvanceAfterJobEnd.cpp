@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
 #include "lo.h"
-struct JOB { char pad[0xC0]; void *task; int pad2[2]; LO *warp; };
+struct JOB { u8 unknown_0x0[0xC0]; void *task; int pad2[2]; LO *warp; };
 struct BQ;
 extern BQ B_002E1E88;
 extern "C" int FBootQueueHasEntries(BQ *);

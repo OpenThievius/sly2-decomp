@@ -1,22 +1,22 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
 struct RIDER {
-    char pad[0x2C];
+    u8 unknown_0x0[0x2C];
     float field2C;
     float field30;
     float field34;
     float field38;
-    char pad2[0x44 - 0x3C];
+    u8 unknown_0x3C[0x44 - 0x3C];
     float field44;
     float field48;
-    char pad3[0x60 - 0x4C];
+    u8 unknown_0x4C[0x60 - 0x4C];
     RIDER *pnext;
 };
 struct GROUP {
-    char pad[0xC];
+    u8 unknown_0x0[0xC];
     int alive;
     RIDER *pfirst;
-    char pad2[0x20 - 0x14];
+    u8 unknown_0x14[0x20 - 0x14];
     float gap;
     int crv;
     float target;

@@ -7,7 +7,7 @@ extern "C" {
 extern const float D_FLT_002C3D90;
 extern const float D_FLT_002C3D94;
 void GetJtFocusScore(JT *, STEPGUARD *, s32 *, float *, float *);
-unsigned long GrfsgsFromSgs(int);
+u64 GrfsgsFromSgs(int);
 int FIsGuardInSgs(STEPGUARD *, int);
 GOAL *func_00205458(STEPGUARD *, int);
 int FIsBasicDerivedFrom(void *, int);

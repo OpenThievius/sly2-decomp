@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "types.h"
 struct LinksSidebag257AB0 {
     unsigned prevIndex : 13;
     unsigned prevPool : 2;
@@ -8,9 +9,9 @@ struct LinksSidebag257AB0 {
     unsigned mark : 1;
 };
 struct SidebagNode257AB0 {
-    int pad0;
+    u8 unknown_0x0[4];
     LinksSidebag257AB0 links;
-    char pad8[4];
+    u8 unknown_0x8[4];
 };
 struct SlotHeap257AB0;
 extern "C" {

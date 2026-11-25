@@ -1,7 +1,7 @@
 #include "sly2.h"
 union AFF { float f[8]; QW q[2]; };
 struct MAT { float f[16]; };
-struct CMovieText { char pad[0x7C]; float rxScale; float ryScale; float dyLine; float gScale; };
+struct CMovieText { u8 unknown_0x0[0x7C]; float rxScale; float ryScale; float dyLine; float gScale; };
 extern "C" void CMovieText_BuildGsMatrix(CMovieText*, MAT*, AFF*);
 extern "C" void CMovieText_DrawGlyphs(CMovieText*, MAT*, void*);
 extern "C" void CMovieText_DrawAffine(CMovieText* ptext, AFF* paff, void* pdc)

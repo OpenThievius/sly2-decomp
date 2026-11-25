@@ -3,13 +3,13 @@ extern "C" void GoalAnim_Update(void*);
 extern "C" void GoalFlinch_SetState(void*, int);
 extern "C" QW PosLoWorld(void*);
 extern "C" float g_2dded0;
-struct Track { char pad[0x20]; QW pos; };
-struct Guard { char pad[0x35C]; Track* track; };
+struct Track { u8 unknown_0x0[0x20]; QW pos; };
+struct Guard { u8 unknown_0x0[0x35C]; Track* track; };
 #include "goal.h"
 struct GOAL_17A670 : GOAL {
-    char pad_30[0x20];
+    u8 unknown_0x30[0x20];
     int state;
-    char pad_54[0x4];
+    u8 unknown_0x54[0x4];
     float tNext;
 };
 extern "C" void func_0017A670(GOAL_17A670* goal)

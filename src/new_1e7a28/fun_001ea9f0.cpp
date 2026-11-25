@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "sw.h"
-struct GIFS { char pad[0x30]; };
+struct GIFS { u8 unknown_0x0[0x30]; };
 struct VECTOR { float x, y, z, w; } __attribute__((aligned(16)));
 struct CLR {
     int rgba;
@@ -15,15 +15,15 @@ void __4GIFS(GIFS *);
 void AllocStatic__4DMASiP2QW(GIFS *, int, QW *);
 void AddDmaCnt__4DMAS(GIFS *);
 void AddDmaRefs__4DMASiP2QW(GIFS *, int, int *);
-void AddPrimPack__4GIFSiiUl(GIFS *, int, int, unsigned long);
-void PackAD__4GIFSll(GIFS *, long, long);
+void AddPrimPack__4GIFSiiUl(GIFS *, int, int, u64);
+void PackAD__4GIFSll(GIFS *, s64, s64);
 void AddPrimEnd__4GIFS(GIFS *);
 void AddDmaEnd__4DMAS(GIFS *);
 void Detach__4DMASPiPP2QW(GIFS *, int, int *);
 void BuildImageGifs__FiiiiiiP4GIFS(int, int, int, int, int, int, GIFS *);
 void ConvertUserHsvToUserRgb__FP6VECTORT0(VECTOR *, VECTOR *);
 void SendDmaSyncGsFinish__FP10sceDmaChanP2QW(int, int);
-long AllocZpr(int, int);
+s64 AllocZpr(int, int);
 extern VECTOR B_003E1300[];
 extern int D_002C3680[];
 extern int g_2de598;

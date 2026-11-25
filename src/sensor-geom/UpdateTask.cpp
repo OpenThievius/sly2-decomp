@@ -1,56 +1,33 @@
 #include "sly2.h"
+#include "clock.h"
+#include "job.h"
 
-struct TaskObject {
-    char pad0[0xC];
-    virtual void v0();
-    virtual void v1();
-    virtual void v2();
-    virtual void v3();
-    virtual void v4();
-    virtual void v5();
-    virtual void v6();
-    virtual void v7();
-    virtual void v8();
-    virtual void v9();
-};
-
-struct Task {
-    char pad0[0x54];
-    int state;
-    float f58;
-    char pad1[0x78 - 0x5C];
-    float f78;
-    char pad2[0x80 - 0x7C];
-    TaskObject *object;
-};
-
-extern "C" void UpdateLo(Task *task);
-extern "C" void SendTaskTimeLimit(Task *task, int limit);
-extern "C" float g_2dded0[2];
+extern "C" void UpdateLo(TASK *task);
+extern "C" void SendTaskTimeLimit(TASK *task, int limit);
 extern "C" int B_003E0F9C;
 
-extern "C" void UpdateTask(Task *task)
+extern "C" void UpdateTask(TASK *task)
 {
     UpdateLo(task);
     if (task->state == 1) {
-        if (0.0f < task->f78) {
-            float gap = g_2dded0[0] - task->f58;
-            if (gap < task->f78) {
-                if (task->f78 + g_2dded0[1] <= gap) {
+        if (0.0f < task->tLimit) {
+            float gap = g_2dded0.t - task->tState;
+            if (gap < task->tLimit) {
+                if (task->tLimit + g_2dded0.dt <= gap) {
                     SendTaskTimeLimit(task, 0);
                 }
             }
         }
     }
-    if (task->object != 0) {
+    if (task->ploMarker != 0) {
         int chooseFirst = (task->state == 1);
         if (B_003E0F9C != 0) {
             chooseFirst = 0;
         }
         if (chooseFirst) {
-            task->object->v7();
+            task->ploMarker->Add();
         } else {
-            task->object->v8();
+            task->ploMarker->Remove();
         }
     }
 }

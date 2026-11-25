@@ -56,7 +56,9 @@ struct SM : LO {
 struct SMA : BASIC {
     /* 0x10 */ s32 cref;            /* Sma_AddRef, Sma_Release */
     /* 0x14 */ struct SMA *psmaNext; /* the DLE in SM::dlsma: PsmaFindSm follows it */
-    u8 unknown_0x18[0xC];
+    u8 unknown_0x18[0x4];
+    /* 0x1C */ struct SMA *psmaNextAll; /* the DLE of the global list B_003E126C (InitSm_file appends to it): PsmaFindAlo follows it */
+    u8 unknown_0x20[0x4];
     /* 0x24 */ SM *psm;
     /* 0x28 */ struct ALO *paloRoot;
     /* 0x2C */ s32 grfapl;

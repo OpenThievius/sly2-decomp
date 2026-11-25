@@ -1,5 +1,5 @@
 #include "sly2.h"
-struct Node { char pad[0x10]; int mark; int pad2; Node *next; };
+struct Node { u8 unknown_0x0[0x10]; s32 mark; u8 unknown_0x14[4]; Node *next; };
 struct CSplotheap { Node *head; };
 extern "C" void UnmarkAll__10CSplotheap(CSplotheap *self)
 {

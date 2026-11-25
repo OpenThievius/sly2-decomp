@@ -12,7 +12,7 @@ extern "C" Varb *PvarbNew(void);
 
 extern "C" void func_00257430(HV *h, Varb *p);
 
-extern "C" void CRef_RefClone(void *out, void *src, void *frame, unsigned long arg);
+extern "C" void CRef_RefClone(void *out, void *src, void *frame, u64 arg);
 
 extern "C" void __as__4CRefRC4CRef(void *dst, void *src);
 
@@ -28,9 +28,9 @@ extern "C" void FreeSlotheapPv(void *heap, void *p);
 
 extern "C" char B_004520D0[];
 
-extern "C" HV *VarbClone(HV *result, Varb *src, void *frame, unsigned long arg);
+extern "C" HV *VarbClone(HV *result, Varb *src, void *frame, u64 arg);
 
-extern "C" HV *func_0012B0E8(HV *result, Varb *src, void *frame, unsigned long arg)
+extern "C" HV *func_0012B0E8(HV *result, Varb *src, void *frame, u64 arg)
 {
     HV h;
     func_00257430(&h, PvarbNew());

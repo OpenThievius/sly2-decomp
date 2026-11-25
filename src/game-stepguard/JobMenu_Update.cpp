@@ -1,21 +1,12 @@
-struct VT { char pad[0x80]; short d80; short i80; void (*f80)(char *); };
-struct BLOT { char pad[0xC]; VT *vt; char pad1[0x58 - 0x10]; int blots; };
-struct JOBMENU {
-    char pad0[0xC]; void *vt;
-    void *pjoy;
-    char pad1[0x24 - 0x14];
-    BLOT *pblot;
-    char pad2[0x40 - 0x28];
-    int page; int pad3; int cent;
-    char pad4[0x114 - 0x4C];
-    int fFromJobs;
-};
+#include "jobmenu.h"
+#include "blot.h"
+#include "joy.h"
 extern "C" {
 void Menu_Update(JOBMENU *);
 int func_002127C8();
 void SetBlotBlots(BLOT *, int);
 void SetTimerTimers__FP5TIMER6TIMERS(BLOT *, int);
-int FJoyButtonPressed(void *, int);
+int FJoyButtonPressed(JOY *, int);
 void JobMenu_SetPage(JOBMENU *, int);
 void Menu_UpdateStick(JOBMENU *);
 void JobMenu_UpdateBlot(JOBMENU *);
@@ -32,7 +23,7 @@ void JobMenu_Update(JOBMENU *job)
         SetBlotBlots(job->pblot, 1);
         SetTimerTimers__FP5TIMER6TIMERS(job->pblot, 2);
         BLOT *blot = job->pblot;
-        blot->vt->f80((char *)blot + blot->vt->d80);
+        blot->Update();
     }
     if (FJoyButtonPressed(job->pjoy, 0x800)) {
         JobMenu_SetPage(job, -1);

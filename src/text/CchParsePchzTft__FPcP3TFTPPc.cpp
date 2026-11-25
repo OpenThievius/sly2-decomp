@@ -1,21 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
-struct TFT {
-    int fLeft;      // 0x00
-    int fPlus;      // 0x04
-    int fSpace;     // 0x08
-    int fAlt;       // 0x0C
-    int fZero;      // 0x10
-    int fNoPrec;    // 0x14
-    int cchWidth;   // 0x18
-    int cchPrec;    // 0x1C
-    int cbArg;      // 0x20
-    int cVecElem;   // 0x24
-    int cVecRow;    // 0x28
-    char chType;    // 0x2C
-    char pad2D[3];
-    int fUpper;     // 0x30
-};
+#include "tft.h"
 extern unsigned char RO_002AA6A1[];
 int CchParsePchzInt(char *, int *);
 int CchParsePchzTft(char *pchz, TFT *ptft, char **ppvaArg)
@@ -109,7 +94,7 @@ int CchParsePchzTft(char *pchz, TFT *ptft, char **ppvaArg)
                 } else {
                     advance = CchParsePchzInt((char *)pch, &ptft->cchPrec);
                 }
-                ptft->fNoPrec = ptft->cchPrec == 0;
+                ptft->fPrec = ptft->cchPrec == 0;
                 next = 4;
                 break;
             case 4: {

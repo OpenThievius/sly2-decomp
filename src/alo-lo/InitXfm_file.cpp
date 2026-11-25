@@ -230,7 +230,7 @@ extern "C" void LoadXfmBaseFromBrx(XFM *self, void *stream) {
     SetLoGrfzon(self, U32Read__18CBinaryInputStream_231768(stream));
 }
 
-struct PLOARRAY { char pad[8]; int cplo; LO **aplo; };
+struct PLOARRAY { u8 unknown_0x0[0x8]; s32 cplo; LO **aplo; };
 
 extern "C" void func_0022D670(void *);
 

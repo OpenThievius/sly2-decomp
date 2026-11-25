@@ -2,12 +2,12 @@
 #include "sly2.h"
 #include "stepguard.h"
 extern "C" {
-unsigned long GrfsgsFromSgs(int);
-int CsgsMatchGrfsgs(unsigned long, unsigned long);
+u64 GrfsgsFromSgs(int);
+int CsgsMatchGrfsgs(u64, u64);
 }
-extern "C" GUARDANIM *PguardanimBestMatch(STEPGUARD *pguard, unsigned long grf)
+extern "C" GUARDANIM *PguardanimBestMatch(STEPGUARD *pguard, u64 grf)
 {
-    unsigned long lowest = 0;
+    u64 lowest = 0;
     int csgsBest = 0;
     GUARDANIM *best = 0;
     for (int sgs = 0; sgs < 0x30;) {

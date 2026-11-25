@@ -1,7 +1,8 @@
+#include "types.h"
 /* SPDX-License-Identifier: GPL-3.0-or-later */
 typedef struct BitReader {
-    unsigned long window;
-    long consumed;
+    u64 window;
+    s64 consumed;
     int pad10;
     unsigned char *cursor;
     int bitCount;
@@ -14,7 +15,7 @@ static inline void Consume(BitReader *reader, int count)
     reader->window = reader->window << count;
     reader->bitCount -= count;
     while (reader->bitCount <= 0x38) {
-        reader->window |= (long)*reader->cursor++ << (0x38 - reader->bitCount);
+        reader->window |= (s64)*reader->cursor++ << (0x38 - reader->bitCount);
         if (reader->cursor >= reader->end)
             reader->cursor = reader->start;
         reader->bitCount += 8;
@@ -24,7 +25,7 @@ static inline void Consume(BitReader *reader, int count)
 
 int func_0024CD70(BitReader *reader)
 {
-    unsigned long top;
+    u64 top;
     Consume(reader, 0x38);
     Consume(reader, 0x28);
     if ((unsigned int)(reader->window >> 0x3F) == 1) {

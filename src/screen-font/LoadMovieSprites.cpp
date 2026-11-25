@@ -1,20 +1,20 @@
 #include "sly2.h"
 struct SLOTHEAP;
 struct Bis;
-struct BLOT { char pad[0xC4]; SLOTHEAP *heap; };
+struct BLOT { u8 unknown_0x0[0xC4]; SLOTHEAP *heap; };
 struct B4 { char b[4]; };
 struct M3 { QW r[3]; };
 struct SPRITE;
 struct MOVIE;
-struct PLACE { unsigned short a, b, c; short d; char pad0[8]; float m[6]; char padm[8]; unsigned char e, f; char pad2[2]; int g; char pad3[8]; };
+struct PLACE { unsigned short a, b, c; short d; u8 unknown_0x8[0x8]; float m[6]; u8 unknown_0x28[0x8]; unsigned char e, f; u8 unknown_0x32[0x2]; int g; u8 unknown_0x38[0x8]; };
 struct PAIR { int second; int first; };
 struct ACTION { unsigned kind; int arg; };
-struct KEY { float t; unsigned char cplace, cpair, chalf, cbyte; unsigned char *abyte; PLACE *aplace; PAIR *apair; unsigned short *ahalf; unsigned char caction; char pad[3]; ACTION *aaction; };
-struct LABEL { unsigned short ckey; char pad[2]; KEY *akey; float dur; MOVIE *pmovie; SPRITE *psprite; int id; };
-struct SLOT { char pad[0x70]; };
+struct KEY { float t; unsigned char cplace, cpair, chalf, cbyte; unsigned char *abyte; PLACE *aplace; PAIR *apair; unsigned short *ahalf; unsigned char caction; u8 unknown_0x19[0x3]; ACTION *aaction; };
+struct LABEL { unsigned short ckey; u8 unknown_0x2[0x2]; KEY *akey; float dur; MOVIE *pmovie; SPRITE *psprite; int id; };
+struct SLOT { u8 unknown_0x0[0x70]; };
 struct INST { int cslot; SLOT *aslot; short ilabel; short unk; int c; int d; int e; };
-struct SPRITE { unsigned short clabel; unsigned short cinst; LABEL *alabel; INST *ainst; char pad[0x20 - 0xC]; int pending; MOVIE *pmovie; int root; int pad2[1]; };
-struct MOVIE { char pad[0x80]; unsigned short csprite; char pad2[2]; SPRITE *asprite; };
+struct SPRITE { unsigned short clabel; unsigned short cinst; LABEL *alabel; INST *ainst; u8 unknown_0xC[0x14]; int pending; MOVIE *pmovie; int root; int pad2[1]; };
+struct MOVIE { u8 unknown_0x0[0x80]; unsigned short csprite; u8 unknown_0x82[0x2]; SPRITE *asprite; };
 extern "C" {
 unsigned short U16Read__18CBinaryInputStream(Bis *);
 unsigned char U8Read__18CBinaryInputStream(Bis *);

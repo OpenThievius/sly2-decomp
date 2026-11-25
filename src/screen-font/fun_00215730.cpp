@@ -1,8 +1,9 @@
+#include "types.h"
 struct B4 { char b[4]; };
-struct SpriteBase { char pad[0x84]; };
-struct Blot { char pad[0x84]; char *sprites; };
+struct SpriteBase { u8 unknown_0x0[0x84]; };
+struct Blot { u8 unknown_0x0[0x84]; char *sprites; };
 struct Char { int pad0; int type; Blot *blot; int padC; int id; int handle; };
-struct Slot { char pad[0x30]; Char *chr; char pad34[0x24]; int iinst; };
+struct Slot { u8 unknown_0x0[0x30]; Char *chr; u8 unknown_0x34[0x24]; int iinst; };
 
 extern "C" int IinstFindFreeSprite(void *);
 extern "C" void PlaceSpriteInstance(void *, int, int, void *, B4 *, B4 *);

@@ -77,11 +77,11 @@ struct STEPGUARD : STEP {
     /* 0x484 */ s32 cguardact; /* func_001F1900 and func_001F1CF8 (two readers) */
     /* 0x488 */ s32 iguardactCur; /* func_001F1CF8, func_001F1EB8 */
     /* 0x48C */ s32 fActionDone; /* func_001F1CF8 */
-    u8 unknown_0x490[0x4];
+    /* 0x490 */ s32 fEnabled; /* func_001F1768, func_001F17B0 (two readers agree): nonzero lets a guard act be queued; OnGuardRemove (27) clears it */
     /* 0x494 */ struct RIGOBJ *prig; /* OnGuardAdd (26); func_001F1900, func_001F1CF8, func_001F17F8 */
     /* 0x498 */ struct FALLCHECK *pfallcheck; /* PostGuardLoad (15), OnGuardAdd (26); UpdateGuard (16) passes it to UpdateFallCheck */
     /* 0x49C */ struct GUARDDAMAGE *pdamage; /* PostGuardLoad (15), OnGuardAdd (26), HandleStepguardMessage (5), UpdateGuard (16) */
-    u8 unknown_0x4A0[0x4];
+    /* 0x4A0 */ s32 field_0x4A0; /* OnGuardRemove (27) sets it to 1 */
     /* 0x4A4 */ s32 field_0x4A4; /* func_0014B1A0 */
     u8 unknown_0x4A8[0x8];
     /* 0x4B0 */ QW posCopy; /* UpdateGuard (16): a copy of *ppos; GoalBrain_SetCommand (command 19) hands it to the snap goal */
@@ -103,7 +103,9 @@ struct STEPGUARD : STEP {
     u8 unknown_0xE7C[0x8];
     /* 0xE84 */ s32 field_0xE84; /* OnGuardAdd (26) */
     /* 0xE88 */ s32 field_0xE88; /* OnGuardAdd (26) */
-    u8 unknown_0xE8C[0x2C];
+    u8 unknown_0xE8C[0x8];
+    /* 0xE94 */ s32 field_0xE94; /* OnGuardRemove (27) clears it */
+    u8 unknown_0xE98[0x20];
     /* 0xEB8 */ s32 aoid[8]; /* ResolveGuardAimObjects: object ids to look up */
     /* 0xED8 */ s32 caoid; /* ResolveGuardAimObjects: entries in aoid */
     /* 0xEDC */ s32 afound[8]; /* ResolveGuardAimObjects: the objects found */
@@ -129,18 +131,22 @@ struct STEPGUARD : STEP {
     /* 0xF88 */ f32 sPath; /* SetGuardPathTarget (FindCrvClosestPointAll out), func_00209C88 */
     /* 0xF8C */ s32 nPath; /* SetGuardPathTarget */
     /* 0xF90 */ void *prefPath; /* SetGuardPathTarget; func_00209C88 (its PosLoWorld) */
-    u8 unknown_0xF94[0x28];
+    /* 0xF94 */ s32 field_0xF94; /* OnGuardRemove (27) clears it */
+    u8 unknown_0xF98[0x10];
+    /* 0xFA8 */ s32 field_0xFA8; /* OnGuardRemove (27) clears it */
+    u8 unknown_0xFAC[0x10];
     /* 0xFBC */ s32 mode; /* SetGuardMode, GoalBrain_ChooseNextCommand, SetSwGuardsFrozen */
     /* 0xFC0 */ f32 tMode; /* SetGuardMode */
     /* 0xFC4 */ void *field_0xFC4; /* PostGuardLoad (15) */
     /* 0xFC8 */ s32 field_0xFC8; /* func_00209098 (GoalIdle_Update passes the guard) */
-    u8 unknown_0xFCC[0x4];
+    /* 0xFCC */ s32 field_0xFCC; /* OnGuardRemove (27) clears it */
     /* 0xFD0 */ GUARDHEADING heading; /* GrfGuardCustomXps (85) reads its first word; OnGuardAdd, CloneGuard and UpdateGuard pass its address */
     /* 0xFE0 */ struct STEPGUARD *pnext; /* the world list of guards: UpdateJtFocus */
     u8 unknown_0xFE4[0x4];
     /* 0xFE8 */ u32 grf; /* OnGuardAdd (26); func_0017D450, func_0017D6C8 */
     /* 0xFEC */ struct LO *field_0xFEC; /* OnGuardAdd (26) */
-    u8 unknown_0xFF0[0x8];
+    u8 unknown_0xFF0[0x4];
+    /* 0xFF4 */ f32 field_0xFF4; /* OnGuardRemove (27) sets it from a constant */
     /* 0xFF8 */ f32 field_0xFF8; /* AddStepguardHierarchy (23), RemoveStepguardHierarchy (22) */
     /* 0xFFC */ s32 busyGoalCount; /* AddGuardBusyGoal, RemoveGuardBusyGoal */
     /* 0x1000 */ s32 field_0x1000; /* func_0020B590 */
@@ -188,6 +194,7 @@ SLY2_OFFSET_CHECK(STEPGUARD, tState, 0x400);
 SLY2_OFFSET_CHECK(STEPGUARD, aguardact, 0x404);
 SLY2_OFFSET_CHECK(STEPGUARD, iguardactCur, 0x488);
 SLY2_OFFSET_CHECK(STEPGUARD, fActionDone, 0x48C);
+SLY2_OFFSET_CHECK(STEPGUARD, fEnabled, 0x490);
 SLY2_OFFSET_CHECK(STEPGUARD, field_0x2CC, 0x2CC);
 SLY2_OFFSET_CHECK(STEPGUARD, field_0x2D4, 0x2D4);
 SLY2_OFFSET_CHECK(STEPGUARD, scratch, 0x2DC);
@@ -239,5 +246,11 @@ SLY2_OFFSET_CHECK(STEPGUARD, tCooldown, 0xF04);
 SLY2_OFFSET_CHECK(STEPGUARD, ptargetGoto, 0xF68);
 SLY2_OFFSET_CHECK(STEPGUARD, posGoto, 0xF70);
 SLY2_OFFSET_CHECK(STEPGUARD, field_0xFC8, 0xFC8);
+SLY2_OFFSET_CHECK(STEPGUARD, field_0x4A0, 0x4A0);
+SLY2_OFFSET_CHECK(STEPGUARD, field_0xE94, 0xE94);
+SLY2_OFFSET_CHECK(STEPGUARD, field_0xF94, 0xF94);
+SLY2_OFFSET_CHECK(STEPGUARD, field_0xFA8, 0xFA8);
+SLY2_OFFSET_CHECK(STEPGUARD, field_0xFCC, 0xFCC);
+SLY2_OFFSET_CHECK(STEPGUARD, field_0xFF4, 0xFF4);
 #endif
 #endif

@@ -1,11 +1,11 @@
 #include "sly2.h"
-struct QWL { long lo; long hi; };
-struct GIFS { char pad0[0xC]; QWL *pend; char pad10[0x20]; };
-struct VIFS { char pad[0x30]; };
-struct SFRAME { int a; QW *pqw; int pad[2]; };
-struct Ctl { int pad0; int f4; int f8; };
-struct Clut { int id; unsigned char group; char pad5[5]; unsigned short size; int fC; int f10; long f18; };
-struct Bmp { int id; unsigned char group; char pad5[7]; unsigned char fC; char padD; unsigned short size; int f10; int f14; int f18; int pad1C; long f20; };
+struct QWL { s64 lo; s64 hi; };
+struct GIFS { u8 unknown_0x0[0xC]; QWL *pend; u8 unknown_0x10[0x20]; };
+struct VIFS { u8 unknown_0x0[0x30]; };
+struct SFRAME { int a; QW *pqw; u8 unknown_0x8[8]; };
+struct Ctl { u8 unknown_0x0[4]; int f4; int f8; };
+struct Clut { int id; u8 group; u8 unknown_0x5[5]; u16 size; int fC; int f10; s64 f18; };
+struct Bmp { int id; u8 group; u8 unknown_0x5[7]; u8 fC; u8 unknown_0xD; u16 size; int f10; int f14; int f18; u8 unknown_0x1C[4]; s64 f20; };
 extern "C" {
 void __4GIFS(GIFS *);
 void __4VIFS(VIFS *);
@@ -24,8 +24,8 @@ void BuildBmpGifs__FP3BMPiP4GIFS(Bmp *, int, GIFS *);
 void Detach__4DMASPiPP2QW(GIFS *, int *, QW **);
 void AddVifDirect__4VIFSiP2QWi(VIFS *, int, QW *, int);
 void AddVifDirectRefs__4VIFSiP2QWi(VIFS *, int, int, int);
-void AddPrimPack__4GIFSiiUl(GIFS *, int, int, unsigned long);
-void PackAD__4GIFSll(GIFS *, long, long);
+void AddPrimPack__4GIFSiiUl(GIFS *, int, int, u64);
+void PackAD__4GIFSll(GIFS *, s64, s64);
 void AddPrimEnd__4GIFS(GIFS *);
 void EndDmaCnt__4DMAS(VIFS *);
 void AddDmaRet__4DMAS(VIFS *);

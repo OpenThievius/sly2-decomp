@@ -60,7 +60,12 @@ struct SO : LO {
     /* 0x70 */ struct LO *ploChildEnd; /* AddSoLoHierarchy (slot 11 of SO) walks dlChild until it meets this */
     u8 unknown_0x74[0xC];
     /* 0x80 */ u8 field_0x80;         /* reader: func_001F3CC8 and CSo_LoadFromBrx pass its address (the globset) */
-    u8 unknown_0x81[0x37];
+    u8 unknown_0x81[0x23];
+    /* 0xA4 */ s32 cplo;               /* SetAloScrollingMasterSpeeds, func_001F8038, SetAloEyesClosed, func_001F8198 (four readers agree): the object's attached objects */
+    /* 0xA8 */ struct LO **aplo;       /* the same four: each entry is tested with FIsBasicDerivedFrom; func_001F8198 compares its oid (0x18) */
+    /* 0xAC */ s32 coid;               /* SetAloSelectedOid: the count of aoid */
+    /* 0xB0 */ s32 *aoid;              /* SetAloSelectedOid: the oids it looks up */
+    /* 0xB4 */ s32 selected;           /* SetAloSelectedOid sets it to 0 or -(index + 3); func_001F8238 clears it (they agree) */
     /* 0xB8 */ s32 field_0xB8;        /* readers: func_001F5FF8 (count), CSo_LoadFromBrx (tested against 0) */
     u8 unknown_0xBC[0x4];
     /* 0xC0 */ struct GLOBENTRY *field_0xC0; /* readers: func_001F5FF8 (array of 0x28-byte entries, key first), func_001F69F8, func_001F6A68 (the same, field_0xB8 many) */
@@ -74,7 +79,9 @@ struct SO : LO {
     /* 0xE8 */ struct PHYS *pphys;     /* include/phys.h; FIsSoLocked, ProjectSoTransform, TranslateSoToPos, UpdateSo and others */
     /* 0xEC */ struct OXA *poxa;       /* GetSoNoXpsAll, FFilterSensorSight, RecalcSoLocked and others; func_001F7410 and
                                        func_001F7950 read the same object (+0x6C) as PHYS */
-    u8 unknown_0xF0[0x3C];
+    u8 unknown_0xF0[0x20];
+    /* 0x110 */ u8 ainteract[0x1A];    /* GrficFromAlo (reads one byte per take bit), SetAloInteract (writes it): two readers agree */
+    u8 unknown_0x12A[0x2];
     /* 0x12C */ f32 uFade;             /* UpdateSo, InitFragile */
     /* 0x130 */ f32 duFade;            /* the same functions */
     /* 0x134 */ struct RO *field_0x134; /* reader: func_001F3CC8 (a 0x30-byte render options block, copied when the caller passes none) */
@@ -82,7 +89,10 @@ struct SO : LO {
     /* 0x13C */ f32 field_0x13C;       /* InitSo (from a constant) */
     /* 0x140 */ s32 field_0x140;       /* InitSo (-1) */
     u8 unknown_0x144[0x4];
-    /* 0x148 */ u64 grfso;             /* ZapContinue, ExtractUniqueSosFromGeoms, UpdateSwXaList and others */
+    union {
+        /* 0x148 */ u64 grfso;         /* ZapContinue, ExtractUniqueSosFromGeoms, UpdateSwXaList and others */
+        s8 bGrfso[8];               /* InitSo stores its first two bytes on their own (sb) */
+    };
 };
 
 #if defined(__mips__)

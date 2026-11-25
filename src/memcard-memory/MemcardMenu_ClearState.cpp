@@ -1,10 +1,11 @@
+#include "types.h"
 struct O;
 struct VT_1ACBB8 {
-    char pad0[0x58]; short delta58; short pad5A; void (*fn5C)(void *);
-    char pad60[0x190 - 0x60]; short delta190; short pad192; void (*fn194)(void *);
+    u8 unknown_0x0[0x58]; short delta58; short pad5A; void (*fn5C)(void *);
+    u8 unknown_0x60[0x190 - 0x60]; short delta190; short pad192; void (*fn194)(void *);
 };
 struct O {
-    char pad0[0xC]; VT_1ACBB8 *vt; char pad10[0x14]; O *child; char pad28[0x18]; int state;
+    u8 unknown_0x0[0xC]; VT_1ACBB8 *vt; u8 unknown_0x10[0x14]; O *child; u8 unknown_0x28[0x18]; int state;
 };
 extern "C" {
 void MemcardMenu_ClearState(O *self) {

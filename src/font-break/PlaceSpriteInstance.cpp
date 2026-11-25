@@ -1,11 +1,9 @@
 #include "sly2.h"
-struct B4 { char b[4]; };
-struct LABEL { char pad[0x14]; int id; };
-struct SPRITE { unsigned short clabel; char pad2[2]; LABEL *labels; char pad8[8]; unsigned long stamp; float tStopped; int ilabelStopped; int ilabelPending; };
-extern unsigned long g_2ddf18;
-void StartSpriteInstance(float, SPRITE *, int, int, void *, B4 *, B4 *);
+#include "fbsprite.h"
+extern SPRITESTAMP g_2ddf18;
+void StartSpriteInstance(float, SPRITE *, int, int, AFFINE2D *, RGBA *, RGBA *);
 
-void PlaceSpriteInstance(SPRITE *s, int id, int iinst, void *xf, B4 *add, B4 *mul)
+void PlaceSpriteInstance(SPRITE *s, int id, int iinst, AFFINE2D *xf, RGBA *add, RGBA *mul)
 {
     float start = 0.0f;
     int ilabel;
@@ -14,7 +12,7 @@ void PlaceSpriteInstance(SPRITE *s, int id, int iinst, void *xf, B4 *add, B4 *mu
         if (ilabel != -1) {
             s->ilabelPending = -1;
         } else {
-            if (s->stamp == g_2ddf18) {
+            if (s->stamp.value == g_2ddf18.value) {
                 start = s->tStopped;
                 ilabel = s->ilabelStopped;
             } else {
@@ -29,7 +27,7 @@ void PlaceSpriteInstance(SPRITE *s, int id, int iinst, void *xf, B4 *add, B4 *mu
         }
         if (ilabel >= s->clabel) return;
     }
-    B4 a = *add;
-    B4 m = *mul;
+    RGBA a = *add;
+    RGBA m = *mul;
     StartSpriteInstance(start, s, ilabel, iinst, xf, &a, &m);
 }

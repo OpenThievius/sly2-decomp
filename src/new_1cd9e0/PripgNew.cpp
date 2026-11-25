@@ -1,6 +1,6 @@
 #include "sly2.h"
-struct VT { char pad[0x38]; short d0; short i0; void (*f0)(void *); char pad2[0x18]; short d1; short i1; void (*f1)(void *); char pad3[0x18]; short d2; short i2; void (*f2)(void *); };
-struct PRIPG { int a; int b; int c; VT *vt; char pad[0x80 - 0x10]; char globset[0xD0]; int mode; };
+struct VT { u8 unknown_0x0[0x38]; short d0; short i0; void (*f0)(void *); u8 unknown_0x40[0x18]; short d1; short i1; void (*f1)(void *); u8 unknown_0x60[0x18]; short d2; short i2; void (*f2)(void *); };
+struct PRIPG { int a; int b; int c; VT *vt; u8 unknown_0x10[0x80 - 0x10]; u8 globset[0xD0]; int mode; };
 #include "sw.h"
 extern "C" void *PvAllocSlotheapImpl(void *);
 void *memset(void *, int, unsigned int);

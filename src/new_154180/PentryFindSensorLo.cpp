@@ -1,6 +1,6 @@
 #include "sly2.h"
 struct SENSORENTRY154180 { int key; int pad[3]; };
-struct SENSORLO154180 { char pad[0xFC]; int count; SENSORENTRY154180 entry[1]; };
+struct SENSORLO154180 { u8 unknown_0x0[0xFC]; int count; SENSORENTRY154180 entry[1]; };
 extern "C" {
 SENSORENTRY154180 *PentryFindSensorLo(SENSORLO154180 *lo, int key)
 {

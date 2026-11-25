@@ -1,15 +1,16 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "types.h"
 typedef struct MpegState {
-    char pad0[0xC4];
+    u8 unknown_0x0[0xC4];
     int field0C4;
-    char pad0C8[0xEC - 0xC8];
+    u8 unknown_0xC8[0xEC - 0xC8];
     unsigned field0EC;
     unsigned field0F0;
     unsigned field0F4;
     unsigned field0F8;
 } MpegState;
 typedef struct MpegHandle {
-    char pad0[0x40];
+    u8 unknown_0x0[0x40];
     MpegState *state;
 } MpegHandle;
 extern "C" int func_0024ACD8(MpegHandle *handle);

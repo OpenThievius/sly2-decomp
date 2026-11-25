@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "amb.h"
 #include "ps2inline.h"
 #include "sly2.h"
-struct AMB { char pad0[0x1C]; void *palo; QW pos; };
 extern "C" {
 int FFloatsNear__Ffff(float, float, float);
 void SetAmbGrf(AMB *, int, int);
 }
 extern QW g_2a2dd0;
 static inline int Near(float a, float b) { return FFloatsNear__Ffff(a, b, 0.0001f); }
-void SetEmitterUnpositioned(AMB *pamb, void *palo)
+void SetEmitterUnpositioned(AMB *pamb, LO *palo)
 {
     pamb->palo = palo;
     if (palo != 0) {

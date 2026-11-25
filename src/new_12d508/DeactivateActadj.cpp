@@ -1,12 +1,13 @@
-struct ACTADJ_VT_12D890 { char pad[0x10]; short nOffset; char pad2[0x2]; void (*pfnApply)(void *); };
-struct ACTADJ_OBJ_12D890 { char pad[0x18]; struct ACTADJ_VT_12D890 *pVt; };
-struct ACTADJ_12D890 { char pad[0x1C]; struct ACTADJ_OBJ_12D890 *pTarget; };
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "act.h"
+struct ACTADJ { u8 unknown_0x0[0x10]; ACT *pactNext; u8 unknown_0x14[8]; ACT *pactBase; };
 
-extern "C" void DeactivateActadj(struct ACTADJ_12D890 *pActadj)
+extern "C" void DeactivateActadj(ACTADJ *pactadj)
 {
-    struct ACTADJ_OBJ_12D890 *pTarget = pActadj->pTarget;
-    if (pTarget != 0) {
-        pTarget->pVt->pfnApply((char *)pTarget + pTarget->pVt->nOffset);
-        pActadj->pTarget = 0;
+    ACT *pact = pactadj->pactBase;
+    if (pact != 0) {
+        ACTVTENTRY *pentry = &((ACTVT *)pact->vtable)->slot2;
+        pentry->fn((char *)pact + pentry->delta);
+        pactadj->pactBase = 0;
     }
 }

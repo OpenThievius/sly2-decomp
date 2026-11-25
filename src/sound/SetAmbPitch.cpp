@@ -1,4 +1,4 @@
-struct AMB { char pad[0x18]; float pitch; };
+#include "amb.h"
 extern "C" void SetAmbGrf(AMB *, unsigned short, unsigned short);
 extern "C" void SetAmbPitch(AMB *pamb, float pitch)
 {

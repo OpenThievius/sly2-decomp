@@ -1,6 +1,5 @@
 #include "sly2.h"
-struct INST { char pad[8]; short ilabel; };
-struct SPRITE { char pad0[8]; INST *pinst; char pad1[0x28 - 0xC]; int fRoot; };
+#include "fbsprite.h"
 extern char RO_002A3A10[];
 extern "C" void StopRootSprite(SPRITE *);
 extern "C" void StartSpriteInstance(float, SPRITE *, int, int, void *, unsigned *, unsigned *);
@@ -8,7 +7,7 @@ extern "C" void StartSpriteInstance(float, SPRITE *, int, int, void *, unsigned 
 void PlayRootSpriteLabelIndex(SPRITE *psprite, int ilabel)
 {
     if (psprite->fRoot) {
-        if (psprite->pinst->ilabel >= 0)
+        if (psprite->insts->ilabel >= 0)
             StopRootSprite(psprite);
         unsigned argbaAdd[4];
         unsigned argbaMul[4];

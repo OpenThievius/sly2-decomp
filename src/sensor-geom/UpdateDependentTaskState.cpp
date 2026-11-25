@@ -1,11 +1,11 @@
 #include "sly2.h"
-struct TASK { char pad0[0x54]; int nState; char pad58[0x3C]; int cPrereq; TASK **apPrereq; char pad9C[0x54]; int nPending; };
-static inline int GetCount(TASK *task) { return task->cPrereq; }
-static inline int GetState(TASK *task) { return task->nState; }
+#include "job.h"
+static inline int GetCount(TASK *task) { return task->cprereq; }
+static inline int GetState(TASK *task) { return task->state; }
 extern "C" void SetTaskStateCascade(TASK *, int);
 extern "C" void UpdateDependentTaskState(TASK *ptask, int nStateParent)
 {
-    if (ptask->nPending != -1)
+    if (ptask->pending != -1)
         return;
     int nStateOld = GetState(ptask);
     int nState = nStateOld;
@@ -14,8 +14,8 @@ extern "C" void UpdateDependentTaskState(TASK *ptask, int nStateParent)
             nState = 0;
         } else if (nStateParent < 4) {
             int fAllComplete = 1;
-            for (int itask = 0; itask < ptask->cPrereq; itask++) {
-                if (ptask->apPrereq[itask]->nState < 2) {
+            for (int itask = 0; itask < ptask->cprereq; itask++) {
+                if (ptask->aprereq[itask]->state < 2) {
                     fAllComplete = 0;
                     break;
                 }

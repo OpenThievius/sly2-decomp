@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "types.h"
 typedef unsigned int size_t;
 typedef int (*compare_function)(const void *, const void *);
 
 #define SMALLER(first, second) ((first) < (second) ? (first) : (second))
 
 #define SWAP_WORDS(TYPE, left_bytes, right_bytes, byte_count) {   \
-    long remaining = (byte_count) / sizeof(TYPE);                \
+    s64 remaining = (byte_count) / sizeof(TYPE);                \
     TYPE *left_item = (TYPE *)(left_bytes);                     \
     TYPE *right_item = (TYPE *)(right_bytes);                   \
     do {                                                        \
@@ -18,16 +19,16 @@ typedef int (*compare_function)(const void *, const void *);
 static inline void SwapBlocks(char *left, char *right, int byte_count, int swap_kind)
 {
     if (swap_kind <= 1)
-        SWAP_WORDS(long, left, right, byte_count)
+        SWAP_WORDS(s64, left, right, byte_count)
     else
         SWAP_WORDS(char, left, right, byte_count)
 }
 
 #define SWAP_ELEMENTS(left, right)                        \
     if (swap_kind == 0) {                                 \
-        long held = *(long *)(left);                      \
-        *(long *)(left) = *(long *)(right);               \
-        *(long *)(right) = held;                          \
+        s64 held = *(s64 *)(left);                      \
+        *(s64 *)(left) = *(s64 *)(right);               \
+        *(s64 *)(right) = held;                          \
     } else                                                \
         SwapBlocks(left, right, element_size, swap_kind)
 
@@ -47,7 +48,7 @@ void qsort(void *base, size_t count, size_t element_size, compare_function compa
     int distance, result, swap_kind, swapped;
 
 restart:
-    swap_kind = ((char *)base - (char *)0) % sizeof(long) || element_size % sizeof(long) ? 2 : element_size == sizeof(long) ? 0 : 1;
+    swap_kind = ((char *)base - (char *)0) % sizeof(s64) || element_size % sizeof(s64) ? 2 : element_size == sizeof(s64) ? 0 : 1;
     swapped = 0;
     if (count < 7) {
         for (middle = (char *)base + element_size; middle < (char *)base + count * element_size; middle += element_size)

@@ -1,6 +1,6 @@
 #include "sly2.h"
-struct GADGET { char pad[0x150]; int state; };
-extern "C" int FGadgetObjActive(GADGET *pgadget)
+#include "gadgetobj.h"
+extern "C" int FGadgetObjActive(GADGETOBJ *pgadget)
 {
     int state = pgadget->state;
     if (state < 3) {

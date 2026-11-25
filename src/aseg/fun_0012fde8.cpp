@@ -1,6 +1,6 @@
 #include "alloc.h"
 struct NODE { float x; float y; int value; };
-struct OWNER { char pad[0xB0]; NODE *node; };
+struct OWNER { u8 unknown_0x0[0xB0]; NODE *node; };
 extern "C" void *PvAllocSwImpl__Fi(ALLOCREQ *);
 extern "C" void func_0012FDE8(OWNER *self, int value, float x, float y)
 {

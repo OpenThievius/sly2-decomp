@@ -1,19 +1,13 @@
 #include "sly2.h"
-struct B4 { char b[4]; };
-struct Slot { B4 add; B4 mul; char pad[8]; QW mat0; QW mat1; };
-struct LABEL { char pad0[8]; float dt; char pad1[0x18 - 0xC]; };
-struct INST { char pad0[8]; short ilabel; short ikeyNext; float t; int fPaused; char pad1[0x18 - 0x14]; };
-struct SPRITE;
-struct BLOT { char pad[0x84]; SPRITE *sprites; };
-struct SPRITE { char pad0[4]; LABEL *labels; INST *insts; char pad1[0x24 - 0xC]; BLOT *pmovie; char pad2[0x30 - 0x28]; };
+#include "fbsprite.h"
 extern "C" {
-int FGetSpriteSlotTransform(BLOT *, int, QW *, B4 *, B4 *, int, void *);
+int FGetSpriteSlotTransform(SPRITEMOVIE *, int, AFFINE2D *, RGBA *, RGBA *, int, void *);
 void ClearSpriteInstance(SPRITE *, int);
-void UpdateSpriteInstance(float, SPRITE *, int, QW *, B4 *, B4 *);
+void UpdateSpriteInstance(float, SPRITE *, int, AFFINE2D *, RGBA *, RGBA *);
 }
-void SeekSpriteInstanceTime(float t, SPRITE *sprite, int iinst, Slot *slot)
+void SeekSpriteInstanceTime(float t, SPRITE *sprite, int iinst, SLOT *slot)
 {
-    struct { QW mat[2]; B4 add[4]; B4 mul[4]; B4 ca[4]; B4 cm[4]; B4 cm2[4]; } l;
+    struct { AFFINE2D mat; RGBA add[4]; RGBA mul[4]; RGBA ca[4]; RGBA cm[4]; RGBA cm2[4]; } l;
     if (sprite->insts[iinst].ilabel < 0)
         return;
     float dt = sprite->labels[sprite->insts[iinst].ilabel].dt;
@@ -21,14 +15,13 @@ void SeekSpriteInstanceTime(float t, SPRITE *sprite, int iinst, Slot *slot)
     lo = lo < t ? t : lo;
     float tc = lo < dt ? lo : dt;
     if (slot != 0) {
-        l.mat[0] = slot->mat0;
-        l.mat[1] = slot->mat1;
-        l.add[0] = slot->add;
-        l.mul[0] = slot->mul;
+        l.mat = slot->xf;
+        l.add[0] = slot->rgbaAdd;
+        l.mul[0] = slot->rgbaMul;
     } else {
-        BLOT *blot = sprite->pmovie;
-        int index = sprite - blot->sprites;
-        if (!FGetSpriteSlotTransform(blot, index, l.mat, l.add, l.mul, 0, 0))
+        SPRITEMOVIE *movie = sprite->pmovie;
+        int index = sprite - movie->asprite;
+        if (!FGetSpriteSlotTransform(movie, index, &l.mat, l.add, l.mul, 0, 0))
             return;
     }
     ClearSpriteInstance(sprite, iinst);
@@ -37,10 +30,10 @@ void SeekSpriteInstanceTime(float t, SPRITE *sprite, int iinst, Slot *slot)
     sprite->insts[iinst].fPaused = 0;
     l.ca[0] = l.add[0];
     l.cm[0] = l.mul[0];
-    UpdateSpriteInstance(0.0f, sprite, iinst, l.mat, l.ca, l.cm);
+    UpdateSpriteInstance(0.0f, sprite, iinst, &l.mat, l.ca, l.cm);
     sprite->insts[iinst].fPaused = 0;
     l.ca[0] = l.add[0];
     l.cm2[0] = l.mul[0];
-    UpdateSpriteInstance(tc, sprite, iinst, l.mat, l.ca, l.cm2);
+    UpdateSpriteInstance(tc, sprite, iinst, &l.mat, l.ca, l.cm2);
     sprite->insts[iinst].fPaused = 1;
 }

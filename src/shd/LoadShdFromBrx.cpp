@@ -1,66 +1,58 @@
 #include "alloc.h"
-struct Stream_1EB2F0;
-struct Shd_1EB2F0;
-struct Tex_1EB2F0 { char pad0[6]; unsigned char tag; char pad1; Shd_1EB2F0 *owner; char pad2[0x14 - 0xC]; };
-struct Part_1EB2F0 { int count; void *memory; };
-struct Shd_1EB2F0 {
-    char pad0[4]; unsigned char kind; unsigned char flags; char pad1[2]; int color8; int colorC; int color10; char pad2[3];
-    unsigned char texCount; Tex_1EB2F0 *textures; int partCount; Part_1EB2F0 *parts; int tag24; int texture28;
-};
-extern "C" void CBinaryInputStream_Read_thunk(Stream_1EB2F0 *, int, Shd_1EB2F0 *);
+#include "bis.h"
+#include "shd.h"
 extern "C" void FilterColorRgba8_1ed278(void *);
-extern "C" void LoadTexFromBrx__FP18CBinaryInputStreamP3TEX(Stream_1EB2F0 *, Tex_1EB2F0 *);
+void LoadTexFromBrx(CBinaryInputStream *, TEX *);
 extern "C" void *PvAllocSwClearImpl__Fi(ALLOCREQ *);
-extern "C" int S16Read__18CBinaryInputStream(Stream_1EB2F0 *);
 extern int *B_003DD004;
-extern "C" void LoadShdFromBrx(Stream_1EB2F0 *stream, Shd_1EB2F0 *shd) {
+extern "C" void LoadShdFromBrx(CBinaryInputStream *stream, SHD *shd) {
     ALLOCREQ request;
     CBinaryInputStream_Read_thunk(stream, 0x18, shd);
-    FilterColorRgba8_1ed278(&shd->color8);
-    FilterColorRgba8_1ed278(&shd->colorC);
-    FilterColorRgba8_1ed278(&shd->color10);
-    int textureIndex = S16Read__18CBinaryInputStream(stream);
+    FilterColorRgba8_1ed278(&shd->rgba8);
+    FilterColorRgba8_1ed278(&shd->rgbaC);
+    FilterColorRgba8_1ed278(&shd->rgbaTex);
+    int textureIndex = stream->S16Read();
     if (textureIndex >= 0) {
-        shd->texture28 = B_003DD004[textureIndex];
+        shd->field_0x28 = B_003DD004[textureIndex];
     }
     request.cbAlign = 0x10;
-    request.cb = shd->texCount * sizeof(Tex_1EB2F0);
-    shd->textures = (Tex_1EB2F0 *)PvAllocSwClearImpl__Fi(&request);
-    for (int index = 0; index < shd->texCount; index++) {
-        Tex_1EB2F0 *texture = &shd->textures[index];
-        LoadTexFromBrx__FP18CBinaryInputStreamP3TEX(stream, texture);
+    request.cb = shd->ctex * sizeof(TEX);
+    shd->atex = (TEX *)PvAllocSwClearImpl__Fi(&request);
+    for (int index = 0; index < shd->ctex; index++) {
+        TEX *texture = &shd->atex[index];
+        LoadTexFromBrx(stream, texture);
         texture->owner = shd;
     }
-    shd->tag24 = shd->textures->tag;
+    shd->cframe = shd->atex->cbmp;
     switch (shd->kind) {
     case 0:
     case 4:
     case 5:
     case 6:
-        shd->partCount = 1;
+        shd->cpart = 1;
         break;
     case 1:
     case 2:
-        shd->partCount = 2;
+        shd->cpart = 2;
         break;
     case 7:
-        shd->partCount = (shd->flags & 0x20) ? 2 : 3;
+        shd->cpart = (shd->grf & 0x20) ? 2 : 3;
         break;
     case 3:
-        shd->partCount = 4;
+        shd->cpart = 4;
         break;
     }
     request.cbAlign = 0x10;
-    request.cb = shd->partCount * 8;
-    Part_1EB2F0 *parts = (Part_1EB2F0 *)PvAllocSwClearImpl__Fi(&request);
-    shd->parts = parts;
-    Part_1EB2F0 *cursor;
+    request.cb = shd->cpart * 8;
+    SHDPART *parts = (SHDPART *)PvAllocSwClearImpl__Fi(&request);
+    shd->apart = parts;
+    SHDPART *cursor;
     switch (shd->kind) {
     case 0:
     case 4:
     case 5:
     case 6: {
-        int vertices = shd->textures->owner->tag24 + 8;
+        int vertices = shd->atex->owner->cframe + 8;
         parts[0].count = vertices;
         request.cb = vertices * 0x10;
         request.cbAlign = 0x10;
@@ -69,8 +61,8 @@ extern "C" void LoadShdFromBrx(Stream_1EB2F0 *stream, Shd_1EB2F0 *shd) {
     }
     case 3: {
         int extra;
-        if (shd->flags & 2) {
-            extra = shd->textures->owner->tag24 + 2;
+        if (shd->grf & 2) {
+            extra = shd->atex->owner->cframe + 2;
         } else {
             extra = 0;
         }
@@ -109,7 +101,7 @@ extern "C" void LoadShdFromBrx(Stream_1EB2F0 *stream, Shd_1EB2F0 *shd) {
         return;
     case 1: {
         cursor = &parts[1];
-        int vertices = shd->textures->owner->tag24 + 8;
+        int vertices = shd->atex->owner->cframe + 8;
         parts[0].count = vertices;
         request.cb = vertices * 0x10;
         request.cbAlign = 0x10;
@@ -122,7 +114,7 @@ extern "C" void LoadShdFromBrx(Stream_1EB2F0 *stream, Shd_1EB2F0 *shd) {
     }
     case 7: {
         cursor = &parts[1];
-        int vertices = shd->textures->owner->tag24 + 8;
+        int vertices = shd->atex->owner->cframe + 8;
         parts[0].count = vertices;
         int bytes = vertices * 0x10;
         request.cb = bytes;
@@ -133,7 +125,7 @@ extern "C" void LoadShdFromBrx(Stream_1EB2F0 *stream, Shd_1EB2F0 *shd) {
         request.cbAlign = 0x10;
         cursor->memory = PvAllocSwClearImpl__Fi(&request);
         cursor = &parts[2];
-        if (!(shd->flags & 0x20)) {
+        if (!(shd->grf & 0x20)) {
             parts[2].count = vertices;
             request.cb = bytes;
             request.cbAlign = 0x10;

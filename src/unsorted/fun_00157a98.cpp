@@ -2,7 +2,7 @@
 #include "types.h"
 
 struct SortEntry {
-    char pad0[4];
+    u8 unknown_0x0[4];
     f32 key;
 };
 
