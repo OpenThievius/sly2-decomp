@@ -1,35 +1,20 @@
-#include "types.h"
+#include "goal.h"
 struct SCRIPTSTATE { int pcmd; int context; };
-struct SCRIPT { int frame; char pad[0x4C]; int first; };
-struct BEHB {
-    int pad0[3];
-    virtual void v0();
-    virtual void v1();
-    virtual void HandleEvent(int, int, int, int, int);
-    virtual void v3();
-    virtual void v4();
-    virtual void v5();
-    virtual void v6();
-    virtual void v7();
-    virtual void v8();
-    virtual void v9();
-    virtual void v10();
-    virtual void v11();
-    virtual void v12();
-    virtual void v13();
-    virtual void ExecuteCmd(int);
+/* the script object: an LO (0x50 bytes) whose command list starts at 0x50 (script.h's SCRIPT) */
+struct SCRIPT : LO {
+    /* 0x50 */ int first;
 };
-struct BEH : BEHB {
-    char pad1[8];
-    char goal[0x18];
-    SCRIPT *script;
-    int context;
-    int cmd;
-    int unk3C;
-    int unk40;
-    SCRIPTSTATE *state;
-    int unk48;
-    int flag;
+/* a guard's script behaviour (a GOAL, GUARDSCRIPTBEH of guardscriptbeh.h with its virtuals) */
+struct BEH : GOAL {
+    /* 0x30 */ SCRIPT *script;
+    /* 0x34 */ int context;
+    /* 0x38 */ int cmd;
+    u8 unknown_0x3C[4];
+    /* 0x40 */ int unk40;
+    /* 0x44 */ SCRIPTSTATE *state;
+    u8 unknown_0x48[4];
+    /* 0x4C */ int flag;
+    virtual void ExecuteCmd(int cmd); /* 15 */
 };
 extern "C" void Goal_Pop(void *);
 extern "C" void CFramePtr_Assign(void *, int);
@@ -39,10 +24,10 @@ extern "C" void SetGuardScript(BEH *beh, SCRIPT *script, int flag, SCRIPTSTATE *
     if (script == beh->script)
         return;
     if (beh->script != 0) {
-        Goal_Pop(beh->goal);
-        beh->HandleEvent(3, 0, 0, 0, 0);
-        CFramePtr_Assign(beh, 0);
-        SidebagPtr_Assign((char *)beh + 4, 0);
+        Goal_Pop(&beh->pgoalChild);
+        beh->HandleSpliceEvent(3, 0, 0, 0, 0);
+        CFramePtr_Assign(&beh->pframe, 0);
+        SidebagPtr_Assign(&beh->psidebag, 0);
         beh->context = 0;
         beh->cmd = 0;
         beh->unk40 = 0;
@@ -51,8 +36,8 @@ extern "C" void SetGuardScript(BEH *beh, SCRIPT *script, int flag, SCRIPTSTATE *
     beh->script = script;
     if (script == 0)
         return;
-    CFramePtr_Assign(beh, script->frame);
-    beh->HandleEvent(2, 0, 0, 0, 0);
+    CFramePtr_Assign(&beh->pframe, (int)script->pframe);
+    beh->HandleSpliceEvent(2, 0, 0, 0, 0);
     beh->flag = flag;
     if (resume == 0 || resume->pcmd == 0) {
         SCRIPT *current = beh->script;

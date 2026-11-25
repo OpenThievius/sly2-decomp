@@ -1,7 +1,6 @@
-struct BLOTVT { char pad[0x190]; short delta; short index; void (*fn)(void *); };
-struct BLOT { char pad[0xC]; BLOTVT *vt; };
+#include "blot.h"
 struct HUDLABEL {
-    char pad[0x10]; int state; float tState; int label; float tHold; int labelNext; float tHoldNext; BLOT *pblot;
+    u8 unknown_0x0[0x10]; int state; float tState; int label; float tHold; int labelNext; float tHoldNext; BLOT *pblot;
 };
 extern "C" {
 struct CLK { float t; float dt; };
@@ -35,7 +34,7 @@ void SetHudLabelState(HUDLABEL *phudlabel, int state)
             PlayBlotLabel(phudlabel->pblot, 0x312);
             break;
         case 3:
-            phudlabel->pblot->vt->fn((char *)phudlabel->pblot + phudlabel->pblot->vt->delta);
+            phudlabel->pblot->Hide();
             break;
         case 1:
             SetBlotLabelList(phudlabel->pblot, 1, &phudlabel->label);

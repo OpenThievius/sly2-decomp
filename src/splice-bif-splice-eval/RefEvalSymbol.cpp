@@ -1,13 +1,12 @@
-extern "C" void FFindBinding__6CFrameUiiP4CRef(char *, unsigned int, int, char *);
-extern "C" void CRef_CopyConstruct(char *, char *);
-extern "C" void CRef_Destruct(char *);
+#include "cref.h"
+struct CFrame;
+struct SYMBOLNODE { u8 unknown_0x0[0xC]; unsigned symid; }; /* a parsed symbol: its id at 0xC (reader: RefEvalSymbol) */
+extern "C" void FFindBinding__6CFrameUiiP4CRef(CFrame *, unsigned int, int, CRef *);
 
-char *RefEvalSymbol(char *arg0, char *arg1, char *arg2) {
-    char sp[0x10];
+extern "C" CRef RefEvalSymbol(SYMBOLNODE *psym, CFrame *pframe) {
+    CRef ref;
 
-    *(int *)sp = -1;
-    FFindBinding__6CFrameUiiP4CRef(arg2, *(unsigned int *)(arg1 + 0xC), 1, sp);
-    CRef_CopyConstruct(arg0, sp);
-    CRef_Destruct(sp);
-    return arg0;
+    ref.m_tagk = TAGK_Nil;
+    FFindBinding__6CFrameUiiP4CRef(pframe, psym->symid, 1, &ref);
+    return ref;
 }

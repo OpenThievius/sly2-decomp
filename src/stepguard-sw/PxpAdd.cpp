@@ -2,12 +2,12 @@
 #include "vu0inline.h"
 #include "ps2inline.h"
 #include "types.h"
-struct SW;
+#include "sw.h"
 struct XP;
-struct XPSOVT { char pad[0x1B8]; short delta; short index; void (*fn)(void *, XP *, int); };
-struct XPSO { char pad[0xC]; XPSOVT *vt; };
-struct XPSEC { char pad[0x60]; int unk60; };
-struct XPOWN { char pad[0xEC]; XPSEC *psec; };
+struct XPSOVT { u8 unknown_0x0[0x1B8]; short delta; short index; void (*fn)(void *, XP *, int); };
+struct XPSO { u8 unknown_0x0[0xC]; XPSOVT *vt; };
+struct XPSEC { u8 unknown_0x0[0x60]; int unk60; };
+struct XPOWN { u8 unknown_0x0[0xEC]; XPSEC *psec; };
 struct XPOBJ { int unk0; XPOWN *powner; };
 struct XPD { XPOBJ *pobj; int unk4; int unk8; XPSO *pso; QW pos; QW posConv; QW vel; };
 struct XP {
@@ -17,17 +17,17 @@ struct XP {
 };
 union VU_SCALE { QW q; float g[4]; };
 extern "C" {
-void *PvAllocSlotheapImpl(void *);
+void *PvAllocSlotheapImpl(SLOTHEAP *);
 QW ConvertXfPos(int, int, QW);
 void RecalcSwXpMovement(SW *, int, XP **);
 extern float D_FLT_002BFD30;
 extern float D_FLT_002BFD34;
-void PxpAdd(char *psw, void *pobjA, void *pobjB, QW pos, QW vel, int arg5, int arg6, int arg7, float gScale, XP **ppxpHead)
+void PxpAdd(SW *psw, void *pobjA, void *pobjB, QW pos, QW vel, int arg5, int arg6, int arg7, float gScale, XP **ppxpHead)
 {
     VU_SCALE scale;
     XP *pxp;
     XPD *pxpd;
-    XP *pxpNew = (XP *)PvAllocSlotheapImpl(psw + 0x3D40);
+    XP *pxpNew = (XP *)PvAllocSlotheapImpl(&psw->slotheapMq);
     pxp = pxpNew;
     pxpNew->xpd[0].pos = pos;
     scale.q = VectorFromFloat(-gScale);
@@ -64,7 +64,7 @@ void PxpAdd(char *psw, void *pobjA, void *pobjB, QW pos, QW vel, int arg5, int a
             pso->vt->fn((char *)pso + pso->vt->delta, pxp, ixpd);
         ixpd++;
     } while (ixpd < 2);
-    RecalcSwXpMovement((SW *)psw, 1, &pxp);
+    RecalcSwXpMovement(psw, 1, &pxp);
     XP *pxpLast = pxp;
     while (pxpLast->pxpNext)
         pxpLast = pxpLast->pxpNext;

@@ -1,27 +1,22 @@
+#include "blot.h"
+#include "blotsprite.h"
 extern "C" void func_00218038(void *);
 extern "C" void SeekSpriteInstanceTime(void *, float, int, int);
 
-struct Inst { char pad[8]; short state; char pad2[14]; };
-struct Label { char pad[0x14]; int id; };
-struct Sprite { unsigned short labelCount; unsigned short instCount; Label *labels; Inst *insts; char pad[0x24]; };
-struct Blot { char pad[0x80]; unsigned short spriteCount; unsigned short pad82; Sprite *sprites; };
-
-static inline Sprite *SpriteAt(Blot *blot, int i) { return &blot->sprites[i]; }
-static inline int LabelIdAt(Sprite *sprite, int j) { int offset = j * 0x18; return *(int *)((char *)sprite->labels + offset + 0x14); }
-
-extern "C" void func_00212F80(float u, Blot *blot, int label)
+extern "C" void func_00212F80(float u, BLOT *blot, int label)
 {
     if (label == 0x314) {
-        func_00218038(blot->sprites);
+        func_00218038((BLOTSPRITE *)blot->asprite);
         return;
     }
-    for (int i = 0; i < blot->spriteCount; i++) {
-        Sprite *sprite = SpriteAt(blot, i);
-        for (int j = 0; j < sprite->labelCount; j++) {
+    for (int i = 0; i < blot->csprite; i++) {
+        BLOTSPRITE *sprite = &((BLOTSPRITE *)blot->asprite)[i];
+        for (int j = 0; j < sprite->clabel; j++) {
             int last = -1;
-            if (label == LabelIdAt(sprite, j)) {
-                for (int k = 0; k < sprite->instCount; k++) {
-                    if (sprite->insts[k].state != -1) last = k;
+            BLOTSPRITELABEL *plabel = &sprite->alabel[j];
+            if (label == plabel->id) {
+                for (int k = 0; k < sprite->cinstance; k++) {
+                    if (sprite->ainstance[k].state != -1) last = k;
                 }
                 if (last >= 0) SeekSpriteInstanceTime(sprite, u, last, 0);
             }

@@ -296,7 +296,7 @@ struct SW : BASIC {
     /* 0x45E0 */ f32 field_0x45E0[2]; /* Sw_Construct: D_002C3E6C and D_002C3E68 */
     /* 0x45E8 */ struct ZPRENTRY azprentry[2]; /* AllocSwBuffers fills each with func_001BE398 and a fresh ZPR */
     /* 0x4638 */ void *ppool; /* func_0013CF38 */
-    u8 unknown_0x463C[0x4];
+    /* 0x463C */ u32 oidNext; /* reader: PostCrfodbLoad hands out the next object id from it (certain: read through the global) */
     /* 0x4640 */ s32 field_0x4640; /* func_00210BE0, func_00211EC0 test it; LoadSwStringsFromBrx stores the string count */
     /* 0x4644 */ struct SWSTRING *astring; /* LoadSwStringsFromBrx: the string table, cstring (0x4640) entries of 8 bytes */
     /* 0x4648 */ SLOTHEAP field_0x4648; /* Sw_Construct: 0x40-byte slots */
@@ -305,7 +305,7 @@ struct SW : BASIC {
     u8 unknown_0x467C[0x4];
     /* 0x4680 */ TGT atgt[4]; /* the target list: UpdateSwTargetList */
     /* 0x4740 */ s32 field_0x4740; /* Sw_Construct sets -1 */
-    u8 unknown_0x4744[0x4];
+    /* 0x4744 */ struct LO *ploIndicatorTemplate; /* reader: FindTargetIndicatorTemplate (stores PloFindSwObject_thunk's result), func_00195608 hands it to PloSpawnTargetIndicator */
     /* 0x4748 */ s32 fGuardsFrozen; /* SetSwGuardsFrozen */
     /* 0x474C */ f32 tGuardsFrozen; /* SetSwGuardsFrozen */
     /* 0x4750 */ f32 field_0x4750; /* Sw_Construct sets -60, as it sets tL3; UpdateCplook reads it through a local view (tLook) */

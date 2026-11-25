@@ -155,7 +155,8 @@ struct SENSOR {
     /* 0xE4 */ struct OXA *poxa; /* OnGuardAdd (26): the guard's poxa */
     /* 0xE8 */ void *pvolume;    /* func_00259D38 sets it; func_00208BE0 tests its grfo bit 60 and hands it to func_00227C90 */
     /* 0xEC */ s32 field_0xEC;   /* func_00259D48 sets it, func_00259D70 returns it */
-    u8 unknown_0xF0[0xC];
+    u8 unknown_0xF0[0x8];
+    /* 0xF8 */ s32 grfSensing;   /* readers: ForgetJtGuards (bit 0 tested), fun_001B9F80 sets 3 (it declares its own SENSOR view), asm-archive 1541D8 tests bits 0, 1 and 3 */
     /* 0xFC */ s32 centry;       /* the objects watched: ClearGuardSensing clears it; AddSensorLo (bounded by 8), RemoveSensorLo,
                                     ResetSensorStates, PentryFindSensorLo, func_00153DE0 */
     /* 0x100 */ struct SENSORENTRY aentry[8]; /* the same functions */

@@ -765,17 +765,9 @@ void CLo_Clone(LO *plo, LO *ploBase)
     CopyAb__FPvT0Ui((char *)plo + sizeof(LO), (char *)ploBase + sizeof(LO), pcls->cb - sizeof(LO));
 }
 
-struct Object_1A6AD0;
-
-/* LO slot 41 as CloneLoVirtual calls it, with an int (lo.h declares Slot41 for a source SO). */
-struct Vtable_1A6AD0 { u8 unknown_0x0[0x148]; short delta; short index; void (*function)(Object_1A6AD0 *, int); };
-
-struct Object_1A6AD0 { u8 unknown_0x0[0xC]; Vtable_1A6AD0 *vtable; };
-
-void CloneLoVirtual(Object_1A6AD0 *self, int argument)
+void CloneLoVirtual(LO *self, int argument)
 {
-    Vtable_1A6AD0 *vtable = self->vtable;
-    vtable->function((Object_1A6AD0 *)((char *)self + vtable->delta), argument);
+    self->Slot41((SO *)argument);
 }
 
 int func_001A6AF8(SO *start, SO *target)

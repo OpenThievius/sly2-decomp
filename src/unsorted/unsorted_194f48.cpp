@@ -6,13 +6,12 @@
 #include "include_asm.h"
 #include "sw.h"
 #include "jt.h"
+#include "swfind.h"
 
-struct Item { char pad[8]; float key; };
-
-int func_00194F48(Item *left, Item *right)
+int func_00194F48(TGT *left, TGT *right)
 {
-    float leftKey = left->key;
-    float rightKey = right->key;
+    float leftKey = left->sRank;
+    float rightKey = right->sRank;
     if (leftKey < rightKey)
         return -1;
     return 1;
@@ -145,34 +144,25 @@ wrap:
 
 INCLUDE_ASM(0X195368);
 
-struct VT { char pad[0x48]; short delta; short index; void (*fn)(void *); };
+extern "C" LO *PloSpawnTargetIndicator_195608(SW *, void *, TGT *);
 
-struct Obj { char pad[0xC]; VT *vt; };
-
-struct ENTRY { void *key; char pad[0xC]; Obj *old; char pad2[0x1C]; };
-
-struct STATE { char pad[0x4678]; int count; char pad1[4]; ENTRY entries[1]; char pad2[0x4744 - 0x4680 - 0x30]; void *owner; };
-
-extern "C" void *PloSpawnTargetIndicator_195608(STATE *, void *, ENTRY *);
-
-extern "C" void func_00195608(STATE *state, void *key)
+extern "C" void func_00195608(SW *psw, int oid)
 {
-    ENTRY *entry;
-    if (key != 0) {
-        if (state->owner != 0) {
-            for (int index = 0; index < state->count; index++) {
-                ENTRY *candidate = &state->entries[index];
-                if (key == candidate->key) { entry = candidate; break; }
+    TGT *ptgt;
+    if (oid != 0) {
+        if (psw->ploIndicatorTemplate != 0) {
+            for (int itgt = 0; itgt < psw->ctgt; itgt++) {
+                TGT *ptgtCandidate = &psw->atgt[itgt];
+                if (oid == ptgtCandidate->oid) { ptgt = ptgtCandidate; break; }
             }
-            if (entry != 0) {
-                void *result = PloSpawnTargetIndicator_195608(state, state->owner, entry);
-                if (result != 0) {
-                    Obj *old = entry->old;
-                    if (old != 0) {
-                        VT *vt = old->vt;
-                        vt->fn((char *)old + vt->delta);
+            if (ptgt != 0) {
+                LO *ploNew = PloSpawnTargetIndicator_195608(psw, psw->ploIndicatorTemplate, ptgt);
+                if (ploNew != 0) {
+                    LO *ploOld = ptgt->ploClone;
+                    if (ploOld != 0) {
+                        ploOld->Remove();
                     }
-                    entry->old = (Obj *)result;
+                    ptgt->ploClone = ploNew;
                 }
             }
         }
@@ -205,11 +195,9 @@ extern "C" LO *PloSpawnTargetIndicator(SW *psw, void *ptemplate, TGT *ptarget)
     return plo;
 }
 
-extern "C" int PloFindSwObject_thunk(char *, int, int, int);
-
-void FindTargetIndicatorTemplate(char *self)
+void FindTargetIndicatorTemplate(SW *psw)
 {
-    *(int *)(self + 0x4744) = PloFindSwObject_thunk(self, 0x405, 0x624, 0);
+    psw->ploIndicatorTemplate = PloFindSwObject_thunk(psw, 0x405, 0x624, 0);
 }
 
 extern "C" {

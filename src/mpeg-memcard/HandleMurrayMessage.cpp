@@ -43,7 +43,7 @@ void HandleMurrayMessage(MURRAY *pmurray, s32 msgid, MSGANIM *pmsg) {
                     func_001B7AE8(pmurray);
                     break;
                 case 15:
-                    CarryThrow_Launch((char *)pmurray + 0x1910);
+                    CarryThrow_Launch(pmurray->PvCarry());
                     break;
                 }
                 break;

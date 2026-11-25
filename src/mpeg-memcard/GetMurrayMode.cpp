@@ -1,6 +1,7 @@
-int GetMurrayMode(char *pmurray)
+#include "murray.h"
+int GetMurrayMode(MURRAY *pmurray)
 {
-    switch (*(int *)(pmurray + 0x13D0)) {
+    switch (pmurray->state) {
     case 0: return 0;
     case 5: return 0;
     case 2: return 1;

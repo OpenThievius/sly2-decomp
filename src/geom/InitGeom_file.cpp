@@ -440,9 +440,8 @@ void CBinaryInputStream_ReadBspc(CBinaryInputStream *pbis, GEOM_117FD0 *pgeom, B
 
 INCLUDE_ASM(0X118378);
 
-struct AVT { u8 unknown_0x0[8]; short delta; short index; char *(*fn)(void *, int, int); };
-
-struct ALLOC { AVT *vptr; };
+/* an allocator object (vtable pointer at 0): slot 1 allocates a block of the given size */
+struct ALLOC { virtual char *Alloc(int cb, int arg); };
 
 extern "C" void CBinaryInputStream_Read_thunk_118380(CBinaryInputStream *, int, char *);
 
@@ -452,8 +451,7 @@ void func_00118380(CBinaryInputStream *stream, char **out, ALLOC *alloc, int arg
     if (length == 0) {
         *out = 0;
     } else {
-        AVT *vtable = alloc->vptr;
-        char *buffer = vtable->fn((char *)alloc + vtable->delta, length + 1, arg);
+        char *buffer = alloc->Alloc(length + 1, arg);
         CBinaryInputStream_Read_thunk_118380(stream, length, buffer);
         buffer[length] = 0;
         *out = buffer;

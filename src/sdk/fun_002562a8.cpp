@@ -1,5 +1,6 @@
-void func_002562A8(void *a0)
+struct CARY { int *pb; int c; }; /* the first two words of Vector_Add's CARY (the array's buffer and its count) */
+void func_002562A8(CARY *pary)
 {
-    *(unsigned int *)(static_cast<char *>(a0) + 0) = 0;
-    *(unsigned int *)(static_cast<char *>(a0) + 4) = 0;
+    pary->pb = 0;
+    pary->c = 0;
 }

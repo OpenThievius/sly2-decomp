@@ -43,7 +43,7 @@ struct JT : STEP {
     virtual void Slot93();              /* 93: func_00140EB0; ZapContinue calls it without arguments */
     virtual void Slot94();
     virtual void SetFocus(int prioNear, struct STEPGUARD *pguardNear, int prioBest, struct STEPGUARD *pguardBest); /* 95: SetJtFocus; UpdateJtFocus */
-    virtual void PredictLead(float dt, struct LEAD *plead); /* 96: PredictLoLead; GoalAnimLeap_SetState passes a 0x30-byte LEAD */
+    virtual void PredictLead(struct LEAD *plead, float dt); /* 96: PredictLoLead; GoalAnimLeap_SetState passes a 0x30-byte LEAD; the lead comes first (PredictSlyLead(self, plead, dt), func_0017ABC8) */
     virtual void Slot97(float *ppos);   /* 97: func_00141588; GetJtCpdefi passes a four-float output */
     virtual void Slot98();              /* 98: func_001409B8 */
     virtual int FCanUseGadget(int gadget); /* 99: func_00141C00, FBentleyCanUseGadget; UpdateLookRig */

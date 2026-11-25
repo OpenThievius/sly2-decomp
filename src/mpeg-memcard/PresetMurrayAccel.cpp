@@ -23,7 +23,7 @@ void PresetMurrayAccel(MURRAY *self) {
         PresetJtAccelHide((JT *)self->PvAttach());
         return;
     case 14:
-        PresetJtAccelZap((char *)self + 0xDF0);
+        PresetJtAccelZap(self->PvZap());
         return;
     case 3:
         func_001B6CC0(self);

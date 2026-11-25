@@ -52,8 +52,7 @@ void func_001C65F8(DPRIZECOIN *pcoin, int dprizes)
             int *msg = loc.aw;
             msg[0] = 1;
             msg[1] = (sptr)pcoin;
-            const MSGSINKVT *vt = psink->vt;
-            vt->fn((char *)psink + vt->delta, msg);
+            psink->Notify(msg);
         }
         dprizes = 2;
         pcoin->HandleSpliceEvent(5, 0, 0, 0, 0);

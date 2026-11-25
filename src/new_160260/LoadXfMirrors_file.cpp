@@ -7,10 +7,7 @@
 
 struct Bis;
 
-struct VT { short delta; short index; void *(*fn)(void *, int); };
-
-struct ALO { char pad0[0xC]; char *vt; };
-
+#include "so.h"
 #include "xf.h"
 
 struct XFMIRROR { XF *pxfSource; XF *pxfTarget; int fPosition; int fRotation; };
@@ -25,15 +22,14 @@ extern "C" int S16Read__18CBinaryInputStream(Bis *);
 
 extern "C" void *PvAllocSwClearImpl__Fi(ALLOCREQ *);
 
-extern "C" void SetXfKind(ALO *, XF *, int);
+extern "C" void SetXfKind(SO *, XF *, int);
 
-static inline XF *ReadXf(ALO *palo, Bis *pbis)
+static inline XF *ReadXf(SO *palo, Bis *pbis)
 {
-    VT *vt = (VT *)(palo->vt + 0x198);
-    return (XF *)vt->fn((char *)palo + vt->delta, S16Read__18CBinaryInputStream(pbis));
+    return (XF *)palo->PxfFromRef(S16Read__18CBinaryInputStream(pbis));
 }
 
-extern "C" void LoadXfMirrors(ALO *palo, Bis *pbis)
+extern "C" void LoadXfMirrors(SO *palo, Bis *pbis)
 {
     int count = S8Read__18CBinaryInputStream(pbis);
     if (count > 0) for (int cmirror = count; cmirror != 0; --cmirror) {

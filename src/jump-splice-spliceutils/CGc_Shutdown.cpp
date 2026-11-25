@@ -1,8 +1,15 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
 #include "dl.h"
-struct SVT { char pad[0x58]; short delta; short index; void (*fn)(char *); };
-struct SCR { char pad[0xC]; SVT *vt; };
+#include "lo.h"
+/* an object of the list (class not known: a BASIC whose slot 11 is called on each at shutdown) */
+struct SCR : BASIC {
+    virtual void Slot7();
+    virtual void Slot8();
+    virtual void Slot9();
+    virtual void Slot10();
+    virtual void Slot11();
+};
 extern int g_2dd318;
 extern char B_003D9E80, B_003D9ED0, B_002E1E60, B_003DA0F0, B_003DA150, B_003DA0C0, B_003DA3C0, B_002E6550, B_002E65A0, B_003DA4F0, B_003DA530;
 extern "C" {
@@ -27,9 +34,8 @@ void CGc_Shutdown(DL *list)
 {
     DLI iterator;
     PushDli(&iterator, list);
-    for (char *item = (char *)PvStep(&iterator); item != 0; item = (char *)PvStep(&iterator)) {
-        SVT *vt = ((SCR *)item)->vt;
-        vt->fn(item + vt->delta);
+    for (SCR *item = (SCR *)PvStep(&iterator); item != 0; item = (SCR *)PvStep(&iterator)) {
+        item->Slot11();
     }
     g_2dd318 = 0;
     ReleaseMeter(&B_003D9E80);

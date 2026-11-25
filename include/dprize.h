@@ -24,15 +24,10 @@ struct SMAMSG {
 
 /* what a prize's collect and expire hooks are: an object whose slot 51 (offset 0x198) takes a message {1, source}; its class is not
    recovered, so the vtable is read by hand (entry: delta, index, function) */
-struct MSGSINKVT {
-    u8 unknown_0x0[0x198];
-    s16 delta;
-    s16 index;
-    void (*fn)(void *, int *);
-};
-struct MSGSINK {
-    u8 unknown_0x0[0xC];
-    const MSGSINKVT *vt;
+struct MSGSINK : LO {
+    virtual void Slot49();
+    virtual void Slot50();
+    virtual void Notify(int *pmsg);     /* 51: the message {1, source} of the collect and expire hooks */
 };
 /* the message a sink receives: {1, the prize} in its first two words; the callers' frames give it 0x40 bytes */
 struct SINKMSG {

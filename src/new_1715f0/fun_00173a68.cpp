@@ -2,17 +2,15 @@
 #include "sly2.h"
 #include "sw.h"
 #include "ps2inline.h"
+#include "stepguard.h"
 #include "vu0inline.h"
 
-struct POINT { char pad[0x14]; int fBusy; };
-struct VT { char pad[0x18]; short delta; short index; void (*fn)(void *, int, int, int, void *, int); };
-struct ACTOR { char pad[0xF64]; int handle; };
-struct SLOT { ACTOR *pactor; float tSpawn; char pad8[4]; POINT *ppoint; };
-struct ALERT { float tSeen; char pad4[0xC - 4]; int handle; char pad10[0x28 - 0x10]; int kind; int target; };
+struct POINT { u8 unknown_0x0[0x14]; int fBusy; };
+struct SLOT { STEPGUARD *pactor; float tSpawn; u8 unknown_0x8[4]; POINT *ppoint; };
 struct ROTATION { QW right; QW up; QW forward; };
 struct CLOCK { float t; float dt; };
 struct MESSAGE { void **ppactor; };
-struct SPAWNER { char pad[0xC]; VT *vptr; char pad10[0x58 - 0x10]; int cSlot; int cSlotMax; char pad60[0x70 - 0x60]; QW posLast; char pad80[0xA8 - 0x80]; float tNext; int mode; };
+struct SPAWNER : LO { u8 unknown_0x50[0x8]; int cSlot; int cSlotMax; u8 unknown_0x60[0x10]; QW posLast; u8 unknown_0x80[0x28]; float tNext; int mode; };
 
 extern SW B_003DD490;
 extern "C" {
@@ -24,9 +22,9 @@ ALERT *PalertFind(void *);
 SLOT *func_00173E78(SPAWNER *, int);
 POINT *func_00173F18(SPAWNER *, QW, QW *, ROTATION *, int *);
 void func_00173928(SPAWNER *, SLOT *, int, int);
-ACTOR *func_00174490(SPAWNER *, POINT *, QW *, ROTATION *, int);
-void SetAloAlpha(ACTOR *, float);
-void FadeAloIn(ACTOR *, float);
+STEPGUARD *func_00174490(SPAWNER *, POINT *, QW *, ROTATION *, int);
+void SetAloAlpha(STEPGUARD *, float);
+void FadeAloIn(STEPGUARD *, float);
 void func_00154038(int, int, int);
 extern CLOCK g_2dded0;
 extern float D_002BE5CC;
@@ -56,14 +54,14 @@ void func_00173A68(SPAWNER *spawner)
     if (base) {
         alert = PalertFind(base);
         if (alert) {
-            if (alert->kind == 0) {
+            if (alert->cguard == 0) {
                 alert = 0;
             } else {
                 switch (spawner->mode) {
                 case 0:
                     return;
                 case 1:
-                    if (D_002BE5CC < g_2dded0.t - alert->tSeen)
+                    if (D_002BE5CC < g_2dded0.t - alert->tStart)
                         return;
                     break;
                 case 2:
@@ -74,8 +72,8 @@ void func_00173A68(SPAWNER *spawner)
         }
     }
     int handle = 0;
-    if (alert && alert->kind == 1)
-        handle = alert->target;
+    if (alert && alert->cguard == 1)
+        handle = (int)alert->apguard[0];
     SLOT *slot = func_00173E78(spawner, handle);
     if (!slot)
         return;
@@ -85,13 +83,13 @@ void func_00173A68(SPAWNER *spawner)
     spawner->posLast = focus;
     if (slot->pactor)
         func_00173928(spawner, slot, 0, 1);
-    ACTOR *actor = func_00174490(spawner, point, position, &rotation, goal);
+    STEPGUARD *actor = func_00174490(spawner, point, position, &rotation, goal);
     if (!actor)
         return;
     SetAloAlpha(actor, 0.01f);
     FadeAloIn(actor, 0.5f);
     if (alert)
-        func_00154038(actor->handle, alert->handle, 2);
+        func_00154038((int)actor->psensor, (int)alert->palo, 2);
     slot->pactor = actor;
     slot->tSpawn = g_2dded0.t;
     slot->ppoint = point;
@@ -100,6 +98,6 @@ void func_00173A68(SPAWNER *spawner)
     MESSAGE message;
     message.ppactor = (void **)&actor;
     spawner->tNext = g_2dded0.t + D_002BE5D8;
-    spawner->vptr->fn((char *)spawner + spawner->vptr->delta, 0x19, 0, 1, &message, 0);
+    spawner->HandleSpliceEvent(0x19, 0, 1, (int)&message, 0);
 }
 }

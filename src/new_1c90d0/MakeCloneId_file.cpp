@@ -124,9 +124,10 @@ extern "C" void ALO_SetCloneId(SO *pso, int cloneid, int grf)
         child->SetCloneId(cloneid, 0);
 }
 
-struct VTSINK { u8 unknown_0x0[8]; short delta; short index; void (*fn)(void *, int, void *); };
-
-struct SINK { VTSINK *vt; };
+/* the object that receives a freshly instantiated clone set: its first virtual takes the count and the array of the set's objects */
+struct SINK {
+    virtual void ReceiveClones(int count, void *apalo); /* 1: InstantiateClone */
+};
 
 extern "C" unsigned MakeCloneId_1CA370(int, int);
 
@@ -145,7 +146,7 @@ void InstantiateClone(SW *sw, int iset, LO *parent, void *pxf, int oid, void *pm
         lo->Slot37(pmat);
     }
     if (sink) {
-        sink->vt->fn((char *)sink + sink->vt->delta, set->cpalo, set->apalo + set->icloneFree * set->cpalo);
+        sink->ReceiveClones(set->cpalo, set->apalo + set->icloneFree * set->cpalo);
     }
     set->icloneFree = set->icloneFree + 1;
 }

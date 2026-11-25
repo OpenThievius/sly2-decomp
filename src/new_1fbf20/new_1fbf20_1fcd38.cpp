@@ -782,47 +782,33 @@ extern "C" f32 MarkClockTickRealOnly__FP5CLOCK(SNDSYSTEM *clock)
     return value * 3.390842e-9f;
 }
 
-struct VT_1FE478 { u8 unknown_0x0[0x10]; short delta; short index; void (*fn)(void *); };
-
-struct Amb {
-    u8 unknown_0x0[0xC];
-    VT_1FE478 *vt;
-    u8 unknown_0x10[0x60 - 0x10];
-    int rec;
-};
-
-struct Stream {
-    u8 unknown_0x0[0x204];
-    int count;
-};
-
-#define AMB_1FE478(st, i) (*(Amb **)((char *)(st) + 0x208 + (i) * 4))
-
-extern "C" int func_001FCFF8_1FE478(Stream *, int);
+extern "C" int func_001FCFF8_1FE478(SNDSYSTEM *, int);
 
 extern "C" void func_00259BB0_1FE478(void *, void *);
 
 extern "C" void func_00259B48_1FE478(void *, void *);
 
-void **func_001FE478(void **out, Stream *stream, int id)
+/* typed queue[index] / apamb[index + 1] indexing scores 17 to 56: retail addresses the queue as base + 0x208 + index * 4 */
+#define AMB_1FE478(snd, i) (*(STREAMAMB **)((char *)(snd) + 0x208 + (i) * 4))
+
+void **func_001FE478(void **out, SNDSYSTEM *stream, int id)
 {
     int rec = func_001FCFF8_1FE478(stream, id);
     int index = 0;
-    while (index < stream->count && AMB_1FE478(stream, index)->rec != rec)
+    while (index < stream->field_0x204 && AMB_1FE478(stream, index)->sfxid != rec)
         index++;
-    if (index == stream->count) {
+    if (index == stream->field_0x204) {
         func_00259BB0_1FE478(out, 0);
         return out;
     }
-    Amb *taken;
+    STREAMAMB *taken;
     func_00259BB0_1FE478(&taken, AMB_1FE478(stream, index));
-    stream->count = stream->count - 1;
-    for (; index < stream->count; index++)
+    stream->field_0x204 = stream->field_0x204 - 1;
+    for (; index < stream->field_0x204; index++)
         func_00259B48_1FE478(&AMB_1FE478(stream, index), AMB_1FE478(stream, index + 1));
     func_00259BB0_1FE478(out, taken);
     if (taken) {
-        VT_1FE478 *vt = taken->vt;
-        vt->fn((char *)taken + vt->delta);
+        taken->Release();
     }
     return out;
 }

@@ -11,7 +11,7 @@ void CloneAct(LOOKAT *plookatDest, LOOKAT *plookatSource, ALO *palo, XF *pxf) {
     plookatDest->xfkind = plookatSource->xfkind;
     plookatDest->palo = palo;
     plookatDest->pxf = pxf;
-    CopyAb__FPvT0Ui((char *)plookatDest + 0x1C, (char *)plookatSource + 0x1C, B_003E123C.cb - 0x1C);
+    CopyAb__FPvT0Ui(plookatDest->unknown_0x18 + 4, plookatSource->unknown_0x18 + 4, B_003E123C.cb - 0x1C);
 }
 
 }

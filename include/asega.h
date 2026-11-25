@@ -66,7 +66,8 @@ struct ASEG : LO {
     /* 0x98 */ s32 cevent;     /* ApplyAseg */
     /* 0x9C */ ASEGEVENT *aevent; /* ApplyAseg */
     /* 0xA0 */ s32 iea;        /* ApplyAseg: the handle's current event index */
-    u8 unknown_0xA4[0xC];
+    /* 0xA4 */ f32 *paea;     /* reader: ReblendAsegbl (a blend aseg keeps its event frames here and copies them, rescaled, from its events aseg) */
+    u8 unknown_0xA8[0x8];
     /* 0xB0 */ s32 field_0xB0; /* PostAsegLoad passes it to its queued callback when it is not 0 */
 };
 

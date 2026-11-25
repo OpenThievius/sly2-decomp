@@ -59,7 +59,7 @@ void SetMurrayCarryState(MURRAY *m, int carrys)
     case 1:
         paseg = (ASEG *)view->pasegState1;
         tStart = view->uPhase * paseg->tLength;
-        ResetRunBlendFootsteps((char *)m + 0x1320);
+        ResetRunBlendFootsteps(m->runBlendA);
         grfapl = 9;
         break;
     case 2:

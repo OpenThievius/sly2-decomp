@@ -6,6 +6,8 @@
 #include "types.h"
 #include "alloc.h"
 #include "light.h"
+#include "so.h"
+#include "xf.h"
 #include "include_asm.h"
 
 struct BIS_167870;
@@ -201,7 +203,7 @@ INCLUDE_ASM(0X169198);
 
 extern "C" {
 typedef struct SORTKEY {
-    char pad0[4];
+    u8 unknown_0x0[4];
     s32 field_0x4;
     s32 field_0x8;
     s32 field_0xC;
@@ -254,15 +256,9 @@ struct EXTRA_169AC8 { int a[6]; };
 
 struct DESC_169AC8 { u8 unknown_0x0[2]; unsigned char fShared; signed char fSkip; u8 unknown_0x4[0x10 - 4]; int cqw; };
 
-struct VTE_169AC8 { short delta; short index; int (*fn)(char *, int); };
+struct CTX_169AC8 { SO *pso; };
 
-struct VT_169AC8 { u8 unknown_0x0[0x198]; VTE_169AC8 find; };
-
-struct OBJ_169AC8 { u8 unknown_0x0[0xC]; VT_169AC8 *vt; };
-
-struct CTX_169AC8 { OBJ_169AC8 *pobj; };
-
-struct GEOM_169AC8 { int unk0; int unk4; MATRIX4_169AC8 *pmat; int grf; char *pb; int cb; char pad[0x28 - 0x18]; };
+struct GEOM_169AC8 { int unk0; XF *pxf; MATRIX4_169AC8 *pmat; int grf; char *pb; int cb; u8 unknown_0x18[0x28 - 0x18]; };
 
 struct VTX_169AC8 { unsigned short a; unsigned short b; unsigned char c; char pad; };
 
@@ -270,7 +266,7 @@ struct VTXL_169AC8 { int unk0; VTX_169AC8 *avtx; };
 
 struct MAP_169AC8 { int unk0; VTXL_169AC8 *avtxl; int *aivtxl; };
 
-struct STRIP_169AC8 { int cidx; char pad0[8 - 4]; unsigned grf; char pad1[0x14 - 0xC]; int *aidx; char pad2[0x24 - 0x18]; int offA; int offB; int pad2C; int offC; char pad3[0x40 - 0x34]; };
+struct STRIP_169AC8 { int cidx; u8 unknown_0x4[8 - 4]; unsigned grf; u8 unknown_0xC[0x14 - 0xC]; int *aidx; u8 unknown_0x18[0x24 - 0x18]; int offA; int offB; u8 unknown_0x2C[4]; int offC; u8 unknown_0x34[0x40 - 0x34]; };
 
 extern "C" int S8Read__18CBinaryInputStream_169AC8(BIS_169AC8 *);
 
@@ -302,7 +298,7 @@ extern "C" void func_00169AC8(CTX_169AC8 *pctx, HDR_169AC8 *phdrSrc, INFO_169AC8
     struct {
         MATRIX4_169AC8 mat;
         REQ_169AC8 req;
-        char pad[8];
+        u8 unknown_0x48[8];
         char frame[0x10];
         MATRIX4_169AC8 matCopy;
         MATRIX4_169AC8 matProduct;
@@ -314,9 +310,8 @@ extern "C" void func_00169AC8(CTX_169AC8 *pctx, HDR_169AC8 *phdrSrc, INFO_169AC8
         *pextra = *pextraSrc;
         pextra->a[5] = U32Read__18CBinaryInputStream_169AC8(pbis);
     }
-    OBJ_169AC8 *pobj = pctx->pobj;
-    VTE_169AC8 *pvte = &pobj->vt->find;
-    pgeom->unk4 = pvte->fn((char *)pobj + pvte->delta, S16Read__18CBinaryInputStream_169AC8(pbis));
+    SO *pso = pctx->pso;
+    pgeom->pxf = (XF *)pso->PxfFromRef(S16Read__18CBinaryInputStream_169AC8(pbis));
     if (pgeom->grf & 0x1000) {
         CBinaryInputStream_ReadMatrix4(pbis, &l.mat);
     } else {
@@ -339,7 +334,7 @@ extern "C" void func_00169AC8(CTX_169AC8 *pctx, HDR_169AC8 *phdrSrc, INFO_169AC8
         pgeom->cb += pbNew - pbOld;
         pgeom->pb = pbNew;
         if (pgeom->grf & 0x1000) {
-            c169AC8__ml__FRC7MATRIX4T0(&l.matProduct, (MATRIX4_169AC8 *)((char *)pgeom->unk4 + 0x40), &l.mat);
+            c169AC8__ml__FRC7MATRIX4T0(&l.matProduct, (MATRIX4_169AC8 *)&pgeom->pxf->matWorld, &l.mat);
             l.matCopy = l.matProduct;
             CopyAb__FPvT0Ui_169AC8(pgeom->pb + 0x14, &l.matCopy, 0x40);
         }
@@ -373,7 +368,7 @@ struct DMAQUAD { unsigned tag; int address; u8 unknown_0x8[8]; };
 
 struct GLOB { u8 unknown_0x0[0x10]; int cqw; };
 
-struct GLOBI { char pad[0x10]; int chain; int data; };
+struct GLOBI { u8 unknown_0x0[0x10]; int chain; int data; };
 
 extern "C" void *PvAllocSwCopyImpl__FiPv_169EB8(ALLOCREQ *, void *);
 
@@ -461,7 +456,7 @@ struct SHD_16CAA0 { u8 unknown_0x0[0x1C]; int cslot; };
 
 struct REC { u8 unknown_0x0[1]; char count; u8 unknown_0x2[0xA]; int base; int detached; /* reader: DMAS_DetachCopyPermanent destination */ };
 
-struct ENTRY { int n0; int n4; int n8; char pad[0x50 - 0xC]; };
+struct ENTRY { int n0; int n4; int n8; u8 unknown_0xC[0x50 - 0xC]; };
 
 struct REC2 { u8 unknown_0x0[0x10]; int detached; /* reader: DMAS_DetachCopyPermanent destination */ u8 unknown_0x14[4]; ENTRY *arr; };
 
@@ -470,9 +465,9 @@ struct UNP { unsigned short w[10]; unsigned short ashd[2]; unsigned short aweigh
 struct L {
     char vifs[0x30];
     int frame0;
-    char pad44[0xC];
+    u8 unknown_0x44[0xC];
     ALLOCREQ req;
-    char pad58[8];
+    u8 unknown_0x58[8];
 };
 
 extern "C" void c16CAA0__4VIFS(void *);
@@ -732,7 +727,7 @@ extern "C" void func_0016D6C8(GIFS *pgifs, int flags, void **pcursor)
     PackAD__4GIFSll(pgifs, 0x41, ((0xE000L << 30) | 0x8000L) << 10);
 }
 
-struct GIFS { int pad0; unsigned start; int pad8; unsigned end; char pad10[0x20]; };
+struct GIFS { int pad0; unsigned start; int pad8; unsigned end; u8 unknown_0x10[0x20]; };
 
 extern "C" void AddDmaCall__4DMASP2QW_16DA48(void *, void *);
 
@@ -1137,16 +1132,16 @@ INCLUDE_ASM(0X16EA80);
 struct BND { float x, y, z, r, a, b; };
 
 struct GS {
-    char pad0[0x10];
+    u8 unknown_0x0[0x10];
     VECTOR center;
     float radius;
-    char pad1[0x44 - 0x24 - 0];
+    u8 unknown_0x24[0x44 - 0x24];
     BND *abnd;
 };
 
-struct ALO { char pad[0x148]; unsigned long grf; };
+struct ALO { u8 unknown_0x0[0x148]; unsigned long grf; };
 
-struct GLOBSET { ALO *palo; char pad[0xC]; VECTOR center; float radius; char pad2[0x20]; BND *abnd; };
+struct GLOBSET { ALO *palo; u8 unknown_0x4[0xC]; VECTOR center; float radius; u8 unknown_0x24[0x20]; BND *abnd; };
 
 extern "C" void RemoveAloFromRenderTree(ALO *);
 

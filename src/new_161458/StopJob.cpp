@@ -1,9 +1,7 @@
 #include "sly2.h"
-struct TASK { char pad[0x7C]; struct JOB *job; };
 #include "sw.h"
-struct JOBVTBL { char pad[0x18]; short delta; short index; void (*fn)(void *, int, int, int, int, int); };
-struct JOB { char pad0[0xC]; JOBVTBL *vtbl; char pad1[0x7C]; int ctoggle; void *atoggle; int canim; void *aanim; char pad2[0x54]; int cause; };
-struct DESC { char pad0[8]; int idA; char pad1[0x2C]; int idB; };
+#include "job.h"
+struct DESC { u8 unknown_0x0[8]; int idA; u8 unknown_0xC[0x2C]; int idB; };
 extern "C" SW B_003DD490;
 extern "C" char B_002DEB30;
 extern "C" void SetSwCurrentJob(SW *, JOB *);
@@ -41,6 +39,6 @@ void StopJob(JOB *job)
         bevy_camera_follow_activity(&B_002DEB30, 0x22, job);
         ApplyTaskToggles(job, 5, job->ctoggle, job->atoggle);
         ApplyTaskAnims(job, 5, job->canim, job->aanim, job->cause);
-        job->vtbl->fn((char *)job + job->vtbl->delta, 0x14, 0, 0, 0, 0);
+        job->HandleSpliceEvent(0x14, 0, 0, 0, 0);
     }
 }

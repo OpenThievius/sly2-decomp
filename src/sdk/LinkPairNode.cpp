@@ -1,9 +1,5 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later */
-struct PAIRNODE {
-    char pad0[4];
-    int grf;
-    char pad8[12];
-};
+#include "pairnode.h"
 extern "C" {
 extern unsigned B_002DD284;
 extern PAIRNODE *B_00452098[];
@@ -13,7 +9,7 @@ static inline void LocateGcNode(PAIRNODE *pnode, unsigned *pinode, unsigned *pic
 {
     for (unsigned ichunk = 0; ichunk < B_002DD284; ichunk++) {
         PAIRNODE *pchunk = B_00452098[ichunk];
-        if (pchunk <= pnode && pnode < (PAIRNODE *)((char *)pchunk + 0x28000)) {
+        if (pchunk <= pnode && pnode < pchunk + 0x2000) {
             *pinode = pnode - pchunk;
             *pichunk = ichunk;
             return;

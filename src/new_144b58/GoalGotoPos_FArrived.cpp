@@ -1,9 +1,10 @@
+#include "goals.h"
 extern "C" {
-int GoalFollowCrv_FAtEnd(char *);
-int GoalGotoPos_FArrived(char *self) {
+int GoalFollowCrv_FAtEnd(GOALFOLLOWCRV *);
+int GoalGotoPos_FArrived(GOAL *self) {
     int result = 0;
-    char *crv = *(char **)(self + 0x18);
-    if (GoalFollowCrv_FAtEnd(crv) || *(int *)(crv + 0x4C) == 2) result = 1;
+    GOALFOLLOWCRV *crv = (GOALFOLLOWCRV *)self->pgoalChild;
+    if (GoalFollowCrv_FAtEnd(crv) || crv->state == 2) result = 1;
     return result;
 }
 }

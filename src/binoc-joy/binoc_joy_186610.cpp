@@ -4,47 +4,40 @@
 #include "types.h"
 #include "sly2.h"
 #include "alloc.h"
+#include "alo.h"
+#include "act.h"
 #include "m2c_macros.h"
 #include "include_asm.h"
 
 extern "C" void CloneAct(void *);
 
-struct Obj { char pad[8]; char *owner; char pad2[0x10]; int unk1C; };
-
-void func_00186610(Obj *self)
+void func_00186610(ACT1 *pact)
 {
-    CloneAct(self);
-    self->unk1C = *(int *)(self->owner + 0xA8);
+    CloneAct(pact);
+    pact->field_0x1C = *(s32 *)&pact->act.pxf->tArrive;
 }
 
 extern "C" {
-typedef struct ActTarget {
-    char padA8[0xA8];
-    s32 field_0xA8;
-} ActTarget;
-
-typedef struct Act {
-    char pad0[8];
-    ActTarget *field_0x8;
-    char padC[0x10];
-    s32 field_0x1C;
-} Act;
-
 s32 ActivateAct();                                  /* extern */
 
-void func_00186640(Act *act) {
+void func_00186640(ACT1 *pact) {
     ActivateAct();
-    act->field_0x8->field_0xA8 = act->field_0x1C;
+    pact->act.pxf->pxfSource = (XF *)pact->field_0x1C;
 }
 }
 
 struct Bis;
 
-struct IKLIMB { int xf0; int pxfUpper; int pxfLower; int pxfEnd; char pad[0xA0 - 0x10]; QW posTarget; QW posEffector; char pad2[0xE0 - 0xC0]; };
-
-struct VT { short delta; short index; int (*fn)(void *, int); };
-
-struct ALO { char pad[0xC]; char *vt; char pad1[0x148 - 0x10]; unsigned long flags; };
+struct IKLIMB {
+    s32 xf0;
+    s32 pxfUpper;
+    s32 pxfLower;
+    s32 pxfEnd;
+    u8 unknown_0x10[0x90];
+    QW posTarget;
+    QW posEffector;
+    u8 unknown_0xC0[0x20];
+};
 
 extern "C" {
 unsigned U8Read__18CBinaryInputStream(Bis *);
@@ -57,8 +50,7 @@ void func_0012DD28(ALO *, int, int, void *);
 
 static inline int ReadXf(ALO *palo, Bis *pbis)
 {
-    VT *vt = (VT *)(palo->vt + 0x198);
-    return vt->fn((char *)palo + vt->delta, S16Read__18CBinaryInputStream(pbis));
+    return (int)palo->PxfFromRef(S16Read__18CBinaryInputStream(pbis));
 }
 
 extern "C" void LoadAloIkLimbs(ALO *palo, Bis *pbis)
@@ -66,7 +58,7 @@ extern "C" void LoadAloIkLimbs(ALO *palo, Bis *pbis)
     int count = U8Read__18CBinaryInputStream(pbis);
     if (count == 0)
         return;
-    palo->flags |= 0x1000000000UL;
+    palo->grfso |= 0x1000000000UL;
     if (count <= 0)
         return;
     ALLOCREQ req;

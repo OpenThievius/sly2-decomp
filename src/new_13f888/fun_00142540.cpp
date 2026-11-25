@@ -1,16 +1,21 @@
 #include "sly2.h"
-struct VT { char pad[0x40]; short delta; short index; void (*fn)(void *); };
-struct GO { char pad[0x0C]; VT *vptr; char pad1[0x30 - 0x10]; int a30; char p34[0x40 - 0x34]; QW a40; };
-extern "C" void GoalStack_Clear(char *);
-extern "C" GO *func_00205438(char *, int);
-extern "C" void func_00142540(char *self, int arg1, QW arg2)
+#include "goals.h"
+#include "step.h"
+/* class 0xC2 (GOALPARTNERFOLLOW, goals.h) as this caller fills it: a word at 0x30 (the leader slot) and a quadword at 0x40 */
+struct PARTNERFOLLOWSTART : GOAL {
+    s32 field_0x30;
+    u8 unknown_0x34[0xC];
+    QW pos;
+};
+extern "C" void GoalStack_Clear(GOALSTACK *);
+extern "C" PARTNERFOLLOWSTART *func_00205438(STEP *, int);
+extern "C" void func_00142540(STEP *self, int arg1, QW arg2)
 {
-    GoalStack_Clear(self + 0x26C);
+    GoalStack_Clear(self->pgoalstack());
     if (arg1 != 0) {
-        GO *go = func_00205438(self, 0xC2);
-        go->a30 = arg1;
-        go->a40 = arg2;
-        VT *vt = go->vptr;
-        vt->fn((char *)go + vt->delta);
+        PARTNERFOLLOWSTART *go = func_00205438(self, 0xC2);
+        go->field_0x30 = arg1;
+        go->pos = arg2;
+        go->Activate();
     }
 }

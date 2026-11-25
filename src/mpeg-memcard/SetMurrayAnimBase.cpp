@@ -14,7 +14,7 @@ void SetMurrayAnimBase(MURRAY *self)
         paseg = PasegAttachBase(self->PvAttach(), &secondary);
         break;
     case 0xE:
-        paseg = bevy_player_p7_damage_1a23f8((char *)self + 0xDF0, &secondary);
+        paseg = bevy_player_p7_damage_1a23f8(self->PvZap(), &secondary);
         break;
     case 2:
         if (self->ploCarried != 0)

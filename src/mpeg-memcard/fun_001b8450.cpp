@@ -10,7 +10,7 @@ int func_001B8450(MURRAY *pmurray, void *pso)
     if (pmurray->psoDropped != 0 && func_001A6AF8(pso, pmurray->psoDropped) != 0) {
         level = IMax(level, 3);
     } else if (pmurray->state == 0xf) {
-        level = func_00220498((char *)pmurray + 0x1910, pso, level);
+        level = func_00220498(pmurray->PvCarry(), pso, level);
     }
     return level;
 }

@@ -1,19 +1,18 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-struct PVT { char pad[0xA8]; short delta; short index; void (*fn)(void *, int); };
-struct PART { char pad[0xC]; PVT *vt; };
 #include "sly.h"
+/* a hide part of the player: an object whose slot 21 (LO::Slot21) hides (0) or shows (1) it */
+struct PART : LO {};
 extern "C" void func_00205D10();
-#define SETPART(p, v) ((p)->vt->fn((char *)(p) + (p)->vt->delta, (v)))
 void SetSlyHide(SLY *pjt, int fHide)
 {
     func_00205D10();
     if (fHide != 0) {
-        SETPART(pjt->apartHide[0], 0);
-        SETPART(pjt->apartHide[1], 0);
-        SETPART(pjt->apartHide[2], 0);
+        pjt->apartHide[0]->Slot21(0);
+        pjt->apartHide[1]->Slot21(0);
+        pjt->apartHide[2]->Slot21(0);
     } else {
-        SETPART(pjt->apartHide[0], 1);
-        SETPART(pjt->apartHide[1], 1);
-        SETPART(pjt->apartHide[2], 1);
+        pjt->apartHide[0]->Slot21(1);
+        pjt->apartHide[1]->Slot21(1);
+        pjt->apartHide[2]->Slot21(1);
     }
 }

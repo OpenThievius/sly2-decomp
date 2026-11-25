@@ -1,19 +1,13 @@
-#include "types.h"
-
+#include "sly2.h"
+#include "cref.h"
+struct CFrame;
 extern "C" {
-void SetTag__4CRef4TAGK(s8 *, s32);
-void FInvertMatrix4__FP7MATRIX4T0(s8 *, s8 *);
-void CRef_CopyConstruct(s8 *, s8 *);
-void CRef_Destruct(s8 *);
-
-s8 *RefOpMatrixInvert(s8 *arg0, s32 unused_a1, s8 *arg2) {
-    s8 sp[0x10] __attribute__((aligned(16)));
-
-    SetTag__4CRef4TAGK(sp, 0x1B);
-    FInvertMatrix4__FP7MATRIX4T0(*(s8 **)(arg2 + 4), *(s8 **)(sp + 4));
-    CRef_CopyConstruct(arg0, sp);
-    CRef_Destruct(sp);
-    return arg0;
+void FInvertMatrix4__FP7MATRIX4T0(MATRIX4 *, MATRIX4 *);
+CRef RefOpMatrixInvert(int carg, CRef *aref, CFrame *pframe)
+{
+    CRef refInverse;
+    refInverse.SetTag(TAGK_Matrix);
+    FInvertMatrix4__FP7MATRIX4T0(aref[0].m_tag.m_pmatrix, refInverse.m_tag.m_pmatrix);
+    return refInverse;
 }
-
 }

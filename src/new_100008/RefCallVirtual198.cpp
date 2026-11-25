@@ -1,8 +1,8 @@
 #include "sly2.h"
 #include "cref.h"
 CRef RefSetArgsFromSplice(int cref, CRef *aref, const void *aotyp, ...);
-struct VT { char pad[0x198]; short delta; short index; void (*fn)(void *, int); };
-struct OBJ { char pad[0xC]; VT *vptr; };
+struct VT { u8 unknown_0x0[0x198]; short delta; short index; void (*fn)(void *, int); };
+struct OBJ { u8 unknown_0x0[0xC]; VT *vptr; };
 
 CRef RefCallVirtual198(OBJ *object, int count, CRef *args)
 {

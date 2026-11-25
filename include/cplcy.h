@@ -133,13 +133,17 @@ struct K30CAM CPLCY_BASE {
     /* 0x10 */ s32 field_0x10; /* bevy_classes_k30_cam_150780 reads it as the target object */
     /* 0x14 */ s32 field_0x14;
     /* 0x18 */ f32 minDistance; /* bevy_classes_k30_cam_150ef0's minDistance */
-    u8 unknown_0x1C[0x24];
+    u8 unknown_0x1C[4];
+    /* 0x20 */ QW position;      /* bevy_classes_k30_cam_150ef0 stores bevy_classes_k30_cam_150780's result; func_00150F58 compares it with that result */
+    /* 0x30 */ QW target;        /* bevy_classes_k30_cam_150ef0 stores bevy_classes_k30_cam_1507f8's result; func_00151018 compares it */
     /* 0x40 */ s32 active; /* its own flag (bevy_classes_k30_cam_set, func_00150E60, func_00150EA0), not CPLCY::active */
     u8 unknown_0x44[0x3C];
     /* 0x80 */ s128 currentPosition; /* bevy_classes_k30_cam_150ef0 */
     /* 0x90 */ s128 currentTarget;
     /* 0xA0 */ f32 currentDistance;
-    u8 unknown_0xA4[0x10];
+    u8 unknown_0xA4[8];
+    /* 0xAC */ f32 distance;     /* bevy_classes_k30_cam_150ef0 sets it to minDistance; func_001510D8 compares it */
+    u8 unknown_0xB0[4];
     /* 0xB4 */ f32 field_0xB4; /* func_00150728: 7.0 */
     u8 unknown_0xB8[8];
     /* 0xC0 */ void *field_0xC0; /* reference pointers, cleared by bevy_classes_k30_cam_reset, released by CM_Destruct */

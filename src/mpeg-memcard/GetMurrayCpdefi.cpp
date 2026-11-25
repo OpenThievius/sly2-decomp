@@ -23,7 +23,7 @@ void GetMurrayCpdefi(MURRAY *murray, unsigned *flags)
         *flags |= 1;
         break;
     case 15:
-        func_00220388((char *)murray + 0x1910, flags);
+        func_00220388(murray->PvCarry(), flags);
         break;
     case 20:
         func_0019EA00(murray->PvPipe(), flags);

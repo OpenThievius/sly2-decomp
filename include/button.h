@@ -11,6 +11,7 @@
 #else
 #include "types.h"
 #endif
+#include "rsmg.h"
 
 struct BUTTON;
 
@@ -37,9 +38,14 @@ struct BTN {
     /* 0x94 */ f32 tButtons;  /* the time of the last change */
     /* 0x98 */ f32 dtRepush;  /* how long a mode 2 button waits before it can be pressed again; negative: never released */
     /* 0x9C */ s32 field_0x9C; /* InitVolbtn sets it to 1 */
-    u8 unknown_0xA0[0x4];
+    /* 0xA0 */ s32 fSeekEnd;  /* reader: RunBtnAsegs (a Btn family function, so the class is certain): the segments seek their end when set */
     /* 0xA4 */ s32 field_0xA4; /* LoadVolbtnFromBrx sets it to 1 */
-    u8 unknown_0xA8[0xB0];
+    /* 0xA8 */ struct LO *pjsgSubject; /* reader: RunBtnAsegs passes it to StartJsg after pjsg */
+    /* 0xAC */ void *pjsg;    /* reader: RunBtnAsegs: the joint sequence it starts */
+    /* 0xB0 */ s32 crsmg;     /* readers: RunBtnAsegs passes it and arsmg to TriggerRsmg; SetAlarmRsmg passes both to FAddRsmg */
+    /* 0xB4 */ struct RSMG arsmg[8]; /* readers: RunBtnAsegs (TriggerRsmg reads crsmg of them), SetAlarmRsmg (FAddRsmg, capacity 8) */
+    /* 0x134 */ s32 ctaskreq; /* reader: RunBtnAsegs passes it and ataskreq to ApplyTaskStateRequests */
+    /* 0x138 */ u8 ataskreq[0x20]; /* reader: RunBtnAsegs */
 };
 
 #ifdef __cplusplus
@@ -69,6 +75,9 @@ s32 FAddAshOid(struct ASHLIST *pashlist, s32 oid, s32 nArg);
 #if defined(__cplusplus) && defined(__mips__)
 SLY2_SIZE_CHECK(BTN, 0x158);
 SLY2_OFFSET_CHECK(BTN, ashOff, 0x48);
+SLY2_OFFSET_CHECK(BTN, fSeekEnd, 0xA0);
+SLY2_OFFSET_CHECK(BTN, arsmg, 0xB4);
+SLY2_OFFSET_CHECK(BTN, ctaskreq, 0x134);
 SLY2_OFFSET_CHECK(BTN, buttons, 0x90);
 SLY2_OFFSET_CHECK(BUTTON, btn, 0x150);
 SLY2_OFFSET_CHECK(BUTTON, btnt, 0x2A8);

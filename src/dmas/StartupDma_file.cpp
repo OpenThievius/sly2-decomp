@@ -36,7 +36,6 @@ void StartupDma__Fv(void) {
 
 /* the DMA tag buffer builder (retail's DMAS, mangled in AddDmaCnt__4DMAS and the others): a buffer from pbBase to pbMax, a cursor pbCur and the
    open cnt tag pbCnt (EndDmaCnt closes it). The vtable at 0x18 is not at 0xC: DMAS is not a BASIC. */
-struct DMASVT { u8 unknown_0x0[8]; s16 delta; s16 index; void (*fn)(void *, int); };
 struct DMAS {
     /* 0x00 */ u8 *pbMax;
     /* 0x04 */ u8 *pbBase;
@@ -44,8 +43,10 @@ struct DMAS {
     /* 0x0C */ u8 *pbCur;
     /* 0x10 */ s32 fPad;     /* EndDmaCnt: pad the cursor to a quadword */
     /* 0x14 */ s32 fEndPrim; /* EndDmaCnt: call the vtable's slot instead */
-    /* 0x18 */ DMASVT *vt;
+    /* 0x18 */ const void *vt; /* retail's vtable (D_002CE488), written by the constructor; its first virtual is DMASVIEW::EndPrim */
 };
+/* DMAS seen through its vtable: EndDmaCnt calls slot 1 on the object (fEndPrim set) */
+struct DMASVIEW { u8 unknown_0x0[0x18]; virtual void EndPrim(int); };
 
 extern "C" void Clear__4DMAS_157278(DMAS *);
 
@@ -54,7 +55,7 @@ extern "C" char D_002CE488[];
 extern "C" DMAS *__4DMAS(DMAS *dmas) {
     dmas->fPad = 0;
     dmas->fEndPrim = 0;
-    dmas->vt = (DMASVT *)D_002CE488;
+    dmas->vt = D_002CE488;
     Clear__4DMAS_157278(dmas);
     return dmas;
 }
@@ -261,7 +262,7 @@ void EndDmaCnt__4DMAS(DMAS *dmas)
         }
         dmas->pbCur = (u8 *)cursor;
     } else if (dmas->fEndPrim) {
-        dmas->vt->fn((char *)dmas + dmas->vt->delta, 0);
+        ((DMASVIEW *)dmas)->EndPrim(0);
     }
     u32 *cnt = (u32 *)dmas->pbCnt;
     if (cnt) {

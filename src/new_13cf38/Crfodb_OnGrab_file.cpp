@@ -81,7 +81,7 @@ extern "C" char B_003E0EA8[];
 
 static inline void *SymtabOfSave(char *save) { return save + 8; }
 
-extern "C" void *PpathCrfodbLoot(void *guard)
+extern "C" void *PpathCrfodbLoot(CRFODB *guard)
 {
     short asym[3];
     SAVEPATH path;
@@ -90,7 +90,7 @@ extern "C" void *PpathCrfodbLoot(void *guard)
         idLevel = 0;
     asym[0] = SymidFindSymtab(SymtabOfSave(B_003E0EA8), "booty");
     asym[1] = SymidFindSymtab(SymtabOfSave(B_003E0EA8), "aoidAssembly");
-    asym[2] = *(unsigned short *)((char *)guard + 0x180);
+    asym[2] = guard->oid;
     path.csym = 3;
     path.asym = asym;
     return PpathConcatStack(func_002109B8(idLevel), &path);
@@ -102,7 +102,7 @@ extern "C" {
 extern int B_003D4A60[];
 void CStackFrame_Construct(void *);
 void CStackFrame_Destructor(void *, int);
-void *PpathCrfodbLoot(void *);
+void *PpathCrfodbLoot(CRFODB *);
 CRef RefGetGameSaveValue(void *, int *);
 }
 

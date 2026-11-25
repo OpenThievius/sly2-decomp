@@ -3,6 +3,8 @@
 // A candidate of the world's target list (SW::atgt, 0x30 bytes) as this function reads it: word 0 an object it passes to
 // FIsBasicDerivedFrom (UpdateSwTargetList reads the same word as an object id, TGT::oid), word 1 a member index, word 2 the distance (TGT::sRank).
 struct TARGETVIEW { LO *plo; s32 imember; float dist; u8 unknown_0xC[0x30 - 0xC]; };
+// An object of class 0x26 as this function reads it: the attach kind it hands to StartAttach (only reader, so a view and not a header).
+struct TARGETKINDVIEW : LO { u8 unknown_0x50[0xBC]; s32 kind; };
 extern SW B_003DD490;
 extern SLY *g_2e1e40; /* the player */
 extern float D_FLT_002BF660;
@@ -26,7 +28,7 @@ int FAttachGroundTarget(ATTACH *pattach)
         } else if (FIsBasicDerivedFrom(plo, 0xC) || FIsBasicDerivedFrom(plo, 0x22)) {
             kind = 0;
         } else if (FIsBasicDerivedFrom(plo, 0x26)) {
-            kind = *(int *)((char *)ptarget->plo + 0x10C);
+            kind = ((TARGETKINDVIEW *)ptarget->plo)->kind;
         } else if (FIsBasicDerivedFrom(plo, 0x23)) {
             kind = 7;
         } else {

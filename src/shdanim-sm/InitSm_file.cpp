@@ -73,6 +73,11 @@ struct SMAHEAP { DL dl; int heap; };
 extern "C" SMAHEAP B_003E126C;
 
 extern "C" char D_002D9768[];
+/* the flat view the constructor sets the vtable pointer through by hand (as a compiler-made constructor would, as BLOTVIEW does) */
+struct SMAVIEW {
+    u8 unknown_0x0[0xC];
+    void *vtable;
+};
 
 extern "C" void *PvAllocSlotheapImpl(void *);
 
@@ -100,7 +105,7 @@ void PsmaApplySmInternal(SM *psm, ALO *paloRoot, int oidInitial, int grfapl, uns
     psma->psidebag = 0;
     psma->psm = psm;
     psma->ismsNext = -1;
-    *(void **)((char *)psma + 0xC) = &D_002D9768;
+    ((SMAVIEW *)psma)->vtable = &D_002D9768;
     psma->svt = 1.0f;
     AppendDlEntry(&B_003E126C.dl, psma);
     AppendDlEntry(&psm->dlsma, psma);

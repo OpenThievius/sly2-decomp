@@ -10,11 +10,13 @@
 struct SOHITBYTES8 { u8 bytes[8]; };
 
 struct SOHIT : PO {
+    virtual void Slot82();              /* 82: no named reader yet (slot 82 of PO's subclasses that are not STEP) */
+    virtual void Slot83();              /* 83: SoHit_PostLoad (func_0017F138) calls it after PostSoLoad, without arguments */
     /* 0x180 */ s32 hpMax;      /* SoHit_ResetState (func_0017F6B0) copies it to hp; Chaser_SetState does the same when its state leaves -1 */
     /* 0x184 */ s32 hp;         /* the same two; Chaser_FTakeHit reads it */
     /* 0x188 */ s32 dhp;        /* SoHit_Kill (the damage it deals on contact); Swarm_AdjustNewXp tests it */
     /* 0x18C */ s32 fTouchQueued; /* SoHit_Reset (func_0017F110) clears it, SoHit_QueueTouch (func_0017F5B0) tests and sets it, SoHit_ResetState (func_0017F6B0) tests it: all three SOHIT methods */
-    u8 unknown_0x190[0x4];
+    /* 0x190 */ void *pexpl;   /* reader: SoHit_Kill (a method of SOHIT) passes it to ExplodeExpl when set */
     /* 0x194 */ s32 hAsega;     /* SoHit_SetAnimEntry (func_0017F4C0), SoHit_FAnimDone (func_0017F550): the playing animation's handle */
     /* 0x198 */ s32 hSma;       /* the same two: the SM's handle */
     u8 unknown_0x19C[0x4];

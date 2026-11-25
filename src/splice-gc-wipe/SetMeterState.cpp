@@ -1,9 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "gadgetmenu.h"
-struct BVT { char pad[0x188]; short delta; short unused; void (*fn)(void *, int); };
-struct Blot { char pad[0xC]; BVT *vt; };
-struct ITEMDEF { int a; int b; int price; int shown; char pad[16]; };
-struct Meter { char pad0[0x20]; float low; char pad1[4]; float high; char pad2[4]; unsigned state; int actor; Blot *blot; int arg3C; int arg40; int arg44; int arg48; int arg4C; };
+#include "blot.h"
+struct ITEMDEF { int a; int b; int price; int shown; u8 unknown_0x10[16]; };
+struct Meter { u8 unknown_0x0[0x20]; float low; u8 unknown_0x24[4]; float high; u8 unknown_0x2C[4]; unsigned state; int actor; BLOT *blot; int arg3C; int arg40; int arg44; int arg48; int arg4C; };
 extern ITEMDEF D_002BCD00[];
 extern GADGETMENUENTRY D_002C2DE8[];
 extern GADGETMENUENTRY D_002C3028[];
@@ -11,27 +10,26 @@ extern GADGETMENUENTRY D_002C3148[];
 extern "C" {
 int FGadgetAcquired(int);
 int FIsBasicDerivedFrom(int, int);
-void SeekBlotLabel(float, Blot *, int);
-void func_00213928(Blot *, int);
-void func_00213B00(Blot *, int);
+void SeekBlotLabel(float, BLOT *, int);
+void func_00213928(BLOT *, int);
+void func_00213B00(BLOT *, int);
 }
-#define CALL(blot, arg) ((blot)->vt->fn((char *)(blot) + (blot)->vt->delta, (arg)))
 extern "C" void SetMeterState(Meter *self, unsigned state)
 {
     if (self->state == state) return;
     if (self->blot == 0) return;
-    if (self->state == 2 || self->state == 6) CALL(self->blot, self->arg3C);
+    if (self->state == 2 || self->state == 6) self->blot->Select(self->arg3C);
     self->state = state;
     if (state >= 8) return;
     switch (state) {
     case 0:
     case 5:
-        CALL(self->blot, self->arg44);
+        self->blot->Select(self->arg44);
         break;
     case 1: {
         int count = 0;
         GADGETMENUENTRY *entries = 0;
-        CALL(self->blot, self->arg3C);
+        self->blot->Select(self->arg3C);
         func_00213B00(self->blot, 0x34F);
         SeekBlotLabel(1.0f - self->low, self->blot, 0x34F);
         if (FIsBasicDerivedFrom(self->actor, 0x35)) { count = 0x12; entries = D_002C2DE8; }
@@ -55,13 +53,13 @@ extern "C" void SetMeterState(Meter *self, unsigned state)
         break;
     }
     case 2:
-        CALL(self->blot, self->arg40);
+        self->blot->Select(self->arg40);
         break;
     case 6:
-        CALL(self->blot, self->arg48);
+        self->blot->Select(self->arg48);
         break;
     case 7:
-        CALL(self->blot, self->arg4C);
+        self->blot->Select(self->arg4C);
         break;
     }
 }

@@ -1,48 +1,32 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-struct VT {
-    char pad[0x18];
-    short delta;
-    short index;
-    void (*fn)(void *, float, float, float *, int);
-};
-struct CHN {
-    int unk0;
-    void **panim;
-};
-struct ASEG {
-    char pad[0x74];
-    float duration;
-};
-struct ENT { ASEG *paseg_unused; ASEG *paseg; int u8; float speed; };
-struct PIPE {
+#include "asega.h"
+/* two blend entries of an animation each: the aseg, its speed from the start and end of its first channel */
+struct PIPEBLENDENTRY { ASEG *pasegUnused; ASEG *paseg; s32 field_0x8; float speed; };
+/* the object PostJtLoadPipe prepares: a Jt, then two entries from 0x50 and a word EnsureAsegBlendDynamic fills at 0x70 */
+struct JTPIPEBLEND {
     void *pjt;
-    char pad[0x4C];
-    ENT aent[2];
-    int unk70;
+    u8 unknown_0x4[0x4C];
+    PIPEBLENDENTRY aent[2];
+    s32 unk70;
 };
 extern "C" {
-CHN *PchnFindAseg(ASEG *, void *, int, int);
+ASEGCHN *PchnFindAseg(ASEG *, void *, int, int);
 void EnsureAsegBlendDynamic(void *, int, int, void *, int, void *, void *, void *);
 }
-struct PIPE2;
-void PostJtLoadPipe(PIPE *ppipe)
+void PostJtLoadPipe(JTPIPEBLEND *ppipe)
 {
     float agStart[4];
     float agEnd[4];
     int i = 1;
-    ENT *pent = &ppipe->aent[0];
+    PIPEBLENDENTRY *pent = &ppipe->aent[0];
     do {
         ASEG *paseg = pent->paseg;
         if (paseg != 0) {
-            CHN *pchn = PchnFindAseg(paseg, ppipe->pjt, 1, 1);
+            ASEGCHN *pchn = PchnFindAseg(paseg, ppipe->pjt, 1, 1);
             if (pchn != 0) {
-                void *panim = pchn->panim;
-                VT *vt = *(VT **)panim;
-                vt->fn((char *)panim + vt->delta, 0.0f, 1.0f, agStart, 0);
-                void *panim2 = pchn->panim;
-                VT *vt2 = *(VT **)panim2;
-                vt2->fn((char *)panim2 + vt2->delta, paseg->duration, 1.0f, agEnd, 0);
-                pent->speed = (agStart[2] - agEnd[2]) / paseg->duration;
+                pchn->panim->GetValues(0.0f, 1.0f, agStart, 0);
+                pchn->panim->GetValues(paseg->tLength, 1.0f, agEnd, 0);
+                pent->speed = (agStart[2] - agEnd[2]) / paseg->tLength;
             }
         }
         pent++;

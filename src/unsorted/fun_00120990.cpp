@@ -1,7 +1,9 @@
 // 0x120990 RefOpIsNull
-extern "C" void* func_00120990(void* a0, int unused_a1, void* a2) {
-    unsigned int v1 = *(unsigned int*)a2;
-    *(unsigned int*)a0 = 0x17;
-    *(unsigned int*)((unsigned char*)a0 + 4) = (v1 < 1u);
-    return a0;
+#include "cref.h"
+// retail writes the result through the hidden return pointer (no copy constructor call), so the result is an argument
+extern "C" CRef *func_00120990(CRef *result, int carg, CRef *aref) {
+    u32 tagk = aref[0].m_tagk;
+    result->m_tagk = TAGK_Bool;
+    result->m_tag.m_bool = tagk < 1u;
+    return result;
 }

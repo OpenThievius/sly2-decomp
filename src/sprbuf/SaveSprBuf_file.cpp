@@ -4,6 +4,7 @@
 #include "sly2.h"
 #include "m2c_macros.h"
 #include "include_asm.h"
+#include "dmachannel.h"
 
 INCLUDE_ASM(0X201620);
 
@@ -15,11 +16,11 @@ extern "C" SPRBUF B_003DD2C0[2];
 
 extern "C" int g_2c3c5c;
 
-extern "C" int *g_2de59c;
+extern "C" DMACHANNEL *g_2de59c;
 
-extern "C" void func_002417F0(int *, int, int);
+extern "C" void func_002417F0(DMACHANNEL *, int, int);
 
-extern "C" void func_002417A0(int *);
+extern "C" void func_002417A0(DMACHANNEL *);
 
 extern "C" void SaveSprBuf__FPve(void *pvDest, ...)
 {
@@ -43,17 +44,17 @@ extern "C" void SaveSprBuf__FPve(void *pvDest, ...)
         ientry++;
         ipvDest++;
     }
-    int *channel = g_2de59c;
+    DMACHANNEL *channel = g_2de59c;
     *(unsigned long *)(psprbuf->aentry[ientry].pvSpr - 0x10) = (unsigned long)(psprbuf->aentry[ientry].cb >> 4) | 0x70000000UL | ((unsigned long)apvDest[ipvDest] << 32);
-    *channel = *channel & ~0x40;
-    *(unsigned *)((char *)channel + 0x80) = (psprbuf->pvSpr & 0x0FFFFFFF) | 0x80000000;
+    channel->control = channel->control & ~0x40;
+    channel->scratchAddress = (psprbuf->pvSpr & 0x0FFFFFFF) | 0x80000000;
     func_002417A0(channel);
     psprbuf = &B_003DD2C0[1 - g_2c3c5c];
     if (psprbuf->sprbs == 3)
         psprbuf->sprbs = 0;
 }
 
-struct Slot_201998 { char pad[0x4C]; int mode; };
+struct Slot_201998 { u8 unknown_0x0[0x4C]; int mode; };
 
 extern "C" void func_002417F0_201998(int, int, int);
 

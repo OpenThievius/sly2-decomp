@@ -33,14 +33,15 @@ struct TANK : PO {
     /* 0x198 */ f32 tiltRate;         /* UpdateTankAim */
     /* 0x19C */ LM lmTilt;            /* UpdateTankAim limits tilt with it */
     /* 0x1A4 */ LM lmPan;             /* UpdateTankAim limits pan with it */
-    u8 unknown_0x1AC[0x10];
+    /* 0x1AC */ LM lmSkill;           /* reader: InitTank (copies two floats from a rodata pair, then reads gMax into skill) */
+    u8 unknown_0x1B4[0x8];
     /* 0x1BC */ f32 skill;            /* UpdateTankAim scales the turn speed and its limit by it */
     /* 0x1C0 */ struct LO *ploCloneSrc; /* UpdateTankFire leases a clone of it (PloLeaseCloneObject); FIgnoreTankIntersection compares its scope */
     /* 0x1C4 */ struct LAUNCH *plaunch; /* UpdateTankFire aims the clone with it (LaunchSoAtTarget) */
     /* 0x1C8 */ struct SO *psoClone;  /* UpdateTankFire: the clone it leased */
     /* 0x1CC */ s32 fRotAct;          /* PostTankLoad clears it and restarts the act (func_00226370); UpdateTankAim tests it */
     /* 0x1D0 */ struct TANK *field_0x1D0; /* CloneTank: re-pointed at the clone when it pointed at the tank cloned from */
-    u8 unknown_0x1D4[0x4];
+    /* 0x1D4 */ s32 field_0x1D4;     /* reader: InitTank (sets 1) */
     /* 0x1D8 */ struct ACT *pact;     /* the rotation act func_00226370 starts and stops; UpdateTankAim updates it */
     u8 unknown_0x1DC[0x4];
     /* PO::pjoy's block as the stick words UpdateTankAim reads (JOY leaves them unknown); an accessor, as STEP::pgoalstack() */

@@ -1,9 +1,9 @@
 #include "sly2.h"
-struct JOBVTBL { char pad[0x18]; short delta; short index; void (*fn)(void *, int, int, int, int, int); };
-struct JOB { char pad0[0xC]; JOBVTBL *vtbl; char pad1[0x40]; int disabled; int cevFail; int *aevFail; int cevComplete; int *aevComplete; };
-extern "C" char B_003DD490;
+#include "sw.h"
+#include "job.h"
+extern "C" SW B_003DD490;
 extern "C" int FJobRunning(JOB *);
-extern "C" int FSwLoadBusy(void *);
+extern "C" int FSwLoadBusy(SW *);
 extern "C" void bevy_jobs_162dd0(JOB *);
 extern "C" void bevy_jobs_162e38(JOB *);
 extern "C" void bevy_jobs_162df8(JOB *);
@@ -15,7 +15,7 @@ void OnJobEvent(JOB *job, int event, int arg)
         void *args[2];
         args[0] = &eventValue;
         args[1] = &argValue;
-        job->vtbl->fn((char *)job + job->vtbl->delta, 0x11, 0, 2, (sptr)args, 0);
+        job->HandleSpliceEvent(0x11, 0, 2, (sptr)args, 0);
         for (int index = 0; index < job->cevFail; index++) {
             if (eventValue == job->aevFail[index]) {
                 bevy_jobs_162dd0(job);

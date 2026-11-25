@@ -1,13 +1,16 @@
-struct VT_201E88 { char pad[0x48]; short delta; short idx; void (*fn)(void *); };
-struct Tgt_201E88 { char pad[0xC]; VT_201E88 *vt; };
-struct Item_201E88 { char pad[0x100]; Tgt_201E88 *link; };
-struct Rec_201E88 { char pad[0x30]; int count; Item_201E88 *items[1]; };
-extern "C" void HideReconLinks(Rec_201E88 *rec) {
-    for (int index = 0; index < rec->count; index++) {
-        Tgt_201E88 *link = rec->items[index]->link;
+#include "sly2.h"
+#include "so.h"
+/* the same view of a recon target as ShowReconLinks: SO word 0x100 is an LO (slot 9 called here), one reader on a guessed class */
+struct SORECON {
+    u8 unknown_0x0[0x100];
+    /* 0x100 */ LO *plo;
+};
+struct RECON { u8 unknown_0x0[0x30]; int ctarget; SO *aptarget[1]; };
+extern "C" void HideReconLinks(RECON *rec) {
+    for (int index = 0; index < rec->ctarget; index++) {
+        LO *link = ((SORECON *)rec->aptarget[index])->plo;
         if (link != 0) {
-            VT_201E88 *vt = link->vt;
-            vt->fn((char *)link + vt->delta);
+            link->Remove();
         }
     }
 }

@@ -17,6 +17,7 @@ struct SAVEVARS
 {
     int crec;
     SAVEVARREC *arec;
+    u8 symtab[0]; /* the symbol table follows the save variables */
 };
 
 struct SAVEPATH
@@ -55,7 +56,7 @@ extern const char RO_002A4DA0[];
 // The symbol table follows the save variables.
 static inline void *SymtabOfSave(SAVEVARS *psavevars)
 {
-    return (char *)psavevars + 8;
+    return psavevars->symtab;
 }
 
 // The game's save variables; an out-of-line copy is at 0x2581C0.

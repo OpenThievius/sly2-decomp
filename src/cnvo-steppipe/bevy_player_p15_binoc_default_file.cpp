@@ -6,30 +6,63 @@
 #include "sly2.h"
 #include "jt.h"
 #include "include_asm.h"
+#include "asega.h"
+#include "blot.h"
+#include "joy.h"
+#include "swfind.h"
 
-extern "C" void InitBinocHud_19CBF8(char *, char *);
+/* the binoculars' recon object (kept at its JT's 0x1D40): StopBinoc reads its state */
+struct BINOCRECON {
+    s32 binocs; /* reader: StopBinoc (0, 8, 9 and 10 mean it is already stopping) */
+};
 
-void bevy_player_p15_binoc_default(char *self, int value)
+struct BINOC;
+
+/* the binocular view's blots and recon object, inside BINOC from 0x24 */
+struct BINOCHUD {
+    /* 0x00 */ BINOC *pbinoc;  /* InitBinocHud */
+    /* 0x04 */ s32 state;      /* InitBinocHud sets -1; SetBinocHudState, UpdateBinocHud */
+    /* 0x08 */ BLOT *pblotA;   /* PostBinocHudLoad finds it; SetBinocHudState (the left one), UpdateBinocHud */
+    /* 0x0C */ BLOT *pblotB;   /* PostBinocHudLoad finds it; SetBinocHudBlot falls back to it */
+    /* 0x10 */ BLOT *pblotCur; /* SetBinocHudBlot sets it (the right one: SetBinocHudState, UpdateBinocHud) */
+    /* 0x14 */ BINOCRECON *precon; /* InitBinocHud points it at the JT's 0x1D40; PostBinocHudLoad, SetBinocHudState */
+};
+
+/* the binoculars the player holds: its JT, its state machine and its view */
+struct BINOC {
+    /* 0x00 */ JT *pjt;     /* bevy_player_p15_binoc_default stores its argument; UpdateBinoc, SetBinocHudState */
+    /* 0x04 */ s32 state;   /* StartBinoc, UpdateBinoc */
+    u8 unknown_0x8[0xC];
+    /* 0x14 */ ASEGA *pasega; /* UpdateBinoc waits until it is gone */
+    u8 unknown_0x18[0x8];
+    /* 0x20 */ s32 mode;    /* StartBinoc, UpdateBinoc (phase), UpdateBinocHud */
+    /* 0x24 */ BINOCHUD hud;
+    /* 0x3C */ f32 fov;     /* UpdateBinoc sets it from the camera manager; UpdateBinocHud, SetBinocHudState seek a label to it */
+    /* 0x40 */ void *so;    /* StartBinoc */
+    /* 0x44 */ void *blot;  /* StartBinoc */
+};
+
+extern "C" void InitBinocHud_19CBF8(BINOCHUD *, BINOC *);
+
+void bevy_player_p15_binoc_default(BINOC *self, JT *pjt)
 {
-    *(int *)self = value;
-    *(int *)(self + 4) = -1;
-    *(int *)(self + 0x20) = -1;
-    InitBinocHud_19CBF8(self + 0x24, self);
+    self->pjt = pjt;
+    self->state = -1;
+    self->mode = -1;
+    InitBinocHud_19CBF8(&self->hud, self);
 }
 
 extern "C" {
-s32 PostBinocHudLoad_19CC30(s32);                      /* extern */
+s32 PostBinocHudLoad_19CC30(BINOCHUD *);                      /* extern */
 
-void PostBinocLoad(s32 arg0) {
-    PostBinocHudLoad_19CC30(arg0 + 0x24);
+void PostBinocLoad(BINOC *pbinoc) {
+    PostBinocHudLoad_19CC30(&pbinoc->hud);
 }
 }
 
-struct Binoc { char pad[4]; int state; char pad2[0x18]; int mode; char pad3[0x1C]; void *so; void *blot; };
+extern "C" void SetBinocState(BINOC *, int);
 
-extern "C" void SetBinocState(Binoc *, int);
-
-extern "C" void StartBinoc(Binoc *binoc, int mode, void *so, void *blot)
+extern "C" void StartBinoc(BINOC *binoc, int mode, void *so, void *blot)
 {
     if (binoc->state != -1) {
         if (binoc->mode == 1)
@@ -45,16 +78,12 @@ extern "C" void StartBinoc(Binoc *binoc, int mode, void *so, void *blot)
     SetBinocState(binoc, 0);
 }
 
-struct BINOCSTATE_19CCE8 { int binocs; };
+extern "C" void SetBinocState_19CCE8(BINOC *, int);
 
-struct BINOC_19CCE8 { char pad[0x38]; BINOCSTATE_19CCE8 *pstate; };
-
-extern "C" void SetBinocState_19CCE8(BINOC_19CCE8 *, int);
-
-extern "C" void StopBinoc(BINOC_19CCE8 *pbinoc)
+extern "C" void StopBinoc(BINOC *pbinoc)
 {
-    if (pbinoc->pstate != 0) {
-        switch (pbinoc->pstate->binocs) {
+    if (pbinoc->hud.precon != 0) {
+        switch (pbinoc->hud.precon->binocs) {
         case 0:
         case 8:
         case 9:
@@ -67,165 +96,118 @@ extern "C" void StopBinoc(BINOC_19CCE8 *pbinoc)
 
 INCLUDE_ASM(0X19CD38);
 
-struct ASEGA;
-struct STEP;
-struct STEP_19D330 { char pad0[0x150]; struct STEPPO_19D330 *ppo; char pad154[0x190 - 0x154]; QW xfIdentity; };
-struct STEPPO_19D330 { char pad0[0x10]; float v10, v14, v18, v1C, v20, v24, v28, v2C; char pad30[0x80 - 0x30]; int mode; };
-struct CM_19D330 { char pad0[0x460]; float radA; char pad464[0x470 - 0x464]; float fovA; char pad474[0x5C4 - 0x474]; float radB; char pad5C8[4]; float fovB; };
-struct BINOCHUD_19D330 { char pad0[0x3C - 0x24]; };
-struct BINOC_19D330 { STEP_19D330 *pstep; int state; char pad8[0xC]; ASEGA *pasega; char pad18[8]; int phase; BINOCHUD_19D330 hud; float fov; };
+/* the camera manager's binocular settings, read by UpdateBinoc only: a local view of B_002DDF40 */
+struct CM_19D330 { u8 unknown_0x0[0x460]; float radA; u8 unknown_0x464[0xC]; float fovA; u8 unknown_0x474[0x150]; float radB; u8 unknown_0x5C8[4]; float fovB; };
+/* the controller's stick values UpdateBinoc clears (a local view of JOY: one reader) */
+struct JOYSTICKVIEW { u8 unknown_0x0[0x10]; float v10, v14, v18, v1C, v20, v24, v28, v2C; };
 
 extern "C" int FAsegaGone(ASEGA *);
-extern "C" void SetBinocState_19D330(BINOC_19D330 *, int);
-extern "C" void SetStepRadTarget(STEP_19D330 *, float);
-extern "C" void UpdateBinocHud_19D330(BINOCHUD_19D330 *);
+extern "C" void SetBinocState_19D330(BINOC *, int);
+extern "C" void SetStepRadTarget(STEP *, float);
+extern "C" void UpdateBinocHud_19D330(BINOCHUD *);
 extern CM_19D330 B_002DDF40;
 extern "C" QW g_2a2dd0;
 
-void UpdateBinoc(BINOC_19D330 *binoc)
+void UpdateBinoc(BINOC *binoc)
 {
     int state;
     do {
         state = binoc->state;
         switch (state) {
         case 0:
-            binoc->pstep->xfIdentity = g_2a2dd0;
+            binoc->pjt->velGoal = g_2a2dd0;
             if (binoc->pasega == 0 || FAsegaGone(binoc->pasega) != 0)
                 SetBinocState_19D330(binoc, 1);
             break;
         case 1:
-            binoc->pstep->xfIdentity = g_2a2dd0;
-            switch (binoc->phase) {
+            binoc->pjt->velGoal = g_2a2dd0;
+            switch (binoc->mode) {
             case 0:
-                SetStepRadTarget(binoc->pstep, B_002DDF40.radA);
+                SetStepRadTarget(binoc->pjt, B_002DDF40.radA);
                 binoc->fov = B_002DDF40.fovA;
                 UpdateBinocHud_19D330(&binoc->hud);
                 break;
             case 1:
-                SetStepRadTarget(binoc->pstep, B_002DDF40.radB);
+                SetStepRadTarget(binoc->pjt, B_002DDF40.radB);
                 binoc->fov = B_002DDF40.fovB;
                 UpdateBinocHud_19D330(&binoc->hud);
                 break;
             }
             break;
         case 2:
-            binoc->pstep->xfIdentity = g_2a2dd0;
+            binoc->pjt->velGoal = g_2a2dd0;
             if (binoc->pasega == 0 || FAsegaGone(binoc->pasega) != 0)
                 SetBinocState_19D330(binoc, -1);
             break;
         }
     } while (state != binoc->state);
-    if (binoc->phase != 0)
+    if (binoc->mode != 0)
         return;
-    STEPPO_19D330 *ppo = binoc->pstep->ppo;
-    if (ppo->mode == 1) {
-        ppo->v20 = ppo->v24 = ppo->v28 = ppo->v2C = ppo->v10 = ppo->v14 = ppo->v18 = ppo->v1C = 0.0f;
+    JOY *pjoy = binoc->pjt->pjoy;
+    JOYSTICKVIEW *pstick = (JOYSTICKVIEW *)pjoy;
+    if (pjoy->vjoym == 1) {
+        pstick->v20 = pstick->v24 = pstick->v28 = pstick->v2C = pstick->v10 = pstick->v14 = pstick->v18 = pstick->v1C = 0.0f;
     }
 }
 
 extern "C" {
-struct BinocHud {
-    s32 *basic;
-    s32 field_0x4;
-    char pad0[0xC];
-    s32 field_0x14;
-};
-
 s32 FIsBasicDerivedFrom(s32, s32);
 
-void func_00201D78(s32, s32 *);
+void func_00201D78(s32, BINOC *);
 
-void InitBinocHud(struct BinocHud *hud, s32 *basic) {
+void InitBinocHud(BINOCHUD *hud, BINOC *pbinoc) {
     s32 target;
 
-    hud->basic = basic;
-    hud->field_0x4 = -1;
-    if (FIsBasicDerivedFrom(*basic, 0x35) != 0) {
-        target = *hud->basic + 0x1D40;
-        hud->field_0x14 = target;
-        func_00201D78(target, basic);
+    hud->pbinoc = pbinoc;
+    hud->state = -1;
+    if (FIsBasicDerivedFrom((s32)pbinoc->pjt, 0x35) != 0) {
+        target = (s32)hud->pbinoc->pjt + 0x1D40;
+        hud->precon = (BINOCRECON *)target;
+        func_00201D78(target, pbinoc);
         return;
     }
-    hud->field_0x14 = 0;
+    hud->precon = 0;
 }
 }
-
-struct BINOC { void *pjt; };
-
-struct HUD { BINOC *pbinoc; int pad; int blotA; int blotB; int pad2; int recon; };
 
 extern "C" int FIsBasicDerivedFrom_19D540(void *, int);
 
-extern "C" int PloFindSwObject_thunk(void *, int, int, int);
+extern "C" SW B_003DD490;
 
-extern "C" void SetBinocHudBlot_19D540(HUD *, int);
+extern "C" void SetBinocHudBlot_19D540(BINOCHUD *, BLOT *);
 
-extern "C" void func_00201DC8(int);
+extern "C" void func_00201DC8(BINOCRECON *);
 
-extern "C" char B_003DD490[];
-
-extern "C" void PostBinocHudLoad(HUD *phud)
+extern "C" void PostBinocHudLoad(BINOCHUD *phud)
 {
     if (FIsBasicDerivedFrom_19D540(phud->pbinoc->pjt, 0x35) != 0) {
-        phud->blotA = PloFindSwObject_thunk(B_003DD490, 0x405, 0x35F, 0);
-        phud->blotB = PloFindSwObject_thunk(B_003DD490, 0x405, 0x368, 0);
+        phud->pblotA = (BLOT *)PloFindSwObject_thunk(&B_003DD490, 0x405, 0x35F, 0);
+        phud->pblotB = (BLOT *)PloFindSwObject_thunk(&B_003DD490, 0x405, 0x368, 0);
     } else if (FIsBasicDerivedFrom_19D540(phud->pbinoc->pjt, 0x37) != 0) {
-        phud->blotA = PloFindSwObject_thunk(B_003DD490, 0x405, 0x360, 0);
-        phud->blotB = PloFindSwObject_thunk(B_003DD490, 0x405, 0x369, 0);
+        phud->pblotA = (BLOT *)PloFindSwObject_thunk(&B_003DD490, 0x405, 0x360, 0);
+        phud->pblotB = (BLOT *)PloFindSwObject_thunk(&B_003DD490, 0x405, 0x369, 0);
     } else if (FIsBasicDerivedFrom_19D540(phud->pbinoc->pjt, 0x36) != 0) {
-        phud->blotA = PloFindSwObject_thunk(B_003DD490, 0x405, 0x361, 0);
-        phud->blotB = PloFindSwObject_thunk(B_003DD490, 0x405, 0x36A, 0);
+        phud->pblotA = (BLOT *)PloFindSwObject_thunk(&B_003DD490, 0x405, 0x361, 0);
+        phud->pblotB = (BLOT *)PloFindSwObject_thunk(&B_003DD490, 0x405, 0x36A, 0);
     }
-    if (phud->recon != 0)
-        func_00201DC8(phud->recon);
-    SetBinocHudBlot_19D540(phud, phud->blotB);
+    if (phud->precon != 0)
+        func_00201DC8(phud->precon);
+    SetBinocHudBlot_19D540(phud, phud->pblotB);
 }
 
-struct VTable {
-    char pad[0x188];
-    short deltaMute;
-    short pad1;
-    void (*mute)(void *, int);
-    short deltaApply;
-    short pad2;
-    void (*apply)(void *);
-};
+extern "C" void SeekBlotLabel(BLOT *, int, float);
 
-struct Widget {
-    char pad[0xC];
-    VTable *vt;
-    char pad2[0x58 - 0x10];
-    int active;
-};
+extern "C" void SetBlotBlots(BLOT *, int);
 
-struct Camera { char pad[0x1A8]; float angle; };
-
-struct Actor { Camera *camera; char pad[0x20 - 4]; int mode; char pad2[0x3C - 0x24]; float seekValue; };
-
-struct Owner { Actor *actor; };
-
-struct BinocHud_19D660 {
-    Actor *actor;
-    int state;
-    Widget *left;
-    char pad[4];
-    Widget *right;
-    int recon;
-};
-
-extern "C" void SeekBlotLabel(Widget *, int, float);
-
-extern "C" void SetBlotBlots(Widget *, int);
-
-extern "C" float SetTimerTimers__FP5TIMER6TIMERS(Widget *, int);
+extern "C" float SetTimerTimers__FP5TIMER6TIMERS(BLOT *, int);
 
 extern "C" void bevy_camera_follow_activity(void *, int, int);
 
-extern "C" void bevy_ui_binoc_recon_202768(int, int);
+extern "C" void bevy_ui_binoc_recon_202768(BINOCRECON *, int);
 
 extern "C" void func_0019D948();
 
-extern "C" int func_00213B00(Widget *, int);
+extern "C" int func_00213B00(BLOT *, int);
 
 extern "C" void func_00227788(void *);
 
@@ -233,7 +215,7 @@ extern "C" char B_002DEB30[];
 
 extern "C" char B_004435F0[];
 
-extern "C" void SetBinocHudState(BinocHud_19D660 *phud, int state)
+extern "C" void SetBinocHudState(BINOCHUD *phud, int state)
 {
     int old = phud->state;
     if (old == state)
@@ -244,78 +226,65 @@ extern "C" void SetBinocHudState(BinocHud_19D660 *phud, int state)
     phud->state = state;
     switch (state) {
     case 0:
-        if (phud->actor->mode == 1)
+        if (phud->pbinoc->mode == 1)
             bevy_camera_follow_activity(B_002DEB30, 0xC, 0);
         else
             bevy_camera_follow_activity(B_002DEB30, 7, 0);
-        if (phud->left != 0) {
-            Widget *pleft = phud->left;
-            pleft->vt->mute((char *)pleft + pleft->vt->deltaMute, -1);
-            func_00213B00(phud->left, 0x352);
-            func_00213B00(phud->left, 0x351);
-            SeekBlotLabel(phud->left, 0x352, (phud->actor->camera->angle + 3.1415927f) * 0.15915494f);
-            SeekBlotLabel(phud->left, 0x351, phud->actor->seekValue);
+        if (phud->pblotA != 0) {
+            phud->pblotA->Select(-1);
+            func_00213B00(phud->pblotA, 0x352);
+            func_00213B00(phud->pblotA, 0x351);
+            SeekBlotLabel(phud->pblotA, 0x352, (phud->pbinoc->pjt->radHeading + 3.1415927f) * 0.15915494f);
+            SeekBlotLabel(phud->pblotA, 0x351, phud->pbinoc->fov);
         }
-        if (phud->actor->mode == 1) {
+        if (phud->pbinoc->mode == 1) {
             func_00227788(B_004435F0);
-            if (phud->right != 0) {
-                Widget *pright = phud->right;
-                pright->vt->mute((char *)pright + pright->vt->deltaMute, -1);
-            }
+            if (phud->pblotCur != 0)
+                phud->pblotCur->Select(-1);
         }
-        if (phud->recon != 0)
-            bevy_ui_binoc_recon_202768(phud->recon, 0);
+        if (phud->precon != 0)
+            bevy_ui_binoc_recon_202768(phud->precon, 0);
         break;
     case 2:
-        if (phud->actor->mode == 1)
+        if (phud->pbinoc->mode == 1)
             bevy_camera_follow_activity(B_002DEB30, 0xD, 0);
         else
             bevy_camera_follow_activity(B_002DEB30, 8, 0);
-        if (phud->left != 0) {
-            Widget *pleft = phud->left;
-            pleft->vt->apply((char *)pleft + pleft->vt->deltaApply);
-        }
-        if (phud->right != 0) {
-            Widget *pright = phud->right;
-            pright->vt->apply((char *)pright + pright->vt->deltaApply);
-        }
-        if (phud->recon != 0)
-            bevy_ui_binoc_recon_202768(phud->recon, 10);
+        if (phud->pblotA != 0)
+            phud->pblotA->Hide();
+        if (phud->pblotCur != 0)
+            phud->pblotCur->Hide();
+        if (phud->precon != 0)
+            bevy_ui_binoc_recon_202768(phud->precon, 10);
         break;
     case -1:
         if (previous != 2) {
-            if (phud->actor->mode == 1)
+            if (phud->pbinoc->mode == 1)
                 bevy_camera_follow_activity(B_002DEB30, 0xD, 0);
             else
                 bevy_camera_follow_activity(B_002DEB30, 8, 0);
         }
-        if (phud->left != 0 && phud->left->active != 0) {
-            SetBlotBlots(phud->left, 1);
-            SetTimerTimers__FP5TIMER6TIMERS(phud->left, 1);
+        if (phud->pblotA != 0 && phud->pblotA->blots != 0) {
+            SetBlotBlots(phud->pblotA, 1);
+            SetTimerTimers__FP5TIMER6TIMERS(phud->pblotA, 1);
         }
-        if (phud->right != 0 && phud->right->active != 0) {
-            SetBlotBlots(phud->right, 1);
-            SetTimerTimers__FP5TIMER6TIMERS(phud->right, 1);
+        if (phud->pblotCur != 0 && phud->pblotCur->blots != 0) {
+            SetBlotBlots(phud->pblotCur, 1);
+            SetTimerTimers__FP5TIMER6TIMERS(phud->pblotCur, 1);
         }
-        if (phud->recon != 0)
-            bevy_ui_binoc_recon_202768(phud->recon, -1);
+        if (phud->precon != 0)
+            bevy_ui_binoc_recon_202768(phud->precon, -1);
         break;
     }
 }
 
 INCLUDE_ASM(0X19D948);
 
-struct BINOC_19DA78 { JT *jt; char pad[0x20 - 4]; int mode; char pad1[0x3C - 0x24]; float camera; };
-
-struct BLOT { char pad[0x58]; int state; };
-
-struct HUD_19DA78 { BINOC_19DA78 *binoc; int state; BLOT *blotA; int pad0c; BLOT *blotCur; void *recon; };
-
 extern "C" int D_002BF920;
 
-extern "C" void bevy_ui_binoc_recon_202d38(void *);
+extern "C" void bevy_ui_binoc_recon_202d38(BINOCRECON *);
 
-extern "C" void SetBinocHudState_19DA78(HUD_19DA78 *, int);
+extern "C" void SetBinocHudState_19DA78(BINOCHUD *, int);
 
 extern "C" void func_00213B00_19DA78(BLOT *, int);
 
@@ -323,20 +292,20 @@ extern "C" void func_00213928(BLOT *, int);
 
 extern "C" void SeekBlotLabel_19DA78(BLOT *, int, float);
 
-extern "C" void UpdateBinocHud(HUD_19DA78 *hud)
+extern "C" void UpdateBinocHud(BINOCHUD *hud)
 {
-    if (hud->recon)
-        bevy_ui_binoc_recon_202d38(hud->recon);
+    if (hud->precon)
+        bevy_ui_binoc_recon_202d38(hud->precon);
     int state = hud->state;
     switch (state) {
     case 2: {
         int blotAGone = 0;
-        if (hud->blotA == 0 || hud->blotA->state < 2)
+        if (hud->pblotA == 0 || hud->pblotA->blots < 2)
             blotAGone = 1;
         int blotCurGone = 1;
-        if (hud->binoc->mode == 1) {
+        if (hud->pbinoc->mode == 1) {
             blotCurGone = 0;
-            if (hud->blotCur == 0 || hud->blotCur->state < 2)
+            if (hud->pblotCur == 0 || hud->pblotCur->blots < 2)
                 blotCurGone = 1;
         }
         if (blotAGone && blotCurGone)
@@ -345,13 +314,13 @@ extern "C" void UpdateBinocHud(HUD_19DA78 *hud)
     }
     case 0: {
         int blotAReady = 0;
-        if (hud->blotA == 0 || hud->blotA->state == 2)
+        if (hud->pblotA == 0 || hud->pblotA->blots == 2)
             blotAReady = 1;
         int blotCurReady = 1;
         D_002BF920 = -1;
-        if (hud->binoc->mode == 1) {
+        if (hud->pbinoc->mode == 1) {
             blotCurReady = 0;
-            if (hud->blotCur == 0 || hud->blotCur->state == 2)
+            if (hud->pblotCur == 0 || hud->pblotCur->blots == 2)
                 blotCurReady = 1;
         }
         if (blotAReady && blotCurReady)
@@ -361,32 +330,32 @@ extern "C" void UpdateBinocHud(HUD_19DA78 *hud)
     case -1:
         return;
     }
-    if (hud->blotA == 0)
+    if (hud->pblotA == 0)
         return;
     if (hud->state != 0) {
-        int mode = hud->binoc->jt->focusMode;
+        int mode = hud->pbinoc->pjt->focusMode;
         if (mode == 4) {
             if (D_002BF920 != mode)
-                func_00213B00_19DA78(hud->blotA, 0x353);
-            if (hud->binoc->jt->focusMode == mode)
+                func_00213B00_19DA78(hud->pblotA, 0x353);
+            if (hud->pbinoc->pjt->focusMode == mode)
                 goto store;
         }
         if (D_002BF920 == 4)
-            func_00213928(hud->blotA, 0x353);
+            func_00213928(hud->pblotA, 0x353);
     store:
-        D_002BF920 = hud->binoc->jt->focusKind;
+        D_002BF920 = hud->pbinoc->pjt->focusKind;
     }
-    SeekBlotLabel_19DA78(hud->blotA, 0x352, (hud->binoc->jt->radHeading + 3.14159274f) * 0.159154937f);
-    SeekBlotLabel_19DA78(hud->blotA, 0x351, hud->binoc->camera);
+    SeekBlotLabel_19DA78(hud->pblotA, 0x352, (hud->pbinoc->pjt->radHeading + 3.14159274f) * 0.159154937f);
+    SeekBlotLabel_19DA78(hud->pblotA, 0x351, hud->pbinoc->fov);
 }
 
-void SetBinocHudBlot(int *arg0, int arg1)
+void SetBinocHudBlot(BINOCHUD *phud, BLOT *pblot)
 {
-    if (arg1 != 0) {
-        arg0[4] = arg1;
+    if (pblot != 0) {
+        phud->pblotCur = pblot;
         return;
     }
-    arg0[4] = arg0[3];
+    phud->pblotCur = phud->pblotB;
 }
 
 extern "C" {
