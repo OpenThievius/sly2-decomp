@@ -1,9 +1,5 @@
-#include "types.h"
+#include "blot.h"
 struct CLK { u8 unknown_0x0[0x3C]; float t; };
-struct BLOT {
-    u8 unknown_0x0[0x58]; int blots; float f5C; u8 unknown_0x60[0x4]; int req; float f68; u8 unknown_0x6C[0x8];
-    int f74; int f78; int f7C; u8 unknown_0x80[0x4]; void *f84; float f88; float f8C;
-};
 extern "C" {
 void UpdateLo(BLOT *);
 int FBlotLabelPlaying(BLOT *, int);
@@ -18,26 +14,26 @@ void UpdateBlotMovie(BLOT *blot)
     UpdateLo(blot);
     int blots = blot->blots;
     if (blots == 1) {
-        if (blot->req == 2)
-            blots = (blot->f74 == -1) ? 2 : 3;
-    } else if (blot->f68 != g_2dded0.t) {
+        if (blot->field_0x64 == 2)
+            blots = (blot->labelAppear == -1) ? 2 : 3;
+    } else if (blot->tLast != g_2dded0.t) {
         switch (blots) {
         case 2:
-            if (!FBlotLabelPlaying(blot, blot->f7C))
+            if (!FBlotLabelPlaying(blot, blot->cur))
                 SetTimerTimers__FP5TIMER6TIMERS(blot, 1);
             {
-                float visible = blot->f8C;
-                if (0.0f < visible && visible < g_2dded0.t - blot->f5C)
+                float visible = *(float *)&blot->field_0x8C;
+                if (0.0f < visible && visible < g_2dded0.t - blot->time)
                     SetTimerTimers__FP5TIMER6TIMERS(blot, 1);
             }
-            if (blot->req == 1)
-                blots = (blot->f78 == -1) ? 1 : 4;
+            if (blot->field_0x64 == 1)
+                blots = (blot->labelDisappear == -1) ? 1 : 4;
             break;
         case 3:
-            if (!FBlotLabelPlaying(blot, blot->f74)) {
-                switch (blot->req) {
+            if (!FBlotLabelPlaying(blot, blot->labelAppear)) {
+                switch (blot->field_0x64) {
                 case 1:
-                    blots = (blot->f78 == -1) ? 1 : 4;
+                    blots = (blot->labelDisappear == -1) ? 1 : 4;
                     break;
                 case 2:
                     blots = 2;
@@ -46,13 +42,13 @@ void UpdateBlotMovie(BLOT *blot)
             }
             break;
         case 4:
-            if (!FBlotLabelPlaying(blot, blot->f78)) {
-                switch (blot->req) {
+            if (!FBlotLabelPlaying(blot, blot->labelDisappear)) {
+                switch (blot->field_0x64) {
                 case 1:
                     blots = 1;
                     break;
                 case 2:
-                    blots = (blot->f74 == -1) ? 2 : 3;
+                    blots = (blot->labelAppear == -1) ? 2 : 3;
                     break;
                 }
             }
@@ -60,8 +56,8 @@ void UpdateBlotMovie(BLOT *blot)
         }
     }
     SetBlotBlots(blot, blots);
-    if (blot->f7C != -1) {
-        blot->f88 = blot->f88 + g_2ddf10;
-        UpdateRootSprite(blot->f84, g_2ddf10);
+    if (blot->cur != -1) {
+        blot->labelTime = blot->labelTime + g_2ddf10;
+        UpdateRootSprite((void *)blot->asprite, g_2ddf10);
     }
 }

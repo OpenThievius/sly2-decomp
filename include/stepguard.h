@@ -36,7 +36,9 @@ struct STEPGUARD : STEP {
     u8 unknown_0x2F4[0xC];
     /* 0x300 */ QW posHome; /* OnGuardAdd (26) */
     /* 0x310 */ f32 radHome; /* OnGuardAdd (26) */
-    u8 unknown_0x314[0x10];
+    /* 0x314 */ f32 gNear; /* GoalNotice_Update: the distance under which it stops following (state 3) */
+    /* 0x318 */ f32 gFar; /* GoalNotice_Update: the distance over which it starts following (state 0) */
+    u8 unknown_0x31C[0x8];
     /* 0x324 */ u8 lm[0x8]; /* func_0017C3E8 passes its address to FCheckLm (an embedded LM; size to fDown, a guess); one reader */
     /* 0x32C */ s32 fDown; /* func_0017A8C8 */
     /* 0x330 */ s32 field_0x330; /* OnGuardRemove (27) */
@@ -100,7 +102,8 @@ struct STEPGUARD : STEP {
     /* 0xE70 */ f32 field_0xE70; /* the same: its maximum */
     u8 unknown_0xE74[0x4];
     /* 0xE78 */ s32 field_0xE78; /* OnGuardAdd (26) */
-    u8 unknown_0xE7C[0x8];
+    /* 0xE7C */ f32 field_0xE7C; /* GoalFlinch_SetState (a goal of the guard: guard code): GRandInRange's minimum for its next flinch delay */
+    /* 0xE80 */ f32 field_0xE80; /* the same: its maximum */
     /* 0xE84 */ s32 field_0xE84; /* OnGuardAdd (26) */
     /* 0xE88 */ s32 field_0xE88; /* OnGuardAdd (26) */
     u8 unknown_0xE8C[0x8];
@@ -120,7 +123,11 @@ struct STEPGUARD : STEP {
     /* 0xF20 */ QW vecLook; /* func_0020AC28: its fourth argument */
     u8 unknown_0xF30[0xC];
     /* 0xF3C */ s32 fFlag; /* func_001752F0 */
-    u8 unknown_0xF40[0x20];
+    /* 0xF40 */ s32 fActive; /* GoalNotice_Update: tested before func_0020B140 runs; one reader */
+    /* 0xF44 */ f32 tMin; /* GoalNotice_Update: the clock must have reached it; one reader */
+    /* 0xF48 */ u8 lmDistance[0x8]; /* func_00175D00 passes its address to FCheckLm (an embedded LM, 8 bytes): the sight distance range; one reader */
+    /* 0xF50 */ u8 lmYaw[0x8]; /* func_00175D00 (FCheckLm): the yaw range */
+    /* 0xF58 */ u8 lmPitch[0x8]; /* func_00175D00 (FCheckLm): the pitch range */
     /* 0xF60 */ s32 field_0xF60; /* func_0017B750 */
     /* 0xF64 */ struct SENSOR *psensor; /* OnGuardAdd (26), func_00208BE0 (89), CloneGuard (41) */
     /* 0xF68 */ struct LO *ptargetGoto; /* SetGuardGotoTarget; GoalBrain_SetCommand (command 16) hands it to the goto-target goal, which reads its position */
@@ -179,6 +186,8 @@ SLY2_OFFSET_CHECK(STEPGUARD, pfallcheck, 0x498);
 SLY2_OFFSET_CHECK(STEPGUARD, pdamage, 0x49C);
 SLY2_OFFSET_CHECK(STEPGUARD, field_0xE68, 0xE68);
 SLY2_OFFSET_CHECK(STEPGUARD, field_0xE78, 0xE78);
+SLY2_OFFSET_CHECK(STEPGUARD, field_0xE7C, 0xE7C);
+SLY2_OFFSET_CHECK(STEPGUARD, field_0xE80, 0xE80);
 SLY2_OFFSET_CHECK(STEPGUARD, field_0xE84, 0xE84);
 SLY2_OFFSET_CHECK(STEPGUARD, field_0xE88, 0xE88);
 SLY2_OFFSET_CHECK(STEPGUARD, psensor, 0xF64);

@@ -11,7 +11,8 @@ struct SHD;
 
 /* One texture of a shader (0x14 bytes); LoadTexFromBrx reads its first eight bytes from the stream. */
 struct TEX {
-    unsigned char unknown_0x0[6];
+    unsigned char unknown_0x0[4];
+    /* 0x4 */ unsigned short flags;    /* reader: func_001EA750 (bit 0: clamp S, bit 1: clamp T; one reader, the class is certain: FillShaders passes atex to it) */
     /* 0x6 */ unsigned char cbmp;      /* LoadTexFromBrx: how many bitmaps; LoadShdFromBrx copies the first texture's into SHD::cframe; func_001EB678 sizes the frame table by it */
     /* 0x7 */ unsigned char cpal;      /* LoadTexFromBrx: how many palettes */
     /* 0x8 */ struct SHD *owner;       /* LoadShdFromBrx sets it to the shader (the stream does not hold it) */

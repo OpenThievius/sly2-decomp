@@ -1,36 +1,28 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "types.h"
-/* a task of the job menu (JobMenu_BuildList sorts an array of them with this comparator) */
-struct TASKINFO {
-    u8 unknown_0x0[0x18];
-    s32 oid;
-    u8 unknown_0x1C[0x60];
-    TASKINFO *owner;
-    u8 unknown_0x80[0x80];
-    s32 priority;
-    s32 group;
-};
-extern "C" s32 func_00165C28(TASKINFO **first, TASKINFO **second) {
-    TASKINFO *taskFirst = *first;
-    TASKINFO *taskSecond = *second;
-    s32 valueFirst = taskFirst->group;
-    s32 valueSecond = taskSecond->group;
+#include "job.h"
+/* the comparator JobMenu_BuildList sorts its array of tasks with: group = jobDepthMax, priority = depthMax (VisitTaskInOrder), owner = the job */
+extern "C" s32 func_00165C28(TASK **first, TASK **second) {
+    TASK *taskFirst = *first;
+    TASK *taskSecond = *second;
+    s32 valueFirst = taskFirst->jobDepthMax;
+    s32 valueSecond = taskSecond->jobDepthMax;
     if (valueFirst != valueSecond) {
         return valueFirst - valueSecond;
     }
     valueFirst = -1;
-    if (taskFirst->owner != 0) {
-        valueFirst = taskFirst->owner->oid;
+    if (taskFirst->job != 0) {
+        valueFirst = taskFirst->job->oid;
     }
     valueSecond = -1;
-    if (taskSecond->owner != 0) {
-        valueSecond = taskSecond->owner->oid;
+    if (taskSecond->job != 0) {
+        valueSecond = taskSecond->job->oid;
     }
     if (valueFirst != valueSecond) {
         return valueFirst - valueSecond;
     }
-    valueFirst = taskFirst->priority;
-    valueSecond = taskSecond->priority;
+    valueFirst = taskFirst->depthMax;
+    valueSecond = taskSecond->depthMax;
     if (valueFirst != valueSecond) {
         return valueFirst - valueSecond;
     }

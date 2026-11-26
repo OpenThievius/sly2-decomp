@@ -1,35 +1,27 @@
-#include "types.h"
-struct B4 { char b[4]; };
+#include "fbsprite.h"
 
-struct Char { int pad0; int type; int pad8; int padC; int sprite; };
-struct Slot { B4 add; B4 mul; u8 unknown_0x8[0x8]; QW mat0; QW mat1; Char *chr; u8 unknown_0x34[0x24]; int instIndex; u8 unknown_0x5C[0x14]; };
-struct Inst { int count; Slot *slots; int pad[4]; };
-struct Sprite { int pad0; int pad4; Inst *insts; u8 unknown_0xC[0x24]; };
-struct Root { u8 unknown_0x0[0x84]; Sprite *sprites; };
-
-extern "C" int FGetSpriteSlotTransform(Root *blot, int isprite, QW *mat, B4 *add, B4 *mul, int count, Slot *slots)
+extern "C" int FGetSpriteSlotTransform(BLOT *blot, int isprite, AFFINE2D *mat, RGBA *add, RGBA *mul, int count, SLOT *slots)
 {
     if (slots == 0) {
-        Inst *root = blot->sprites->insts;
-        count = root->count;
-        slots = root->slots;
+        SPRITEINST *root = ((SPRITE *)blot->asprite)->insts;
+        count = root->cslot;
+        slots = root->aslot;
     }
     int i = 0;
     if (i < count) {
-        Slot *cur = slots;
+        SLOT *cur = slots;
         do {
-            Char *chr = cur->chr;
+            MOVIECHAR *chr = cur->pchar;
             if (chr != 0 && chr->type == 4) {
-                if (isprite == chr->sprite) {
-                    mat[0] = cur->mat0;
-                    mat[1] = cur->mat1;
-                    *add = cur->add;
-                    *mul = cur->mul;
+                if (isprite == chr->id) {
+                    *mat = cur->xf;
+                    *add = cur->rgbaAdd;
+                    *mul = cur->rgbaMul;
                     return 1;
                 }
-                Sprite *sp = (Sprite *)(chr->sprite * sizeof(Sprite) + (uptr)blot->sprites);
-                Inst *inst = (Inst *)(cur->instIndex * sizeof(Inst) + (uptr)sp->insts);
-                if (FGetSpriteSlotTransform(blot, isprite, mat, add, mul, inst->count, inst->slots)) return 1;
+                SPRITE *sp = (SPRITE *)(chr->id * sizeof(SPRITE) + (uptr)blot->asprite);
+                SPRITEINST *inst = (SPRITEINST *)(cur->iinst * sizeof(SPRITEINST) + (uptr)sp->insts);
+                if (FGetSpriteSlotTransform(blot, isprite, mat, add, mul, inst->cslot, inst->aslot)) return 1;
             }
             i++;
             cur++;

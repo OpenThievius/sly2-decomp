@@ -1,34 +1,22 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
 #include "rgba.h"
-struct AFF { float a, b, c, d, e, f, u6, u7; } __attribute__((aligned(16)));
-struct MOVIECHAR;
+#include "fbsprite.h"
 struct P16 { RGBA v; u8 unknown_0x4[12]; };
-struct TMP { union { AFF dummy; struct { RGBA t0; u8 unknown_0x4[12]; RGBA t1; u8 unknown_0x14[12]; } c; } v; union { AFF lerped; struct { RGBA t2; u8 unknown_0x4[12]; RGBA t3; } c; } u; };
-struct FRAME { AFF xf; P16 outAdd, outMul, s40, s50, s60; TMP tmp; };
-struct SLOT {
-    RGBA rgbaAdd; RGBA rgbaMul; u8 unknown_0x8[8];
-    AFF xf;
-    MOVIECHAR *pchar; int maskMode; float tFrom; RGBA rgbaAddFrom; RGBA rgbaMulFrom; AFF *pxfFrom;
-    float tTo; RGBA rgbaAddTo; RGBA rgbaMulTo; AFF *pxfTo; int iinst; float tUpdated;
-    unsigned char fTween; u8 unknown_0x61[7]; void *pslNext; u8 unknown_0x6C[4];
-};
-struct INST { int cslot; SLOT *aslot; short ilabel; short ikeyNext; float t; int fPaused; int pamb; };
-struct SPRITE { u8 unknown_0x0[8]; INST *insts; };
-struct KEY { float t; u8 unknown_0x4[0x1C]; };
-struct LABEL { unsigned short ckey; u8 unknown_0x2[2]; KEY *akey; u8 unknown_0x8[8]; SPRITE *psprite; };
+struct TMP { union { AFFINE2D dummy; struct { RGBA t0; u8 unknown_0x4[12]; RGBA t1; u8 unknown_0x14[12]; } c; } v; union { AFFINE2D lerped; struct { RGBA t2; u8 unknown_0x4[12]; RGBA t3; } c; } u; };
+struct FRAME { AFFINE2D xf; P16 outAdd, outMul, s40, s50, s60; TMP tmp; };
 extern "C" void ClearSle(void *);
-extern "C" void ApplySpriteKeySounds(LABEL *, int, int);
-extern "C" void func_002190F8(LABEL *, int, int);
-extern "C" void ClearSpriteKeySlots(LABEL *, int, int);
-extern "C" void PlaceSpriteKeyCharacters(float, float, LABEL *, int, int, AFF *, RGBA *, RGBA *);
+extern "C" void ApplySpriteKeySounds(SPRITELABEL *, int, int);
+extern "C" void func_002190F8(SPRITELABEL *, int, int);
+extern "C" void ClearSpriteKeySlots(SPRITELABEL *, int, int);
+extern "C" void PlaceSpriteKeyCharacters(float, float, SPRITELABEL *, int, int, AFFINE2D *, RGBA *, RGBA *);
 extern "C" void func_002158C0(MOVIECHAR *, SLOT *);
 extern "C" void CombineColorTransforms(RGBA *, RGBA *, RGBA *, RGBA *, RGBA *, RGBA *);
-extern "C" void func_00215850(MOVIECHAR *, SLOT *, float, AFF *, RGBA *, RGBA *);
+extern "C" void func_00215850(MOVIECHAR *, SLOT *, float, AFFINE2D *, RGBA *, RGBA *);
 
-static inline AFF Mult(const AFF &child, const AFF &parent)
+static inline AFFINE2D Mult(const AFFINE2D &child, const AFFINE2D &parent)
 {
-    AFF product;
+    AFFINE2D product;
     float ca = child.a, cb = child.b, cc = child.c, cd = child.d, ce = child.e, cf = child.f;
     product.a = ca * parent.a + cb * parent.c;
     product.b = ca * parent.b + cb * parent.d;
@@ -45,14 +33,14 @@ static inline unsigned char LerpByte(int from, int to, float u)
     float inv = 1.0f - u;
     return to + (int)(inv * ((float)from + 0.999f - (float)to));
 }
-static inline INST *PinstFromLabel(LABEL *label, int iinst)
+static inline SPRITEINST *PinstFromLabel(SPRITELABEL *label, int iinst)
 {
-    return (INST *)(iinst * sizeof(INST) + (uptr)label->psprite->insts);
+    return (SPRITEINST *)(iinst * sizeof(SPRITEINST) + (uptr)label->psprite->insts);
 }
-extern "C" void AdvanceSpriteInstance(float dt, LABEL *label, int iinst, AFF *pxf, RGBA *prgbaAdd, RGBA *prgbaMul)
+extern "C" void AdvanceSpriteInstance(float dt, SPRITELABEL *label, int iinst, AFFINE2D *pxf, RGBA *prgbaAdd, RGBA *prgbaMul)
 {
     FRAME fr;
-    INST *inst;
+    SPRITEINST *inst;
     int cslot;
     SLOT *aslot;
     float tNow;
@@ -67,7 +55,7 @@ extern "C" void AdvanceSpriteInstance(float dt, LABEL *label, int iinst, AFF *px
     aslot = PinstFromLabel(label, iinst)->aslot;
     do {
         if (ikey < label->ckey) {
-            KEY *key = (__typeof__(&(label->akey)[0]))((ikey) * sizeof((label->akey)[0]) + (uptr)(label->akey));
+            SPRITEKEY *key = (__typeof__(&(label->akey)[0]))((ikey) * sizeof((label->akey)[0]) + (uptr)(label->akey));
             float tKey = key->t;
             if (tKey <= tNow) {
                 tLast = tKey;

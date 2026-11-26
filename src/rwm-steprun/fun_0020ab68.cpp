@@ -1,32 +1,27 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
-struct Anim { u8 unknown_0x0[0x60]; float low; float high; u8 unknown_0x68[0x58]; struct Clip *clip; };
-struct Clip { u8 unknown_0x0[0xC]; int flags; };
-struct Obj {
-    u8 unknown_0x0[0xF00];
-    Anim *playing;
-    float timer;
-};
-extern "C" void StopAnimref(Clip *);
-extern "C" void StartAnimref(Clip *, Obj *, int, float);
+#include "stepguard.h"
+#include "guard.h"
+extern "C" void StopAnimref(ANIMREF *);
+extern "C" void StartAnimref(ANIMREF *, STEPGUARD *, int, float);
 extern "C" float GRandInRange(float, float);
-extern "C" void func_0020AC28(Obj *, Anim *, int, QW);
+extern "C" void func_0020AC28(STEPGUARD *, AIMSTATE *, int, QW);
 extern float g_2dded0;
 extern "C" const float RO_FLT_002A88C4;
-void func_0020AB68(Obj *self, Anim *anim, int mode, QW vec) {
-    if (self->playing) {
-        StopAnimref(self->playing->clip);
-        Anim *old = self->playing;
+void func_0020AB68(STEPGUARD *self, AIMSTATE *anim, int mode, QW vec) {
+    if (self->paimstate) {
+        StopAnimref(self->paimstate->panimref);
+        AIMSTATE *old = self->paimstate;
         float base = g_2dded0;
-        float wait = base + GRandInRange(old->low, old->high);
-        self->playing = 0;
-        self->timer = wait;
+        float wait = base + GRandInRange(old->field_0x60, old->field_0x64);
+        self->paimstate = 0;
+        self->tCooldown = wait;
     }
-    self->playing = anim;
+    self->paimstate = anim;
     if (anim) {
-        Clip *clip = anim->clip;
-        StartAnimref(clip, self, clip->flags | 1, 0.0f);
-        self->timer = RO_FLT_002A88C4;
+        ANIMREF *clip = anim->panimref;
+        StartAnimref(clip, self, clip->grf | 1, 0.0f);
+        self->tCooldown = RO_FLT_002A88C4;
     }
     func_0020AC28(self, anim, mode, vec);
 }

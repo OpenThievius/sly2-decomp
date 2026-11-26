@@ -4,17 +4,8 @@
 #include "sly2.h"
 #include "m2c_macros.h"
 
+#include "keypad.h"
 #include "xf.h"
-
-struct KP {
-    u8 unknown_0x0[0x188];
-    int state; float tState; void *jt; int icell;
-    u8 unknown_0x198[8];
-    void *handle; u8 unknown_0x1A4[4];
-    void *cells[8]; u8 unknown_0x1C8[4];
-    void *asegs[8]; u8 unknown_0x1EC[0x204 - 0x1EC];
-    XF *xf; void *camera;
-};
 
 extern "C" {
 void ReleaseAsegaHandle(void *);
@@ -23,53 +14,51 @@ QW bevy_camera_follow_track_heading_weight(void *, void *, QW);
 QW ConvertXfVec(void *, void *, QW);
 QW ConvertXfPos(void *, void *, QW);
 QW PosLoWorld(void *);
-void SetXfKind(KP *, XF *, int);
+void SetXfKind(KEYPAD *, XF *, int);
 void ApplyAsegToHandle(void *, void *, int, void *, float, float);
 extern float g_2dded0[];
 extern QW D_002C1080;
 extern QW D_002C1090;
 }
 
-// Retail reloads kp->xf after every call (lw 0x204 once per convert) and keeps it in $s0 across the
+// Retail reloads kp->pxf after every call (lw 0x204 once per convert) and keeps it in $s0 across the
 // convert, with that load scheduled after the cell-index load and in the jal delay slot. One local
 // reassigned three times is one pseudo whose reload sched1 hoists to the top of each block; a separate
 // XF* local per field write (three pseudos) gives retail's order.
-void func_001C8918(KP *kp, int state)
+void func_001C8918(KEYPAD *kp, int state)
 {
-    if (state == kp->state) return;
-    ReleaseAsegaHandle(&kp->handle);
-    kp->state = state;
-    kp->tState = g_2dded0[0];
+    if (state == kp->stateCell) return;
+    ReleaseAsegaHandle(&kp->hAsega);
+    kp->stateCell = state;
+    kp->tStateCell = g_2dded0[0];
     switch (state) {
     case -1:
-        kp->icell = state;
-        SetJtAttach5(kp->jt, 0);
+        kp->cnt = state;
+        SetJtAttach5(kp->ppoUser, 0);
         break;
     case 0:
-        SetJtAttach5(kp->jt, kp->cells[kp->icell]);
+        SetJtAttach5(kp->ppoUser, kp->acell[kp->cnt]);
         break;
     case 1: {
-        SetJtAttach5(kp->jt, kp->camera);
-        kp->xf->tArrive = g_2dded0[0] + 0.25f;
-        XF *xfVel = kp->xf;
-        xfVel->vel = ConvertXfVec(0, xfVel->pxfParent, bevy_camera_follow_track_heading_weight(kp->jt, 0, D_002C1080));
-        XF *xfPos = kp->xf;
-        xfPos->posGoal = ConvertXfPos(0, xfPos->pxfParent, PosLoWorld(kp->cells[kp->icell]));
-        XF *xfTan = kp->xf;
-        xfTan->velGoal = ConvertXfVec(0, xfTan->pxfParent, bevy_camera_follow_track_heading_weight(kp->jt, 0, D_002C1090));
-        SetXfKind(kp, kp->xf, 0x11);
+        SetJtAttach5(kp->ppoUser, kp->pcamera);
+        kp->pxf->tArrive = g_2dded0[0] + 0.25f;
+        XF *xfVel = kp->pxf;
+        xfVel->vel = ConvertXfVec(0, xfVel->pxfParent, bevy_camera_follow_track_heading_weight(kp->ppoUser, 0, D_002C1080));
+        XF *xfPos = kp->pxf;
+        xfPos->posGoal = ConvertXfPos(0, xfPos->pxfParent, PosLoWorld(kp->acell[kp->cnt]));
+        XF *xfTan = kp->pxf;
+        xfTan->velGoal = ConvertXfVec(0, xfTan->pxfParent, bevy_camera_follow_track_heading_weight(kp->ppoUser, 0, D_002C1090));
+        SetXfKind(kp, kp->pxf, 0x11);
         break;
     }
     case 2:
-        SetJtAttach5(kp->jt, kp->cells[kp->icell]);
-        ApplyAsegToHandle(kp->asegs[kp->icell], kp, 0, &kp->handle, 0.0f, 1.0f);
+        SetJtAttach5(kp->ppoUser, kp->acell[kp->cnt]);
+        ApplyAsegToHandle(kp->aaseg[kp->cnt], kp, 0, &kp->hAsega, 0.0f, 1.0f);
         break;
     }
 }
 
 #include "sw.h"
-
-struct CLUE_1C8AF0 { u8 unknown_0x0[0x190]; int n; u8 unknown_0x194[0x1F8 - 0x194]; int stream; };
 
 extern SW B_003DD490;
 
@@ -79,18 +68,18 @@ extern "C" void ShowClueBlot(SW *, int);
 
 extern "C" void StartStream(int *, int, int);
 
-extern "C" void func_001C8730(CLUE_1C8AF0 *, int);
+extern "C" void func_001C8730(KEYPAD *, int);
 
-extern "C" void func_001C8AF0(CLUE_1C8AF0 *pclue, int n)
+extern "C" void func_001C8AF0(KEYPAD *pclue, int n)
 {
     if (B_003DD490.cclueFound >= B_003DD490.field_0x4768) {
-        pclue->n = n;
+        pclue->ppoUser = (PO *)n;
         func_001C8730(pclue, 1);
         return;
     }
     ShowClueBlot(&B_003DD490, n);
-    if (pclue->stream != -1)
-        StartStream(&B_003DD040, pclue->stream, 1);
+    if (pclue->streamClue != -1)
+        StartStream(&B_003DD040, pclue->streamClue, 1);
 }
 
 extern "C" {

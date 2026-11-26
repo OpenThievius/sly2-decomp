@@ -1,11 +1,12 @@
 #include "types.h"
 
+/* a C view of rhythm.h's RHYTHMCROWD and RHYTHM (C++ only): the names are the shared header's */
 struct RHYTHMCROWD {
-    s32 a;
-    s32 b;
-    u8 unknown_0x8[4];
-    s32 c;
-    u8 unknown_0x10[0xC];
+    s32 oid;
+    s32 oidCheer;
+    void *link;
+    s32 level;
+    f32 threshold[3];
 };
 
 struct RHYTHM {
@@ -14,7 +15,7 @@ struct RHYTHM {
     struct RHYTHMCROWD acrowd[0x80];
 };
 
-void AddRhythmCrowd(struct RHYTHM *prhythm, s32 arg1, s32 arg2) {
+void AddRhythmCrowd(struct RHYTHM *prhythm, s32 oid, s32 oidCheer) {
     u32 temp_a0;
     struct RHYTHMCROWD *pcrowd;
 
@@ -22,8 +23,8 @@ void AddRhythmCrowd(struct RHYTHM *prhythm, s32 arg1, s32 arg2) {
     if (temp_a0 < 0x80U) {
         prhythm->ccrowd = (u32) (temp_a0 + 1);
         pcrowd = &prhythm->acrowd[temp_a0];
-        pcrowd->a = arg1;
-        pcrowd->b = arg2;
-        pcrowd->c = -1;
+        pcrowd->oid = oid;
+        pcrowd->oidCheer = oidCheer;
+        pcrowd->level = -1;
     }
 }

@@ -1,20 +1,18 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later */
 #include "alloc.h"
-struct MOVIE { unsigned record[0x11]; int start; int end; };
+#include "blot.h"
+/* cfilelocation.h's CFileLocation stores slot before hash in Set; this one stores hash first (23 words differ with the shared one) */
 struct CFileLocation { unsigned hash; unsigned slot; unsigned kind; unsigned field0C; char path[0x100]; void Clear(); int Set(const MOVIE *movie)
     {
         if (movie == 0) return 0;
-        unsigned slotNew = movie->record[1] ^ movie->record[0xF];
-        unsigned hashNew = movie->record[0] ^ movie->record[0xD];
+        unsigned slotNew = movie->field_0x4 ^ movie->field_0x3C;
+        unsigned hashNew = movie->field_0x0 ^ movie->field_0x34;
         kind = 2;
         hash = hashNew + 0xCA0;
         slot = slotNew;
         return slotNew != 0;
     }
 };
-struct BLOTX { u8 unknown_0x0[0x58]; int state; int pad5C; int time; };
-struct NODE { u8 unknown_0x0[0x40]; BLOTX *blot; int first; int last; NODE *next; };
-struct BLOT { u8 unknown_0x0[0x50]; int field50; int field54; u8 unknown_0x58[0x68]; MOVIE *movie; };
 struct COUNTERS { u8 unknown_0x0[0xC]; int limit; };
 struct STREAM { char bytes[0x70]; };
 extern "C" {
@@ -24,14 +22,14 @@ void CBinaryFileStream_Destructor(STREAM *, int);
 void CBinaryInputStream_ConstructFromBuffer(STREAM *, int, void *, int);
 int CBinaryFileStream_FOpenLocation(STREAM *, CFileLocation *);
 void *PvAllocStackImpl__Fi(ALLOCREQ *);
-void SetBlotBlots(BLOTX *, int);
+void SetBlotBlots(BLOT *, int);
 int U16Read__18CBinaryInputStream(STREAM *);
 int U8Read__18CBinaryInputStream(STREAM *);
 void func_001179D8(STREAM *, int, int);
 int func_00233470(const void *, const void *, int);
 void LoadMovieDictionary(BLOT *, STREAM *, BLOT *, int *, int *);
 void LoadMovieSprites(BLOT *, STREAM *, BLOT *);
-extern NODE *B_003E106C;
+extern BLOTSTREAM *B_003E106C;
 extern COUNTERS B_003E1C70;
 extern int g_2be538;
 }
@@ -43,18 +41,18 @@ extern int g_2be538;
 extern "C" void PrepareBlotMovie(BLOT *pblot)
 {
     int latest = 0;
-    NODE *node;
-    BLOTX *blot;
-    for (node = B_003E106C; node != 0; node = node->next) {
-        blot = node->blot;
-        if (blot->state != 0 && (blot->state != 1 || g_2be538 - blot->time < 2)) {
-            int last = node->last;
+    BLOTSTREAM *node;
+    BLOT *blot;
+    for (node = B_003E106C; node != 0; node = node->pnext) {
+        blot = node->pblot;
+        if (blot->blots != 0 && (blot->blots != 1 || g_2be538 - blot->tagState < 2)) {
+            int last = node->end;
             latest = latest < last ? last : latest;
         }
     }
-    for (node = B_003E106C; node != 0; node = node->next) {
-        blot = node->blot;
-        if (node->first >= latest && blot->state != 0) SetBlotBlots(blot, 0);
+    for (node = B_003E106C; node != 0; node = node->pnext) {
+        blot = node->pblot;
+        if (node->start >= latest && blot->blots != 0) SetBlotBlots(blot, 0);
     }
     B_003E1C70.limit = latest;
     char frame[0x10];
@@ -73,7 +71,7 @@ extern "C" void PrepareBlotMovie(BLOT *pblot)
     CFileLocation *loc = &location;
     loc->kind = 2;
     loc->Clear();
-    if (!location.Set(pblot->movie)) {
+    if (!location.Set(pblot->pstream)) {
         CBinaryFileStream_Destructor(&stream, 2);
         CStackFrame_Destructor(frame, 2);
         return;
@@ -102,10 +100,10 @@ extern "C" void PrepareBlotMovie(BLOT *pblot)
             return;
         }
     }
-    pblot->movie->start = B_003E1C70.limit;
-    LoadMovieDictionary(pblot, &stream, pblot, &pblot->field50, &pblot->field54);
+    pblot->pstream->start = B_003E1C70.limit;
+    LoadMovieDictionary(pblot, &stream, pblot, &pblot->field_0x50, &pblot->field_0x54);
     LoadMovieSprites(pblot, &stream, pblot);
-    pblot->movie->end = B_003E1C70.limit;
+    pblot->pstream->end = B_003E1C70.limit;
     CBinaryFileStream_Destructor(&stream, 2);
     CStackFrame_Destructor(frame, 2);
 }

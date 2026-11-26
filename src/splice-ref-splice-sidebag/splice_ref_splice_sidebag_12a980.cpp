@@ -7,7 +7,6 @@
 
 struct HV { VARB *p; u8 unknown_0x4[0xC]; };
 
-struct Owner { u8 unknown_0x0[0x8]; VARB *varb; };
 
 extern "C" VARB *PvarbNew(void);
 
@@ -25,10 +24,10 @@ extern "C" void FreeSlotheapPv(void *heap, void *p);
 
 extern "C" char B_004520D0[];
 
-extern "C" CRef *CSidebag_RefAddBinding(CRef *pref, Owner *powner, int sym, CRef *pvalue)
+extern "C" CRef *CSidebag_RefAddBinding(CRef *pref, SIDEBAG *powner, int sym, CRef *pvalue)
 {
     HV h;
-    VARB **pvarbHead = &powner->varb;
+    VARB **pvarbHead = &powner->pvarb;
     func_00257430(&h, PvarbNew());
     h.p->symid = sym;
     h.p->ref = *pvalue;

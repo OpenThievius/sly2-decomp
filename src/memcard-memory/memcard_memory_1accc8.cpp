@@ -10,6 +10,8 @@
 #include "pausemenu.h"
 #include "sw.h"
 #include "joy.h"
+#include "menu.h"
+#include "blot.h"
 
 struct B8 { s64 v; } __attribute__((packed));
 
@@ -179,16 +181,12 @@ extern "C" void func_001AD168(MEMCARDMENU *pmenu)
     }
 }
 
-struct CRef_1AD250 { int tagk; float g; };
-
-extern "C" char *B_003E0FAC;
+extern "C" void *B_003E0FAC;
 
 // The menu item of a save slot: the slot index and the flags word func_001AD250, SlotItem_Load and func_001AD480 read.
 struct SLOTITEM { u8 unknown_0x0[8]; int slot; u8 unknown_0xC[0x10]; unsigned flags; };
 
-extern "C" CRef_1AD250 *RefGetGameSaveValue(CRef_1AD250 *, void *, void *);
-
-extern "C" void CRef_Destruct(CRef_1AD250 *);
+extern "C" CRef RefGetGameSaveValue(void *, void *);
 
 extern "C" void ResetSaveKeepingOptions(void *, int);
 
@@ -201,10 +199,7 @@ extern "C" void SetEmitterUnpositioned(void *, void *);
 extern "C" void func_001AD250(SLOTITEM *item)
 {
     SLOT *pslot = &B_002E65E0.aslot[item->slot];
-    CRef_1AD250 ref;
-    RefGetGameSaveValue(&ref, B_003E0FAC, pslot);
-    float g = ref.g;
-    CRef_Destruct(&ref);
+    float g = RefGetGameSaveValue(B_003E0FAC, pslot).m_tag.m_g;
     if (g == 0.0f) {
         B_002E65E0.pslotCur = pslot;
         ResetSaveKeepingOptions(pslot, 1);
@@ -217,21 +212,10 @@ extern "C" void func_001AD250(SLOTITEM *item)
     }
 }
 
-struct CRef_1AD320 { int tagk; float g; int unknown_0x8[2]; };
-
-extern int B_003E0FAC_1AD320;
-
-extern "C" void RefGetGameSaveValue_1AD320(CRef_1AD320 *, int, void *);
-
-extern "C" void CRef_Destruct_1AD320(CRef_1AD320 *);
-
 void SlotItem_Load(SLOTITEM *item)
 {
     SLOT *slot = &B_002E65E0.aslot[item->slot];
-    CRef_1AD320 ref;
-    RefGetGameSaveValue_1AD320(&ref, B_003E0FAC_1AD320, slot);
-    float value = ref.g;
-    CRef_Destruct_1AD320(&ref);
+    float value = RefGetGameSaveValue(B_003E0FAC, slot).m_tag.m_g;
     B_002E65E0.pslotCur = slot;
     if (value == 0.0f) {
         ResetSaveKeepingOptions(slot, 1);
@@ -243,8 +227,6 @@ void SlotItem_Load(SLOTITEM *item)
     }
 }
 
-struct CRef_1AD3E0 { int tag; int n; int a; int b; };
-
 extern SAVE B_002E65E0;
 
 extern MEMCARDMENU B_002E6550;
@@ -253,54 +235,30 @@ extern void *B_003E0FE4;
 
 extern char B_003D4A60[];
 
-extern "C" void RefGetGameSaveValue_1AD3E0(CRef_1AD3E0 *, void *, void *);
-
-extern "C" void CRef_Destruct_1AD3E0(CRef_1AD3E0 *);
-
-extern "C" void MemcardMenu_SetState_1AD3E0(MEMCARDMENU *, int);
-
 extern "C" void func_001ABD40(void *);
 
 void func_001AD3E0()
 {
-    CRef_1AD3E0 ref;
     B_002E65E0.pslotCur = B_002E65E0.pslotInit;
     B_002E6550.mode = 2;
-    RefGetGameSaveValue_1AD3E0(&ref, B_003E0FE4, B_003D4A60);
-    int n = ref.n;
-    CRef_Destruct_1AD3E0(&ref);
+    int n = RefGetGameSaveValue(B_003E0FE4, B_003D4A60).m_tag.m_n;
     if (n == 0) {
-        MemcardMenu_SetState_1AD3E0(&B_002E6550, 0x22);
+        MemcardMenu_SetState(&B_002E6550, 0x22);
     } else {
-        MemcardMenu_SetState_1AD3E0(&B_002E6550, 0x1A);
+        MemcardMenu_SetState(&B_002E6550, 0x1A);
         func_001ABD40(&B_002E65E0);
     }
 }
 
-struct CRef_1AD480 { int a; union { float g; int n; }; int c; int d; };
-
-extern int B_003E0FAC_1AD480;
-
-extern char B_002E6550_1AD480;
-
-extern "C" void RefGetGameSaveValue_1AD480(CRef_1AD480 *, int, SLOT *);
-
-extern "C" void CRef_Destruct_1AD480(CRef_1AD480 *);
-
-extern "C" void MemcardMenu_SetState_1AD480(char *, int);
-
 extern "C" void func_001AD480(SLOTITEM *item)
 {
-    CRef_1AD480 ref;
     SLOT *slot = &B_002E65E0.aslot[item->slot];
-    RefGetGameSaveValue_1AD480(&ref, B_003E0FAC_1AD480, slot);
-    float dt = ref.g;
-    CRef_Destruct_1AD480(&ref);
+    float dt = RefGetGameSaveValue(B_003E0FAC, slot).m_tag.m_g;
     B_002E65E0.pslotInit = slot;
     if (dt == 0.0f)
         func_001AD3E0();
     else
-        MemcardMenu_SetState_1AD480(&B_002E6550_1AD480, 0x1C);
+        MemcardMenu_SetState(&B_002E6550, 0x1C);
     if (item != 0)
         item->flags |= 2;
 }
@@ -510,157 +468,37 @@ void func_001ADBB8(char *dest)
 
 INCLUDE_ASM(0X1ADC40);
 
-struct BusyMenu {
-    u8 unknown_0x0[0xC];
-    void *field_0xC;
-    u8 unknown_0x10[0x10];
-    s32 field_0x20;
-};
-
 extern "C" s32 Menu_Construct();
 
-extern "C" void Menu_ResetState(BusyMenu *);
+extern "C" void Menu_ResetState(MENUVIEW *);
 
 extern "C" char D_002D36D0[];
 
-extern "C" BusyMenu *BusyMenu_Construct(BusyMenu *menu) {
+extern "C" MENUVIEW *BusyMenu_Construct(MENUVIEW *menu) {
     Menu_Construct();
-    menu->field_0x20 = 0x5D4;
-    menu->field_0xC = D_002D36D0;
+    menu->oid = 0x5D4;
+    menu->vtable = D_002D36D0;
     Menu_ResetState(menu);
     return menu;
 }
 
-struct Obj {
-    int pad[3];
-    virtual void v0();
-    virtual void v1();
-    virtual void v2();
-    virtual void v3();
-    virtual void v4();
-    virtual void v5();
-    virtual void v6();
-    virtual void v7();
-    virtual void v8();
-    virtual void v9();
-    virtual void v10();
-    virtual void v11();
-    virtual void v12();
-    virtual void v13();
-    virtual void v14();
-    virtual void v15();
-    virtual void v16();
-    virtual void v17();
-    virtual void v18();
-    virtual void v19();
-    virtual void v20();
-    virtual void v21();
-    virtual void v22();
-    virtual void v23();
-    virtual void v24();
-    virtual void v25();
-    virtual void v26();
-    virtual void v27();
-    virtual void v28();
-    virtual void v29();
-    virtual void v30();
-    virtual void v31();
-    virtual void v32();
-    virtual void v33();
-    virtual void v34();
-    virtual void v35();
-    virtual void v36();
-    virtual void v37();
-    virtual void v38();
-    virtual void v39();
-    virtual void v40();
-    virtual void v41();
-    virtual void v42();
-    virtual void v43();
-    virtual void v44();
-    virtual void v45();
-    virtual void v46();
-    virtual void v47();
-    virtual void Target(int);
-};
-
-struct Menu { u8 unknown_0x0[0x24]; Obj *obj; };
-
-void BusyMenu_Show(Menu *menu)
+void BusyMenu_Show(MENU *menu)
 {
-    if (menu->obj)
-        menu->obj->Target(-1);
+    if (menu->pblot)
+        menu->pblot->Select(-1);
 }
 
-struct Obj_1ADE70 {
-    int pad[3];
-    virtual void v0();
-    virtual void v1();
-    virtual void v2();
-    virtual void v3();
-    virtual void v4();
-    virtual void v5();
-    virtual void v6();
-    virtual void v7();
-    virtual void v8();
-    virtual void v9();
-    virtual void v10();
-    virtual void v11();
-    virtual void v12();
-    virtual void v13();
-    virtual void v14();
-    virtual void v15();
-    virtual void v16();
-    virtual void v17();
-    virtual void v18();
-    virtual void v19();
-    virtual void v20();
-    virtual void v21();
-    virtual void v22();
-    virtual void v23();
-    virtual void v24();
-    virtual void v25();
-    virtual void v26();
-    virtual void v27();
-    virtual void v28();
-    virtual void v29();
-    virtual void v30();
-    virtual void v31();
-    virtual void v32();
-    virtual void v33();
-    virtual void v34();
-    virtual void v35();
-    virtual void v36();
-    virtual void v37();
-    virtual void v38();
-    virtual void v39();
-    virtual void v40();
-    virtual void v41();
-    virtual void v42();
-    virtual void v43();
-    virtual void v44();
-    virtual void v45();
-    virtual void v46();
-    virtual void v47();
-    virtual void v48();
-    virtual void Target();
-};
-
-struct Menu_1ADE70 { u8 unknown_0x0[0x24]; Obj_1ADE70 *obj; };
-
-void BusyMenu_Hide(Menu_1ADE70 *menu)
+void BusyMenu_Hide(MENU *menu)
 {
-    if (menu->obj)
-        menu->obj->Target();
+    if (menu->pblot)
+        menu->pblot->Hide();
 }
 
-struct MENU_1ADEE8 { u8 unknown_0x0[0x24]; MENUOBJECT *pblot; };
-
-extern "C" int BusyMenu_FShowing(MENU_1ADEE8 *pmenu) {
-    MENUOBJECT *pblot = pmenu->pblot;
+extern "C" int BusyMenu_FShowing(MENU *pmenu) {
+    BLOT *pblot = pmenu->pblot;
     if (pblot == 0) return 0;
     int result = 1;
-    if (pblot->field_0x58 < 2) {
+    if (pblot->blots < 2) {
         result = 1;
         if (pblot->field_0x64 < 2) return 0;
     }
@@ -671,34 +509,28 @@ extern "C" MEMCARD B_002F633C_1ADEE8;
 
 extern "C" float g_2ddf0c;
 
-extern "C" void Menu_Update(MENU_1ADEE8 *);
+extern "C" void Menu_Update(MENU *);
 
-extern "C" void BusyMenu_Hide_1ADEE8(MENU_1ADEE8 *);
+extern "C" void BusyMenu_Hide_1ADEE8(MENU *);
 
 int FMemcardThreadValid(MEMCARD *);
 
-void BusyMenu_Update(MENU_1ADEE8 *pmenu)
+void BusyMenu_Update(MENU *pmenu)
 {
     Menu_Update(pmenu);
-    MENUOBJECT *pblot = pmenu->pblot;
-    if (pblot != 0 && pblot->field_0x58 == 2 && pblot->field_0x64 == 2 && 1.0f < g_2ddf0c - pblot->field_0x5C
+    BLOT *pblot = pmenu->pblot;
+    if (pblot != 0 && pblot->blots == 2 && pblot->field_0x64 == 2 && 1.0f < g_2ddf0c - pblot->time
         && FMemcardThreadValid(&B_002F633C_1ADEE8) == 0)
         BusyMenu_Hide_1ADEE8(pmenu);
 }
 
 extern "C" {
-struct BusyMenu_1ADF78 {
-    u8 unknown_0x0[0x28];
-    s32 dir;
-    f32 dirTime;
-};
-
 extern f32 g_2ddf0c_1ADF78;
 
-void BusyMenu_SetDir(struct BusyMenu_1ADF78 *menu, s32 dir) {
-    if (dir != menu->dir) {
-        menu->dir = dir;
-        menu->dirTime = (f32) g_2ddf0c_1ADF78;
+void BusyMenu_SetDir(MENU *menu, s32 dir) {
+    if (dir != menu->direction) {
+        menu->direction = dir;
+        menu->tDirection = (f32) g_2ddf0c_1ADF78;
     }
 }
 }

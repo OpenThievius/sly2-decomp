@@ -15,7 +15,9 @@ struct JOY;
 struct BLOT;
 
 typedef struct MENUVIEW {
-    u8 unknown_0x0[0xC];
+    /* 0x00 */ void *pframe;      /* BASIC::pframe: Menu_Construct clears it */
+    /* 0x04 */ void *psidebag;    /* BASIC::psidebag: Menu_Construct clears it */
+    u8 unknown_0x8[0x4];
     /* 0x0C */ void *vtable;      /* the constructors store the class's table (Shop/Job/Title/Gadget/Menu52D_Construct) */
     /* 0x10 */ struct JOY *pjoy;  /* TitleMenu_Update, JobMenu_Update, ShopMenu_Update, MemcardMenu_Update read the controller here */
     u8 unknown_0x14[0xC];

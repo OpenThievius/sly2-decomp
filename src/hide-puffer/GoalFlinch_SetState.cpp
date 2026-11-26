@@ -1,36 +1,28 @@
 #include "sly2.h"
-struct Sma { int kind; u8 unknown_0x4[4]; int oid; };
-struct Guard { u8 unknown_0x0[0xE7C]; float lo; float hi; };
-#include "goal.h"
-struct GOAL_17A5B0 : GOAL {
-    u8 unknown_0x30[0x10];
-    Sma *sma;
-    u8 unknown_0x44[0xC];
-    int state;
-    float stateF;
-    float timer;
-};
+#include "goals.h"
+#include "stepguard.h"
+#include "sma.h"
 extern "C" float g_2dded0;
 extern "C" float GRandInRange(float, float);
-extern "C" void SetSmaGoal__FP3SMA3OID(int, int);
-extern "C" void GoalFlinch_SetState(GOAL_17A5B0 *goal, int state)
+extern "C" void SetSmaGoal__FP3SMA3OID(SMA *, int);
+extern "C" void GoalFlinch_SetState(GOALFLINCH *goal, int state)
 {
-    if (state == goal->state)
+    if (state == goal->stateFlinch)
         return;
-    goal->state = state;
+    goal->stateFlinch = state;
     goal->stateF = (float)state;
     switch (state) {
     case 0: {
-        if (goal->sma->kind == 1)
-            SetSmaGoal__FP3SMA3OID(goal->sma->oid, 0x44);
+        if (goal->panimref->kind == 1)
+            SetSmaGoal__FP3SMA3OID((SMA *)goal->panimref->pinst, 0x44);
         float base = g_2dded0;
-        Guard *guard = ((Guard *)goal->pstep);
-        goal->timer = base + GRandInRange(guard->lo, guard->hi);
+        STEPGUARD *guard = (STEPGUARD *)goal->pstep;
+        goal->tNext = base + GRandInRange(guard->field_0xE7C, guard->field_0xE80);
         break;
     }
     case 1:
-        if (goal->sma->kind == state)
-            SetSmaGoal__FP3SMA3OID(goal->sma->oid, 0x43);
+        if (goal->panimref->kind == state)
+            SetSmaGoal__FP3SMA3OID((SMA *)goal->panimref->pinst, 0x43);
         break;
     }
 }

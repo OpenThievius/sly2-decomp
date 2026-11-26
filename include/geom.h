@@ -8,12 +8,22 @@
 struct GEOM {
     /* 0x00 */ struct XF *pxf;          /* the transform the shape follows: func_001F3900, func_001F38A8 */
     /* 0x04 */ struct SO *pso;          /* its owner: func_001F38A8 passes it to func_001F4BF8; GetBombVictims reads it too */
-    u8 unknown_0x8[0x4];
+    /* 0x8 */ f32 radius;              /* CloneCloth sets it to the largest vertex length; CSo_LoadFromBrx reads a float into it */
     /* 0xC */ s32 alo;                  /* PpartFindAlo compares it with the id it is given; func_001F6AC8, func_001F6B48 match it with their argument */
-    /* 0x10 */ u64 grf;                 /* func_001F3900 tests bit 50; FFilterOxa and ProjectSoTransform read the same word */
-    u8 unknown_0x18[0x8];
+#ifdef __cplusplus
+    union {
+        /* 0x10 */ u64 grf;             /* func_001F3900 tests bit 50; FFilterOxa and ProjectSoTransform read the same word */
+        /* 0x10 */ s16 ashGrf[4];       /* the same word in halves: func_001F7A68 and func_001F7410 read the damage dealt at 0x14 (ashGrf[2], a short) */
+    };
+#else
+    /* 0x10 */ u64 grf;
+#endif
+    /* 0x18 */ s32 grftak;              /* the take flags the shape answers to: func_001F7410 passes them to PaloFindWkrAbsorber, func_001F7A68 swaps them
+                                           between two values, func_001F6BC8 sets them on the shapes whose alo it is given */
+    /* 0x1C */ s32 cfixed;             /* CloneCloth copies it and splits the vertex block at it; CSo_LoadFromBrx reads a short into it */
     /* 0x20 */ struct MATRIX4 matWorld; /* func_001F3900 copies the XF's world matrix here */
-    u8 unknown_0x60[0x18];
+    u8 unknown_0x60[0x8];
+    /* 0x68 */ u8 field_0x68[0x10];     /* CloneCloth hands both blocks to CloneBspc as the tree (0x68) and its planes (0x90); CSo_LoadFromBrx passes 0x68 to ReadBspc */
     /* 0x78 */ u8 field_0x78[0x18];     /* func_001F38A8 passes both blocks to TransformGeom with the XF's world matrix */
     /* 0x90 */ u8 field_0x90[0x18];
     /* 0xA8 */ s32 generationBound;     /* func_001F38A8: the XF generation the two blocks were computed for */

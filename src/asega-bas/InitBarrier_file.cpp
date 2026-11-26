@@ -5,6 +5,7 @@
 #include "types.h"
 #include "m2c_macros.h"
 #include "so.h"
+#include "oxa.h"
 #include "sw.h"
 
 /* a barrier: an SO that lets through or stops the objects and classes it lists (FIgnoreBarrierIntersection) */
@@ -91,18 +92,16 @@ extern "C" void AdjustBarrierNewXp(s32 *arg0) {
 
 struct SIDE { u8 unknown_0x0[8]; int pso; u8 unknown_0xC[0x34]; };
 
-struct XP { SIDE side[2]; u8 unknown_0x80[0xAC - 0x80]; XP *pxpNext; };
+struct XP { SIDE side[2]; u8 unknown_0x80[0x9C - 0x80]; /* 0x9C */ s32 kind; /* readers: UpdateButton (skips 10), SolveSw_file.cpp */ u8 unknown_0xA0[0xAC - 0xA0]; XP *pxpNext; };
 
 struct NODE { XP *pxpChain; NODE *pnodeNext; };
-
-struct OXA { u8 unknown_0x0[0x64]; NODE *pnode; };
 
 extern "C" void NotifyBarrierImpact(BARRIER *pbarrier)
 {
     int apso[16];
     int cpso = 0;
     int ipso;
-    for (NODE *pnode = ((OXA *)pbarrier->poxa)->pnode; pnode != 0; pnode = pnode->pnodeNext) {
+    for (NODE *pnode = pbarrier->poxa->first; pnode != 0; pnode = pnode->pnodeNext) {
         for (XP *pxp = pnode->pxpChain; pxp != 0; pxp = pxp->pxpNext) {
             int fNotSelf = pxp->side[0].pso != (sptr)pbarrier;
             int pso = pxp->side[1 - fNotSelf].pso;

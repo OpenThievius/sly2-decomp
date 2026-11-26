@@ -1,65 +1,47 @@
 #include "types.h"
 #include "ps2inline.h"
 #include "vu0inline.h"
-#include "goal.h"
 
-struct ZONEB { u8 unknown_0x0[0x10]; int pzone; };
-struct ZONEA { u8 unknown_0x0[0xDC]; ZONEB *pb; };
+#include "stepguard.h"
+#include "goals.h"
+#include "phys.h"
+#include "pathzone.h"
+
+struct LINK { u8 unknown_0x0[0x10]; PATHZONE *zone; }; /* the region link of a PHYS: only the zone is read here, as its other readers do */
+/* what STEPGUARD::field_0xFC4 points at: only its divisor at 0x20 is read, here */
 struct DIVISOR { u8 unknown_0x0[0x20]; float gDivisor; };
-struct NOTICESTEP {
-    u8 unknown_0x0[0xE8];
-    ZONEA *pa;
-    u8 unknown_0xEC[0x314 - 0xEC];
-    float gNear;
-    float gFar;
-    u8 unknown_0x31C[0xF40 - 0x31C];
-    int fActive;
-    float tMin;
-    u8 unknown_0xF48[0xFBC - 0xF48];
-    int kind;
-    u8 unknown_0xFC0[4];
-    DIVISOR *pdivisor;
-};
 struct TARGET { int a[4]; QW pos; };
-struct GOALNOTICE : GOAL {
-    void *target;
-    int state;
-    u8 unknown_0x38[0xC];
-    int pzoneLast;
-    u8 unknown_0x48[0x8];
-    QW posLast;
-};
 
 extern "C" {
 void func_001EEF98(GOALNOTICE *);
 int func_001EF0A8(GOALNOTICE *);
-int func_00209098(NOTICESTEP *);
+int func_00209098(STEPGUARD *);
 int func_00176060(GOALNOTICE *);
 int func_00175FF0(GOALNOTICE *);
 int func_00175D00(GOALNOTICE *);
 void GoalNotice_SetState(GOALNOTICE *, int);
 QW PosLoWorld(void *);
-int PpathzoneFindPos(QW, int);
+PATHZONE *PpathzoneFindPos(QW, int);
 void func_002562A8(TARGET *);
 void SetGoalTarget(GOAL *, TARGET *);
 int FGoalReactDone(GOAL *);
 int FGoalAnimDone(GOAL *);
 int func_0017B7F8(GOAL *);
-void func_0020B140(NOTICESTEP *, void *);
+void func_0020B140(STEPGUARD *, void *);
 }
 extern float D_FLT_002BE614;
 extern float g_2dded0;
 extern float B_FLT_003E1BE8;
 
-static inline int ZoneOf(NOTICESTEP *pstep)
+static inline PATHZONE *ZoneOf(STEPGUARD *pstep)
 {
-    ZONEA *pa = pstep->pa;
-    ZONEB *pb = 0;
-    if (pa != 0)
-        pb = pa->pb;
-    int pzone = 0;
-    if (pb != 0)
-        pzone = pb->pzone;
+    PHYS *pphys = pstep->pphys;
+    LINK *plink = 0;
+    if (pphys != 0)
+        plink = pphys->plink;
+    PATHZONE *pzone = 0;
+    if (plink != 0)
+        pzone = plink->zone;
     return pzone;
 }
 
@@ -79,7 +61,7 @@ extern "C" void GoalNotice_Update(GOALNOTICE *pgoal)
         case 0:
         case 3:
             if (func_001EF0A8(pgoal) == 0) {
-                if (func_00209098((NOTICESTEP *)pgoal->pstep) != 0) {
+                if (func_00209098((STEPGUARD *)pgoal->pstep) != 0) {
                     GoalNotice_SetState(pgoal, 5);
                 } else if (func_00176060(pgoal) != 0) {
                     GoalNotice_SetState(pgoal, 4);
@@ -88,21 +70,21 @@ extern "C" void GoalNotice_Update(GOALNOTICE *pgoal)
                 } else if (func_00175D00(pgoal) != 0) {
                     GoalNotice_SetState(pgoal, 2);
                 } else {
-                    QW pos = PosLoWorld(pgoal->target);
+                    QW pos = PosLoWorld(pgoal->ptarget);
                     QW posStep = PosLoWorld(pgoal->pstep);
                     float distance = LaneX(SqrtX(SquaredLengthXy(VectorSub(pos, posStep))));
-                    if (((NOTICESTEP *)pgoal->pstep)->kind == 8 || ((NOTICESTEP *)pgoal->pstep)->kind == 13) {
-                        if (((NOTICESTEP *)pgoal->pstep)->pdivisor != 0)
-                            distance /= ((NOTICESTEP *)pgoal->pstep)->pdivisor->gDivisor;
+                    if (((STEPGUARD *)pgoal->pstep)->mode == 8 || ((STEPGUARD *)pgoal->pstep)->mode == 13) {
+                        if (((STEPGUARD *)pgoal->pstep)->field_0xFC4 != 0)
+                            distance /= ((DIVISOR *)((STEPGUARD *)pgoal->pstep)->field_0xFC4)->gDivisor;
                     }
-                    int pzone = PpathzoneFindPos(pos, 1);
+                    PATHZONE *pzone = PpathzoneFindPos(pos, 1);
                     if (pgoal->state != 0) {
                         if (pgoal->state == 3) {
-                            NOTICESTEP *pstepFar = (NOTICESTEP *)pgoal->pstep;
+                            STEPGUARD *pstepFar = (STEPGUARD *)pgoal->pstep;
                             if (distance < pstepFar->gNear && pzone == ZoneOf(pstepFar)) {
                                 GoalNotice_SetState(pgoal, 0);
-                            } else if (pgoal->pzoneLast != pzone || FMoved(pos, pgoal->posLast)) {
-                                pgoal->pzoneLast = pzone;
+                            } else if (pgoal->pzone != pzone || FMoved(pos, pgoal->posLast)) {
+                                pgoal->pzone = pzone;
                                 pgoal->posLast = pos;
                                 func_002562A8(&target);
                                 target.pos = pos;
@@ -110,7 +92,7 @@ extern "C" void GoalNotice_Update(GOALNOTICE *pgoal)
                             }
                         }
                     } else {
-                        NOTICESTEP *pstepNear = (NOTICESTEP *)pgoal->pstep;
+                        STEPGUARD *pstepNear = (STEPGUARD *)pgoal->pstep;
                         if (pstepNear->gFar < distance || pzone != ZoneOf(pstepNear))
                             GoalNotice_SetState(pgoal, 3);
                     }
@@ -118,7 +100,7 @@ extern "C" void GoalNotice_Update(GOALNOTICE *pgoal)
             }
             break;
         case 1:
-            if (func_00209098((NOTICESTEP *)pgoal->pstep) != 0) {
+            if (func_00209098((STEPGUARD *)pgoal->pstep) != 0) {
                 GoalNotice_SetState(pgoal, 5);
             } else if (func_001EF0A8(pgoal) == 0) {
                 if (FGoalReactDone(pgoal->pgoalChild) != 0)
@@ -126,7 +108,7 @@ extern "C" void GoalNotice_Update(GOALNOTICE *pgoal)
             }
             break;
         case 2:
-            if (func_00209098((NOTICESTEP *)pgoal->pstep) != 0) {
+            if (func_00209098((STEPGUARD *)pgoal->pstep) != 0) {
                 GoalNotice_SetState(pgoal, 5);
             } else if (func_001EF0A8(pgoal) == 0) {
                 if (func_0017B7F8(pgoal->pgoalChild) != 0)
@@ -138,12 +120,12 @@ extern "C" void GoalNotice_Update(GOALNOTICE *pgoal)
                 GoalNotice_SetState(pgoal, -1);
             break;
         case 5:
-            if (func_001EF0A8(pgoal) == 0 && func_00209098((NOTICESTEP *)pgoal->pstep) == 0)
+            if (func_001EF0A8(pgoal) == 0 && func_00209098((STEPGUARD *)pgoal->pstep) == 0)
                 GoalNotice_SetState(pgoal, 3);
             break;
         }
     } while (state != pgoal->state);
-    NOTICESTEP *pstepEnd = (NOTICESTEP *)pgoal->pstep;
+    STEPGUARD *pstepEnd = (STEPGUARD *)pgoal->pstep;
     if (pstepEnd->fActive != 0 && state < 4 && state >= 0 && pstepEnd->tMin <= g_2dded0 && B_FLT_003E1BE8 <= g_2dded0)
-        func_0020B140(pstepEnd, pgoal->target);
+        func_0020B140(pstepEnd, pgoal->ptarget);
 }

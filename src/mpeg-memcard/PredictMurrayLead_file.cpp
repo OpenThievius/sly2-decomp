@@ -81,43 +81,28 @@ void StartMurrayFlop(MURRAY *self) {
     SetMurrayState(self, 3);
 }
 
-// What func_001B9D28 reads of the player past murray.h's fields: the object Murray holds at 0x1AD0 and the aseg at 0x1AD4.
-struct MURRAYCARRIEDVIEW {
-    u8 unknown_0x0[0x1AD0];
-    LO *plo;
-    void *paseg;
-};
-
 extern "C" int FGadgetAcquired(int);
 
 extern "C" void ApplyAseg(void *, void *, float, float, int, void *);
 
-void func_001B9D28(MURRAYCARRIEDVIEW *pmurray, QW pos)
+extern "C" void func_001B9D28(MURRAY *pmurray, QW pos)
 {
     if (FGadgetAcquired(0x11) == 0)
         return;
-    LO *plo = pmurray->plo;
+    LO *plo = pmurray->ploA;
     u64 bit = (plo->grfo >> 60) & 1;
     if (bit)
         return;
     plo->TranslateToPos(pos);
-    ApplyAseg(pmurray->paseg, pmurray->plo, 0.0f, 1.0f, 0, 0);
+    ApplyAseg(pmurray->pasegA, pmurray->ploA, 0.0f, 1.0f, 0, 0);
 }
 
-// The aseg at 0x1AD8 of its owner (an ASEG, an LO: grfo at 0x28) and the slot-29 call func_001B9DB8 makes with one word.
-struct Vt { u8 unknown_0x0[0xE8]; short offset; short unknown_0xEA; void (*method)(s8 *, s32); };
-
-struct Aseg { u8 unknown_0x0[0xC]; Vt *vtable; u8 unknown_0x10[0x28 - 0x10]; u64 flags; };
-
-struct AsegOwner { u8 unknown_0x0[0x1AD8]; Aseg *aseg; s32 field_0x1ADC; };
-
-extern "C" void ApplyAseg_1B9DB8(s32, Aseg *, s32, s32, f32, f32);
-
-extern "C" void func_001B9DB8(AsegOwner *owner, s32 arg1) {
-    Aseg *aseg = owner->aseg;
-    if (((int)(aseg->flags >> 0x3C) & 1) == 0) {
-        aseg->vtable->method((s8 *)aseg + aseg->vtable->offset, arg1);
-        ApplyAseg_1B9DB8(owner->field_0x1ADC, owner->aseg, 0, 0, 0.0f, 1.0f);
+extern "C" void func_001B9DB8(MURRAY *pmurray, QW pos)
+{
+    LO *plo = pmurray->ploB;
+    if (((int)(plo->grfo >> 0x3C) & 1) == 0) {
+        plo->TranslateToPos(pos);
+        ApplyAseg(pmurray->pasegB, pmurray->ploB, 0.0f, 1.0f, 0, 0);
     }
 }
 

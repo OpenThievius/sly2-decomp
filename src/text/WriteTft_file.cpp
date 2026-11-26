@@ -105,21 +105,15 @@ void WriteTft__FP3TFTP5OSTRMPPcPci(TFT *ptft, OSTRM *postrm, char **ppchArg, cha
     }
 }
 
-struct TFT_21EAC8 { u8 unknown_0x0[0x40]; };
-
-struct OSTRM_21EAC8 { u8 unknown_0x0[0x10]; s32 cbTotal; int CbWrite(void *, int); };
-
 extern "C" char *strchr_21EAC8(const char *, int);
 
 extern "C" unsigned strlen_21EAC8(const char *);
 
-int CchParsePchzTft(char *, TFT_21EAC8 *, char **);
+int CchParsePchzTft(char *, TFT *, char **);
 
-void WriteTft(TFT_21EAC8 *, OSTRM_21EAC8 *, char **, char *, int);
-
-int CchOstrmPrintf(OSTRM_21EAC8 *postrm, char *format, char *va)
+int CchOstrmPrintf(OSTRM *postrm, char *format, char *va)
 {
-    TFT_21EAC8 tft;
+    TFT tft;
     char *pva = va;
     if (*(unsigned char *)format != 0) {
         do {
@@ -138,12 +132,12 @@ int CchOstrmPrintf(OSTRM_21EAC8 *postrm, char *format, char *va)
             }
             if (*(unsigned char *)format == '%') {
                 int spec = CchParsePchzTft(format, &tft, &pva);
-                WriteTft(&tft, postrm, &pva, format, spec);
+                WriteTft__FP3TFTP5OSTRMPPcPci(&tft, postrm, &pva, format, spec);
                 format += spec;
             }
         } while (*(unsigned char *)format != 0);
     }
-    return postrm->cbTotal;
+    return postrm->cchWritten;
 }
 
 struct OSTRM_21EBB8 {

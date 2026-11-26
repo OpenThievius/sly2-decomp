@@ -6,15 +6,31 @@
 #include "m2c_macros.h"
 #include "include_asm.h"
 
-extern "C" {
-typedef struct VIFS {
-    u8 unknown_0x0[0x10];
-    s32 field_0x10;
+enum UPK { UPK_DUMMY };
+
+/* VIFS, the VIF packet builder: a DMAS (0xC bytes of fields) followed by its cursor, the unpack mask and its own state.
+   Every function of this file wrote its own view of the same object; offsets agree across them. */
+class VIFS {
+public:
+    u8 unknown_0x0[0xC];
+    /* 0x0C */ unsigned *cursor; /* next word to write; readers: Align, AddVifBaseOffset, AddVifMscal, AddVifFlush, AddVifFlusha, AddVifStcycl, AddVifStrow, AddVifStmask, AddVifDirect(Refs), UnpackHelper */
+    /* 0x10 */ s32 field_0x10;   /* ctor sets 1 */
     u8 unknown_0x14[4];
-    s32 *field_0x18;
-    s32 field_0x1C;
+    /* 0x18 */ s32 *field_0x18;  /* ctor sets &D_002CE488 */
+    /* 0x1C */ unsigned mask;    /* AddVifStmask stores it, VIFS_AddUnpackCommand tests it for the unpack command's m bit (0x10000000), ctor clears it */
     s32 field_0x20;
-} VIFS;
+    void Align(int align);
+    void AddVifBaseOffset(int base, int offset);
+    void AddVifMscal(void *program);
+    void AddVifStcycl(int wl, int cl);
+    void AddVifStmask(unsigned maskValue);
+    void UnpackHelper(UPK upk, int c, int uAddr, int *pcb, unsigned **ppb);
+    void AddVifUnpack(UPK upk, int c, void *pvSrc, int uAddr);
+    void AddVifDirect(int, QW *, int);
+    void AddVifGifs(struct GIFS *gifs);
+};
+
+extern "C" {
 
 void *__4DMAS(void *);
 
@@ -24,98 +40,67 @@ VIFS *__4VIFS(VIFS *vifs) {
     __4DMAS(vifs);
     vifs->field_0x10 = 1;
     vifs->field_0x18 = &D_002CE488;
-    vifs->field_0x1C = 0;
+    vifs->mask = 0;
     vifs->field_0x20 = 0;
     return vifs;
 }
 }
 
-struct VIFS_226C58 { u8 unknown_0x0[0xC]; int addr; };
-
-void Align__4VIFSi(VIFS_226C58 *pvifs, int align)
+void VIFS::Align(int align)
 {
-    int addr = pvifs->addr;
+    int addr = (sptr)cursor;
     int phase = (unsigned)(addr & 0xC) >> 2;
     int *pcur = (int *)addr;
     while (phase != align) {
         *pcur++ = 0;
         phase = (phase + 1) % 4;
     }
-    pvifs->addr = (sptr)pcur;
+    cursor = (unsigned *)pcur;
 }
 
-class VIFS_226CA8 {
-public:
-    u8 unknown_0x0[0xC];
-    unsigned *cursor;
-    u8 unknown_0x10[0xC];
-    unsigned mask;
-    void AddVifBaseOffset(int base, int offset);
-    void AddVifMscal(void *program);
-    void AddVifStmask(unsigned maskValue);
-};
-
-static inline void Push(VIFS_226CA8 *vifs, unsigned word)
+static inline void Push(VIFS *vifs, unsigned word)
 {
     unsigned *slot = vifs->cursor;
     vifs->cursor = slot + 1;
     *slot = word;
 }
 
-void VIFS_226CA8::AddVifBaseOffset(int base, int offset)
+void VIFS::AddVifBaseOffset(int base, int offset)
 {
     Push(this, base | 0x3000000);
     Push(this, offset | 0x2000000);
 }
 
-class VIFS_226CE0 {
-public:
-    u8 unknown_0x0[0xC];
-    unsigned *cursor;
-    void AddVifMscal(void *program);
-};
-
-void VIFS_226CE0::AddVifMscal(void *program)
+void VIFS::AddVifMscal(void *program)
 {
     int address = (sptr)program / 8; unsigned *slot = cursor; cursor = slot + 1; *slot = address | 0x14000000;
 }
 
-struct VIFS_226D10 { u8 unknown_0x0[0xC]; int *cursor; };
-
-extern "C" int AddVifFlush__4VIFS(VIFS_226D10 *vifs)
+extern "C" int AddVifFlush__4VIFS(VIFS *vifs)
 {
-    int *slot = vifs->cursor;
-    int *next = slot + 1;
+    unsigned *slot = vifs->cursor;
+    unsigned *next = slot + 1;
     vifs->cursor = next;
     *slot = 0x11000000;
     return (int)next;
 }
 
 // 0x226D28 VIFS::AddVifFlusha
-struct VIFS_226D28 { u8 unknown_0x0[0xC]; int *cursor; };
-
-extern "C" int AddVifFlusha__4VIFS(VIFS_226D28 *vifs)
+extern "C" int AddVifFlusha__4VIFS(VIFS *vifs)
 {
-    int *slot = vifs->cursor;
-    int *next = slot + 1;
+    unsigned *slot = vifs->cursor;
+    unsigned *next = slot + 1;
     vifs->cursor = next;
     *slot = 0x13000000;
     return (int)next;
 }
 
-struct VIFS_226D40 { u8 unknown_0x0[0xC]; int *pcur; void AddVifStcycl(int, int); };
-
-void VIFS_226D40::AddVifStcycl(int wl, int cl)
+void VIFS::AddVifStcycl(int wl, int cl)
 {
-    int *pword = pcur;
-    pcur = pword + 1;
+    unsigned *pword = cursor;
+    cursor = pword + 1;
     *pword = cl | (wl << 8) | 0x1000000;
 }
-
-struct VIFS_226D68 {
-    u8 unknown_0x0[0xC];
-    s32 *cursor;
-};
 
 struct VifStrowData {
     s32 word0;
@@ -124,12 +109,12 @@ struct VifStrowData {
     s32 word3;
 };
 
-extern "C" void AddVifStrow__4VIFSP2QW(VIFS_226D68 *vifs, VifStrowData *quad) {
-    s32 *controlSlot;
-    s32 *slotWord1;
-    s32 *slotWord2;
-    s32 *slotWord3;
-    s32 *slotWord4;
+extern "C" void AddVifStrow__4VIFSP2QW(VIFS *vifs, VifStrowData *quad) {
+    unsigned *controlSlot;
+    unsigned *slotWord1;
+    unsigned *slotWord2;
+    unsigned *slotWord3;
+    unsigned *slotWord4;
 
     controlSlot = vifs->cursor;
     vifs->cursor = controlSlot + 1;
@@ -148,25 +133,14 @@ extern "C" void AddVifStrow__4VIFSP2QW(VIFS_226D68 *vifs, VifStrowData *quad) {
     *slotWord4 = quad->word3;
 }
 
-class VIFS_226DD0 {
-public:
-    u8 unknown_0x0[0xC];
-    unsigned *cursor;
-    u8 unknown_0x10[0xC];
-    unsigned mask;
-    void AddVifBaseOffset(int base, int offset);
-    void AddVifMscal(void *program);
-    void AddVifStmask(unsigned maskValue);
-};
-
-static inline void Push_226DD0(VIFS_226DD0 *vifs, unsigned word)
+static inline void Push_226DD0(VIFS *vifs, unsigned word)
 {
     unsigned *slot = vifs->cursor;
     vifs->cursor = slot + 1;
     *slot = word;
 }
 
-void VIFS_226DD0::AddVifStmask(unsigned maskValue)
+void VIFS::AddVifStmask(unsigned maskValue)
 {
     if (maskValue != 0) {
         Push_226DD0(this, 0x20000000);
@@ -177,11 +151,9 @@ void VIFS_226DD0::AddVifStmask(unsigned maskValue)
 
 INCLUDE_ASM(0X226E08);
 
-struct VIFS_226E10 { u8 unknown_0x0[0xC]; unsigned *pcur; u8 unknown_0x10[0xC]; int flag; };
-
 extern "C" int D_002C4430[];
 
-extern "C" int VIFS_AddUnpackCommand(VIFS_226E10 *pvifs, int a, int b, int c)
+extern "C" int VIFS_AddUnpackCommand(VIFS *pvifs, int a, int b, int c)
 {
     unsigned word;
     if (a >= 0x10) {
@@ -191,25 +163,17 @@ extern "C" int VIFS_AddUnpackCommand(VIFS_226E10 *pvifs, int a, int b, int c)
         word = 0x6000C000;
     }
     word = word | (a << 24) | (b << 16) | c;
-    if (pvifs->flag != 0)
+    if (pvifs->mask != 0)
         word |= 0x10000000;
-    unsigned *pcur = pvifs->pcur;
-    pvifs->pcur = pcur + 1;
+    unsigned *pcur = pvifs->cursor;
+    pvifs->cursor = pcur + 1;
     *pcur = word;
     return D_002C4430[a] * b;
 }
 
-enum UPK { UPK_DUMMY };
+extern "C" int VIFS_AddUnpackCommand_226E88(VIFS *, UPK, int, int);
 
-struct VIFS_226E88 {
-    u8 unknown_0x0[0xC];
-    char *m_pb;
-    void UnpackHelper(UPK upk, int c, int uAddr, int *pcb, unsigned **ppb);
-};
-
-extern "C" int VIFS_AddUnpackCommand_226E88(VIFS_226E88 *, UPK, int, int);
-
-void VIFS_226E88::UnpackHelper(UPK upk, int c, int uAddr, int *pcb, unsigned **ppb)
+void VIFS::UnpackHelper(UPK upk, int c, int uAddr, int *pcb, unsigned **ppb)
 {
     if (c == 0) {
         if (ppb != 0)
@@ -220,20 +184,13 @@ void VIFS_226E88::UnpackHelper(UPK upk, int c, int uAddr, int *pcb, unsigned **p
     }
     int cb = VIFS_AddUnpackCommand_226E88(this, upk, c, uAddr);
     if (ppb != 0)
-        *ppb = (unsigned *)m_pb;
-    m_pb = m_pb + ((cb + 3) / 4) * 4;
+        *ppb = cursor;
+    cursor = (unsigned *)((char *)cursor + ((cb + 3) / 4) * 4);
     if (pcb != 0)
         *pcb = cb;
 }
 
-struct VIFS_226F28 {
-    u8 unknown_0x0[0xC];
-    char *m_pb;
-    void UnpackHelper(UPK upk, int c, int uAddr, int *pcb, unsigned **ppb);
-    void AddVifUnpack(UPK upk, int c, void *pvSrc, int uAddr);
-};
-
-void VIFS_226F28::AddVifUnpack(UPK upk, int c, void *pvSrc, int uAddr)
+void VIFS::AddVifUnpack(UPK upk, int c, void *pvSrc, int uAddr)
 {
     int cb;
     unsigned *pbDest;
@@ -303,27 +260,19 @@ void VIFS_227010::AddVifUnpackRefs(UPK upk, int c, void *pvSrc, int uAddr, void 
     }
 }
 
-struct VIFS_2270C8 { u8 unknown_0x0[0xC]; u32 *cursor; };
+extern "C" void AddDmaBulk__4DMASiP2QW(VIFS *, s32, s32);
 
-extern "C" void AddDmaBulk__4DMASiP2QW(VIFS_2270C8 *, s32, s32);
-
-extern "C" int Align__4VIFSi_2270C8(VIFS_2270C8 *, int);
-
-extern "C" void AddVifDirect__4VIFSiP2QWi(VIFS_2270C8 *arg0, s32 arg1, s32 arg2, s32 arg3) {
-    Align__4VIFSi_2270C8(arg0, 3);
+extern "C" void AddVifDirect__4VIFSiP2QWi(VIFS *arg0, s32 arg1, s32 arg2, s32 arg3) {
+    arg0->Align(3);
     u32 *slot = arg0->cursor;
     u32 hdr = (arg3 << 31) | 0x50000000; arg0->cursor = slot + 1; *slot = arg1 | hdr;
     AddDmaBulk__4DMASiP2QW(arg0, arg1, arg2);
 }
 
-struct VIFS_227148 { u8 unknown_0x0[0xC]; u32 *cursor; };
+extern "C" void AddDmaRefs__4DMASiP2QW_227148(VIFS *, s32, s32);
 
-extern "C" void AddDmaRefs__4DMASiP2QW_227148(VIFS_227148 *, s32, s32);
-
-extern "C" int Align__4VIFSi_227148(VIFS_227148 *, int);
-
-extern "C" void AddVifDirectRefs__4VIFSiP2QWi(VIFS_227148 *arg0, s32 arg1, s32 arg2, s32 arg3) {
-    Align__4VIFSi_227148(arg0, 3);
+extern "C" void AddVifDirectRefs__4VIFSiP2QWi(VIFS *arg0, s32 arg1, s32 arg2, s32 arg3) {
+    arg0->Align(3);
     u32 *slot = arg0->cursor;
     u32 hdr = (arg3 << 31) | 0x50000000; arg0->cursor = slot + 1; *slot = arg1 | hdr;
     AddDmaRefs__4DMASiP2QW_227148(arg0, arg1, arg2);
@@ -331,13 +280,7 @@ extern "C" void AddVifDirectRefs__4VIFSiP2QWi(VIFS_227148 *arg0, s32 arg1, s32 a
 
 class GIFS { public: u8 unknown_0x0[4]; unsigned base; u8 unknown_0x8[4]; unsigned cursor; };
 
-class VIFS_2271C8 {
-public:
-    void AddVifGifs(GIFS *gifs);
-    void AddVifDirect(int, QW *, int);
-};
-
-void VIFS_2271C8::AddVifGifs(GIFS *gifs)
+void VIFS::AddVifGifs(GIFS *gifs)
 {
     AddVifDirect((gifs->cursor - gifs->base) >> 4, (QW *)gifs->base, 0);
 }

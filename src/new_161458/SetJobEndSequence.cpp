@@ -1,23 +1,17 @@
 #include "types.h"
-struct V;
-struct VT {
-    u8 unknown_0x0[0x188];
-    short delta188; short unused188; void (*fn18C)(void *, int);
-    short delta190; short unused190; void (*fn194)(void *);
-};
-struct V { u8 unknown_0x0[0xC]; VT *vt; };
+#include "blot.h"
 struct OBJ {
     u8 unknown_0x0[0x40]; int tagged;
     u8 unknown_0x44[0x68 - 0x44]; OBJ *owner;
     u8 unknown_0x6C[0x94 - 0x6C]; int cdeps; int *deps; u8 unknown_0x9C[4]; int cmembers; OBJ **members;
-    u8 unknown_0xA8[0xB0 - 0xA8]; int seqA; int seqB; V *vB8; V *vBC; OBJ *pick; int state; float timer;
+    u8 unknown_0xA8[0xB0 - 0xA8]; int seqA; int seqB; BLOT *vB8; BLOT *vBC; OBJ *pick; int state; float timer;
 };
 extern "C" {
 void ClearHandsOff(void *, int);
 int FTaskComplete(int);
 void SetHandsOff(void *, int);
 void func_001A6CA8(OBJ *, int);
-void func_00213B00(V *, int);
+void func_00213B00(BLOT *, int);
 extern char B_003DD490[];
 extern float g_2dded0[];
 void SetJobEndSequence(OBJ *self, int arg1) {
@@ -56,15 +50,13 @@ void SetJobEndSequence(OBJ *self, int arg1) {
     self->timer = g_2dded0[0];
     switch (arg1) {
     case 0: {
-        V *objC = self->vBC;
+        BLOT *objC = self->vBC;
         if (objC != 0) {
-            VT *vt = objC->vt;
-            vt->fn194((char *)objC + vt->delta190);
+            objC->Hide();
         }
-        V *objB = self->vB8;
+        BLOT *objB = self->vB8;
         if (objB != 0) {
-            VT *vt = objB->vt;
-            vt->fn194((char *)objB + vt->delta190);
+            objB->Hide();
         }
         func_001A6CA8(self, 2);
         {
@@ -78,16 +70,14 @@ void SetJobEndSequence(OBJ *self, int arg1) {
         return;
     }
     case 1: {
-        V *objB = self->vB8;
-        VT *vt = objB->vt;
-        vt->fn18C((char *)objB + vt->delta188, -1);
+        BLOT *objB = self->vB8;
+        objB->Select(-1);
         func_00213B00(self->vB8, self->seqA);
         return;
     }
     case 3: {
-        V *objC = self->vBC;
-        VT *vt = objC->vt;
-        vt->fn18C((char *)objC + vt->delta188, -1);
+        BLOT *objC = self->vBC;
+        objC->Select(-1);
         return;
     }
     case 2:

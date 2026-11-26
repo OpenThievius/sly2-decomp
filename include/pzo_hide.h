@@ -65,7 +65,9 @@ struct ATTACHCRV {
 
 /* a cylinder attachment: an XFM (InitXfm, CloneXfm) with a MEMBER at +0xE0 */
 struct ATTACHCYL {
-    u8 unknown_0x0[0xE0];
+    u8 unknown_0x0[0x38];
+    /* 0x38 */ f32 radius;          /* AttachCyl_PostLoad, AttachCrv_PostLoad, AttachFlat_PostLoad (the three agree): 1e10 until PostLoad derives it */
+    u8 unknown_0x3C[0xE0 - 0x3C];
     /* 0xE0 */ struct MEMBER member;
     /* 0x104 */ struct BYTES8 kept; /* AttachCyl_Clone */
     /* 0x10C */ f32 heightOffset;   /* AttachCyl_GetRandomPos adds it to the random height; AttachCyl_PostLoad reads it as the radius */
@@ -183,23 +185,40 @@ struct CHASER : SOHIT {
     /* 0x384 */ f32 speedGain;     /* reader: Chaser_SetSpeedGain (func_001813F0), a method of the class, so certain */
 };
 
-/* a Swarm rider (0x64+ bytes; the swarm keeps them in its groups' lists and its dead list, linked through the DLE at 0x60) */
+/* a Swarm rider (0x70 bytes: Swarm_PostLoad allocates them; the swarm keeps them in its groups' lists and its dead list, linked through the DLE at 0x60) */
 struct SWARMRIDER {
-    u8 unknown_0x0[0x20];
-    /* 0x20 */ struct SWARMGROUP *group; /* Swarm_Reset, Swarm_SetRiderState */
-    /* 0x24 */ s32 state;                /* Swarm_SetRiderState (2 = dead) */
+    /* 0x00 */ QW pos;                   /* Swarm_AbsorbTouch: the rider nearest the touching object, its position goes to the weapon record and the explosion */
+    u8 unknown_0x10[0x10];
+    /* 0x20 */ struct SWARMGROUP *group; /* Swarm_Reset, Swarm_SetRiderState; Swarm_PostLoad sets it on each rider it allocates */
+    /* 0x24 */ s32 state;                /* Swarm_SetRiderState (2 = dead); Swarm_PostLoad sets -1, SwarmGroup_PlaceRiders sets -1 before its state call */
     /* 0x28 */ f32 tState;               /* the clock at the change */
-    u8 unknown_0x2C[0x34];
-    /* 0x60 */ DLE dle;                  /* Swarm_Reset: the dead list's entry (InitDl's ibDle 0x60) */
+    /* 0x2C */ f32 field_0x2C;           /* reader: SwarmGroup_UpdateTargets (one end of the lerp that gives the rider's slot along the curve) */
+    /* 0x30 */ f32 field_0x30;           /* the other end */
+    /* 0x34 */ f32 field_0x34;           /* the group target at which the lerp is at field_0x2C */
+    /* 0x38 */ f32 field_0x38;           /* the group target at which the lerp is at field_0x30 */
+    /* 0x3C */ f32 s;                    /* reader: SwarmGroup_PlaceRiders (its place along the curve: the curve's length times (index + 0.5) over the alive count) */
+    /* 0x40 */ f32 v;                    /* SwarmGroup_PlaceRiders clears it */
+    /* 0x44 */ f32 sGoal;                /* SwarmGroup_UpdateTargets: the clamped slot */
+    /* 0x48 */ f32 priority;             /* SwarmGroup_UpdateTargets: minus the distance of the slot's midpoint from the group target */
+    /* 0x4C */ s32 hp;                   /* SwarmGroup_PlaceRiders copies the group's hpRider */
+    u8 unknown_0x50[0x10];
+    /* 0x60 */ DLE dle;                  /* Swarm_Reset: the dead list's entry (InitDl's ibDle 0x60); SwarmGroup_PlaceRiders and _UpdateTargets walk it as the next rider */
+    u8 unknown_0x68[0x8];
 };
 
+/* a group of riders (0x30 bytes). Readers that agree: Swarm_PostLoad (the oid, the curve it finds, the list), SwarmGroup_PlaceRiders,
+   SwarmGroup_UpdateTargets and Swarm_AddGroup (which fills the first three words, hpRider and gap) */
 struct SWARMGROUP {
-    u8 unknown_0x0[4];
-    /* 0x4 */ s32 total;  /* Swarm_Reset: alive is reset to it */
-    u8 unknown_0x8[4];
-    /* 0xC */ s32 alive;  /* Swarm_Reset, Swarm_SetRiderState */
-    /* 0x10 */ DL dl;     /* the group's live riders: Swarm_SetRiderState removes a dying one */
-    u8 unknown_0x1C[0x14];
+    /* 0x0 */ s32 oid;    /* Swarm_AddGroup's first argument; Swarm_PostLoad finds the curve object by it */
+    /* 0x4 */ s32 total;  /* Swarm_Reset: alive is reset to it; Swarm_PostLoad allocates that many riders (Swarm_AddGroup's second argument) */
+    /* 0x8 */ s32 field_0x8; /* Swarm_AddGroup's third argument */
+    /* 0xC */ s32 alive;  /* Swarm_Reset, Swarm_SetRiderState, SwarmGroup_PlaceRiders, SwarmGroup_UpdateTargets */
+    /* 0x10 */ DL dl;     /* the group's live riders: Swarm_SetRiderState removes a dying one; Swarm_PostLoad inits it (InitDl 0x60) and appends; the head is the first rider */
+    /* 0x1C */ s32 hpRider; /* SwarmGroup_PlaceRiders gives it to each rider; Swarm_AddGroup stores the constant at 0x2BE8AC */
+    /* 0x20 */ f32 gap;   /* SwarmGroup_UpdateTargets (the rider spacing, at most the curve over twice the riders); Swarm_AddGroup stores its rate argument */
+    /* 0x24 */ struct CRV *pcrv; /* Swarm_PostLoad stores the object it finds for the oid; SwarmGroup_PlaceRiders and _UpdateTargets pass it to SMaxCrv */
+    /* 0x28 */ f32 target; /* SwarmGroup_UpdateTargets */
+    /* 0x2C */ f32 timer;  /* Swarm_AddGroup sets -1 */
 };
 
 /* SWARM, a SOHIT: up to four groups, a dead list */

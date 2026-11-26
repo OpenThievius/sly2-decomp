@@ -14,6 +14,8 @@
 struct ALO;
 struct XFR;
 struct EMITB;
+struct RIPG;
+struct BLIPG;
 
 /* what to explode with: grfexpl says which of the fields count (FireExplsExplso: 1 palo, 2 vec, 4 pos, 8 and 0x10 g/uPercent,
    0x20 field_0x30, 0x40 pxfr, 0x80 cparticle) */
@@ -41,12 +43,22 @@ struct EXPLO : EXPL {
     u8 unknown_0xE8[0x8];
 };
 
+/* the sound an explosion plays: FireExplsExplso reads it */
+struct AMBDESC {
+    /* 0x0 */ s32 sfx;
+    /* 0x4 */ struct { f32 gMin, gMax; } lmRange; /* the range of the sound */
+    /* 0xC */ f32 uVolume;
+    /* 0x10 */ f32 uPitch;
+};
+
 /* class 33, 0x110 bytes */
 struct EXPLS : EXPLO {
     virtual void FireExplso(EXPLSO *pexplso); /* 52: FireExplsExplso; ExplodeExplsExplso calls it */
-    u8 unknown_0xF0[0x10];
-    /* 0x100 */ void *pripg;  /* HandleExplsMessage (clears it when it goes away), FireExplsExplso (hands its address to the emitter) */
-    /* 0x104 */ void *pblipg; /* HandleExplsMessage, FireExplsExplso, likewise */
+    /* 0xF0 */ struct AMBDESC *pambdesc;  /* FireExplsExplso (a method): the sound to start, 0 for none */
+    /* 0xF4 */ struct { f32 gMin, gMax; } lmcParticle; /* FireExplsExplso: the range the particle count is drawn from */
+    /* 0xFC */ s32 fEmitg;                /* FireExplsExplso: nonzero hands the emitter the group pointers */
+    /* 0x100 */ struct RIPG *pripg;  /* HandleExplsMessage (clears it when it goes away), FireExplsExplso (hands its address to the emitter) */
+    /* 0x104 */ struct BLIPG *pblipg; /* HandleExplsMessage, FireExplsExplso, likewise */
     u8 unknown_0x108[0x8];
 };
 
@@ -59,5 +71,6 @@ SLY2_SIZE_CHECK(EXPLO, 0xF0);
 SLY2_OFFSET_CHECK(EXPLO, pemitb, 0xE4);
 SLY2_SIZE_CHECK(EXPLS, 0x110);
 SLY2_OFFSET_CHECK(EXPLS, pripg, 0x100);
+SLY2_OFFSET_CHECK(EXPLS, fEmitg, 0xFC);
 #endif
 #endif

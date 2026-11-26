@@ -22,7 +22,9 @@ struct MOUNTREC { s32 oidPart; s32 oidObject; void *pxf; void *pact; void *plo; 
     /* 0x220 */ QW vecStick;             /* Mount_Update: the stick as a vector (SetVectorCylind) in state 1, zero in the others */ \
     /* 0x230 */ s32 crec;                /* Mount_BindRecords (func_0017F770), Mount_AddPart (0x1800A0, named UseStepguardDeathAnimation by a wrong match): count, at most 4 */ \
     /* 0x234 */ struct MOUNTREC arec[4]; /* the same two: the records */ \
-    u8 unknown_0x294[0xC]; \
+    /* 0x294 */ struct LO *ploAttach;   /* Mount_SetState (state 3 places the mount under its parent and reads its matrix; state 3's exit clears it); Grab_SetState sets it (pzo_hide.h: its anchor) */ \
+    /* 0x298 */ s32 hActA;               /* Mount_SetState (state 3): the handle func_0012DC18 returned for pxfLinear's constraint; func_0012E460 frees it through its address */ \
+    /* 0x29C */ s32 hActB;               /* the same for pxfAngular */ \
     /* 0x2A0 */ void *pblot;            /* Mount_UpdateHealthBlot (a method of MOUNT): the health blot it seeks to the share of health lost */ \
     /* 0x2A4 */ struct AMB *pamb;        /* Mount_Update: the ambient sound it fades with the stick magnitude */ \
     /* 0x2A8 */ s32 field_0x2A8;         /* Mount_Init (a method) sets -1 */ \

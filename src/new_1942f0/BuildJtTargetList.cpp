@@ -1,25 +1,17 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "ps2inline.h"
 #include "vu0inline.h"
+#include "sw.h"
 #include "jt.h"
+#include "xfm.h"
 
 
-/* a candidate of the player's target list (0x30 bytes); the world keeps four (from 0x4680) */
-struct TGT {
-    LO *plo;
-    struct TGTDEF { u8 unknown_0x0[0x14]; s32 idLabel; } *ptgtdef;
-    f32 sRank;
-    s32 iRank;
-    LO *ploClone;
-    f32 tShown;
-    u8 unknown_0x18[0x8];
-    QW pos;
-};
-
-/* the target interface of a targetable object: InsertTargetCandidate reads 0x18 and 0x1C; the list link follows at 0x24 */
-struct TARGET {
-    u8 unknown_0x0[0x24];
-    DLE dleTarget;
+/* the target interface of a targetable object: sw.h's TGTDEF (vtable at 0x20, label id at 0x14), the list link follows at 0x24. It is
+   pzo_hide.h's MEMBER too (same vtable slots, field 0x14 is -1 without a label), and its DLE is the BYTES8 `kept` that the Attach*
+   classes' Clone methods keep after the member. The lists: B_003E13F0 ATTACHCRV (member at 0x190), B_003E13FC ATTACHCYL, B_003E1414
+   ATTACHPT (0xE0), B_003E1438 ATTACHZONE (0x130), B_003E1408 ATTACHFLAT (0xE0); the other three are not identified */
+struct TARGET : TGTDEF {
+    /* 0x24 */ DLE dleTarget;
 };
 
 /* the classes before TARGET in each object (the casts retail makes put TARGET at 0x190, 0xE0, 0x130) */
@@ -29,27 +21,19 @@ struct BASE130 { u8 unknown_0x0[0x130]; };
 struct TGTOBJA : BASE190, TARGET { };
 struct TGTOBJB : BASEE0, TARGET { };
 struct TGTOBJC : BASE130, TARGET { };
-struct TGTLOBASE : LO {
-    u8 unknown_0x50[0x90];
-    /* 0xE0 */ struct TGTLO *pnext;
-    u8 unknown_0xE4[0x4];
-    /* 0xE8 */ u32 grf;
+/* the Target class of break-text/InitTarget_file.cpp: an XFM whose own fields start at 0xE0 (the DLE the list B_003E13B4 links it
+   through, which CloneTarget keeps across the clone; the flags InitTarget sets to 0x17E) */
+struct TGTLOBASE : XFM {
+    /* 0xE0 */ DLE dleList;
+    /* 0xE8 */ u32 grf;  /* readers: BuildJtTargetList, InitTarget (as the word at 0xE8) */
     u8 unknown_0xEC[0x14];
 };
 struct TGTLO : TGTLOBASE, TARGET { };
 
-struct SWTARGETS {
-    u8 unknown_0x0[0x4678];
-    /* 0x4678 */ s32 ctgt;
-    u8 unknown_0x467C[0x4];
-    /* 0x4680 */ TGT atgt[4];
-    /* 0x4740 */ s32 idLabel;
-};
-
 struct HUD;
 struct POOLO { u8 unknown_0x0[0x18]; s32 oid; };
 
-extern SWTARGETS B_003DD490;
+extern SW B_003DD490;
 extern HUD B_003DA0C0;
 extern DL B_003E13B4;
 extern DL B_003E13C0;
@@ -70,8 +54,8 @@ void *memset(void *, int, unsigned int);
 QW PosLoWorld(JT *);
 void InsertTargetCandidate(void *, JT *, QW, void *, TARGET *, int, TGT *);
 int FIsBasicDerivedFrom(void *, int);
-void EmitTargetSparkles(SWTARGETS *, JT *, int, TGT *);
-void UpdateSwTargetList(SWTARGETS *, JT *, int, TGT *);
+void EmitTargetSparkles(SW *, JT *, int, TGT *);
+void UpdateSwTargetList(SW *, JT *, int, TGT *);
 int func_001DA5B0(HUD *);
 POOLO *PpoolFromLoClone(LO *);
 void ClearHudLabel(HUD *, int);
@@ -124,7 +108,7 @@ extern "C" void BuildJtTargetList(void *pv, JT *pjt, int grf)
                 InsertTargetCandidate(pv, pjt, posJt, p, p, 4, atgt);
         }
         if (grf & 1) {
-            for (TGTLO *p = (TGTLO *)B_003E13B4.head; p; p = p->pnext)
+            for (TGTLO *p = (TGTLO *)B_003E13B4.head; p; p = (TGTLO *)p->dleList.next)
                 if ((p->grf & 1) && FIsBasicDerivedFrom(p, 0x13))
                     InsertTargetCandidate(pv, pjt, posJt, p, p, 4, atgt);
         }
@@ -132,12 +116,12 @@ extern "C" void BuildJtTargetList(void *pv, JT *pjt, int grf)
             for (TGTOBJB *p = (TGTOBJB *)B_003E1408.head; p; p = (TGTOBJB *)p->dleTarget.next)
                 InsertTargetCandidate(pv, pjt, posJt, p, p, 4, atgt);
         }
-        for (ctgt = 4; ctgt > 0 && atgt[ctgt - 1].plo == 0; ctgt--)
+        for (ctgt = 4; ctgt > 0 && atgt[ctgt - 1].oid == 0; ctgt--)
             ;
         EmitTargetSparkles(&B_003DD490, pjt, ctgt, atgt);
         UpdateSwTargetList(&B_003DD490, pjt, ctgt, atgt);
         int idCur = func_001DA5B0(&B_003DA0C0);
-        if (idCur == -1 || idCur == B_003DD490.idLabel) {
+        if (idCur == -1 || idCur == B_003DD490.field_0x4740) {
             int idLabel;
             if (B_003DD490.ctgt == 0 || FFarFrom(posJt, B_003DD490.atgt[0].pos)) {
                 idLabel = -1;
@@ -152,10 +136,10 @@ extern "C" void BuildJtTargetList(void *pv, JT *pjt, int grf)
             }
             if (idLabel != idCur) {
                 if (idLabel == -1)
-                    ClearHudLabel(&B_003DA0C0, B_003DD490.idLabel);
+                    ClearHudLabel(&B_003DA0C0, B_003DD490.field_0x4740);
                 else
                     ShowHudLabel(-1.0f, &B_003DA0C0, idLabel);
-                B_003DD490.idLabel = idLabel;
+                B_003DD490.field_0x4740 = idLabel;
             }
         }
     }

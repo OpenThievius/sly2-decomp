@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "amb.h"
-/* the sound bank manager (0x3DD040): hBank is the bank handle StartAmb hands to the driver */
-struct SNDBANKS { u8 unknown_0x0[0xE8]; s32 hBank; };
+#include "sndsystem.h"
 /* a sound record: kind 2 is a looping voice that reports back through OnAmbVoiceStarted */
 struct SFXREC { s32 kind; };
 /* the play request func_00232320 and func_002322F0 take (0x30 bytes, cleared first) */
@@ -18,17 +17,17 @@ struct SNDPLAY {
     u8 unknown_0x2C[4];
 };
 extern "C" {
-SFXREC *func_001FD028(SNDBANKS *, s32 sfxid);
-s16 func_001FD070(SNDBANKS *, SFXREC *);
+SFXREC *func_001FD028(SNDSYSTEM *, s32 sfxid);
+s16 func_001FD070(SNDSYSTEM *, SFXREC *);
 void DeactivateAmb(AMB *);
 void *memset(void *, int, unsigned);
 void func_00232320(SNDPLAY *, void (*)(int, AMB *), AMB *);
 void func_002322F0(SNDPLAY *);
 void SetAmbGrf(AMB *, int, int);
 void *PpoSwFocusBase(void *);
-void func_001FEED0(SNDBANKS *);
+void func_001FEED0(SNDSYSTEM *);
 void OnAmbVoiceStarted(int, AMB *);
-extern SNDBANKS B_003DD040;
+extern SNDSYSTEM B_003DD040;
 extern u8 B_003DD490[];
 extern void *g_2f7900;
 extern void *g_2dd5bc;
@@ -38,7 +37,7 @@ extern void *g_2e1e40;
 void StartAmb(AMB *pamb)
 {
     SFXREC *prec = func_001FD028(&B_003DD040, pamb->sfxid);
-    if (prec == 0 || B_003DD040.hBank == 0) {
+    if (prec == 0 || B_003DD040.bank == 0) {
         SetAmbGrf(pamb, 0x1FFF, 0);
         return;
     }
@@ -49,7 +48,7 @@ void StartAmb(AMB *pamb)
     SNDPLAY play;
     memset(&play, 0, 0x30);
     play.grf = 3;
-    play.hBank = B_003DD040.hBank;
+    play.hBank = B_003DD040.bank;
     play.isndrec = func_001FD070(&B_003DD040, prec);
     if (pamb->grf & 0x10) {
         play.grf |= 4;

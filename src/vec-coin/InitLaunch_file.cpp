@@ -4,6 +4,7 @@
 #include "m2c_macros.h"
 #include "include_asm.h"
 #include "types.h"
+#include "lo.h"
 
 INCLUDE_ASM(0X1D6848);
 
@@ -11,8 +12,9 @@ INCLUDE_ASM(0X1D69F0);
 
 struct IVec { int x; float y; int z; };
 
-struct Launch {
-    u8 unknown_0x0[0x70];
+/* a launcher: an LO subclass (InitLaunch calls InitLo on it; LO's 0x50 bytes, then its own from 0x50) */
+struct Launch : LO {
+    u8 unknown_0x50[0x20];
     int a0, a1, a2;
     u8 unknown_0x7C[4];
     int f80; float f84;

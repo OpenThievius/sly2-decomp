@@ -40,14 +40,27 @@ INCLUDE_ASM(0X1D5808);
 
 #define NULL 0
 
-// One render tree entry (0x20 bytes). Its signed 4-bit field at bit 32 of the doubleword at +0x10 is the entry's state:
-// AddSphereToRenderTree reads it with dsll 28 / dsra32 28 and treats -1 as a free entry; RemoveAloFromRenderTree frees one
-// by or-ing 0xF << 32 in.
+// One render tree entry (0x20 bytes): a sphere (x, y, z, radius), the signed 4-bit kind at bit 32 of the doubleword at +0x10
+// (AddSphereToRenderTree reads it with dsll 28 / dsra32 28 and treats -1 as a free entry; RemoveAloFromRenderTree frees one
+// by or-ing 0xF << 32 in) and the child block. Both functions read the same entry, which each used to declare on its own.
+struct RTB;
+
+struct RTEBITS {
+    u64 low : 32;
+    s64 kind : 4;
+    s64 grf : 8;
+    u64 flag : 1;
+    u64 rest : 19;
+};
+
 struct RTE {
-    u8 unknown_0x0[0x10];
-    s64 field10 : 32;
-    s64 rtet : 4;
-    u8 unknown_0x18[8];
+    float x, y, z, radius;
+    union {
+        float sRadius;
+        RTEBITS bits;
+    };
+    RTB *child;
+    s32 unknown_0x1C;
 };
 
 /* RemoveAloFromRenderTree's view of the object: its render tree entry at 0x144 (so.h leaves the word undeclared: one reader) */
@@ -59,7 +72,7 @@ void RemoveAloFromRenderTree(SO *object) {
     RTE *node;
     node = ((SORENDER *)object)->prte;
     if (node != NULL) {
-        node->rtet = -1;
+        node->bits.kind = -1;
         object->field_0x140 = -1;
         flags = object->grfSw;
         ((SORENDER *)object)->prte = NULL;
@@ -88,58 +101,38 @@ RTN *AllocRenderTreeNode()
     request.cb = 0x80;
     request.cbAlign = 0x10;
     RTN *node = (RTN *)PvAllocSwClearImpl__Fi(&request);
-    node->arte[0].rtet = node->arte[1].rtet = node->arte[2].rtet = node->arte[3].rtet = -1;
+    node->arte[0].bits.kind = node->arte[1].bits.kind = node->arte[2].bits.kind = node->arte[3].bits.kind = -1;
     return node;
 }
 
-struct RTB_1D6508;
+struct RTB { RTE aentry[3]; float x, y, z, radius; u64 bits; RTB *child; RTB *next; };
 
-struct BITS_1D6508 {
-    u64 low : 32;
-    s64 kind : 4;
-    s64 grf : 8;
-    u64 flag : 1;
-    u64 rest : 19;
-};
+struct TREE { u8 unknown_0x0[0x3E5C]; RTB *root; };
 
-struct RTE_1D6508 {
-    float x, y, z, radius;
-    union {
-        float sRadius;
-        BITS_1D6508 bits;
-    };
-    RTB_1D6508 *child;
-    s32 unknown_0x1C;
-};
-
-struct RTB_1D6508 { RTE_1D6508 aentry[3]; float x, y, z, radius; u64 bits; RTB_1D6508 *child; RTB_1D6508 *next; };
-
-struct TREE_1D6508 { u8 unknown_0x0[0x3E5C]; RTB_1D6508 *root; };
-
-extern "C" RTB_1D6508 *AllocRenderTreeNode(TREE_1D6508 *);
+extern "C" RTB *AllocRenderTreeNode(TREE *);
 
 extern "C" float g_2a7870;
 
 static inline float GMin(float a, float b) { return a < b ? a : b; }
 
-extern "C" RTE_1D6508 *AddSphereToRenderTree(TREE_1D6508 *tree, QW pos, int grf, float radius, float sRadius)
+extern "C" RTE *AddSphereToRenderTree(TREE *tree, QW pos, int grf, float radius, float sRadius)
 {
-    RTE_1D6508 * result;
-    RTB_1D6508 *pblock = tree->root;
-    RTE_1D6508 *pfree;
-    RTB_1D6508 *pb;
+    RTE * result;
+    RTB *pblock = tree->root;
+    RTE *pfree;
+    RTB *pb;
     if (pblock == 0)
         return 0;
     s64 newGrf = grf & 0xFF;
     while (pblock != 0) {
         float best = g_2a7870;
-        RTB_1D6508 *pnext = 0;
+        RTB *pnext = 0;
         pfree = 0;
         pb = pblock;
         for (;;) {
-            RTB_1D6508 *chain = pb->next;
+            RTB *chain = pb->next;
             unsigned int i = 0;
-            RTE_1D6508 *pe = (RTE_1D6508 *)pb;
+            RTE *pe = (RTE *)pb;
             for (; i < 4; i++, pe++) {
                 switch (pe->bits.kind) {
                 case 1: {
@@ -171,9 +164,9 @@ extern "C" RTE_1D6508 *AddSphereToRenderTree(TREE_1D6508 *tree, QW pos, int grf,
         }
         if (pnext == 0) {
             if (pfree == 0) {
-                RTB_1D6508 *pnew = AllocRenderTreeNode(tree);
+                RTB *pnew = AllocRenderTreeNode(tree);
                 pb->next = pnew;
-                pfree = (RTE_1D6508 *)pnew;
+                pfree = (RTE *)pnew;
             }
             pfree->sRadius = sRadius;
             *(QW *)pfree = pos;

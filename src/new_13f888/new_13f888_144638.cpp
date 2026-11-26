@@ -20,7 +20,11 @@ struct Item_144640 { Side_144640 sides[2]; u8 unknown_0x80[0xAC - 0x80]; Item_14
 
 struct NODE { Item_144640 *head; NODE *next; };
 
-struct Goal_144640 { u8 unknown_0x0[0x40]; int *kind; };
+/* JT::pseqnode's object: the same SEQNODE as in JT_TranslateToPos_file.cpp, whose drive record is at 0x40 (SetSeqnodeDrive in AddJsgContext_file.cpp names it precDrive) */
+struct SEQNODE {
+    u8 unknown_0x0[0x40];
+    /* 0x40 */ int *precDrive; /* readers: func_00144640 tests the first word of the record; func_00143DE8; SetSeqnodeDrive */
+};
 
 struct Act_144640 { JT *jt; u8 unknown_0x4[0x10 - 4]; QW pos; float distance; float tNext; int flag; };
 
@@ -86,9 +90,9 @@ extern "C" void func_00144640(Act_144640 *self) {
                 }
                 if (found != 0) return;
             }
-            Goal_144640 *goal = (Goal_144640 *)self->jt->pseqnode;
+            SEQNODE *goal = self->jt->pseqnode;
             if (goal != 0) {
-                if (*goal->kind != 0x24) return;
+                if (*goal->precDrive != 0x24) return;
             } else {
                 Ent_144640 *ent = func_00205458(self->jt, 0xA8);
                 if (ent == 0) return;
@@ -117,13 +121,9 @@ extern "C" void func_00144640(Act_144640 *self) {
 
 INCLUDE_ASM(0X1448F0);
 
-typedef struct CBinaryAsyncStream {
-    u8 unknown_0x0[0x28];
-    s32 field_0x28;
-} CBinaryAsyncStream;
-
-s32 func_001449C8(CBinaryAsyncStream *stream) {
-    return stream->field_0x28;
+/* the vjoy part JT::PvVjoy() (Act_144640, the part func_00144640 updates): UpdateJt passes it to both; its flag is at 0x28 */
+s32 func_001449C8(Act_144640 *self) {
+    return self->flag;
 }
 
 s32 CreateSlotheapSwAlign(s32 *, s32, s32, s32); /* extern */

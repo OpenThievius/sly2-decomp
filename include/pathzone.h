@@ -23,13 +23,24 @@ struct PZEP {
 
 struct PATHZONE;
 
+/* an 8-byte block Obstacle_Clone keeps across CloneCrv (the group link and the state); a plain copy unit */
+struct QB { char b[8]; };
+
 /* an obstacle in a pathzone: a curve (CRV: its points are apos) with a world box */
 struct OBSTACLE : CRV {
-    u8 unknown_0x180[0x20];
+    u8 unknown_0x180[0x10];
+    /* 0x190 */ s32 convk;           /* Obstacle_PostLoad (a method: slot 15); 3 or 4 after func_001BC2F8 classifies the outline */
+    u8 unknown_0x194[0xC];
     /* 0x1A0 */ QW posMin;          /* AddPathzoneObstacle: the box the sweep index is searched with, and inserted by x and y */
     /* 0x1B0 */ QW posMax;
-    u8 unknown_0x1C0[0x1C];
-    /* 0x1DC */ PATHZONE *ppathzone; /* AddPathzoneObstacle sets it */
+    u8 unknown_0x1C0[0x4];
+    /* 0x1C4 */ DL members;         /* the obstacles of a group: Obstacle_Init starts it with item offset 0x1D0, Obstacle_JoinGroup, ObstacleGroup_Dissolve */
+    /* 0x1D0 */ QB link;            /* the member's DLE in its group's list: Obstacle_Init (the item offset), Obstacle_Clone keeps it across CloneCrv */
+    /* 0x1D8 */ OBSTACLE *group;    /* Obstacle_JoinGroup, ObstacleGroup_Dissolve, Obstacle_RemoveLoHierarchy */
+    /* 0x1DC */ PATHZONE *ppathzone; /* AddPathzoneObstacle sets it; Obstacle_RemoveFromPathzone hands it to RemovePathzoneObstacle and clears it */
+    /* 0x1E0 */ QB state;           /* Obstacle_Clone keeps it across CloneCrv (one reader) */
+    /* 0x1E8 */ s32 field_0x1E8;    /* Obstacle_Init sets -1 */
+    /* 0x1EC */ void *pplanes;      /* Obstacle_LoadFromBrx and Obstacle_Clone allocate it, 0x10 bytes per control point less one */
 };
 
 /* a sweep query's state, 0x40 bytes (CobstacleFindPathzoneBox, ResetPathzoneQuery): the slots inside each axis's interval as bit sets
@@ -122,7 +133,14 @@ SLY2_OFFSET_CHECK(PATHZONE, stamp, 0x114);
 SLY2_OFFSET_CHECK(PATHZONE, dlItem, 0x118);
 SLY2_OFFSET_CHECK(PATHZONE, ipathzone, 0x124);
 SLY2_OFFSET_CHECK(OBSTACLE, posMin, 0x1A0);
+SLY2_OFFSET_CHECK(OBSTACLE, convk, 0x190);
+SLY2_OFFSET_CHECK(OBSTACLE, members, 0x1C4);
+SLY2_OFFSET_CHECK(OBSTACLE, link, 0x1D0);
+SLY2_OFFSET_CHECK(OBSTACLE, group, 0x1D8);
 SLY2_OFFSET_CHECK(OBSTACLE, ppathzone, 0x1DC);
+SLY2_OFFSET_CHECK(OBSTACLE, state, 0x1E0);
+SLY2_OFFSET_CHECK(OBSTACLE, field_0x1E8, 0x1E8);
+SLY2_OFFSET_CHECK(OBSTACLE, pplanes, 0x1EC);
 SLY2_OFFSET_CHECK(PZLINK, atarget, 0x60);
 SLY2_OFFSET_CHECK(PZLINK, ppathzoneA, 0x124);
 SLY2_OFFSET_CHECK(PZLINK, posA, 0x130);

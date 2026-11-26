@@ -9,24 +9,9 @@
 #include "include_asm.h"
 #include "lo.h"
 #include "crv.h"
+#include "pathzone.h"
+#include "lsg.h"
 #include "vu0inline.h"
-
-struct QB { char b[8]; };
-
-// An obstacle: a closed outline of control points the player's path may not cross (class table of retail, a curve subclass).
-// Each function of this file reads its own words past the curve's 0x180 bytes; the one type holds them all.
-struct OBSTACLE : CRV {
-    u8 unknown_0x180[0x10];
-    s32 convk;                     // 0x190: Obstacle_PostLoad
-    u8 unknown_0x194[0x30];
-    DL members;                    // 0x1C4: the obstacles of a group (Obstacle_Init starts it with item offset 0x1D0, JoinGroup, ObstacleGroup_Dissolve)
-    QB link;                       // 0x1D0: the member's DLE in its group's list
-    OBSTACLE *group;               // 0x1D8: Obstacle_JoinGroup, ObstacleGroup_Dissolve, Obstacle_RemoveLoHierarchy
-    s32 pathzone;                  // 0x1DC: Obstacle_RemoveFromPathzone
-    QB state;                      // 0x1E0
-    s32 field_0x1E8;               // 0x1E8: Obstacle_Init sets -1
-    void *pplanes;                 // 0x1EC: Obstacle_LoadFromBrx, Obstacle_Clone allocate it
-};
 
 void InitDl(DL *, int);
 
@@ -274,15 +259,15 @@ int FFindCrvSInPathzone(float s, CRV *pcrv, PATHZONE *ppathzone, float *psFound,
 INCLUDE_ASM(0X1BD040);
 
 extern "C" {
-void RemovePathzoneObstacle(s32, OBSTACLE *);
+void RemovePathzoneObstacle(PATHZONE *, OBSTACLE *);
 
 void Obstacle_RemoveFromPathzone(OBSTACLE *obstacle) {
-    s32 pathzone;
+    PATHZONE *pathzone;
 
-    pathzone = obstacle->pathzone;
+    pathzone = obstacle->ppathzone;
     if (pathzone != 0) {
         RemovePathzoneObstacle(pathzone, obstacle);
-        obstacle->pathzone = 0;
+        obstacle->ppathzone = 0;
     }
 }
 }
@@ -320,8 +305,6 @@ void ObstacleGroup_Dissolve(OBSTACLE *group)
 
 struct SAPQUERY;
 
-struct LSG { u8 unknown_0x0[0x40]; float u1; float u2; u8 unknown_0x48[0x18]; };
-
 extern "C" int CobstacleFindPathzoneBox(LO *, SAPQUERY *, QW, QW, int, OBSTACLE **);
 
 extern "C" int ClsgClipEdgeToObstacle(OBSTACLE *, QW, QW, int, LSG *);
@@ -335,11 +318,11 @@ OBSTACLE *PobstacleFindEdgeBlocker(LO *pathzone, SAPQUERY *query, QW posA, QW po
     OBSTACLE *best = 0;
     for (int index = 0; index < count; index++) {
         OBSTACLE *obstacle = apobstacle[index];
-        if (!ClsgClipEdgeToObstacle(obstacle, posA, posB, 2, alsg) || alsg[0].u1 != 0.0f) {
+        if (!ClsgClipEdgeToObstacle(obstacle, posA, posB, 2, alsg) || alsg[0].as[0] != 0.0f) {
             best = obstacle;
             break;
         }
-        float uEnter = alsg[0].u2;
+        float uEnter = alsg[0].as[1];
         if (uBest <= uEnter)
             continue;
         uBest = uEnter;

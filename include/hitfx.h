@@ -10,9 +10,18 @@
 #include "lo.h"
 #endif
 
+/* HITFXDEF, an effect's definition: a class 0x75 object (InitSwHitFxParms makes seven with PloNew and calls slot 9, Remove, on each),
+   so an LO in C++; in C the LO's 0x50 bytes are unknown. */
+#ifdef __cplusplus
+struct HITFXDEF : LO {
+#else
 struct HITFXDEF {
-    u8 unknown_0x0[0x60];
-    /* 0x60 */ f32 duration;    /* HitFx_CheckExpiry (below 0: never expires), HitFx_GIntensity */
+    u8 unknown_0x0[0x50];
+#endif
+    /* 0x50 */ s32 fSense;      /* InitSwHitFxParms sets 0 or 1; func_001CBEE0 (the guard class's slot-89 override) widens the range only while it is 0 */
+    /* 0x54 */ f32 strength;    /* InitSwHitFxParms sets it for four definitions; func_001CBEE0 doubles it with the range and restores it */
+    u8 unknown_0x58[0x8];
+    /* 0x60 */ f32 duration;    /* HitFx_CheckExpiry (below 0: never expires), HitFx_GIntensity; InitSwHitFxParms sets it */
 };
 
 #ifdef __cplusplus

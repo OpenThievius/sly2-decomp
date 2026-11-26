@@ -80,20 +80,29 @@ struct SLY : JT {
     /* 0x1AA4 */ f32 field_0x1AA4; /* func_0018A428 (50) */
     u8 unknown_0x1AA8[0x118];
     /* 0x1BC0 */ void *field_0x1BC0; /* bevy_player_input_from_pad_cm */
-    u8 unknown_0x1BC4[0x11C];
+    u8 unknown_0x1BC4[0x8];
+    /* 0x1BCC */ sptr field_0x1BCC; /* HandleSlyMessage (Sly slot 5): the object func_001F1E20 found, stored before func_001424E0 starts the attachment */
+    u8 unknown_0x1BD0[0x4];
+    /* 0x1BD4 */ s32 field_0x1BD4; /* HandleSlyMessage: tested with field_0x10DC before the search */
+    u8 unknown_0x1BD8[0x108];
     /* 0x1CE0 */ struct ASEG *apasegJtcs[15]; /* SetJtJtcs (states 12 to 21 from 0, 22 and 23 at 13 and 14) */
     /* 0x1D1C */ void *field_0x1D1C; /* bevy_player_input_from_pad_cm */
     u8 unknown_0x1D20[0xC];
     /* 0x1D2C */ s32 field_0x1D2C; /* bevy_player_input_from_pad_cm */
     u8 unknown_0x1D30[0x280];
-    /* 0x1FB0 */ s32 field_0x1FB0; /* InitSly (slot 7) sets 0x1A; four records of 0xC bytes follow, their first word set by it */
-    u8 unknown_0x1FB4[0x8];
-    /* 0x1FBC */ s32 field_0x1FBC; /* InitSly sets 0x25 */
-    u8 unknown_0x1FC0[0x8];
-    /* 0x1FC8 */ s32 field_0x1FC8; /* InitSly sets 0x26 */
-    u8 unknown_0x1FCC[0x8];
-    /* 0x1FD4 */ s32 field_0x1FD4; /* InitSly sets 0x29 */
-    u8 unknown_0x1FD8[0x8];
+    union {
+        /* 0x1FB0 */ GADGETSLOT aslotSly[4]; /* the four gadget slots (0xC bytes each, JT::aslot's layout): func_0018D6F8 maps gadgets 0x1A, 0x25, 0x26 and 0x29 to them; HandleSlyMessage (Sly slot 5) reads each slot's plo and passes the slot to func_0018D698 */
+        struct {
+            /* 0x1FB0 */ s32 field_0x1FB0; /* InitSly (slot 7) sets 0x1A; four records of 0xC bytes follow, their first word set by it */
+            u8 unknown_0x1FB4[0x8];
+            /* 0x1FBC */ s32 field_0x1FBC; /* InitSly sets 0x25 */
+            u8 unknown_0x1FC0[0x8];
+            /* 0x1FC8 */ s32 field_0x1FC8; /* InitSly sets 0x26 */
+            u8 unknown_0x1FCC[0x8];
+            /* 0x1FD4 */ s32 field_0x1FD4; /* InitSly sets 0x29 */
+            u8 unknown_0x1FD8[0x8];
+        };
+    };
     /* 0x1FE0 */ s32 field_0x1FE0; /* UseSlyGadget (100) */
     /* 0x1FE4 */ s32 field_0x1FE4; /* UseSlyGadget (100) */
     u8 unknown_0x1FE8[0x2C];

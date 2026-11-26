@@ -36,4 +36,16 @@ typedef struct GADGETMENU {
     /* 0x4C */ s32 cgme;         /* the number of rows of agme */
     /* 0x50 */ GADGETMENUENTRY *agme;
 } GADGETMENU;
+
+#ifdef __cplusplus
+#include "menu.h"
+/* the same object as a MENU subclass (C++ only): GadgetMenu_SetPage calls the menu's slots 10 and 11 as virtuals, the blot's through BLOT */
+struct GADGETMENUOBJ : MENU {
+    /* 0x40 */ s32 page;
+    /* 0x44 */ f32 clock;
+    /* 0x48 */ s32 gadget;
+    /* 0x4C */ s32 cgme;
+    /* 0x50 */ GADGETMENUENTRY *agme;
+};
+#endif
 #endif

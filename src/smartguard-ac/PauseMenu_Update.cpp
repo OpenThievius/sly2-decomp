@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "cref.h"
 #include "pausemenu.h"
-struct SAVE { u8 unknown_0x0[0x5464]; };
+#include "memcard.h"
 extern "C" {
 int FBlotLabelPlaying(PAUSEBLOT *, int);
 int FJoyButtonPressed(void *, int);
@@ -12,16 +12,13 @@ void PauseMenu_CancelOption(PAUSEMENU *, PAUSEITEM *);
 void PauseMenu_Close(PAUSEMENU *);
 void PauseMenu_Pop(PAUSEMENU *);
 void PauseMenu_SetState(PAUSEMENU *, int);
-CRef RefGetGameSaveValue(int, SAVE *);
+CRef RefGetGameSaveValue(int, SAVEDATA *);
 int UpdateJoyNavY(void *);
 void func_001AF490(PAUSEMENU *);
 int func_001B0078(PAUSEMENU *);
 void func_001D9870();
 extern char B_002E6550[];
-struct MCDATA { SAVE asave[3]; };
-/* the memory card menu's block at 0x7FDC of the same object: its selected slot is 0x7D58 into it */
-struct MCCARD { u8 unknown_0x0[0x7D58]; SAVE *psaveSelected; };
-extern union { MCDATA slots; struct { u8 unknown_0x0[0x7FDC]; MCCARD card; } block; } B_002E6604;
+extern SAVE B_002E65E0;
 extern int B_003E0FAC;
 }
 
@@ -131,11 +128,10 @@ extern "C" void PauseMenu_Update(PAUSEMENU *pmenu)
                 } else if (grfbtn & 0x20) {
                     int kind = func_001B0078(pmenu);
                     if (kind == 0x19 || kind == 0x1E) {
-                        SAVE *psave = &B_002E6604.slots.asave[ppage->iitemCur];
-                        float value = RefGetGameSaveValue(B_003E0FAC, psave).m_tag.m_g;
+                        SLOT *psave = &B_002E65E0.aslot[ppage->iitemCur];
+                        float value = RefGetGameSaveValue(B_003E0FAC, &psave->data).m_tag.m_g;
                         if (value != 0.0f) {
-                            MCCARD *pcard = &B_002E6604.block.card;
-                            pcard->psaveSelected = psave;
+                            B_002E65E0.pslotInit = psave;
                             MemcardMenu_SetState(B_002E6550, 0x20);
                         }
                     }

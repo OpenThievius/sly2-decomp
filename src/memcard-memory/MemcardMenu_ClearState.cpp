@@ -1,19 +1,15 @@
-#include "types.h"
-struct O;
-struct VT_1ACBB8 {
-    u8 unknown_0x0[0x58]; short delta58; short pad5A; void (*fn5C)(void *);
-    u8 unknown_0x60[0x190 - 0x60]; short delta190; short pad192; void (*fn194)(void *);
-};
-struct O {
-    u8 unknown_0x0[0xC]; VT_1ACBB8 *vt; u8 unknown_0x10[0x14]; O *child; u8 unknown_0x28[0x18]; int state;
+#include "menu.h"
+#include "blot.h"
+/* MEMCARDMENU (memcardmenu.h) as a MENU: its state word follows the base class' 0x40 bytes (MemcardMenu_SetState, MemcardMenu_ClearState) */
+struct MEMCARDMENUSTATE : MENU {
+    /* 0x40 */ s32 state;
 };
 extern "C" {
-void MemcardMenu_ClearState(O *self) {
+void MemcardMenu_ClearState(MEMCARDMENUSTATE *self) {
     self->state = -1;
-    if (self->child) {
-        self->vt->fn5C((char *)self + self->vt->delta58);
-        O *child = self->child;
-        child->vt->fn194((char *)child + child->vt->delta190);
+    if (self->pblot) {
+        self->Slot11();
+        self->pblot->Hide();
     }
 }
 }

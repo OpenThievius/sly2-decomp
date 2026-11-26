@@ -5,8 +5,10 @@
 #include "xf.h"
 #include "murray.h"
 #include "carry.h"
-struct IKLIMB { int id; int a; int b; u8 unknown_0xC[0x94]; QW q; u8 unknown_0xB0[0x1C]; float f; };
-struct PEAH { u8 unknown_0x0[0x14]; void *aseg; u8 unknown_0x18[4]; float time; u8 unknown_0x20[0x20]; float dur; };
+#include "asega.h"
+/* An IK limb record (0xE0 bytes, MURRAY::pikLimbA/B): LoadMurrayFromBrx stores three transform handles at +4, +8 and +0xC and binoc_joy_186610's
+   record has the same three (pxfUpper, pxfLower, pxfEnd) and the same target quad at 0xA0: the layout is shared, the fields past it are not. */
+struct IKLIMB { int id; int a; int b; int c; u8 unknown_0x10[0x90]; QW q; u8 unknown_0xB0[0x1C]; float f; };
 /* local view of the carry object past what carry.h declares (g++ 2.95 starts a derived class's fields at 0x188, after CARRY's 0x184): the two objects the lift's IK limbs follow, read here only */
 struct CARRYLIFT : CARRY { u8 unknown_0x188[0x8]; LO *ploLimbA; u8 unknown_0x194[4]; LO *ploLimbB; };
 struct GADGETSTATE { u8 unknown_0x0[0x1C]; int flag; };
@@ -57,8 +59,8 @@ void SetMurrayLiftState(MURRAY *self, int state)
             self->field_0x1408 = so->pxfAngular->kind;
             func_001A58D0(so, 0, 0xF);
             SetSoNoXpsAll(so, 1);
-            float *label = PeaFindAsegLabel(((PEAH *)self->field_0x1030)->aseg, 0x1C7);
-            t = (*label - ((PEAH *)self->field_0x1030)->time) / ((PEAH *)self->field_0x1030)->dur;
+            float *label = PeaFindAsegLabel(((ASEGA *)self->field_0x1030)->paseg, 0x1C7);
+            t = (*label - ((ASEGA *)self->field_0x1030)->tLocal) / ((ASEGA *)self->field_0x1030)->svtLocal;
             PredictXfTransform((int)((SO *)self->field_0x13EC)->pxfRoot, (int)self->pxfRoot, sp, 0, t);
             ConvertAloMat(&sp[4], self, 0, sp);
             sp[0] = sp[4]; sp[1] = sp[5]; sp[2] = sp[6]; sp[3] = sp[7];

@@ -65,8 +65,8 @@ void NotifyLaserXpEnded(LASER *plaser, void *psoOther)
         MQ *pmq = *ppmqLink;
         if (pmq != 0) {
             do {
-                int n = (pmq->aside[0].pso == plaser);
-                if (psoOther == pmq->aside[n].pso) {
+                int n = (pmq->aside[0].plo == plaser);
+                if (psoOther == pmq->aside[n].plo) {
                     *ppmqLink = pmq->pmqNext;
                     pmq->pmqNext = pmqFree;
                     pmqFree = pmq;
@@ -113,8 +113,8 @@ void ClipLaserBeams(LASER *plaser)
             WKR wkr;
             memset(&wkr, 0, 0x60);
             wkr.psoSource = plaser;
-            wkr.ppartSource = (void *)pmqNearest->aside[0].plo;
-            wkr.ploTarget = (LO *)pmqNearest->aside[1].pgeom;
+            wkr.ppartSource = (void *)pmqNearest->aside[0].pgeom;
+            wkr.ploTarget = (LO *)pmqNearest->aside[1].pso;
             wkr.grftak = 0x1000;
             wkr.damage = -10;
             wkr.pos = pmqNearest->aside[0].pos;

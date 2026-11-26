@@ -1,6 +1,8 @@
 #include "blot.h"
 #include "sw.h"
-struct MT { int a; int unknown_0x4; int cur; int base; int other; u8 unknown_0x14[4]; int rgba; u8 unknown_0x1C[0x24]; QW r0; QW r1; u8 unknown_0x60[4]; float ox; float oy; int z6c; int z70; float f74; float f78; float f7c; float f80; float f84; float f88; int i8c; int i90; int i94; };
+#include "rgba.h"
+/* a movie text: p, rgbaCur, rgbaOther and changed are CMovieText_ChNext's (same offsets for cur, base, other and the base colour rgba) */
+struct MT { int a; unsigned char *p; int cur; int base; int other; RGBA rgbaCur; int rgba; RGBA rgbaOther; u8 unknown_0x20[0x20]; QW r0; QW r1; int changed; float ox; float oy; int z6c; int z70; float f74; float f78; float f7c; float f80; float f84; float f88; int i8c; int i90; int i94; };
 struct SRC { u8 unknown_0x0[8]; BLOT *owner; u8 unknown_0xC[0x10]; int i1c; float f20; float f24; float f28; int i2c; int i30; };
 struct M3 { QW r[3]; };
 struct FONTINFO { u8 unknown_0x0[0x54]; s32 word54; };

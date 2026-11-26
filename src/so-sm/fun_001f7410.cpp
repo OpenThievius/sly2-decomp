@@ -1,6 +1,6 @@
+#include "geom.h"
 #include "sly2.h"
-struct PARTX { u8 unknown_0x0[0x14]; short damage; u8 unknown_0x16[2]; int grftak; };
-struct HALF { PARTX *ppart; u8 unknown_0x4[4]; void *pso; struct LO *plo; QW pos; QW unk20; QW vel; };
+struct HALF { GEOM *ppart; u8 unknown_0x4[4]; void *pso; struct LO *plo; QW pos; QW unk20; QW vel; };
 struct MQ { HALF half[2]; u8 unknown_0x80[0xAC - 0x80]; MQ *pnext; };
 #include "so.h"
 #include "oxa.h"
@@ -27,7 +27,7 @@ void func_001F7410(SO *pso)
         wkr.ppartSource = self->ppart;
         wkr.ploTarget = target;
         wkr.grftak = self->ppart->grftak;
-        wkr.damage = self->ppart->damage;
+        wkr.damage = self->ppart->ashGrf[2];
         wkr.pos = other->pos;
         wkr.vel = self->vel;
         PaloAbsorbWkr(&wkr);

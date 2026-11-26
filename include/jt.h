@@ -69,7 +69,8 @@ struct JT : STEP {
     /* 0x2C4 */ s32 field_0x2C4; /* in the JMP: SetMurrayMode (Murray slot 88) */
     u8 unknown_0x2C8[0x14];
     /* 0x2DC */ s32 jmpState; /* the jump state, in the JMP InitJt starts at 0x2C0: FInvulnerableJt (slot 76), func_00143C78 (85), func_00141588 (97) */
-    u8 unknown_0x2E0[0xF8];
+    /* 0x2E0 */ f32 tJmpState; /* the time the jump state was entered: JMP::tState (jmp.h, StartJmpDirectionAseg_file.cpp), JT + 0x2C0 + 0x20; reader: func_00149010 */
+    u8 unknown_0x2E4[0xF4];
     /* 0x3D8 */ f32 field_0x3D8; /* InitBentley (Bentley slot 7) sets -70 */
     u8 unknown_0x3DC[0x58];
     /* 0x434 */ s32 field_0x434; /* GetJtCpdefi (JT slot 50) */
@@ -121,7 +122,7 @@ struct JT : STEP {
     u8 unknown_0x102C[0x4];
     /* 0x1030 */ void *field_0x1030; /* JT_StartPose (which calls slot 88, so holds a JT) */
     /* 0x1034 */ void *field_0x1034; /* JT_StartPose, UpdateJtStand */
-    u8 unknown_0x1038[0x4];
+    /* 0x1038 */ s32 field_0x1038; /* HandleSlyMessage (Sly slot 5) sets -1 in states 7 and 21: the player's own message handler */
     /* 0x103C */ f32 field_0x103C; /* InitJt sets 20 */
     /* 0x1040 */ s32 field_0x1040; /* InitBentley sets 0 */
     /* 0x1044 */ s32 fLook; /* func_001E5000: set while the seqnode's look target steers it (guess: reader is certain JT, class 0x34 test) */

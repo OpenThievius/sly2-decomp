@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
+#include "crv.h"
 struct LM { float gMin; float gMax; };
 struct CM;
-struct CRV_14AA30 { u8 unknown_0x0[0xF0]; float *ag; QW *apos; };
 struct ENTRY_14AA30 { int n0; int n4; int fActive; };
-struct PATH_14AA30 { u8 unknown_0x0[0x50]; int n50; int c; ENTRY_14AA30 *a; CRV_14AA30 *pcrv; };
+struct PATH_14AA30 { u8 unknown_0x0[0x50]; int n50; int c; ENTRY_14AA30 *a; CRV *pcrv; };
 struct OBJ_14AA30 { u8 unknown_0x0[0x38]; PATH_14AA30 *ppath; };
 extern "C" {
 void *PpoSwFocusBase(void *);
@@ -48,7 +48,7 @@ extern "C" int func_0014AA30(OBJ_14AA30 *pobj)
         ENTRY_14AA30 *pentry = &pobj->ppath->a[i];
         if (pentry->fActive == 0)
             continue;
-        float ds = s - pobj->ppath->pcrv->ag[i];
+        float ds = s - pobj->ppath->pcrv->as[i];
         if (pobj->ppath->n50 == 1)
             ds = -ds;
         float gDist;

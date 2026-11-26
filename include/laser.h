@@ -23,22 +23,29 @@ struct SEG {
     u8 unknown_0x98[8];
 };
 
-/* One side of a queued contact (0x40 bytes): the contact holds two. ClipLaserBeams reads the nearest hit's plo and pos from the first
-   side and pgeom from the second; NotifyLaserXpEnded compares pso with the laser and with the other object. */
+/* One side of a queued contact (0x40 bytes): the contact holds two. The names follow the readers that agree on them: the shape at 0,
+   the object at 8 and its root at 0xC (MarkSoCustomContacts and RecalcSwXpMovement in FreeSwMqList_file.cpp, func_001F7410,
+   AdjustMurrayNewXp, AdjustVehicleNewXp, AdjustStepXps). ClipLaserBeams hands the first side's pgeom and pos and the second side's pso
+   to the weapon record (WKR::ppartSource, pos, ploTarget); NotifyLaserXpEnded compares plo with the laser and with the other object.
+   The types are the first readers' (int for the shape and the root). */
 struct SIDE {
-    /* 0x00 */ int plo;
+    /* 0x00 */ int pgeom;
     u8 unknown_0x4[4];
-    /* 0x08 */ void *pso;
-    /* 0x0C */ int pgeom;
+    /* 0x08 */ void *plo;
+    /* 0x0C */ int pso;
     /* 0x10 */ QW pos;
     u8 unknown_0x20[0x20];
 };
 
-/* A queued contact of a beam (0xB0 bytes): ClipLaserBeams reads the nearest hit (plo, pos, pgeom, s), NotifyLaserXpEnded walks the chain and
-   compares pso with the contact's two sides (SIDE, 0x40 bytes each, the first one starts here). */
+/* A queued contact of a beam (0xB0 bytes): ClipLaserBeams reads the nearest hit (pgeom, pos, pso, s), NotifyLaserXpEnded walks the chain and
+   compares plo with the contact's two sides (SIDE, 0x40 bytes each, the first one starts here). */
 struct MQ {
     /* 0x00 */ SIDE aside[2];
-    u8 unknown_0x80[0x20];
+    /* 0x80 */ QW normal;          /* AdjustVehicleNewXp, AdjustMurrayNewXp: the contact's normal (PxpAdd builds it from the velocities, as velBase) */
+    /* 0x90 */ float gScale;       /* PxpAdd stores its gScale argument here; AdjustStepXps picks the kind-0xE contact with the smallest, func_001D2DD0 the largest */
+    /* 0x94 */ float friction;     /* AdjustVehicleNewXp sets it (PxpAdd's gB) */
+    /* 0x98 */ float bounce;       /* AdjustVehicleNewXp sets it (PxpAdd's gC) */
+    /* 0x9C */ int kind;           /* AdjustStepXps (0xE), func_001F90D0 in SolveSw_file.cpp (0xD, 0xE: its XP is this record) */
     /* 0xA0 */ float s;
     u8 unknown_0xA4[8];
     /* 0xAC */ MQ *pmqNext;

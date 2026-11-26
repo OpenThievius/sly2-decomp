@@ -6,14 +6,25 @@
 #include "m2c_macros.h"
 #include "include_asm.h"
 
-extern "C" {
 struct Tail { float scale; int first; int second; };
 
-struct Fragile { u8 unknown_0x0[0x170]; struct Tail tail; u8 unknown_0x17C[8]; float field184; };
+/* a fragile object: an SO that breaks apart (the arc-trail module's class, FRAGILE in retail's mangled InitFragile__FP7FRAGILE); the fields
+   are those its functions in this file read: InitFragile sets tail and field184, func_0021BBD0 tests hier, func_0021C0D8 reads cIdle and cRec */
+struct FRAGILE : SO {
+    u8 unknown_0x150[0x8];
+    /* 0x158 */ s32 cIdle;
+    /* 0x15C */ void *hier;      /* func_0021BBD0 (reader: it passes the object to func_0021BC08 when it is set) */
+    u8 unknown_0x160[0x4];
+    /* 0x164 */ s32 cRec;
+    u8 unknown_0x168[0x8];
+    /* 0x170 */ struct Tail tail;  /* InitFragile (reader: one function) */
+    u8 unknown_0x17C[8];
+    /* 0x184 */ float field184;    /* InitFragile */
+};
 
-void InitSo();
+extern "C" void InitSo();
 
-void InitFragile__FP7FRAGILE(struct Fragile *fragile) {
+void InitFragile(FRAGILE *fragile) {
     struct Tail *tail;
     InitSo();
     tail = &fragile->tail;
@@ -22,15 +33,12 @@ void InitFragile__FP7FRAGILE(struct Fragile *fragile) {
     tail->second = 0;
     fragile->field184 = 100.0f;
 }
-}
 
-struct So { u8 unknown_0x0[0x15C]; void *hier; };
+extern "C" void AddSoLoHierarchy(FRAGILE *);
 
-extern "C" void AddSoLoHierarchy(So *);
+extern "C" void func_0021BC08(FRAGILE *);
 
-extern "C" void func_0021BC08(So *);
-
-void func_0021BBD0(So *so)
+void func_0021BBD0(FRAGILE *so)
 {
     AddSoLoHierarchy(so);
     if (so->hier) func_0021BC08(so);
@@ -39,13 +47,6 @@ void func_0021BBD0(So *so)
 INCLUDE_ASM(0X21BC08);
 
 INCLUDE_ASM(0X21BD18);
-
-struct FRAGILE : SO {
-    u8 unknown_0x150[0x8];
-    /* 0x158 */ s32 cIdle;
-    u8 unknown_0x15C[0x8];
-    /* 0x164 */ s32 cRec;
-};
 
 extern "C" void UpdateLo(SO *);
 

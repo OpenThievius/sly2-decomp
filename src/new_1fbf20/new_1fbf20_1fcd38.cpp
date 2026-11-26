@@ -8,6 +8,8 @@
 #include "include_asm.h"
 #include "bis.h"
 #include "alloc.h"
+#include "clock.h"
+#include "cfilelocation.h"
 
 #include "sndsystem.h"
 
@@ -67,8 +69,6 @@ extern "C" int func_00233048(int, s64, s64, s64, s64, s64, s64);
 
 extern "C" s64 TickReadCount(void *);
 
-extern "C" char g_2dded0[];
-
 extern "C" SNDSYSTEM B_003DD040;
 
 void InitSndSystem()
@@ -77,7 +77,7 @@ void InitSndSystem()
     func_00233048(0x524B5553, 0L, 0L, 0L, 0L, 0L, 0L);
     B_003DD040.field_0x1BC = 1.0f;
     int i; int j; for (i = 0; i < 4; i++) { B_003DD040.mix[i] = 1.0f; for (j = 7; j >= 0; j--) B_003DD040.grid[j][i] = 1.0f; }
-    s64 t = TickReadCount(g_2dded0);
+    s64 t = TickReadCount(&g_2dded0);
     B_003DD040.now = t;
     B_003DD040.prev = t;
 }
@@ -273,8 +273,6 @@ extern "C" void LoadSndFromBrx(SNDSYSTEM *snd, CBinaryInputStream *stream)
     }
 }
 
-struct CFileLocation { unsigned a; unsigned b; int mode; u8 unknown_0xC[0x104]; void Clear(); };
-
 struct SndRec { unsigned w0; unsigned w1; u8 unknown_0x8[0x2C]; unsigned w34; unsigned w38; unsigned w3c; };
 
 extern "C" int snd_BankLoadByLoc(unsigned, int);
@@ -287,20 +285,20 @@ void LoadSndBank(SNDSYSTEM *snd)
 {
     if (snd->bank == 0) {
         CFileLocation loc;
-        loc.mode = 2;
+        loc.kind = 2;
         loc.Clear();
         SndRec *rec = (SndRec *)&snd->oid;
         int valid;
         if (!rec) valid = 0; else {
             unsigned x = rec->w1;
             unsigned y = rec->w3c;
-            loc.mode = 2;
-            loc.b = x ^ y;
-            loc.a = (rec->w0 ^ rec->w34) + 0xCA0;
+            loc.kind = 2;
+            loc.slot = x ^ y;
+            loc.hash = (rec->w0 ^ rec->w34) + 0xCA0;
             valid = x != y;
         }
-        if (valid && loc.mode == 2)
-            snd->bank = snd_BankLoadByLoc(loc.a, 0);
+        if (valid && loc.kind == 2)
+            snd->bank = snd_BankLoadByLoc(loc.hash, 0);
         snd_ResolveBankXREFS();
     }
     for (int i = 0; i < snd->nbank; i++) {
@@ -361,8 +359,6 @@ extern "C" void ResetSnd(SNDSYSTEM *psnd)
     ClearDl__FP2DL(&psnd->dl);
     ResetSndbankVolumeFactors_1FD700(psnd);
 }
-
-struct CLOCK { u8 unknown_0x0[4]; float dt; u8 unknown_0x8[0x38]; float gScale; };
 
 extern "C" CLOCK g_2dded0_1FD830;
 
@@ -431,7 +427,7 @@ extern "C" void UpdateSnd(SNDSYSTEM *self)
         if (g_2dded0_1FD830.dt == 0.0f)
             gMute = 0.0f;
     }
-    float gVolume = GSmooth__FfffP3SMPPf(self->grid[2][0], gMute, g_2dded0_1FD830.gScale, &smp, 0);
+    float gVolume = GSmooth__FfffP3SMPPf(self->grid[2][0], gMute, g_2dded0_1FD830.dtReal, &smp, 0);
     SetSndbankVolumeFactor(self, 0, gVolume, 2);
     SetSndbankVolumeFactor(self, 1, gVolume, 2);
     SetSndbankVolumeFactor(self, 2, gMute, 2);

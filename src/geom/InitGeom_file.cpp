@@ -7,16 +7,6 @@
 #include "alloc.h"
 #include "include_asm.h"
 
-void InitGeom__FP4GEOM(void *arg0) {
-    unsigned int *a0 = (unsigned int *)arg0;
-    a0[4] = 0;
-    a0[1] = 0;
-    a0[5] = 0;
-    a0[2] = 0;
-    a0[6] = 0;
-    a0[7] = 0;
-}
-
 /* the binary input stream: Pump refills it, the Read functions take bytes from pb while cb lasts. g++ puts the vtable pointer after the
    own fields, at 0x30 (func_00118480 and func_001184B8 write it by hand, see STREAMVPTR). */
 struct CBinaryInputStream {
@@ -26,7 +16,8 @@ struct CBinaryInputStream {
     /* 0x0C */ int cbPumped;
     /* 0x10 */ u8 *pbRaw;           /* the raw bytes not yet pumped */
     /* 0x14 */ int cbRaw;
-    u8 unknown_0x18[0x8];
+    /* 0x18 */ s32 field_0x18;      /* writer: InitGeom__FP4GEOM (the stream's reset, which CBinaryFileStream_Close calls) clears it */
+    /* 0x1C */ s32 field_0x1C;      /* the same */
     /* 0x20 */ s32 field_0x20;       /* func_001179D8: its first argument, with flag 2 set */
     /* 0x24 */ s32 field_0x24;       /* its second argument */
     u8 unknown_0x28[0x8];
@@ -35,6 +26,17 @@ struct CBinaryInputStream {
     unsigned U16Read();
     unsigned U32Read();
 };
+
+void InitGeom__FP4GEOM(void *arg0) {
+    CBinaryInputStream *stream = (CBinaryInputStream *)arg0;
+    stream->pbRaw = 0;
+    stream->pb = 0;
+    stream->cbRaw = 0;
+    stream->cb = 0;
+    stream->field_0x18 = 0;
+    stream->field_0x1C = 0;
+}
+
 /* the stream over a memory block (its vtable is D_002CA5A0): the block's size and address wait at 0x34 and 0x38 */
 struct CBinaryInputStreamMem : CBinaryInputStream {
     /* 0x34 */ s32 cbSource;

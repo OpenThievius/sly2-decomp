@@ -24,7 +24,7 @@ struct M34 { float m[3][4]; } __attribute__((aligned(16)));
 
 struct STUCK { u8 unknown_0x0[0x40]; M34 mat; };
 
-struct LEAF { u8 unknown_0x0[0x1C]; ALO *alo; };
+struct LEAF : RIP {};
 
 extern "C" int FIsBasicDerivedFrom(void *basic, int cid);
 
@@ -38,7 +38,7 @@ int FBounceLeaf__FP4LEAFP2SOP6VECTORT2(LEAF *leaf, BOUNCEHIT *so, QW pos, QW nor
 {
     if (FIsBasicDerivedFrom(so->basic, 0x33))
         return 0;
-    STUCK *stuck = CreateStuck__FP3RIPP3ALOP2SOP6VECTORT3PP5STUCK((RIP *)leaf, leaf->alo, (SO *)so->pso, pos, normal);
+    STUCK *stuck = CreateStuck__FP3RIPP3ALOP2SOP6VECTORT3PP5STUCK((RIP *)leaf, leaf->palo, (SO *)so->pso, pos, normal);
     if (stuck != 0)
         stuck->mat = ConvertLoMat(0, so->basic, &stuck->mat);
     RemoveRip((RIP *)leaf);
@@ -75,14 +75,6 @@ extern "C" void PostDropletEmit(DROPLET *droplet, EMITB *emitb)
 
 struct LSGHIT { QW pos; u8 unknown_0x10[0x50]; };
 
-/* a ripple (a RIP) keeps a palette at 0x1C and a second scale at 0x24, in the RIP's gap */
-struct RIPPLEWORDS {
-    u8 unknown_0x0[0x1C];
-    s32 paloRender;
-    u8 unknown_0x20[0x4];
-    f32 scale1;
-};
-
 extern SW B_003DD490;
 
 extern "C" int ClsgClipEdgeToObject(GEOM *, QW, QW, int, LSGHIT *);
@@ -107,8 +99,8 @@ extern "C" void TouchDroplet__FP7DROPLETi(DROPLET *droplet, int touching)
             ripple->Slot1(hit.pos, scale, 0);
             ripple->dtLifetime = 0.75f;
             ripple->field_0x20 = scale;
-            ((RIPPLEWORDS *)ripple)->scale1 = 30.0f;
-            ((RIPPLEWORDS *)ripple)->paloRender = droplet->paloRipple;
+            ripple->radius.c1 = 30.0f;
+            ripple->palo = (ALO *)droplet->paloRipple;
         }
     }
     TouchRip__FP3RIPi(droplet, touching);

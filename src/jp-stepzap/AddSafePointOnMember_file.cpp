@@ -81,7 +81,17 @@ void UpdateJtSafePoints(SLY *self)
     }
 }
 
-struct SP { LO *plo; void *pmember; u8 unknown_0x8[4]; float tStamp; float x; u8 unknown_0x14[0xC]; } __attribute__((aligned(16)));
+/* one safe point of a JT's list (0x20 bytes): the object it was taken on, the member or geom, when, and where */
+struct SP {
+    /* 0x0 */ LO *plo;          /* AddSafePointOnMember stores the member's owner; RemoveSafePoints drops the points of an object */
+    /* 0x4 */ void *pmember;    /* AddSafePointOnMember; WarpJtToSafePoint tests the word (SAFEPT::field4) */
+    /* 0x8 */ GEOM *pgeom;      /* RemoveSafePoints drops the points of a geom (it compares this word); AddSafePointOnMember clears it */
+    /* 0xC */ float tStamp;     /* AddSafePointOnMember: the clock */
+    union {
+        /* 0x10 */ float x;     /* AddSafePointOnMember: the parameter along the member */
+        /* 0x10 */ QW second;   /* the point's second quadword (WarpJtToSafePoint copies it whole) */
+    };
+} __attribute__((aligned(16)));
 
 struct SPL { void *pjt; int count; u8 unknown_0x8[8]; SP items[1]; };
 
@@ -127,17 +137,13 @@ void AddSafePointOnMember(float parameter, SPL *list, SAFEMEMBEROBJ *pmember)
 
 INCLUDE_ASM(0X19FEB0);
 
-struct SP_1A0048 { int a; int b; int c; int d; QW q1; };
-
-struct SPL_1A0048 { int unknown_0x0; int count; int unknown_0x8[2]; SP_1A0048 items[1]; };
-
-void RemoveSafePoints(SPL_1A0048 *list, int a, int b)
+void RemoveSafePoints(SPL *list, LO *plo, GEOM *pgeom)
 {
-    SP_1A0048 *dst = list->items;
-    SP_1A0048 *end = list->items + list->count;
-    SP_1A0048 *src = dst;
+    SP *dst = list->items;
+    SP *end = list->items + list->count;
+    SP *src = dst;
     while (src < end) {
-        if ((a == 0 || a != src->a) && (b == 0 || b != src->c)) {
+        if ((plo == 0 || plo != src->plo) && (pgeom == 0 || pgeom != src->pgeom)) {
             if (src != dst) {
                 QW *d = (QW*)dst; QW *s = (QW*)src;
                 d[0] = s[0]; d[1] = s[1];

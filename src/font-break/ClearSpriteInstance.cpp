@@ -1,19 +1,16 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-#include "types.h"
-struct SPRITESLOT { u8 unknown_0x0[0x30]; void *pdepth; u8 unknown_0x34[0x3C]; };
-struct SPRITEGROUP { int count; SPRITESLOT *aslot; u8 unknown_0x8[0x10]; };
-struct SPRITES { u8 unknown_0x0[0x8]; SPRITEGROUP *agroup; };
-extern "C" void InitDepthSlot(SPRITESLOT *);
-extern "C" void func_002158C0(void *, SPRITESLOT *);
-extern "C" void ClearSpriteInstance(SPRITES *psprites, int igroup)
+#include "fbsprite.h"
+extern "C" void InitDepthSlot(SLOT *);
+extern "C" void func_002158C0(MOVIECHAR *, SLOT *);
+extern "C" void ClearSpriteInstance(SPRITE *psprite, int iinst)
 {
-    SPRITEGROUP *pgroup = (SPRITEGROUP *)(igroup * 0x18 + (sptr)psprites->agroup);
-    int count = pgroup->count;
-    SPRITESLOT *aslot = pgroup->aslot;
+    SPRITEINST *pinst = (SPRITEINST *)(iinst * 0x18 + (sptr)psprite->insts);
+    int count = pinst->cslot;
+    SLOT *aslot = pinst->aslot;
     for (int i = 0; i < count; i++) {
-        SPRITESLOT *pslot = &aslot[i];
-        if (pslot->pdepth)
-            func_002158C0(pslot->pdepth, pslot);
+        SLOT *pslot = &aslot[i];
+        if (pslot->pchar)
+            func_002158C0(pslot->pchar, pslot);
         else
             InitDepthSlot(pslot);
     }

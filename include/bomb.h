@@ -24,8 +24,8 @@ struct BOMB : SO {
     /* 0x150 */ s32 field_0x150;   /* InitBomb clears it */
     /* 0x154 */ f32 tDetonate;     /* PrimeBomb (min of it and now + dt), Bomb_OnPoolClaim (sets FLT_MAX), InitBomb, DetonateBomb */
     u8 unknown_0x158[0x4];
-    /* 0x15C */ f32 field_0x15C;   /* InitBomb sets it; DetonateBomb sends it in the message to its other bomb */
-    /* 0x160 */ f32 field_0x160;   /* InitBomb sets it */
+    /* 0x15C */ f32 radius;        /* the blast radius: GetBombVictims (the bound for most victims), DetonateBomb (sends it in the message to its other bomb as EXPLSO::uPercent), InitBomb sets it */
+    /* 0x160 */ f32 radiusJt;      /* the blast radius against a JT (class 0x34): GetBombVictims; InitBomb sets it */
     /* 0x164 */ s32 field_0x164;   /* DetonateBomb: tested against 0 before the victims are collected */
     /* 0x168 */ struct BOMB *pbombOther; /* DetonateBomb sends it message 9 through its slot 51 */
     /* 0x16C */ f32 field_0x16C;   /* DetonateBomb: sent in that message */

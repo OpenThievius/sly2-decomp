@@ -9,8 +9,8 @@ extern "C" void InitBomb(BOMB *pbomb)
     InitSo(pbomb);
     unsigned flags = pbomb->grfSw;
     pbomb->tDetonate = RO_002A4B08;
-    pbomb->field_0x15C = RO_002BC9C8;
-    pbomb->field_0x160 = RO_002BC9C8;
+    pbomb->radius = RO_002BC9C8;
+    pbomb->radiusJt = RO_002BC9C8;
     pbomb->field_0x1E0 = 1;
     pbomb->field_0x150 = 0;
     pbomb->field_0x1EC = 0x100;

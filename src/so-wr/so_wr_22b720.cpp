@@ -14,19 +14,22 @@ struct WARP {
     QW pos;
     u8 unknown_0x20[0x40];
     s32 state;
-    u8 unknown_0x64[0x6C];
+    f32 frequency;              /* 0x64: SetWrWavelength stores 1/wavelength here, GetWrWavelength reads it (through PwreGetWrCircle) */
+    u8 unknown_0x68[0x68];
 };
 
+struct ONZE { float uAmpl, gFreq, gPhase, uRandom; };
+
+struct ONZ { float gMin, gMax, uBias; int conze; ONZE aonze[4]; };
+
+/* a bend warp keeps two noise blocks: AddWrBendWarp sets the uBias of each (0x38 and 0x88), the Set* functions pass AddOnzOnze their addresses (+0x30, +0x80) */
 struct BENDWARP {
     s32 active;
     u8 unknown_0x4[0xC];
     s128 rowA;
     s128 rowB;
-    u8 unknown_0x30[8];
-    f32 half38;
-    u8 unknown_0x3C[0x4C];
-    f32 half88;
-    u8 unknown_0x8C[0x44];
+    ONZ onzA;
+    ONZ onzB;
 };
 
 /* WR, the water-ripple object (an LO of 0x990 bytes): up to eight warps, circle or bend, in one 0xD0-byte array. */
@@ -117,10 +120,6 @@ f32 UBias__Fff(f32 fparg0, f32 fparg1) {
 }
 }
 
-struct ONZE { float uAmpl, gFreq, gPhase, uRandom; };
-
-struct ONZ { float gMin, gMax, uBias; int conze; ONZE aonze[4]; };
-
 float UNoise_22BF70(float, float, float);
 
 extern "C" float UBias__Fff_22BF70(float, float);
@@ -177,8 +176,8 @@ extern "C" void AddWrBendWarp__FP2WR(WR *wr) {
     warp->active = 1;
     warp->rowA = g_2a2db0;
     warp->rowB = g_2a2dc0;
-    warp->half38 = 0.5f;
-    warp->half88 = 0.5f;
+    warp->onzA.uBias = 0.5f;
+    warp->onzB.uBias = 0.5f;
     wr->idNext = wr->idNext + 1;
 }
 
@@ -209,15 +208,10 @@ void PwreGetWrBend__FP2WR4ENSK(void* pwr, int ensk)
     PwreGetWrCur__FP2WR4ENSK4WREK_22C4F8(pwr, ensk, 1);
 }
 
-struct WrCircle {
-    u8 unknown_0x0[0x64];
-    f32 frequency;
-};
-
-extern "C" WrCircle *PwreGetWrCircle__FP2WR4ENSK_22C518(s8 *, s32);
+extern "C" WARP *PwreGetWrCircle__FP2WR4ENSK_22C518(s8 *, s32);
 
 extern "C" void SetWrWavelength__FP2WRf(s8 *arg0, f32 fparg0) {
-    WrCircle *temp_v0;
+    WARP *temp_v0;
 
     temp_v0 = PwreGetWrCircle__FP2WR4ENSK_22C518(arg0, 1);
     if (fparg0 == 0.0f) {
@@ -227,7 +221,7 @@ extern "C" void SetWrWavelength__FP2WRf(s8 *arg0, f32 fparg0) {
     }
 }
 
-extern "C" WrCircle *PwreGetWrCircle__FP2WR4ENSK_22C570(WR *, int);
+extern "C" WARP *PwreGetWrCircle__FP2WR4ENSK_22C570(WR *, int);
 
 extern "C" f32 GetWrWavelength__FP2WRPf(WR *pwr, f32 *) {
     f32 frequency = PwreGetWrCircle__FP2WR4ENSK_22C570(pwr, 1)->frequency;
@@ -251,20 +245,20 @@ void AddOnzOnze(ONZ *ponz, float uAmpl, float gFreq, float gPhase, float uRandom
     }
 }
 
-extern "C" s32 AddOnzOnze__FP3ONZffff_22C5F0(s32, f32, f32, f32, f32);
+extern "C" void AddOnzOnze__FP3ONZffff_22C5F0(ONZ *, f32, f32, f32, f32);
 
-extern "C" s32 PwreGetWrBend__FP2WR4ENSK_22C5F0(s32, s32);
+extern "C" BENDWARP *PwreGetWrBend__FP2WR4ENSK_22C5F0(WR *, s32);
 
-extern "C" void AddWrBendNoise(s32 wr, f32 fparg0, f32 fparg1, f32 fparg2, f32 fparg3) {
-    AddOnzOnze__FP3ONZffff_22C5F0(PwreGetWrBend__FP2WR4ENSK_22C5F0(wr, 1) + 0x30, fparg0, fparg1, fparg2, fparg3);
+extern "C" void AddWrBendNoise(WR *wr, f32 fparg0, f32 fparg1, f32 fparg2, f32 fparg3) {
+    AddOnzOnze__FP3ONZffff_22C5F0(&PwreGetWrBend__FP2WR4ENSK_22C5F0(wr, 1)->onzA, fparg0, fparg1, fparg2, fparg3);
 }
 
-extern "C" s32 AddOnzOnze__FP3ONZffff_22C658(s32, f32, f32, f32, f32);
+extern "C" void AddOnzOnze__FP3ONZffff_22C658(ONZ *, f32, f32, f32, f32);
 
-extern "C" s32 PwreGetWrBend__FP2WR4ENSK_22C658(s32, s32);
+extern "C" BENDWARP *PwreGetWrBend__FP2WR4ENSK_22C658(WR *, s32);
 
-extern "C" void AddWrSwivelNoise(s32 wr, f32 fparg0, f32 fparg1, f32 fparg2, f32 fparg3) {
-    AddOnzOnze__FP3ONZffff_22C658(PwreGetWrBend__FP2WR4ENSK_22C658(wr, 1) + 0x80, fparg0, fparg1, fparg2, fparg3);
+extern "C" void AddWrSwivelNoise(WR *wr, f32 fparg0, f32 fparg1, f32 fparg2, f32 fparg3) {
+    AddOnzOnze__FP3ONZffff_22C658(&PwreGetWrBend__FP2WR4ENSK_22C658(wr, 1)->onzB, fparg0, fparg1, fparg2, fparg3);
 }
 
 extern "C" {

@@ -1,20 +1,9 @@
 #include "sly2.h"
 #include "so.h"
+#include "laser.h"
 #include "ps2inline.h"
 #include "vu0inline.h"
 
-struct XPR {
-    u8 unknown_0x0[8];
-    void *plo;
-    u8 unknown_0xC[0x34];
-};
-struct MQ {
-    XPR side[2];
-    QW normal;
-    u8 unknown_0x90[4];
-    float friction;
-    float bounce;
-};
 union VU_SCALE {
     QW q;
     VECTOR v;
@@ -32,7 +21,7 @@ void QueueSwCallbackOnce(void *, SO *, u64, int);
 void AdjustVehicleNewXp(SO *pvehicle, MQ *pcontact, int side)
 {
     func_001F4FB0(pvehicle, pcontact, side);
-    void *plo = pcontact->side[1 - side].plo;
+    void *plo = pcontact->aside[1 - side].plo;
     QW normal;
     if (side == 0) {
         normal = pcontact->normal;

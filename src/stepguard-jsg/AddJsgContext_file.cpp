@@ -825,11 +825,9 @@ struct TN;
 /* the node's vtable, as RunSeqnode and StartNextSeqnodeRecord call it: two 8-byte entries (delta, index, function) after the
    type-info one */
 struct SEQVT { u8 unknown_0x0[0x8]; short deltaAddRef; short idxAddRef; void (*fnAddRef)(void *); short deltaRelease; short idxRelease; void (*fnRelease)(void *); };
-struct SEQNODE {
-    /* 0x0 */ void *pframe;   /* CFramePtr_Assign clears it (BASIC::pframe): Seqnode_Release */
-    /* 0x4 */ void *psidebag; /* SidebagPtr_Assign clears it (BASIC::psidebag): Seqnode_Release */
-    u8 unknown_0x8[0x4];
-    /* 0xC */ SEQVT *vt;
+/* a node of a running sequence: a BASIC (class root, lo.h) whose vtable (D_002D8C08) puts Seqnode_AddRef in slot 1, Seqnode_Release
+   in slot 2 and HandleSeqnodeMessage in slot 5 */
+struct SEQNODE : BASIC {
     /* 0x10 */ s32 cref;      /* the reference count: Seqnode_AddRef adds one, Seqnode_Release frees the node when it reaches 0 */
     LO *psw;        /* 0x14 */
     LO *ploCtx;     /* 0x18 */
@@ -859,9 +857,13 @@ struct SEQNODE {
     float sCrv78;   /* 0x78 */
     float sCrv7C;   /* 0x7C */
     float tCam;     /* 0x80 */
-    u8 unknown_0x84[0xC];
-    int field_0x90; /* StopSeqnodeCameraMove stores its argument */
-    u8 unknown_0x94[0x8];
+    /* 0x84 to 0x9B: the camera move's data, whose address is the camera policy's argument (StopSeqnodeCameraMove passes it to
+       RevokeCmPolicy; StartSeqnodeCameraMove, 0x1E57A0, still assembly, fills it and passes it to SetCmPolicy) */
+    /* 0x84 */ void *apvCamPose[2]; /* reader: StartSeqnodeCameraMove stores the two pose blocks of its source records (+0x10) */
+    /* 0x8C */ float dtCamMove; /* reader: StartSeqnodeCameraMove stores its time argument */
+    int field_0x90; /* StopSeqnodeCameraMove stores its argument; StartSeqnodeCameraMove sets 1 */
+    /* 0x94 */ int field_0x94; /* reader: StartSeqnodeCameraMove copies the first source's word at +0x44 */
+    /* 0x98 */ SEQNODE *pseqnodeCam; /* reader: StartSeqnodeCameraMove stores the node itself */
     int fCamMove;   /* 0x9C */
     LO *pjtBinoc;   /* 0xA0 */
     int cattach;    /* 0xA4 */
@@ -871,7 +873,7 @@ struct SEQNODE {
     LO *ploD8;      /* 0xD8 */
     LO *ploDC;      /* 0xDC */
     int fE0;        /* 0xE0 */
-    u8 unknown_0xE4[0x8];
+    /* 0xE4 */ DLE dleJsg; /* its entry in the owning JSG's dlSeqnode: InitJsg sets that list's ibDle to 0xE4, PseqnodeFind follows next */
     void *pamb;     /* 0xEC */
 };
 
@@ -933,8 +935,8 @@ extern "C" void StopSeqnode_1E1C40(SEQNODE *);
 
 struct REF {
     SEQNODE *p;
-    REF(SEQNODE *q) { p = q; p->vt->fnAddRef((char *)p + p->vt->deltaAddRef); }
-    ~REF() { p->vt->fnRelease((char *)p + p->vt->deltaRelease); }
+    REF(SEQNODE *q) { p = q; p->OnAdd(); } /* slot 1: Seqnode_AddRef */
+    ~REF() { p->Slot2(); }                  /* slot 2: Seqnode_Release */
 };
 
 extern "C" void RunSeqnode(SEQNODE *pseqnode)
@@ -2066,16 +2068,24 @@ struct PLAYERJT {
     /* 0x1A20 */ QW field_0x1A20; /* SLY */
 };
 
-struct SEQNODEDONE {
-    u8 unknown_0x0[0x14];
+/* SEQNODE as FSeqnodeRecordDone reads it: the player objects typed as PLAYERJT, the stream record as RECDONE; the other members as
+   SEQNODE declares them (same object, same readers) */
+struct SEQNODEDONE : BASIC {
+    /* 0x10 */ s32 cref;        /* SEQNODE::cref */
     /* 0x14 */ LO *psw;
-    u8 unknown_0x18[0xC];
+    /* 0x18 */ LO *ploCtx;      /* SEQNODE::ploCtx */
+    /* 0x1C */ LO *plo1C;       /* SEQNODE::plo1C */
+    /* 0x20 */ LO *plo20;       /* SEQNODE::plo20 */
     /* 0x24 */ LO *psubject;
-    u8 unknown_0x28[0xC];
+    /* 0x28 */ JSGE *precFirst; /* SEQNODE::precFirst */
+    /* 0x2C */ JSGE *precLast;  /* SEQNODE::precLast */
+    /* 0x30 */ JSGE *precCur;   /* SEQNODE::precCur */
     /* 0x34 */ float tStart;
-    u8 unknown_0x38[0xC];
+    /* 0x38 */ int fHandsOff;   /* SEQNODE::fHandsOff */
+    /* 0x3C */ int grfHandsOff; /* SEQNODE::grfHandsOff */
+    /* 0x40 */ JSGE *precDrive; /* SEQNODE::precDrive */
     /* 0x44 */ PLAYERJT *pjt;
-    u8 unknown_0x48[0x4];
+    /* 0x48 */ int fVjoyHold;   /* SEQNODE::fVjoyHold */
     /* 0x4C */ LO *pasega;
     /* 0x50 */ LO *pjsg;
     /* 0x54 */ int pjtPose;
@@ -2084,13 +2094,23 @@ struct SEQNODEDONE {
     /* 0x60 */ LO *ploShown;
     /* 0x64 */ int ploSw;
     /* 0x68 */ RECDONE *precStream;
-    u8 unknown_0x6C[0x10];
+    /* 0x6C */ TN *ptn;         /* SEQNODE::ptn */
+    /* 0x70 */ int fTnAdded;    /* SEQNODE::fTnAdded */
+    /* 0x74 */ LO *ploLook;     /* SEQNODE::ploLook */
+    /* 0x78 */ float sCrv78;    /* SEQNODE::sCrv78 */
     /* 0x7C */ float sCrv;
     /* 0x80 */ float tCam;
-    u8 unknown_0x84[0x18];
+    /* 0x84 */ void *apvCamPose[2]; /* SEQNODE::apvCamPose */
+    /* 0x8C */ float dtCamMove; /* SEQNODE::dtCamMove */
+    /* 0x90 */ int field_0x90;  /* SEQNODE::field_0x90 */
+    /* 0x94 */ int field_0x94;  /* SEQNODE::field_0x94 */
+    /* 0x98 */ SEQNODE *pseqnodeCam; /* SEQNODE::pseqnodeCam */
     /* 0x9C */ int fCamMove;
     /* 0xA0 */ PLAYERJT *pjtBinoc;
-    u8 unknown_0xA4[0x34];
+    /* 0xA4 */ int cattach;     /* SEQNODE::cattach */
+    /* 0xA8 */ LO *aploAttach[4]; /* SEQNODE::aploAttach */
+    /* 0xB8 */ int an1Attach[4];  /* SEQNODE::an1Attach */
+    /* 0xC8 */ int an2Attach[4];  /* SEQNODE::an2Attach */
     /* 0xD8 */ int ploD8;
     /* 0xDC */ int ploDC;
 };
@@ -2938,27 +2958,16 @@ tail:
     }
 }
 
-struct SEQNODE_1E4D40 {
-    u8 unknown_0x0[0x24];
-    /* 0x24 */ LO *plo;
-    u8 unknown_0x28[0x1C];
-    /* 0x44 */ LO *ploFallback;
-};
-
-struct LOTARGET : LO {
-    u8 unknown_0x50[0x158];
-    /* 0x1A8 */ f32 rad;
-    u8 unknown_0x1AC[0x94];
-    /* 0x240 */ QW offset;
-};
+/* SEQNODE under its own name, so GetSeqnodeObjectPosRad keeps its symbol */
+struct SEQNODE_1E4D40 : SEQNODE {};
 
 extern "C" f32 atan2f(f32, f32);
 
 void GetSeqnodeObjectPosRad(SEQNODE_1E4D40 *pseqnode, LO *plo, QW *ppos, f32 *pradYaw)
 {
-    LO *ploSelf = pseqnode->plo;
+    LO *ploSelf = pseqnode->psubject;
     if (ploSelf == 0)
-        ploSelf = pseqnode->ploFallback;
+        ploSelf = pseqnode->ploDrive;
     union { QW qw; VECTOR vec; } pos;
     VECTOR tangent;
     f32 rad;
@@ -2973,9 +2982,9 @@ void GetSeqnodeObjectPosRad(SEQNODE_1E4D40 *pseqnode, LO *plo, QW *ppos, f32 *pr
     } else {
         pos.qw = PosLoWorld(ploSelf);
         if (FIsBasicDerivedFrom(ploSelf, 0x33) != 0) {
-            LOTARGET *ploTarget = static_cast<LOTARGET *>(ploSelf);
-            pos.qw = VectorAdd(pos.qw, ploTarget->offset);
-            rad = ploTarget->rad;
+            STEP *pstep = static_cast<STEP *>(ploSelf); /* class 0x33 is STEP */
+            pos.qw = VectorAdd(pos.qw, pstep->posLocal);
+            rad = pstep->radHeading;
         } else {
             rad = atan2f(ploSelf->PmatWorld()->mat[0][1], ploSelf->PmatWorld()->mat[0][0]);
         }
@@ -3233,12 +3242,13 @@ extern "C" void func_001E5570(SEQNODE *pseqnode)
     }
 }
 
-struct SEQNODE_1E5628 { u8 unknown_0x0[0xC]; SEQVT *vt; u8 unknown_0x10[0x4]; char *powner; u8 unknown_0x18[0x84]; int fCamMove; u8 unknown_0xA0[0x4C]; void *pamb; };
+/* SEQNODE under its own name, so StopSeqnode keeps its symbol (an extern "C" StopSeqnode(SEQNODE *) is declared above) */
+struct SEQNODE_1E5628 : SEQNODE {};
 
 struct SeqnodeScope {
     SEQNODE_1E5628 *node;
     SeqnodeScope(SEQNODE_1E5628 *seqnode) : node(seqnode) {}
-    ~SeqnodeScope() { node->vt->fnRelease((char *)node + node->vt->deltaRelease); }
+    ~SeqnodeScope() { node->Slot2(); } /* slot 2: Seqnode_Release */
 };
 
 
@@ -3280,8 +3290,8 @@ void StopSeqnode(SEQNODE_1E5628 *pseqnode)
         return;
     SeqnodeScope scope(pseqnode);
     void **pamb = &pseqnode->pamb;
-    pseqnode->vt->fnAddRef((char *)pseqnode + pseqnode->vt->deltaAddRef);
-    RemoveDlEntry(pseqnode->powner + 0x5C, pseqnode);
+    pseqnode->OnAdd(); /* slot 1: Seqnode_AddRef */
+    RemoveDlEntry(&static_cast<JSG *>(pseqnode->psw)->dlSeqnode, pseqnode);
     ReleaseSeqnodeAnim_1E5628(pseqnode);
     func_001E53D8_1E5628(pseqnode);
     ReleaseSeqnodeSma_1E5628(pseqnode);
@@ -3300,7 +3310,7 @@ void StopSeqnode(SEQNODE_1E5628 *pseqnode)
     }
     if (pseqnode->fCamMove != 0)
         StopSeqnodeCameraMove_1E5628(pseqnode, 1);
-    pseqnode->vt->fnRelease((char *)pseqnode + pseqnode->vt->deltaRelease);
+    pseqnode->Slot2(); /* slot 2: Seqnode_Release */
 }
 
 extern "C" {
@@ -3320,32 +3330,68 @@ extern "C" void StopSeqnodeCameraMove(SEQNODE *pseqnode, int arg1)
 {
     pseqnode->field_0x90 = arg1;
     pseqnode->fCamMove = 0;
-    RevokeCmPolicy(&B_002DDF40, 2, 0xA, &B_002DDF40.cppolicy, 0, pseqnode->unknown_0x84);
+    RevokeCmPolicy(&B_002DDF40, 2, 0xA, &B_002DDF40.cppolicy, 0, pseqnode->apvCamPose);
 }
 
-/* the JSG that owns the node (jsg.h: its records and the node list at 0x5C) */
-struct OWNER {
-    u8 unknown_0x0[0x50];
-    /* 0x50 */ int crec;
-    /* 0x54 */ JSGE *arec;
-    u8 unknown_0x58[0x4];
+/* the JSG that owns the node (jsg.h: its records and the node list at 0x5C), with the record array typed */
+struct OWNER : LO {
+    /* 0x50 */ int crec;        /* JSG::cjsge */
+    /* 0x54 */ JSGE *arec;      /* JSG::ajsge */
+    /* 0x58 */ s32 cjsgeMax;    /* JSG::cjsgeMax (PjsgeAllocJsg, CSeq_LoadFromBrx, CSeq_Clone) */
     /* 0x5C */ DL dlSeqnode; /* JSG::dlSeqnode */
 };
 
-/* SEQNODE as PseqnodeNew builds it: the owner typed as OWNER and the records as JSGE */
+/* SEQNODE as PseqnodeNew builds it: the vtable pointer as a member (it stores it), the owner typed as OWNER and the records as JSGE;
+   the other members as SEQNODE declares them */
 struct SEQNODE_1E5AE0 {
     /* 0x0 */ void *pframe;
     /* 0x4 */ void *psidebag;
-    u8 unknown_0x8[0x4];
+    /* 0x8 */ struct SUBSCRIBER *psubFirst; /* BASIC::psubFirst */
     /* 0xC */ SEQVT *vt;
     /* 0x10 */ s32 cref;
     /* 0x14 */ OWNER *powner;     /* SEQNODE::psw */
     /* 0x18 */ OWNER *pownerRoot; /* SEQNODE::ploCtx */
     /* 0x1C */ int plo;           /* SEQNODE::plo1C */
-    u8 unknown_0x20[0x8];
+    /* 0x20 */ LO *plo20;         /* SEQNODE::plo20 */
+    /* 0x24 */ LO *psubject;      /* SEQNODE::psubject */
     /* 0x28 */ JSGE *prec;        /* SEQNODE::precFirst */
     /* 0x2C */ JSGE *precEnd;     /* SEQNODE::precLast */
-    u8 unknown_0x30[0xBC];
+    /* 0x30 */ JSGE *precCur;     /* SEQNODE::precCur */
+    /* 0x34 */ float rClock;      /* SEQNODE::rClock */
+    /* 0x38 */ int fHandsOff;     /* SEQNODE::fHandsOff */
+    /* 0x3C */ int grfHandsOff;   /* SEQNODE::grfHandsOff */
+    /* 0x40 */ JSGE *precDrive;   /* SEQNODE::precDrive */
+    /* 0x44 */ LO *ploDrive;      /* SEQNODE::ploDrive */
+    /* 0x48 */ int fVjoyHold;     /* SEQNODE::fVjoyHold */
+    /* 0x4C */ LO *pasega;        /* SEQNODE::pasega */
+    /* 0x50 */ LO *pjsg;          /* SEQNODE::pjsg */
+    /* 0x54 */ LO *pjtPose;       /* SEQNODE::pjtPose */
+    /* 0x58 */ LO *psma;          /* SEQNODE::psma */
+    /* 0x5C */ int fSmaCur;       /* SEQNODE::fSmaCur */
+    /* 0x60 */ LO *ploShown;      /* SEQNODE::ploShown */
+    /* 0x64 */ LO *ploSw;         /* SEQNODE::ploSw */
+    /* 0x68 */ JSGE *precStream;  /* SEQNODE::precStream */
+    /* 0x6C */ TN *ptn;           /* SEQNODE::ptn */
+    /* 0x70 */ int fTnAdded;      /* SEQNODE::fTnAdded */
+    /* 0x74 */ LO *ploLook;       /* SEQNODE::ploLook */
+    /* 0x78 */ float sCrv78;      /* SEQNODE::sCrv78 */
+    /* 0x7C */ float sCrv7C;      /* SEQNODE::sCrv7C */
+    /* 0x80 */ float tCam;        /* SEQNODE::tCam */
+    /* 0x84 */ void *apvCamPose[2]; /* SEQNODE::apvCamPose */
+    /* 0x8C */ float dtCamMove;   /* SEQNODE::dtCamMove */
+    /* 0x90 */ int field_0x90;    /* SEQNODE::field_0x90 */
+    /* 0x94 */ int field_0x94;    /* SEQNODE::field_0x94 */
+    /* 0x98 */ SEQNODE *pseqnodeCam; /* SEQNODE::pseqnodeCam */
+    /* 0x9C */ int fCamMove;      /* SEQNODE::fCamMove */
+    /* 0xA0 */ LO *pjtBinoc;      /* SEQNODE::pjtBinoc */
+    /* 0xA4 */ int cattach;       /* SEQNODE::cattach */
+    /* 0xA8 */ LO *aploAttach[4]; /* SEQNODE::aploAttach */
+    /* 0xB8 */ int an1Attach[4];  /* SEQNODE::an1Attach */
+    /* 0xC8 */ int an2Attach[4];  /* SEQNODE::an2Attach */
+    /* 0xD8 */ LO *ploD8;         /* SEQNODE::ploD8 */
+    /* 0xDC */ LO *ploDC;         /* SEQNODE::ploDC */
+    /* 0xE0 */ int fE0;           /* SEQNODE::fE0 */
+    /* 0xE4 */ DLE dleJsg;        /* SEQNODE::dleJsg: PrependDlEntry links it */
     /* 0xEC */ int pamb;
 };
 

@@ -1,25 +1,18 @@
 #include "types.h"
 #include "vu0inline.h"
-#include "po.h"
+#include "step.h"
+#include "oxa.h"
+#include "guard.h"
+/* a local view of the SENSOR words at 0xF0 and 0xF4 (guard.h leaves them a gap): only this function reads them */
+struct SENSORFORCE { u8 unknown_0x0[0xF0]; int fForce; int fSuppress; };
 struct CLIPEDGE { char data[0x180]; };
-struct OBJ : PO {
-    u8 unknown_0x180[0x240 - 0x180];
-    QW offset;
-    u8 unknown_0x250[0x11AC - 0x250];
+/* a STEP (class 0x33) or a JT (class 0x34, whose 0x11AC is a gap in jt.h: this function is its only reader) */
+struct OBJ : STEP {
+    u8 unknown_0x2C0[0x11AC - 0x2C0];
     int field11AC;
 };
 struct NODE { int hit; NODE *next; u8 unknown_0x8[4]; OBJ *pobj; };
-struct SENSORSET { u8 unknown_0x0[0x64]; NODE *pnodes; };
 struct BSP { u8 unknown_0x0[0xEC]; void *pclip; u8 unknown_0xF0[0x130 - 0xF0]; BSP *pnext; };
-struct SENSOR {
-    u8 unknown_0x0[0xE4];
-    SENSORSET *pset;
-    void *pvolume;
-    void *pvolumeExtra;
-    int fForce;
-    int fSuppress;
-    unsigned flags;
-};
 extern "C" {
 void *PpoSwFocusBase(void *);
 int FSwBinocActive(void *);
@@ -48,16 +41,16 @@ extern "C" int NNextSensorState(SENSOR *psensor, OBJ *pobj, int state)
         state = 0;
     } else if (FSwBinocActive(&B_003DD490)) {
         state = 0;
-    } else if (psensor->fSuppress) {
+    } else if (((SENSORFORCE *)psensor)->fSuppress) {
         state = 0;
     } else if (FIsBasicDerivedFrom(pobj, 0x34) && pobj->field11AC) {
         state = 0;
-    } else if (psensor->fForce) {
+    } else if (((SENSORFORCE *)psensor)->fForce) {
         state = 1;
     } else {
         QW pos;
         if (FIsBasicDerivedFrom(pobj, 0x33))
-            pos = VectorAdd(PosLoWorld(pobj), pobj->offset);
+            pos = VectorAdd(PosLoWorld(pobj), pobj->posLocal);
         else
             pos = PosLoWorld(pobj);
         for (BSP *pbsp = B_003E1480; pbsp; pbsp = pbsp->pnext) {
@@ -70,9 +63,9 @@ extern "C" int NNextSensorState(SENSOR *psensor, OBJ *pobj, int state)
         }
         switch (state) {
         case 0: {
-            SENSORSET *pset = psensor->pset;
+            OXA *pset = psensor->poxa;
             if (pset) {
-                for (NODE *pnode = pset->pnodes; pnode; pnode = pnode->next) {
+                for (NODE *pnode = (NODE *)pset->first; pnode; pnode = pnode->next) {
                     if (pnode->pobj == pobj) {
                         if (pnode->hit) {
                             state = 1;
@@ -84,11 +77,11 @@ extern "C" int NNextSensorState(SENSOR *psensor, OBJ *pobj, int state)
             }
             if (!func_00227C90(psensor->pvolume, pos)) {
                 state = 0;
-            } else if (psensor->pvolumeExtra && !func_00227C90(psensor->pvolumeExtra, pos)) {
+            } else if ((void *)psensor->field_0xEC && !func_00227C90((void *)psensor->field_0xEC, pos)) {
                 state = 0;
-            } else if ((psensor->flags & 1) || !func_00154770(psensor, pobj)) {
+            } else if ((psensor->grfSensing & 1) || !func_00154770(psensor, pobj)) {
                 state = 1;
-                if (!(psensor->flags & 2))
+                if (!(psensor->grfSensing & 2))
                     state = FSensorSightBlocked(psensor, pobj) == 0;
             } else {
                 state = 0;
@@ -96,22 +89,22 @@ extern "C" int NNextSensorState(SENSOR *psensor, OBJ *pobj, int state)
             break;
         }
         case 1:
-            if (psensor->pvolumeExtra && !func_00227C90(psensor->pvolumeExtra, pos)) {
+            if ((void *)psensor->field_0xEC && !func_00227C90((void *)psensor->field_0xEC, pos)) {
                 state = 0;
             } else if (!func_00227C90(psensor->pvolume, pos)) {
                 state = 2;
-            } else if (psensor->flags & 8) {
+            } else if (psensor->grfSensing & 8) {
                 if (FSensorSightBlocked(psensor, pobj))
                     state = 0;
             }
             break;
         case 2:
-            if (psensor->pvolumeExtra && !func_00227C90(psensor->pvolumeExtra, pos)) {
+            if ((void *)psensor->field_0xEC && !func_00227C90((void *)psensor->field_0xEC, pos)) {
                 state = 0;
             } else if (func_00227C90(psensor->pvolume, pos)) {
-                if ((psensor->flags & 2) || !FSensorSightBlocked(psensor, pobj))
+                if ((psensor->grfSensing & 2) || !FSensorSightBlocked(psensor, pobj))
                     state = 1;
-            } else if (psensor->flags & 8) {
+            } else if (psensor->grfSensing & 8) {
                 if (FSensorSightBlocked(psensor, pobj))
                     state = 0;
             }

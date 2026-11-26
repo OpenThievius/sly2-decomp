@@ -4,6 +4,8 @@
 #include "m2c_macros.h"
 #include "sly2.h"
 #include "include_asm.h"
+#include "sw.h"
+#include "classinfo.h"
 
 struct Entry { u8 unknown_0x0[12]; };
 
@@ -12,17 +14,13 @@ extern "C" Entry *PdlFromSwOid(char *base, int oid)
     return (Entry *)(base + 0x38) + ((oid * 0x95675) & 0x1FF);
 }
 
-typedef struct Pdl { s32 a, b, c; } Pdl;
-
-typedef struct Sw { u8 unknown_0x0[0x3038]; Pdl pdls[1]; } Sw;
-
-extern "C" Pdl *PdlFromSwCid(Sw *arg0, s32 arg1) {
-    return &arg0->pdls[arg1];
+extern "C" SL *PdlFromSwCid(SW *psw, s32 cid) {
+    return &psw->aslCid[cid];
 }
 
-extern "C" Entry *func_0015E3C0(char *base, int oid)
+extern "C" SL *func_0015E3C0(SW *psw, int oid)
 {
-    return (Entry *)(base + 0x1838) + ((oid * 0x95675) & 0x1FF);
+    return &psw->field_0x1838[(oid * 0x95675) & 0x1FF];
 }
 
 struct LO_15E3E8 {
@@ -131,7 +129,7 @@ extern "C" void CploFindSwObjects_thunk(int a, int b, int c, int d, int e, int f
 
 extern "C" Entry *PdlFromSwOid(char *base, int oid);
 
-extern "C" Entry *func_0015E3C0(char *base, int oid);
+extern "C" SL *func_0015E3C0(SW *psw, int oid);
 
 extern "C" void MatchSwObject(void *psw, LO_15E3E8 *plo, LO_15E3E8 *ploMatch, unsigned grffso, LO_15E3E8 *ploContext,
                               LO_15E3E8 *plst, int cploMax, int *pcploMatch, LO_15E3E8 **aplo, int *pipsl);
@@ -209,8 +207,8 @@ extern "C" int CploFindSwObjects(char *psw, int grffso, int oid, LO_15E678 *ploC
             MatchSwObject(psw, (LO_15E3E8 *)plo, plo->ploMatch, grffso, (LO_15E3E8 *)ploContext, plst, cploMax,
                           &find.cploMatch, aplo, &find.ipsl);
     }
-    func_0015E3C0(psw, oid);
-    for (LINK_15E678 *plink = *(LINK_15E678 **)func_0015E3C0(psw, oid); plink; plink = plink->plinkNext) {
+    func_0015E3C0((SW *)psw, oid);
+    for (LINK_15E678 *plink = *(LINK_15E678 **)func_0015E3C0((SW *)psw, oid); plink; plink = plink->plinkNext) {
         if (plink->oid == oid) {
             if (plink->plo) {
                 if (((LO_15E678 *)plink->plo)->oid == oid) {
@@ -260,14 +258,12 @@ extern "C" LO *PloFindSwObject(SW *sw, unsigned flags, int oid, LO *context, voi
     return 0;
 }
 
-struct CLSDEF_15E988 { CLSDEF_15E988 *pclsdefBase; int cid; u8 unknown_0x8[0xC]; };
-
-extern CLSDEF_15E988 D_002BAAE8[];
+extern CLASSINFO D_002BAAE8[];
 
 extern "C" int FIsCidDerivedFrom(int cid, int cidBase)
 {
-    for (CLSDEF_15E988 *pclsdef = &D_002BAAE8[cid]; pclsdef != 0; pclsdef = pclsdef->pclsdefBase) {
-        if (pclsdef->cid == cidBase)
+    for (CLASSINFO *pclassinfo = &D_002BAAE8[cid]; pclassinfo != 0; pclassinfo = pclassinfo->pclassinfoParent) {
+        if (pclassinfo->cid == cidBase)
             return 1;
     }
     return 0;

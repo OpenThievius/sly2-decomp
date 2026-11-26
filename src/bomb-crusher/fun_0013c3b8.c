@@ -1,27 +1,11 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later */
 #include "types.h"
+#include "loot.h"
 
-struct LOOTDEF_13C3B8 {
-    s32 id;
-    s32 field_0x4;
-    u8 unknown_0x8[0xC];
-    s32 field_0x14;
-    s32 field_0x18;
-    s32 field_0x1C;
-    u8 unknown_0x20[0xC];
-};
+void func_0013C440(struct LOOT *loot);
 
-struct LOOT_13C3B8 {
-    u8 unknown_0x0[0x150];
-    s32 clootdef;
-    struct LOOTDEF_13C3B8 *alootdef;
-    struct LOOTDEF_13C3B8 *plootdefSel;
-};
-
-void func_0013C440(struct LOOT_13C3B8 *loot);
-
-void func_0013C3B8(struct LOOT_13C3B8 *loot, s32 id, s32 value4, s32 value14) {
-    struct LOOTDEF_13C3B8 *def;
+void func_0013C3B8(struct LOOT *loot, s32 id, s32 value4, s32 value14) {
+    struct LOOTDEF *def;
     s32 count;
 
     func_0013C440(loot);
@@ -34,6 +18,6 @@ void func_0013C3B8(struct LOOT_13C3B8 *loot, s32 id, s32 value4, s32 value14) {
         def->field_0x4 = value4;
         def->field_0x14 = value14;
         def->field_0x18 = -1;
-        def->field_0x1C = 0;
+        def->cslot = 0;
     }
 }

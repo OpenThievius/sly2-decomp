@@ -7,13 +7,15 @@
 #include "vu0inline.h"
 #include "cm.h"
 
-extern "C" {
-typedef struct ACCMISS {
-    u8 unknown_0x0[0x100];
+#include "xfm.h"
+/* ACCMISS, class 44 (0x140 bytes) of retail's class table, a child of class 3 (XFM, 0xE0 bytes): InitAccmiss starts with InitXfm. */
+struct ACCMISS : XFM {
+    u8 unknown_0xE0[0x20];
     s128 field_0x100;
     s128 field_0x110;
-} ACCMISS;
+};
 
+extern "C" {
 void InitXfm();
 
 extern s128 g_2a2da0;

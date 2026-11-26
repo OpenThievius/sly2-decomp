@@ -8,8 +8,10 @@ INCLUDE_ASM(0X13A1E8);
 
 #include "cm.h"
 #include "clock.h"
+#include "blip.h"
 
-/* BLIPG's draw-time fields, read by func_0013A688 only (a local view of BLIPG: blip.h keeps them as gaps) */
+/* BLIPG's draw-time fields that blip.h does not declare, read by func_0013A688 only (one reader: a local view of BLIPG, the rest of
+   the draw reads go through BLIPG's members cqwTexture, aqw, hasColor, color and pgifs, as PropagateBlipgShader reads them) */
 struct BLIPGDRAW {
     u8 unknown_0x0[0x110];
     /* 0x110 */ u8 field_0x110[0x10];
@@ -17,15 +19,9 @@ struct BLIPGDRAW {
     /* 0x130 */ u8 field_0x130[0x10];
     /* 0x140 */ u8 field_0x140[0x10];
     /* 0x150 */ u8 field_0x150[0x10];
-    u8 unknown_0x160[0x40];
-    /* 0x1A0 */ s32 field_0x1A0;
-    u8 unknown_0x1A4[0xC];
-    /* 0x1B0 */ u8 field_0x1B0[0x200];
-    /* 0x3B0 */ u32 ccolor;
-    /* 0x3B4 */ u8 acolor[0x80];
+    u8 unknown_0x160[0x2D4];
     /* 0x434 */ s32 fFlag;
-    /* 0x438 */ void *pvData;
-    u8 unknown_0x43C[0x4];
+    u8 unknown_0x438[8];
     /* 0x440 */ f32 field_0x440;
 };
 
@@ -37,30 +33,31 @@ extern "C" void AddVifUnpack__4VIFS3UPKiPvi(void *, int, int, void *, int);
 
 extern "C" void AddVifUnpackRefs__4VIFS3UPKiPviPPPv(void *, int, int, void *, int, void *);
 
-void func_0013A688(BLIPGDRAW *pblipg)
+void func_0013A688(BLIPG *pblipg)
 {
+    BLIPGDRAW *pdraw = (BLIPGDRAW *)pblipg;
     float *pqwConstants;
     unsigned *pqwCounts;
     UnpackHelper__4VIFS3UPKiiPiPPUi(g_2dea28, 0xC, 1, 5, 0, &pqwConstants);
     pqwConstants[0] = B_002DDF40.matProj.mat[0][0];
     pqwConstants[1] = B_002DDF40.matProj.mat[1][1];
-    pqwConstants[2] = pblipg->field_0x440;
+    pqwConstants[2] = pdraw->field_0x440;
     pqwConstants[3] = g_2dded0.t;
     UnpackHelper__4VIFS3UPKiiPiPPUi(g_2dea28, 0xC, 1, 6, 0, &pqwCounts);
     pqwCounts[0] = 0;
-    if (pblipg->fFlag != 0)
+    if (pdraw->fFlag != 0)
         pqwCounts[0] |= 1;
-    pqwCounts[1] = pblipg->ccolor;
-    pqwCounts[2] = pblipg->field_0x1A0;
+    pqwCounts[1] = pblipg->hasColor;
+    pqwCounts[2] = pblipg->cqwTexture;
     ((float *)pqwCounts)[3] = g_2dded0.dtReal;
-    int ccolor = pblipg->ccolor;
-    AddVifUnpack__4VIFS3UPKiPvi(g_2dea28, 0xE, ccolor, pblipg->acolor, 0x30 - ccolor);
-    AddVifUnpack__4VIFS3UPKiPvi(g_2dea28, 8, 1, pblipg->field_0x130, 1);
-    AddVifUnpack__4VIFS3UPKiPvi(g_2dea28, 8, 1, pblipg->field_0x110, 2);
-    AddVifUnpack__4VIFS3UPKiPvi(g_2dea28, 8, 1, pblipg->field_0x140, 3);
-    AddVifUnpack__4VIFS3UPKiPvi(g_2dea28, 8, 1, pblipg->field_0x150, 4);
-    AddVifUnpack__4VIFS3UPKiPvi(g_2dea28, 0xC, 4, pblipg->pvData, 0x30);
-    AddVifUnpackRefs__4VIFS3UPKiPviPPPv(g_2dea28, 0xC, pblipg->field_0x1A0, pblipg->field_0x1B0, 0xF, 0);
+    int ccolor = pblipg->hasColor;
+    AddVifUnpack__4VIFS3UPKiPvi(g_2dea28, 0xE, ccolor, pblipg->color, 0x30 - ccolor);
+    AddVifUnpack__4VIFS3UPKiPvi(g_2dea28, 8, 1, pdraw->field_0x130, 1);
+    AddVifUnpack__4VIFS3UPKiPvi(g_2dea28, 8, 1, pdraw->field_0x110, 2);
+    AddVifUnpack__4VIFS3UPKiPvi(g_2dea28, 8, 1, pdraw->field_0x140, 3);
+    AddVifUnpack__4VIFS3UPKiPvi(g_2dea28, 8, 1, pdraw->field_0x150, 4);
+    AddVifUnpack__4VIFS3UPKiPvi(g_2dea28, 0xC, 4, pblipg->pgifs, 0x30);
+    AddVifUnpackRefs__4VIFS3UPKiPviPPPv(g_2dea28, 0xC, pblipg->cqwTexture, pblipg->aqw, 0xF, 0);
 }
 
 struct VIFS;

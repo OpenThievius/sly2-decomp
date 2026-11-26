@@ -1,27 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
-struct RIDER {
-    u8 unknown_0x0[0x2C];
-    float field2C;
-    float field30;
-    float field34;
-    float field38;
-    u8 unknown_0x3C[0x44 - 0x3C];
-    float field44;
-    float field48;
-    u8 unknown_0x4C[0x60 - 0x4C];
-    RIDER *pnext;
-};
-struct GROUP {
-    u8 unknown_0x0[0xC];
-    int alive;
-    RIDER *pfirst;
-    u8 unknown_0x14[0x20 - 0x14];
-    float gap;
-    int crv;
-    float target;
-};
-extern "C" float SMaxCrv(int);
+#include "pzo_hide.h"
+extern "C" float SMaxCrv(CRV *);
 static inline float GClamp(float value, float lower, float upper)
 {
     if (value < lower)
@@ -35,23 +15,23 @@ static inline float GClamp(float value, float lower, float upper)
 // first operand of the add.s), and keeps the clamped value and the midpoint
 // (field2C + field30) * 0.5 in the same register ($f3): the source reuses one local for
 // both; a separate midpoint local gets its own register (score 14).
-extern "C" void SwarmGroup_UpdateTargets(void *pswarm, GROUP *pgroup)
+extern "C" void SwarmGroup_UpdateTargets(void *pswarm, SWARMGROUP *pgroup)
 {
-    float sCurve = SMaxCrv(pgroup->crv);
+    float sCurve = SMaxCrv(pgroup->pcrv);
     float gapMax = (sCurve * 0.5f) / (float)pgroup->alive;
     float gap = pgroup->gap < gapMax ? pgroup->gap : gapMax;
     int index = 0;
-    for (RIDER *prider = pgroup->pfirst; prider; prider = prider->pnext) {
+    for (SWARMRIDER *prider = (SWARMRIDER *)pgroup->dl.head; prider; prider = (SWARMRIDER *)prider->dle.next) {
         int remaining = pgroup->alive - index - 1;
-        float fraction = (pgroup->target - prider->field34) / (prider->field38 - prider->field34);
+        float fraction = (pgroup->target - prider->field_0x34) / (prider->field_0x38 - prider->field_0x34);
         fraction = GClamp(fraction, 0.0f, 1.0f);
-        float value = (1.0f - fraction) * prider->field2C + fraction * prider->field30;
+        float value = (1.0f - fraction) * prider->field_0x2C + fraction * prider->field_0x30;
         float lower = ((float)index + (float)index + 1.0f) * gap;
         float upper = sCurve - (((float)remaining + (float)remaining) + 1.0f) * gap;
         value = GClamp(value, lower, upper);
-        prider->field44 = value;
-        value = (prider->field2C + prider->field30) * 0.5f;
-        prider->field48 = -fabsf(value - pgroup->target);
+        prider->sGoal = value;
+        value = (prider->field_0x2C + prider->field_0x30) * 0.5f;
+        prider->priority = -fabsf(value - pgroup->target);
         index++;
     }
 }
