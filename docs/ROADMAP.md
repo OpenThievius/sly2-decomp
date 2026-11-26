@@ -72,6 +72,7 @@ waves. Item numbers are stable: tools and docs cite them.
    went next (`SetEpselHint`: only the `hint` field needs casts, `tHint` typed scores 0; `FClipEdgeToPathzone` passes its other
    three arguments through): 0 m2c macros, 3,148 padding, 727 cast offsets, 250 char offsets; then one CM and CPLCY in `cm.h` for the camera manager's file (cm.h had `acplcy[2]` at 0x450, which is the look policy, K30CAM sits at 0x520): 3,038 padding, 704 cast offsets, 230 char offsets; the policy classes derive from CPLCY, one `CPP` enum and `include/rgba.h`: 3,036 padding. Next: cast offsets, vtable calls,
    padding and char offsets module by module.
+   Waves c5 and c6 (2026-11-25, PRs #79 and the one after it): padding 3,036 -> 0 (897 sources, `u8 unknown_0xOFF[n]` gaps: honest, not yet typed members), bare `long` -> `s64`/`u64`, cast offsets 29 -> 9, char offsets 9 -> 1, vtable calls 30 -> 15, m2c 0, 3 local copies. What is left is closed by ruling or measurement: 3 cast stores and 1 char store where a typed member moved registers (`SetBtnButtons`, `GoalGoto_Init`, `GoalHit_Update`) plus address arithmetic in `fun_00217298`; 15 vtable calls on tables or classes without a header (ACT-style pointer-and-delta tables, classes 35-37, JT `SetMode`, a pointer-to-member in `ZapContinue`, a C source); 22 bare `long` lines (19 in `FillShaders`, whose own `QW` clashes with `types.h`, 3 are the word in comments and a string); the 3 local copies above. New: `include/expl.h` (EXPLSO, EXPL, EXPLO, EXPLS from retail's class table 30-33); `act.h` holds the pointer-and-delta idiom in three static inline helpers (relocated, not removed). The count that still matters is the ~2,000 `unknown_0x...` gaps: typing them as members of SO, ALO, JT, GOAL and the rest is the next wave.
 2. **Whole files** (In Progress). Left: `po_screen_210eb0`, `SyncVBlank_file`, `StartupJmt_file`, `PloFindSpawn_file` (one callee or
    global written with several types), `QueueSwCallback_file` and `PsoHitTestLineObjects_file` (compile to another size), and four
    files with per-function flag lists. Then the 826 low-confidence cuts inside a span, checked as item 3's first stage.
@@ -110,7 +111,7 @@ waves. Item numbers are stable: tools and docs cite them.
      helpers; varargs that step 8-byte EE slots (3 files).
    - **Aligned vector globals** typed `QW` or `VECTOR` rather than `f32[4]`, so a host linker keeps their 16-byte alignment (the
      tie-break rule already prefers the type).
-   - **Bare `long`** (642 lines): `s64` or `s32` as retail's code uses it.
+   - **Bare `long`** (done 2026-11-25: `s64`/`u64`; 22 lines left, 19 in `FillShaders`): `s32` where retail's code uses 32 bits.
    - **Members instead of raw offsets.** 1,594 reads at a raw offset in 465 files, 386 of them pointer reads (sly1-decomp: 269 and
      32). Under native 64-bit pointers (PORTING.md route A) every type takes the host's layout, so these, not the layouts, are the
      cost; it also settles `virtual` (55 files rely on gcc 2.95's vtable layout, which even a modern 32-bit compiler does not keep).

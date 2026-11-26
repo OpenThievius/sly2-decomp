@@ -10,9 +10,10 @@ extern "C" void func_0012BE68(ACRBL *pacrbl, float t, float svt, QW *pvecPos, QW
     QW posPrev;
     QW posNext;
     int ikey = func_0012BB70(pacrbl, t);
+    /* the key as an address: as a typed pointer the previous key's address is shared and the loads move (scores 10, 20) */
     int pkey = ikey * 0x20 + (sptr)pacrbl->akey;
     *(B12 *)&posPrev = *(B12 *)(pkey - 0x20);
     *(B12 *)&posNext = *(B12 *)pkey;
-    float tPrev = *(float *)(pkey - 0x14);
-    EvaluateBezierPos__FfffP6VECTORN63(*(float *)(pkey + 0xC) - tPrev, t - tPrev, svt, posPrev, *(QW *)(pkey - 0x10), posNext, *(QW *)(pkey + 0x10), pvecPos, pvecVel, 0);
+    float tPrev = ((KEYBL *)(pkey - 0x20))->t;
+    EvaluateBezierPos__FfffP6VECTORN63(((KEYBL *)pkey)->t - tPrev, t - tPrev, svt, posPrev, ((KEYBL *)pkey)[-1].tan, posNext, ((KEYBL *)pkey)->tan, pvecPos, pvecVel, 0);
 }

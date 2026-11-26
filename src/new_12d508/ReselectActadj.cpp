@@ -7,14 +7,12 @@ extern "C" void ReselectActadj(ACTADJ *pactadj) {
         InvalidateXfSegment(pactadj->act.palo, pactadj->act.pxf);
         ACT *pactOld = pactadj->pactBase;
         if (pactOld != 0) {
-            ACTVTENTRY *pentry = &((ACTVT *)pactOld->vtable)->slot2;
-            pentry->fn((char *)pactOld + pentry->delta);
+            CallActSlot2(pactOld);
         }
         ACT *pactNew = pactadj->act.pactNext;
         pactadj->pactBase = pactNew;
         if (pactNew != 0) {
-            ACTVTENTRY *pentry = &((ACTVT *)pactNew->vtable)->slot1;
-            pentry->fn((char *)pactNew + pentry->delta);
+            CallActSlot1(pactNew);
         }
     }
 }

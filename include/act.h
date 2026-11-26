@@ -43,6 +43,21 @@ struct ACTVT {
     /* 0x20 */ struct ACTVTENTRY slot4;
 };
 
+/* an act's virtual call, as g++ 2.95 makes one: the entry's function on the act moved by the entry's delta. Slot 1 starts the
+   act (it becomes the top one), slot 2 stops it (ActivateActadj, DeactivateActadj, ReselectActadj) */
+static inline void CallActvtEntry(struct ACT *pact, const struct ACTVTENTRY *pentry)
+{
+    pentry->fn((char *)pact + pentry->delta);
+}
+static inline void CallActSlot1(struct ACT *pact)
+{
+    CallActvtEntry(pact, &((struct ACTVT *)pact->vtable)->slot1);
+}
+static inline void CallActSlot2(struct ACT *pact)
+{
+    CallActvtEntry(pact, &((struct ACTVT *)pact->vtable)->slot2);
+}
+
 struct ACTASEG {
     struct ACT act;
     /* 0x1C */ struct ASEGANIM *panim;      /* ApplyAseg stores the channel's curve here, or in panimAlt when its bit 31 is set */

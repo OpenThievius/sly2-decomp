@@ -3,13 +3,10 @@
 #include "ps2inline.h"
 #include "types.h"
 #include "sw.h"
-struct XP;
-struct XPSOVT { u8 unknown_0x0[0x1B8]; short delta; short index; void (*fn)(void *, XP *, int); };
-struct XPSO { u8 unknown_0x0[0xC]; XPSOVT *vt; };
-struct XPSEC { u8 unknown_0x0[0x60]; int unk60; };
-struct XPOWN { u8 unknown_0x0[0xEC]; XPSEC *psec; };
-struct XPOBJ { int unk0; XPOWN *powner; };
-struct XPD { XPOBJ *pobj; int unk4; int unk8; XPSO *pso; QW pos; QW posConv; QW vel; };
+#include "so.h"
+#include "oxa.h"
+struct XPOBJ { int unk0; SO *powner; };
+struct XPD { XPOBJ *pobj; int unk4; SO *psoOxaOwner; SO *pso; QW pos; QW posConv; QW vel; };
 struct XP {
     XPD xpd[2];
     QW velBase;
@@ -43,9 +40,9 @@ void PxpAdd(SW *psw, void *pobjA, void *pobjB, QW pos, QW vel, int arg5, int arg
         XPOBJ *pobj = pxpd->pobj;
         if (pobj) {
             pxpd->unk4 = pobj->unk0;
-            XPOWN *powner = pobj->powner;
-            pxpd->pso = (XPSO *)powner;
-            pxpd->unk8 = powner->psec->unk60;
+            SO *powner = pobj->powner;
+            pxpd->pso = powner;
+            pxpd->psoOxaOwner = powner->poxa->owner;
         }
         ixpd++;
         pxpd->posConv = ConvertXfPos(0, pxpd->unk4, pxpd->pos);
@@ -59,9 +56,9 @@ void PxpAdd(SW *psw, void *pobjA, void *pobjB, QW pos, QW vel, int arg5, int arg
     ixpd = 0;
     do {
         pxpd = &pxp->xpd[ixpd];
-        XPSO *pso = pxpd->pso;
+        SO *pso = pxpd->pso;
         if (pso)
-            pso->vt->fn((char *)pso + pso->vt->delta, pxp, ixpd);
+            pso->Slot55(pxp, ixpd);
         ixpd++;
     } while (ixpd < 2);
     RecalcSwXpMovement(psw, 1, &pxp);

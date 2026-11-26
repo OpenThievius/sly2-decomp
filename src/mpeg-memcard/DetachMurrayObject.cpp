@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "murray.h"
 #include "carry.h"
+#include "clock.h"
 struct XF;
 extern "C" void func_0012E460(void *);
 extern "C" void SetXfKind(SO *, XF *, int);
@@ -8,7 +9,6 @@ extern "C" void SetSoNoXpsAll(SO *, int);
 extern "C" void func_001A58D0(SO *, int, int);
 extern "C" void RecalcSwOxfFilterForObject(void *, MURRAY *);
 extern "C" char B_003DD490[];
-extern "C" float g_2dded0;
 extern "C" void DetachMurrayObject(MURRAY *pmurray)
 {
     func_0012E460(&pmurray->field_0x13F4);
@@ -32,7 +32,7 @@ extern "C" void DetachMurrayObject(MURRAY *pmurray)
     SetXfKind(pso, pso->pxfAngular, pmurray->field_0x1408);
     SetSoNoXpsAll(pso, 0);
     func_001A58D0(pso, 0, 0xF);
-    *(SO **)((char *)pmurray + 0x1430) = pso; /* psoDropped: as a member the store is scheduled after the float load, retail keeps it before */
-    pmurray->field_0x1434 = g_2dded0;
+    pmurray->psoDropped = pso;
+    pmurray->field_0x1434 = g_2dded0.t;
     RecalcSwOxfFilterForObject(B_003DD490, pmurray);
 }

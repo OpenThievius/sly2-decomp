@@ -10,6 +10,7 @@
 #include "ps2inline.h"
 #include "types.h"
 #include "phys.h"
+#include "step.h"
 #include "include_asm.h"
 
 extern "C" void RecalcSwXpAll(SW *);
@@ -95,11 +96,8 @@ void func_001F8F80(SW *psw, unsigned grf)
     }
 }
 
-struct VT { u8 unknown_0x0[0x2a8]; short delta; short index; int (*fn)(void *); };
-
-struct SOB { u8 unknown_0x0[0xc]; VT *vt; };
-
-struct XP { u8 unknown_0x0[8]; SOB *pso; u8 unknown_0xC[0x9c - 0xc]; int kind; u8 unknown_0xA0[0xa8 - 0xa0]; int num; XP *next; };
+/* pso: the OXA owner of the contact's side (PxpAdd stores poxa->owner here); a kind-0xE (custom) contact's object is a STEP */
+struct XP { u8 unknown_0x0[8]; SO *pso; u8 unknown_0xC[0x9c - 0xc]; int kind; u8 unknown_0xA0[0xa8 - 0xa0]; int num; XP *next; };
 
 int func_001F90D0(void *psw, int grf, int cso, SO **apso, int cxpMax, XP **axp)
 {
@@ -124,8 +122,7 @@ int func_001F90D0(void *psw, int grf, int cso, SO **apso, int cxpMax, XP **axp)
                 if (pxp->kind == 0xd)
                     continue;
                 if (pxp->kind == 0xe) {
-                    VT *vt = pxp->pso->vt;
-                    if ((vt->fn((char *)pxp->pso + vt->delta) & 4) == 0)
+                    if ((((STEP *)pxp->pso)->Slot85() & 4) == 0)
                         continue;
                 }
                 if (cxp >= cxpMax)

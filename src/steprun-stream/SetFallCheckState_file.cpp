@@ -48,7 +48,7 @@ void SetFallCheckState(FALLCHECK *self, int state)
 {
     ABSORBWKR absorb;
     if (self->state != state) {
-        *(int *)((char *)self + 4) = state; // a member store here schedules the g_2dded0.t load one slot early (score 2): kept as retail's cast
+        self->state = state;
         self->tState = g_2dded0.t;
         if (state == 2) {
             memset(&absorb, 0, 0x60);

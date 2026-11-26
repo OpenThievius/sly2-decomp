@@ -852,27 +852,19 @@ extern "C" void func_001A6CA8(S6CA8 *self, int arg1) {
     if (self->top & 1) ReinsertSwRoot_1A6CA8(B_003DD490_1A6CA8, self->field14);
 }
 
-struct ROOT { u8 unknown_0x0[0x28]; u64 grfo; };
-
-struct LO_1A6D28;
-
-/* LO slot 46 as SetLoGrfzon calls it, with an int (lo.h declares Slot46 without arguments). */
-struct VT_1A6D28 { u8 unknown_0x0[0x170]; short delta; short idx; void (*pfn)(LO_1A6D28 *, int); };
-
-struct LO_1A6D28 { u8 unknown_0x0[0xC]; VT_1A6D28 *pvt; LO_1A6D28 *pparent; ROOT **proot; };
-
 extern "C" char B_003DD490_1A6D28[];
 
-extern "C" void ReinsertSwRoot_1A6D28(char *, ROOT **);
+extern "C" void ReinsertSwRoot_1A6D28(char *, LO **);
 
-void SetLoGrfzon(LO_1A6D28 *plo, int grf)
+/* LO::proot (0x14) is declared as an s32; here it is the object's root slot, whose LO carries the flags in grfo. */
+void SetLoGrfzon(LO *plo, int grf)
 {
-    ROOT **proot = plo->proot;
+    LO **proot = (LO **)plo->proot;
     if ((((*proot)->grfo >> 60) & 1) == 1)
         ReinsertSwRoot_1A6D28(B_003DD490_1A6D28, proot);
-    plo->pvt->pfn((LO_1A6D28 *)((char *)plo + plo->pvt->delta), grf);
-    for (LO_1A6D28 *p = plo->pparent; p != 0; p = p->pparent)
-        ((unsigned char *)p)[0x2D] |= grf;
+    plo->Slot46(grf);
+    for (SO *pso = plo->psoParent; pso != 0; pso = pso->psoParent)
+        ((u8 *)&pso->grfo)[5] |= grf;
 }
 
 extern "C" {

@@ -80,7 +80,7 @@ extern "C" void SolveDzg__FP3DZGiiPP2XPPiPPP2SO(DZG *dzg, s32 arg1)
     iterator.m_ppv = (void **)list;
     iterator.m_pdl = (DL *)list;
     DLI *previous = g_2dd2fc;
-    s32 ibDle = *(s32 *)(list + 8);
+    s32 ibDle = ((DL *)list)->ibDle;
     g_2dd2fc = &iterator;
     iterator.m_pdliNext = previous;
     DZ *head = *(DZ **)list;

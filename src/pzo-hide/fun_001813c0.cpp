@@ -2,7 +2,7 @@
 extern float D_002BE870[3];
 #include "goal.h"
 struct GOAL_1813C0 : GOAL {
-    char pad_30[0x348];
+    u8 unknown_0x30[0x348];
     float x;
     float y;
     float z;

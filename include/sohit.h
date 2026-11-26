@@ -10,8 +10,8 @@
 struct SOHITBYTES8 { u8 bytes[8]; };
 
 struct SOHIT : PO {
-    virtual void Slot82();              /* 82: no named reader yet (slot 82 of PO's subclasses that are not STEP) */
-    virtual void Slot83();              /* 83: SoHit_PostLoad (func_0017F138) calls it after PostSoLoad, without arguments */
+    virtual void Slot82(int arg);       /* 82: RefCallSlot290 (the Splice binding of classes 71 to 76) passes one word (Splice type 0x2030) */
+    virtual void Slot83();              /* 83: SoHit_PostLoad (func_0017F138) calls it after PostSoLoad, without arguments; so does RefCallSlot298 (Splice) */
     /* 0x180 */ s32 hpMax;      /* SoHit_ResetState (func_0017F6B0) copies it to hp; Chaser_SetState does the same when its state leaves -1 */
     /* 0x184 */ s32 hp;         /* the same two; Chaser_FTakeHit reads it */
     /* 0x188 */ s32 dhp;        /* SoHit_Kill (the damage it deals on contact); Swarm_AdjustNewXp tests it */
