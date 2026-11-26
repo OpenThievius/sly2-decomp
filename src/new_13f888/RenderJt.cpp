@@ -1,16 +1,7 @@
 #include "sly2.h"
+#include "sly.h"
 
 struct SmoothParam { float a; float b; float c; };
-struct RenderObject {
-    u8 unknown_0x0[0x2D]; unsigned char grfo;
-    u8 unknown_0x2E[0x80 - 0x2E]; char globset[0xAC];
-    float uFade; u8 unknown_0x130[4]; void *prenderOptions;
-    u8 unknown_0x138[0x4C8 - 0x138]; int kind;
-    u8 unknown_0x4CC[0xF04 - 0x4CC]; int binoUse;
-    u8 unknown_0xF08[0xF20 - 0xF08]; int binoMode;
-    u8 unknown_0xF24[0x10D4 - 0xF24]; float uFadeA; float uFadeB;
-    u8 unknown_0x10DC[0x19A0 - 0x10DC]; RenderObject *ppartA; RenderObject *ppartB;
-};
 
 extern "C" {
 extern unsigned int g_2ddf54;
@@ -18,32 +9,32 @@ extern float g_2dded0[];
 extern const float D_FLT_002BD268;
 extern const float D_FLT_002BD26C;
 extern SmoothParam D_002BD270;
-extern RenderObject *g_2e1e40;
-void func_001F3C10(RenderObject *);
+extern SLY *g_2e1e40;
+void func_001F3C10(JT *);
 float GSmooth__FfffP3SMPPf(float, float, float, SmoothParam *, float *);
 void RenderGlobset(void *, void *, void *, float, float);
 }
 
-extern "C" void RenderJt(RenderObject *pjt)
+extern "C" void RenderJt(JT *pjt)
 {
-    if ((pjt->grfo & g_2ddf54) == 0) return;
+    if ((*((u8 *)&pjt->grfo + 5) & g_2ddf54) == 0) return;
     func_001F3C10(pjt);
-    if (pjt->binoUse == 1 && pjt->binoMode != 2) return;
+    if (pjt->binocState == 1 && pjt->binocPhase != 2) return;
     float goalA;
     float goalB;
-    if (pjt->kind == 2) {
+    if (pjt->attachKind == 2) {
         goalA = D_FLT_002BD268;
         goalB = D_FLT_002BD26C;
     } else {
         goalB = 1.0f;
         goalA = goalB;
     }
-    pjt->uFadeA = GSmooth__FfffP3SMPPf(pjt->uFadeA, goalA, g_2dded0[1], &D_002BD270, 0);
-    pjt->uFadeB = GSmooth__FfffP3SMPPf(pjt->uFadeB, goalB, g_2dded0[1], &D_002BD270, 0);
+    pjt->field_0x10D4 = GSmooth__FfffP3SMPPf(pjt->field_0x10D4, goalA, g_2dded0[1], &D_002BD270, 0);
+    pjt->field_0x10D8 = GSmooth__FfffP3SMPPf(pjt->field_0x10D8, goalB, g_2dded0[1], &D_002BD270, 0);
     if (pjt == g_2e1e40) {
-        pjt->ppartA->uFade = pjt->uFadeA;
-        pjt->ppartB->uFade = pjt->uFadeA;
+        ((SO *)g_2e1e40->apartHide[0])->uFade = pjt->field_0x10D4;
+        ((SO *)g_2e1e40->apartHide[1])->uFade = pjt->field_0x10D4;
     }
     float uFade = pjt->uFade;
-    RenderGlobset(pjt->globset, 0, pjt->prenderOptions, uFade * pjt->uFadeA, uFade * pjt->uFadeB);
+    RenderGlobset(&pjt->field_0x80, 0, pjt->field_0x134, uFade * pjt->field_0x10D4, uFade * pjt->field_0x10D8);
 }

@@ -10,6 +10,7 @@
 #include "clonepool.h"
 #include "lo.h"
 #include "so.h"
+#include "xfm.h"
 #include "phys.h"
 #include "include_asm.h"
 
@@ -151,8 +152,6 @@ void InstantiateClone(SW *sw, int iset, LO *parent, void *pxf, int oid, void *pm
     set->icloneFree = set->icloneFree + 1;
 }
 
-struct ROWS3 { VECTOR row[3]; };
-
 extern "C" unsigned MakeCloneId_1CA500(int, int);
 
 extern "C" void *PvAllocSwClearImpl__Fi_1CA500(ALLOCREQ *);
@@ -237,7 +236,13 @@ struct OPT { int a; int b; CFrame *pframe; int d; int e; int f; };
 
 union U { ALLOCREQ req; CFrame *clone; };
 
-struct XFMOPTIONS { u8 unknown_0x0[0xEC]; int count; OPT *options; };
+/* an XFM subclass with an array of frame options from 0xEC (func_001CA7B8, the clone method of the pool class by its position: CLONEPOOL's
+   own fields end at 0xEC, clonepool.h) */
+struct XFMOPTIONS : XFM {
+    u8 unknown_0xE0[0xC];
+    int count;
+    OPT *options;
+};
 
 extern "C" void CloneXfm(XFMOPTIONS *, XFMOPTIONS *);
 
@@ -528,24 +533,13 @@ void func_001CB5D0(SO *so, void *pool)
         child->Slot27(pool);
 }
 
-// the clone's search scope: its id word and active word are set by AllocSwBuffers and InitCloneSets
-struct CLONESCOPE {
-    s32 cloneid;
-    u8 unknown_0x4[0x20];
-    s32 active;
-};
 extern "C" int IcloneFromCloneId_1CB658(int);
 extern "C" int IsetFromCloneId_1CB658(int);
 extern CLONESET *B_003E1398_1CB658;
-// LO::pscope read as the clone's scope (CLONESCOPE) instead of lo.h's SCOPE, whose first word it does not declare
-struct CLONEOBJECT {
-    u8 unknown_0x0[0x3C];
-    CLONESCOPE *pscope;
-};
-extern "C" CLONEPOOL *PpoolFromLoClone(CLONEOBJECT *self) {
-    if (self->pscope == 0 || self->pscope->active == 0) return 0;
-        int set_index = IsetFromCloneId_1CB658(self->pscope->cloneid);
-        int clone_index = IcloneFromCloneId_1CB658(self->pscope->cloneid);
+extern "C" CLONEPOOL *PpoolFromLoClone(LO *self) {
+    if (self->pscope == 0 || self->pscope->field_0x24 == 0) return 0;
+        int set_index = IsetFromCloneId_1CB658(self->pscope->field_0x0);
+        int clone_index = IcloneFromCloneId_1CB658(self->pscope->field_0x0);
         CLONESET *set = &B_003E1398_1CB658[set_index];
         CLONELEASE *lease = set->axf;
         lease += clone_index - set->icloneFree;

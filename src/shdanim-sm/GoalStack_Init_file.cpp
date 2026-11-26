@@ -188,22 +188,6 @@ extern "C" void Goal_Pop(GOAL **slot)
 
 struct OBJ { int a; int b; u8 unknown_0x8[4]; void *vt; };
 
-/* the goals PgoalConstruct clears and then touches beyond their head: 0x9C (a range at 0x30), 0xBA (three targets at 0x40) and 0xBF (one at 0x30) */
-struct GOAL_9C : OBJ {
-    u8 unknown_0x10[0x20];
-    u8 unknown_0x30[0x70];
-};
-
-struct GOAL_BA : OBJ {
-    u8 unknown_0x10[0x30];
-    GOALTARGET target[3];
-};
-
-struct GOAL_BF : OBJ {
-    u8 unknown_0x10[0x20];
-    GOALTARGET target;
-};
-
 extern "C" void func_002562A8(void *);
 
 extern "C" char D_002CC1C0[];
@@ -294,7 +278,7 @@ void *PgoalConstruct(int type, OBJ *obj, void *result)
         obj->a = 0;
         obj->vt = D_002D04A0;
         obj->b = 0;
-        memset(((GOAL_9C *)obj)->unknown_0x30, 0, 0x70);
+        memset(&((GOALBRAIN *)obj)->cmd, 0, 0x70);
         result = obj;
         break;
     case 0x9D:
@@ -540,9 +524,9 @@ void *PgoalConstruct(int type, OBJ *obj, void *result)
         obj->a = 0;
         obj->vt = D_002CFE20;
         obj->b = 0;
-        func_002562A8(&((GOAL_BA *)obj)->target[0]);
-        func_002562A8(&((GOAL_BA *)obj)->target[1]);
-        func_002562A8(&((GOAL_BA *)obj)->target[2]);
+        func_002562A8(&((GOALGOTO *)obj)->target);
+        func_002562A8(&((GOALGOTO *)obj)->targetResolved);
+        func_002562A8(&((GOALGOTO *)obj)->targetSnap);
         result = obj;
         break;
     case 0xBD:
@@ -564,7 +548,7 @@ void *PgoalConstruct(int type, OBJ *obj, void *result)
         obj->a = 0;
         obj->vt = D_002CFC20;
         obj->b = 0;
-        func_002562A8(&((GOAL_BF *)obj)->target);
+        func_002562A8(&((GOALSNAPTOPOINT *)obj)->target);
         result = obj;
         break;
     case 0xC0:

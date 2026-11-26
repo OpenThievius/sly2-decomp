@@ -47,7 +47,9 @@ struct STEPGUARDVIEW {
     /* 0x33C */ s32 field_0x33C;
     u8 unknown_0x340[0x34C - 0x340];
     /* 0x34C */ struct ASEGA *pasega;
-    u8 unknown_0x350[0x38C - 0x350];
+    u8 unknown_0x350[0x364 - 0x350];
+    /* 0x364 */ s32 field_0x364; /* STEPGUARD::field_0x364 (stepguard.h: func_00208E70); fun_001b9f80 clears it */
+    u8 unknown_0x368[0x38C - 0x368];
     /* 0x38C */ struct BASIC *pbasicAlert;
     /* 0x390 */ s32 field_0x390;
     /* 0x394 */ s32 cgroup;
@@ -58,14 +60,18 @@ struct STEPGUARDVIEW {
     /* 0x3C0 */ s32 cclassFilter;
     u8 unknown_0x3C4[0x3CC - 0x3C4];
     /* 0x3CC */ struct ALERT *palert;
-    u8 unknown_0x3D0[0x4C0 - 0x3D0];
+    u8 unknown_0x3D0[0x4A4 - 0x3D0];
+    /* 0x4A4 */ s32 field_0x4A4; /* STEPGUARD::field_0x4A4 (stepguard.h: func_0014B1A0); fun_001b9f80 sets 1 */
+    u8 unknown_0x4A8[0x4C0 - 0x4A8];
     /* 0x4C0 */ s32 canim;
     u8 unknown_0x4C4[0xC];
     /* 0x4D0 */ struct GUARDANIM aanim[0x20];
     /* 0x8D0 */ struct ANIMREF aarefA[26];
     /* 0xA70 */ struct ANIMREF aarefB[26];
     /* 0xC10 */ struct ANIMREF aarefC[26];
-    u8 unknown_0xDB0[0xF04 - 0xDB0];
+    u8 unknown_0xDB0[0xE64 - 0xDB0];
+    /* 0xE64 */ s32 sensing; /* STEPGUARD::sensing (stepguard.h: func_00208D70); fun_001b9f80 clears it */
+    u8 unknown_0xE68[0xF04 - 0xE68];
     /* 0xF04 */ f32 tCooldown;
     u8 unknown_0xF08[0xF3C - 0xF08];
     /* 0xF3C */ s32 fFlag;

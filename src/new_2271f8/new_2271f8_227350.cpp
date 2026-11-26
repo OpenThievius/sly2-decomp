@@ -4,26 +4,10 @@
 #include "types.h"
 #include "clock.h"
 #include "sw.h"
+#include "xfm.h"
+#include "bspzone.h"
 
-struct CBSP;
 struct CBinaryInputStream;
-
-/* the convex-volume zone these functions load and test: an XFM-based object with a point-in-BSP test and an inside flag
-   (func_00227380 loads it, func_002273F0 tests a point, func_00227440 changes the flag) */
-struct BSPC {
-    u8 unknown_0x0[0xC];
-    /* 0xC */ struct CBSP *pcbsp;  /* func_002273F0 asks it whether a point is inside */
-};
-
-struct BSPZONE {
-    u8 unknown_0x0[0xE0];
-    /* 0xE0 */ u32 grf;            /* func_00227380 reads it from the file (U32Read) */
-    u8 unknown_0xE4[0x4];
-    /* 0xE8 */ struct BSPC bspc;   /* func_00227380 reads it (ReadBspc against geom) */
-    /* 0xF8 */ u8 geom[0x18];      /* func_00227380 reads it (ReadGeom); the size is the gap up to state */
-    /* 0x110 */ s32 state;         /* func_00227350 sets -1; func_00227440 sets 0 or 1 (inside) and stamps tState */
-    /* 0x114 */ f32 tState;        /* the clock time of the last change of state */
-};
 
 extern "C" void InitXfm(void *pxfm);
 

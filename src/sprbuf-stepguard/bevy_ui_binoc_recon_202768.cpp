@@ -1,32 +1,4 @@
-#include "blot.h"
-
-/* A recon target: RECON, an ALO subclass (class 46, 0x120 bytes; sprbuf_stepguard_202d38.cpp). */
-struct RECON : LO {
-    u8 unknown_0x50[0x9C];
-    /* 0xEC */ void *ptask;
-    u8 unknown_0xF0[0x4];
-    /* 0xF4 */ s32 field_0xF4;      /* the binocular state 7 copies it to BINOCRECON::field_0xBC */
-    u8 unknown_0xF8[0x4];
-    /* 0xFC */ s32 stream;          /* the stream (-1: none) and wipe argument the binocular state 9 starts */
-};
-
-/* The binocular recon screen (the bevy_ui_binoc_recon functions): its state, the recon targets and the two blots it shows. */
-struct BINOCRECON {
-    /* 0x0 */ s32 state;
-    u8 unknown_0x4[0x70];
-    /* 0x74 */ s32 clist;           /* the targets listed on the screen (bevy_ui_binoc_recon_202030) */
-    u8 unknown_0x78[0x14];
-    /* 0x8C */ RECON *precon;       /* the target being looked at */
-    u8 unknown_0x90[0x10];
-    /* 0xA0 */ s32 grfSaved;        /* state 8 saves the focus object's flags here and puts them back when it leaves */
-    /* 0xA4 */ s32 wipe;
-    /* 0xA8 */ LO **pplo;           /* the focus object */
-    /* 0xAC */ BLOT *pblotA;
-    /* 0xB0 */ BLOT *pblotB;
-    u8 unknown_0xB4[0x8];
-    /* 0xBC */ s32 field_0xBC;
-    /* 0xC0 */ s32 field_0xC0;
-};
+#include "recon.h"
 
 /* the field pblotB's subclass of BLOT keeps at 0xF4: the target it shows */
 struct RECONBLOTVIEW {
@@ -134,12 +106,12 @@ void bevy_ui_binoc_recon_202768(BINOCRECON *arg0, int arg1) {
             func_0014FE28(&B_002DE390);
             SetBlotModal(arg0->pblotA, -1);
             arg0->pblotA->Select(0x310);
-            if (arg0->wipe != 0) {
+            if (arg0->pobjWipe != 0) {
                 int stream = arg0->precon->stream;
                 if (stream != -1) {
                     StartStream(&B_003DD040, stream, 0);
                 }
-                StartWipe(arg0->wipe, 0x608, arg0->precon->stream);
+                StartWipe((int)arg0->pobjWipe, 0x608, arg0->precon->stream);
             }
             SetReconTargetDone(arg0->precon, 1);
             bevy_camera_follow_activity(&B_002DEB30, 0xA, 0);
@@ -157,9 +129,9 @@ void bevy_ui_binoc_recon_202768(BINOCRECON *arg0, int arg1) {
         arg0->state = arg1;
         switch (arg1) {
         case 0:
-            arg0->field_0xBC = -1;
+            arg0->sidA = -1;
             arg0->precon = 0;
-            arg0->field_0xC0 = -1;
+            arg0->sidB = -1;
             ClearReconVisibility(arg0, previous);
             arg0->pblotA->Select(-1);
             HideReconLinks(arg0);
@@ -180,7 +152,7 @@ void bevy_ui_binoc_recon_202768(BINOCRECON *arg0, int arg1) {
             return;
         case 7:
             SetEmitterUnpositioned(NewEmitter(0x52, previous), 0);
-            arg0->field_0xBC = arg0->precon->field_0xF4;
+            arg0->sidA = arg0->precon->field_0xF4;
             func_00213B00(arg0->pblotA, 0x356);
             func_00213B00(arg0->pblotB, 0x356);
             func_00213B00(arg0->pblotB, 0x357);
@@ -211,9 +183,9 @@ void bevy_ui_binoc_recon_202768(BINOCRECON *arg0, int arg1) {
             arg0->pblotB->Select(0x339);
             return;
         case 10:
-            arg0->field_0xBC = -1;
+            arg0->sidA = -1;
             arg0->precon = 0;
-            arg0->field_0xC0 = -1;
+            arg0->sidB = -1;
             arg0->pblotB->Hide();
             arg0->pblotA->Hide();
             ShowReconLinks(arg0);

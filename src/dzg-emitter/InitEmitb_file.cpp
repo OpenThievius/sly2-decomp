@@ -4,7 +4,12 @@
 #include "sly2.h"
 #include "lo.h"
 #include "so.h"
+#include "emitter.h"
 #include "expl.h"
+#include "alo.h"
+#include "rip.h"
+#include "blip.h"
+#include "cm.h"
 #include "m2c_macros.h"
 #include "types.h"
 #include "alloc.h"
@@ -12,11 +17,7 @@
 #include "vu0inline.h"
 #include "ps2inline.h"
 
-struct EMITB { int refs; int pk; u8 unknown_0x8[8]; QW a[4]; QW b[7]; };
-
 struct BLK { QW q[4]; };
-
-struct BLK2 { QW q[7]; };
 
 // A vector whose first float is a union's.
 struct __attribute__((aligned(16))) QUADRATIC_15CAD8 {
@@ -58,13 +59,11 @@ extern "C" EXPLB_15CAD8 B_002DE5F0;
 extern "C" void InitEmitb(EMITB *pemitb)
 {
     memset(pemitb, 0, 0x100);
-    pemitb->refs = 1;
-    pemitb->pk = -1;
-    *(BLK *)&pemitb->a[0] = g_2de5b0;
-    *(BLK2 *)&pemitb->b[0] = *(BLK2 *)&B_002DE5F0;
+    pemitb->cref = 1;
+    pemitb->emitpk = -1;
+    *(BLK *)&pemitb->emitok = g_2de5b0;
+    pemitb->emitv = *(EMITV *)&B_002DE5F0;
 }
-
-struct EMITTER { u8 unknown_0x0[0x40]; unsigned tagged; u8 unknown_0x44[0xAC]; int unkF0; int unkF4; float unkF8; float unkFC; u8 unknown_0x100[0x18]; int unk118; char dl[0x2C]; float unk148; };
 
 extern "C" void InitXfm(EMITTER *);
 
@@ -75,20 +74,20 @@ extern "C" void func_001A6CA8(EMITTER *, int);
 void InitEmitter(EMITTER *pemitter)
 {
     InitXfm(pemitter);
-    pemitter->unkF4 = -1;
-    pemitter->unkF0 = -1;
-    pemitter->unk118 = -1;
-    pemitter->unkFC = 10.0f;
-    pemitter->unkF8 = 10.0f;
-    pemitter->unk148 = -1.0f;
-    InitDl__FP2DLi(pemitter->dl, 0x128);
+    pemitter->cParticlesLeft = -1;
+    pemitter->emitk = -1;
+    pemitter->oidTarget = -1;
+    pemitter->lmRate.gMax = 10.0f;
+    pemitter->lmRate.gMin = 10.0f;
+    pemitter->tUnpause = -1.0f;
+    InitDl__FP2DLi(&pemitter->dlSrc, 0x128);
     func_001A6CA8(pemitter, 0);
-    unsigned tagged = pemitter->tagged;
-    if (((tagged ^ 1) & 1) != 0) {
-        unsigned *pu = (unsigned *)tagged;
+    unsigned grfSw = pemitter->grfSw;
+    if (((grfSw ^ 1) & 1) != 0) {
+        unsigned *pu = (unsigned *)grfSw;
         *pu = *pu | 2;
     } else {
-        pemitter->tagged = tagged | 2;
+        pemitter->grfSw = grfSw | 2;
     }
 }
 
@@ -106,116 +105,76 @@ void AddSwFocusFollower_thunk(s32 arg0) {
 
 struct UL_159500 { u64 v; } __attribute__((packed));
 
-struct Bytes8_159500 { char b[8]; };
-
-struct ALLOCREQ_159500 { int size; int align; };
-
-struct BOX_159500 { float minX, minY, minZ, minW; float maxX, maxY, maxZ, maxW; };
-
-struct EMITB_159500 {
-    int cref;
-    u8 unknown_0x4[4];
-    int *pflag;
-    u8 unknown_0xC[4];
-    int type;
-    u8 unknown_0x14[0xC];
-    int oidFollow;
-    u8 unknown_0x24[0xC];
-    BOX_159500 *pbox;
-};
-
-struct EMITTER_159500 : LO {
-    u8 unknown_0x50[0x90];
-    int fE0;
-    EMITB_159500 *pemitb;
-    u8 unknown_0xE8[8];
-    int mode;
-    int fF4;
-    union { Bytes8_159500 bF8; struct { float gMin, gMax; } lmF8; };
-    int f100;
-    float f104;
-    union { Bytes8_159500 b108; struct { float gMin, gMax; } lm108; };
-    float f110;
-    int f114;
-    int oidTarget;
-    char dl11C[0x14];
-    float f130;
-    float f134;
-    float f138;
-    float f13C;
-    float f140;
-};
-
 extern "C" const UL_159500 RO_002A5140;
 
 extern "C" const float RO_002A5148;
 
 extern "C" char B_003DD490_159500[];
 
-extern "C" void BindEmitter(EMITTER_159500 *);
+extern "C" void BindEmitter(EMITTER *);
 
-extern "C" void QueueSwCallback(char *, EMITTER_159500 *, u64, int);
+extern "C" void QueueSwCallback(char *, EMITTER *, u64, int);
 
 extern "C" float GRandInRange(float, float);
 
-extern "C" void PauseEmitterIndefinite__FP7EMITTER_159500(EMITTER_159500 *);
+extern "C" void PauseEmitterIndefinite__FP7EMITTER_159500(EMITTER *);
 
-extern "C" void PauseEmitter__FP7EMITTERf_159500(EMITTER_159500 *, float);
+extern "C" void PauseEmitter__FP7EMITTERf_159500(EMITTER *, float);
 
-extern "C" EMITTER_159500 *PloFindSwObject_thunk(char *, int, int, void *);
+extern "C" EMITTER *PloFindSwObject_thunk(char *, int, int, void *);
 
-extern "C" EMITTER_159500 *PloNew(int, void *, int, int);
+extern "C" EMITTER *PloNew(int, void *, int, int);
 
-extern "C" void *PvAllocSwCopyImpl__FiPv(ALLOCREQ_159500 *, void *);
+extern "C" void *PvAllocSwCopyImpl__FiPv(ALLOCREQ *, void *);
 
-extern "C" void func_001A6CA8_159500(EMITTER_159500 *, int);
+extern "C" void func_001A6CA8_159500(EMITTER *, int);
 
-extern "C" void *PmatLoWorld(EMITTER_159500 *);
+extern "C" void *PmatLoWorld(EMITTER *);
 
-extern "C" void AppendDlEntry(char *, EMITTER_159500 *);
+extern "C" void AppendDlEntry(void *, EMITTER *);
 
-extern "C" void CEmitter_PostLoad(EMITTER_159500 *pemitter)
+extern "C" void CEmitter_PostLoad(EMITTER *pemitter)
 {
     BindEmitter(pemitter);
-    if (*pemitter->pemitb->pflag != 0)
+    if (pemitter->pemitb->pinfo->plo != 0)
         QueueSwCallback(B_003DD490_159500, pemitter, RO_002A5140.v, 0);
-    if (pemitter->mode == -1) {
-        if (pemitter->f104 != 0.0f || pemitter->f114 != 0)
-            pemitter->mode = 3;
-        else if (pemitter->f110 != 0.0f)
-            pemitter->mode = 1;
+    if (pemitter->emitk == -1) {
+        if (pemitter->uPause != 0.0f || pemitter->fPauseIndefinite != 0)
+            pemitter->emitk = 3;
+        else if (pemitter->cMax != 0.0f)
+            pemitter->emitk = 1;
         else
-            pemitter->mode = 0;
+            pemitter->emitk = 0;
     }
-    switch (pemitter->mode) {
+    switch (pemitter->emitk) {
     case 2:
-        pemitter->f138 = RO_002A5148;
-        pemitter->f130 = GRandInRange(pemitter->lmF8.gMin, pemitter->lmF8.gMax);
-        if (pemitter->f114 != 0)
+        pemitter->tReset = RO_002A5148;
+        pemitter->rate = GRandInRange(pemitter->lmRate.gMin, pemitter->lmRate.gMax);
+        if (pemitter->fPauseIndefinite != 0)
             PauseEmitterIndefinite__FP7EMITTER_159500(pemitter);
-        else if (GRandInRange(0.0f, 1.0f) <= pemitter->f104)
-            PauseEmitter__FP7EMITTERf_159500(pemitter, GRandInRange(pemitter->lm108.gMin, pemitter->lm108.gMax));
+        else if (GRandInRange(0.0f, 1.0f) <= pemitter->uPause)
+            PauseEmitter__FP7EMITTERf_159500(pemitter, GRandInRange(pemitter->lmPause.gMin, pemitter->lmPause.gMax));
         break;
     case 3:
-        pemitter->f138 = RO_002A5148;
-        pemitter->f130 = GRandInRange(pemitter->lmF8.gMin, pemitter->lmF8.gMax) * 60.0f;
-        if (pemitter->f114 != 0)
+        pemitter->tReset = RO_002A5148;
+        pemitter->rate = GRandInRange(pemitter->lmRate.gMin, pemitter->lmRate.gMax) * 60.0f;
+        if (pemitter->fPauseIndefinite != 0)
             PauseEmitterIndefinite__FP7EMITTER_159500(pemitter);
-        else if (GRandInRange(0.0f, 1.0f) <= pemitter->f104)
-            PauseEmitter__FP7EMITTERf_159500(pemitter, GRandInRange(pemitter->lm108.gMin, pemitter->lm108.gMax));
+        else if (GRandInRange(0.0f, 1.0f) <= pemitter->uPause)
+            PauseEmitter__FP7EMITTERf_159500(pemitter, GRandInRange(pemitter->lmPause.gMin, pemitter->lmPause.gMax));
         break;
     case 0:
     case 1:
-        pemitter->f138 = 1.0f;
-        pemitter->f134 = 1.0f;
-        pemitter->f130 = GRandInRange(pemitter->lmF8.gMin, pemitter->lmF8.gMax);
+        pemitter->tReset = 1.0f;
+        pemitter->dtReset = 1.0f;
+        pemitter->rate = GRandInRange(pemitter->lmRate.gMin, pemitter->lmRate.gMax);
         break;
     }
-    EMITB_159500 *pemitb = pemitter->pemitb;
-    pemitter->f13C = 1.0f;
-    if (pemitb->type == 1) {
-        BOX_159500 *pbox = pemitb->pbox;
-        if (*pemitb->pflag != 0) {
+    EMITB *pemitb = pemitter->pemitb;
+    pemitter->svRate = 1.0f;
+    if (pemitb->emitok == 1) {
+        EMITBBOX *pbox = pemitb->pbox;
+        if (pemitb->pinfo->plo != 0) {
             float dx = fabsf(pbox->maxX - pbox->minX);
             float dy = fabsf(pbox->maxY - pbox->minY);
             float dz = fabsf(pbox->maxZ - pbox->minZ);
@@ -226,46 +185,46 @@ extern "C" void CEmitter_PostLoad(EMITTER_159500 *pemitter)
                 r = dy;
             else
                 r = dz;
-            pemitter->f140 = r * 0.5f;
+            pemitter->sRadius = r * 0.5f;
         }
-        if (pemitter->f100 != 0) {
-            if (pemitter->f110 != 0.0f)
-                pemitter->f13C = (pbox->maxX - pbox->minX) * (pbox->maxY - pbox->minY) * (pbox->maxZ - pbox->minZ) * 0.000001f;
+        if (pemitter->field_0x100 != 0) {
+            if (pemitter->cMax != 0.0f)
+                pemitter->svRate = (pbox->maxX - pbox->minX) * (pbox->maxY - pbox->minY) * (pbox->maxZ - pbox->minZ) * 0.000001f;
             else
-                pemitter->f13C = (pbox->maxY - pbox->minY) * (pbox->maxZ - pbox->minZ) * 0.0001f;
+                pemitter->svRate = (pbox->maxY - pbox->minY) * (pbox->maxZ - pbox->minZ) * 0.0001f;
         }
     }
     if (pemitter->oidTarget != -1) {
-        EMITTER_159500 *ptarget = PloFindSwObject_thunk(B_003DD490_159500, 5, pemitter->oidTarget, 0);
+        EMITTER *ptarget = PloFindSwObject_thunk(B_003DD490_159500, 5, pemitter->oidTarget, 0);
         if (ptarget == 0) {
             ptarget = PloNew(0x1D, 0, pemitter->oidTarget, -1);
-            ALLOCREQ_159500 req;
-            req.size = 0x100;
-            req.align = 0x10;
-            EMITB_159500 *pemitbNew = (EMITB_159500 *)PvAllocSwCopyImpl__FiPv(&req, pemitter->pemitb);
+            ALLOCREQ req;
+            req.cb = 0x100;
+            req.cbAlign = 0x10;
+            EMITB *pemitbNew = (EMITB *)PvAllocSwCopyImpl__FiPv(&req, pemitter->pemitb);
             ptarget->pemitb = pemitbNew;
             pemitbNew->cref = 1;
-            int *pflag = pemitter->pemitb->pflag;
-            if (*pflag != 0) {
-                req.align = 0x10;
-                req.size = 0x14;
-                ptarget->pemitb->pflag = (int *)PvAllocSwCopyImpl__FiPv(&req, pflag);
-                ptarget->pemitb->oidFollow = -1;
-                *ptarget->pemitb->pflag = 0;
+            EMITBINFO *pinfo = pemitter->pemitb->pinfo;
+            if (pinfo->plo != 0) {
+                req.cbAlign = 0x10;
+                req.cb = 0x14;
+                ptarget->pemitb->pinfo = (EMITBINFO *)PvAllocSwCopyImpl__FiPv(&req, pinfo);
+                ptarget->pemitb->oidReference = -1;
+                ptarget->pemitb->pinfo->plo = 0;
             }
-            ptarget->mode = pemitter->mode;
-            ptarget->fF4 = pemitter->fF4;
-            ptarget->bF8 = pemitter->bF8;
-            ptarget->f100 = pemitter->f100;
-            ptarget->f104 = pemitter->f104;
-            ptarget->b108 = pemitter->b108;
-            ptarget->f110 = pemitter->f110;
-            ptarget->f114 = pemitter->f114;
+            ptarget->emitk = pemitter->emitk;
+            ptarget->cParticlesLeft = pemitter->cParticlesLeft;
+            ptarget->bytesRate = pemitter->bytesRate;
+            ptarget->field_0x100 = pemitter->field_0x100;
+            ptarget->uPause = pemitter->uPause;
+            ptarget->bytesPause = pemitter->bytesPause;
+            ptarget->cMax = pemitter->cMax;
+            ptarget->fPauseIndefinite = pemitter->fPauseIndefinite;
             func_001A6CA8_159500(ptarget, 1);
             ptarget->Slot30(PmatLoWorld(pemitter));
         }
-        pemitter->fE0 = 0;
-        AppendDlEntry(ptarget->dl11C, pemitter);
+        pemitter->ensured = 0;
+        AppendDlEntry(&ptarget->dlSrc, pemitter);
         int flags = pemitter->grfSw;
         if (((flags ^ 1) & 1) != 0)
             *(int *)flags &= ~2;
@@ -275,63 +234,37 @@ extern "C" void CEmitter_PostLoad(EMITTER_159500 *pemitter)
 }
 
 extern "C" {
-typedef struct EmitterBlock {
-    u8 unknown_0x0[8];
-    s32 *field_0x8;
-} EmitterBlock;
-
-typedef struct EMITTER_159968 {
-    u8 unknown_0x0[0xE4];
-    EmitterBlock *field_0xE4;
-} EMITTER_159968;
-
-void func_001A58D0(EMITTER_159968 *, s32, s32); /* extern */
+void func_001A58D0(EMITTER *, s32, s32); /* extern */
 
 s32 func_001A5BF0(s32); /* extern */
 
-void AttachEmitterToReference(EMITTER_159968 *emitter) {
-    func_001A58D0(emitter, func_001A5BF0(*emitter->field_0xE4->field_0x8), 0);
+void AttachEmitterToReference(EMITTER *emitter) {
+    func_001A58D0(emitter, func_001A5BF0((s32)emitter->pemitb->pinfo->plo), 0);
 }
 }
 
 extern "C" void UnsubscribeLoObject(void *, void *);
 
-// An emitter's two followed objects, at 0x14C and 0x150 (the fields UpdateEmitter reads as pv14C and p150).
-struct EMITTER_1599A8 {
-    u8 unknown_0x0[0x14C];
-    void *pv14C;
-    void *p150;
-};
-
-void HandleEmitterMessage(EMITTER_1599A8 *pemitter, int msgid, void *pv) {
+void HandleEmitterMessage(EMITTER *pemitter, int msgid, void *pv) {
     if (msgid == 1) {
-        if (pv == pemitter->pv14C) {
+        if (pv == pemitter->pripg) {
             UnsubscribeLoObject(pv, pemitter);
-            pemitter->pv14C = 0;
-        } else if (pv == pemitter->p150) {
+            pemitter->pripg = 0;
+        } else if (pv == pemitter->pblipg) {
             UnsubscribeLoObject(pv, pemitter);
-            pemitter->p150 = 0;
+            pemitter->pblipg = 0;
         }
     }
 }
 
 extern "C" {
-typedef struct EMITTER_159A08 {
-    u8 unknown_0x0[0xE0];
-    s32 field_0xE0;
-} EMITTER_159A08;
-
-EMITTER_159A08 *func_00159A08(EMITTER_159A08 *emitter, s32 value) {
+EMITTER *func_00159A08(EMITTER *emitter, s32 value) {
     if (value == 1) {
-        emitter->field_0xE0 = value;
+        emitter->ensured = value;
     }
     return emitter;
 }
 }
-
-struct EMITFOLLOW { void *ploTarget; };
-
-struct EMITB_159A20 { u8 unknown_0x0[0x4]; s32 fFree; EMITFOLLOW *pfollow; };
 
 struct EMITBLOCK {
     u8 unknown_0x0[0x1080];
@@ -343,24 +276,13 @@ struct EMITBLOCK {
 
 struct PARTBUF { VECTOR avec[0x84]; };
 
-struct EMITLISTOWNER { u8 unknown_0x0[0x448]; EMITBLOCK *pblockFirst; };
-
-struct EMITTER_159A20 {
-    u8 unknown_0x0[0xE4];
-    EMITB_159A20 *pemitb;
-    u8 unknown_0xE8[0x58];
-    f32 sRadius;
-    u8 unknown_0x144[0xC];
-    EMITLISTOWNER *powner;
-};
-
 union VU_SCALE { QW q; VECTOR v; };
 
 extern "C" QW PosLoWorld(void *);
 
 extern "C" f32 GModPositive__Fff(f32, f32);
 
-extern "C" void ModifyEmitterParticles__FP7EMITTER(EMITTER_159A20 *pemitter)
+extern "C" void ModifyEmitterParticles__FP7EMITTER(EMITTER *pemitter)
 {
     VECTOR vecScale;
     VECTOR vecMin;
@@ -370,11 +292,11 @@ extern "C" void ModifyEmitterParticles__FP7EMITTER(EMITTER_159A20 *pemitter)
         vecScale.z = pemitter->sRadius;
         vecScale.y = pemitter->sRadius;
         vecScale.x = pemitter->sRadius;
-        void *plo = pemitter->pemitb->pfollow->ploTarget;
+        LO *plo = pemitter->pemitb->pinfo->plo;
         if (plo != 0) {
             QW pos = PosLoWorld(plo);
             *(QW *)&vecMin = VectorSub(pos, *(QW *)&vecScale);
-            *(QW *)&vecMax = VectorAdd(PosLoWorld(pemitter->pemitb->pfollow->ploTarget), *(QW *)&vecScale);
+            *(QW *)&vecMax = VectorAdd(PosLoWorld(pemitter->pemitb->pinfo->plo), *(QW *)&vecScale);
         } else {
             VU_SCALE minusOne;
             minusOne.q = VectorFromFloat(-1.0f);
@@ -387,9 +309,9 @@ extern "C" void ModifyEmitterParticles__FP7EMITTER(EMITTER_159A20 *pemitter)
         vecScale.z = sRange;
         vecScale.y = sRange;
         vecScale.x = sRange;
-        if (pemitter->pemitb->fFree == 0) {
-            if (pemitter->powner != 0) {
-                for (EMITBLOCK *pblock = pemitter->powner->pblockFirst; pblock != 0; pblock = pblock->pnext) {
+        if (pemitter->pemitb->emitpk == 0) {
+            if (pemitter->pblipg != 0) {
+                for (EMITBLOCK *pblock = (EMITBLOCK *)pemitter->pblipg->dlBlips.head; pblock != 0; pblock = pblock->pnext) {
                     s32 i = 0;
                     VECTOR *avec = ((PARTBUF *)pblock)[pblock->iSlot].avec;
                     if (pblock->cparticle > 0) {
@@ -416,84 +338,18 @@ extern "C" void ModifyEmitterParticles__FP7EMITTER(EMITTER_159A20 *pemitter)
     }
 }
 
-struct DL;
-struct CM {
-    u8 unknown_0x0[0x1C];
-    float scale;     /* scales a source's radius into the camera's audible range */
-    u8 unknown_0x20[0x90 - 0x20];
-    QW pos;          /* the camera's position */
-};
-struct SRC_159C80 {  /* an object in the emitter's source list */
-    u8 unknown_0x0[0x10];
-    void *psoParent;
-    u8 unknown_0x14[0x38 - 0x14];
-    float radius;
-    u8 unknown_0x3C[0x128 - 0x3C];
+struct SRC_159C80 : LO {  /* an object in the emitter's source list: a DLE at 0x128 links it */
+    u8 unknown_0x50[0xD8];
     SRC_159C80 *pNext;
-};
-struct EMITHOLD_159C80 {
-    void *pemitterOwner;
-    int c;
-};
-struct EMITB_159C80 {
-    u8 unknown_0x0[4];
-    int fPerSource;
-    EMITHOLD_159C80 *phold;
-};
-struct EMITG_159C80 {
-    void *p150;
-    void *p14C;
-    void *pemitter;
-};
-struct RIPG_159C80 {  /* the ripple group (RIPG) an emitter feeds, 0x14C */
-    u8 unknown_0x0[0x15C];
-    u8 dlRip[0xC];    /* a DL: counted with CPvDl */
-};
-struct BLIPG_159C80 {  /* the blip group (BLIPG) an emitter feeds, 0x150 */
-    u8 unknown_0x0[0x444];
-    int cblip;
-};
-struct EMITTER_159C80 {
-    u8 unknown_0x0[0x10];
-    void *psoParent;
-    u8 unknown_0x14[0x38 - 0x14];
-    float radius;
-    u8 unknown_0x3C[0xE0 - 0x3C];
-    int fValuesChanged;
-    EMITB_159C80 *pemitb;
-    u8 unknown_0xE8[0xF0 - 0xE8];
-    int emitk;
-    int cParticlesLeft;
-    float tPauseMin;
-    float tPauseMax;
-    u8 unknown_0x100[0x104 - 0x100];
-    float uPause;
-    float dtPauseMin;
-    float dtPauseMax;
-    float cMax;
-    int fPauseIndefinite;
-    int stateOn;
-    SRC_159C80 *psrcFirst;  /* the source list (a DL) */
-    u8 unknown_0x120[0x130 - 0x120];
-    float rate;
-    float dtReset;
-    float tReset;
-    float svRate;
-    u8 unknown_0x140[0x144 - 0x140];
-    float fracParticles;
-    u8 unknown_0x148[0x14C - 0x148];
-    RIPG_159C80 *pv14C;
-    BLIPG_159C80 *p150;
 };
 struct CLOCK_159C80 { float t; float dt; };  /* 0x2DDED0; the whole file declares g_2dded0 as f32, so the pair is read through it */
 
 extern "C" {
-void OnEmitterValuesChanged__FP7EMITTER_159C80(EMITTER_159C80 *);
-void PauseEmitterIndefinite__FP7EMITTER(EMITTER_159C80 *);
-void PauseEmitter__FP7EMITTERf_159C80(EMITTER_159C80 *, float);
-int FPausedEmitter__FP7EMITTER_159C80(EMITTER_159C80 *);
-void ModifyEmitterParticles__FP7EMITTER_159C80(EMITTER_159C80 *);
-void EmitParticles__FiP5EMITBP5EMITG(int, EMITB_159C80 *, EMITG_159C80 *);
+void OnEmitterValuesChanged__FP7EMITTER_159C80(EMITTER *);
+void PauseEmitterIndefinite__FP7EMITTER(EMITTER *);
+void PauseEmitter__FP7EMITTERf_159C80(EMITTER *, float);
+int FPausedEmitter__FP7EMITTER_159C80(EMITTER *);
+void ModifyEmitterParticles__FP7EMITTER_159C80(EMITTER *);
 void UpdateLo(void *);
 QW PosLoWorld(void *);
 int FIsLoInWorld(void *);
@@ -504,30 +360,38 @@ extern CM B_002DDF40;
 extern float g_2dded0;  /* the clock's t; its dt follows (0x2DDED4) */
 }
 
-extern "C" void UpdateEmitter__FP7EMITTERf(EMITTER_159C80 *pemitter, float dt)
+void EmitParticles(int cparticle, EMITB *pemitb, EMITG *pemitg);
+
+/* the blip group's count at 0x444 (UpdateEmitter is its one reader, so a local view of blip.h's BLIPG) */
+struct BLIPGCOUNT {
+    u8 unknown_0x0[0x444];
+    /* 0x444 */ s32 cblip;
+};
+
+extern "C" void UpdateEmitter__FP7EMITTERf(EMITTER *pemitter, float dt)
 {
-    if (pemitter->fValuesChanged)
+    if (pemitter->ensured)
         OnEmitterValuesChanged__FP7EMITTER_159C80(pemitter);
     UpdateLo(pemitter);
-    if (pemitter->stateOn != -1)
+    if (pemitter->oidTarget != -1)
         return;
-    if (!FIsDlEmpty__FP2DL_159C80(&pemitter->psrcFirst)) {
+    if (!FIsDlEmpty__FP2DL_159C80(&pemitter->dlSrc)) {
         SRC_159C80 *psrc;
-        for (psrc = pemitter->psrcFirst; psrc; psrc = psrc->pNext) {
+        for (psrc = (SRC_159C80 *)pemitter->dlSrc.head; psrc; psrc = psrc->pNext) {
             if (!FIsLoInWorld(psrc))
                 continue;
             if (!psrc->psoParent)
                 goto LActive;
-            float radius = psrc->radius * B_002DDF40.scale;
-            QW delta = VectorSub(PosLoWorld(psrc), B_002DDF40.pos);
+            float radius = psrc->field_0x38 * B_002DDF40.rMrd;
+            QW delta = VectorSub(PosLoWorld(psrc), B_002DDF40.mat.row[3]);
             int fNear = LaneX(SquaredLength(delta)) < radius * radius;
             if (fNear)
                 goto LActive;
         }
         return;
     } else if (pemitter->psoParent) {
-        float radius = pemitter->radius * B_002DDF40.scale;
-        QW delta = VectorSub(PosLoWorld(pemitter), B_002DDF40.pos);
+        float radius = pemitter->field_0x38 * B_002DDF40.rMrd;
+        QW delta = VectorSub(PosLoWorld(pemitter), B_002DDF40.mat.row[3]);
         int fFar = radius * radius < LaneX(SquaredLength(delta));
         if (fFar)
             return;
@@ -550,10 +414,10 @@ LActive:
             }
             if (pemitter->fPauseIndefinite) {
                 PauseEmitterIndefinite__FP7EMITTER(pemitter);
-                pemitter->rate = GRandInRange(pemitter->tPauseMin, pemitter->tPauseMax) * 60.0f;
+                pemitter->rate = GRandInRange(pemitter->lmRate.gMin, pemitter->lmRate.gMax) * 60.0f;
             } else if (GRandInRange(0.0f, 1.0f) <= pemitter->uPause) {
-                PauseEmitter__FP7EMITTERf_159C80(pemitter, GRandInRange(pemitter->dtPauseMin, pemitter->dtPauseMax));
-                pemitter->rate = GRandInRange(pemitter->tPauseMin, pemitter->tPauseMax) * 60.0f;
+                PauseEmitter__FP7EMITTERf_159C80(pemitter, GRandInRange(pemitter->lmPause.gMin, pemitter->lmPause.gMax));
+                pemitter->rate = GRandInRange(pemitter->lmRate.gMin, pemitter->lmRate.gMax) * 60.0f;
             }
         }
         break;
@@ -569,8 +433,8 @@ LActive:
         if (pemitter->fPauseIndefinite)
             PauseEmitterIndefinite__FP7EMITTER(pemitter);
         else if (GRandInRange(0.0f, 1.0f) <= pemitter->uPause)
-            PauseEmitter__FP7EMITTERf_159C80(pemitter, GRandInRange(pemitter->dtPauseMin, pemitter->dtPauseMax));
-        pemitter->rate = GRandInRange(pemitter->tPauseMin, pemitter->tPauseMax);
+            PauseEmitter__FP7EMITTERf_159C80(pemitter, GRandInRange(pemitter->lmPause.gMin, pemitter->lmPause.gMax));
+        pemitter->rate = GRandInRange(pemitter->lmRate.gMin, pemitter->lmRate.gMax);
         break;
     }
     case 0: {
@@ -590,12 +454,12 @@ LActive:
     case 1: {
         int cWanted = (int)(pemitter->cMax * pemitter->svRate);
         int cExisting;
-        if (!pemitter->pemitb->fPerSource) {
-            BLIPG_159C80 *pblipg = pemitter->p150;
-            cExisting = pblipg ? pblipg->cblip : 0;
+        if (!pemitter->pemitb->emitpk) {
+            BLIPG *pblipg = pemitter->pblipg;
+            cExisting = pblipg ? ((BLIPGCOUNT *)pblipg)->cblip : 0;
         } else {
-            RIPG_159C80 *pripg = pemitter->pv14C;
-            cExisting = pripg ? CPvDl__FP2DL(pripg->dlRip) : 0;
+            RIPG *pripg = pemitter->pripg;
+            cExisting = pripg ? CPvDl__FP2DL(&pripg->rips) : 0;
         }
         int cMissing = cWanted - cExisting;
         cParticles = 0;
@@ -606,144 +470,101 @@ LActive:
     }
     if (cParticles) {
         VECTOR posEmit;  // frame: retail's frame has an untouched 16-byte slot at sp+0x00 (as ModifyEmitterParticles' vecUnused, ruled 2026-11-13)
-        EMITG_159C80 emitg;
+        EMITG emitg;
         memset(&emitg, 0, sizeof(emitg));
-        emitg.pemitter = pemitter;
-        emitg.p150 = &pemitter->p150;
-        emitg.p14C = &pemitter->pv14C;
-        EMITHOLD_159C80 *phold = pemitter->pemitb->phold;
-        void *pemitterOwner = phold->pemitterOwner;
-        if (!pemitterOwner && !phold->c)
-            phold->pemitterOwner = pemitter;
-        EmitParticles__FiP5EMITBP5EMITG(cParticles, pemitter->pemitb, &emitg);
-        pemitter->pemitb->phold->pemitterOwner = pemitterOwner;
+        emitg.plo = pemitter;
+        emitg.ppblipg = &pemitter->pblipg;
+        emitg.ppripg = &pemitter->pripg;
+        EMITBINFO *pinfo = pemitter->pemitb->pinfo;
+        LO *ploOwner = pinfo->plo;
+        if (!ploOwner && !pinfo->pobj)
+            pinfo->plo = pemitter;
+        EmitParticles(cParticles, pemitter->pemitb, &emitg);
+        pemitter->pemitb->pinfo->plo = ploOwner;
     }
     if (((CLOCK_159C80 *)&g_2dded0)->t >= pemitter->tReset) {
-        pemitter->rate = GRandInRange(pemitter->tPauseMin, pemitter->tPauseMax);
+        pemitter->rate = GRandInRange(pemitter->lmRate.gMin, pemitter->lmRate.gMax);
         pemitter->tReset = ((CLOCK_159C80 *)&g_2dded0)->t + pemitter->dtReset;
     }
     ModifyEmitterParticles__FP7EMITTER_159C80(pemitter);
 }
 
 extern "C" {
-typedef struct EMITTER_15A138 {
-    u8 unknown_0x0[0x148];
-    f32 field_0x148;
-} EMITTER_15A138;
-
 extern f32 g_2dded0;
 
-void PauseEmitter__FP7EMITTERf(EMITTER_15A138 *emitter, f32 duration) {
-    emitter->field_0x148 = g_2dded0 + duration;
+void PauseEmitter__FP7EMITTERf(EMITTER *emitter, f32 duration) {
+    emitter->tUnpause = g_2dded0 + duration;
 }
 }
 
 extern const float RO_002A514C;
 
-void PauseEmitterIndefinite__FP7EMITTER(EMITTER_15A138 *emitter) {
-    emitter->field_0x148 = RO_002A514C;
+void PauseEmitterIndefinite__FP7EMITTER(EMITTER *emitter) {
+    emitter->tUnpause = RO_002A514C;
 }
 
 extern "C" {
-typedef struct EMITTER_15A160 {
-    u8 unknown_0x0[0x148];
-    f32 field_0x148;
-} EMITTER_15A160;
-
-void UnpauseEmitter__FP7EMITTER(EMITTER_15A160 *emitter) {
-    emitter->field_0x148 = -1.0f;
+void UnpauseEmitter__FP7EMITTER(EMITTER *emitter) {
+    emitter->tUnpause = -1.0f;
 }
 }
 
 extern "C" float g_2dded0_15A170;
 
-struct EMITTER_15A170 {
-    u8 unknown_0x0[0xF0];
-    int state;
-    int fF4;
-    u8 unknown_0xF8[0x50];
-    float tUnpause;
-};
-
-extern "C" int FPausedEmitter__FP7EMITTER(EMITTER_15A170 *emitter) {
+extern "C" int FPausedEmitter__FP7EMITTER(EMITTER *emitter) {
     if (g_2dded0_15A170 < emitter->tUnpause) return 1;
-    int state = emitter->state;
+    int state = emitter->emitk;
     if (state < 2) {
         if (state >= 0) {
-            if (emitter->fF4 == 0) return 1;
+            if (emitter->cParticlesLeft == 0) return 1;
         }
     }
     return 0;
 }
 
 extern "C" {
-typedef struct EMITTER_15A1C0 {
-    u8 unknown_0x0[0xE0];
-    s32 field_0xE0;
-    s32 field_0xE4;
-    u8 unknown_0xE8[8];
-    s32 field_0xF0;
-    u8 unknown_0xF4[4];
-    f32 field_0xF8;
-    f32 field_0xFC;
-    u8 unknown_0x100[0x30];
-    f32 field_0x130;
-    u8 unknown_0x134[0x14];
-    s32 field_0x148;
-    s32 field_0x14C;
-    s32 field_0x150;
-} EMITTER_15A1C0;
-
 f32 GRandInRange_15A1C0(f32, f32); /* extern */
 
-void SetBlipgEmitb__FP5BLIPGP5EMITB(s32, s32); /* extern */
+void SetBlipgEmitb__FP5BLIPGP5EMITB(BLIPG *, EMITB *); /* extern */
 
-void SetRipgEmitb__FP4RIPGP5EMITB(s32, s32); /* extern */
+void SetRipgEmitb__FP4RIPGP5EMITB(RIPG *, EMITB *); /* extern */
 
-void OnEmitterValuesChanged__FP7EMITTER(EMITTER_15A1C0 *emitter) {
+void OnEmitterValuesChanged__FP7EMITTER(EMITTER *emitter) {
     f32 minimum;
     f32 value;
-    s32 blipg;
-    s32 ripg;
+    BLIPG *blipg;
+    RIPG *ripg;
 
-    emitter->field_0xE0 = 0;
-    blipg = emitter->field_0x150;
+    emitter->ensured = 0;
+    blipg = emitter->pblipg;
     if (blipg != 0) {
-        SetBlipgEmitb__FP5BLIPGP5EMITB(blipg, emitter->field_0xE4);
+        SetBlipgEmitb__FP5BLIPGP5EMITB(blipg, emitter->pemitb);
     }
-    ripg = emitter->field_0x14C;
+    ripg = emitter->pripg;
     if (ripg != 0) {
-        SetRipgEmitb__FP4RIPGP5EMITB(ripg, emitter->field_0xE4);
+        SetRipgEmitb__FP4RIPGP5EMITB(ripg, emitter->pemitb);
     }
-    minimum = emitter->field_0xF8;
-    if (emitter->field_0xF0 == 3) {
-        value = GRandInRange_15A1C0(minimum, emitter->field_0xFC) * 60.0f;
+    minimum = emitter->lmRate.gMin;
+    if (emitter->emitk == 3) {
+        value = GRandInRange_15A1C0(minimum, emitter->lmRate.gMax) * 60.0f;
     } else {
-        value = GRandInRange_15A1C0(minimum, emitter->field_0xFC);
+        value = GRandInRange_15A1C0(minimum, emitter->lmRate.gMax);
     }
-    emitter->field_0x130 = value;
+    emitter->rate = value;
 }
 }
-
-struct EMITTER_15A240 {
-    u8 unknown_0x0[0xE0];
-    s32 field_0xE0;
-    u8 unknown_0xE4[0xC];
-    s32 field_0xF0;
-    s32 field_0xF4;
-};
 
 extern "C" void PauseEmitterIndefinite__FP7EMITTER_15A240(); /* extern */
 
-extern "C" void UnpauseEmitter__FP7EMITTER_15A240(EMITTER_15A240 *); /* extern */
+extern "C" void UnpauseEmitter__FP7EMITTER_15A240(EMITTER *); /* extern */
 
-extern "C" void SetEmitterEnabled__FP7EMITTERi(EMITTER_15A240 *emitter, s32 enabled) {
+extern "C" void SetEmitterEnabled__FP7EMITTERi(EMITTER *emitter, s32 enabled) {
     s32 mode;
 
-    mode = emitter->field_0xF0;
+    mode = emitter->emitk;
     switch (mode) {
     case -1:
-        emitter->field_0xF4 = enabled;
+        emitter->cParticlesLeft = enabled;
         break;
     case 0:
         if (enabled == 0) {
@@ -751,24 +572,17 @@ extern "C" void SetEmitterEnabled__FP7EMITTERi(EMITTER_15A240 *emitter, s32 enab
         } else if (enabled == -1) {
             UnpauseEmitter__FP7EMITTER_15A240(emitter);
         } else {
-            emitter->field_0xF4 = enabled;
+            emitter->cParticlesLeft = enabled;
         }
         break;
     }
-    emitter->field_0xE0 = 1;
+    emitter->ensured = 1;
 }
 
 extern "C" {
-typedef struct EMITTER_15A2B0 {
-    u8 unknown_0x0[0xE0];
-    s32 field_0xE0;
-    u8 unknown_0xE4[0x30];
-    s32 field_0x114;
-} EMITTER_15A2B0;
-
-void func_0015A2B0(EMITTER_15A2B0 *emitter, s32 value) {
-    emitter->field_0x114 = value;
-    emitter->field_0xE0 = 1;
+void func_0015A2B0(EMITTER *emitter, s32 value) {
+    emitter->fPauseIndefinite = value;
+    emitter->ensured = 1;
 }
 }
 
@@ -878,16 +692,6 @@ INCLUDE_ASM(0X15B0C8);
 
 struct MAT3_15B1B0 { QW r0, r1, r2; };
 
-struct LO_15B1B0;
-
-struct EMITREF_15B1B0 { LO_15B1B0 *plo; u8 unknown_0x4[4]; int unk8; u8 unknown_0xC[4]; int unk10; };
-
-struct EMITB_15B1B0 { int unk0; int emitpk; EMITREF_15B1B0 *pemitref; u8 unknown_0xC[0xB0 - 0xC]; QW vec; int ript; int ripgt; u8 unknown_0xC8[0xD8 - 0xC8]; float gMin; float gMax; u8 unknown_0xE0[0xE4 - 0xE0]; float fE4; float fE8; };
-
-struct RIPG_15B1B0;
-
-struct EMITG { int unk0; RIPG_15B1B0 **ppripg; LO_15B1B0 *plo; };
-
 struct EMITDV_15B1B0 { u8 unknown_0x0[1]; };
 
 struct RIP_15B1B0 {
@@ -895,71 +699,77 @@ struct RIP_15B1B0 {
     QW vec; MAT3_15B1B0 mat; u8 unknown_0x70[0x90 - 0x70]; QW v; EMITDV_15B1B0 emitdv[0x4C];
     // vtable at 0xEC (rip.h's RIP): slot 1 starts the particle, slot 2 hands it the emit block
     virtual void Init(QW pos, float scale, int field);
-    virtual void Post(EMITB_15B1B0 *pemitb);
-};
-
-struct DL_15B1B0 { int a; };
-
-struct RIPG_15B1B0 : SO {
-    u8 unknown_0x150[0xC];
-    DL_15B1B0 dlRip;
+    virtual void Post(EMITB *pemitb);
 };
 
 struct SWX_15B1B0 { u8 unknown_0x0[1]; };
 
 extern SWX_15B1B0 B_003DD490_15B1B0;
 
-extern "C" RIPG_15B1B0 *PripgNew(SWX_15B1B0 *, int);
+extern "C" RIPG *PripgNew(SWX_15B1B0 *, int);
 
-extern "C" RIP_15B1B0 *PripNewRipg(SWX_15B1B0 *, int, RIPG_15B1B0 *);
+extern "C" RIP_15B1B0 *PripNewRipg(SWX_15B1B0 *, int, RIPG *);
 
-extern "C" void SetRipgEmitb__FP4RIPGP5EMITB_15B1B0(RIPG_15B1B0 *, EMITB_15B1B0 *);
+extern "C" void SetRipgEmitb__FP4RIPGP5EMITB(RIPG *, EMITB *);
 
-extern "C" void SubscribeLoObject(RIPG_15B1B0 *, LO_15B1B0 *);
+extern "C" void SubscribeLoObject(RIPG *, LO *);
 
-extern "C" void SetEmitdvEmitb__FP6EMITDVP5EMITB(EMITDV_15B1B0 *, EMITB_15B1B0 *);
+extern "C" void SetEmitdvEmitb__FP6EMITDVP5EMITB(EMITDV_15B1B0 *, EMITB *);
 
-extern "C" MAT3_15B1B0 *PmatLoWorld_15B1B0(LO_15B1B0 *);
+extern "C" MAT3_15B1B0 *PmatLoWorld_15B1B0(LO *);
 
-extern "C" int FIsDlEmpty__FP2DL(DL_15B1B0 *);
+extern "C" int FIsDlEmpty__FP2DL(DL *);
 
-void EmitRips(EMITB_15B1B0 *pemitb, EMITG *pemitg, int crip, VECTOR *apos, VECTOR *av, float *atc, float *atd)
+/* the rip kind's words of the parameter block (EMITB 0xE4, 0xE8) and of the emit info (0x8): EmitRips is their one reader, so local
+   views of emitter.h's EMITPARAMS and EMITBINFO */
+struct EMITPARAMSRIP {
+    u8 unknown_0x0[0x24];
+    /* 0x24 */ f32 fE4;
+    /* 0x28 */ f32 fE8;
+};
+
+struct EMITBINFORIP {
+    u8 unknown_0x0[0x8];
+    /* 0x8 */ s32 field_0x8;
+};
+
+void EmitRips(EMITB *pemitb, EMITG *pemitg, int crip, VECTOR *apos, VECTOR *av, float *atc, float *atd)
 {
-    RIPG_15B1B0 *pripg = 0;
+    RIPG *pripg = 0;
     if (pemitg != 0 && pemitg->ppripg != 0)
         pripg = *pemitg->ppripg;
     if (pripg == 0) {
-        pripg = PripgNew(&B_003DD490_15B1B0, pemitb->ripgt);
+        pripg = PripgNew(&B_003DD490_15B1B0, pemitb->params.ripgt);
         if (pripg == 0)
             return;
         if (pemitg != 0 && pemitg->ppripg != 0)
             *pemitg->ppripg = pripg;
-        SetRipgEmitb__FP4RIPGP5EMITB_15B1B0(pripg, pemitb);
+        SetRipgEmitb__FP4RIPGP5EMITB(pripg, pemitb);
         if (pemitg != 0 && pemitg->plo != 0)
             SubscribeLoObject(pripg, pemitg->plo);
         if (pripg == 0)
             return;
     }
     for (int irip = 0; irip < crip; irip++) {
-        RIP_15B1B0 *prip = PripNewRipg(&B_003DD490_15B1B0, pemitb->ript, pripg);
+        RIP_15B1B0 *prip = PripNewRipg(&B_003DD490_15B1B0, pemitb->params.kind, pripg);
         if (prip == 0)
             break;
-        prip->Init(*(QW *)&apos[irip], GRandInRange(pemitb->gMin, pemitb->gMax), pemitb->pemitref->unk10);
-        if (pemitb->fE4 != 0.0f || pemitb->fE8 != 0.0f) {
-            prip->fE4 = pemitb->fE4;
-            prip->fE8 = pemitb->fE8;
+        prip->Init(*(QW *)&apos[irip], GRandInRange(pemitb->params.gMin, pemitb->params.gMax), pemitb->pinfo->field_0x10);
+        if (((EMITPARAMSRIP *)&pemitb->params)->fE4 != 0.0f || ((EMITPARAMSRIP *)&pemitb->params)->fE8 != 0.0f) {
+            prip->fE4 = ((EMITPARAMSRIP *)&pemitb->params)->fE4;
+            prip->fE8 = ((EMITPARAMSRIP *)&pemitb->params)->fE8;
         }
         prip->v = *(QW *)&av[irip];
         prip->tc = atc[irip];
         prip->td = atd[irip] - atc[irip];
-        prip->vec = pemitb->vec;
+        prip->vec = pemitb->emitv.q[6];
         SetEmitdvEmitb__FP6EMITDVP5EMITB(prip->emitdv, pemitb);
-        prip->unk1C = pemitb->pemitref->unk8;
-        if (pemitb->pemitref->plo != 0)
-            prip->mat = *PmatLoWorld_15B1B0(pemitb->pemitref->plo);
+        prip->unk1C = ((EMITBINFORIP *)pemitb->pinfo)->field_0x8;
+        if (pemitb->pinfo->plo != 0)
+            prip->mat = *PmatLoWorld_15B1B0(pemitb->pinfo->plo);
         prip->Post(pemitb);
     }
-    if (FIsDlEmpty__FP2DL(&pripg->dlRip))
+    if (FIsDlEmpty__FP2DL(&pripg->rips))
         pripg->Remove();
 }
 
@@ -969,35 +779,29 @@ INCLUDE_ASM(0X15B7E8);
 
 INCLUDE_ASM(0X15B9F0);
 
-struct EMITB_15BD20 { int a0; int pk; u8 unknown_0x8[0xC4 - 8]; int blipmk; };
-
-struct EMITG;
-
 struct EMITGEN { VECTOR *apos; VECTOR *av; float *atc; float *atd; int fconv; };
 
 extern "C" void CStackFrame_Construct(void *);
 
 extern "C" void CStackFrame_Destructor(void *, int);
 
-void OriginateParticles(int, EMITB_15BD20 *, EMITGEN *);
+void OriginateParticles(int, EMITB *, EMITGEN *);
 
-void OriginateSplineSinkParticles(int, EMITB_15BD20 *, EMITGEN &, EMITGEN &);
+void OriginateSplineSinkParticles(int, EMITB *, EMITGEN &, EMITGEN &);
 
-void EmitRips_15BD20(EMITB_15BD20 *, EMITG *, int, VECTOR *, VECTOR *, float *, float *);
+void EmitBlips(EMITB *, EMITG *, int, VECTOR *, VECTOR *, float *, float *, VECTOR *, VECTOR *);
 
-void EmitBlips(EMITB_15BD20 *, EMITG *, int, VECTOR *, VECTOR *, float *, float *, VECTOR *, VECTOR *);
-
-void EmitParticles(int count, EMITB_15BD20 *pemitb, EMITG *pemitg)
+void EmitParticles(int count, EMITB *pemitb, EMITG *pemitg)
 {
     if (count == 0) return;
     struct L { EMITGEN gen; u8 unknown_0x14[0x20 - sizeof(EMITGEN)]; char frame[0x10]; EMITGEN target; } l;
     CStackFrame_Construct(l.frame);
     l.gen.fconv = 1;
     OriginateParticles(count, pemitb, &l.gen);
-    if (pemitb->pk == 1) {
-        EmitRips_15BD20(pemitb, pemitg, count, l.gen.apos, l.gen.av, l.gen.atc, l.gen.atd);
+    if (pemitb->emitpk == 1) {
+        EmitRips(pemitb, pemitg, count, l.gen.apos, l.gen.av, l.gen.atc, l.gen.atd);
     } else {
-        if (pemitb->blipmk == 2) {
+        if (pemitb->params.blipmk == 2) {
             OriginateSplineSinkParticles(count, pemitb, l.gen, l.target);
         } else {
             l.target.apos = 0;
@@ -1008,42 +812,21 @@ void EmitParticles(int count, EMITB_15BD20 *pemitb, EMITG *pemitg)
     CStackFrame_Destructor(l.frame, 2);
 }
 
-struct EMITV { QW q[7]; };
-
-struct EMITRIP { QW q[4]; };
-
-struct EMITG_15BE28 { int a; int ppripg; int lo; };
-
-struct EMITB_15BE28 {
-    int unk0;
-    int emitpk;
-    int pemitref;
-    u8 unknown_0xC[0x24];
-    QW pos;
-    QW vec;
-    EMITV emitv;
-    EMITRIP emitrip;
-};
-
-extern "C" void InitEmitb_15BE28(EMITB_15BE28 *);
-
-void EmitParticles_15BE28(int, EMITB_15BE28 *, EMITG_15BE28 *) __asm__("EmitParticles__FiP5EMITBP5EMITG");
-
-extern "C" void EmitRipsSphere__FP6VECTORT0iP7EMITRIPP5EMITVPP4RIPGP2LO(QW pos, QW vec, int crip, EMITRIP *pemitrip, EMITV *pemitv, int pemitref, int ppripg, int lo)
+extern "C" void EmitRipsSphere__FP6VECTORT0iP7EMITRIPP5EMITVPP4RIPGP2LO(QW pos, QW vec, int crip, EMITRIP *pemitrip, EMITV *pemitv, EMITBINFO *pemitref, RIPG **ppripg, LO *plo)
 {
-    EMITB_15BE28 emitb;
-    EMITG_15BE28 emitg;
-    InitEmitb_15BE28(&emitb);
+    EMITB emitb;
+    EMITG emitg;
+    InitEmitb(&emitb);
     memset(&emitg, 0, 12);
     emitb.pos = pos;
     emitb.vec = vec;
     emitb.emitv = *pemitv;
-    emitb.pemitref = pemitref;
+    emitb.pinfo = pemitref;
     emitg.ppripg = ppripg;
-    emitg.lo = lo;
+    emitg.plo = plo;
     emitb.emitpk = 1;
     emitb.emitrip = *pemitrip;
-    EmitParticles_15BE28(crip, &emitb, &emitg);
+    EmitParticles(crip, &emitb, &emitg);
 }
 
 INCLUDE_ASM(0X15BF38);
@@ -1078,7 +861,11 @@ void ExplodeExplExplso(void) {
 }
 }
 
-struct EXPLG { u8 unknown_0x0[0xE0]; int cexpl; LO **apexpl; };
+// class 31 (expl.h): an EXPL holding a list of explosions, which LoadExplgFromBrx loads and CloneExplg clones
+struct EXPLG : EXPL {
+    /* 0xE0 */ s32 cexpl;   /* LoadExplgFromBrx, CloneExplg: how many of the objects it keeps */
+    /* 0xE4 */ LO **apexpl; /* LoadExplgFromBrx, CloneExplg: the objects themselves (EXPLs, cloned with the group) */
+};
 
 struct PLOARRAY { int a; int b; int cplo; LO **aplo; };
 
@@ -1122,60 +909,43 @@ void LoadExplgFromBrx(EXPLG *pexplg, void *pbis)
 }
 
 extern "C" {
-typedef struct EMITTER_15C310 {
-    u8 unknown_0x0[0xE0];
-    s32 field_0xE0;
-    s32 field_0xE4;
-} EMITTER_15C310;
-
-s32 func_0015C310(EMITTER_15C310 *emitter, s32 *out) {
-    *out = emitter->field_0xE4;
-    return emitter->field_0xE0;
+s32 func_0015C310(EMITTER *emitter, s32 *out) {
+    *out = (s32)emitter->pemitb;
+    return emitter->ensured;
 }
 }
 
-struct LO_15C320 { u8 unknown_0x0[0x10]; void *parent; };
-
-struct EXPLG_15C320 { u8 unknown_0x0[0x10]; void *parent; u8 unknown_0x14[0xCC]; int cexpl; LO_15C320 **apexpl; };
-
-extern "C" void CloneXfm(EXPLG_15C320 *, EXPLG_15C320 *);
+extern "C" void CloneXfm(EXPLG *, EXPLG *);
 
 extern "C" void *PvAllocSwCopyImpl__FiPv_15C320(ALLOCREQ *, void *);
 
-extern "C" LO_15C320 *PloCloneLo(LO_15C320 *, void *);
+extern "C" LO *PloCloneLo(LO *, void *);
 
-extern "C" void CloneExplg(EXPLG_15C320 *pexplg, EXPLG_15C320 *pexplgBase)
+extern "C" void CloneExplg(EXPLG *pexplg, EXPLG *pexplgBase)
 {
     int i = 0;
     CloneXfm(pexplg, pexplgBase);
     ALLOCREQ req;
     req.cb = pexplg->cexpl << 2;
     req.cbAlign = 0x10;
-    pexplg->apexpl = (LO_15C320 **)PvAllocSwCopyImpl__FiPv_15C320(&req, pexplg->apexpl);
+    pexplg->apexpl = (LO **)PvAllocSwCopyImpl__FiPv_15C320(&req, pexplg->apexpl);
     while (i < pexplg->cexpl) {
-        pexplg->apexpl[i] = PloCloneLo(pexplg->apexpl[i], pexplg->parent);
+        pexplg->apexpl[i] = PloCloneLo(pexplg->apexpl[i], pexplg->psoParent);
         i++;
     }
 }
 
 INCLUDE_ASM(0X15C3C0);
 
-extern "C" s32 UnsubscribeLoObject_15C5C8(s32 object, char *owner);
+extern "C" s32 UnsubscribeLoObject_15C5C8(void *object, void *owner);
 
-// An explosion's two followed objects, at 0x100 and 0x104 (the pripg and pblipg words of EXPLS in FireExplsExplso).
-struct EXPLS_15C5C8 {
-    u8 unknown_0x0[0x100];
-    s32 pripg;
-    s32 pblipg;
-};
-
-extern "C" void HandleExplsMessage(EXPLS_15C5C8 *pexpls, s32 msgid, s32 pv) {
+extern "C" void HandleExplsMessage(EXPLS *pexpls, s32 msgid, void *pv) {
     if (msgid == 1) {
         if (pv == pexpls->pripg) {
-            UnsubscribeLoObject_15C5C8(pv, (char *)pexpls);
+            UnsubscribeLoObject_15C5C8(pv, pexpls);
             pexpls->pripg = 0;
         } else if (pv == pexpls->pblipg) {
-            UnsubscribeLoObject_15C5C8(pv, (char *)pexpls);
+            UnsubscribeLoObject_15C5C8(pv, pexpls);
             pexpls->pblipg = 0;
         }
     }
@@ -1223,47 +993,7 @@ struct M3 { QW row[3]; };
 
 struct XFR { QW pos; M3 mat; };
 
-/* the object an emitter follows: its +0xF4 points at a position (case 2 of EMITB::emitk) */
-struct EMITOBJ { u8 unknown_0x0[0xF4]; QW *ppos; };
-
-struct EMITO_15C690 { void *palo; EMITOBJ *pobj; int unknown8; int unknownC; int unknown10; };
-
-struct EMITB_15C690 {
-    int cref;
-    int pk;
-    EMITO_15C690 *pemito;
-    int unknownC;
-    int emitk;
-    int unknown14[2];
-    XFR *pxfr;
-    int unknown20[4];
-    union { QW pos; QW *apos; char *pb; };
-    QW vec;
-    LM_15C690 lmSpeed;
-    char unknown58[0xD8 - 0x58];
-    float gD8;
-    float gDC;
-    VECTOR vecE0;
-    QW unknownF0;
-};
-
-struct EMITG_15C690 { void **ppblipg; void **ppripg; void *plo; };
-
 struct AMB;
-
-struct AMBDESC { int sfx; LM_15C690 lmRange; float uVolume; float uPitch; };
-
-/* FireExplsExplso's view of EXPLS (include/expl.h) with this file's emitter types */
-struct EXPLS_15C690 {
-    u8 unknown_0x0[0xE4];
-    EMITB_15C690 *pemitb;
-    u8 unknown_0xE8[0xF0 - 0xE8];
-    AMBDESC *pambdesc;
-    LM_15C690 lmcParticle;
-    int fEmitg;
-    void *pripg;
-    void *pblipg;
-};
 
 extern LM_15C690 D_002BDEC0;
 
@@ -1279,36 +1009,33 @@ extern "C" void SetAmbVolume(AMB *pamb, float uVolume);
 
 extern "C" void SetAmbPitch(AMB *pamb, float uPitch);
 
-void EmitParticles(int cparticle, EMITB_15C690 *pemitb, EMITG_15C690 *pemitg);
-
 static inline float GMax(float a, float b) { return a >? b; }
 
-void FireExplsExplso(EXPLS *pexplsArg, EXPLSO *pexplso)
+void FireExplsExplso(EXPLS *pexpls, EXPLSO *pexplso)
 {
-    EXPLS_15C690 *pexpls = (EXPLS_15C690 *)pexplsArg;
-    EMITO_15C690 emito = *pexpls->pemitb->pemito;
-    EMITB_15C690 emitb = *pexpls->pemitb;
-    EMITG_15C690 emitg;
-    EMITG_15C690 *pemitg;
+    EMITBINFO emito = *pexpls->pemitb->pinfo;
+    EMITB emitb = *pexpls->pemitb;
+    EMITG emitg;
+    EMITG *pemitg;
     VU_SCALE pos;
     VU_SCALE half;
-    emitb.pemito = &emito;
+    emitb.pinfo = &emito;
     int cparticle;
     if (pexplso->grfexpl & 0x80)
         cparticle = pexplso->cparticle;
     else
         cparticle = (int)GRandInRange(pexpls->lmcParticle.gMin, pexpls->lmcParticle.gMax);
     if (pexplso->grfexpl & 1)
-        emito.palo = pexplso->palo;
+        emito.plo = pexplso->palo;
     if (pexplso->grfexpl & 2)
         emitb.vec = pexplso->vec;
     if (pexplso->grfexpl & 4) {
         emitb.pos = pexplso->pos;
-        emitb.emitk = 0;
+        emitb.emitok = 0;
     } else if (pexplso->grfexpl & 0x40) {
         emitb.pxfr = pexplso->pxfr;
     }
-    if ((pexplso->grfexpl & 8) && emitb.pk == 0) {
+    if ((pexplso->grfexpl & 8) && emitb.emitpk == 0) {
         float g;
         if (pexplso->g == 0.0f)
             g = pexplso->uPercent * 0.01f;
@@ -1325,13 +1052,13 @@ void FireExplsExplso(EXPLS *pexplsArg, EXPLSO *pexplso)
         emitb.lmSpeed.gMin = emitb.lmSpeed.gMin * gSpeed;
         emitb.lmSpeed.gMax = emitb.lmSpeed.gMax * gSpeed;
         g = GMax(0.5f, g);
-        __as__6VECTORG9VU_VECTOR(&emitb.vecE0, VU_FLOAT(g) * VU_VECTOR(emitb.vecE0));
+        __as__6VECTORG9VU_VECTOR(&emitb.params.vecScale, VU_FLOAT(g) * VU_VECTOR(emitb.params.vecScale));
     }
-    if (emitb.pk == 1) {
+    if (emitb.emitpk == 1) {
         if (pexplso->grfexpl & 0x10)
-            emitb.gDC = emitb.gD8 = pexplso->g;
+            emitb.params.gMax = emitb.params.gMin = pexplso->g;
         if (pexplso->grfexpl & 0x20)
-            emitb.pemito->unknown10 = pexplso->field_0x30;
+            emitb.pinfo->field_0x10 = pexplso->field_0x30;
     }
     if (pexpls->fEmitg) {
         emitg.ppblipg = &pexpls->pblipg;
@@ -1341,11 +1068,11 @@ void FireExplsExplso(EXPLS *pexplsArg, EXPLSO *pexplso)
     } else {
         pemitg = 0;
     }
-    if (emito.palo == 0 && emitb.emitk != 2 && !(pexplso->grfexpl & 0x48))
-        emito.palo = pexpls;
+    if (emito.plo == 0 && emitb.emitok != 2 && !(pexplso->grfexpl & 0x48))
+        emito.plo = pexpls;
     EmitParticles(cparticle, &emitb, pemitg);
     if (pexpls->pambdesc) {
-        switch (emitb.emitk) {
+        switch (emitb.emitok) {
         case 0:
             pos.q = emitb.pos;
             break;
@@ -1359,7 +1086,7 @@ void FireExplsExplso(EXPLS *pexplsArg, EXPLSO *pexplso)
             }
             break;
         case 2:
-            pos.q = *emitb.pemito->pobj->ppos;
+            pos.q = *emitb.pinfo->pobj->ppos;
             break;
         case 3:
             pos.q = emitb.apos[2];
@@ -1370,7 +1097,7 @@ void FireExplsExplso(EXPLS *pexplsArg, EXPLSO *pexplso)
             M3 *pmat = &pxfr->mat;
             pos.q = VectorAdd(TransformVector(pos.q, pmat->row[0], pmat->row[1], pmat->row[2]), pxfr->pos);
         }
-        pos.q = ConvertAloPos(emito.palo, 0, pos.q);
+        pos.q = ConvertAloPos(emito.plo, 0, pos.q);
         AMB *pamb = NewEmitter(pexpls->pambdesc->sfx);
         SetEmitterUnpositioned(pamb, 0);
         SetAmbPos(pamb, pos.q);

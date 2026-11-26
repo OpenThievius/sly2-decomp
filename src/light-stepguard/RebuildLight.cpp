@@ -1,38 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
-#include "lo.h"
-
-struct BYTES8 {
-    char bytes[8];
-};
-struct BYTES12 {
-    BYTES8 first;
-    int second;
-};
-
-struct LIGHT : LO {
-    u8 unknown_0x50[0x90];
-    /* 0xE0 */ s32 mode;
-    u8 unknown_0xE4[0xC];
-    /* 0xF0 */ VECTOR hsv;
-    /* 0x100 */ VECTOR pos;
-    /* 0x110 */ float scaleA;
-    /* 0x114 */ float scaleB;
-    u8 unknown_0x118[8];
-    /* 0x120 */ s32 modeCopy;
-    /* 0x124 */ float angleA;
-    /* 0x128 */ float angleB;
-    /* 0x12C */ float fitA;
-    /* 0x130 */ float color[3];
-    /* 0x13C */ float alpha;
-    /* 0x140 */ BYTES12 posCopy;
-    /* 0x14C */ float fitB;
-    /* 0x150 */ float strength;
-    /* 0x154 */ float cone;
-    u8 unknown_0x158[0xC];
-    /* 0x164 */ float rangeA;
-    /* 0x168 */ float rangeB;
-};
+#include "light.h"
 
 extern "C" {
 void ConvertAngleStrength__FffffPfT4(float, float, float, float, float *, float *);

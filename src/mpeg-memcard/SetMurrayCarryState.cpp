@@ -12,12 +12,11 @@ void ApplyAsegToHandle(float, float, void *, void *, int, void *);
 void func_001F1448(void *, void *, int, int, void *);
 extern QW g_2a2dd0;
 }
-/* What SetMurrayCarryState reads of the player past the fields of murray.h: the phase of the carry blend, the time of the last
-   state change and the three animation bindings of the carry states. */
+/* What SetMurrayCarryState reads of the player past the fields of murray.h: the time of the last state change and the three
+   animation bindings of the carry states (the last two inside the carry blend part, one reader each: a view). The phase of the
+   carry blend is STEP::uPhase. */
 struct MURRAYCARRYVIEW {
-    u8 unknown_0x0[0x1A0];
-    f32 uPhase;
-    u8 unknown_0x1A4[0x12B8];
+    u8 unknown_0x0[0x145C];
     f32 tStateChange;
     u8 unknown_0x1460[0x4];
     void *pasegState1;
@@ -40,7 +39,7 @@ void SetMurrayCarryState(MURRAY *m, int carrys)
         if (old < 3) {
             ASEGA *pasega = (ASEGA *)m->field_0x1030;
             ASEG *paseg = pasega->paseg;
-            view->uPhase = pasega->tLocal / paseg->tLength;
+            m->uPhase = pasega->tLocal / paseg->tLength;
         }
     }
     m->iapasegByIndex = carrys;
@@ -58,14 +57,14 @@ void SetMurrayCarryState(MURRAY *m, int carrys)
         break;
     case 1:
         paseg = (ASEG *)view->pasegState1;
-        tStart = view->uPhase * paseg->tLength;
+        tStart = m->uPhase * paseg->tLength;
         ResetRunBlendFootsteps(m->runBlendA);
         grfapl = 9;
         break;
     case 2:
         paseg = (ASEG *)view->pasegState2;
         grfapl = 9;
-        tStart = view->uPhase * paseg->tLength;
+        tStart = m->uPhase * paseg->tLength;
         break;
     }
     RetractAsegaHandle(&m->field_0x1030);

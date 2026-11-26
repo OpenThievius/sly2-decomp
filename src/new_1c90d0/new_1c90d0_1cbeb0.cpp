@@ -5,6 +5,7 @@
 #include "types.h"
 #include "stepguard.h"
 #include "cm.h"
+#include "hitfx.h"
 
 extern "C" void InitGuard(STEPGUARD *);
 
@@ -14,39 +15,44 @@ extern "C" void func_001CBEB0(STEPGUARD *self)
     self->field_0x4A4 = 1;
 }
 
-struct RANGE { float lo; float hi; };
+extern "C" int func_00208BE0(STEPGUARD *, HITFX *);
 
-struct SENSE { u8 unknown_0x0[0x50]; int flag; float strength; RANGE range; };
+/* a range of two floats, copied whole */
+struct HITRANGE { f32 lo; f32 hi; };
 
-struct TARGET { u8 unknown_0x0[0x18]; int oid; };
+/* func_001CBEE0 is the one reader of these words, so local views of hitfx.h's HITFXDEF (the range at 0x58) and HITFX (the target at 0x40) */
+struct HITFXDEFRANGE {
+    u8 unknown_0x0[0x58];
+    /* 0x58 */ HITRANGE range;
+};
 
-struct STIM { u8 unknown_0x0[0x14]; SENSE *sense; u8 unknown_0x18[0x28]; TARGET *target; };
+struct HITFXTARGET {
+    u8 unknown_0x0[0x40];
+    /* 0x40 */ LO *ploTarget;
+};
 
-extern "C" int func_00208BE0(void *, STIM *);
-
-extern "C" int func_001CBEE0(void *self, STIM *stim)
+extern "C" int func_001CBEE0(STEPGUARD *self, HITFX *stim)
 {
-    SENSE *sense = stim->sense;
-    RANGE saved = sense->range;
+    HITFXDEF *sense = stim->pdef;
+    HITRANGE saved = ((HITFXDEFRANGE *)sense)->range;
     float strength = sense->strength;
-    if (sense->flag == 0 && stim->target != 0 && stim->target->oid == 0x246) {
+    if (sense->fSense == 0 && ((HITFXTARGET *)stim)->ploTarget != 0 && ((HITFXTARGET *)stim)->ploTarget->oid == 0x246) {
         float doubled = strength + strength;
         float half = (saved.hi - saved.lo) * 0.5f;
         float mid = saved.lo + half;
-        sense->range.hi = mid + (half + half);
+        ((HITFXDEFRANGE *)sense)->range.hi = mid + (half + half);
         sense->strength = doubled;
-        sense->range.lo = mid - (half + half);
+        ((HITFXDEFRANGE *)sense)->range.lo = mid - (half + half);
     }
     int result = func_00208BE0(self, stim);
-    sense->range = saved;
+    ((HITFXDEFRANGE *)sense)->range = saved;
     sense->strength = strength;
     return result;
 }
 
-// An object with a camera policy switch at 0x1010 (a JT's: JT's own words end before it).
-struct CMOWNER {
-    u8 unknown_0x0[0x1010];
-    s32 fPolicyOn;
+// A guard subclass with a camera policy switch right after STEPGUARD's 0x1010 bytes (class unnamed; not a JT: a JT's posOffset is there).
+struct CMOWNER : STEPGUARD {
+    /* 0x1010 */ s32 fPolicyOn;
 };
 
 

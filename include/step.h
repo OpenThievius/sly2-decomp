@@ -26,7 +26,7 @@ struct STEP : PO {
     /* 0x180 */ f32 uTarget; /* UpdateStep (STEP slot 16) sets it each frame from the heading error */
     u8 unknown_0x184[0xC];
     /* 0x190 */ QW velGoal; /* SetMurrayCarryState, func_001B5D30 (two readers) */
-    u8 unknown_0x1A0[0x4];
+    /* 0x1A0 */ f32 uPhase; /* SetBentleyState and SetMurrayCarryState (two readers): the phase tLocal / tLength of the run or carry animation, kept when a state is left and restored on entering the next */
     /* 0x1A4 */ s32 fLock; /* func_001750E0; UpdateStep switches on it (0 steers toward radHeading, 1 and -1 run at full speed) */
     /* 0x1A8 */ f32 radHeading; /* ChooseJtSweepTarget, UpdateBinocHud (two readers); UpdateStep steers toward it */
     u8 unknown_0x1AC[0x4];
@@ -71,6 +71,7 @@ struct STEP : PO {
 #if defined(__mips__)
 SLY2_SIZE_CHECK(STEP, 0x2C0);
 SLY2_OFFSET_CHECK(STEP, velGoal, 0x190);
+SLY2_OFFSET_CHECK(STEP, uPhase, 0x1A0);
 SLY2_OFFSET_CHECK(STEP, radHeading, 0x1A8);
 SLY2_OFFSET_CHECK(STEP, matHeading, 0x1B0);
 SLY2_OFFSET_CHECK(STEP, field_0x204, 0x204);

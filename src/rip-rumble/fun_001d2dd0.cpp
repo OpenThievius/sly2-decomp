@@ -1,30 +1,25 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "types.h"
+#include "laser.h"
 
-/* a linked list of scored candidates (what owns it is not known): the entry keeps its score at 0x90 and the next entry at 0xAC */
-struct CANDIDATE {
-    u8 unknown_0x0[0x90];
-    f32 score;
-    u8 unknown_0x94[0x18];
-    CANDIDATE *pcandidateNext;
-};
+/* a list of contacts (MQ) that starts at 0x8: VEHICLEWHEEL::pxps has that offset (one reader, so a local view) */
 struct CANDIDATELIST {
     u8 unknown_0x0[0x8];
-    CANDIDATE *pcandidateFirst;
+    MQ *pmqFirst;
 };
 
-CANDIDATE *func_001D2DD0(void *self, CANDIDATELIST *list) {
-    CANDIDATE *candidate = list->pcandidateFirst;
+MQ *func_001D2DD0(void *self, CANDIDATELIST *list) {
+    MQ *candidate = list->pmqFirst;
     float bestScore = -3.4028235e38f;
-    CANDIDATE *best = 0;
+    MQ *best = 0;
     if (candidate != 0) {
         do {
-            float score = candidate->score;
+            float score = candidate->gScale;
             if (bestScore < score) {
                 bestScore = score;
                 best = candidate;
             }
-            candidate = candidate->pcandidateNext;
+            candidate = candidate->pmqNext;
         } while (candidate != 0);
     }
     return best;

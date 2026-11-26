@@ -10,11 +10,7 @@
 #include "blot.h"
 #include "joy.h"
 #include "swfind.h"
-
-/* the binoculars' recon object (kept at its JT's 0x1D40): StopBinoc reads its state */
-struct BINOCRECON {
-    s32 binocs; /* reader: StopBinoc (0, 8, 9 and 10 mean it is already stopping) */
-};
+#include "recon.h"
 
 struct BINOC;
 
@@ -83,7 +79,7 @@ extern "C" void SetBinocState_19CCE8(BINOC *, int);
 extern "C" void StopBinoc(BINOC *pbinoc)
 {
     if (pbinoc->hud.precon != 0) {
-        switch (pbinoc->hud.precon->binocs) {
+        switch (pbinoc->hud.precon->state) {
         case 0:
         case 8:
         case 9:
@@ -98,8 +94,6 @@ INCLUDE_ASM(0X19CD38);
 
 /* the camera manager's binocular settings, read by UpdateBinoc only: a local view of B_002DDF40 */
 struct CM_19D330 { u8 unknown_0x0[0x460]; float radA; u8 unknown_0x464[0xC]; float fovA; u8 unknown_0x474[0x150]; float radB; u8 unknown_0x5C8[4]; float fovB; };
-/* the controller's stick values UpdateBinoc clears (a local view of JOY: one reader) */
-struct JOYSTICKVIEW { u8 unknown_0x0[0x10]; float v10, v14, v18, v1C, v20, v24, v28, v2C; };
 
 extern "C" int FAsegaGone(ASEGA *);
 extern "C" void SetBinocState_19D330(BINOC *, int);
@@ -144,9 +138,8 @@ void UpdateBinoc(BINOC *binoc)
     if (binoc->mode != 0)
         return;
     JOY *pjoy = binoc->pjt->pjoy;
-    JOYSTICKVIEW *pstick = (JOYSTICKVIEW *)pjoy;
     if (pjoy->vjoym == 1) {
-        pstick->v20 = pstick->v24 = pstick->v28 = pstick->v2C = pstick->v10 = pstick->v14 = pstick->v18 = pstick->v1C = 0.0f;
+        pjoy->field_0x20 = pjoy->field_0x24 = pjoy->field_0x28 = pjoy->field_0x2C = pjoy->xLeft = pjoy->yLeft = pjoy->radStick = pjoy->uStick = 0.0f;
     }
 }
 

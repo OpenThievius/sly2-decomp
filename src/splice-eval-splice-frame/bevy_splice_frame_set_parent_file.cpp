@@ -26,7 +26,8 @@ struct CFrame {
     int unk0;
     int unk4;
     int cparent;
-    int aparent[1];
+    int aparent[4];            /* the parents CFrame_AddParent fills (CFrame_127E90 below: slots[4]) */
+    VARB *pvarb;               /* 0x1C: the first binding (CFrame_RefAddBinding, the clone at 127E90 reads it as varbs) */
     CRef RefSetBinding(unsigned int symid, CRef *pref);
     CRef *PrefFindBinding(unsigned int symid, int fRecurse);
     int FFindBinding(unsigned int symid, int fRecurse, CRef *pref);
@@ -63,8 +64,6 @@ extern "C" void CFrame_RemoveParent(CFrame_127B70 *pframe, CFrame_127B70 *pparen
 
 struct HV { VARB *p; int pad[3]; };
 
-struct Owner { u8 unknown_0x0[0x1C]; VARB *varb; };
-
 extern "C" VARB *PvarbNew(void);
 
 extern "C" void func_00257430(HV *h, VARB *v);
@@ -81,10 +80,10 @@ extern "C" void FreeSlotheapPv(void *heap, void *p);
 
 extern "C" char B_004520D0[];
 
-extern "C" CRef *CFrame_RefAddBinding(CRef *pref, Owner *powner, int sym, CRef *pvalue)
+extern "C" CRef *CFrame_RefAddBinding(CRef *pref, CFrame *powner, int sym, CRef *pvalue)
 {
     HV h;
-    VARB **pvarbHead = &powner->varb;
+    VARB **pvarbHead = &powner->pvarb;
     func_00257430(&h, PvarbNew());
     h.p->symid = sym;
     h.p->ref = *pvalue;

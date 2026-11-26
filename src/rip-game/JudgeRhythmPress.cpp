@@ -1,59 +1,52 @@
-#include "types.h"
-struct Dancer_1533B0 { u8 unknown_0x0[0x150]; int pad150; };
-struct Entry_1533B0 { Dancer_1533B0 *target; int f4; int f8; float fC; u8 unknown_0x10[0xC]; int f1C; int f20; };
-struct Cell_1533B0 { float f0; u8 unknown_0x4[0x1C]; int f20; u8 unknown_0x24[0xC]; };
-struct RhythmFull_1533B0 {
-    u8 unknown_0x0[0x58]; float f58; u8 unknown_0x5C[4]; int cellCount; u8 unknown_0x64[0xC]; Cell_1533B0 cells[7];
-    int entryCount; Entry_1533B0 entries[1]; u8 unknown_0x1E8[0x230 - 0x1C4 - 0x24]; int f230;
-    u8 unknown_0x234[0x298 - 0x234]; float f298; float f29C; float f2A0;
-};
+#include "dancer.h"
+#include "rhythm.h"
 extern "C" {
-void AddRhythmScore(void *, float);
+void AddRhythmScore(RHYTHM *, float);
 int FFloatsNear__Ffff(float, float, float);
-int FVjoyButtonPressed(int, int);
-float GAccuracyRhythmCue(void *, void *);
-int GrfbtnVjoyPressedWithin(int, int, float);
+int FVjoyButtonPressed(JOY *, int);
+float GAccuracyRhythmCue(RHYTHM *, RHYTHMNOTE *);
+int GrfbtnVjoyPressedWithin(JOY *, int, float);
 float MarkClockTickRealOnly__FP5CLOCK(void *);
-void PlayDancerMove(Dancer_1533B0 *, int, int, int);
+void PlayDancerMove(DANCER *, int, int, int);
 void bevy_camera_follow_activity(void *, int, void *);
-float func_00153638(void *, float);
+float func_00153638(RHYTHM *, float);
 extern char B_002DEB30[];
 extern char B_003DD040[];
-void JudgeRhythmPress(RhythmFull_1533B0 *self, Dancer_1533B0 *dancer) {
-    int pad = dancer->pad150;
-    int pressed = GrfbtnVjoyPressedWithin(pad, 0xF0, 0.0f);
-    self->f230 = pressed;
+void JudgeRhythmPress(RHYTHM *self, DANCER *dancer) {
+    JOY *pjoy = dancer->pjoy;
+    int pressed = GrfbtnVjoyPressedWithin(pjoy, 0xF0, 0.0f);
+    self->btnCue = pressed;
     if (pressed != 0) {
-        for (int index = 0; index < self->entryCount; index++) {
-            Entry_1533B0 *entry = &self->entries[index];
-            if (entry->target == dancer) {
-                if (entry->f20 == 0) {
+        for (int index = 0; index < self->cnote; index++) {
+            RHYTHMNOTE *entry = &self->anote[index];
+            if (entry->pdancer == dancer) {
+                if (entry->fDone == 0) {
                     bevy_camera_follow_activity(B_002DEB30, 0x35, self);
-                    if (MarkClockTickRealOnly__FP5CLOCK(B_003DD040) < entry->fC - self->f58) {
+                    if (MarkClockTickRealOnly__FP5CLOCK(B_003DD040) < entry->time - self->windowEarly) {
                         PlayDancerMove(dancer, -1, -1, 1);
-                        AddRhythmScore(self, self->f298);
+                        AddRhythmScore(self, self->scoreTooEarly);
                         return;
                     }
-                    if (entry->f1C != 0) {
+                    if (entry->fHit != 0) {
                         PlayDancerMove(dancer, -1, -1, 1);
-                        AddRhythmScore(self, self->f2A0);
+                        AddRhythmScore(self, self->scoreRepeat);
                         return;
                     }
-                    entry->f1C = 1;
-                    if (FVjoyButtonPressed(pad, entry->f4) != 0) {
+                    entry->fHit = 1;
+                    if (FVjoyButtonPressed(pjoy, entry->btn) != 0) {
                         int cellIndex = 0;
-                        PlayDancerMove(dancer, entry->f4, entry->f8, 0);
+                        PlayDancerMove(dancer, entry->btn, entry->oid, 0);
                         AddRhythmScore(self, func_00153638(self, GAccuracyRhythmCue(self, entry)));
-                        for (; cellIndex < self->cellCount; cellIndex++) {
-                            Cell_1533B0 *cell = &self->cells[cellIndex];
-                            if (FFloatsNear__Ffff(cell->f0, entry->fC, 0.1f) != 0) {
-                                cell->f20 = 1;
+                        for (; cellIndex < self->cbeat; cellIndex++) {
+                            RHYTHMBEAT *cell = &self->abeat[cellIndex];
+                            if (FFloatsNear__Ffff(cell->time, entry->time, 0.1f) != 0) {
+                                cell->hit = 1;
                                 break;
                             }
                         }
                     } else {
                         PlayDancerMove(dancer, -1, -1, 1);
-                        AddRhythmScore(self, self->f29C);
+                        AddRhythmScore(self, self->scoreWrongButton);
                     }
                     return;
                 }

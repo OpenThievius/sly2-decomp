@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "button.h"
+#include "sly.h"
+#include "oxa.h"
 #include "sw.h"
 #include "sly2.h"
 
@@ -7,28 +9,23 @@ struct UL { u64 v; } __attribute__((packed));
 extern "C" const UL RO_002A4E80;
 extern "C" SW B_003DD490;
 /* one half of a contact (0x40 bytes, two per contact): the object and the object it touches */
-/* the object g_2e1e40 points at (the player: SLY::jts is its 0x18C8, SLY::pjtcsinfo its 0x18C4, which UpdateButton compares with a button id): one reader, so a view */
-/* what g_2e1e40 points at, the player (sly.h: SLY::pjtcsinfo is its 0x18C4, SLY::jts its 0x18C8); one reader, so a view */
-struct PLAYERVIEW { u8 unknown_0x0[0x18C4]; s32 id; s32 jts; };
 struct XPSIDE { u8 unknown_0x0[0x8]; SO *pso; BUTTON *pbutton; u8 unknown_0x10[0x30]; };
 struct XP { XPSIDE aside[2]; u8 unknown_0x80[0x1C]; s32 kind; u8 unknown_0xA0[0xC]; XP *pxpNext; };
-struct XPGROUP { XP *pxpFirst; XPGROUP *pxpgroupNext; };
-/* SO::poxa's block as UpdateButton reads it past OXA's declared part */
-struct OXABOARD { u8 unknown_0x0[0x60]; SO *owner; XPGROUP *pxpgroupFirst; };
+struct NODE { XP *pxpFirst; NODE *pxpgroupNext; }; /* the contact list node oxa.h's OXA::first points at (InitBarrier_file.cpp defines the same NODE) */
 extern "C" {
 void UpdateSo(void);
 void SetButtonButtons(BUTTON *, unsigned);
 int FCheckButtonObject(BUTTON *, SO *);
 void QueueSwCallbackOnce(SW *, BUTTON *, u64, int);
 }
-extern PLAYERVIEW *g_2e1e40;
+extern SLY *g_2e1e40; /* the player */
 extern float g_2dded0;
 extern "C" void UpdateButton(BUTTON *button)
 {
     UpdateSo();
     switch (button->btn.buttons) {
     case 2:
-        if (g_2e1e40 != 0 && g_2e1e40->jts == 3 && g_2e1e40->id == button->id)
+        if (g_2e1e40 != 0 && g_2e1e40->jts == 3 && (s32)g_2e1e40->pjtcsinfo == button->id)
             button->btn.tButtons = g_2dded0;
         {
             float time = button->btn.dtRepush;
@@ -59,16 +56,16 @@ extern "C" void UpdateButton(BUTTON *button)
             buttons = 0;
             if (g_2e1e40 != 0) {
                 if (g_2e1e40->jts == 3)
-                    buttons = g_2e1e40->id == button->id;
+                    buttons = (s32)g_2e1e40->pjtcsinfo == button->id;
             }
             break;
         case 0:
-            XPGROUP *pxpgroup = ((OXABOARD *)button->poxa)->pxpgroupFirst;
+            NODE *pxpgroup = (NODE *)button->poxa->first;
             buttons = 0;
             for (; pxpgroup != 0; pxpgroup = pxpgroup->pxpgroupNext) {
                 for (XP *pxp = pxpgroup->pxpFirst; pxp != 0; pxp = pxp->pxpNext) {
                     if (pxp->kind == 10) continue;
-                    int side = ((OXABOARD *)button->poxa)->owner != pxp->aside[0].pso;
+                    int side = button->poxa->owner != pxp->aside[0].pso;
                     SO *psoOther = pxp->aside[1 - side].pso;
                     if (((XPSIDE *)((char *)pxp + (side << 6)))->pbutton == button && FCheckButtonObject(button, psoOther)) {
                         button->ptarget = psoOther;

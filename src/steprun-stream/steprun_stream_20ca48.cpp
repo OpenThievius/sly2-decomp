@@ -16,20 +16,33 @@ extern "C" void func_0020CA48(s32 arg0) {
 }
 
 extern "C" {
+struct ASEGA;
+struct ALO;
+struct DIRANIMS;
 struct FlagObject {
     u8 unknown_0x0[0x24];
-    s32 field_0x24;
+    /* 0x24 */ ASEGA *pasega;       /* reader: StartDirAnim stores the handle there */
 };
 
 s32 func_0020CA98(struct FlagObject *object) {
-    return object->field_0x24 == 0;
+    return object->pasega == 0;
 }
 }
 
+/* a playing direction animation (DIRANIM of src/steprun-stream/StartDirAnim.cpp): the members below are those StartDirAnim stores */
 struct DirAnim {
-    u8 unknown_0x0[0x34];
-    s32 field_0x34;
-    s32 field_0x38;
+    /* 0x0 */ s32 field_0x0;
+    /* 0x4 */ s32 field_0x4;
+    u8 unknown_0x8[0x4];
+    /* 0xC */ void *pvtable;
+    u8 unknown_0x10[0x10];
+    /* 0x20 */ ALO *palo;
+    /* 0x24 */ ASEGA *pasega;
+    /* 0x28 */ DIRANIMS *pdiranims;
+    /* 0x2C */ void *ppasegCurrent;
+    /* 0x30 */ u32 grfapl;
+    /* 0x34 */ s32 field_0x34;
+    /* 0x38 */ s32 field_0x38;
 };
 
 struct LoMessage {

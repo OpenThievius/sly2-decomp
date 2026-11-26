@@ -7,35 +7,7 @@
 #include "m2c_macros.h"
 #include "include_asm.h"
 #include "dl.h"
-
-/* one zero-crossing constraint row (0x28 bytes, kept on one of the DZG's lists through its DLE) */
-struct DZ {
-    /* 0x00 */ s32 dzk;  /* SolveDzg: 1 is a row waiting to be placed */
-    u8 unknown_0x4[0xC];
-    /* 0x10 */ f32 sdv;  /* SolveDzg picks the most negative */
-    u8 unknown_0x14[4];
-    /* 0x18 */ s32 field_0x18; /* SolveDzg: zero means FillDzgDz has not run for the row */
-    u8 unknown_0x1C[4];
-    /* 0x20 */ DLE dle;
-};
-
-/* the constraint solver (InitDzg, func_0011A550 in src/dl-dzg/ keeps its own local copy) */
-struct DZG {
-    /* 0x00 */ s32 cdzMax;
-    /* 0x04 */ s32 cdz;
-    /* 0x08 */ DZ *adz;
-    /* 0x0C */ DL dlPos;
-    /* 0x18 */ DL dlZero;
-    /* 0x24 */ DL dlMax;
-    /* 0x30 */ DL dlUncat;
-    /* 0x3C */ s32 cdzPos;
-    u8 unknown_0x40[0x10];
-    /* 0x50 */ s32 cxp;
-    /* 0x54 */ s32 axp;
-    /* 0x58 */ s32 cso;
-    /* 0x5C */ s32 apso;
-    /* 0x60 */ void *axpd;
-};
+#include "dzg.h"
 
 extern "C" DZG *func_0011A550(DZG *, int);
 
@@ -76,7 +48,7 @@ extern "C" void SolveDzg__FP3DZGiiPP2XPPiPPP2SO(DZG *dzg, s32 arg1)
 {
     DLI iterator;
     DLI second;
-    s32 list = (sptr)dzg + 0x30;
+    s32 list = (sptr)&dzg->dlUncat;
     iterator.m_ppv = (void **)list;
     iterator.m_pdl = (DL *)list;
     DLI *previous = g_2dd2fc;
@@ -89,7 +61,7 @@ extern "C" void SolveDzg__FP3DZGiiPP2XPPiPPP2SO(DZG *dzg, s32 arg1)
     DZ *node = head;
     while (node != 0) {
         if (node->dzk == 1) {
-            if (node->field_0x18 == 0)
+            if (node->row == 0)
                 FillDzgDz(dzg, arg1, node, func_00158958_158988(dzg, node));
             RemoveDlEntry(&dzg->dlUncat, node);
             AppendDlEntry(&dzg->dlPos, node);
@@ -105,11 +77,11 @@ extern "C" void SolveDzg__FP3DZGiiPP2XPPiPPP2SO(DZG *dzg, s32 arg1)
         f32 best = -0.01f;
         DZ *sel = 0;
         for (DZ *dz = (DZ *)dzg->dlUncat.head; dz != 0; dz = (DZ *)dz->dle.next) {
-            f32 value = dz->sdv;
+            f32 value = dz->sf;
             if (value < best) { best = value; sel = dz; }
         }
         if (sel == 0) break;
-        if (sel->field_0x18 == 0)
+        if (sel->row == 0)
             FillDzgDz(dzg, arg1, sel, func_00158958_158988(dzg, sel));
         EnforceDzgDz__FP3DZGP2DZ_158988(dzg, sel);
     }

@@ -6,33 +6,42 @@
 #include "m2c_macros.h"
 #include "include_asm.h"
 
-typedef struct CBinaryAsyncStream {
-    s32 field_0x0;
-    s32 handle;
-    s32 field_0x8;
-    s32 field_0xC;
-    s32 field_0x10;
-    s32 field_0x14;
-    s32 alignedSize;
-    s32 field_0x1C;
-    s32 field_0x20;
-    s32 field_0x24;
-    s32 field_0x28;
-    s32 field_0x2C;
-} CBinaryAsyncStream;
+/* the buffered stream of the movie and sound files, one layout for every function of this file (each used to keep its own view).
+   Readers of the fields: the constructor (cbBuf, pbBuf, zeroes the rest), FOpenSector, StartSpooling, FSpoolingComplete,
+   FinishSpooling, Skip, Close; CMpeg_CbDemuxed (src/mpeg/Finish_file.cpp) reads cbAvail, pbCur, cbConsumed and cbRemaining
+   under other names, func_001449C8 (src/new_13f888) reads cbRemaining. */
+struct CBinaryAsyncStream {
+    /* 0x00 */ int mode;        /* 0: the file is read through the IOP's file system (fd), 1: sectors straight off the disc (isector) */
+    /* 0x04 */ int fd;          /* -1 when closed */
+    /* 0x08 */ int isector;     /* the next sector of a mode 1 stream */
+    /* 0x0C */ int cbSpooling;  /* the bytes being read right now; zero when nothing is */
+    /* 0x10 */ char *pbSpooling; /* where they go */
+    /* 0x14 */ int cbBuf;       /* the buffer's size, two halves */
+    /* 0x18 */ char *pbBuf;     /* the buffer, 64-byte aligned */
+    /* 0x1C */ int cbAvail;     /* the bytes the last read delivered */
+    /* 0x20 */ char *pbCur;     /* the start of them */
+    /* 0x24 */ int cbConsumed;  /* how many the reader took */
+    /* 0x28 */ int cbRemaining; /* what the file still holds */
+    /* 0x2C */ unsigned int field_0x2C; /* the constructor zeroes it, FOpenSector sets it to its second argument */
+    int FOpenSector(unsigned int, unsigned int);
+    int FSpooling();
+    int FSpoolingComplete();
+    void FinishSpooling();
+    void StartSpooling();
+};
 
 CBinaryAsyncStream *__18CBinaryAsyncStreamPv(CBinaryAsyncStream *stream, s32 arg1, s32 size) {
-    stream->alignedSize = (size + 0x3F) & ~0x3F;
-    stream->handle = -1;
-    stream->field_0x8 = 0;
-    stream->field_0x10 = 0;
-    stream->field_0x20 = 0;
-    stream->field_0x14 = arg1;
+    stream->pbBuf = (char *)((size + 0x3F) & ~0x3F);
+    stream->fd = -1;
+    stream->isector = 0;
+    stream->pbSpooling = 0;
+    stream->pbCur = 0;
+    stream->cbBuf = arg1;
     stream->field_0x2C = 0;
-    stream->field_0x28 = 0;
-    stream->field_0xC = 0;
-    stream->field_0x24 = 0;
-    stream->field_0x1C = 0;
+    stream->cbRemaining = 0;
+    stream->cbSpooling = 0;
+    stream->cbConsumed = 0;
+    stream->cbAvail = 0;
     return stream;
 }
 
@@ -49,11 +58,9 @@ void func_001325B8(s32 arg0, s32 arg1) {
 
 }
 
-struct CBinaryAsyncStream_132600 { int FOpenSector(unsigned int, unsigned int); };
-
 struct LOCATION { unsigned int isector; unsigned int cb; int kind; };
 
-extern "C" int CBinaryAsyncStream_FOpenLocation(CBinaryAsyncStream_132600 *pstream, LOCATION *ploc)
+extern "C" int CBinaryAsyncStream_FOpenLocation(CBinaryAsyncStream *pstream, LOCATION *ploc)
 {
     int fOpened = 0;
     if (ploc->kind == 2)
@@ -63,90 +70,57 @@ extern "C" int CBinaryAsyncStream_FOpenLocation(CBinaryAsyncStream_132600 *pstre
 
 INCLUDE_ASM(0X132638);
 
-struct CBinaryAsyncStream_132640 {
-    int m_state;      /* 0x00 */
-    int pad04;
-    unsigned int m_isector;  /* 0x08 */
-    int pad0c[3];
-    int m_x18;        /* 0x18 */
-    int m_x1c;        /* 0x1C */
-    int m_x20;        /* 0x20 */
-    int m_x24;        /* 0x24 */
-    unsigned int m_x28;  /* 0x28 */
-    unsigned int m_x2c;  /* 0x2C */
-};
 
-extern "C" void StartSpooling__18CBinaryAsyncStream(CBinaryAsyncStream_132640 *);
+extern "C" void StartSpooling__18CBinaryAsyncStream(CBinaryAsyncStream *);
 
-extern "C" int FOpenSector__18CBinaryAsyncStreamUiUi(CBinaryAsyncStream_132640 *self, unsigned int isector, unsigned int csector) {
-    self->m_isector = isector;
-    self->m_x2c = csector;
-    self->m_x28 = csector;
-    self->m_state = 1;
-    self->m_x20 = self->m_x18;
-    self->m_x1c = 0;
-    self->m_x24 = 0;
+extern "C" int FOpenSector__18CBinaryAsyncStreamUiUi(CBinaryAsyncStream *self, unsigned int isector, unsigned int csector) {
+    self->isector = isector;
+    self->field_0x2C = csector;
+    self->cbRemaining = csector;
+    self->mode = 1;
+    self->pbCur = self->pbBuf;
+    self->cbAvail = 0;
+    self->cbConsumed = 0;
     StartSpooling__18CBinaryAsyncStream(self);
     return 1;
 }
 
-typedef struct CBinaryAsyncStream_132688 {
-    s32 mode;
-    s32 handle;
-    s32 field_0x8;
-} CBinaryAsyncStream_132688;
+s32 FSpooling__18CBinaryAsyncStream_132688(CBinaryAsyncStream *);
 
-s32 FSpooling__18CBinaryAsyncStream_132688(CBinaryAsyncStream_132688 *);
-
-s32 FinishSpooling__18CBinaryAsyncStream(CBinaryAsyncStream_132688 *);
+s32 FinishSpooling__18CBinaryAsyncStream(CBinaryAsyncStream *);
 
 s32 sceCdSync(s32);
 
 s32 sceClose(s32);
 
-void Close__18CBinaryAsyncStream(CBinaryAsyncStream_132688 *stream) {
+void Close__18CBinaryAsyncStream(CBinaryAsyncStream *stream) {
     s32 handle;
 
     switch (stream->mode) {
     case 0:
-        handle = stream->handle;
+        handle = stream->fd;
         if (handle >= 0) {
             sceClose(handle);
         }
-        stream->handle = -1;
+        stream->fd = -1;
         break;
     case 1:
         if (FSpooling__18CBinaryAsyncStream_132688(stream) != 0) {
             sceCdSync(0);
             FinishSpooling__18CBinaryAsyncStream(stream);
         }
-        stream->field_0x8 = 0;
+        stream->isector = 0;
         break;
     }
     stream->mode = -1;
 }
 
-struct CBinaryAsyncStream_132710 {
-    int mode;
-    int fd;
-    int isector;
-    int cbSpooling;
-    char *pbSpooling;
-    int cbBuf;
-    char *pbBuf;
-    int pad1C;
-    char *pbCur;
-    int pad24;
-    int cbRemaining;
-    int FSpooling();
-    void StartSpooling();
-};
 
 extern "C" int sceRead(int, void *, int);
 
 extern "C" void ReadCdDirect__FUiUiPv(unsigned, unsigned, void *, int);
 
-void CBinaryAsyncStream_132710::StartSpooling()
+void CBinaryAsyncStream::StartSpooling()
 {
     int cbHalf = cbBuf / 2;
     if (FSpooling() != 0)
@@ -170,28 +144,10 @@ void CBinaryAsyncStream_132710::StartSpooling()
     }
 }
 
-typedef struct CBinaryAsyncStream_1327D0 {
-    u8 unknown_0x0[0xC];
-    s32 field_0xC;
-} CBinaryAsyncStream_1327D0;
-
-s32 FSpooling__18CBinaryAsyncStream(CBinaryAsyncStream_1327D0 *stream) {
-    return stream->field_0xC != 0;
+s32 FSpooling__18CBinaryAsyncStream(CBinaryAsyncStream *stream) {
+    return stream->cbSpooling != 0;
 }
 
-struct CBinaryAsyncStream_1327E0 {
-    int mode;
-    int fd;
-    int pad8;
-    int pbSpooling;
-    int cbSpooling;
-    u8 unknown_0x14[8];
-    int cbAvail;
-    int pad20;
-    int cbConsumed;
-    int FSpooling();
-    int FSpoolingComplete();
-};
 
 extern "C" int sceIoctl(int, int, int *);
 
@@ -199,7 +155,7 @@ extern "C" int sceCdSync_1327E0(int);
 
 extern "C" int sceCdGetError();
 
-int CBinaryAsyncStream_1327E0::FSpoolingComplete()
+int CBinaryAsyncStream::FSpoolingComplete()
 {
     int fComplete = 0;
     int ierror = 0;
@@ -221,29 +177,15 @@ int CBinaryAsyncStream_1327E0::FSpoolingComplete()
         }
     }
     if (ierror != 0) {
-        pbSpooling = 0;
         cbSpooling = 0;
+        pbSpooling = 0;
         fComplete = 0;
     }
     return fComplete;
 }
 
-struct CBinaryAsyncStream_1328A8 {
-    int mode;
-    int pad4;
-    int isector;
-    int cbSpooling;
-    int pbSpooling;
-    u8 unknown_0x14[8];
-    int cbAvail;
-    int pbCur;
-    int cbConsumed;
-    int cbRemaining;
-    int FSpoolingComplete();
-    void FinishSpooling();
-};
 
-void CBinaryAsyncStream_1328A8::FinishSpooling()
+void CBinaryAsyncStream::FinishSpooling()
 {
     if (FSpoolingComplete() == 0)
         return;
@@ -277,13 +219,8 @@ void Spool__18CBinaryAsyncStream(s32 *arg0) {
     }
 }
 
-typedef struct CBinaryAsyncStream_132998 {
-    u8 unknown_0x0[0x24];
-    s32 field_0x24;
-} CBinaryAsyncStream_132998;
-
-void Skip__18CBinaryAsyncStreami(CBinaryAsyncStream_132998 *stream, s32 count) {
-    stream->field_0x24 = stream->field_0x24 + count;
+void Skip__18CBinaryAsyncStreami(CBinaryAsyncStream *stream, s32 count) {
+    stream->cbConsumed = stream->cbConsumed + count;
 }
 
 s32 CreateSlotheapSwAlign(s32 *, s32, s32, s32); /* extern */

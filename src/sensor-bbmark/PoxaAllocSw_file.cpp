@@ -27,7 +27,7 @@ struct POXA {
     /* 0x60 */ SO *pso;
     /* 0x64 */ OX *head;
     /* 0x68 */ MQ *pmqList;         /* RecalcSwXpAll frees it */
-    u8 unknown_0x6C[0x4];
+    /* 0x6C */ MQ *pcontact;        /* readers (oxa.h): MarkSoCustomContacts, func_001F7410, so_sm_1f77c0 */
     /* 0x70 */ u64 grf;             /* RecalcSwXpAll: bits 2, 8 and 0x10 */
 };
 

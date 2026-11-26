@@ -14,7 +14,7 @@ struct NEWXP {
     u8 unknown_0x90[0x4];
     /* 0x94 */ f32 field_0x94;
     /* 0x98 */ s32 field_0x98;
-    /* 0x9C */ s32 field_0x9C; // 0xE selects the attached case of state 7
+    /* 0x9C */ s32 kind; // 0xE selects the attached case of state 7 (SolveSw and UpdateButton read the same word as the contact kind)
 };
 
 // the object behind JT::field_0x4D4: only the word at 0x1BC is read
@@ -39,7 +39,7 @@ void AdjustSlyNewXp(SLY *sly, NEWXP *pxp, int iside)
         func_0019E9C8(sly->PvPipe(), pxp, iside);
         break;
     case 7:
-        if (pxp->field_0x9C == 0xE && sly->attachKind == 3 && sly->field_0x4D4->field_0x1BC != 0) {
+        if (pxp->kind == 0xE && sly->attachKind == 3 && sly->field_0x4D4->field_0x1BC != 0) {
             pxp->field_0x98 = 0;
             if (sly->field_0x4CC == 0) {
                 pxp->field_0x94 = 0.0f;

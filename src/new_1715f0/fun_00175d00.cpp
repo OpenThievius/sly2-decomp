@@ -2,12 +2,10 @@
 #include "stepguard.h"
 #include "sly.h"
 #include "clq.h"
-/* The guard's sight limits, read only here (the class is a guess from grf, paimstate and poxa): a local view. */
-struct GUARDSIGHTVIEW { u8 unknown_0x0[0xF48]; LM lmDistance; LM lmYaw; LM lmPitch; };
+#include "goals.h"
 struct LSG { QW pos; u8 unknown_0x10[0x50]; };
 struct HITOBJ { u8 unknown_0x0[0x14]; JT **pptarget; };
 struct HIT { u8 unknown_0x0[4]; HITOBJ *pobj; };
-struct GUARDCHECK { u8 unknown_0x0[0x10]; STEPGUARD *pactor; u8 unknown_0x14[0x30 - 0x14]; JT *ptarget; int field_0x34; float field_0x38; int field_0x3C; };
 extern "C" {
 void CStackFrame_Construct(void *);
 void CStackFrame_Destructor(void *, int);
@@ -25,22 +23,22 @@ extern float g_2dded0;
 }
 int FCheckLm(LM *, float);
 float RadNormalize(float);
-extern "C" int func_00175D00(GUARDCHECK *pcheck)
+extern "C" int func_00175D00(GOALNOTICE *pcheck)
 {
-    STEPGUARD *pactor = pcheck->pactor;
-    if (!(pactor->grf & 8) || pactor->paimstate || pcheck->field_0x3C)
+    STEPGUARD *pactor = (STEPGUARD *)pcheck->pstep;
+    if (!(pactor->grf & 8) || pactor->paimstate || pcheck->prange)
         return 0;
     if (!pcheck->ptarget)
         return 0;
     if (((pcheck->ptarget->grfo >> 60) & 1) == 0)
         return 0;
     if (FIsBasicDerivedFrom(pcheck->ptarget, 0x32)) {
-        if (pcheck->ptarget->NAlertLevel() == 2)
+        if (((JT *)pcheck->ptarget)->NAlertLevel() == 2)
             return 0;
     }
     int fForce = 0;
     if (FIsBasicDerivedFrom(pcheck->ptarget, 0x34)) {
-        JT *ptarget = pcheck->ptarget;
+        JT *ptarget = (JT *)pcheck->ptarget;
         if (ptarget->field_0x4CC != -1) {
             if (ptarget->attachKind < 5)
                 fForce = ptarget->attachKind >= 3;
@@ -65,32 +63,32 @@ extern "C" int func_00175D00(GUARDCHECK *pcheck)
     LSG lsg;
     float yaw, pitch, dist, pan;
     int count, list;
-    QW posActor = PosLoWorld(pcheck->pactor);
+    QW posActor = PosLoWorld(((STEPGUARD *)pcheck->pstep));
     QW posTarget = PosLoWorld(pcheck->ptarget);
     QW delta = VectorSub(posTarget, posActor);
-    float yawSo = RadYawSo(pcheck->pactor);
+    float yawSo = RadYawSo(((STEPGUARD *)pcheck->pstep));
     DecomposeSphere(delta, &yaw, &pitch, &dist);
-    if (!FCheckLm(&((GUARDSIGHTVIEW *)pcheck->pactor)->lmDistance, dist))
+    if (!FCheckLm((LM *)((STEPGUARD *)pcheck->pstep)->lmDistance, dist))
         return 0;
     float yawDiff = RadNormalize(yaw - yawSo);
-    if (!FCheckLm(&((GUARDSIGHTVIEW *)pcheck->pactor)->lmYaw, yawDiff))
+    if (!FCheckLm((LM *)((STEPGUARD *)pcheck->pstep)->lmYaw, yawDiff))
         return 0;
-    CalculateVectorPanTilt__FP6VECTORPfT1(*PmatLoWorld(pcheck->pactor), 0, &pan);
+    CalculateVectorPanTilt__FP6VECTORPfT1(*PmatLoWorld(((STEPGUARD *)pcheck->pstep)), 0, &pan);
     float pitchDiff = RadNormalize(pitch - pan);
-    if (!FCheckLm(&((GUARDSIGHTVIEW *)pcheck->pactor)->lmPitch, pitchDiff))
+    if (!FCheckLm((LM *)((STEPGUARD *)pcheck->pstep)->lmPitch, pitchDiff))
         return 0;
     if (!fForce) {
-        if (pcheck->field_0x34 == 0) {
-            if (g_2dded0 - pcheck->field_0x38 < 3.0f)
+        if (pcheck->state == 0) {
+            if (g_2dded0 - pcheck->tState < 3.0f)
                 return 0;
-        } else if (pcheck->field_0x34 != 2) {
+        } else if (pcheck->state != 2) {
             return 0;
         }
     }
     CStackFrame_Construct(frame);
-    bevy_camera_follow_push_out(&B_003DD490, posActor, posTarget, &FFilterOxaBasic, pcheck->pactor->poxa, &count, &list);
+    bevy_camera_follow_push_out(&B_003DD490, posActor, posTarget, &FFilterOxaBasic, ((STEPGUARD *)pcheck->pstep)->poxa, &count, &list);
     HIT *phit = PsoHitTestLineObjects__FiP6VECTORT1iPP2SOP3LSG(0, posActor, posTarget, count, list, &lsg);
-    if (phit && *phit->pobj->pptarget != pcheck->ptarget) {
+    if (phit && *phit->pobj->pptarget != (JT *)pcheck->ptarget) {
         CStackFrame_Destructor(frame, 2);
         return 0;
     }

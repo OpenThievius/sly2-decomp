@@ -4,8 +4,10 @@
 #include "ps2inline.h"
 #include "bomb.h"
 #include "expl.h"
-union W_13B860 { void *p; int i; float f; };
-struct Msg_13B860 { W_13B860 w0, w4, w8, wC, w10; u8 unknown_0x14[0xC]; QW dir; QW f40; u8 unknown_0x50[0x20]; QW f70; };
+#include "wkr.h"
+#include "sw.h"
+/* the weapon record DetonateBomb sends, with a quadword past WKR's 0x60 bytes: the scale it measured the push with (one reader, so a local struct) */
+struct BOMBWKR : WKR { QW scale; };
 struct Frame_13B860 { u8 unknown_0x0[0x10]; };
 struct Phit_13B860 { u8 unknown_0x0[0x54]; int f54; };
 struct Link_13B860 { u8 unknown_0x0[0x14]; void **f14; };
@@ -14,12 +16,11 @@ void CStackFrame_Construct(Frame_13B860 *);
 void CStackFrame_Destructor(Frame_13B860 *, int);
 int FIsBasicDerivedFrom(void *, int);
 void GetBombVictims(BOMB *, int *, void ***);
-int PaloAbsorbWkr(Msg_13B860 *);
+SO *PaloAbsorbWkr(WKR *);
 Phit_13B860 *PhitfxSpawn(int, QW, void *);
 QW PosLoWorld(void *);
 void PrepareBombDetonation(BOMB *, QW, QW);
-struct SWBOMB { u8 unknown_0x0[0x402C]; int idHitfx; };
-extern SWBOMB B_003DD490;
+extern SW B_003DD490;
 extern int D_002BC9E0;
 extern QW g_2a2dc0;
 extern float RO_002A4B1C;
@@ -36,13 +37,13 @@ void DetonateBomb(BOMB *self) {
             if (count > 0) {
                 do {
                     void *victim = victims[index];
-                    Msg_13B860 msg;
+                    BOMBWKR msg;
                     memset(&msg, 0, 0x60);
-                    msg.wC.i = self->field_0x1EC;
-                    msg.w10.i = self->field_0x1F0;
-                    msg.dir = self->pos180;
-                    msg.w0.p = self;
-                    msg.w8.p = victim;
+                    msg.grftak = self->field_0x1EC;
+                    msg.damage = self->field_0x1F0;
+                    msg.pos = self->pos180;
+                    msg.psoSource = self;
+                    msg.ploTarget = (LO *)victim;
                     QW pos = PosLoWorld(victim);
                     QW fallback = g_2a2dc0;
                     QW offset = VectorSub(pos, self->pos180);
@@ -54,8 +55,8 @@ void DetonateBomb(BOMB *self) {
                     QW direction = distance;
                     QW scale = VectorFromWord(*(u32 *)&D_002BC9E0);
                     index++;
-                    msg.f40 = VectorScaleX(direction, scale);
-                    msg.f70 = scale;
+                    msg.vel = VectorScaleX(direction, scale);
+                    msg.scale = scale;
                     PaloAbsorbWkr(&msg);
                 } while (index < count);
             }
@@ -72,7 +73,7 @@ void DetonateBomb(BOMB *self) {
             explso.grfexpl = 9;
             explso.palo = (ALO *)self;
             explso.g = self->field_0x16C;
-            explso.uPercent = self->field_0x15C;
+            explso.uPercent = self->radius;
             pexpl->ExplodeExplso(&explso);
         }
         if (self->field_0x1E0 != 0) {
@@ -84,7 +85,7 @@ void DetonateBomb(BOMB *self) {
                     owner = ((*link) == attacker) ? (void *)self : (*link);
                 }
             }
-            PhitfxSpawn(B_003DD490.idHitfx, PosLoWorld(self), owner)->f54 = 1;
+            PhitfxSpawn(B_003DD490.field_0x402C, PosLoWorld(self), owner)->f54 = 1;
         }
         self->Remove();
         self->field_0x174 = 0;

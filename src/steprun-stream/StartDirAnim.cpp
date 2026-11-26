@@ -21,6 +21,8 @@ struct DIRANIM {
     DIRANIMS *pdiranims;
     ASEG **ppasegCurrent;
     u32 grfapl;
+    s32 field_0x34;     /* reader: HandleDirAnimMessage (steprun_stream_20ca48.cpp) sets it on messages 0x17D and 0x17E */
+    s32 field_0x38;     /* the same, messages 0x17F and 0x180 */
 };
 
 extern char D_002DA9D0[];

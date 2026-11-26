@@ -1,12 +1,9 @@
 #include "sly2.h"
 #include "vu0inline.h"
+#include "crv.h"
 
 struct JT;
 struct ACTADJ;
-struct CRV {
-    u8 unknown_0x0[0xE4];
-    /* 0xE4 */ s32 fLoop;
-};
 struct JTRAIL {
     u8 unknown_0x0[0x4D4];
     /* 0x4D4 */ CRV *pcrv;
@@ -56,7 +53,7 @@ void MatchJtXmgRail__FP2JTP3XMGP6ACTADJ(JT *pjt, XMG *pxmg, ACTADJ *pactadj)
     f32 sMin = SMinCrv(pcrv);
     f32 sMax = SMaxCrv(pcrv);
     f32 s;
-    if (pcrv->fLoop != 0) {
+    if (pcrv->closed != 0) {
         s = GModPositive__Fff(prail->s + ds, sMax);
     } else {
         s = prail->s + ds;

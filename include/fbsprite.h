@@ -9,9 +9,9 @@
 #include "types.h"
 #include "rgba.h"
 #include "blot.h"
+#include "rogwindow.h"
 
 struct AMB;
-struct MOVIECHAR;
 struct SPRITE;
 
 /* the instance's ambient sound is held through a reference pointer (StopSpriteInstance clears it with VirtualRefPtr_Assign); reading it
@@ -30,10 +30,18 @@ struct AFFINE2D {
 
 /* one key of a label: its actions (func_002190F8 pauses the instance on action 7) */
 struct SPRITEKEY {
-    u8 unknown_0x0[7];
+    /* 0x00 */ f32 t;               /* the key's time: AdvanceSpriteInstance, LoadMovieSprites (UpdateSpriteInstance reads it through its own view) */
+    /* 0x04 */ u8 cplace;           /* LoadMovieSprites (the loader that fills the key): the counts of the lists a key holds */
+    /* 0x05 */ u8 cpair;
+    /* 0x06 */ u8 cclear;           /* the slots the key clears: ClearSpriteKeySlots, LoadMovieSprites (two readers agree) */
     /* 0x07 */ u8 caction;
     /* 0x08 */ u8 *aaction;
-    u8 unknown_0xC[0x14];
+    /* 0x0C */ struct SPRITEPLACE *aplace; /* LoadMovieSprites: cplace 0x40-byte places (SPRITEPLACE is defined there) */
+    /* 0x10 */ struct SPRITEPAIR *apair; /* LoadMovieSprites: cpair 8-byte pairs */
+    /* 0x14 */ u16 *aclear;         /* the indices of the slots it clears: ClearSpriteKeySlots, LoadMovieSprites (cclear halfwords) */
+    /* 0x18 */ u8 cactionRec;       /* LoadMovieSprites: the number of 8-byte {kind, argument} records at aactionRec */
+    u8 unknown_0x19[3];
+    /* 0x1C */ struct SPRITEACTION *aactionRec;
 };
 
 /* a 64-bit clock value (g_2ddf18); kept in a struct because StopSpriteInstance copies it as a struct */
@@ -42,12 +50,27 @@ struct SPRITESTAMP {
 };
 
 struct SPRITELABEL {
-    u8 unknown_0x0[4];
+    /* 0x00 */ u16 ckey;            /* the number of keys in akey: AdvanceSpriteInstance, LoadMovieSprites */
+    u8 unknown_0x2[2];
     /* 0x04 */ SPRITEKEY *akey;     /* reader: func_002190F8 */
     /* 0x08 */ f32 dt;              /* the label's length: SeekSpriteInstanceFraction, SeekSpriteInstanceTime, UpdateSpriteInstance */
     /* 0x0C */ BLOT *pblot;         /* QueueSpriteInstanceSlots queues onto its list (sl, 0xFC) */
     /* 0x10 */ struct SPRITE *psprite; /* RefreshSpriteInstance, func_002190F8 */
     /* 0x14 */ s32 id;              /* PlayRootSpriteLabel, PlaceSpriteInstance */
+};
+
+/* a movie character (the dictionary of LoadMovieDictionary keeps them 0x40 bytes apart); a slot's pchar points at one. Readers of the fields:
+   type: FGetSpriteSlotTransform, FStartSpriteLabelInstance, func_00215730, func_002158C0, func_00215960 (DrawMovieCharacter and
+   func_00215850 read it as `kind`); pblot: func_00215730, func_002158C0, func_00215960; id: the four first ones (a sprite index for type 4, an
+   object id for type 6); pwindow: func_00215730 sets it (func_001BEB28's window), func_002158C0 reads its pcamobj and clears it. */
+struct MOVIECHAR {
+    u8 unknown_0x0[4];
+    /* 0x04 */ s32 type;            /* 4: a sprite, 6: a rog-path object, 1, 3, 7: drawn through the slot's list */
+    /* 0x08 */ BLOT *pblot;
+    u8 unknown_0xC[4];
+    /* 0x10 */ s32 id;
+    /* 0x14 */ ROGWINDOW *pwindow;
+    u8 unknown_0x18[0x28];
 };
 
 /* one character slot of an instance (RefreshSpriteInstance fills the current transform and colours) */
@@ -69,7 +92,8 @@ struct SLOT {
     /* 0x58 */ s32 iinst;
     /* 0x5C */ f32 tUpdated;
     /* 0x60 */ u8 fTween;
-    u8 unknown_0x61[7];
+    /* 0x61 */ u8 flag;                 /* readers: func_00215960 sets it from QueueSpriteInstanceSlots' third word, DrawBlotMovie passes it to DrawMovieCharacter */
+    u8 unknown_0x62[6];
     /* 0x68 */ void *pslNext;
     u8 unknown_0x6C[4];
 };
@@ -79,7 +103,7 @@ struct SPRITEINST {
     /* 0x04 */ SLOT *aslot;
     /* 0x08 */ s16 ilabel;          /* -1 when unused */
     /* 0x0A */ s16 ikeyNext;
-    /* 0x0C */ f32 t;
+    /* 0x0C */ f32 t;              /* LoadMovieSprites clears it */
     /* 0x10 */ s32 fPaused;
     /* 0x14 */ AMBREF ramb;
 };
@@ -95,7 +119,7 @@ struct SPRITEMOVIE {
 
 struct SPRITE {
     /* 0x00 */ u16 clabel;
-    u8 unknown_0x2[2];
+    /* 0x02 */ u16 cinstance;           /* readers: func_00213B00, LoadMovieSprites (blotsprite.h's cinstance) */
     /* 0x04 */ SPRITELABEL *labels;
     /* 0x08 */ SPRITEINST *insts;
     u8 unknown_0xC[4];

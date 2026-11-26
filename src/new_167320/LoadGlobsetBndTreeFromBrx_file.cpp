@@ -6,7 +6,10 @@
 #include "types.h"
 #include "alloc.h"
 #include "light.h"
+#include "globset.h"
 #include "so.h"
+#include "alo.h"
+#include "sw.h"
 #include "xf.h"
 #include "include_asm.h"
 
@@ -105,9 +108,7 @@ INCLUDE_ASM(0X167E58);
 
 INCLUDE_ASM(0X167F78);
 
-struct SW_16DD58 { u8 unknown_0x0[0x3E38]; int flag; };
-
-extern "C" SW_16DD58 B_003DD490;
+extern "C" SW B_003DD490;
 
 extern "C" const char RO_0025E090[];
 
@@ -127,7 +128,7 @@ extern "C" void EndDmaCnt__4DMAS_167FC0(void *);
 
 extern "C" void CopyAb__FPvT0Ui_167FC0(void *, const void *, unsigned);
 
-extern "C" int CploFindSwObjectsByClass(SW_16DD58 *, int, int, int, int, void **);
+extern "C" int CploFindSwObjectsByClass(SW *, int, int, int, int, void **);
 
 extern "C" void UploadRelightLights(void *vifs)
 {
@@ -883,7 +884,7 @@ extern "C" char B_002DF940[];
 
 extern "C" char B_002DFA80[];
 
-extern "C" SW_16DD58 B_003DD490;
+extern "C" SW B_003DD490;
 
 extern "C" s64 B_003E1330;
 
@@ -959,7 +960,7 @@ extern "C" void func_0016DD58(void *arg0, int unused, int arg2) {
     AddVifFlusha__4VIFS_16DD58(arg0);
     AddVifMscal__4VIFSPv_16DD58(arg0, D_00001C48);
     AddVifFlusha__4VIFS_16DD58(arg0);
-    if (B_003DD490.flag != 0) {
+    if (B_003DD490.field_0x3E38 != 0) {
         if (g_2dea4c == B_002DEA50) {
             AddDmaCall__4DMASP2QW_16DD58(arg0, B_002DF940);
         } else {
@@ -1129,19 +1130,7 @@ void AddVifFlushaPacket(s32 arg0) {
 
 INCLUDE_ASM(0X16EA80);
 
-struct BND { float x, y, z, r, a, b; };
 
-struct GS {
-    u8 unknown_0x0[0x10];
-    VECTOR center;
-    float radius;
-    u8 unknown_0x24[0x44 - 0x24];
-    BND *abnd;
-};
-
-struct ALO { u8 unknown_0x0[0x148]; u64 grf; };
-
-struct GLOBSET { ALO *palo; u8 unknown_0x4[0xC]; VECTOR center; float radius; u8 unknown_0x24[0x20]; BND *abnd; };
 
 extern "C" void RemoveAloFromRenderTree(ALO *);
 
@@ -1156,16 +1145,16 @@ extern "C" VECTOR g_2a2dd0;
 void func_0016EF00(GLOBSET *g, int index)
 {
     RemoveAloFromRenderTree(g->palo);
-    g->palo->grf &= ~0x800000000UL;
-    g->center = g_2a2dd0;
+    g->palo->grfso &= ~0x800000000UL;
+    *(VECTOR *)g->center = g_2a2dd0;
     g->radius = 1000000.0f;
-    BND *b = g->abnd + index;
+    SUBGLOB *b = g->asubglob + index;
     VECTOR v = g_2a2dd0;
     float x = func_002599D8(&v);
     float y = func_002599E0(&v);
     float z = func_002599E8(&v);
-    b->r = 1000000.0f;
-    b->x = x; b->y = y; b->z = z;
+    b->radius = 1000000.0f;
+    b->pos[0] = x; b->pos[1] = y; b->pos[2] = z;
 }
 
 extern "C" {

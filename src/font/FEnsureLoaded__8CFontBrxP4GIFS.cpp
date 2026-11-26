@@ -1,43 +1,34 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-/* no cfont.h: it brings types.h, whose QW is a typedef, and the DMA methods below mangle a struct QW (P2QW) */
-struct QW;
-struct DMAS { void AddDmaCnt(); void AddDmaRefs(int, QW *); void EndDmaCnt(); };
-struct GIFS : DMAS {};
-/* the bitmap font: fontk (CFONT's first field), then the DMA blocks FEnsureLoaded sends (read by this method only) */
-struct CFontBrx {
-    /* 0x00 */ int fontk;
-    unsigned char unknown_0x4[0x58 - 4];
-    /* 0x58 */ int cbBmp; QW *pqwBmp;
-    unsigned char unknown_0x60[0xC0 - 0x60];
-    /* 0xC0 */ int cbBmp2; QW *pqwBmp2;
-    /* 0xC8 */ int cbClut; QW *pqwClut;
-    unsigned char unknown_0xD0[0x130 - 0xD0];
-    /* 0x130 */ int cb3; QW *pqw3;
-    int FEnsureLoaded(GIFS *);
-};
-/* the frame being built (FRM, frm.h): FEnsureLoaded keeps a bit per font loaded into it at 0x2C (one reader, so a view) */
-struct FRMFONTS { unsigned char unknown_0x0[0x2C]; unsigned fontsLoaded; };
+/* the DMA methods are extern "C" under their retail names: cfont.h brings types.h, whose QW is a typedef, so they cannot be
+   declared as methods whose mangling names a struct QW (P2QW) */
+#include "cfont.h"
+#include "frm.h"
+extern "C" {
+void EndDmaCnt__4DMAS(GIFS *);
+void AddDmaRefs__4DMASiP2QW(GIFS *, int, QW *);
+void AddDmaCnt__4DMAS(GIFS *);
 extern GIFS B_002DEA00;
-extern "C" FRMFONTS *g_2dea4c;
-int CFontBrx::FEnsureLoaded(GIFS *pgifs)
+extern FRM *g_2dea4c;
+int FEnsureLoaded__8CFontBrxP4GIFS(CFONT *pfont, GIFS *pgifs)
 {
     int fLoad;
     if (pgifs == &B_002DEA00) {
-        unsigned bit = 1u << fontk;
-        unsigned loaded = g_2dea4c->fontsLoaded;
+        unsigned bit = 1u << pfont->fontk;
+        unsigned loaded = g_2dea4c->grfFontLoaded;
         fLoad = (loaded & bit) == 0;
-        g_2dea4c->fontsLoaded = loaded | bit;
+        g_2dea4c->grfFontLoaded = loaded | bit;
     } else
         fLoad = 1;
     if (fLoad) {
-        pgifs->EndDmaCnt();
-        pgifs->AddDmaRefs(cbBmp, pqwBmp);
-        pgifs->AddDmaRefs(cbBmp2, pqwBmp2);
-        if (cbClut != 0) {
-            pgifs->AddDmaRefs(cbClut, pqwClut);
-            pgifs->AddDmaRefs(cb3, pqw3);
+        EndDmaCnt__4DMAS(pgifs);
+        AddDmaRefs__4DMASiP2QW(pgifs, pfont->cbBmp, (QW *)pfont->pqwBmp);
+        AddDmaRefs__4DMASiP2QW(pgifs, pfont->cbBmp2, (QW *)pfont->pqwBmp2);
+        if (pfont->cbClut != 0) {
+            AddDmaRefs__4DMASiP2QW(pgifs, pfont->cbClut, (QW *)pfont->pqwClut);
+            AddDmaRefs__4DMASiP2QW(pgifs, pfont->cbClut2, (QW *)pfont->pqwClut2);
         }
-        pgifs->AddDmaCnt();
+        AddDmaCnt__4DMAS(pgifs);
     }
     return fLoad;
+}
 }

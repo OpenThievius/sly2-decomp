@@ -4,6 +4,8 @@
 #include "m2c_macros.h"
 #include "sly2.h"
 #include "lo.h"
+#include "xfm.h"
+#include "sndsystem.h"
 #include "alloc.h"
 #include "types.h"
 
@@ -18,8 +20,24 @@ void func_0012EB48(s32 arg0) {
 }
 }
 
-/* the object whose xfm and vector lists LoadXfmFromBrx reads: an ALO-derived class (ALO is 0xE0 bytes) of unknown number */
-struct ALO_12EB48 : LO { u8 unknown_0x50[0x94]; int cxfm; void *axfm; int unkEC; int cvec; void *avec; };
+/* One sound or slot of a proxy (SND is 0x14 bytes, SLOT is its first 0x10): the range in which it is heard, its volume and pitch. */
+struct SLOT { int sfxid; float sStart; float sFull; float uVolume; };
+struct SND { int sfxid; float sStart; float sFull; float uVolume; float uPitch; };
+struct AMB;
+
+/* the proxy object (0xF8 bytes, an XFM: InitXfm starts func_0012EB48, LoadXfmFromBrx is called on it by func_0012EB78 and its fields
+   start at 0xE0 where XFM ends), seen by the functions of this file: psndDefault is Proxy_PsndDefault's pick, asnd and aslot are the
+   arrays AddProxySnd and AddProxySlotSource fill (up to 8; func_0012EB78 loads them, 0x14 and 0x10 bytes per entry), aref the live
+   ambient sources CloneProxy allocates, one per sound. func_0012EB78 had its own view of these words (cxfm, axfm, unkEC, cvec, avec)
+   under other names: the entry sizes 0x14 and 0x10 are SND and SLOT. */
+struct PROXY : XFM {
+    /* 0xE0 */ SND *psndDefault;
+    /* 0xE4 */ int csnd;
+    /* 0xE8 */ SND *asnd;
+    /* 0xEC */ void **aref;
+    /* 0xF0 */ int cslot;
+    /* 0xF4 */ SLOT *aslot;
+};
 
 extern "C" void *CStackFrame_Construct(void *);
 
@@ -29,9 +47,9 @@ extern "C" void *PvAllocStackClearImpl__Fi(ALLOCREQ *);
 
 extern "C" void *PvAllocSwCopyImpl__FiPv(ALLOCREQ *, void *);
 
-extern "C" void LoadXfmFromBrx(ALO_12EB48 *, void *);
+extern "C" void LoadXfmFromBrx(XFM *, void *);
 
-extern "C" void func_0012EB78(ALO_12EB48 *plo, void *pbis)
+extern "C" void func_0012EB78(PROXY *pproxy, void *pbis)
 {
     char frame[0x10];
     ALLOCREQ allocreq;
@@ -39,36 +57,19 @@ extern "C" void func_0012EB78(ALO_12EB48 *plo, void *pbis)
     ALLOCREQ *preq = &allocreq;
     preq->cb = 0xA0;
     preq->cbAlign = 0x10;
-    plo->axfm = PvAllocStackClearImpl__Fi(preq);
+    pproxy->asnd = (SND *)PvAllocStackClearImpl__Fi(preq);
     preq->cb = 0x80;
     preq->cbAlign = 0x10;
-    plo->avec = PvAllocStackClearImpl__Fi(preq);
-    LoadXfmFromBrx(plo, pbis);
-    preq->cb = plo->cxfm * 0x14;
+    pproxy->aslot = (SLOT *)PvAllocStackClearImpl__Fi(preq);
+    LoadXfmFromBrx(pproxy, pbis);
+    preq->cb = pproxy->csnd * 0x14;
     preq->cbAlign = 0x10;
-    plo->axfm = PvAllocSwCopyImpl__FiPv(preq, plo->axfm);
-    preq->cb = plo->cvec << 4;
+    pproxy->asnd = (SND *)PvAllocSwCopyImpl__FiPv(preq, pproxy->asnd);
+    preq->cb = pproxy->cslot << 4;
     preq->cbAlign = 0x10;
-    plo->avec = PvAllocSwCopyImpl__FiPv(preq, plo->avec);
+    pproxy->aslot = (SLOT *)PvAllocSwCopyImpl__FiPv(preq, pproxy->aslot);
     CStackFrame_Destructor(frame, 2);
 }
-
-/* One sound or slot of a proxy (SND is 0x14 bytes, SLOT is its first 0x10): the range in which it is heard, its volume and pitch. */
-struct SLOT { int sfxid; float sStart; float sFull; float uVolume; };
-struct SND { int sfxid; float sStart; float sFull; float uVolume; float uPitch; };
-struct AMB;
-
-/* the proxy object (0xF8 bytes), seen by the six functions of this file: psndDefault is Proxy_PsndDefault's pick, asnd and aslot
-   are the arrays AddProxySnd and AddProxySlotSource fill (up to 8), aref the live ambient sources CloneProxy allocates, one per sound */
-struct PROXY {
-    u8 unknown_0x0[0xE0];
-    /* 0xE0 */ SND *psndDefault;
-    /* 0xE4 */ int csnd;
-    /* 0xE8 */ SND *asnd;
-    /* 0xEC */ void **aref;
-    /* 0xF0 */ int cslot;
-    /* 0xF4 */ SLOT *aslot;
-};
 
 extern "C" void PostLoLoad(PROXY *);
 
@@ -78,9 +79,7 @@ extern "C" int func_001FE990(void *, int);
 
 extern "C" void AddAmbSlotSource(void *, int, float, PROXY *, float *);
 
-struct BANK { u8 unknown_0x0[0x228]; void *pmgr; };
-
-extern "C" BANK B_003DD040;
+extern "C" SNDSYSTEM B_003DD040;
 
 extern "C" void CloneProxy__FP5PROXYT0(PROXY *pproxy, PROXY *pproxySource)
 {
@@ -89,7 +88,7 @@ extern "C" void CloneProxy__FP5PROXYT0(PROXY *pproxy, PROXY *pproxySource)
     allocreq.cb = pproxy->csnd << 2;
     allocreq.cbAlign = 0x10;
     pproxy->aref = (void **)PvAllocSwClearImpl__Fi(&allocreq);
-    void *pmgr = B_003DD040.pmgr;
+    STREAMAMB *pmgr = B_003DD040.pambC;
     if (pmgr != 0) {
         for (int islot = 0; islot < pproxy->cslot; islot++) {
             SLOT *pslot = &pproxy->aslot[islot];

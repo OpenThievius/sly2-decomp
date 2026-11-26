@@ -1,7 +1,7 @@
 #include "sly2.h"
-struct XA { u8 unknown_0x0[0x60]; void *owner; };
-struct SOX { u8 unknown_0x0[0xEC]; XA *xa; };
-struct GEOM { u8 unknown_0x0[0x4]; SOX *so; };
+#include "geom.h"
+#include "so.h"
+#include "oxa.h"
 struct RIP;
 extern "C" {
 int FIsBasicDerivedFrom(void *, int);
@@ -10,7 +10,7 @@ int FBounceRip__FP3RIPP2SOP6VECTORT2(RIP *, GEOM *, QW, QW);
 }
 extern "C" int FBounceShrapnel(RIP *rip, GEOM *geom, QW pos, QW normal)
 {
-    void *owner = geom->so->xa->owner;
+    void *owner = geom->pso->poxa->owner;
     if (FIsBasicDerivedFrom(owner, 0x32))
         return 0;
     if (FIsBasicDerivedFrom(owner, 0x59)) {

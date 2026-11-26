@@ -2,29 +2,22 @@
 #include "types.h"
 #include "goal.h"
 #include "stepguard.h"
-struct ASEGA_REF;
-struct ASEGA_INFO { u8 unknown_0x0[0x78]; f32 svtMaster; };
-struct ASEGA { u8 unknown_0x0[0x14]; ASEGA_INFO *pinfo; };
-struct GOAL_GUARD : GOAL {
-    /* 0x30 */ s32 state;
-    u8 unknown_0x34[0xC];
-    /* 0x40 */ ASEGA_REF *pref;
-    /* 0x44 */ f32 tEnd;
-};
+#include "goals.h"
+#include "asega.h"
 
 extern "C" {
 int FCanSetGuardMode(STEPGUARD *, int);
-GOAL_GUARD *func_00205458(STEPGUARD *, int);
-ASEGA *func_00209518(ASEGA_REF *);
+GOAL *func_00205458(STEPGUARD *, int);
+ASEGA *func_00209518(void *);
 void SetAsegaMasterSpeed(ASEGA *, f32);
 void RemoveGuardPriorityClass(STEPGUARD *, int);
 void AddGuardPriorityClass(STEPGUARD *, int);
 void func_00206E50(STEPGUARD *);
 void func_00206DB0(STEPGUARD *);
 void func_0012D108(void *, QW);
-ASEGA_REF *PpoSwFocusBase(void *);
+void *PpoSwFocusBase(void *);
 void SetGuardMode(STEPGUARD *pguard, int mode);
-void GoalBrain_ChooseNextCommand(GOAL_GUARD *);
+void GoalBrain_ChooseNextCommand(GOALBRAIN *);
 extern char B_003DD490[];
 struct CLOCK { f32 t; f32 dt; };
 extern CLOCK g_2dded0;
@@ -54,19 +47,19 @@ void SetGuardMode(STEPGUARD *pguard, int mode)
         func_00206E50(pguard);
         break;
     case 14: {
-        GOAL_GUARD *pgoal = func_00205458(pguard, 0x9D);
+        GOALANIM *pgoal = (GOALANIM *)func_00205458(pguard, 0x9D);
         if (pgoal != 0) {
-            ASEGA *pasega = func_00209518(pgoal->pref);
+            ASEGA *pasega = func_00209518(pgoal->panimref);
             if (pasega != 0) {
-                SetAsegaMasterSpeed(pasega, pasega->pinfo->svtMaster);
+                SetAsegaMasterSpeed(pasega, pasega->paseg->svtMaster);
             }
         }
         break;
     }
     case 21: {
-        GOAL_GUARD *pgoal = func_00205458(pguard, 0x9C);
-        if (pgoal != 0 && pgoal->state == 0x12 && pgoal->pref == PpoSwFocusBase(B_003DD490) &&
-            pgoal->tEnd == 3.4028235e38f) {
+        GOALBRAIN *pgoal = (GOALBRAIN *)func_00205458(pguard, 0x9C);
+        if (pgoal != 0 && pgoal->cmd.type == 0x12 && (void *)pgoal->cmd.args.arg == PpoSwFocusBase(B_003DD490) &&
+            pgoal->cmd.args.argf == 3.4028235e38f) {
             GoalBrain_ChooseNextCommand(pgoal);
         }
         break;
@@ -86,9 +79,9 @@ void SetGuardMode(STEPGUARD *pguard, int mode)
         func_00206DB0(pguard);
         break;
     case 14: {
-        GOAL_GUARD *pgoal = func_00205458(pguard, 0x9D);
+        GOALANIM *pgoal = (GOALANIM *)func_00205458(pguard, 0x9D);
         if (pgoal != 0) {
-            ASEGA *pasega = func_00209518(pgoal->pref);
+            ASEGA *pasega = func_00209518(pgoal->panimref);
             if (pasega != 0) {
                 SetAsegaMasterSpeed(pasega, 0.0f);
             }
@@ -100,9 +93,9 @@ void SetGuardMode(STEPGUARD *pguard, int mode)
         break;
     }
     case 21: {
-        GOAL_GUARD *pgoal = func_00205458(pguard, 0x9C);
+        GOALBRAIN *pgoal = (GOALBRAIN *)func_00205458(pguard, 0x9C);
         if (pgoal != 0) {
-            switch (pgoal->state) {
+            switch (pgoal->cmd.type) {
             case 1:
             case 2:
             case 3:

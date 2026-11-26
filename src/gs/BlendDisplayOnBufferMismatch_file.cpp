@@ -19,10 +19,20 @@ struct DISPENV { GsPmode pmode; u64 smode2; GsDispFb dispfb; GsDisplay display; 
 
 extern DISPENV B_002DEB80[2];
 
+/* the GS's privileged registers at 0x12000000 (the public register map; sceGsPutDispEnv writes the same addresses): circuit 1's
+   DISPFB1 and DISPLAY1 are the ones BlendDisplayOnBufferMismatch writes (it sets PMODE's EN1) */
 struct GsPrivRegs {
-    GsPmode pmode; u8 unknown_0x8[0x70 - 8];
-    GsDispFb dispfb2; u8 unknown_0x78[8];
-    GsDisplay display2; u8 unknown_0x88[0x1000 - 0x88];
+    GsPmode pmode; u8 unknown_0x8[0x20 - 8];
+    /* 0x20 */ u64 smode2;       /* sceGsPutDispEnv (the non-interlaced branch) */
+    u8 unknown_0x28[0x70 - 0x28];
+    GsDispFb dispfb1; u8 unknown_0x78[8];
+    GsDisplay display1; u8 unknown_0x88[8];
+    /* 0x90 */ u64 dispfb2;      /* sceGsPutDispEnv */
+    u8 unknown_0x98[8];
+    /* 0xA0 */ u64 display2;     /* sceGsPutDispEnv */
+    u8 unknown_0xA8[0xE0 - 0xA8];
+    /* 0xE0 */ u64 bgcolor;      /* sceGsPutDispEnv */
+    u8 unknown_0xE8[0x1000 - 0xE8];
     u32 csr;
 };
 
@@ -45,8 +55,8 @@ void BlendDisplayOnBufferMismatch(void)
         } else {
             fb.dby = fb.dby + 1;
         }
-        ((GsPrivRegs*)0x12000000)->display2 = d;
-        ((GsPrivRegs*)0x12000000)->dispfb2 = fb;
+        ((GsPrivRegs*)0x12000000)->display1 = d;
+        ((GsPrivRegs*)0x12000000)->dispfb1 = fb;
         pm.en1 = 1;
     }
     ((GsPrivRegs*)0x12000000)->pmode = pm;
@@ -125,13 +135,17 @@ struct GSFRAME {
 
 union GSFRAMEU { GSFRAME f; u64 ul; };
 
+/* sceGsDrawEnv1 as sceGsSetDefDrawEnv fills it: each register is followed by its A+D address word (0x4C, 0x4E, 0x18, 0x40, 0x1A, 0x46,
+   0x45, 0x47); then the clear packet and the next GIF tag (0x70 bytes) that sceGsSetDefDBuff lays out */
 struct DRAWENV {
-    GSFRAMEU frame; s64 pad0;
-    s64 zbuf; s64 pad1;
-    s64 xyoffset; s64 pad2;
-    s64 scissor; s64 pad3;
-    u8 unknown_0x40[0x70 - 0x40];
-    s64 test; s64 pad5;
+    GSFRAMEU frame; s64 frameAddress;
+    s64 zbuf; s64 zbufAddress;
+    s64 xyoffset; s64 xyoffsetAddress;
+    s64 scissor; s64 scissorAddress;
+    /* 0x40 */ s64 prmodecont; s64 prmodecontAddress;    /* sceGsSetDefDrawEnv sets bit 0 (address 0x1A) */
+    /* 0x50 */ s64 colclamp; s64 colclampAddress;        /* the same (address 0x46) */
+    /* 0x60 */ s64 dthe; s64 dtheAddress;                /* the same: bit 0 set from the pixel format (address 0x45) */
+    s64 test; s64 testAddress;
     u8 unknown_0x80[0xF0 - 0x80];
 };
 
@@ -272,7 +286,18 @@ extern "C" void SendDmaSyncGsFinish__FP10sceDmaChanP2QW(sceDmaChan *chan, QW *pa
     LeaveCritSect(&B_002DFB40);
 }
 
-struct DMAS { u8 unknown_0x0[0x20]; };
+/* the DMA tag buffer builder (src/dmas/StartupDma_file.cpp: its constructor and Clear write these words, EndDmaCnt reads them; the GIFS and VIFS
+   constructors reuse them): this file only passes it on, so the last word before the derived classes' own is a gap */
+struct DMAS {
+    /* 0x00 */ u8 *pbMax;
+    /* 0x04 */ u8 *pbBase;
+    /* 0x08 */ u8 *pbCnt;
+    /* 0x0C */ u8 *pbCur;
+    /* 0x10 */ s32 fPad;
+    /* 0x14 */ s32 fEndPrim;
+    /* 0x18 */ const void *vt;
+    u8 unknown_0x1C[4];
+};
 
 struct GIFS : DMAS { u8 unknown_0x20[0x10]; };
 

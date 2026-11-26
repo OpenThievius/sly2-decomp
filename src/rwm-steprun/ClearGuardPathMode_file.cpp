@@ -5,6 +5,7 @@
 #include "stepguard.h"
 #include "types.h"
 #include "alloc.h"
+#include "sw.h"
 #include "m2c_macros.h"
 
 typedef STEPGUARD GUARD;
@@ -86,28 +87,25 @@ void RemoveGuardBusyGoal(STEPGUARD *owner)
     if (busy == 0) func_001A6CA8_20B478(owner, 0);
 }
 
-struct Object20B4A8 {
-    u8 unknown_0x0[0x40];
-    s32 field_0x40;
-};
 
 extern "C" void InitLo();
 
-extern "C" void func_001A6CA8_20B4A8(Object20B4A8 *, s32);
+extern "C" void func_001A6CA8_20B4A8(LO *, s32);
 
-extern "C" void func_0020B4A8(Object20B4A8 *object) {
+extern "C" void func_0020B4A8(LO *object) {
     s32 flags;
     InitLo();
-    flags = object->field_0x40;
+    flags = object->grfSw;
     if ((flags ^ 1) & 1) {
-        *(s32 *)flags = (s32) (*(s32 *)flags | 2);
+        object->pgrfentry->grf = object->pgrfentry->grf | 2;
     } else {
-        object->field_0x40 = (s32) (flags | 2);
+        object->grfSw = (s32) (flags | 2);
     }
     func_001A6CA8_20B4A8(object, 1);
 }
 
-struct PLO { u8 unknown_0x0[0x50]; int count; void *array; };
+/* the guard respawner (class unknown): an LO with a count and an array of guards, read by PostGuardRespawnerLoad and func_0020B590 */
+struct PLO : LO { int count; STEPGUARD **array; };
 
  extern "C" char B_003DD490[];
 
@@ -125,12 +123,12 @@ void PostGuardRespawnerLoad(PLO *plo)
     req.cb = count << 2;
     req.cbAlign = 0x10;
     plo->count = count;
-    void *array = PvAllocSwImpl__Fi(&req);
+    STEPGUARD **array = (STEPGUARD **)PvAllocSwImpl__Fi(&req);
     plo->array = array;
     CploFindSwObjectsByClass(B_003DD490, 0x405, 0x38, 0, plo->count, array);
 }
 
-struct LIST { u8 unknown_0x0[0x50]; int count; STEPGUARD **pguards; };
+typedef PLO LIST;
 
 void *memset(void *, int, unsigned int);
 
@@ -152,7 +150,7 @@ extern "C" void func_0020B590(LIST *list)
 {
     UpdateLo(list);
     int count = list->count;
-    STEPGUARD **pguards = list->pguards;
+    STEPGUARD **pguards = list->array;
     for (int index = 0; index < count; index++) {
         STEPGUARD *guard = pguards[index];
         if (((int)(guard->grfo >> 60) & 1) != 0 && g_2dded0 - guard->field_0xFF8 > g_2c3dbc) {

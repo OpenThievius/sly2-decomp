@@ -16,13 +16,14 @@ struct SEQNODEBASE {
     virtual void Slot2();
 };
 struct SEQNODE : SEQNODEBASE {
-    u8 unknown_0x10[0x30];
-    /* 0x40 */ s32 *pkind;
+    /* 0x10 */ s32 cref;  /* readers: Seqnode_AddRef, Seqnode_Release (AddJsgContext_file.cpp): the reference count */
+    u8 unknown_0x14[0x2C];
+    /* 0x40 */ s32 *precDrive; /* readers: func_00143DE8 tests the kind word of the record; SetSeqnodeDrive, the seqnode's drive JSGE (AddJsgContext_file.cpp, whose jsgek is that first word) */
 };
 
 /* the binoculars' part of the player (JT::PvBinoc()): the state word bevy_player_p15_binoc_active tests */
 struct BINOC {
-    u8 unknown_0x0[0x4];
+    /* 0x0 */ JT *pjt; /* readers: bevy_player_p15_binoc_default stores its argument; UpdateBinoc, SetBinocHudState (bevy_player_p15_binoc_default_file.cpp) */
     /* 0x4 */ u32 state;
 };
 
@@ -87,7 +88,7 @@ void func_00143DE8(JT *pjt, SEQNODE *pseqnodeNew)
     GoalStack_Clear(pjt->pgoalstack());
     if (bevy_player_p15_binoc_active(pjt))
         SetBinocState(pjt->PvBinoc(), -1);
-    if (pjt->field_0x11B4 != -1 && *pjt->pseqnode->pkind != 0x1E)
+    if (pjt->field_0x11B4 != -1 && *pjt->pseqnode->precDrive != 0x1E)
         pjt->SetMode(0);
 }
 

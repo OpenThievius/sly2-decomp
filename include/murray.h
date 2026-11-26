@@ -10,6 +10,7 @@
 
 struct IKLIMB;
 struct ASEGA;
+struct ASEG;
 
 struct MURRAY : JT {
     void *PvCarry() { return (char *)this + 0x1910; } /* Murray's carry part, CarryThrow_Init's second one (JT::PvCarry is the first, at 0x11B0): InitMurray, PostMurrayLoad, GetMurrayCpdefi, HandleMurrayMessage, UpdateMurrayActive and func_001B8450 pass its address */
@@ -84,7 +85,8 @@ struct MURRAY : JT {
     /* 0x1830 */ QW field_0x1830; /* PredictMurrayLead (96) */
     /* 0x1840 */ s32 field_0x1840; /* InitMurray sets -1 */
     u8 unknown_0x1844[0xC];
-    u8 part1850[0xBC]; /* reader: InitMurray (7) passes its address to func_0020BD78 */
+    u8 part1850[0xB8]; /* reader: InitMurray (7) passes its address to func_0020BD78 */
+    /* 0x1908 */ s32 field_0x1908; /* AdjustMurrayNewXp sets it; func_001B8EC0 tests it (two readers) */
     /* 0x190C */ struct ASEGA *field_0x190C; /* StartMurrayAttackA, StartMurrayAttackB read the aseg at its +0x14 */
     u8 unknown_0x1910[0x4];
     /* 0x1914 */ s32 stateCarry; /* in Murray's carry part at 0x1910 (state at +4, CarryThrow_SetState); func_00136530 (Bentley) tests it against 7 */
@@ -98,7 +100,11 @@ struct MURRAY : JT {
     /* 0x1AC4 */ s32 field_0x1AC4; /* UseMurrayGadget (100) copies it to JT field_0x130C */
     /* 0x1AC8 */ f32 field_0x1AC8; /* InitMurray sets -60 */
     /* 0x1ACC */ s32 field_0x1ACC; /* PostMurrayLoad (15) */
-    u8 unknown_0x1AD0[0x30];
+    /* 0x1AD0 */ struct LO *ploA;    /* func_001B9D28 (called from a script step with g_2f7900, the Murray InitMurray stores): moves it to a position unless its grfo bit 60 is set */
+    /* 0x1AD4 */ struct ASEG *pasegA; /* func_001B9D28 applies it to ploA */
+    /* 0x1AD8 */ struct LO *ploB;     /* func_001B9DB8 (called with g_2f7900 too): the same move through slot 29, unless bit 60 is set */
+    /* 0x1ADC */ struct ASEG *pasegB; /* func_001B9DB8 applies it to ploB */
+    u8 unknown_0x1AE0[0x20];
 };
 
 #if defined(__mips__)
@@ -124,6 +130,7 @@ SLY2_OFFSET_CHECK(MURRAY, field_0x1624, 0x1624);
 SLY2_OFFSET_CHECK(MURRAY, field_0x17FC, 0x17FC);
 SLY2_OFFSET_CHECK(MURRAY, field_0x1804, 0x1804);
 SLY2_OFFSET_CHECK(MURRAY, field_0x1808, 0x1808);
+SLY2_OFFSET_CHECK(MURRAY, field_0x1908, 0x1908);
 SLY2_OFFSET_CHECK(MURRAY, field_0x190C, 0x190C);
 SLY2_OFFSET_CHECK(MURRAY, stateCarry, 0x1914);
 SLY2_OFFSET_CHECK(MURRAY, psoCarry, 0x191C);
@@ -161,6 +168,10 @@ SLY2_OFFSET_CHECK(MURRAY, field_0x1840, 0x1840);
 SLY2_OFFSET_CHECK(MURRAY, apasegState, 0x1A58);
 SLY2_OFFSET_CHECK(MURRAY, apasegByIndex, 0x1AB0);
 SLY2_OFFSET_CHECK(MURRAY, pasegCarry, 0x1ABC);
+SLY2_OFFSET_CHECK(MURRAY, ploA, 0x1AD0);
+SLY2_OFFSET_CHECK(MURRAY, pasegA, 0x1AD4);
+SLY2_OFFSET_CHECK(MURRAY, ploB, 0x1AD8);
+SLY2_OFFSET_CHECK(MURRAY, pasegB, 0x1ADC);
 SLY2_OFFSET_CHECK(MURRAY, field_0x1AC0, 0x1AC0);
 SLY2_OFFSET_CHECK(MURRAY, field_0x1AC4, 0x1AC4);
 SLY2_OFFSET_CHECK(MURRAY, field_0x1AC8, 0x1AC8);

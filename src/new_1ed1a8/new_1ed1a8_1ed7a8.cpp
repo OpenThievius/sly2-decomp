@@ -7,27 +7,11 @@
 #include "classinfo.h"
 #include "lo.h"
 #include "sl.h"
+#include "saa.h"
+#include "shd.h"
 
 struct CBinaryInputStream;
 
-/* a screen animation node (retail "saa"): a BASIC whose slot 7 reads its record; the subclasses below add their own fields at 0x50 */
-struct SAA : BASIC {
-    virtual void LoadFromRecord(void *precord); /* 7: func_001ED7A8 calls it with the 0x20-byte record it just read */
-    /* 0x10 */ f32 tLast;          /* FUpdatableSaa: the clock time of the last update */
-    /* 0x14 */ s32 oid;            /* InitSaa copies it from the record; FMatchesSaaOid */
-    /* 0x18 */ s32 field_0x18;     /* InitSaa copies it from the record */
-    /* 0x1C */ s32 cframe;         /* the frame count: InitSaa copies it from the record; SetSaiIframe, UpdateLoop */
-    /* 0x20 */ s32 field_0x20;     /* InitSaa copies it from the record */
-    /* 0x24 */ s16 du;             /* SetSaiDuDv: 12-bit fixed point */
-    /* 0x26 */ s16 dv;
-    /* 0x28 */ u16 iframe;         /* SetSaiIframe */
-    u8 unknown_0x2A[0x2];
-    /* 0x2C */ s32 fDirty;         /* SetSaiIframe, SetSaiDuDv set it; FlushSaaUnpacks clears it */
-    /* 0x30 */ SAA *owner;         /* func_001ED7A8 sets it; InitSaa appends the node to the list only when it has none */
-    /* 0x34 */ SL sl;              /* InitSaa: InitSl(.., 0x10), the node's pending unpacks */
-    /* 0x40 */ SAA *next;          /* the link in B_003E159C's list (FlushSaaUnpacks) */
-    u8 unknown_0x44[0xC];
-};
 
 extern CLASSINFO D_002BAAE8[];
 
@@ -72,16 +56,27 @@ s32 func_001ED850(BASIC *pobj) {
 }
 }
 
+struct F2 { float lo, hi; };
+
+/* the 0x20-byte record InitSaa and the subclasses' Init functions read (func_001ED7A8 reads it from the stream): every subclass
+   takes the four floats at 0xC to 0x18 under its own names (loop and pause for InitLoop, a to d for InitPingpong, ...) */
 struct SAAF {
     s32 field_0x0;
     s32 field_0x4;
     u16 field_0x8;
     u16 field_0xA;
-    f32 field_0xC;
-    f32 field_0x10;
-    f32 field_0x14;
-    f32 field_0x18;
-    s32 field_0x1C;
+    union {
+        struct { f32 field_0xC; f32 field_0x10; };
+        F2 loop;
+    };
+    union {
+        struct { f32 field_0x14; f32 field_0x18; };
+        F2 pause;
+    };
+    union {
+        s32 field_0x1C;
+        u16 frame;
+    };
 };
 
 extern "C" void AppendSlEntry_1ED8E0(s32 *, SAA *);
@@ -200,10 +195,6 @@ s32 FMatchesSaaOid(struct SAA *saa, s32 *oid) {
 }
 }
 
-struct F2 { float lo, hi; };
-
-struct SAAF_1EDB98 { u8 unknown_0x0[0xC]; F2 loop; F2 pause; unsigned short frame; };
-
 struct LOOP : SAA {
     /* 0x50 */ F2 loop;            /* the range of seconds one pass takes */
     /* 0x58 */ F2 pause;           /* the range of seconds it waits between passes */
@@ -213,11 +204,11 @@ struct LOOP : SAA {
     /* 0x6C */ float cur;          /* the pause left */
 };
 
-extern "C" void InitSaa_1EDB98(SAA *, SAAF_1EDB98 *);
+extern "C" void InitSaa_1EDB98(SAA *, SAAF *);
 
 extern "C" float GRandInRange(float, float);
 
-extern "C" void InitLoop__FP4LOOPP4SAAF(LOOP *loop, SAAF_1EDB98 *saaf)
+extern "C" void InitLoop__FP4LOOPP4SAAF(LOOP *loop, SAAF *saaf)
 {
     InitSaa_1EDB98(loop, saaf);
     F2 *pl = &loop->loop;
@@ -290,24 +281,22 @@ struct PINGPONG : SAA {
     /* 0x6C */ float dtPause;      /* the pause left */
 };
 
-struct SAAF_1EDD60 { u8 unknown_0x0[0xC]; float a, b, c, d; unsigned short e; };
+extern "C" void InitSaa_1EDD60(SAA *, SAAF *);
 
-extern "C" void InitSaa_1EDD60(SAA *, void *);
-
-extern "C" void InitPingpong__FP8PINGPONGP4SAAF(PINGPONG *pp, SAAF_1EDD60 *saaf)
+extern "C" void InitPingpong__FP8PINGPONGP4SAAF(PINGPONG *pp, SAAF *saaf)
 {
     InitSaa_1EDD60(pp, saaf);
     R2 *dt = &pp->dt;
     R2 *pause = &pp->pause;
-    float a = saaf->a;
-    float b = saaf->b;
+    float a = saaf->field_0xC;
+    float b = saaf->field_0x10;
     dt->a = a;
     dt->b = b;
-    float c = saaf->c;
-    float d = saaf->d;
+    float c = saaf->field_0x14;
+    float d = saaf->field_0x18;
     pause->a = c;
     pause->b = d;
-    int frame = saaf->e;
+    int frame = saaf->frame;
     pp->gframe = (float)frame;
     float t = GRandInRange(dt->a, dt->b);
     int twice = pp->cframe << 1;
@@ -557,7 +546,6 @@ extern "C" void SetEyesClosed__FP4EYESf(EYES *eyes, f32 closed) {
     SetSaiIframe_1EE3B0(eyes, (s32) eyes->pos);
 }
 
-struct SHD { int oid; };
 
 extern "C" int FMatchesSaaOid_1EE420(SAA *, SHD *);
 
@@ -671,14 +659,13 @@ extern "C" float UCompleteCircler__FP7CIRCLER(CIRCLER *circler)
     return GModPositive__Fff_1EE768(g_2dded0_1EE768 * circler->sw, 6.2831855f) * 0.15915494f;
 }
 
-struct VECTOR_1EE7B0 { float x, y, z, w; } __attribute__((aligned(16)));
 
 extern "C" void func_001EC718_1EE7B0(ENTRY *);
 
 extern "C" SAA *B_003E159C_1EE7B0;
 
 extern "C" void FlushSaaUnpacks(void) {
-    VECTOR_1EE7B0 vector;
+    VECTOR vector;
     SAA *saa = B_003E159C_1EE7B0;
     ENTRY *unpack;
     if (saa != 0) {

@@ -6,6 +6,7 @@
 #include "jt.h"
 #include "include_asm.h"
 #include "so.h"
+#include "oxa.h"
 #include "sw.h"
 #include "phys.h"
 #include "ps2inline.h"
@@ -69,14 +70,23 @@ extern "C" void StartJmpDirectionAseg(JMP *pthis)
     ApplyAsegToHandle(paseg, pthis->pjt, 1, &pthis->pjt->field_0x1030, phandle->tStart, phandle->tEnd);
 }
 
-struct Node { int value; Node *next; };
+struct MQ;
 
-struct PMQOWNER { u8 unknown_0x0[0x64]; Node *first; };
+/* OXA::first's element, the contact list: PmqFirstOxaContact reads the first word as an int, FreeSwMqList's caller (func_00199298)
+   as the head of a chain of MQ and its slot */
+struct NODE {
+    union {
+        int value;
+        MQ *pmqFirst;
+    };
+    NODE *next;
+    MQ **ppmqSlot;
+};
 
-int PmqFirstOxaContact(PMQOWNER *self)
+int PmqFirstOxaContact(OXA *self)
 {
     int value = 0;
-    for (Node *node = self->first; node; node = node->next) {
+    for (NODE *node = self->first; node; node = node->next) {
         value = node->value;
         if (value)
             return value;
@@ -419,23 +429,10 @@ struct MQ {
     MQ *next;
 };
 
-struct MQLINK {
-    MQ *pmqFirst;
-    MQLINK *next;
-    MQ **ppmqSlot;
-};
 
-struct MQHOLDER { u8 unknown_0x0[0x64]; MQLINK *first; };
+struct MQROOT { u8 unknown_0x0[4]; SO *pinfo; };
 
-struct MQLEVEL { u8 unknown_0x0[0xEC]; MQHOLDER *pholder; };
-
-struct MQXPS { u8 unknown_0x0[0x60]; SO *pso; };
-
-struct MQINFO { u8 unknown_0x0[0xEC]; MQXPS *poxa; };
-
-struct MQROOT { u8 unknown_0x0[4]; MQINFO *pinfo; };
-
-struct MQOWNER { MQLEVEL *plevel; u8 unknown_0x4[0x18]; int kind; u8 unknown_0x20[0xA8]; MQROOT *proot; };
+struct MQOWNER { SO *plevel; u8 unknown_0x4[0x18]; int kind; u8 unknown_0x20[0xA8]; MQROOT *proot; };
 
 extern SW B_003DD490;
 
@@ -445,19 +442,19 @@ void func_00199298(MQOWNER *powner)
 {
     if (powner->kind != 0x11)
         return;
-    MQXPS *poxa = powner->proot->pinfo->poxa;
+    OXA *poxa = powner->proot->pinfo->poxa;
     if (poxa) {
-        SO *psoTarget = poxa->pso;
+        SO *psoTarget = poxa->owner;
         int fLocked = psoTarget->FIsLocked();
         MQ *pmqFree = 0;
-        for (MQLINK *plink = powner->plevel->pholder->first; plink; plink = plink->next) {
+        for (NODE *plink = powner->plevel->poxa->first; plink; plink = plink->next) {
             MQ **ppmq = &plink->pmqFirst;
             for (MQ *pmq = *ppmq; pmq; pmq = *ppmq) {
                 if (pmq->kind == 0xB) {
                     ppmq = &pmq->next;
                     continue;
                 }
-                int fOther = powner->plevel != (MQLEVEL *)pmq->aside[0].pso;
+                int fOther = powner->plevel != pmq->aside[0].pso;
                 SO *pso = pmq->aside[1 - fOther].pso;
                 if (fLocked ? pso->FIsLocked() != 0 : pso == psoTarget) {
                     *ppmq = pmq->next;
@@ -487,15 +484,10 @@ INCLUDE_ASM(0X19A098);
 
 extern "C" int CSolveQuadratic(float, float, float, float *);
 
-struct JMP_19A400 {
-    char *pjt;
-};
-
-int FTimeJtJumpToTarget(JMP_19A400 *pjmp, QW pos, QW vJump, QW posTarget, QW vTarget, float *pdtPredict)
+int FTimeJtJumpToTarget(JMP *pjmp, QW pos, QW vJump, QW posTarget, QW vTarget, float *pdtPredict)
 {
     float roots[4];
-    char *pjt = pjmp->pjt;
-    float gravityZ = ((SO *)pjt)->pphys->gravity[2];
+    float gravityZ = pjmp->pjt->pphys->gravity[2];
     float jumpZ = LaneZInGeneralRegister(vJump);
     float targetVelocityZ = LaneZInGeneralRegister(vTarget);
     float posZ = LaneZInGeneralRegister(pos);
@@ -761,19 +753,15 @@ float GAdjustJtLandingScore(Jt *self, int landing, float score, float bonus)
     return score;
 }
 
-struct CANDIDATETARGET { u8 unknown_0x0[0x70]; s64 grf; };
+struct CANDIDATE { u8 unknown_0x0[4]; SO *pinfo; u8 unknown_0x8[8]; s64 grf; };
 
-struct CANDIDATEINFO { u8 unknown_0x0[0xEC]; CANDIDATETARGET *ptarget; };
-
-struct CANDIDATE { u8 unknown_0x0[4]; CANDIDATEINFO *pinfo; u8 unknown_0x8[8]; s64 grf; };
-
-struct TARGETLIST { s32 count; CANDIDATETARGET **aptarget; };
+struct TARGETLIST { s32 count; OXA **aptarget; };
 
 extern "C" int func_0019B0A8(TARGETLIST *arg0, CANDIDATE *arg1) {
     if (arg1->grf & (0x8000L << 33)) {
         return 0;
     }
-    CANDIDATETARGET *target = arg1->pinfo->ptarget;
+    OXA *target = arg1->pinfo->poxa;
     if (target->grf & 4) {
         return 0;
     }

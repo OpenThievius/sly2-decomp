@@ -6,7 +6,10 @@
 #include "vu0inline.h"
 
 struct SWNODE {
-    u8 unknown_0x0[0x20];
+    /* 0x0 */ f32 lo[3];       /* reader: bevy_camera_follow_push_out (the node's box, compared with the swept box) */
+    u8 unknown_0xC[0x4];
+    /* 0x10 */ f32 hi[3];      /* reader: bevy_camera_follow_push_out */
+    u8 unknown_0x1C[0x4];
     /* 0x20 */ QW posCenter;
     /* 0x30 */ f32 sRadius;
     /* 0x34 */ struct ALO *paloFirst;

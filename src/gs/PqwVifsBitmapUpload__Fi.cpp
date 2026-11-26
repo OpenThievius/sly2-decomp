@@ -1,11 +1,12 @@
 #include "sly2.h"
+#include "bmp.h"
 struct QWL { s64 lo; s64 hi; };
-struct GIFS { u8 unknown_0x0[0xC]; QWL *pend; u8 unknown_0x10[0x20]; };
+/* the GIFS is 0x30 bytes (a DMAS with the packet state: __4GIFS_file.cpp); the cursor is the DMAS's pbCur at 0xC */
+struct GIFS { u8 unknown_0x0[0xC]; QWL *pbCur; u8 unknown_0x10[0x20]; };
 struct VIFS { u8 unknown_0x0[0x30]; };
 struct SFRAME { int a; QW *pqw; u8 unknown_0x8[8]; };
-struct Ctl { u8 unknown_0x0[4]; int f4; int f8; };
-struct Clut { int id; u8 group; u8 unknown_0x5[5]; u16 size; int fC; int f10; s64 f18; };
-struct Bmp { int id; u8 group; u8 unknown_0x5[7]; u8 fC; u8 unknown_0xD; u16 size; int f10; int f14; int f18; u8 unknown_0x1C[4]; s64 f20; };
+/* the ZPR (BlendDisplayOnBufferMismatch_file.cpp) as far as the upload reads it: its cursor at 4 (InitZpr, FlushZprPage) */
+struct Ctl { u8 unknown_0x0[4]; int cur; int f8; };
 extern "C" {
 void __4GIFS(GIFS *);
 void __4VIFS(VIFS *);
@@ -17,10 +18,10 @@ void AddVifFlush__4VIFS(VIFS *);
 void Reset__4DMAS(GIFS *);
 void AllocStatic__4DMASiP2QW(GIFS *, int, QW *);
 int AllocZpr(Ctl *, int);
-void BuildClutTex2__FP4CLUTi(Clut *, int);
-void BuildClutGifs__FP4CLUTiP4GIFS(Clut *, int, GIFS *);
-void BuildBmpTex0__FP3BMPi(Bmp *, int);
-void BuildBmpGifs__FP3BMPiP4GIFS(Bmp *, int, GIFS *);
+void BuildClutTex2__FP4CLUTi(CLUT *, int);
+void BuildClutGifs__FP4CLUTiP4GIFS(CLUT *, int, GIFS *);
+void BuildBmpTex0__FP3BMPi(BMP *, int);
+void BuildBmpGifs__FP3BMPiP4GIFS(BMP *, int, GIFS *);
 void Detach__4DMASPiPP2QW(GIFS *, int *, QW **);
 void AddVifDirect__4VIFSiP2QWi(VIFS *, int, QW *, int);
 void AddVifDirectRefs__4VIFSiP2QWi(VIFS *, int, int, int);
@@ -33,9 +34,9 @@ void DMAS_DetachCopyPermanent(VIFS *, int, int, int *);
 extern int B_003DCF98;
 extern int B_003DCF9C;
 extern int B_003DCFF0;
-extern Bmp *B_003DCFF4;
+extern BMP *B_003DCFF4;
 extern int B_003DCFF8;
-extern Clut *B_003DCFFC;
+extern CLUT *B_003DCFFC;
 }
 extern "C" int PqwVifsBitmapUpload__Fi(Ctl *pctl, int group)
 {
@@ -52,40 +53,40 @@ extern "C" int PqwVifsBitmapUpload__Fi(Ctl *pctl, int group)
     __4GIFS(&gifs);
     result = 0;
     __4VIFS(&vifs);
-    cStart = pctl->f4;
+    cStart = pctl->cur;
     CStackFrame_Construct(&frame);
     AllocStack__4DMASi(&vifs, (B_003DCF9C * 3 + B_003DCF98) * 10 + 4);
     AddDmaCnt__4DMAS(&vifs);
     AddVifFlush__4VIFS(&vifs);
     for (i = 0; i < B_003DCFF8; i++) {
-        Clut *pclut = &B_003DCFFC[i];
+        CLUT *pclut = &B_003DCFFC[i];
         if (pclut->group == group) {
             Reset__4DMAS(&gifs);
             AllocStatic__4DMASiP2QW(&gifs, 10, aqw);
-            int zpr = AllocZpr(pctl, pclut->size);
+            int zpr = AllocZpr(pctl, pclut->iblock);
             BuildClutTex2__FP4CLUTi(pclut, zpr);
             BuildClutGifs__FP4CLUTiP4GIFS(pclut, zpr, &gifs);
-            { QWL *pqwl = gifs.pend - 1; pqwl->lo = pqwl->lo | 0x8000; }
+            { QWL *pqwl = gifs.pbCur - 1; pqwl->lo = pqwl->lo | 0x8000; }
             Detach__4DMASPiPP2QW(&gifs, &cbDetach, (QW **)&pqwDetach);
             AddVifDirect__4VIFSiP2QWi(&vifs, cbDetach, pqwDetach, 0);
-            AddVifDirectRefs__4VIFSiP2QWi(&vifs, pclut->f10, pclut->fC, 0);
+            AddVifDirectRefs__4VIFSiP2QWi(&vifs, pclut->cb2, (int)pclut->pqw2, 0);
         }
     }
     for (i = 0; i < B_003DCFF0; i++) {
-        Bmp *pbmp = &B_003DCFF4[i];
-        if (group == pbmp->group) {
+        BMP *pbmp = &B_003DCFF4[i];
+        if (group == pbmp->bmpk) {
             Reset__4DMAS(&gifs);
             AllocStatic__4DMASiP2QW(&gifs, 10, aqw);
-            int zpr = AllocZpr(pctl, pbmp->size);
+            int zpr = AllocZpr(pctl, pbmp->iblock);
             BuildBmpTex0__FP3BMPi(pbmp, zpr);
             BuildBmpGifs__FP3BMPiP4GIFS(pbmp, zpr, &gifs);
-            { QWL *pqwl = gifs.pend - 1; pqwl->lo = pqwl->lo | 0x8000; }
+            { QWL *pqwl = gifs.pbCur - 1; pqwl->lo = pqwl->lo | 0x8000; }
             Detach__4DMASPiPP2QW(&gifs, &cbDetach, (QW **)&pqwDetach);
             AddVifDirect__4VIFSiP2QWi(&vifs, cbDetach, pqwDetach, 0);
-            AddVifDirectRefs__4VIFSiP2QWi(&vifs, pbmp->f18, pbmp->f14, 0);
+            AddVifDirectRefs__4VIFSiP2QWi(&vifs, pbmp->cqw, (int)pbmp->pvPixels, 0);
         }
     }
-    if (cStart < pctl->f4) {
+    if (cStart < pctl->cur) {
         Reset__4DMAS(&gifs);
         AllocStatic__4DMASiP2QW(&gifs, 10, aqw);
         AddPrimPack__4GIFSiiUl(&gifs, 0, 1, 0xE);

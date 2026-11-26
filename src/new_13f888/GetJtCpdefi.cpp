@@ -4,28 +4,8 @@
 #include "vu0inline.h"
 #include "jt.h"
 #include "clock.h"
+#include "cm.h"
 
-/* the camera's focus record GetJtCpdefi fills: the focus position, then the speed scale at 0x34 */
-struct CPDEFI {
-    u8 unknown_0x0[0x10];
-    union {
-        QW pos;
-        struct {
-            f32 x;
-            f32 y;
-            f32 z;
-        };
-    };
-    u8 unknown_0x20[0x14];
-    /* 0x34 */ f32 field_0x34;
-};
-/* the camera manager B_002DDF40: the player it follows and a flag */
-struct CAMMGR {
-    u8 unknown_0x0[0x260];
-    /* 0x260 */ JT *pjtFollowed;
-    u8 unknown_0x264[0x300 - 0x264];
-    /* 0x300 */ s32 field_0x300;
-};
 struct LIMITS {
     f32 lo;
     f32 hi;
@@ -43,7 +23,6 @@ QW PosSmooth(QW, QW, void *, int, float);
 void GetAttachCpdefi(void *, CPDEFI *);
 int func_0019C8B0(void *, CPDEFI *);
 int bevy_player_p7_damage_1a2160(void *, CPDEFI *);
-extern CAMMGR B_002DDF40;
 extern char D_002BCCB8[];
 extern char D_002BCCC8[];
 extern char D_002BCCD8[];
@@ -90,14 +69,14 @@ void GetJtCpdefi(JT *pjt, CPDEFI *pcpdefi) {
         }
         float value = GClamp(sp[2], z + lo, z + hi);
         pjt->field_0x104C = value;
-        if (B_002DDF40.field_0x300 != 0 || B_002DDF40.pjtFollowed != pjt) {
-            pcpdefi->z = value;
+        if (B_002DDF40.fCut != 0 || B_002DDF40.psoCpdefi != pjt) {
+            ((f32 *)&pcpdefi->pos)[2] = value;
         } else {
             void *table = pjt->field_0x434 != 0 ? (void *)D_002BCCC8 : (void *)D_002BCCB8;
             float smoothed = GSmooth__FfffP3SMPPf(table, 0, pjt->field_0x1050, pjt->field_0x104C, g_2dded0.dt);
             float floor = z + RO_002BCC98;
             float ceiling = z + RO_002BCC9C;
-            pcpdefi->z = smoothed;
+            ((f32 *)&pcpdefi->pos)[2] = smoothed;
             float clamped;
             if (smoothed < floor) {
                 clamped = floor;
@@ -107,10 +86,10 @@ void GetJtCpdefi(JT *pjt, CPDEFI *pcpdefi) {
                 else
                     clamped = smoothed;
             }
-            pcpdefi->z = clamped;
+            ((f32 *)&pcpdefi->pos)[2] = clamped;
         }
-        pcpdefi->x = sp[0];
-        pcpdefi->y = sp[1];
+        ((f32 *)&pcpdefi->pos)[0] = sp[0];
+        ((f32 *)&pcpdefi->pos)[1] = sp[1];
     }
     {
         QW smoothed = PosSmooth(pjt->dir, g_2a2dd0, D_002BCCD8, 0, g_2dded0.dt);
@@ -119,7 +98,7 @@ void GetJtCpdefi(JT *pjt, CPDEFI *pcpdefi) {
         pcpdefi->pos = sum;
         pjt->look = sum;
     }
-    pjt->field_0x1050 = pcpdefi->z;
+    pjt->field_0x1050 = ((f32 *)&pcpdefi->pos)[2];
     if (pjt->jmpState != -1) func_0019C8B0(pjt->PvJmp(), pcpdefi);
     if (pjt->field_0x4CC != -1) GetAttachCpdefi(pjt->PvAttach(), pcpdefi);
     if (pjt->zapState != -1) bevy_player_p7_damage_1a2160(pjt->PvZap(), pcpdefi);
@@ -134,7 +113,7 @@ void GetJtCpdefi(JT *pjt, CPDEFI *pcpdefi) {
         } else if (tHigh < t) {
             t = tHigh;
         }
-        pcpdefi->field_0x34 = pcpdefi->field_0x34 * t;
+        pcpdefi->sAdjust = pcpdefi->sAdjust * t;
     }
 }
 }

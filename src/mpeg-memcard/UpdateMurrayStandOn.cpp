@@ -13,11 +13,6 @@ struct STANDCONTACT {
     u8 unknown_0x70[0x18];
     f32 nz;
 };
-/* The word of the player at 0x108C that UpdateMurrayStandOn tests (jt.h has it inside an unknown span). */
-struct MURRAYSTANDVIEW {
-    u8 unknown_0x0[0x108C];
-    s32 field_0x108C;
-};
 extern "C" void AddSafePointOnGeom(void *, int, QW);
 extern "C" void func_001942F0(void *);
 extern "C" void UpdateJtPipeLook(void *);
@@ -31,7 +26,7 @@ extern "C" void UpdateMurrayStandOn(MURRAY *self)
             float level = pcontact->nz;
             if (0.7f < level) {
                 if (!(pcontact->pso->grfso & 0x20000000UL)) {
-                    if (((MURRAYSTANDVIEW *)self)->field_0x108C == 0)
+                    if (self->field_0x108C == 0)
                         AddSafePointOnGeom(self->PvPart9E0(), pcontact->field_0x40, pcontact->pos);
                 }
             }

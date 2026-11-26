@@ -5,6 +5,7 @@
 #include "m2c_macros.h"
 #include "include_asm.h"
 #include "bootq.h"
+#include "cmpeg.h"
 
 extern "C" void *memset(void *, int, unsigned);
 
@@ -25,37 +26,33 @@ extern "C" s32 *PentryAddBootQueue(BOOTQ *queue, s32 arg1) {
     return result;
 }
 
-struct MOVIE { int unk0; int id; u8 unknown_0x8[0x34]; int idLast; };
+extern "C" BOOTENTRY *PentryAddBootQueue_1A5020(BOOTQ *pbq, int type);
 
-struct ENTRY { int unk0; MOVIE *pmovie; };
-
-extern "C" ENTRY *PentryAddBootQueue_1A5020(void *pbq, int type);
-
-extern "C" void AddBootQueueMovie(void *pbq, MOVIE *pmovie)
+extern "C" void AddBootQueueMovie(BOOTQ *pbq, MOVIE *pmovie)
 {
-    int f; if (pmovie == 0) f = 0; else f = pmovie->id != pmovie->idLast;
+    int f; if (pmovie == 0) f = 0; else f = pmovie->field_0x4 != pmovie->field_0x3C;
     if (f)
-        PentryAddBootQueue_1A5020(pbq, 0)->pmovie = pmovie;
+        PentryAddBootQueue_1A5020(pbq, 0)->field_0x4 = (s32)pmovie;
 }
 
 INCLUDE_ASM(0X1A5070);
 
+/* the level record a kind-2 entry carries to RequestTransition (RunNextBootQueueEntry passes BOOTENTRY::field_0x8 on): AddBootQueueLevel tests
+   its words at 4 and 0x3C as AddBootQueueMovie does a MOVIE's (one reader on a guessed class, so a view) */
 struct Level_1A5078 { u8 unknown_0x0[4]; s32 f4; u8 unknown_0x8[0x34]; s32 f3C; };
 
-struct Entry_1A5078 { u8 unknown_0x0[8]; Level_1A5078 *level; s32 fC; s32 f10; };
+extern "C" BOOTENTRY *PentryAddBootQueue_1A5078(BOOTQ *, s32);
 
-extern "C" Entry_1A5078 *PentryAddBootQueue_1A5078(void *, s32);
-
-extern "C" void AddBootQueueLevel(void *queue, Level_1A5078 *level, s32 arg2, s32 arg3) {
+extern "C" void AddBootQueueLevel(BOOTQ *queue, Level_1A5078 *level, s32 arg2, s32 arg3) {
     s32 changed;
     if (level == 0) { changed = 0; } else {
         changed = level->f4 != level->f3C;
     }
     if (changed != 0) {
-        Entry_1A5078 *entry = PentryAddBootQueue_1A5078(queue, 2);
-        entry->level = level;
-        entry->fC = arg2;
-        entry->f10 = arg3;
+        BOOTENTRY *entry = PentryAddBootQueue_1A5078(queue, 2);
+        entry->field_0x8 = (s32)level;
+        entry->field_0xC = arg2;
+        entry->field_0x10 = arg3;
     }
 }
 

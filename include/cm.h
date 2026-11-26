@@ -20,7 +20,7 @@
 #include "rgba.h" /* CM::rgbaFog: SetCmRgbaFog and InitCm read it as one unaligned word */
 
 struct SO;
-struct CMREGION; /* the object bevy_camera_cm_14e148 records: its body is local to its only reader's file (new_14d1d0_14d470.cpp) */
+struct BSPZONE; /* the zone bevy_camera_cm_14e148 records: bspzone.h */
 
 /* The camera's definition of its focus, 0x50 bytes: SO slot 50 (GetSoCpdefi) fills the first 0x40, GetCmCpdefi adds posAdjust.
    source:sly1 CPDEFI (posBase, vBase there) */
@@ -79,7 +79,7 @@ struct CPR {
 };
 
 struct CM : BASIC {
-    /* 0x10 */ struct CMREGION *pregion; /* bevy_camera_cm_14e148 records the region func_0014E078 ranks first; InitCm clears it */
+    /* 0x10 */ struct BSPZONE *pregion; /* bevy_camera_cm_14e148 records the region func_0014E078 ranks first; InitCm clears it */
     /* 0x14 */ s32 field_0x14;     /* bevy_camera_cm_14e148: the region's word 0xE0; InitCm: 0xFF */
     /* 0x18 */ f32 rMrdRatio;      /* SetCmMrdRatio; RecalcCmFrustrum divides it by radFov; InitCm: 1.0 */
     /* 0x1C */ f32 rMrd;           /* RecalcCmFrustrum: at least 1; InitCm: 1.0. source:sly1 rMRD */

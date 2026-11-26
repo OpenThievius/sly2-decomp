@@ -17,18 +17,22 @@ struct GEOM {
 
 /* one side of a contact pair: the shape and the object it belongs to */
 struct MQSIDE {
-    GEOM *pgeom;
-    u8 unknown_0x4[0x8];
-    SO *pso;
-    u8 unknown_0x10[0x30];
+    /* 0x00 */ GEOM *pgeom;       /* reader: MarkSoCustomContacts (RecalcSwXpMovement sees the same word as an int) */
+    /* 0x04 */ void *pxf;         /* reader: RecalcSwXpMovement (the side's transform) */
+    u8 unknown_0x8[0x4];
+    /* 0x0C */ SO *pso;           /* readers: RecalcSwXpMovement, MarkSoCustomContacts; AdjustMurrayNewXp, AdjustVehicleNewXp (plo at 0x8 there) */
+    /* 0x10 */ QW pos;            /* reader: RecalcSwXpMovement */
+    u8 unknown_0x20[0x10];
+    /* 0x30 */ QW vel;            /* reader: RecalcSwXpMovement */
 };
 
 /* a contact between two objects, 0xC0 bytes (CloneMqList copies it): the lists are linked through next */
 struct MQ {
     MQSIDE side[2];
-    u8 unknown_0x80[0x2C];
-    MQ *next;
-    u8 unknown_0xB0[0x10];
+    /* 0x80 */ QW normal;         /* readers: AdjustMurrayNewXp (its VECTOR normal), AdjustVehicleNewXp (QW normal) */
+    u8 unknown_0x90[0x1C];
+    /* 0xAC */ MQ *next;
+    /* 0xB0 */ QW velRel;         /* reader: RecalcSwXpMovement */
 } __attribute__((aligned(16)));
 
 extern "C" void FreeSlotheapPv(SLOTHEAP *, void *);
@@ -47,17 +51,13 @@ extern "C" void FreeSwMqList__FP2SWP2MQ(SW *psw, MQ *pmq) {
 
 INCLUDE_ASM(0X1A7E60);
 
-struct XPD { int unknown_0x0; void *pxf; int unknown_0x8; SO *pso; QW pos; QW unknown_0x20; QW vel; };
-
-struct XP { XPD xpd[2]; QW unknown_0x80[3]; QW velRel; };
-
 extern "C" QW VelocityXfAtPos(void *, int, QW);
 
-void RecalcSwXpMovement(SW *psw, int cpxp, XP **apxp) {
+void RecalcSwXpMovement(SW *psw, int cpxp, MQ **apxp) {
     int ixpd;
     for (int ipxp = 0; ipxp < cpxp; ipxp++) {
-        XP *pxp = apxp[ipxp];
-        XPD *pxpd = pxp->xpd;
+        MQ *pxp = apxp[ipxp];
+        MQSIDE *pxpd = pxp->side;
         ixpd = 0;
         do {
             if (pxpd->pxf) {
@@ -68,7 +68,7 @@ void RecalcSwXpMovement(SW *psw, int cpxp, XP **apxp) {
             pxpd++;
         } while (ixpd < 2);
         ixpd = 0;
-        pxpd = pxp->xpd;
+        pxpd = pxp->side;
         SO **ppso = &pxpd->pso;
         do {
             SO *pso = *ppso;
@@ -76,7 +76,7 @@ void RecalcSwXpMovement(SW *psw, int cpxp, XP **apxp) {
             ixpd++;
             ppso += 0x10;
         } while (ixpd < 2);
-        pxp->velRel = VectorSub(pxp->xpd[0].vel, pxp->xpd[1].vel);
+        pxp->velRel = VectorSub(pxp->side[0].vel, pxp->side[1].vel);
     }
 }
 

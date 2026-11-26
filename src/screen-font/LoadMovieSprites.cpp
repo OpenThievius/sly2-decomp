@@ -1,20 +1,13 @@
 #include "sly2.h"
+#include "fbsprite.h"
 struct SLOTHEAP;
 struct Bis;
-struct BLOT { u8 unknown_0x0[0xC4]; SLOTHEAP *heap; };
 struct B4 { char b[4]; };
 struct M3 { QW r[3]; };
-struct SPRITE;
-struct MOVIE;
-struct PLACE { unsigned short a, b, c; short d; u8 unknown_0x8[0x8]; float m[6]; u8 unknown_0x28[0x8]; unsigned char e, f; u8 unknown_0x32[0x2]; int g; u8 unknown_0x38[0x8]; };
-struct PAIR { int second; int first; };
-struct ACTION { unsigned kind; int arg; };
-struct KEY { float t; unsigned char cplace, cpair, chalf, cbyte; unsigned char *abyte; PLACE *aplace; PAIR *apair; unsigned short *ahalf; unsigned char caction; u8 unknown_0x19[0x3]; ACTION *aaction; };
-struct LABEL { unsigned short ckey; u8 unknown_0x2[0x2]; KEY *akey; float dur; MOVIE *pmovie; SPRITE *psprite; int id; };
-struct SLOT { u8 unknown_0x0[0x70]; };
-struct INST { int cslot; SLOT *aslot; short ilabel; short unk; int c; int d; int e; };
-struct SPRITE { unsigned short clabel; unsigned short cinst; LABEL *alabel; INST *ainst; u8 unknown_0xC[0x14]; int pending; MOVIE *pmovie; int root; int pad2[1]; };
-struct MOVIE { u8 unknown_0x0[0x80]; unsigned short csprite; u8 unknown_0x82[0x2]; SPRITE *asprite; };
+/* the loader's own views of what a key holds (nothing else in the matched code reads them) */
+struct SPRITEPLACE { unsigned short a, b, c; short d; u8 unknown_0x8[0x8]; float m[6]; u8 unknown_0x28[0x8]; unsigned char e, f; u8 unknown_0x32[0x2]; int g; u8 unknown_0x38[0x8]; };
+struct SPRITEPAIR { int second; int first; };
+struct SPRITEACTION { unsigned kind; int arg; };
 extern "C" {
 unsigned short U16Read__18CBinaryInputStream(Bis *);
 unsigned char U8Read__18CBinaryInputStream(Bis *);
@@ -26,46 +19,46 @@ void CBinaryInputStream_ReadMatrix(Bis *, M3 *);
 void InitDepthSlot(SLOT *);
 void *PvAllocSlotheapClearImpl__FP8SLOTHEAP(SLOTHEAP *, int, int);
 }
-void LoadMovieSprites(BLOT *pblot, Bis *pbis, MOVIE *pmovie)
+void LoadMovieSprites(BLOT *pblot, Bis *pbis, BLOT *pmovie)
 {
     pmovie->csprite = U16Read__18CBinaryInputStream(pbis);
-    pmovie->asprite = (SPRITE *)PvAllocSlotheapClearImpl__FP8SLOTHEAP(pblot->heap, pmovie->csprite * 0x30, 0x12);
+    pmovie->asprite = (s32)PvAllocSlotheapClearImpl__FP8SLOTHEAP((SLOTHEAP *)pblot->palloc, pmovie->csprite * 0x30, 0x12);
     for (int isprite = 0; isprite < pmovie->csprite; isprite++) {
-        SPRITE *psprite = pmovie->asprite + isprite;
-        psprite->root = isprite == 0;
-        psprite->pmovie = pmovie;
-        psprite->cinst = U16Read__18CBinaryInputStream(pbis);
-        psprite->ainst = (INST *)PvAllocSlotheapClearImpl__FP8SLOTHEAP(pblot->heap, psprite->cinst * 0x18, 0x12);
+        SPRITE *psprite = (SPRITE *)pmovie->asprite + isprite;
+        psprite->fRoot = isprite == 0;
+        psprite->pmovie = (SPRITEMOVIE *)pmovie;
+        psprite->cinstance = U16Read__18CBinaryInputStream(pbis);
+        psprite->insts = (SPRITEINST *)PvAllocSlotheapClearImpl__FP8SLOTHEAP((SLOTHEAP *)pblot->palloc, psprite->cinstance * 0x18, 0x12);
         int cslot = U16Read__18CBinaryInputStream(pbis);
-        for (int iinst = 0; iinst < psprite->cinst; iinst++) {
-            INST *pinst = psprite->ainst + iinst;
-            pinst->c = 0;
+        for (int iinst = 0; iinst < psprite->cinstance; iinst++) {
+            SPRITEINST *pinst = psprite->insts + iinst;
+            pinst->t = 0.0f;
             pinst->ilabel = -1;
-            pinst->unk = 0;
-            pinst->d = 0;
+            pinst->ikeyNext = 0;
+            pinst->fPaused = 0;
             pinst->cslot = cslot;
-            pinst->aslot = (SLOT *)PvAllocSlotheapClearImpl__FP8SLOTHEAP(pblot->heap, cslot * 0x70, 0x10);
+            pinst->aslot = (SLOT *)PvAllocSlotheapClearImpl__FP8SLOTHEAP((SLOTHEAP *)pblot->palloc, cslot * 0x70, 0x10);
             for (int islot = 0; islot < pinst->cslot; islot++)
                 InitDepthSlot(pinst->aslot + islot);
         }
         psprite->clabel = U16Read__18CBinaryInputStream(pbis);
-        psprite->alabel = (LABEL *)PvAllocSlotheapClearImpl__FP8SLOTHEAP(pblot->heap, psprite->clabel * 0x18, 0x12);
-        psprite->pending = -1;
+        psprite->labels = (SPRITELABEL *)PvAllocSlotheapClearImpl__FP8SLOTHEAP((SLOTHEAP *)pblot->palloc, psprite->clabel * 0x18, 0x12);
+        psprite->ilabelPending = -1;
         for (int ilabel = 0; ilabel < psprite->clabel; ilabel++) {
-            LABEL *plabel = psprite->alabel + ilabel;
-            plabel->pmovie = pmovie;
+            SPRITELABEL *plabel = psprite->labels + ilabel;
+            plabel->pblot = pmovie;
             plabel->psprite = psprite;
-            plabel->dur = F32Read__18CBinaryInputStream(pbis);
+            plabel->dt = F32Read__18CBinaryInputStream(pbis);
             plabel->id = S32Read__18CBinaryInputStream(pbis);
             plabel->ckey = U16Read__18CBinaryInputStream(pbis);
-            plabel->akey = (KEY *)PvAllocSlotheapClearImpl__FP8SLOTHEAP(pblot->heap, plabel->ckey << 5, 0x12);
+            plabel->akey = (SPRITEKEY *)PvAllocSlotheapClearImpl__FP8SLOTHEAP((SLOTHEAP *)pblot->palloc, plabel->ckey << 5, 0x12);
             for (int ikey = 0; ikey < plabel->ckey; ikey++) {
-                KEY *pkey = plabel->akey + ikey;
+                SPRITEKEY *pkey = plabel->akey + ikey;
                 pkey->t = F32Read__18CBinaryInputStream(pbis);
                 pkey->cplace = U8Read__18CBinaryInputStream(pbis);
-                pkey->aplace = (PLACE *)PvAllocSlotheapClearImpl__FP8SLOTHEAP(pblot->heap, pkey->cplace << 6, 0x12);
+                pkey->aplace = (SPRITEPLACE *)PvAllocSlotheapClearImpl__FP8SLOTHEAP((SLOTHEAP *)pblot->palloc, pkey->cplace << 6, 0x12);
                 for (int iplace = 0; iplace < pkey->cplace; iplace++) {
-                    PLACE *pplace = pkey->aplace + iplace;
+                    SPRITEPLACE *pplace = pkey->aplace + iplace;
                     pplace->a = U16Read__18CBinaryInputStream(pbis);
                     pplace->b = U16Read__18CBinaryInputStream(pbis);
                     pplace->c = U16Read__18CBinaryInputStream(pbis);
@@ -85,34 +78,34 @@ void LoadMovieSprites(BLOT *pblot, Bis *pbis, MOVIE *pmovie)
                     pf[5] = ((float *)&mat2)[9];
                 }
                 pkey->cpair = U8Read__18CBinaryInputStream(pbis);
-                pkey->apair = (PAIR *)PvAllocSlotheapClearImpl__FP8SLOTHEAP(pblot->heap, pkey->cpair << 3, 0x12);
+                pkey->apair = (SPRITEPAIR *)PvAllocSlotheapClearImpl__FP8SLOTHEAP((SLOTHEAP *)pblot->palloc, pkey->cpair << 3, 0x12);
                 for (int ipair = 0; ipair < pkey->cpair; ipair++) {
-                    PAIR *ppair = pkey->apair + ipair;
+                    SPRITEPAIR *ppair = pkey->apair + ipair;
                     B4 first, second;
                     *(unsigned *)&first = U32Read__18CBinaryInputStream(pbis);
                     *(unsigned *)&second = U32Read__18CBinaryInputStream(pbis);
                     *(B4 *)&ppair->first = first;
                     *(B4 *)&ppair->second = second;
                 }
-                pkey->chalf = U8Read__18CBinaryInputStream(pbis);
-                pkey->ahalf = (unsigned short *)PvAllocSlotheapClearImpl__FP8SLOTHEAP(pblot->heap, pkey->chalf << 1, 0x12);
-                for (int ihalf = 0; ihalf < pkey->chalf; ihalf++)
+                pkey->cclear = U8Read__18CBinaryInputStream(pbis);
+                pkey->aclear = (u16 *)PvAllocSlotheapClearImpl__FP8SLOTHEAP((SLOTHEAP *)pblot->palloc, pkey->cclear << 1, 0x12);
+                for (int ihalf = 0; ihalf < pkey->cclear; ihalf++)
                 {
-                    unsigned short *phalf = pkey->ahalf + ihalf;
+                    unsigned short *phalf = pkey->aclear + ihalf;
                     *phalf = U16Read__18CBinaryInputStream(pbis);
                 }
-                pkey->cbyte = U8Read__18CBinaryInputStream(pbis);
-                pkey->abyte = (unsigned char *)PvAllocSlotheapClearImpl__FP8SLOTHEAP(pblot->heap, pkey->cbyte, 0x12);
-                for (int ibyte = 0; ibyte < pkey->cbyte; ibyte++)
-                    pkey->abyte[ibyte] = U8Read__18CBinaryInputStream(pbis);
                 pkey->caction = U8Read__18CBinaryInputStream(pbis);
-                pkey->aaction = (ACTION *)PvAllocSlotheapClearImpl__FP8SLOTHEAP(pblot->heap, pkey->caction << 3, 0x12);
-                for (int iaction = 0; iaction < pkey->caction; iaction++) {
-                    pkey->aaction[iaction].kind = U8Read__18CBinaryInputStream(pbis);
-                    if (pkey->aaction[iaction].kind < 2)
-                        pkey->aaction[iaction].arg = S32Read__18CBinaryInputStream(pbis);
+                pkey->aaction = (u8 *)PvAllocSlotheapClearImpl__FP8SLOTHEAP((SLOTHEAP *)pblot->palloc, pkey->caction, 0x12);
+                for (int ibyte = 0; ibyte < pkey->caction; ibyte++)
+                    pkey->aaction[ibyte] = U8Read__18CBinaryInputStream(pbis);
+                pkey->cactionRec = U8Read__18CBinaryInputStream(pbis);
+                pkey->aactionRec = (SPRITEACTION *)PvAllocSlotheapClearImpl__FP8SLOTHEAP((SLOTHEAP *)pblot->palloc, pkey->cactionRec << 3, 0x12);
+                for (int iaction = 0; iaction < pkey->cactionRec; iaction++) {
+                    pkey->aactionRec[iaction].kind = U8Read__18CBinaryInputStream(pbis);
+                    if (pkey->aactionRec[iaction].kind < 2)
+                        pkey->aactionRec[iaction].arg = S32Read__18CBinaryInputStream(pbis);
                     else
-                        pkey->aaction[iaction].arg = S32Read__18CBinaryInputStream(pbis);
+                        pkey->aactionRec[iaction].arg = S32Read__18CBinaryInputStream(pbis);
                 }
             }
         }

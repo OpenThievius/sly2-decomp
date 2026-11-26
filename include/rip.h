@@ -17,6 +17,12 @@ struct SO;
 
 struct LO;
 struct RIPG;
+struct ALO;
+
+/* a quadratic c0 + u * (c1 + u * c2) in the ripple's age fraction u (FRenderRipPosMat) */
+struct RIPQUADRATIC {
+    f32 c0, c1, c2;
+};
 
 /* a subscriber of a RIP: a 0xC-byte slot of the heap at 0x3E1144; ReleaseRip sends each one's object message 8 */
 struct RIPSUB {
@@ -32,10 +38,23 @@ struct RIP {
     u8 unknown_0xC[0x8];
     /* 0x14 */ f32 tStart;          /* readers: UpdateRip, ForceRipFade, UpdateRipg, RenderRipgSelf, RenderMatch; InitRip sets it to now */
     /* 0x18 */ f32 dtLifetime;      /* readers: UpdateRip, ForceRipFade; InitRip sets 1.0 */
-    u8 unknown_0x1C[0x4];
-    /* 0x20 */ f32 field_0x20;      /* InitRip (its float argument); GLINT and MATCH reuse the offset */
+    /* 0x1C */ struct ALO *palo;   /* readers: FBounceLeaf (a LEAF passes it to CreateStuck), FRenderRipPosMat (reads its 0x38, an LO's radius, and renders it);
+                                    TouchDroplet stores a word in it (a ripple's) */
+#ifdef __cplusplus
+    union {
+        f32 field_0x20;             /* InitRip (its float argument); GLINT and MATCH reuse the offset */
+        RIPQUADRATIC radius;        /* FRenderRipPosMat; TouchDroplet sets c0 (field_0x20) and c1 (30.0) of a ripple */
+    };
+    u8 unknown_0x2C[0x4];
+    union {
+        QW field_0x30;              /* InitRip, InitGlint, InitMatch set it from a constant */
+        RIPQUADRATIC scale;         /* FRenderRipPosMat reads three floats of it */
+    };
+#else
+    f32 field_0x20;
     u8 unknown_0x24[0xC];
-    /* 0x30 */ QW field_0x30;       /* InitRip, InitGlint, InitMatch set it from a constant */
+    QW field_0x30;
+#endif
     /* 0x40 */ QW field_0x40;       /* InitRip: the first three quadwords of a 0x2A2D00 table */
     /* 0x50 */ QW field_0x50;
     /* 0x60 */ QW field_0x60;

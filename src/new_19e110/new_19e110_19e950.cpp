@@ -9,6 +9,11 @@
 #include "vu0inline.h"
 #include "pipe.h"
 #include "sly.h"
+#include "asega.h"
+
+/* two blend entries of the pipe's animations from 0x50: the aseg and its speed (PostJtLoadPipe, which also names the word at 0x70 that
+   EnsureAsegBlendDynamic fills: pasegSlide) */
+struct PIPEBLENDENTRY { ASEG *pasegUnused; ASEG *paseg; s32 field_0x8; float speed; };
 
 /* the pipe state InitJt starts at JT+0xF50 (jt.h PvPipe): the player, its state, the PIPE it rides and the position along it */
 struct JTPIPE {
@@ -22,12 +27,13 @@ struct JTPIPE {
     /* 0x1C */ s32 n1C;
     /* 0x20 */ s32 stateExit;
     u8 unknown_0x24[0xC];
-    /* 0x30 */ QW pos30;
-    u8 unknown_0x40[0x30];
-    /* 0x70 */ struct ASEG_19EAB0 *pasegSlide;
-    /* 0x74 */ struct ASEG_19EAB0 *pasegEnter;
-    /* 0x78 */ struct ASEG_19EAB0 *pasegExit;
-    /* 0x7C */ struct ASEG_19EAB0 *pasegSpin;
+    /* 0x30 */ QW foot;  /* InitJtPipe sets its first and third floats to 45 and 40 (JtPipe limitA); SetJtPipeHandFoot stores it; SetJtPipeState reads it as a position */
+    /* 0x40 */ QW hand;   /* InitJtPipe (45, 0, -20: limitB); SetJtPipeHandFoot */
+    /* 0x50 */ PIPEBLENDENTRY aent[2];
+    /* 0x70 */ ASEG *pasegSlide;
+    /* 0x74 */ ASEG *pasegEnter;
+    /* 0x78 */ ASEG *pasegExit;
+    /* 0x7C */ ASEG *pasegSpin;
 };
 
 extern "C" void GetPathPosFromS(float, void *, QW *, QW *);
@@ -38,7 +44,7 @@ extern "C" void func_0019E950(JTPIPE *ppipe)
 {
     struct { QW pos; QW tangent; QW posWorld; } l;
     GetPathPosFromS(ppipe->s, ppipe->ppath, &l.pos, &l.tangent);
-    l.posWorld = ConvertAloPos(ppipe->pjt, 0, ppipe->pos30);
+    l.posWorld = ConvertAloPos(ppipe->pjt, 0, ppipe->foot);
     ppipe->pjt->Slot82(7, ppipe->ppath, l.pos, l.tangent, l.posWorld);
 }
 
@@ -77,9 +83,7 @@ void UpdateJtPipeLook(JTPIPE *pjtpipe) {
 }
 }
 
-struct JtPipe { u8 unknown_0x0[0x30]; s128 foot; s128 hand; };
-
-extern "C" void SetJtPipeHandFoot(JtPipe *self, s128 foot, s128 hand)
+extern "C" void SetJtPipeHandFoot(JTPIPE *self, s128 foot, s128 hand)
 {
     self->foot = foot;
     self->hand = hand;
@@ -91,8 +95,6 @@ struct VEC_19EAB0 {
 } __attribute__((aligned(16)));
 
 struct LM_19EAB0 { float gMin; float gMax; };
-
-struct ASEG_19EAB0 { u8 unknown_0x0[0x74]; float duration; };
 
 /* the part of a JT in front of the pipe's offset (jt.h has no field at 0x1010 yet: one reader) */
 struct JTPOSOFFSET {
@@ -126,7 +128,7 @@ extern "C" void SetJtJtcs(JT *, int);
 
 extern "C" void RetractSmaRef(void *);
 
-extern "C" void ApplyAsegToHandle(ASEG_19EAB0 *, float, float, JT *, int, void *);
+extern "C" void ApplyAsegToHandle(ASEG *, float, float, JT *, int, void *);
 
 extern "C" JT *g_2e1e40;
 
@@ -167,7 +169,7 @@ extern "C" void SetJtPipeState(JTPIPE *ppipe, int state)
         bevy_player_p14_19e110(ppipe, &l.lm);
         ppipe->s = GLimitLm__FP2LMf(&l.lm, ppipe->s);
         GetPathPosFromS(ppipe->s, ppipe->ppath, &l.pos, 0);
-        l.posLocal = ConvertAloPos(ppipe->pjt, 0, ppipe->pos30);
+        l.posLocal = ConvertAloPos(ppipe->pjt, 0, ppipe->foot);
         ((JTPOSOFFSET *)ppipe->pjt)->posOffset = VectorSub(l.pos, l.posLocal);
         JT *pjt = ppipe->pjt;
         pjt->dir = VectorSub(pjt->look, l.pos);
@@ -188,7 +190,7 @@ extern "C" void SetJtPipeState(JTPIPE *ppipe, int state)
     }
     }
     ppipe->state = state;
-    ASEG_19EAB0 *paseg = 0;
+    ASEG *paseg = 0;
     int grf = 1;
     float tStart = 0.0f;
     float svt = 1.0f;
@@ -216,7 +218,7 @@ extern "C" void SetJtPipeState(JTPIPE *ppipe, int state)
         paseg = ppipe->pasegEnter;
         if (!paseg) {
             paseg = ppipe->pasegSpin;
-            tStart = paseg->duration * 0.5f;
+            tStart = paseg->tLength * 0.5f;
             svt = 0.5f;
         }
         ppipe->n1C = 0;

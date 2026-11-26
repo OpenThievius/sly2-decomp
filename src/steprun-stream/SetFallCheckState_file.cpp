@@ -6,21 +6,9 @@
 #include "types.h"
 #include "include_asm.h"
 #include "po.h"
+#include "wkr.h"
 #include "ps2inline.h"
 
-
-// the work item PaloAbsorbWkr takes, 0x60 bytes: SetFallCheckState (the guard hits itself) and SetGuardDamageState fill it
-struct ABSORBWKR {
-    SO *psoSource;
-    u8 unknown_0x4[0x4];
-    SO *ptarget;
-    s32 grftak;
-    s32 ndamage;
-    u8 unknown_0x14[0xC];
-    QW pos;
-    QW vel;
-    u8 unknown_0x40[0x20];
-};
 
 // a guard's fall check (STEPGUARD::pfallcheck)
 struct FALLCHECK {
@@ -40,13 +28,13 @@ struct SRC_DAMAGE : SO {
 // a guard's damage watch
 struct GUARDDAMAGE { PO *pguard; int state; float tState; SRC_DAMAGE *psrc; int fActive; };
 
-extern "C" void PaloAbsorbWkr(ABSORBWKR *);
+extern "C" void PaloAbsorbWkr(WKR *);
 
 extern "C" void SetFallCheckState(FALLCHECK *self, int state);
 
 void SetFallCheckState(FALLCHECK *self, int state)
 {
-    ABSORBWKR absorb;
+    WKR absorb;
     if (self->state != state) {
         self->state = state;
         self->tState = g_2dded0.t;
@@ -54,9 +42,9 @@ void SetFallCheckState(FALLCHECK *self, int state)
             memset(&absorb, 0, 0x60);
             PO *owner = self->pguard;
             absorb.psoSource = owner;
-            absorb.ptarget = owner;
+            absorb.ploTarget = owner;
             absorb.grftak = 0x4000;
-            absorb.ndamage = 0;
+            absorb.damage = 0;
             PaloAbsorbWkr(&absorb);
         }
     }
@@ -140,7 +128,7 @@ extern "C" CK g_2dded0_20D3C0;
 
 extern "C" QW PosLoWorld(void *);
 
-extern "C" void PaloAbsorbWkr_20D3C0(ABSORBWKR *);
+extern "C" void PaloAbsorbWkr_20D3C0(WKR *);
 
 void SetGuardDamageState(GUARDDAMAGE *pdamage, int state)
 {
@@ -150,13 +138,13 @@ void SetGuardDamageState(GUARDDAMAGE *pdamage, int state)
     pdamage->tState = g_2dded0_20D3C0.t;
     if (state != 2)
         return;
-    ABSORBWKR wkr;
+    WKR wkr;
     memset(&wkr, 0, 0x60);
     SRC_DAMAGE *psrc = pdamage->psrc;
     wkr.psoSource = psrc;
-    wkr.ptarget = pdamage->pguard;
+    wkr.ploTarget = pdamage->pguard;
     wkr.grftak = psrc->grftak;
-    wkr.ndamage = psrc->ndamage;
+    wkr.damage = psrc->ndamage;
     wkr.pos = PosLoWorld(pdamage->pguard);
     wkr.vel = pdamage->pguard->GetVelocityVec();
     PaloAbsorbWkr_20D3C0(&wkr);

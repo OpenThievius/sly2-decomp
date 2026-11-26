@@ -1,18 +1,12 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-#include "types.h"
+#include "sohit.h"
+#include "oxa.h"
 
-struct FilterOwner {
-    u8 unknown_0x0[0x60];
-    void *activeObject;
-};
-
-struct FilterObject {
-    u8 unknown_0x0[0xEC];
-    FilterOwner *owner;
-    u8 unknown_0xF0[0x1C0 - 0xF0];
-    float result;
-    float fraction;
-    s32 mode;
+/* a SOHIT subclass by its fields from 0x1C0 (the Splice binding RefCall180478 is of the SOHIT family, whose own fields start there); class unnamed */
+struct FilterObject : SOHIT {
+    /* 0x1C0 */ float result;  /* reader: func_00180478 */
+    /* 0x1C4 */ float fraction;
+    /* 0x1C8 */ s32 mode;
 };
 
 extern "C" {
@@ -26,8 +20,7 @@ extern "C" void func_00180478(FilterObject *object, s32 mode)
 {
     if (mode != object->mode) {
         object->mode = mode;
-        FilterOwner *owner = object->owner;
-        if (owner->activeObject == object) {
+        if (object->poxa->owner == object) {
             RecalcSwOxfFilterForObject(B_003DD490, object);
         }
     }

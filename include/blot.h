@@ -12,6 +12,7 @@
 #include "lo.h"
 #include "sl.h"
 #include "job.h"
+#include "cmpeg.h"
 
 struct BLOTSTREAM;
 
@@ -25,7 +26,8 @@ struct BLOT : LO {
     /* 0x5C */ f32 time;                /* bevy_jobs_restart_current: the prompt waits 0.5 s after it */
     /* 0x60 */ s32 tagState;           /* reader: SetBlotBlots (the blot's own state setter) stores B_002BE538's tag */
     /* 0x64 */ s32 field_0x64;          /* readers: func_001DD780 (the menu's blot is ready when it and blots are 2), MemcardMenu_Update (MENUOBJECT) */
-    u8 unknown_0x68[0x5];
+    /* 0x68 */ f32 tLast;              /* readers: UpdateBlotMovie compares it with the clock's time, SetTimerTimers writes g_2ddf0c */
+    u8 unknown_0x6C[0x1];
     /* 0x6D */ u8 field_0x6D;           /* PostBlotLoad selects -1 when it is set */
     u8 unknown_0x6E[0x2];
     /* 0x70 */ s32 labelVisible;        /* Blot_Show, LoadBlotFromBrx (0x310) */
@@ -35,7 +37,7 @@ struct BLOT : LO {
     /* 0x80 */ u16 csprite;             /* readers: SeekBlotLabel, func_00212F80, func_00213CD8 (the count of the sprites asprite points at) */
     u8 unknown_0x82[0x2];
     /* 0x84 */ s32 asprite;             /* Blot_Show passes it to FSpriteHasLabel */
-    u8 unknown_0x88[0x4];
+    /* 0x88 */ f32 labelTime;           /* readers: UpdateBlotMovie adds the frame time while a label plays, StopBlotLabel clears it */
     /* 0x8C */ s32 field_0x8C;         /* reader: ShowCountdownBlot clears it (it calls this blot's Select(-1) next) */
     /* 0x90 */ f32 dwell;               /* LoadBlotFromBrx reads it from the stream */
     /* 0x94 */ s32 height;              /* LoadBlotFromBrx, PostBlotLoad */
@@ -53,16 +55,21 @@ struct BLOT : LO {
     /* 0xC4 */ void *palloc;            /* LoadBlotFromBrx: B_003E1C70 (streamed) or B_003E1C80 (movie) */
     /* 0xC8 */ BLOT *pblotSelf;         /* PostBlotLoad */
     /* 0xCC */ s32 alabel[10];          /* SetBlotLabelList copies up to ten ids in, SetBlotLabelListFromRef fills it; Blot_Construct sets -1 */
-    u8 unknown_0xF4[0x8];
+    u8 unknown_0xF4[0x4];
+    /* 0xF8 */ s32 field_0xF8;          /* reader: ReleaseBlotMovie (SetBlotBlots' state 0) clears it */
     /* 0xFC */ SL sl;                   /* Blot_Construct: InitSl(.., 0x68) */
     u8 unknown_0x108[0x8];
 };
 
-/* what LoadBlotFromBrx allocates (0x50 bytes) for a streamed blot: it points back at the blot at 0x40 */
-struct BLOTSTREAM {
-    u8 unknown_0x0[0x40];
+/* what LoadBlotFromBrx allocates (0x50 bytes) for a streamed blot: it points back at the blot at 0x40. The entries are linked through
+   the word at 0x4C (AppendSlEntry on B_003E106C, the list PrepareBlotMovie and func_002127C8 walk); start and end are the arena
+   marks of the blot's movie (PrepareBlotMovie stores them, ReleaseBlotMovie clears them) */
+struct BLOTSTREAM : MOVIE {         /* the first 0x40 bytes are a movie record (cmpeg.h): PrepareBlotMovie hands it to CFileLocation::Set,
+                                       as CMpeg does with its queued movies */
     /* 0x40 */ BLOT *pblot;
-    u8 unknown_0x44[0xC];
+    /* 0x44 */ s32 start;
+    /* 0x48 */ s32 end;
+    /* 0x4C */ BLOTSTREAM *pnext;
 };
 
 /* the job list's blot: its Update counts the tasks of two lists. A slot holds a task and a word nobody reads. */

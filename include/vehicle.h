@@ -11,6 +11,9 @@
 #endif
 
 struct LO;
+struct SMA;
+struct BLOT;
+struct VEHICLEGUN;
 
 /* one of the vehicle's wheels, 0x60 bytes (AddVehicleWheel fills the next one from a script's arguments) */
 struct VEHICLEWHEEL {
@@ -39,16 +42,22 @@ struct VEHICLE {
     u8 unknown_0x0[0x180]; /* a PO in C++ */
 #endif
     /* 0x180 */ s32 state;       /* OnVehicleActive (2 is driven), SetVehicleState */
-    u8 unknown_0x184[0x4];
+    /* 0x184 */ f32 tState;      /* SetVehicleState: the time of the change (the clock's t) */
     /* 0x188 */ s32 aiState;     /* SetVehicleAiState */
     /* 0x18C */ f32 tAiState;    /* SetVehicleAiState: the time of the change */
     /* 0x190 */ s32 cwheel;      /* AddVehicleWheel (at most 8), NotifyVehicleXpEnded, AddVehicleCustomXps, UpdateVehicleBounds */
     u8 unknown_0x194[0xC];
     /* 0x1A0 */ struct VEHICLEWHEEL awheel[8]; /* the same functions */
-    u8 unknown_0x4A0[0xBC];
+    u8 unknown_0x4A0[0x58];
+    /* 0x4F8 */ s32 cgun;        /* AddVehicleGun, CloneVehicle, func_001D2240, func_001D3FA8, func_001D2150 (five agree) */
+    /* 0x4FC */ struct VEHICLEGUN *apgun[8]; /* the same: the guns, at most 8 */
+    /* 0x51C */ f32 speedMax;    /* InitVehicle sets it; func_001D2150 drives speedGoal to it while the button is held */
+    u8 unknown_0x520[0x3C];   /* func_001D2150 reads and writes words at 0x540 to 0x550 (one reader: its own view) */
     /* 0x55C */ s32 hpMax;       /* func_001D14C0 copies it to hp; UpdateVehicleHpBlot divides by it */
     /* 0x560 */ s32 hp;          /* func_001D14C0 */
-    u8 unknown_0x564[0xC];
+    u8 unknown_0x564[0x4];
+    /* 0x568 */ struct BLOT *pblot; /* SetVehicleState (a method): the vehicle's HUD blot: Select(-1) and func_00213B00 when the state leaves 0, Hide when it enters 0 */
+    u8 unknown_0x56C[0x4];
     /* 0x570 */ struct SMA *psma; /* func_001D14C0 (snapped to its goal), SetVehicleState */
     /* 0x574 */ struct VEHICLEAMMO aammo[4]; /* func_001D4CE0, func_001D4D00, func_001D4D18, func_001D22D0 (index 4 and up unread) */
     u8 unknown_0x5A4[0x14];

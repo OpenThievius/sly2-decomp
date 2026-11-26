@@ -10,9 +10,11 @@
 struct CLOCK {
     /* 0x0 */ f32 t;  /* the time: Warp_SetState */
     /* 0x4 */ f32 dt; /* the last frame's length: UpdateWarp */
-    u8 unknown_0x8[0x8];
+    /* 0x8 */ f32 rate;     /* the product of arate: RecalcClockRate sets it; MarkClockTick scales the game frame by it */
+    /* 0xC */ f32 rateCopy; /* RecalcClockRate copies arate[8] here; MarkClockTick scales the real frame by it */
     /* 0x10 */ f32 field_0x10; /* UpdateSw runs UpdateCmLast only while it is positive */
-    u8 unknown_0x14[0x28];
+    u8 unknown_0x14[0x4];
+    /* 0x18 */ f32 arate[9]; /* the rate factors: InitClock sets eight to 1.0, SetClockRate sets one by index, RecalcClockRate multiplies them; MarkClockTick scales the scaled frame by arate[3] */
     /* 0x3C */ f32 tReal;  /* the real time (the global g_2ddf0c is this field: 0x2DDED0 + 0x3C): SetJoyJoys, FReadJoy, UpdateJoyNavX/Y,
                               _MatchCodes */
     /* 0x40 */ f32 dtReal; /* the real frame length: FReadJoy divides the stick's change by it */

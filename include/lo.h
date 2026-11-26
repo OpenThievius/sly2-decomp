@@ -48,9 +48,11 @@ struct BASIC {
    0x8 to -1 and initialises a list at 0x18; an LO points at its own (LO::pscope), which PloFindSwObject takes in its place. */
 struct SCOPE {
     /* 0x0 */ s32 field_0x0;           /* AllocSwBuffers sets it to -1 on the world's default scope */
-    u8 unknown_0x4[0x4];
-    /* 0x8 */ s32 field_0x8;           /* AllocSwBuffers sets it to -1 */
-    u8 unknown_0xC[0xC];
+    /* 0x4 */ struct SCOPE *pscopeParent; /* the clone path's parent scope: func_001A6260, FLoHasOid (walk it), CLo_Clone, PcnodeFindOrAddClonePath (its CNODE) */
+    /* 0x8 */ s32 field_0x8;           /* AllocSwBuffers sets it to -1; FLoHasOid compares it with an object id */
+    u8 unknown_0xC[0x4];
+    /* 0x10 */ struct LO *plo;         /* the object the scope belongs to: func_001A6260, FLoHasOid, CLo_Clone (all stop when it differs) */
+    u8 unknown_0x14[0x4];
     /* 0x18 */ u8 sl[0xC];             /* a list (sl.h's SL, not included here: several sources declare their own) that
                                           AllocSwBuffers starts with InitSl (item size 0x14) */
     /* 0x24 */ s32 field_0x24;         /* InitCloneSets sets it to 1 on each clone's scope */

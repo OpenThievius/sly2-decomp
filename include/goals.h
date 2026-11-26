@@ -291,8 +291,10 @@ GOAL_CLASS(GOALSTAND, GOAL, GOALSTAND_FIELDS)
 /* 0xAF (175) GoalFlinch, 0x60 bytes: Init func_0017A4B0, Activate func_0017A4E8, Deactivate func_0017A558, Update func_0017A670,
    GoalFlinch_SetState (GoalAnim's slots 11 to 13) */
 #define GOALFLINCH_FIELDS \
-    /* 0x50 */ s32 stateFlinch;     /* func_0017A4B0 writes -1; GoalFlinch_SetState */ \
-    u8 unknown_0x54[0xC];
+    /* 0x50 */ s32 stateFlinch;     /* func_0017A4B0 writes -1; GoalFlinch_SetState; func_0017A670 */ \
+    /* 0x54 */ f32 stateF;          /* GoalFlinch_SetState stores the state as a float (one reader: a method of the class) */ \
+    /* 0x58 */ f32 tNext;           /* GoalFlinch_SetState (clock plus a random delay); func_0017A670 compares the clock with it */ \
+    u8 unknown_0x5C[0x4];
 GOAL_CLASS(GOALFLINCH, GOALANIM, GOALFLINCH_FIELDS)
 
 /* 0xB0 (176), 0x40 bytes, no recovered name: Init func_0017A6F8, Activate func_0017A730, Deactivate func_0017A7B8, Update func_0017A7F8,
@@ -413,9 +415,10 @@ GOAL_CLASS(GOALSNAPTOPOINT, GOAL, GOALSNAPTOPOINT_FIELDS)
     /* 0x30 */ s32 pcrv;            /* reader: ExecuteGuardScriptCmd (type 6, guard mode -1) stores the found curve object here (guess) */ \
     /* 0x34 */ s32 field_0x34;      /* the same: the command's word b */ \
     /* 0x38 */ f32 s;               /* the curve parameter, -1.0 before Activate (Init); ExecuteGuardScriptCmd copies the source's value in */ \
-    u8 unknown_0x3C[0x14]; \
+    u8 unknown_0x3C[0x4]; \
+    /* 0x40 */ QW pos;              /* func_0017EB88 (Activate, a method of the class) stores the curve's closest point */ \
     /* 0x50 */ s32 poidOther;       /* reader: ExecuteGuardScriptCmd stores the object of the command's word c (guess) */ \
-    u8 unknown_0x54[0x4]; \
+    /* 0x54 */ s32 field_0x54;      /* func_0017EB88 (Activate, a method) copies it to the goto goal's 0xAC */ \
     /* 0x58 */ s32 field_0x58;      /* reader: ExecuteGuardScriptCmd stores the script's flag 0x4C */ \
     u8 unknown_0x5C[0x4];
 GOAL_CLASS(GOALFOLLOWCURVE, GOAL, GOALFOLLOWCURVE_FIELDS)

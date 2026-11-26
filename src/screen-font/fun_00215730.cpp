@@ -1,31 +1,26 @@
-#include "types.h"
-struct B4 { char b[4]; };
-struct SpriteBase { u8 unknown_0x0[0x84]; };
-struct Blot { u8 unknown_0x0[0x84]; char *sprites; };
-struct Char { int pad0; int type; Blot *blot; int padC; int id; int handle; };
-struct Slot { u8 unknown_0x0[0x30]; Char *chr; u8 unknown_0x34[0x24]; int iinst; };
+#include "fbsprite.h"
 
 extern "C" int IinstFindFreeSprite(void *);
-extern "C" void PlaceSpriteInstance(void *, int, int, void *, B4 *, B4 *);
+extern "C" void PlaceSpriteInstance(void *, int, int, void *, RGBA *, RGBA *);
 extern "C" void *func_001BEED8(int);
-extern "C" int func_001BEB28(void *);
+extern "C" ROGWINDOW *func_001BEB28(void *);
 
-extern "C" void func_00215730(Char *chr, Slot *slot, void *xf, B4 *add, B4 *mul)
+extern "C" void func_00215730(MOVIECHAR *chr, SLOT *slot, void *xf, RGBA *add, RGBA *mul)
 {
-    slot->chr = chr;
+    slot->pchar = chr;
     switch (chr->type) {
     case 4: {
-        int iinst = IinstFindFreeSprite(chr->blot->sprites + chr->id * 0x30);
+        int iinst = IinstFindFreeSprite(&((SPRITE *)chr->pblot->asprite)[chr->id]);
         slot->iinst = iinst;
-        B4 localAdd = *add;
-        B4 localMul = *mul;
-        PlaceSpriteInstance(chr->blot->sprites + chr->id * 0x30, 0x314, iinst, xf, &localAdd, &localMul);
+        RGBA localAdd = *add;
+        RGBA localMul = *mul;
+        PlaceSpriteInstance(&((SPRITE *)chr->pblot->asprite)[chr->id], 0x314, iinst, xf, &localAdd, &localMul);
         break;
     }
     case 6:
         if (chr->id != -1) {
             void *object = func_001BEED8(chr->id);
-            if (object) chr->handle = func_001BEB28(object);
+            if (object) chr->pwindow = func_001BEB28(object);
         }
         break;
     }
