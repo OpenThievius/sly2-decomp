@@ -6,6 +6,7 @@
 #include "vu0inline.h"
 union VU_SCALE { QW q; VECTOR v; };
 struct VT { u8 unknown_0x0[0x118]; short delta; short index; void (*fn)(char *, QW); }; /* STEPGUARD slot 35 (Slot35) */
+struct GUARDVTVIEW { u8 unknown_0x0[0xC]; VT *vt; }; /* the guard seen through its vtable pointer */
 
 /* The data of an animation event message (message 9): who it came from, a float argument and the event id. */
 struct ANIMEVENTMSG {
@@ -42,16 +43,16 @@ int GoalAnim_FHandleMessage(GOALANIM *goal, int message, ANIMEVENTMSG *data) {
                     QW vel = func_00204E38(guard, sender, data->arg);
                     VU_SCALE scale;
                     scale.q = VectorFromFloat(-1.0f);
-                    *(QW *)((char *)guard + 0x190) = VectorScaleX(vel, scale.q);
-                    /* kept as the hand-written byte offsets: typed members (guard->velGoal, matHeading) and the virtual Slot35 hoist the guard
-                       load and move the vtable and matrix loads after TransformVector (scores 36 to 76), retail loads them first */
-                    char *base = (char *)guard;
-                    VT *vtable = *(VT **)(base + 0xC);
-                    QW *rows = (QW *)(base + 0x1B0);
+                    guard->velGoal = VectorScaleX(vel, scale.q);
+                    /* kept as a hand-written vtable call: the virtual Slot35 hoists the guard load and moves the vtable and matrix loads
+                       after TransformVector (scores 36 to 76), retail loads them first */
+                    STEPGUARD *pguard = guard;
+                    VT *vtable = ((GUARDVTVIEW *)pguard)->vt;
+                    QW *rows = (QW *)&pguard->matHeading;
                     QW row0 = rows[0];
                     QW row1 = rows[1];
                     QW row2 = rows[2];
-                    char *self = base + vtable->delta;
+                    char *self = (char *)pguard + vtable->delta;
                     void (*fn)(char *, QW) = vtable->fn;
                     QW world = TransformVector(vel, row0, row1, row2);
                     fn(self, world);

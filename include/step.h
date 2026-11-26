@@ -19,7 +19,8 @@ struct STEP : PO {
                                            func_00209C88 (STEPGUARD's path mode) passes 0x22 or 7, the path target and three positions */
     virtual void RetainSmKinds(int n1, int n2);       /* 83: RetainAloSmKinds, JT_RetainSmKinds */
     virtual void ReleaseSmKinds();      /* 84: ReleaseAloSmKinds, JT_ReleaseSmKinds */
-    virtual void Slot85();              /* 85: func_002040F8, func_00143C78 (JT) */
+    virtual int Slot85();               /* 85: func_002040F8, func_00143C78 (JT), GrfGuardCustomXps (STEPGUARD, returns func_002040F8's int);
+                                           SolveSw's func_001F90D0 tests bit 4 of its result on a kind-0xE contact's object */
     virtual int FLethalHit();           /* 86: func_00205D08, JT_FLethalHit */
     virtual void Slot87(int arg);       /* 87: func_00205D10; func_001B81B8 (Murray) calls it with a flag on the held object */
     /* 0x180 */ f32 uTarget; /* UpdateStep (STEP slot 16) sets it each frame from the heading error */

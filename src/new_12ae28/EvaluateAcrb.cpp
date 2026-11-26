@@ -10,9 +10,10 @@ extern "C" void EvaluateAcrb(ACRB *pacrb, float t, float svt, QW *pvecPos, QW *p
     QW posPrev;
     QW posNext;
     int ikey = IkeyFindAcrb(pacrb, t);
+    /* the key as an address: as a typed pointer the previous key's address is shared and the loads move (scores 10, 20) */
     int pkey = ikey * 0x30 + (sptr)pacrb->akey;
     *(B12 *)&posPrev = *(B12 *)(pkey - 0x30);
     *(B12 *)&posNext = *(B12 *)pkey;
-    float tPrev = *(float *)(pkey - 0x24);
-    EvaluateBezierPos__FfffP6VECTORN63(*(float *)(pkey + 0xC) - tPrev, t - tPrev, svt, posPrev, *(QW *)(pkey - 0x10), posNext, *(QW *)(pkey + 0x10), pvecPos, pvecVel, 0);
+    float tPrev = ((KEYB *)(pkey - 0x30))->t;
+    EvaluateBezierPos__FfffP6VECTORN63(((KEYB *)pkey)->t - tPrev, t - tPrev, svt, posPrev, ((KEYB *)pkey)[-1].out, posNext, ((KEYB *)pkey)->in, pvecPos, pvecVel, 0);
 }

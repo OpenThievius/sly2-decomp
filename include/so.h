@@ -29,7 +29,7 @@ struct SO : LO {
     virtual void Slot52();
     virtual struct OXA *PoxaAlloc();    /* 53: PoxaAllocSo; RecalcSoLocked keeps the result */
     virtual void Slot54(void *pso);     /* 54: func_001F5988; DiscardSoXps passes another SO or 0 */
-    virtual void Slot55();
+    virtual void Slot55(void *pxp, int ixpd); /* 55: AdjustStepNewXp (STEP); PxpAdd calls it on the object of each side of a new contact pair, with the pair and the side's index (as RecalcSwXpMovement calls 56 and 57) */
     virtual void Slot56(void *pxp, int ixpd); /* 56: RecalcSwXpMovement calls it on the object of each side of a contact pair, with the pair and the side's index */
     virtual void Slot57(void *pxp, int ixpd); /* 57: RecalcSwXpMovement, after Slot56 has run on both sides: the same arguments */
     virtual void Slot58();              /* 58: func_001F4F10 */

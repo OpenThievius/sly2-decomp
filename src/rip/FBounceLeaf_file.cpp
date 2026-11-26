@@ -8,6 +8,7 @@
 #include "geom.h"
 #include "sw.h"
 #include "xf.h"
+#include "expl.h"
 #include "include_asm.h"
 
 struct ALO;
@@ -125,14 +126,8 @@ void TouchBublet__FP6BUBLETi(RIP *bublet, int touching)
 }
 
 /* a REMIT (a RIP) emits explosions: the explosion object it was given, the rate it was given and what has accumulated */
-struct EXPLSO { int grf; u8 unknown_0x4[0x1C]; QW pos; QW tail; };
-
-struct EVT { u8 unknown_0x0[0x198]; short delta; short index; void (*fn)(char *, EXPLSO *); };
-
-struct EXPLS { u8 unknown_0x0[0xC]; EVT *vt; };
-
 struct REMIT : RIP {
-    EXPLS *expls; /* PostRemitEmit sets it, UpdateRemit */
+    EXPL *pexpl;  /* PostRemitEmit sets it (an object it finds by oid), UpdateRemit explodes it */
     float rate;   /* PostRemitEmit sets it, UpdateRemit */
     float count;  /* UpdateRemit */
 };
@@ -145,7 +140,7 @@ extern "C" SW B_003DD490_1D1108;
 
 extern "C" void PostRemitEmit__FP5REMITP5EMITB(REMIT *remit, EMITB *emitb) {
     func_001CE9B8_1D1108(remit, emitb);
-    remit->expls = (EXPLS *)PloFindSwObject_thunk(&B_003DD490_1D1108, 4, emitb->params.payload, emitb->pinfo->plo);
+    remit->pexpl = (EXPL *)PloFindSwObject_thunk(&B_003DD490_1D1108, 4, emitb->params.payload, emitb->pinfo->plo);
     remit->rate = emitb->params.field_0x34;
 }
 
@@ -155,16 +150,15 @@ extern "C" void UpdateRip__FP3RIPf(RIP *, float);
 void UpdateRemit__FP5REMITf(REMIT *remit, float dt)
 {
     UpdateRip__FP3RIPf(remit, dt);
-    if (remit->expls != 0) {
+    if (remit->pexpl != 0) {
         remit->count = remit->count + g_2dded0.dt * remit->rate;
         float count = remit->count;
         if (count >= 1.0f) {
             do {
                 EXPLSO explso;
-                explso.grf = 4;
+                explso.grfexpl = 4;
                 explso.pos = remit->pos;
-                EXPLS *expls = remit->expls;
-                expls->vt->fn((char *)expls + expls->vt->delta, &explso);
+                remit->pexpl->ExplodeExplso(&explso);
                 count = remit->count - 1.0f;
                 remit->count = count;
             } while (count >= 1.0f);

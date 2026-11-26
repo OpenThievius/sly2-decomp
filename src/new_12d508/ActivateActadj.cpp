@@ -6,7 +6,6 @@ extern "C" void ActivateActadj(ACTADJ *pactadj)
     ACT *pact = pactadj->pactNext;
     pactadj->pactBase = pact;
     if (pact != 0) {
-        ACTVTENTRY *pentry = &((ACTVT *)pact->vtable)->slot1;
-        pentry->fn((char *)pact + pentry->delta);
+        CallActSlot1(pact);
     }
 }

@@ -4,6 +4,7 @@
 #include "sly2.h"
 #include "lo.h"
 #include "so.h"
+#include "expl.h"
 #include "m2c_macros.h"
 #include "types.h"
 #include "alloc.h"
@@ -1051,48 +1052,24 @@ INCLUDE_ASM(0X15BF40);
 
 INCLUDE_ASM(0X15BFD8);
 
-struct EXPL_VT_15C150 { u8 unknown_0x0[0x19C]; void (*fn)(char *, char *); };
-
-struct EXPL_OBJ_15C150 { u8 unknown_0x0[0x198]; short offset; };
-
-struct EXPL_15C150 { u8 unknown_0x0[0xC]; char *vtable; };
-
-void ExplodeExpl(char *arg0)
+void ExplodeExpl(EXPL *pexpl)
 {
-    char sp[0x40];
-    memset(sp, 0, 0x40);
-    char *obj = ((EXPL_15C150 *)arg0)->vtable;
-    ((EXPL_VT_15C150 *)obj)->fn(arg0 + ((EXPL_OBJ_15C150 *)obj)->offset, sp);
+    EXPLSO explso;
+    memset(&explso, 0, sizeof(explso));
+    pexpl->ExplodeExplso(&explso);
 }
 
-struct ALO_15C198;
-
-struct EXPLP_15C198 {
-    unsigned grfexpl;
-    ALO_15C198 *palo;
-    float r1;
-    float r2;
-    QW pos;
-    QW normal;
-    QW unk0x30;
-};
-
-struct VTable_15C198 { u8 unknown_0x0[0x198]; short delta; short index; void (*fn)(void *, EXPLP_15C198 *); };
-
-struct EXPL_15C198 { u8 unknown_0x0[0xC]; VTable_15C198 *vtable; };
-
-extern "C" void ExplodeExplParams__FP4EXPLUiP3ALOP6VECTORT3ff(EXPL_15C198 *pexpl, unsigned grfexpl, ALO_15C198 *palo,
-                                                               QW pos, QW normal, float r1, float r2)
+extern "C" void ExplodeExplParams__FP4EXPLUiP3ALOP6VECTORT3ff(EXPL *pexpl, unsigned grfexpl, ALO *palo, QW vec, QW pos,
+                                                               float g, float uPercent)
 {
-    EXPLP_15C198 params;
-    params.grfexpl = grfexpl;
-    params.palo = palo;
-    params.r1 = r1;
-    params.r2 = r2;
-    params.pos = pos;
-    params.normal = normal;
-    VTable_15C198 *vtable = pexpl->vtable;
-    vtable->fn((char *)pexpl + vtable->delta, &params);
+    EXPLSO explso;
+    explso.grfexpl = grfexpl;
+    explso.palo = palo;
+    explso.g = g;
+    explso.uPercent = uPercent;
+    explso.vec = vec;
+    explso.pos = pos;
+    pexpl->ExplodeExplso(&explso);
 }
 
 extern "C" {
@@ -1204,14 +1181,9 @@ extern "C" void HandleExplsMessage(EXPLS_15C5C8 *pexpls, s32 msgid, s32 pv) {
     }
 }
 
-struct VTable { u8 unknown_0x0[0x1A0]; short delta; short index; void (*fn)(void *, int); };
-
-struct Object { u8 unknown_0x0[0xC]; VTable *vtable; };
-
-extern "C" void ExplodeExplsExplso(Object *self, int arg)
+extern "C" void ExplodeExplsExplso(EXPLS *pexpls, EXPLSO *pexplso)
 {
-    VTable *vtable = self->vtable;
-    vtable->fn((char *)self + vtable->delta, arg);
+    pexpls->FireExplso(pexplso);
 }
 
 extern "C" {
@@ -1281,7 +1253,8 @@ struct AMB;
 
 struct AMBDESC { int sfx; LM_15C690 lmRange; float uVolume; float uPitch; };
 
-struct EXPLS {
+/* FireExplsExplso's view of EXPLS (include/expl.h) with this file's emitter types */
+struct EXPLS_15C690 {
     u8 unknown_0x0[0xE4];
     EMITB_15C690 *pemitb;
     u8 unknown_0xE8[0xF0 - 0xE8];
@@ -1290,18 +1263,6 @@ struct EXPLS {
     int fEmitg;
     void *pripg;
     void *pblipg;
-};
-
-struct EXPLSO {
-    unsigned int grf;
-    void *palo;
-    float g;
-    float uPercent;
-    QW vec;
-    QW pos;
-    int unknown30;
-    XFR *pxfr;
-    int cparticle;
 };
 
 extern LM_15C690 D_002BDEC0;
@@ -1322,8 +1283,9 @@ void EmitParticles(int cparticle, EMITB_15C690 *pemitb, EMITG_15C690 *pemitg);
 
 static inline float GMax(float a, float b) { return a >? b; }
 
-void FireExplsExplso(EXPLS *pexpls, EXPLSO *pexplso)
+void FireExplsExplso(EXPLS *pexplsArg, EXPLSO *pexplso)
 {
+    EXPLS_15C690 *pexpls = (EXPLS_15C690 *)pexplsArg;
     EMITO_15C690 emito = *pexpls->pemitb->pemito;
     EMITB_15C690 emitb = *pexpls->pemitb;
     EMITG_15C690 emitg;
@@ -1332,21 +1294,21 @@ void FireExplsExplso(EXPLS *pexpls, EXPLSO *pexplso)
     VU_SCALE half;
     emitb.pemito = &emito;
     int cparticle;
-    if (pexplso->grf & 0x80)
+    if (pexplso->grfexpl & 0x80)
         cparticle = pexplso->cparticle;
     else
         cparticle = (int)GRandInRange(pexpls->lmcParticle.gMin, pexpls->lmcParticle.gMax);
-    if (pexplso->grf & 1)
+    if (pexplso->grfexpl & 1)
         emito.palo = pexplso->palo;
-    if (pexplso->grf & 2)
+    if (pexplso->grfexpl & 2)
         emitb.vec = pexplso->vec;
-    if (pexplso->grf & 4) {
+    if (pexplso->grfexpl & 4) {
         emitb.pos = pexplso->pos;
         emitb.emitk = 0;
-    } else if (pexplso->grf & 0x40) {
+    } else if (pexplso->grfexpl & 0x40) {
         emitb.pxfr = pexplso->pxfr;
     }
-    if ((pexplso->grf & 8) && emitb.pk == 0) {
+    if ((pexplso->grfexpl & 8) && emitb.pk == 0) {
         float g;
         if (pexplso->g == 0.0f)
             g = pexplso->uPercent * 0.01f;
@@ -1366,10 +1328,10 @@ void FireExplsExplso(EXPLS *pexpls, EXPLSO *pexplso)
         __as__6VECTORG9VU_VECTOR(&emitb.vecE0, VU_FLOAT(g) * VU_VECTOR(emitb.vecE0));
     }
     if (emitb.pk == 1) {
-        if (pexplso->grf & 0x10)
+        if (pexplso->grfexpl & 0x10)
             emitb.gDC = emitb.gD8 = pexplso->g;
-        if (pexplso->grf & 0x20)
-            emitb.pemito->unknown10 = pexplso->unknown30;
+        if (pexplso->grfexpl & 0x20)
+            emitb.pemito->unknown10 = pexplso->field_0x30;
     }
     if (pexpls->fEmitg) {
         emitg.ppblipg = &pexpls->pblipg;
@@ -1379,7 +1341,7 @@ void FireExplsExplso(EXPLS *pexpls, EXPLSO *pexplso)
     } else {
         pemitg = 0;
     }
-    if (emito.palo == 0 && emitb.emitk != 2 && !(pexplso->grf & 0x48))
+    if (emito.palo == 0 && emitb.emitk != 2 && !(pexplso->grfexpl & 0x48))
         emito.palo = pexpls;
     EmitParticles(cparticle, &emitb, pemitg);
     if (pexpls->pambdesc) {

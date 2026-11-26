@@ -99,7 +99,7 @@ struct LO : BASIC {
     virtual unsigned FReturnFalse(int ipart); /* 43: FReturnFalseLo; func_00130010 passes a part index and keeps the unsigned the ALO override returns */
     virtual void Slot44(int ipart);     /* 44: ApplyAseg calls it on each part's object with the part index */
     virtual void Slot45(int ipart);     /* 45: RetractAsega calls it on each part link's object with the part index (the same word ApplyAseg passed to slot 44) */
-    virtual void Slot46();
+    virtual void Slot46(int grf);       /* 46: SetLoGrfzon passes its grf (the zone bits it then ors into each parent) */
     virtual void SetGrfField(u32 grf);  /* 47: SetLoGrfField; func_001F2FE0 passes a mask to each child */
     virtual void ClearGrfField(u32 grf); /* 48: ClearLoGrfField; func_001F3078 passes a mask to each child */
 

@@ -6,8 +6,7 @@ extern "C" void DeactivateActadj(ACTADJ *pactadj)
 {
     ACT *pact = pactadj->pactBase;
     if (pact != 0) {
-        ACTVTENTRY *pentry = &((ACTVT *)pact->vtable)->slot2;
-        pentry->fn((char *)pact + pentry->delta);
+        CallActSlot2(pact);
         pactadj->pactBase = 0;
     }
 }
