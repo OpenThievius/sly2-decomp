@@ -1,16 +1,12 @@
-#include "types.h"
-struct Owner {
-    u8 unknown_0x0[0xEB8];
-    int items[8];
-    unsigned count;
-};
-void AddGuardAimOid(Owner *owner, int oid)
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "stepguard.h"
+void AddGuardAimOid(STEPGUARD *owner, int oid)
 {
     if (oid != -1) {
-        unsigned count = owner->count;
+        unsigned count = owner->caoid;
         if (count < 8) {
-            owner->items[count] = oid;
-            owner->count = count + 1;
+            owner->aoid[count] = oid;
+            owner->caoid = count + 1;
         }
     }
 }

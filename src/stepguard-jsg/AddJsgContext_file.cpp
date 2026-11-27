@@ -12,6 +12,7 @@
 #include "lo.h"
 #include "jt.h"
 #include "murray.h"
+#include "sly.h"
 #include "jsg.h"
 #include "joy.h"
 #include "clock.h"
@@ -1519,7 +1520,7 @@ extern "C" void StartNextSeqnodeRecord(SEQNODE *pseqnode)
             QW posT2 = *(QW *)&pos;
             QW result = ScaleAddX(posT2, up, height);
             RQ(pjt, 0x1060) = result;
-            if (prec->arg[1].n == 0 && RI(pjt, 0x12F4) == 0) {
+            if (prec->arg[1].n == 0 && ((JT *)pjt)->field_0x12F4 == 0) {
                 SetJmpState(((JT *)pjt)->PvJmp(), 0xB, 0, 0);
                 DiscardSoXps(pjt);
             }
@@ -1546,7 +1547,7 @@ extern "C" void StartNextSeqnodeRecord(SEQNODE *pseqnode)
     case 0x1A:
         if (pseqnode->psubject != 0 && FIsBasicDerivedFrom(pseqnode->psubject, 0x34) != 0) {
             LO *pjt = pseqnode->psubject;
-            if (RI(pjt, 0xF54) != -1) {
+            if (((JT *)pjt)->field_0xF54 != -1) {
                 VECTOR pos;
                 GetSeqnodeObjectPosRad(pseqnode, PloFindSeqnodeObject(pseqnode, prec->arg[0].n), &pos, 0);
                 FindCrvClosestPointAll(RP(pjt, 0xF5C), *(QW *)&pos, 0, 0, 0, 0, &pseqnode->sCrv7C);
@@ -1638,8 +1639,8 @@ extern "C" void StartNextSeqnodeRecord(SEQNODE *pseqnode)
                         grf = FIsBasicDerivedFrom(pjt, 0x37) != 0 ? 0xF8FE : 0xF8FA;
                     FAttachGroundTarget(((JT *)pjt)->PvAttach(), grf, pground);
                 }
-                if (RI(pjt, 0x4CC) != -1 && RI(pjt, 0x4C8) == 3) {
-                    void *pcrv = RP(pjt, 0x4D4);
+                if (((JT *)pjt)->field_0x4CC != -1 && ((JT *)pjt)->attachKind == 3) {
+                    void *pcrv = ((JT *)pjt)->field_0x4D4;
                     VECTOR pos;
                     GetSeqnodeObjectPosRad(pseqnode, pground, &pos, 0);
                     FindCrvClosestPointAll(pcrv, *(QW *)&pos, 0, 0, 0, &pseqnode->sCrv78, 0);
@@ -1689,7 +1690,7 @@ extern "C" void StartNextSeqnodeRecord(SEQNODE *pseqnode)
     case 0x29:
         if (pseqnode->psubject != 0 && FIsBasicDerivedFrom(pseqnode->psubject, 0x34) != 0) {
             LO *pjt = pseqnode->psubject;
-            if (RI(pjt, 0x4CC) != -1 && RI(pjt, 0x4C8) == 8)
+            if (((JT *)pjt)->field_0x4CC != -1 && ((JT *)pjt)->attachKind == 8)
                 SetSeqnodeDrive(pseqnode, prec, pjt);
         }
         break;
@@ -1708,7 +1709,7 @@ extern "C" void StartNextSeqnodeRecord(SEQNODE *pseqnode)
                 MEMBER *pmember = PmemberFromLo(pdest);
                 warp.pmember = pmember;
                 if (pmember != 0) {
-                    if (RI(pjt, 0xF54) != -1 && RP(pjt, 0xF5C) == pdest)
+                    if (((JT *)pjt)->field_0xF54 != -1 && RP(pjt, 0xF5C) == pdest)
                         break;
                     pmember->GetParam(pjt, (f32 *)&warp.pos);
                     warp.plo = pdest;
@@ -1721,7 +1722,7 @@ extern "C" void StartNextSeqnodeRecord(SEQNODE *pseqnode)
             if (prec->arg[1].n == 1)
                 RI(pjt, 0x2E8) = prec->arg[1].n;
             if (FIsBasicDerivedFrom(pjt, 0x35) != 0)
-                RI(pjt, 0x18F0) = prec->arg[2].n;
+                ((SLY *)pjt)->field_0x18F0 = prec->arg[2].n;
             SetSeqnodeDrive(pseqnode, prec, pjt);
         }
         break;
@@ -1959,7 +1960,7 @@ extern "C" void StartNextSeqnodeRecord(SEQNODE *pseqnode)
             LO *pjt = pseqnode->psubject;
             LO *pso = PloFindSeqnodeObject(pseqnode, prec->arg[0].n);
             if (pso != 0 && FIsBasicDerivedFrom(pso, 0x36) != 0) {
-                SetJmpState(((JT *)pjt)->PvJmp(), (RI(pjt, 0x2DC) == 0x11) ? 3 : 1, 0, 0);
+                SetJmpState(((JT *)pjt)->PvJmp(), (((JT *)pjt)->jmpState == 0x11) ? 3 : 1, 0, 0);
                 SetSeqnodeDrive(pseqnode, prec, pjt);
             }
         }
@@ -1967,7 +1968,7 @@ extern "C" void StartNextSeqnodeRecord(SEQNODE *pseqnode)
     case 0x59:
         if (pseqnode->psubject != 0 && FIsBasicDerivedFrom(pseqnode->psubject, 0x36) != 0) {
             LO *pjt = pseqnode->psubject;
-            int state = RI(pjt, 0x1914);
+            int state = ((MURRAY *)pjt)->stateCarry;
             if (state < 7) if (state >= 4) {
                 LO *pso = PloFindSeqnodeObject(pseqnode, prec->arg[0].n);
                 if (pso != 0)
@@ -1978,7 +1979,7 @@ extern "C" void StartNextSeqnodeRecord(SEQNODE *pseqnode)
     case 0x5A:
         if (pseqnode->psubject != 0 && FIsBasicDerivedFrom(pseqnode->psubject, 0x36) != 0) {
             LO *pjt = pseqnode->psubject;
-            int state = RI(pjt, 0x1914);
+            int state = ((MURRAY *)pjt)->stateCarry;
             if (state < 7) if (state >= 4) {
                 prec->arg[2].n = RI(pjt, 0x1910);
                 LO *pso = PloFindSeqnodeObject(pseqnode, prec->arg[0].n);
@@ -2049,7 +2050,7 @@ struct PLAYERJT {
     u8 unknown_0xF54[0x8];
     /* 0xF5C */ struct CRV *pcrvPipe; /* the pipe's curve: UpdateSeqnodeVjoy walks it, StartNextSeqnodeRecord compares it with an object
                                          (StartJmpDirectionAseg_file stores a JMPASEGA * at this offset, so it stays out of jt.h) */
-    /* 0xF60 */ f32 field_0xF60; /* the arc length along pcrvPipe: UpdateSeqnodeVjoy, FSeqnodeRecordDone */
+    /* 0xF60 */ f32 sPipe; /* JT::sPipe: the arc length along pcrvPipe: UpdateSeqnodeVjoy, FSeqnodeRecordDone */
     u8 unknown_0xF64[0x6C];
     /* 0xFD0 */ s32 field_0xFD0; /* JT: the part func_00144638 starts */
     u8 unknown_0xFD4[0x60];
@@ -2307,7 +2308,7 @@ extern "C" int FSeqnodeRecordDone(SEQNODE *pseqnodeBase, JSGE *precBase) {
             break;
         }
         bevy_player_p14_19e110(&pseqnode->pjt->field_0xF50, &pos);
-        fDone = __builtin_fabsf(pseqnode->pjt->field_0xF60 - GLimitLm__FP2LMf(&pos, pseqnode->sCrv)) <
+        fDone = __builtin_fabsf(pseqnode->pjt->sPipe - GLimitLm__FP2LMf(&pos, pseqnode->sCrv)) <
                 prec->arg[1].g;
         break;
     }
@@ -2787,9 +2788,9 @@ void UpdateSeqnodeVjoy(SEQNODE *pseqnode, JOY *pvjoy)
     case 0x1a: {
         int fBackward = 0;
         float step = 50.0f;
-        float ahead = func_001E6728(pso->pcrvPipe, pso->field_0xF60 + step);
+        float ahead = func_001E6728(pso->pcrvPipe, pso->sPipe + step);
         GetPathPosFromS(pso->pcrvPipe, &l.q0, 0, ahead);
-        float behind = func_001E6728(pso->pcrvPipe, pso->field_0xF60 - step);
+        float behind = func_001E6728(pso->pcrvPipe, pso->sPipe - step);
         GetPathPosFromS(pso->pcrvPipe, &l.q1, 0, behind);
         QW dir = bevy_player_p14_1c4768(pvjoy, VectorSub(l.q0, l.q1));
         float x = LaneX(dir);
@@ -2800,17 +2801,17 @@ void UpdateSeqnodeVjoy(SEQNODE *pseqnode, JOY *pvjoy)
         CRV *pcrv = pso->pcrvPipe;
         if (pcrv->closed != 0) {
             float sBackward, sForward;
-            if (pseqnode->sCrv7C < pso->field_0xF60) {
-                sBackward = pso->field_0xF60 - pseqnode->sCrv7C;
-                sForward = (SMaxCrv(pcrv) + pseqnode->sCrv7C) - pso->field_0xF60;
+            if (pseqnode->sCrv7C < pso->sPipe) {
+                sBackward = pso->sPipe - pseqnode->sCrv7C;
+                sForward = (SMaxCrv(pcrv) + pseqnode->sCrv7C) - pso->sPipe;
             } else {
-                sForward = pseqnode->sCrv7C - pso->field_0xF60;
-                sBackward = (SMaxCrv(pcrv) + pso->field_0xF60) - pseqnode->sCrv7C;
+                sForward = pseqnode->sCrv7C - pso->sPipe;
+                sBackward = (SMaxCrv(pcrv) + pso->sPipe) - pseqnode->sCrv7C;
             }
             if (sBackward < sForward)
                 fBackward = 1;
         } else {
-            if (pseqnode->sCrv7C < pso->field_0xF60)
+            if (pseqnode->sCrv7C < pso->sPipe)
                 fBackward = 1;
         }
         if (fBackward) {

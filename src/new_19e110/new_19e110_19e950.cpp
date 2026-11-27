@@ -96,11 +96,6 @@ struct VEC_19EAB0 {
 
 struct LM_19EAB0 { float gMin; float gMax; };
 
-/* the part of a JT in front of the pipe's offset (jt.h has no field at 0x1010 yet: one reader) */
-struct JTPOSOFFSET {
-    u8 unknown_0x0[0x1010];
-    QW posOffset;
-};
 
 extern "C" void SubscribeLoObject(PIPE *, JT *);
 
@@ -170,7 +165,7 @@ extern "C" void SetJtPipeState(JTPIPE *ppipe, int state)
         ppipe->s = GLimitLm__FP2LMf(&l.lm, ppipe->s);
         GetPathPosFromS(ppipe->s, ppipe->ppath, &l.pos, 0);
         l.posLocal = ConvertAloPos(ppipe->pjt, 0, ppipe->foot);
-        ((JTPOSOFFSET *)ppipe->pjt)->posOffset = VectorSub(l.pos, l.posLocal);
+        ppipe->pjt->posOffset = VectorSub(l.pos, l.posLocal);
         JT *pjt = ppipe->pjt;
         pjt->dir = VectorSub(pjt->look, l.pos);
         ((VECTOR *)&ppipe->pjt->dir)->z = 0;

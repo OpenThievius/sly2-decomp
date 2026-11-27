@@ -11,11 +11,11 @@ void func_0018A350(SLY *pholder, QW *ppos)
     switch (pholder->jts) {
     case 3:
         func_00141588(pholder, ppos);
-        pcomponents[2] = FloatFromWord(LaneWordZ(PosLoWorld(pholder->pjtcsinfo))) + -175.0f;
+        pcomponents[2] = FloatFromWord(LaneWordZ(PosLoWorld(pholder->ploJtcs))) + -175.0f;
         break;
     case 0x16:
         func_00141588(pholder, ppos);
-        pcomponents[2] = FloatFromWord(LaneWordZ(PosLoWorld(pholder->pjtcsinfo))) + -100.0f;
+        pcomponents[2] = FloatFromWord(LaneWordZ(PosLoWorld(pholder->ploJtcs))) + -100.0f;
         break;
     case 0x15:
         *ppos = PosLoWorld(pholder);

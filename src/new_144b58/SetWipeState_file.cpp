@@ -124,11 +124,11 @@ extern "C" void DrawWipeSetup(void)
     PackXYZ__4GIFSiii(pgifs, 0x9000, 0x8700, 0);
 }
 
-int FUpdateSwDuringWipe(SW *psw)
+int FUpdateSwDuringWipe(WIPE *pwipe)
 {
-    int state = psw->state;
-    if (state < 4) {
-        if (state >= 2)
+    int wipes = pwipe->wipes;
+    if (wipes < 4) {
+        if (wipes >= 2)
             return 0;
     }
     return 1;

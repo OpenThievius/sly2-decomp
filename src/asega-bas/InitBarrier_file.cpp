@@ -6,6 +6,7 @@
 #include "m2c_macros.h"
 #include "so.h"
 #include "oxa.h"
+#include "xp.h"
 #include "sw.h"
 
 /* a barrier: an SO that lets through or stops the objects and classes it lists (FIgnoreBarrierIntersection) */
@@ -15,7 +16,7 @@ struct BARRIER : SO {
     /* 0x164 */ s32 ccid;     /* AddBarrierClass (count), FIgnoreBarrierIntersection */
     /* 0x168 */ s32 acid[4];  /* AddBarrierClass appends, FIgnoreBarrierIntersection passes each to FIsBasicDerivedFrom */
     /* 0x178 */ s32 fAllow;   /* FIgnoreBarrierIntersection: the lists name what may pass instead of what is stopped */
-    /* 0x17C */ s32 psoToucher; /* NotifyBarrierImpact stores the object that touched it before each event */
+    /* 0x17C */ SO *psoToucher; /* NotifyBarrierImpact stores the object that touched it before each event */
 };
 
 
@@ -90,21 +91,15 @@ extern "C" void AdjustBarrierNewXp(s32 *arg0) {
     }
 }
 
-struct SIDE { u8 unknown_0x0[8]; int pso; u8 unknown_0xC[0x34]; };
-
-struct XP { SIDE side[2]; u8 unknown_0x80[0x9C - 0x80]; /* 0x9C */ s32 kind; /* readers: UpdateButton (skips 10), SolveSw_file.cpp */ u8 unknown_0xA0[0xAC - 0xA0]; XP *pxpNext; };
-
-struct NODE { XP *pxpChain; NODE *pnodeNext; };
-
 extern "C" void NotifyBarrierImpact(BARRIER *pbarrier)
 {
-    int apso[16];
+    SO *apso[16];
     int cpso = 0;
     int ipso;
-    for (NODE *pnode = pbarrier->poxa->first; pnode != 0; pnode = pnode->pnodeNext) {
-        for (XP *pxp = pnode->pxpChain; pxp != 0; pxp = pxp->pxpNext) {
-            int fNotSelf = pxp->side[0].pso != (sptr)pbarrier;
-            int pso = pxp->side[1 - fNotSelf].pso;
+    for (OX *pnode = pbarrier->poxa->first; pnode != 0; pnode = pnode->next) {
+        for (XP *pxp = pnode->pxp; pxp != 0; pxp = pxp->pxpNext) {
+            int fNotSelf = pxp->axpd[0].psoRoot != pbarrier;
+            SO *pso = pxp->axpd[1 - fNotSelf].psoRoot;
             for (ipso = 0; ipso < cpso; ipso++) {
                 if (pso == apso[ipso])
                     break;

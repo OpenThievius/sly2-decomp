@@ -72,7 +72,7 @@ extern "C" void func_001C8730(KEYPAD *, int);
 
 extern "C" void func_001C8AF0(KEYPAD *pclue, int n)
 {
-    if (B_003DD490.cclueFound >= B_003DD490.field_0x4768) {
+    if (B_003DD490.cclueFound >= B_003DD490.cclueMax) {
         pclue->ppoUser = (PO *)n;
         func_001C8730(pclue, 1);
         return;

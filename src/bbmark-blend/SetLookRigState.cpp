@@ -1,23 +1,6 @@
 #include "sly2.h"
+#include "lookrig.h"
 struct TARGET;
-struct LOOKJT { u8 unknown_00[0x1A8]; float sRange; u8 unknown_1AC[0xF0C]; void *field_0x10B8; };
-struct RIGENTRY { float wOld; u8 unknown_04[8]; float wNew; u8 unknown_10[8]; void *paseg; };
-struct LOOKRIG {
-    LOOKJT *pjt;
-    s32 state;
-    s32 iHigh;
-    s32 unknown_0C;
-    s32 fSnap;
-    s32 unknown_14;
-    float tBlend;
-    float gTarget;
-    QW vecTarget;
-    float rMin;
-    float rMax;
-    RIGENTRY aentry[6];
-    void *phandle;
-    void *palo;
-};
 extern "C" {
 void ApplyAsegToHandle(void *, void *, int, void *, float, float);
 void ChooseJtAttackTarget__FP2JTiP6VECTORffPP6TARGETT2(void *, int, void *, float, float, float, TARGET **, QW *);
@@ -46,12 +29,12 @@ extern "C" void SetLookRigState(LOOKRIG *prig, int state)
     if (state == prig->state)
         return;
     if (prig->state == -1) {
-        prig->unknown_0C = 0;
+        prig->field_0xC = 0;
         prig->tBlend = g_2dded0;
         prig->fSnap = 0;
-        prig->unknown_14 = 0;
+        prig->fReleased = 0;
         float radMax = state == 0 ? 3.15f : 1.5f;
-        ChooseJtAttackTarget__FP2JTiP6VECTORffPP6TARGETT2(prig->pjt, 2, &prig->vecTarget, prig->pjt->sRange, 0.15f, radMax, &l.ptarget, &l.dir);
+        ChooseJtAttackTarget__FP2JTiP6VECTORffPP6TARGETT2(prig->pjt, 2, &prig->vecTarget, prig->pjt->radHeading, 0.15f, radMax, &l.ptarget, &l.dir);
         if (l.ptarget != 0) {
             float rLo = prig->rMin;
             prig->gTarget = GClamp((((float *)&l.dir)[2] - rLo) / (prig->rMax - rLo), 0.0f, 1.0f);
@@ -72,7 +55,7 @@ extern "C" void SetLookRigState(LOOKRIG *prig, int state)
     } else {
         if (state < -1) {
         } else if (state < 3) {
-            RIGENTRY *pentry = &prig->aentry[state * 2 + prig->iHigh];
+            LOOKRIGENTRY *pentry = &prig->aentry[state * 2 + prig->iHigh];
             rBlend = 0.06666667f;
             pentry->wOld = 1.0f - prig->gTarget;
             paseg = pentry->paseg;

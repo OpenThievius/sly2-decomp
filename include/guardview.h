@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later */
-/* C views of STEP (step.h) and STEPGUARD (stepguard.h), which are C++ only: the part of each that the guard code written in C reads,
+/* C views of STEP (step.h), STEPGUARD and ZONEGUARD (stepguard.h), which are C++ only: the part of each that the guard code written in C reads,
    with the same names and offsets. A C++ source uses STEP and STEPGUARD themselves. C only. */
 #ifndef SLY2_GUARDVIEW_H
 #define SLY2_GUARDVIEW_H
@@ -80,7 +80,25 @@ struct STEPGUARDVIEW {
     /* 0xF68 */ struct LO *ptargetGoto;
     u8 unknown_0xF6C[0x4];
     /* 0xF70 */ QW posGoto;
-    u8 unknown_0xF80[0xFD0 - 0xF80];
+    u8 unknown_0xF80[0xF94 - 0xF80];
+    /* 0xF94 */ s32 field_0xF94; /* STEPGUARD::field_0xF94 (OnGuardRemove clears it); func_00177D20 tests it */
+    u8 unknown_0xF98[0xFA8 - 0xF98];
+    /* 0xFA8 */ s32 field_0xFA8; /* STEPGUARD::field_0xFA8 (OnGuardRemove clears it); func_00177D20 tests it */
+    u8 unknown_0xFAC[0xFD0 - 0xFAC];
     /* 0xFD0 */ struct GUARDHEADING heading;
+    u8 unknown_0xFE0[0x1010 - 0xFE0];
+};
+
+/* the C slice of ZONEGUARD (stepguard.h, class 60) */
+struct ZONEGUARDVIEW {
+    struct STEPGUARDVIEW guard;
+    u8 unknown_0x1010[0x1070 - 0x1010];
+    /* 0x1070 */ f32 curve[3];       /* ZONEGUARD::curve: func_001B9F80 (its init) sets it */
+    u8 unknown_0x107C[0x4];
+    /* 0x1080 */ f32 lowLimit;       /* ZONEGUARD::lowLimit */
+    /* 0x1084 */ f32 highLimit;      /* ZONEGUARD::highLimit */
+    /* 0x1088 */ f32 reach;          /* ZONEGUARD::reach */
+    /* 0x108C */ struct LO *ploCommand; /* ZONEGUARD::ploCommand: func_00177D70 tests it */
+    u8 unknown_0x1090[0x10A0 - 0x1090];
 };
 #endif

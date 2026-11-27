@@ -134,7 +134,7 @@ extern "C" void HandleSlyMessage(SLY *psly, int msg, void *pv)
         switch (psly->jts) {
         case 3:
         case 0x16:
-            if ((sptr)psly->pjtcsinfo == (sptr)pv)
+            if ((sptr)psly->ploJtcs == (sptr)pv)
                 SetJmpState(psly->PvJmp(), 0, 0, 0);
             break;
         case 7:

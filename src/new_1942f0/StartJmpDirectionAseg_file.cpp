@@ -7,6 +7,7 @@
 #include "include_asm.h"
 #include "so.h"
 #include "oxa.h"
+#include "xp.h"
 #include "sw.h"
 #include "phys.h"
 #include "ps2inline.h"
@@ -14,6 +15,7 @@
 #include "clock.h"
 #include "joy.h"
 #include "murray.h"
+#include "sly.h"
 #include "jmp.h"
 #include "xf.h"
 
@@ -70,26 +72,15 @@ extern "C" void StartJmpDirectionAseg(JMP *pthis)
     ApplyAsegToHandle(paseg, pthis->pjt, 1, &pthis->pjt->field_0x1030, phandle->tStart, phandle->tEnd);
 }
 
-struct MQ;
 
-/* OXA::first's element, the contact list: PmqFirstOxaContact reads the first word as an int, FreeSwMqList's caller (func_00199298)
-   as the head of a chain of MQ and its slot */
-struct NODE {
-    union {
-        int value;
-        MQ *pmqFirst;
-    };
-    NODE *next;
-    MQ **ppmqSlot;
-};
-
-int PmqFirstOxaContact(OXA *self)
+/* the first contact chain of the object's pairs (retail name: Pmq, the contact's former name MQ) */
+XP *PmqFirstOxaContact(OXA *self)
 {
-    int value = 0;
-    for (NODE *node = self->first; node; node = node->next) {
-        value = node->value;
-        if (value)
-            return value;
+    XP *pxp = 0;
+    for (OX *pox = self->first; pox; pox = pox->next) {
+        pxp = pox->pxp;
+        if (pxp)
+            return pxp;
     }
     return 0;
 }
@@ -98,7 +89,8 @@ union VU_SCALE { QW q; VECTOR v; };
 
 union VU_VECTOR { QW q; VECTOR v; };
 
-/* a field of JT or its subclasses that no header declares yet (one reader each: 0x1010, 0x18F0, 0x18C4, 0xF5C, 0xF60, 0x1F18) */
+/* a field of JT or its subclasses that no header declares (0xF5C: PLAYERJT reads a CRV * there, this file stores a JMPASEGA *; 0x1F18: one
+   reader; 0x18C4: SLY::ploJtcs, which this file stores a JMPASEGA * into through a JT with no class test) */
 #define JT_FIELD(pjt, type, offset) (*(type *)((char *)(pjt) + (offset)))
 
 extern "C" float D_002BF818;
@@ -331,8 +323,7 @@ extern "C" void UpdateJmpBodyState(JMP *pjmp)
                 SetJmpBodyState(pjmp, 4, 0);
             } else {
                 JT *pjtSmooth = pjmp->pjt;
-                JT_FIELD(pjtSmooth, QW, 0x1010) =
-                    PosSmooth(JT_FIELD(pjtSmooth, QW, 0x1010), g_2a2dd0, D_002BF820, 0, g_2dded0.dt);
+                pjtSmooth->posOffset = PosSmooth(pjtSmooth->posOffset, g_2a2dd0, D_002BF820, 0, g_2dded0.dt);
                 posEdge.q = ConvertXfPos(pjmp->psoEdge->pxf, 0, pjmp->posEdge);
                 if (g_2dded0.t - pjmp->tState > 0.03f &&
                     !FCheckJtEdgeGrab__FP2JTP2SOP6VECTOR3XPKPvT2(pjmp, pjmp->psoEdge, posEdge.q, pjmp->field_0x100,
@@ -364,17 +355,17 @@ extern "C" void UpdateJmpBodyState(JMP *pjmp)
         case 21: {
             float tGoal = pjmp->pactval->tGoal;
             if (tGoal < g_2dded0.t) {
-                JT *pjtSly = 0;
+                SLY *pjtSly = 0;
                 if (FIsBasicDerivedFrom(pjmp->pjt, 0x35)) {
-                    pjtSly = pjmp->pjt;
-                    saved = JT_FIELD(pjtSly, s32, 0x18F0);
+                    pjtSly = (SLY *)pjmp->pjt;
+                    saved = pjtSly->field_0x18F0;
                 }
                 posEdge.q = pjmp->pjt->GetVelocityVec();
                 posEdge.v.x = posEdge.v.y = 0.0f;
                 pjmp->pjt->Slot35(posEdge.q);
                 SetJmpState(pjmp, 0xB, 0, 0);
                 if (pjtSly) {
-                    JT_FIELD(pjtSly, s32, 0x18F0) = saved;
+                    pjtSly->field_0x18F0 = saved;
                 }
             } else if (pjmp->landing.field_0x4 && tGoal < g_2dded0.t + 0.25f &&
                        (FIsBasicDerivedFrom(pjmp->landing.plo, 0x13) || FIsBasicDerivedFrom(pjmp->landing.plo, 0xB) ||
@@ -418,17 +409,6 @@ INCLUDE_ASM(0X197F98);
 
 INCLUDE_ASM(0X1991A0);
 
-struct MQSIDE { SO *pso; u8 unknown_0x4[0x3C]; };
-
-struct MQ {
-    u8 unknown_0x0[8];
-    MQSIDE aside[2];
-    u8 unknown_0x88[0x14];
-    int kind;
-    u8 unknown_0xA0[0xC];
-    MQ *next;
-};
-
 
 struct MQROOT { u8 unknown_0x0[4]; SO *pinfo; };
 
@@ -436,7 +416,7 @@ struct MQOWNER { SO *plevel; u8 unknown_0x4[0x18]; int kind; u8 unknown_0x20[0xA
 
 extern SW B_003DD490;
 
-void FreeSwMqList(SW *, MQ *);
+extern "C" void FreeSwMqList__FP2SWP2MQ(SW *, XP *); /* FreeSwMqList(SW *, MQ *): the symbol keeps the record's former name */
 
 void func_00199298(MQOWNER *powner)
 {
@@ -446,27 +426,27 @@ void func_00199298(MQOWNER *powner)
     if (poxa) {
         SO *psoTarget = poxa->owner;
         int fLocked = psoTarget->FIsLocked();
-        MQ *pmqFree = 0;
-        for (NODE *plink = powner->plevel->poxa->first; plink; plink = plink->next) {
-            MQ **ppmq = &plink->pmqFirst;
-            for (MQ *pmq = *ppmq; pmq; pmq = *ppmq) {
-                if (pmq->kind == 0xB) {
-                    ppmq = &pmq->next;
+        XP *pxpFree = 0;
+        for (OX *plink = powner->plevel->poxa->first; plink; plink = plink->next) {
+            XP **ppxp = &plink->pxp;
+            for (XP *pxp = *ppxp; pxp; pxp = *ppxp) {
+                if (pxp->kind == 0xB) {
+                    ppxp = &pxp->pxpNext;
                     continue;
                 }
-                int fOther = powner->plevel != pmq->aside[0].pso;
-                SO *pso = pmq->aside[1 - fOther].pso;
+                int fOther = powner->plevel != pxp->axpd[0].psoRoot;
+                SO *pso = pxp->axpd[1 - fOther].psoRoot;
                 if (fLocked ? pso->FIsLocked() != 0 : pso == psoTarget) {
-                    *ppmq = pmq->next;
-                    pmq->next = pmqFree;
-                    pmqFree = pmq;
+                    *ppxp = pxp->pxpNext;
+                    pxp->pxpNext = pxpFree;
+                    pxpFree = pxp;
                 } else {
-                    ppmq = &pmq->next;
+                    ppxp = &pxp->pxpNext;
                 }
             }
-            *plink->ppmqSlot = plink->pmqFirst;
+            plink->pair->pxp = plink->pxp;
         }
-        FreeSwMqList(&B_003DD490, pmqFree);
+        FreeSwMqList__FP2SWP2MQ(&B_003DD490, pxpFree);
     }
 }
 
@@ -818,7 +798,7 @@ extern "C" void bevy_player_p14_jts8_enter(JMP *pjmp)
         return;
     case 15:
         JT_FIELD(pjmp->pjt, JMPASEGA *, 0xF5C) = pjmp->pasega;
-        JT_FIELD(pjmp->pjt, f32, 0xF60) = pjmp->field_0x14;
+        pjmp->pjt->sPipe = pjmp->field_0x14;
         pjt = pjmp->pjt;
         pjt->SetMode(8);
         return;

@@ -1,7 +1,6 @@
-#include "types.h"
-struct Owner { u8 unknown_0x0[0x4638]; void *swObject; };
-extern "C" void *PloFindSwObject_thunk(Owner *, int, int, int);
-void func_00210940(Owner *owner)
+#include "sw.h"
+extern "C" void *PloFindSwObject_thunk(SW *, int, int, int);
+void func_00210940(SW *psw)
 {
-    owner->swObject = PloFindSwObject_thunk(owner, 5, 0x620, 0);
+    psw->ppool = PloFindSwObject_thunk(psw, 5, 0x620, 0);
 }

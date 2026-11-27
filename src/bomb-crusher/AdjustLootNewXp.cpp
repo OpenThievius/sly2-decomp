@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
 #include "loot.h"
+#include "xp.h"
 struct UL { u64 v; } __attribute__((packed));
-struct XP { u8 unknown_0x0[8]; void *plo; u8 unknown_0xC[0x34]; };
 extern "C" char B_003DD490[];
 extern "C" const UL RO_002A4B58;
 void func_001F4FB0(SO *, XP *, int);
@@ -12,7 +12,7 @@ void AdjustLootNewXp(LOOT *ploot, XP *pxp, int iside)
 {
     func_001F4FB0(ploot, pxp, iside);
     if (ploot->state == 5) {
-        if (!FIsBasicDerivedFrom(((XP *)((char *)pxp + ((1 - iside) << 6)))->plo, 0x34))
+        if (!FIsBasicDerivedFrom(pxp->axpd[1 - iside].psoRoot, 0x34))
             QueueSwCallbackOnce(B_003DD490, ploot, RO_002A4B58.v, 0);
     }
 }

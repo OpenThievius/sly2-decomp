@@ -22,6 +22,7 @@ struct ASEGA {
     u8 unknown_0x44[0x4];
     f32 field_0x48;
 };
+/* the word at 0x130 of SLY::ploJtcs (an LO) that SetJtJtcs reads: a view, one reader */
 struct JTCSINFO {
     u8 unknown_0x0[0x130];
     s32 sfx;
@@ -69,7 +70,7 @@ extern "C" void SetJtJtcs(SLY *psly, int jtcs)
     case -1:
         break;
     case 1:
-        sfx = psly->pjtcsinfo->sfx;
+        sfx = ((JTCSINFO *)psly->ploJtcs)->sfx;
         func_001F4BF8(psly);
         break;
     case 2:

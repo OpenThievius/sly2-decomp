@@ -4,11 +4,7 @@ extern "C" QW PosLoWorld(void*);
 extern "C" float g_2dded0;
 #include "stepguard.h"
 #include "goals.h"
-/* the effect the guard keeps at STEPGUARD 0x35C: func_0017A670 stores the guard position at its 0x20 (one reader: a local view of hitfx.h's HITFX) */
-struct HITFXPOS {
-    u8 unknown_0x0[0x20];
-    /* 0x20 */ QW pos;
-};
+#include "hitfx.h"
 extern "C" void GoalFlinch_SetState(GOALFLINCH*, int);
 extern "C" void func_0017A670(GOALFLINCH* goal)
 {
@@ -21,6 +17,6 @@ extern "C" void func_0017A670(GOALFLINCH* goal)
         }
     } while (goal->stateFlinch != state);
     STEPGUARD* guard = (STEPGUARD*)goal->pstep;
-    HITFXPOS* effect = (HITFXPOS*)guard->field_0x35C;
+    HITFX* effect = guard->phitfx;
     effect->pos = PosLoWorld(guard);
 }

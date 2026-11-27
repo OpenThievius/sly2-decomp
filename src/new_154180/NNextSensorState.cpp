@@ -11,7 +11,6 @@ struct OBJ : STEP {
     u8 unknown_0x2C0[0x11AC - 0x2C0];
     int field11AC;
 };
-struct NODE { int hit; NODE *next; u8 unknown_0x8[4]; OBJ *pobj; };
 struct BSP { u8 unknown_0x0[0xEC]; void *pclip; u8 unknown_0xF0[0x130 - 0xF0]; BSP *pnext; };
 extern "C" {
 void *PpoSwFocusBase(void *);
@@ -65,9 +64,9 @@ extern "C" int NNextSensorState(SENSOR *psensor, OBJ *pobj, int state)
         case 0: {
             OXA *pset = psensor->poxa;
             if (pset) {
-                for (NODE *pnode = (NODE *)pset->first; pnode; pnode = pnode->next) {
-                    if (pnode->pobj == pobj) {
-                        if (pnode->hit) {
+                for (OX *pnode = pset->first; pnode; pnode = pnode->next) {
+                    if (pnode->pso == pobj) {
+                        if (pnode->pxp) {
                             state = 1;
                             goto done;
                         }

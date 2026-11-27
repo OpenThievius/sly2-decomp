@@ -32,7 +32,10 @@ struct HITFX {
 #endif
     /* 0x10 */ s32 cRef;        /* HitFx_AddRef, HitFx_Release */
     /* 0x14 */ struct HITFXDEF *pdef; /* HitFx_CheckExpiry, HitFx_GIntensity */
-    u8 unknown_0x18[0x2C];
+    u8 unknown_0x18[0x8];
+    /* 0x20 */ QW pos;          /* where it plays: GoalHit_Update and func_0017A670 store the guard's position (STEPGUARD::phitfx), func_00208BE0
+                                   (guard slot 89) reads it (three readers agree) */
+    u8 unknown_0x30[0x14];
     /* 0x44 */ struct LO *source; /* func_00208BE0 (guard slot 89) and PhitfxChooseForGuard (they agree): the object that caused it; the key of the guard's SENSOR entry */
     u8 unknown_0x48[0x4];
     /* 0x4C */ f32 tStart;      /* HitFx_CheckExpiry, HitFx_GIntensity */

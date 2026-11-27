@@ -24,7 +24,7 @@ void SetJmpState(void *, int, int, int);
 int FIsBasicDerivedFrom(void *, int);
 void JtbsChooseJtLanding(void *, void *);
 void func_00148300(void *, void *);
-void StartFade(int);
+void StartFade(FADE *);
 }
 
 void WarpJtToSafePoint(JT *pjt, SAFEPT *ppoint)
@@ -55,7 +55,7 @@ void WarpJtToSafePoint(JT *pjt, SAFEPT *ppoint)
                     func_00148300(&B_003DD490, point.pbasic);
                     JtbsChooseJtLanding(pjt->PvJmp(), point.pbasic);
                 }
-                StartFade(B_003DD490.field_0x3E60);
+                StartFade(B_003DD490.pfade);
                 return;
             }
         }

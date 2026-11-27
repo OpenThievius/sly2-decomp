@@ -1,21 +1,22 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "jt.h"
 extern "C" {
 extern unsigned D_002C3258[];
 }
 
-struct JTENTRY_141EA8 { int nKey; int pad[2]; };
-
-extern "C" unsigned GrfbtnJtGadget(char *pThis, int nKey)
+/* the buttons of the player's gadget slots (JT::aslot) that hold gadget nKey */
+extern "C" unsigned GrfbtnJtGadget(JT *pjt, int nKey)
 {
-    struct JTENTRY_141EA8 *pEntry = (struct JTENTRY_141EA8 *)(pThis + 0x1180);
+    GADGETSLOT *pslot = pjt->aslot;
     unsigned *pFlags = D_002C3258;
     unsigned accumulated = 0;
     int nRemain = 2;
     do {
-        if (nKey == pEntry->nKey) {
+        if (nKey == pslot->gadget) {
             accumulated |= *pFlags;
         }
         pFlags++;
-        pEntry++;
+        pslot++;
         nRemain--;
     } while (nRemain >= 0);
     return accumulated;

@@ -11,5 +11,5 @@ extern "C" s128 g_2a2dd0;
 extern "C" void GoalHit_Deactivate(GOALHIT *goalHit)
 {
     func_00174B28(goalHit);
-    ReplaceSwHitFx(B_003DD490, -1, g_2a2dd0, 0, (int)&GOAL_GUARD(goalHit)->field_0x35C);
+    ReplaceSwHitFx(B_003DD490, -1, g_2a2dd0, 0, (int)&GOAL_GUARD(goalHit)->phitfx);
 }

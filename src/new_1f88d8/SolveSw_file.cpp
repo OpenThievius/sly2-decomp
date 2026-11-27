@@ -4,6 +4,7 @@
 #include "sly2.h"
 #include "sw.h"
 #include "oxa.h"
+#include "xp.h"
 #include "so.h"
 #include "xf.h"
 #include "vu0inline.h"
@@ -41,14 +42,12 @@ struct SO;
 
 struct XP;
 
-struct NODE { XP *pxp; NODE *next; int unk8; SO *pso; };
-
 extern "C" void func_001F8E90(SW *psw, SO *pso, int *pcso, SO **apso)
 {
     pso->grfso |= 0x8000000UL;
     apso[*pcso] = pso;
     *pcso = *pcso + 1;
-    for (NODE *pnode = pso->poxa->first; pnode != 0; pnode = pnode->next) {
+    for (OX *pnode = pso->poxa->first; pnode != 0; pnode = pnode->next) {
         if (pnode->pxp == 0)
             continue;
         SO *psoOther = pnode->pso;
@@ -63,8 +62,6 @@ extern "C" void func_001F8E90(SW *psw, SO *pso, int *pcso, SO **apso)
     }
 }
 
-struct SWNODE { u8 unknown_0x0[0x40]; SWNODE *pnext; u8 unknown_0x44[0x60 - 0x44]; SO *pso; };
-
 int FXfKindStatic(int);
 
 void func_001F8E90(SW *, SO *, int *, SO **);
@@ -74,10 +71,10 @@ void func_001F9240(SW *, unsigned, int, SO **);
 void func_001F8F80(SW *psw, unsigned grf)
 {
     struct { SO *apso[769]; int cso; } l;
-    SWNODE *pnode;
+    OXA *poxa;
     SO *pso;
-    for (pnode = psw->pnodeFirst; pnode != 0; pnode = pnode->pnext) {
-        pso = pnode->pso;
+    for (poxa = (OXA *)psw->dlOxaWorld.head; poxa != 0; poxa = poxa->pnextWorld) {
+        pso = poxa->owner;
         PHYS *pphys = pso->pphys;
         if (pphys == 0) continue;
         if ((pso->grfso & 0x8000000UL) != 0) continue;
@@ -89,15 +86,14 @@ void func_001F8F80(SW *psw, unsigned grf)
         func_001F8E90(psw, pso, &l.cso, l.apso);
         func_001F9240(psw, grf, l.cso, l.apso);
     }
-    for (pnode = psw->pnodeFirst; pnode != 0; pnode = pnode->pnext) {
-        pso = pnode->pso;
+    for (poxa = (OXA *)psw->dlOxaWorld.head; poxa != 0; poxa = poxa->pnextWorld) {
+        pso = poxa->owner;
         pso->grfso &= ~0x8000000UL;
         pso->grfso &= ~0x10000000UL;
     }
 }
 
-/* pso: the OXA owner of the contact's side (PxpAdd stores poxa->owner here); a kind-0xE (custom) contact's object is a STEP */
-struct XP { u8 unknown_0x0[8]; SO *pso; u8 unknown_0xC[0x9c - 0xc]; int kind; u8 unknown_0xA0[0xa8 - 0xa0]; int num; XP *next; };
+/* a kind-0xE (custom) contact's root object (XPD::psoRoot) is a STEP */
 
 int func_001F90D0(void *psw, int grf, int cso, SO **apso, int cxpMax, XP **axp)
 {
@@ -105,7 +101,7 @@ int func_001F90D0(void *psw, int grf, int cso, SO **apso, int cxpMax, XP **axp)
     for (int iso = 0; iso < cso; iso++) {
         SO *pso = apso[iso];
         pso->grfso |= 0x10000000UL;
-        NODE *node = pso->poxa->first;
+        OX *node = pso->poxa->first;
         for (;;) {
             XP *pxp;
         findNode:
@@ -118,16 +114,16 @@ int func_001F90D0(void *psw, int grf, int cso, SO **apso, int cxpMax, XP **axp)
             } else {
                 pxp = pso->poxa->own;
             }
-            for (; pxp != 0; pxp = pxp->next) {
+            for (; pxp != 0; pxp = pxp->pxpNext) {
                 if (pxp->kind == 0xd)
                     continue;
                 if (pxp->kind == 0xe) {
-                    if ((((STEP *)pxp->pso)->Slot85() & 4) == 0)
+                    if ((((STEP *)pxp->axpd[0].psoRoot)->Slot85() & 4) == 0)
                         continue;
                 }
                 if (cxp >= cxpMax)
                     return cxp;
-                pxp->num = cxp;
+                pxp->ixp = cxp;
                 axp[cxp++] = pxp;
             }
             if (node == 0)

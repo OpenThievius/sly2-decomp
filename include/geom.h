@@ -22,7 +22,9 @@ struct GEOM {
                                            between two values, func_001F6BC8 sets them on the shapes whose alo it is given */
     /* 0x1C */ s32 cfixed;             /* CloneCloth copies it and splits the vertex block at it; CSo_LoadFromBrx reads a short into it */
     /* 0x20 */ struct MATRIX4 matWorld; /* func_001F3900 copies the XF's world matrix here */
-    u8 unknown_0x60[0x8];
+    /* 0x60 */ struct GEOM *pgeomNext; /* the link of its object's OXA::dlGeom (PoxaAllocSw: InitDl ibDle 0x60; AddSoGeomToOxa appends): IntersectSwBoundingSphere
+                                          and bevy_camera_follow_push_out walk it */
+    u8 unknown_0x64[0x4];
     /* 0x68 */ u8 field_0x68[0x10];     /* CloneCloth hands both blocks to CloneBspc as the tree (0x68) and its planes (0x90); CSo_LoadFromBrx passes 0x68 to ReadBspc */
     /* 0x78 */ u8 field_0x78[0x18];     /* func_001F38A8 passes both blocks to TransformGeom with the XF's world matrix */
     /* 0x90 */ u8 field_0x90[0x18];
@@ -32,6 +34,7 @@ struct GEOM {
 
 #if defined(__mips__)
 typedef char check_GEOM_size[(sizeof(struct GEOM) == 0xB0) ? 1 : -1];
+typedef char check_GEOM_pgeomNext[((unsigned int)&((struct GEOM *)0)->pgeomNext == 0x60) ? 1 : -1];
 typedef char check_GEOM_matWorld[((unsigned int)&((struct GEOM *)0)->matWorld == 0x20) ? 1 : -1];
 #endif
 #endif

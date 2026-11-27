@@ -132,10 +132,19 @@ struct AIMSTATE {
     /* 0xC0 */ struct ANIMREF *panimref; /* UpdateGuard; PostGuardAimLoad points it at animref unless the id is 0x2CC; func_0020C7D8 clears it */
 };
 
-/* a guard's damage record: SetGuardDamageSource (0x20D460) stores the source of the last hit at 0xC */
+/* the object that damages a guard (an SO subclass, stepguard.h's SRC_DAMAGE in C++) */
+struct SRC_DAMAGE;
+
+/* a guard's damage watch, 0x14 bytes (STEPGUARD::pdamage; PostGuardLoad allocates it): func_0020D1B0 (its constructor), func_0020D1C8,
+   UpdateGuardDamage, SetGuardDamageState and SetGuardDamageSource agree on the fields */
 struct GUARDDAMAGE {
-    u8 unknown_0x0[0xC];
-    /* 0xC */ void *psource; /* HandleStepguardMessage */
+    /* 0x0 */ struct STEPGUARD *pguard; /* func_0020D1B0 sets it; UpdateGuardDamage calls its FInvulnerable and GetVelocityVec, SetGuardDamageState
+                                           hands it to the absorb work item */
+    /* 0x4 */ s32 state;               /* func_0020D1B0 and func_0020D1C8 set -1; UpdateGuardDamage switches on it (0 watching, 1 hit, 2 damaging) */
+    /* 0x8 */ f32 tState;              /* SetGuardDamageState: the clock time of the last change; UpdateGuardDamage compares the clock with it */
+    /* 0xC */ struct SRC_DAMAGE *psrc; /* the source of the last hit: SetGuardDamageSource (0x20D460) stores it, HandleStepguardMessage compares it
+                                          (message 5), UpdateGuardDamage and SetGuardDamageState read it */
+    /* 0x10 */ s32 fActive;            /* func_0020D1B0 and func_0020D1C8 set 1; UpdateGuardDamage returns while it is 0 */
 };
 
 /* one object a SENSOR watches (0x10 bytes): AddSensorLo, RemoveSensorLo, ResetSensorStates, SetSensorEntryState, PentryFindSensorLo */

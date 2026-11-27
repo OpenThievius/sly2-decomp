@@ -1,6 +1,5 @@
 #include "sly2.h"
 struct PMF { s64 v; } __attribute__((packed));
-struct NODE { int data; NODE *next; };
 #include "so.h"
 #include "oxa.h"
 extern "C" char B_003DD490[];
@@ -14,8 +13,8 @@ void func_001F4F10(SO *so)
     if (oxa->pcontact != 0) {
         QueueSwCallbackOnce(B_003DD490, so, PM, 0);
     } else if ((so->grfso & 0x3000000UL) != 0) {
-        for (NODE *link = oxa->first; link != 0; link = link->next) {
-            if (link->data != 0) {
+        for (OX *link = oxa->first; link != 0; link = link->next) {
+            if (link->pxp != 0) {
                 QueueSwCallbackOnce(B_003DD490, so, PM, 0);
                 break;
             }

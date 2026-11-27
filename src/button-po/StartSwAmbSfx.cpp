@@ -2,10 +2,9 @@
 #include "sly2.h"
 #include "sw.h"
 #include "amb.h"
+#include "stepguard.h"
+/* what STEPGUARD::field_0xFC4 points at (func_0012DC18's ACT1): only the float at 0x20 is read here (GoalNotice_Update reads the same word) */
 struct COMPONENT { u8 unknown_0x0[0x20]; float gValue; };
-/* class 56 of the class table (0x1010 bytes, derived from class 51), the class FIsBasicDerivedFrom tests below; not named yet */
-struct LO_56 : LO { u8 unknown_0x50[0xF74]; COMPONENT *pcomponent; };
-struct LM { float gMin; float gMax; };
 static inline float GLimitLm(LM *plm, float g)
 {
     float gMin = plm->gMin;
@@ -49,7 +48,7 @@ void StartSwAmbSfx(SW *psw, int sfxid, int oid, int sStart, int sFull, LO *plo, 
     else
         ploFound = (LO *)PloFindSwObject_thunk(psw, 4, oid, ploContext);
     if (ploFound != 0 && FIsBasicDerivedFrom(ploFound, 0x38) != 0) {
-        COMPONENT *pcomponent = ((LO_56 *)ploFound)->pcomponent;
+        COMPONENT *pcomponent = (COMPONENT *)((STEPGUARD *)ploFound)->field_0xFC4;
         if (pcomponent != 0) {
             float gValue = pcomponent->gValue;
             float gCurve = D_FLT_002C3EA0[0] + gValue * (D_FLT_002C3EA0[1] + gValue * D_FLT_002C3EA0[2]);

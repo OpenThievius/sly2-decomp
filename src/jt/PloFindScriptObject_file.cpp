@@ -90,10 +90,10 @@ extern "C" void ExecuteGuardScriptCmd(GOALSCRIPT *self, CMD *cmd) {
     default:
         break;
     case 1:
-        ((STEPGUARD *)self->pstep)->field_0x2CC = *(WORDPAIR *)&cmd->b;
+        ((STEPGUARD *)self->pstep)->field_0x2CC = *(LM *)&cmd->b;
         break;
     case 2:
-        ((STEPGUARD *)self->pstep)->field_0x2D4 = *(WORDPAIR *)&cmd->b;
+        ((STEPGUARD *)self->pstep)->field_0x2D4 = *(LM *)&cmd->b;
         break;
     case 3:
         func_00171AF8_1715F0(self, PloFindScriptObject_1715F0(self, cmd->a), &position, &heading);

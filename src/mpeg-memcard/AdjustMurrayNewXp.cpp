@@ -2,13 +2,7 @@
 #include "sly2.h"
 #include "ps2inline.h"
 #include "murray.h"
-struct XPSIDE { u8 unknown_0x0[0xC]; SO *pso; u8 unknown_0x10[0x30]; };
-struct XP { XPSIDE side[2]; VECTOR normal; };
-/* The word of the player at 0x1908 that this function sets (murray.h has it inside an unknown span). */
-struct MURRAYXPVIEW {
-    u8 unknown_0x0[0x1908];
-    s32 field_0x1908;
-};
+#include "xp.h"
 extern "C" {
 extern float D_002C0A38;
 extern float D_002C3C60[];
@@ -31,22 +25,22 @@ extern "C" void AdjustMurrayNewXp(MURRAY *m, XP *pxp, int iside)
     case 0xC: {
         int charges = m->field_0x1840;
         if (charges != 1) break;
-        SO *pother = pxp->side[1 - iside].pso;
+        SO *pother = pxp->axpd[1 - iside].pso;
         if (pother->FIsLocked() != 0) {
-            float v = pxp->normal.z;
+            float v = pxp->vecNormal.z;
             if (v < 0.7f) {
                 QW velocity = m->GetVelocityVec();
-                QW cosine = GCosAngle(velocity, *(QW *)&pxp->normal);
+                QW cosine = GCosAngle(velocity, pxp->normal);
                 int hit = LaneX(cosine) < D_002C0A38;
                 if (hit)
-                    ((MURRAYXPVIEW *)m)->field_0x1908 = charges;
+                    m->field_0x1908 = charges;
             }
         }
         break;
     }
     case 3:
         if (m->field_0x13D8 == 1) {
-            if (0.7f < D_002C3C60[iside] * pxp->normal.z) {
+            if (0.7f < D_002C3C60[iside] * pxp->vecNormal.z) {
                 void *pmq = CloneMqList(B_003DD490, pxp);
                 PrependMqList(B_003DD490, pmq, &m->field_0x13E4);
             }

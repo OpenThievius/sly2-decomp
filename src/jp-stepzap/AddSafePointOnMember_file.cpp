@@ -19,7 +19,7 @@ struct SAFESURFACE {
     /* 0x88 */ float unk88;
 };
 
-/* the object at 0x100 of what SLY::pjtcsinfo points at (a view): its flag at 0xC, its owner from slot 6 */
+/* the object at 0x100 of what SLY::ploJtcs points at (a view): its flag at 0xC, its owner from slot 6 */
 struct SAFEMEMBEROBJ {
     u8 unknown_0x0[0xC];
     /* 0xC */ int flag;
@@ -67,7 +67,7 @@ void UpdateJtSafePoints(SLY *self)
     }
     case 3:
     case 0x16: {
-        SAFEMEMBER *pmember = (SAFEMEMBER *)self->pjtcsinfo;
+        SAFEMEMBER *pmember = (SAFEMEMBER *)self->ploJtcs;
         if (pmember->obj.flag == 0)
             AddSafePointOnMember(0.0f, self->PvPart9E0(), pmember ? &pmember->obj : 0);
         break;

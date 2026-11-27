@@ -113,9 +113,15 @@ struct JT : STEP {
     u8 unknown_0xF40[0x10];
     /* 0xF50 */ s32 field_0xF50; /* in the pipe state InitJt starts at 0xF50: func_00141588 (97); func_0018A428 */
     /* 0xF54 */ s32 field_0xF54; /* func_00141588 (97); func_0018A428 */
-    u8 unknown_0xF58[0xA8];
+    u8 unknown_0xF58[0x8];
+    /* 0xF60 */ f32 sPipe; /* the arc length along the pipe's curve (0xF5C, whose type the readers do not agree on): UpdateJmpBodyState
+                              (StartJmpDirectionAseg_file) stores the jump's field_0x14 before SetMode(8); UpdateSeqnodeVjoy and FSeqnodeRecordDone
+                              (AddJsgContext_file, PLAYERJT::sPipe) read it (name: c8, from those readers) */
+    u8 unknown_0xF64[0x9C];
     /* 0x1000 */ s32 field_0x1000; /* InitMurray sets 4, InitBentley 2 */
-    u8 unknown_0x1004[0x1C];
+    u8 unknown_0x1004[0xC];
+    /* 0x1010 */ QW posOffset; /* SetJtPipeState (new_19e110_19e950, the pipe part's function) stores the pipe position minus the foot's;
+                                  UpdateJmpBodyState (state 17) eases it toward zero with PosSmooth (two readers; name: new_19e110_19e950's JTPOSOFFSET) */
     /* 0x1020 */ f32 field_0x1020; /* InitJt sets 100 */
     u8 unknown_0x1024[0x4];
     /* 0x1028 */ struct SM *psm; /* SetJtJtcs: IsmsFindSmOptional */
@@ -163,7 +169,8 @@ struct JT : STEP {
     u8 unknown_0x10F4[0x4];
     /* 0x10F8 */ struct LO *ploLook; /* SetJtLookTarget sets it; func_001430C8 reads its world position (two readers) */
     /* 0x10FC */ s32 kindLook; /* SetJtLookTarget sets it; func_001430C8 switches on it */
-    u8 unknown_0x1100[0x38];
+    /* 0x1100 */ s32 fLookHold; /* SetJtLookTargetHeld sets 1, ReleaseJtLookHold (jtview.h) clears it (two readers; name: jtview.h) */
+    u8 unknown_0x1104[0x34];
     /* 0x1138 */ f32 field_0x1138; /* InitJt sets 1.5 */
     /* 0x113C */ f32 field_0x113C; /* InitJt sets 2.5 */
     /* 0x1140 */ f32 field_0x1140; /* InitJt sets 3 */
@@ -177,9 +184,13 @@ struct JT : STEP {
     u8 unknown_0x11AC[0x8];
     /* 0x11B4 */ s32 field_0x11B4; /* in the carry state InitJt starts at 0x11B0: UseSlyGadget (Sly slot 100) */
     u8 unknown_0x11B8[0x8];
-    /* 0x11C0 */ struct GADGETOBJ *pgadgetLeased; /* in the carry state InitJt starts at 0x11B0: UseSlyGadget and UseBentleyGadget (slot 100 of
-                                                    Sly and Bentley) store the gadget object they leased (gadgetobj.h) */
-    u8 unknown_0x11C4[0x12C];
+    /* 0x11C0 */ struct GADGETOBJ *pgadgetLeased; /* in the carry state InitJt starts at 0x11B0 (CARRYTHROW::pso, the carried object): UseSlyGadget
+                                                    and UseBentleyGadget (slot 100 of Sly and Bentley) store the gadget object they leased (gadgetobj.h);
+                                                    StartJtCarry stores the object it starts carrying */
+    u8 unknown_0x11C4[0xCC];
+    /* 0x1290 */ QW posCarryFrom; /* in the carry state InitJt starts at 0x11B0 (CARRYTHROW +0xE0): StartJtCarry stores the world position of
+                                     the object the carried one is lifted from (one reader that calls JT slot 88, so the class is certain) */
+    u8 unknown_0x12A0[0x50];
     /* 0x12F0 */ s32 fGadgetsAllowed; /* InitJt sets 1; FAttachAllowsGadget, FJmpAllowsGadget test it */
     /* 0x12F4 */ s32 field_0x12F4; /* JT_RetainSmKinds (slot 83) counts up, JT_ReleaseSmKinds (84) down */
     u8 unknown_0x12F8[0x4];
@@ -272,5 +283,9 @@ SLY2_OFFSET_CHECK(JT, sidDefault, 0x1318);
 SLY2_OFFSET_CHECK(JT, field_0x10DC, 0x10DC);
 SLY2_OFFSET_CHECK(JT, field_0x1310, 0x1310);
 SLY2_OFFSET_CHECK(JT, field_0x1314, 0x1314);
+SLY2_OFFSET_CHECK(JT, sPipe, 0xF60);
+SLY2_OFFSET_CHECK(JT, posOffset, 0x1010);
+SLY2_OFFSET_CHECK(JT, fLookHold, 0x1100);
+SLY2_OFFSET_CHECK(JT, posCarryFrom, 0x1290);
 #endif
 #endif
