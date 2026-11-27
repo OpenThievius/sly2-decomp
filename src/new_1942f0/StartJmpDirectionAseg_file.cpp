@@ -7,6 +7,7 @@
 #include "include_asm.h"
 #include "so.h"
 #include "oxa.h"
+#include "xp.h"
 #include "sw.h"
 #include "phys.h"
 #include "ps2inline.h"
@@ -70,17 +71,16 @@ extern "C" void StartJmpDirectionAseg(JMP *pthis)
     ApplyAsegToHandle(paseg, pthis->pjt, 1, &pthis->pjt->field_0x1030, phandle->tStart, phandle->tEnd);
 }
 
-struct MQ;
 
 /* OXA::first's element, the contact list: PmqFirstOxaContact reads the first word as an int, FreeSwMqList's caller (func_00199298)
-   as the head of a chain of MQ and its slot */
+   as the head of a chain of XP (include/xp.h) and its slot */
 struct NODE {
     union {
         int value;
-        MQ *pmqFirst;
+        XP *pxpFirst;
     };
     NODE *next;
-    MQ **ppmqSlot;
+    XP **ppxpSlot;
 };
 
 int PmqFirstOxaContact(OXA *self)
@@ -418,17 +418,6 @@ INCLUDE_ASM(0X197F98);
 
 INCLUDE_ASM(0X1991A0);
 
-struct MQSIDE { SO *pso; u8 unknown_0x4[0x3C]; };
-
-struct MQ {
-    u8 unknown_0x0[8];
-    MQSIDE aside[2];
-    u8 unknown_0x88[0x14];
-    int kind;
-    u8 unknown_0xA0[0xC];
-    MQ *next;
-};
-
 
 struct MQROOT { u8 unknown_0x0[4]; SO *pinfo; };
 
@@ -436,7 +425,7 @@ struct MQOWNER { SO *plevel; u8 unknown_0x4[0x18]; int kind; u8 unknown_0x20[0xA
 
 extern SW B_003DD490;
 
-void FreeSwMqList(SW *, MQ *);
+extern "C" void FreeSwMqList__FP2SWP2MQ(SW *, XP *); /* FreeSwMqList(SW *, MQ *): the symbol keeps the record's former name */
 
 void func_00199298(MQOWNER *powner)
 {
@@ -446,27 +435,27 @@ void func_00199298(MQOWNER *powner)
     if (poxa) {
         SO *psoTarget = poxa->owner;
         int fLocked = psoTarget->FIsLocked();
-        MQ *pmqFree = 0;
+        XP *pxpFree = 0;
         for (NODE *plink = powner->plevel->poxa->first; plink; plink = plink->next) {
-            MQ **ppmq = &plink->pmqFirst;
-            for (MQ *pmq = *ppmq; pmq; pmq = *ppmq) {
-                if (pmq->kind == 0xB) {
-                    ppmq = &pmq->next;
+            XP **ppxp = &plink->pxpFirst;
+            for (XP *pxp = *ppxp; pxp; pxp = *ppxp) {
+                if (pxp->kind == 0xB) {
+                    ppxp = &pxp->pxpNext;
                     continue;
                 }
-                int fOther = powner->plevel != pmq->aside[0].pso;
-                SO *pso = pmq->aside[1 - fOther].pso;
+                int fOther = powner->plevel != pxp->axpd[0].psoRoot;
+                SO *pso = pxp->axpd[1 - fOther].psoRoot;
                 if (fLocked ? pso->FIsLocked() != 0 : pso == psoTarget) {
-                    *ppmq = pmq->next;
-                    pmq->next = pmqFree;
-                    pmqFree = pmq;
+                    *ppxp = pxp->pxpNext;
+                    pxp->pxpNext = pxpFree;
+                    pxpFree = pxp;
                 } else {
-                    ppmq = &pmq->next;
+                    ppxp = &pxp->pxpNext;
                 }
             }
-            *plink->ppmqSlot = plink->pmqFirst;
+            *plink->ppxpSlot = plink->pxpFirst;
         }
-        FreeSwMqList(&B_003DD490, pmqFree);
+        FreeSwMqList__FP2SWP2MQ(&B_003DD490, pxpFree);
     }
 }
 

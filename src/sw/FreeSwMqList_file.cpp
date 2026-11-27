@@ -6,6 +6,7 @@
 #include "sw.h"
 #include "so.h"
 #include "oxa.h"
+#include "xp.h"
 #include "include_asm.h"
 #include "vu0inline.h"
 #include "ps2inline.h"
@@ -15,34 +16,14 @@ struct GEOM {
     s32 grftak; /* MarkSoCustomContacts: the take flags, passed to PaloFindWkrAbsorber */
 };
 
-/* one side of a contact pair: the shape and the object it belongs to */
-struct MQSIDE {
-    /* 0x00 */ GEOM *pgeom;       /* reader: MarkSoCustomContacts (RecalcSwXpMovement sees the same word as an int) */
-    /* 0x04 */ void *pxf;         /* reader: RecalcSwXpMovement (the side's transform) */
-    u8 unknown_0x8[0x4];
-    /* 0x0C */ SO *pso;           /* readers: RecalcSwXpMovement, MarkSoCustomContacts; AdjustMurrayNewXp, AdjustVehicleNewXp (plo at 0x8 there) */
-    /* 0x10 */ QW pos;            /* reader: RecalcSwXpMovement */
-    u8 unknown_0x20[0x10];
-    /* 0x30 */ QW vel;            /* reader: RecalcSwXpMovement */
-};
-
-/* a contact between two objects, 0xC0 bytes (CloneMqList copies it): the lists are linked through next */
-struct MQ {
-    MQSIDE side[2];
-    /* 0x80 */ QW normal;         /* readers: AdjustMurrayNewXp (its VECTOR normal), AdjustVehicleNewXp (QW normal) */
-    u8 unknown_0x90[0x1C];
-    /* 0xAC */ MQ *next;
-    /* 0xB0 */ QW velRel;         /* reader: RecalcSwXpMovement */
-} __attribute__((aligned(16)));
-
 extern "C" void FreeSlotheapPv(SLOTHEAP *, void *);
 
-extern "C" void FreeSwMqList__FP2SWP2MQ(SW *psw, MQ *pmq) {
-    MQ *cursor = pmq;
+extern "C" void FreeSwMqList__FP2SWP2MQ(SW *psw, XP *pxp) {
+    XP *cursor = pxp;
 
     if (cursor != 0) {
         do {
-            MQ *next = cursor->next;
+            XP *next = cursor->pxpNext;
             FreeSlotheapPv(&psw->slotheapMq, cursor);
             cursor = next;
         } while (cursor != 0);
@@ -53,11 +34,11 @@ INCLUDE_ASM(0X1A7E60);
 
 extern "C" QW VelocityXfAtPos(void *, int, QW);
 
-void RecalcSwXpMovement(SW *psw, int cpxp, MQ **apxp) {
+void RecalcSwXpMovement(SW *psw, int cpxp, XP **apxp) {
     int ixpd;
     for (int ipxp = 0; ipxp < cpxp; ipxp++) {
-        MQ *pxp = apxp[ipxp];
-        MQSIDE *pxpd = pxp->side;
+        XP *pxp = apxp[ipxp];
+        XPD *pxpd = pxp->axpd;
         ixpd = 0;
         do {
             if (pxpd->pxf) {
@@ -68,7 +49,7 @@ void RecalcSwXpMovement(SW *psw, int cpxp, MQ **apxp) {
             pxpd++;
         } while (ixpd < 2);
         ixpd = 0;
-        pxpd = pxp->side;
+        pxpd = pxp->axpd;
         SO **ppso = &pxpd->pso;
         do {
             SO *pso = *ppso;
@@ -76,7 +57,7 @@ void RecalcSwXpMovement(SW *psw, int cpxp, MQ **apxp) {
             ixpd++;
             ppso += 0x10;
         } while (ixpd < 2);
-        pxp->velRel = VectorSub(pxp->side[0].vel, pxp->side[1].vel);
+        pxp->velRel = VectorSub(pxp->axpd[0].vel, pxp->axpd[1].vel);
     }
 }
 
@@ -129,57 +110,57 @@ INCLUDE_ASM(0X1A9C40);
 
 INCLUDE_ASM(0X1A9D38);
 
-extern "C" void PrependMqList(void *unused, MQ *pList, MQ **ppHead)
+extern "C" void PrependMqList(void *unused, XP *pList, XP **ppHead)
 {
     if (pList != 0) {
-        MQ *pTail = pList;
-        while (pTail->next != 0) {
-            pTail = pTail->next;
+        XP *pTail = pList;
+        while (pTail->pxpNext != 0) {
+            pTail = pTail->pxpNext;
         }
-        pTail->next = *ppHead;
+        pTail->pxpNext = *ppHead;
         *ppHead = pList;
     }
 }
 
 extern "C" void *PvAllocSlotheapImpl(SLOTHEAP *);
 
-MQ *CloneMqList(SW *psw, MQ *src)
+XP *CloneMqList(SW *psw, XP *src)
 {
     if (src == 0) return 0;
-    MQ *head = 0;
-    MQ **link = &head;
+    XP *head = 0;
+    XP **link = &head;
     SLOTHEAP *heap = &psw->slotheapMq;
     do {
-        MQ *clone = (MQ *)PvAllocSlotheapImpl(heap);
+        XP *clone = (XP *)PvAllocSlotheapImpl(heap);
         *clone = *src;
         *link = clone;
-        src = src->next;
-        link = &clone->next;
+        src = src->pxpNext;
+        link = &clone->pxpNext;
     } while (src != 0);
     return head;
 }
 
 extern "C" int PaloFindWkrAbsorber(SO *, int);
 
-extern "C" void MarkSoCustomContacts(SW *psw, OXA *poxaRoot, OXA *poxaOwner, GEOM *pgeom, int cbsp, void *absp, void *pbspLast, MQ **ppmqHead)
+extern "C" void MarkSoCustomContacts(SW *psw, OXA *poxaRoot, OXA *poxaOwner, GEOM *pgeom, int cbsp, void *absp, void *pbspLast, XP **ppxpHead)
 {
-    MQ *pmqLocal = 0;
-    MQ **ptarget = ppmqHead;
-    if (pgeom->grftak) ptarget = &pmqLocal;
+    XP *pxpLocal = 0;
+    XP **ptarget = ppxpHead;
+    if (pgeom->grftak) ptarget = &pxpLocal;
     SO *pso = poxaRoot->owner;
     pso->Slot60(pgeom, cbsp, absp, pbspLast, ptarget);
-    if (pmqLocal == 0) return;
-    for (MQ *pmq = pmqLocal; pmq != 0; pmq = pmq->next) {
-        int other = pmq->side[0].pgeom != pgeom;
-        SO *psoOther = pmq->side[1 - other].pso;
+    if (pxpLocal == 0) return;
+    for (XP *pxp = pxpLocal; pxp != 0; pxp = pxp->pxpNext) {
+        int other = pxp->axpd[0].pgeom != pgeom;
+        SO *psoOther = pxp->axpd[1 - other].pso;
         if (PaloFindWkrAbsorber(psoOther, pgeom->grftak)) {
-            MQ *pclone = (MQ *)PvAllocSlotheapImpl(&psw->slotheapMq);
-            *pclone = *pmq;
-            pclone->next = poxaOwner->pcontact;
+            XP *pclone = (XP *)PvAllocSlotheapImpl(&psw->slotheapMq);
+            *pclone = *pxp;
+            pclone->pxpNext = poxaOwner->pcontact;
             poxaOwner->pcontact = pclone;
         }
     }
-    PrependMqList(psw, pmqLocal, ppmqHead);
+    PrependMqList(psw, pxpLocal, ppxpHead);
 }
 
 INCLUDE_ASM(0X1AA1D8);

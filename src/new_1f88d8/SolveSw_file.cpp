@@ -4,6 +4,7 @@
 #include "sly2.h"
 #include "sw.h"
 #include "oxa.h"
+#include "xp.h"
 #include "so.h"
 #include "xf.h"
 #include "vu0inline.h"
@@ -96,8 +97,7 @@ void func_001F8F80(SW *psw, unsigned grf)
     }
 }
 
-/* pso: the OXA owner of the contact's side (PxpAdd stores poxa->owner here); a kind-0xE (custom) contact's object is a STEP */
-struct XP { u8 unknown_0x0[8]; SO *pso; u8 unknown_0xC[0x9c - 0xc]; int kind; u8 unknown_0xA0[0xa8 - 0xa0]; int num; XP *next; };
+/* a kind-0xE (custom) contact's root object (XPD::psoRoot) is a STEP */
 
 int func_001F90D0(void *psw, int grf, int cso, SO **apso, int cxpMax, XP **axp)
 {
@@ -118,16 +118,16 @@ int func_001F90D0(void *psw, int grf, int cso, SO **apso, int cxpMax, XP **axp)
             } else {
                 pxp = pso->poxa->own;
             }
-            for (; pxp != 0; pxp = pxp->next) {
+            for (; pxp != 0; pxp = pxp->pxpNext) {
                 if (pxp->kind == 0xd)
                     continue;
                 if (pxp->kind == 0xe) {
-                    if ((((STEP *)pxp->pso)->Slot85() & 4) == 0)
+                    if ((((STEP *)pxp->axpd[0].psoRoot)->Slot85() & 4) == 0)
                         continue;
                 }
                 if (cxp >= cxpMax)
                     return cxp;
-                pxp->num = cxp;
+                pxp->ixp = cxp;
                 axp[cxp++] = pxp;
             }
             if (node == 0)

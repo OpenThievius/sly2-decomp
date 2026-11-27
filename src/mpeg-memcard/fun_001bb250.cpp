@@ -5,8 +5,8 @@
 
 struct CLS { int cid; int fEnabled; };
 struct STG : SO { s32 ccls; CLS *acls; };
-struct MQ;
-struct STGITEM { MQ *pmq; STGITEM *pitemNext; s32 *pfActive; SO *pso; };
+struct XP;
+struct STGITEM { XP *pmq; STGITEM *pitemNext; s32 *pfActive; SO *pso; };
 struct OXASTG { char unknown_0x0[0x64]; STGITEM *pitemFirst; };
 
 extern SW B_003DD490;
@@ -15,7 +15,7 @@ void func_001F4F10(SO *);
 int FStgSwitchDone(STG *);
 int FIsBasicDerivedFrom(void *, int);
 void SetStgSwitchHitter(STG *, SO *, int);
-void FreeSwMqList__FP2SWP2MQ(SW *, MQ *);
+void FreeSwMqList__FP2SWP2MQ(SW *, XP *);
 }
 
 extern "C" void func_001BB250(STG *pstg)

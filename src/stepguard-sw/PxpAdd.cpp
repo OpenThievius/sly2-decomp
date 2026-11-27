@@ -5,57 +5,52 @@
 #include "sw.h"
 #include "so.h"
 #include "oxa.h"
-struct XPOBJ { int unk0; SO *powner; };
-struct XPD { XPOBJ *pobj; int unk4; SO *psoOxaOwner; SO *pso; QW pos; QW posConv; QW vel; };
-struct XP {
-    XPD xpd[2];
-    QW velBase;
-    float gA; float gB; float gC; int n9C; int nA0; int nA4; int unkA8; XP *pxpNext;
-};
+#include "geom.h"
+#include "xp.h"
 union VU_SCALE { QW q; float g[4]; };
 extern "C" {
 void *PvAllocSlotheapImpl(SLOTHEAP *);
-QW ConvertXfPos(int, int, QW);
+QW ConvertXfPos(int, XF *, QW);
 void RecalcSwXpMovement(SW *, int, XP **);
 extern float D_FLT_002BFD30;
 extern float D_FLT_002BFD34;
-void PxpAdd(SW *psw, void *pobjA, void *pobjB, QW pos, QW vel, int arg5, int arg6, int arg7, float gScale, XP **ppxpHead)
+void PxpAdd(SW *psw, GEOM *pgeomA, GEOM *pgeomB, QW pos, QW vel, int arg5, int arg6, int arg7, float gScale, XP **ppxpHead)
 {
     VU_SCALE scale;
     XP *pxp;
     XPD *pxpd;
     XP *pxpNew = (XP *)PvAllocSlotheapImpl(&psw->slotheapMq);
     pxp = pxpNew;
-    pxpNew->xpd[0].pos = pos;
+    pxpNew->axpd[0].pos = pos;
     scale.q = VectorFromFloat(-gScale);
-    pxpNew->xpd[1].pos = ScaleAddX(pos, vel, scale.q);
-    pxpNew->velBase = vel;
+    pxpNew->axpd[1].pos = ScaleAddX(pos, vel, scale.q);
+    pxpNew->normal = vel;
     int ixpd = 0;
     do {
-        pxpd = &pxp->xpd[ixpd];
+        pxpd = &pxp->axpd[ixpd];
         if (ixpd == 0)
-            pxpd->pobj = (XPOBJ *)pobjA;
+            pxpd->pgeom = pgeomA;
         else
-            pxpd->pobj = (XPOBJ *)pobjB;
-        XPOBJ *pobj = pxpd->pobj;
-        if (pobj) {
-            pxpd->unk4 = pobj->unk0;
-            SO *powner = pobj->powner;
-            pxpd->pso = powner;
-            pxpd->psoOxaOwner = powner->poxa->owner;
+            pxpd->pgeom = pgeomB;
+        GEOM *pgeom = pxpd->pgeom;
+        if (pgeom) {
+            pxpd->pxf = pgeom->pxf;
+            SO *pso = pgeom->pso;
+            pxpd->pso = pso;
+            pxpd->psoRoot = pso->poxa->owner;
         }
         ixpd++;
-        pxpd->posConv = ConvertXfPos(0, pxpd->unk4, pxpd->pos);
+        pxpd->posConv = ConvertXfPos(0, pxpd->pxf, pxpd->pos);
     } while (ixpd < 2);
-    pxp->gA = gScale;
-    pxp->n9C = arg5;
-    pxp->gB = D_FLT_002BFD30;
-    pxp->gC = D_FLT_002BFD34;
-    pxp->nA0 = arg6;
-    pxp->nA4 = arg7;
+    pxp->gScale = gScale;
+    pxp->kind = arg5;
+    pxp->friction = D_FLT_002BFD30;
+    pxp->bounce = D_FLT_002BFD34;
+    pxp->nUser = arg6;
+    pxp->field_0xA4 = arg7;
     ixpd = 0;
     do {
-        pxpd = &pxp->xpd[ixpd];
+        pxpd = &pxp->axpd[ixpd];
         SO *pso = pxpd->pso;
         if (pso)
             pso->Slot55(pxp, ixpd);

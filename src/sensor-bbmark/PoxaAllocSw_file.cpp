@@ -8,9 +8,9 @@
 #include "m2c_macros.h"
 #include "include_asm.h"
 
-struct MQ;
+struct XP;
 
-struct OX { MQ *pmq; OX *next; OX *pair; SO *pobj; int flag; };
+struct OX { XP *pmq; OX *next; OX *pair; SO *pobj; int flag; };
 
 /* the contact record of a solid object in the world's axis lists (retail "poxa"): its bounds, the list of its pair nodes at 0x64 */
 struct POXA {
@@ -26,8 +26,8 @@ struct POXA {
     u8 unknown_0x5C[0x4];
     /* 0x60 */ SO *pso;
     /* 0x64 */ OX *head;
-    /* 0x68 */ MQ *pmqList;         /* RecalcSwXpAll frees it */
-    /* 0x6C */ MQ *pcontact;        /* readers (oxa.h): MarkSoCustomContacts, func_001F7410, so_sm_1f77c0 */
+    /* 0x68 */ XP *pmqList;         /* RecalcSwXpAll frees it */
+    /* 0x6C */ XP *pcontact;        /* readers (oxa.h): MarkSoCustomContacts, func_001F7410, so_sm_1f77c0 */
     /* 0x70 */ u64 grf;             /* RecalcSwXpAll: bits 2, 8 and 0x10 */
 };
 
@@ -235,9 +235,9 @@ extern "C" void CStackFrame_Construct(void *);
 
 extern "C" void CStackFrame_Destructor(void *, int);
 
-extern "C" void FreeSwMqList__FP2SWP2MQ_134040(void *, MQ *);
+extern "C" void FreeSwMqList__FP2SWP2MQ_134040(void *, XP *);
 
-extern "C" MQ *PxpMarkSwContactsRoot(void *, POXA *, POXA *);
+extern "C" XP *PxpMarkSwContactsRoot(void *, POXA *, POXA *);
 
 extern "C" void RemoveDlEntry(void *, void *);
 
@@ -277,9 +277,9 @@ extern "C" void RecalcSwXpAll(SW *sw)
                         }
                         oxa->pso->Slot54(other->pso);
                         other->pso->Slot54(oxa->pso);
-                        MQ *old = link->pmq;
+                        XP *old = link->pmq;
                         FreeSwMqList__FP2SWP2MQ_134040(sw, old);
-                        MQ *mq = PxpMarkSwContactsRoot(sw, oxa, other);
+                        XP *mq = PxpMarkSwContactsRoot(sw, oxa, other);
                         link->pmq = mq;
                         link->pair->pmq = mq;
                         if (old || link->pmq) {
