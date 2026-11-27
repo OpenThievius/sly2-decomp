@@ -72,24 +72,14 @@ extern "C" void StartJmpDirectionAseg(JMP *pthis)
 }
 
 
-/* OXA::first's element, the contact list: PmqFirstOxaContact reads the first word as an int, FreeSwMqList's caller (func_00199298)
-   as the head of a chain of XP (include/xp.h) and its slot */
-struct NODE {
-    union {
-        int value;
-        XP *pxpFirst;
-    };
-    NODE *next;
-    XP **ppxpSlot;
-};
-
-int PmqFirstOxaContact(OXA *self)
+/* the first contact chain of the object's pairs (retail name: Pmq, the contact's former name MQ) */
+XP *PmqFirstOxaContact(OXA *self)
 {
-    int value = 0;
-    for (NODE *node = self->first; node; node = node->next) {
-        value = node->value;
-        if (value)
-            return value;
+    XP *pxp = 0;
+    for (OX *pox = self->first; pox; pox = pox->next) {
+        pxp = pox->pxp;
+        if (pxp)
+            return pxp;
     }
     return 0;
 }
@@ -436,8 +426,8 @@ void func_00199298(MQOWNER *powner)
         SO *psoTarget = poxa->owner;
         int fLocked = psoTarget->FIsLocked();
         XP *pxpFree = 0;
-        for (NODE *plink = powner->plevel->poxa->first; plink; plink = plink->next) {
-            XP **ppxp = &plink->pxpFirst;
+        for (OX *plink = powner->plevel->poxa->first; plink; plink = plink->next) {
+            XP **ppxp = &plink->pxp;
             for (XP *pxp = *ppxp; pxp; pxp = *ppxp) {
                 if (pxp->kind == 0xB) {
                     ppxp = &pxp->pxpNext;
@@ -453,7 +443,7 @@ void func_00199298(MQOWNER *powner)
                     ppxp = &pxp->pxpNext;
                 }
             }
-            *plink->ppxpSlot = plink->pxpFirst;
+            plink->pair->pxp = plink->pxp;
         }
         FreeSwMqList__FP2SWP2MQ(&B_003DD490, pxpFree);
     }

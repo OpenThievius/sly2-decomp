@@ -9,7 +9,6 @@
 struct UL { u64 v; } __attribute__((packed));
 extern "C" const UL RO_002A4E80;
 extern "C" SW B_003DD490;
-struct NODE { XP *pxpFirst; NODE *pxpgroupNext; }; /* the contact list node oxa.h's OXA::first points at (InitBarrier_file.cpp defines the same NODE) */
 extern "C" {
 void UpdateSo(void);
 void SetButtonButtons(BUTTON *, unsigned);
@@ -58,10 +57,10 @@ extern "C" void UpdateButton(BUTTON *button)
             }
             break;
         case 0:
-            NODE *pxpgroup = (NODE *)button->poxa->first;
+            OX *pox = button->poxa->first;
             buttons = 0;
-            for (; pxpgroup != 0; pxpgroup = pxpgroup->pxpgroupNext) {
-                for (XP *pxp = pxpgroup->pxpFirst; pxp != 0; pxp = pxp->pxpNext) {
+            for (; pox != 0; pox = pox->next) {
+                for (XP *pxp = pox->pxp; pxp != 0; pxp = pxp->pxpNext) {
                     if (pxp->kind == 10) continue;
                     int side = button->poxa->owner != pxp->axpd[0].psoRoot;
                     SO *psoOther = pxp->axpd[1 - side].psoRoot;

@@ -42,14 +42,12 @@ struct SO;
 
 struct XP;
 
-struct NODE { XP *pxp; NODE *next; int unk8; SO *pso; };
-
 extern "C" void func_001F8E90(SW *psw, SO *pso, int *pcso, SO **apso)
 {
     pso->grfso |= 0x8000000UL;
     apso[*pcso] = pso;
     *pcso = *pcso + 1;
-    for (NODE *pnode = pso->poxa->first; pnode != 0; pnode = pnode->next) {
+    for (OX *pnode = pso->poxa->first; pnode != 0; pnode = pnode->next) {
         if (pnode->pxp == 0)
             continue;
         SO *psoOther = pnode->pso;
@@ -105,7 +103,7 @@ int func_001F90D0(void *psw, int grf, int cso, SO **apso, int cxpMax, XP **axp)
     for (int iso = 0; iso < cso; iso++) {
         SO *pso = apso[iso];
         pso->grfso |= 0x10000000UL;
-        NODE *node = pso->poxa->first;
+        OX *node = pso->poxa->first;
         for (;;) {
             XP *pxp;
         findNode:

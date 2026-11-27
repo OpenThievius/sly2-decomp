@@ -1,7 +1,6 @@
 #include "sly2.h"
 #include "so.h"
 #include "oxa.h"
-struct NODE { XP *pxp; NODE *next; int *pcount; SO *pso; };
 struct SW;
 extern "C" void func_001F4BF8(SO *);
 extern SW B_003DD490;
@@ -10,7 +9,7 @@ void DiscardSoXps(SO *pso)
 {
     if (pso->poxa) {
         func_001F4BF8(pso);
-        NODE *link = pso->poxa->first;
+        OX *link = pso->poxa->first;
         if (link) {
             do {
                 SO *owner = pso->poxa->owner;
@@ -18,7 +17,7 @@ void DiscardSoXps(SO *pso)
                 SO *other = link->pso;
                 other->Slot54(pso->poxa->owner);
                 FreeSwMqList__FP2SWP2MQ(&B_003DD490, link->pxp);
-                *link->pcount = 0;
+                link->pair->pxp = 0;
                 link->pxp = 0;
                 link = link->next;
             } while (link);

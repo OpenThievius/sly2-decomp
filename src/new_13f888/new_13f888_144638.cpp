@@ -9,16 +9,11 @@
 #include "vu0inline.h"
 #include "jt.h"
 #include "oxa.h"
+#include "xp.h"
 
 void func_00144638(s32 *arg0, s32 arg1) {
     *arg0 = arg1;
 }
-
-struct Side_144640 { u8 unknown_0x0[8]; void *obj; u8 unknown_0xC[0x40 - 0xC]; };
-
-struct Item_144640 { Side_144640 sides[2]; u8 unknown_0x80[0xAC - 0x80]; Item_144640 *next; };
-
-struct NODE { Item_144640 *head; NODE *next; };
 
 /* JT::pseqnode's object: the same SEQNODE as in JT_TranslateToPos_file.cpp, whose drive record is at 0x40 (SetSeqnodeDrive in AddJsgContext_file.cpp names it precDrive) */
 struct SEQNODE {
@@ -72,10 +67,10 @@ extern "C" void func_00144640(Act_144640 *self) {
             self->tNext = g_2dded0 + D_002BD2D0;
             if (FSwHandsOff(B_003DD490) != 0) {
                 int found = 0;
-                for (NODE *chain = self->jt->poxa->first; chain != 0; chain = chain->next) {
-                    for (Item_144640 *item = chain->head; item != 0; item = item->next) {
-                        int diff = ((void *)self->jt != item->sides[0].obj);
-                        void *other = item->sides[1 - diff].obj;
+                for (OX *chain = self->jt->poxa->first; chain != 0; chain = chain->next) {
+                    for (XP *item = chain->pxp; item != 0; item = item->pxpNext) {
+                        int diff = ((void *)self->jt != item->axpd[0].psoRoot);
+                        void *other = item->axpd[1 - diff].psoRoot;
                         if (FIsBasicDerivedFrom(other, 0x38) != 0) {
                             Ent_144640 *ent = func_00205458(other, 0xA9);
                             if (ent == 0 || ent->f4C == 0) {

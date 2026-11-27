@@ -91,15 +91,13 @@ extern "C" void AdjustBarrierNewXp(s32 *arg0) {
     }
 }
 
-struct NODE { XP *pxpChain; NODE *pnodeNext; };
-
 extern "C" void NotifyBarrierImpact(BARRIER *pbarrier)
 {
     SO *apso[16];
     int cpso = 0;
     int ipso;
-    for (NODE *pnode = pbarrier->poxa->first; pnode != 0; pnode = pnode->pnodeNext) {
-        for (XP *pxp = pnode->pxpChain; pxp != 0; pxp = pxp->pxpNext) {
+    for (OX *pnode = pbarrier->poxa->first; pnode != 0; pnode = pnode->next) {
+        for (XP *pxp = pnode->pxp; pxp != 0; pxp = pxp->pxpNext) {
             int fNotSelf = pxp->axpd[0].psoRoot != pbarrier;
             SO *pso = pxp->axpd[1 - fNotSelf].psoRoot;
             for (ipso = 0; ipso < cpso; ipso++) {

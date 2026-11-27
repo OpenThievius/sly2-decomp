@@ -1,5 +1,5 @@
 #include "so.h"
-struct OXA { u8 unknown_0x0[0x60]; SO *owner; };
+#include "oxa.h"
 extern "C" {
 extern char B_003DD490;
 SO *func_001F2798(SO *);
