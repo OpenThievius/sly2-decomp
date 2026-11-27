@@ -3527,6 +3527,7 @@ us_address	name	other_address	pair	score	addresses
 0x1C90D0	InitLoadingLogoThread	0X1C9340	same	0	ok
 0x1C9190	LoadingLogoThread	0X1C9400	same	0	ok
 0x1C93E0	DrawLoadingLogo	0X1C9650	same	3	ok
+0x1C9688	StaticInitLoadingLogo	0X1C98F8	same	0	ok
 0x1C9920	StaticInitLoadingLogo_thunk	0X1C9B90	same	0	ok
 0x1C9940	MakeCloneId	0X1C9BB0	gap	0	ok
 0x1C9950	IsetFromCloneId	0X1C9BC0	gap	0	ok
@@ -4852,6 +4853,7 @@ us_address	name	other_address	pair	score	addresses
 0x213DB0	SwitchBlotLabel	0X214580	same	0	ok
 0x213E20	FGetSpriteSlotTransform	0X2145F0	same	0	ok
 0x213F70	FStartSpriteLabelInstance	0X214740	same	0	ok
+0x214100	FStartSpriteDepthInstance	0X2148D0	same	0	ok
 0x2142B0	FSpriteHasLabel	0X214A80	identical	0	ok
 0x214300	SetBlotModal	0X214AD0	same	0	ok
 0x214398	LoadMovieDictionary	0X214B68	same	0	ok

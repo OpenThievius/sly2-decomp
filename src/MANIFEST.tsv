@@ -3527,6 +3527,7 @@ address	name	size	file	whole_file	symbol
 0X1C90D0	InitLoadingLogoThread	188	new_1c90d0/InitLoadingLogoThread.cpp		
 0X1C9190	LoadingLogoThread	588	new_1c90d0/LoadingLogoThread.cpp		
 0X1C93E0	DrawLoadingLogo	676	new_1c90d0/DrawLoadingLogo_file.cpp	new_1c90d0/DrawLoadingLogo_file.cpp	DrawLoadingLogo
+0X1C9688	StaticInitLoadingLogo	664	new_1c90d0/DrawLoadingLogo_file.cpp	new_1c90d0/DrawLoadingLogo_file.cpp	StaticInitLoadingLogo
 0X1C9920	StaticInitLoadingLogo_thunk	32	new_1c90d0/DrawLoadingLogo_file.cpp	new_1c90d0/DrawLoadingLogo_file.cpp	StaticInitLoadingLogo_thunk
 0X1C9940	MakeCloneId	16	new_1c90d0/MakeCloneId_file.cpp	new_1c90d0/MakeCloneId_file.cpp	MakeCloneId
 0X1C9950	IsetFromCloneId	8	new_1c90d0/MakeCloneId_file.cpp	new_1c90d0/MakeCloneId_file.cpp	IsetFromCloneId
@@ -4852,6 +4853,7 @@ address	name	size	file	whole_file	symbol
 0X213DB0	SwitchBlotLabel	112	screen-font/SwitchBlotLabel.cpp		
 0X213E20	FGetSpriteSlotTransform	332	screen-font/FGetSpriteSlotTransform.cpp		
 0X213F70	FStartSpriteLabelInstance	396	screen-font/FStartSpriteLabelInstance.cpp		
+0X214100	FStartSpriteDepthInstance	432	screen-font/FStartSpriteDepthInstance.cpp		
 0X2142B0	FSpriteHasLabel	80	screen-font/FSpriteHasLabel.cpp		
 0X214300	SetBlotModal	152	screen-font/SetBlotModal.c		
 0X214398	LoadMovieDictionary	200	screen-font/LoadMovieDictionary.cpp		

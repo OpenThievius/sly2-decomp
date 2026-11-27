@@ -320,7 +320,6 @@ address	name	size	file	score
 0X1C7C30	SetClueFound	208	new_1c76d0/SetClueFound.cpp	7
 0X1C84D8	func_001C84D8	600	new_1c76d0/fun_001c84d8.cpp	44
 0X1C9058	StartLoadingLogo	56	prog-memcard/StartLoadingLogo.cpp	3
-0X1C9688	StaticInitLoadingLogo	664	new_1c90d0/StaticInitLoadingLogo.cpp	65
 0X1C9B08	func_001C9B08	1552	new_1c90d0/fun_001c9b08.cpp	24
 0X1CA118	LO_SetCloneId	496	new_1c90d0/LO_SetCloneId.cpp	19
 0X1CAA60	ReleaseLease	896	new_1c90d0/ReleaseLease.cpp	13
@@ -439,7 +438,6 @@ address	name	size	file	score
 0X20C2F8	SetJumperState	1024	steprun-stream/SetJumperState.cpp	69
 0X20C7E0	LoadDirAnimSet	360	steprun-stream/LoadDirAnimSet.c	71
 0X20E890	ExecuteSwLoadRequest	1840	new_20e040/ExecuteSwLoadRequest.c	327
-0X214100	FStartSpriteDepthInstance	432	screen-font/FStartSpriteDepthInstance.cpp	4
 0X2149D8	LoadMovieCharacter	3048	screen-font/LoadMovieCharacter.cpp	5
 0X215F40	CMovieText_ClineWrap	408	font-break/CMovieText_ClineWrap.cpp	5
 0X2160D8	CMovieText_UpdateFont	240	font-break/CMovieText_UpdateFont.cpp	38
