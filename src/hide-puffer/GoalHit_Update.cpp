@@ -4,8 +4,8 @@
 #include "sly2.h"
 #include "stepguard.h"
 #include "hitfx.h"
+#include "clock.h"
 struct CMOBJ;
-extern float g_2dded0;
 extern CMOBJ B_002DDF40;
 void GoalAnim_Update(GOAL *);
 QW PosLoWorld(LO *);
@@ -16,10 +16,8 @@ void GoalHit_Update(GOALHIT *goal)
     GoalAnim_Update(goal);
     STEPGUARD *lo = (STEPGUARD *)goal->pstep;
     HITFX *target = lo->phitfx;
-    /* through a QW pointer: a direct member store makes gcc move the g_2dded0 load before the store (score 7) */
-    QW *ppos = &target->pos;
-    *ppos = PosLoWorld(lo);
-    float limit = g_2dded0 + 0.0001f;
+    target->pos = PosLoWorld(lo);
+    float limit = g_2dded0.t + 0.0001f;
     if (goal->tJolt < limit) {
         goal->tJolt = 3.402823466e+38f;
         JoltCm(&B_002DDF40, 0);
