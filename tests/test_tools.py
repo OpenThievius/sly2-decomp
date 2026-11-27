@@ -26,6 +26,7 @@ import check_unit  # noqa: E402
 import commit_msg  # noqa: E402
 import boundaries  # noqa: E402
 import compile_unit  # noqa: E402
+import delay_slots  # noqa: E402
 import credit_audit  # noqa: E402
 import harvest  # noqa: E402
 import export_nonmatching  # noqa: E402
@@ -2387,6 +2388,35 @@ class LandingToolTests(unittest.TestCase):
                    ('float func_00153638(void *p, float g);\n', False)]
         arities, types = check_calls.learn(matched)
         self.assertEqual(check_calls.flags('float func_00153638(void *p, float g);\n', False, 'Draft', arities, types), [])
+
+
+class DelaySlotTests(unittest.TestCase):
+    """scripts/build/delay_slots.py: a volatile store directly before a reorder-mode jump moves into its slot (docs/build/assembler.md "Delay slots of the SDK range")."""
+    VOLATILE_STORE = '\t#.set\tvolatile\n\tsw\t$0,0($3)\n\t#.set\tnovolatile\n'
+
+    def test_a_volatile_store_before_a_call_moves_into_its_slot(self):
+        filled = delay_slots.fill('x:\n' + self.VOLATILE_STORE + '\tjal\tInitIpu\n')
+        self.assertIn('\t.set\tnoreorder\n\tjal\tInitIpu\n\tsw\t$0,0($3)\n\t.set\treorder', filled)
+
+    def test_a_plain_store_stays_before_its_call(self):
+        text = 'x:\n\tsw\t$0,0($3)\n\tjal\tInitIpu\n'
+        self.assertEqual(delay_slots.fill(text), text)
+
+    def test_a_volatile_store_with_an_instruction_before_the_call_stays(self):
+        text = 'x:\n' + self.VOLATILE_STORE + '\tli\t$2,1\n\tjal\tInitIpu\n'
+        self.assertEqual(delay_slots.fill(text), text)
+
+    def test_a_store_in_noreorder_mode_stays(self):
+        text = 'x:\n\t.set\tnoreorder\n' + self.VOLATILE_STORE + '\tjal\tInitIpu\n\tnop\n'
+        self.assertEqual(delay_slots.fill(text), text)
+
+    def test_a_store_of_the_return_address_stays(self):
+        text = 'x:\n' + self.VOLATILE_STORE.replace('$0,0($3)', '$31,0($3)') + '\tjal\tInitIpu\n'
+        self.assertEqual(delay_slots.fill(text), text)
+
+    def test_a_store_to_a_constant_keeps_the_assemblers_lui_before_the_call(self):
+        filled = delay_slots.fill('x:\n\t#.set\tvolatile\n\tsw\t$3,0x1000b000\n\t#.set\tnovolatile\n\tjal\tf\n')
+        self.assertIn('\tlui\t$1,4097\n\tjal\tf\n\tsw\t$3,-20480($1)', filled)
 
 
 if __name__ == '__main__':

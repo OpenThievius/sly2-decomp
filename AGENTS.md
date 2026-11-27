@@ -89,7 +89,8 @@ counts as matched.
 - **One flag set per source file** and one assembler for all game code, never per function or ad hoc per attempt: SN's `ps2eeas` 1.9.25.758 with its one short-loop constant
   changed from 6 to 5 (`tools/ps2eeas/Ps2EeAs-loop5.exe`, made by `setup.sh` from the pinned download, never committed; retail pads every short
   loop to five and no assembler release we could run does, docs/build/assembler.md "Short loops"). The SDK range builds with Sony's own
-  toolchain (`config/us/sony_gcc29.txt`).
+  toolchain (`config/us/sony_gcc29.txt`), and the compiler's text goes through one post-pass (`scripts/build/delay_slots.py`) that puts a volatile store
+  into the delay slot of the jump after it, as Sony's library assembler did (docs/build/assembler.md "Delay slots of the SDK range"; Theo, 2026-11-27).
 - Compiler and assembler: see docs/build/compiler-identification.md and docs/build/assembler.md (measure with
   `scripts/matching/assembler_probe.py` before changing the assembler). SDK-range functions list their
   address in `config/us/sony_gcc29.txt`.

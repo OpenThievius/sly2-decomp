@@ -1,13 +1,13 @@
 {
  "measures": {
-  "fuzzy_match_percent": 77.284798,
+  "fuzzy_match_percent": 77.346292,
   "total_code": "1164348",
-  "matched_code": "899864",
-  "matched_code_percent": 77.284798,
+  "matched_code": "900580",
+  "matched_code_percent": 77.346292,
   "total_data": "1038916",
   "total_functions": 6064,
-  "matched_functions": 5646,
-  "matched_functions_percent": 93.10686,
+  "matched_functions": 5649,
+  "matched_functions_percent": 93.156332,
   "complete_code": "241940",
   "complete_code_percent": 20.779011,
   "total_units": 434,
@@ -40650,7 +40650,7 @@
     {
      "name": ".text",
      "size": "142424",
-     "fuzzy_match_percent": 74.40319,
+     "fuzzy_match_percent": 74.905915,
      "metadata": {}
     }
    ],
@@ -41065,7 +41065,7 @@
     {
      "name": "func_00235780",
      "size": "56",
-     "fuzzy_match_percent": 0.0,
+     "fuzzy_match_percent": 100.0,
      "metadata": {},
      "address": "15768"
     },
@@ -43223,7 +43223,7 @@
     {
      "name": "sceMpegInit",
      "size": "176",
-     "fuzzy_match_percent": 0.0,
+     "fuzzy_match_percent": 100.0,
      "metadata": {},
      "address": "105112"
     },
@@ -43804,7 +43804,7 @@
     {
      "name": "func_002540B0",
      "size": "484",
-     "fuzzy_match_percent": 0.0,
+     "fuzzy_match_percent": 100.0,
      "metadata": {},
      "address": "141000"
     },
@@ -44299,14 +44299,14 @@
     ]
    },
    "measures": {
-    "fuzzy_match_percent": 74.40319,
+    "fuzzy_match_percent": 74.905915,
     "total_code": "142424",
-    "matched_code": "105968",
-    "matched_code_percent": 74.40319,
+    "matched_code": "106684",
+    "matched_code_percent": 74.905915,
     "matched_data_percent": 100.0,
     "total_functions": 518,
-    "matched_functions": 409,
-    "matched_functions_percent": 78.957529,
+    "matched_functions": 412,
+    "matched_functions_percent": 79.53668,
     "complete_code": "0",
     "complete_code_percent": 0.0,
     "complete_data_percent": 100.0,
@@ -59095,14 +59095,14 @@
    "id": "sdk",
    "name": "Sony SDK",
    "measures": {
-    "fuzzy_match_percent": 74.40319,
+    "fuzzy_match_percent": 74.905915,
     "total_code": "142424",
-    "matched_code": "105968",
-    "matched_code_percent": 74.40319,
+    "matched_code": "106684",
+    "matched_code_percent": 74.905915,
     "matched_data_percent": 100.0,
     "total_functions": 518,
-    "matched_functions": 409,
-    "matched_functions_percent": 78.957529,
+    "matched_functions": 412,
+    "matched_functions_percent": 79.53668,
     "complete_code": "0",
     "complete_code_percent": 0.0,
     "complete_data_percent": 100.0,

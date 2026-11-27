@@ -5227,6 +5227,7 @@ us_address	name	other_address	pair	score	addresses
 0x2345B8	func_002345B8	0X234E00	same	0	ok
 0x2352B0	func_002352B0	0X235AF0	same	0	ok
 0x235388	func_00235388	0X235BC8	same	0	ok
+0x235780	func_00235780	0X235FC0	identical	0	ok
 0x2357B8	func_002357B8	0X235FF8	same	0	ok
 0x235868	func_00235868	0X2360A8	same	0	ok
 0x2358A0	func_002358A0	0X2360E0	identical	0	ok
@@ -5481,6 +5482,7 @@ us_address	name	other_address	pair	score	addresses
 0x24A9D8	sceMpegCreate	0X24B420	same	0	ok
 0x24AC10	func_0024AC10	0X24B658	same	0	ok
 0x24ACD8	func_0024ACD8	0X24B720	same	0	ok
+0x24B480	sceMpegInit	0X24BEC8	same	0	ok
 0x24B530	func_0024B530	0X24BF78	gap	0	ok
 0x24B540	sceMpegGetPicture	0X24BF88	same	0	ok
 0x24B590	func_0024B590	0X24BFD8	same	0	ok
@@ -5531,6 +5533,7 @@ us_address	name	other_address	pair	score	addresses
 0x253FA8	func_00253FA8	0X2549F8	same	0	ok
 0x254090	func_00254090	0X254AE0	gap	0	ok
 0x2540A0	func_002540A0	0X254AF0	gap	0	ok
+0x2540B0	func_002540B0	0X254B00	same	0	ok
 0x254298	func_00254298	0X254CE8	gap	0	ok
 0x2542A8	func_002542A8	0X254CF8	gap	0	ok
 0x2542B8	func_002542B8	0X254D08	same	0	ok

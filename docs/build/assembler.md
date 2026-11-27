@@ -153,6 +153,26 @@ The patched binary is derived from the pinned download and is made locally (`set
 pinned build. **If a `ps2eeas` release that pads to five is ever found, switch back to it and delete the patch**; measure it with
 `assembler_probe.py` first (below).
 
+## Delay slots of the SDK range
+
+Decision (Theo, 2026-11-27, after reading OpenThievius/sly1-decomp's `docs/TOOLCHAIN.md`, "Sony's libraries had another assembler"). Sony's
+ee-gcc 2.9-ee-991111 never puts a volatile access into a delay slot: it marks it `#.set volatile` / `#.set novolatile` (comments in its
+output) and leaves the `jal` or return after a volatile store in reorder mode with an empty slot. The `as.exe` we have for that range then
+fills the slot with a `nop`; retail's assembler moved the store into it (0x24B480 `sceMpegInit`: `jal InitIpu` with `sw $zero, 0($v1)` in its
+slot). `scripts/build/delay_slots.py` writes out what retail's assembler did: a volatile store that directly precedes a reorder-mode `jal`
+or return moves into its slot under `.set noreorder`; a store to a symbol or constant keeps the assembler's `lui $at` before the jump. It
+runs in `compile_sony` (scripts/build/compile_unit.py) on the compiler's `-S` output of every `sony29` function, which then goes to the
+same `ee/bin/as.exe` with the flags the driver gave it (`-G0 -O2 -mabi=eabi`). `SONY_DELAY_SLOTS=0` switches it off, to compare. The
+`sony29-01` range (libm) does not use it. The rule is the one of `tools/volatile_slots.py` in sly1-decomp (itself after OpenRAC's
+rac1-decomp `fix_volatile_slot.py`); this file was written here from the retail words and shares no code (THIRD_PARTY_NOTICES.md).
+
+Measured (`try.py`, rule off then on; every draft is in `nonmatching/sdk/`): `sceMpegInit` 2 to 0, `func_00235780` 2 to 0, `func_002540B0`
+6 to 0 (all three landed 2026-11-27; the first two joined `config/us/sony_gcc29.txt`: they match only with Sony's compiler and this rule),
+`func_0024C670` 12 to 8, `func_002539D0` 33 to 27, `func_0024C4B0` (94), `func_0023A420` (32), `func_00252148` (21) unchanged. Control:
+`rejudge.py` on all 5,732 matched functions before the landing: only the three known failures (0x114AE0, 0x15CAD8, 0x2019F0), so no
+matched SDK function moved. The `dsra $r,$r,32` and volatile-load cases that sly1-decomp's tool also covers are not implemented: nothing here
+needs them yet; add one only with a function that does.
+
 ## Before changing the assembler
 
 The assembler changed three times in one day on opinion and was measured only afterwards. Measure first:

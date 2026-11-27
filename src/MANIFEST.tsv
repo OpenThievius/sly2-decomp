@@ -5227,6 +5227,7 @@ address	name	size	file	whole_file	symbol
 0X2345B8	func_002345B8	32	sdk/fun_002345b8.c		
 0X2352B0	func_002352B0	216	sdk/fun_002352b0.c		
 0X235388	func_00235388	236	sdk/fun_00235388.cpp		
+0X235780	func_00235780	56	sdk/fun_00235780.c		
 0X2357B8	func_002357B8	176	sdk/fun_002357b8.c		
 0X235868	func_00235868	52	sdk/fun_00235868.c		
 0X2358A0	func_002358A0	144	sdk/fun_002358a0.c		
@@ -5481,6 +5482,7 @@ address	name	size	file	whole_file	symbol
 0X24A9D8	sceMpegCreate	568	sdk/sceMpegCreate.cpp		
 0X24AC10	func_0024AC10	200	sdk/fun_0024ac10.c		
 0X24ACD8	func_0024ACD8	436	sdk/fun_0024acd8.c		
+0X24B480	sceMpegInit	176	sdk/sceMpegInit.c		
 0X24B530	func_0024B530	8	sdk/fun_0024b530.cpp		
 0X24B540	sceMpegGetPicture	72	sdk/sceMpegGetPicture.cpp		
 0X24B590	func_0024B590	124	sdk/fun_0024b590.cpp		
@@ -5531,6 +5533,7 @@ address	name	size	file	whole_file	symbol
 0X253FA8	func_00253FA8	232	sdk/fun_00253fa8.c		
 0X254090	func_00254090	12	unsorted/fun_00254090.c		
 0X2540A0	func_002540A0	12	unsorted/fun_002540a0.c		
+0X2540B0	func_002540B0	484	unsorted/fun_002540b0.cpp		
 0X254298	func_00254298	12	unsorted/fun_00254298.c		
 0X2542A8	func_002542A8	12	unsorted/fun_002542a8.c		
 0X2542B8	func_002542B8	464	sdk/fun_002542b8.c		
