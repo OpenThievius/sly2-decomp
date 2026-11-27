@@ -54,7 +54,7 @@ void GoalHit_Activate(GOALHIT *pgoal) {
     func_0020AB68((STEPGUARD *)pgoal->pstep, 0, 0, g_2a2dd0);
     if (pgoal->state == 0)
         func_001EEFC0(pgoal);
-    ReplaceSwHitFx(&B_003DD490, 1, PosLoWorld(pgoal->pstep), (STEPGUARD *)pgoal->pstep, &((STEPGUARD *)pgoal->pstep)->field_0x35C);
+    ReplaceSwHitFx(&B_003DD490, 1, PosLoWorld(pgoal->pstep), (STEPGUARD *)pgoal->pstep, &((STEPGUARD *)pgoal->pstep)->phitfx);
     pgoal->tLimit = 3.4028235e38f;
     pgoal->tJolt = 3.4028235e38f;
     ((STEPGUARD *)pgoal->pstep)->tCooldown = 0;

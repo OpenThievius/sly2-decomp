@@ -2,11 +2,6 @@
 #include "stepguard.h"
 #include "goals.h"
 #include "sly2.h"
-/* a guard of class 0x3C (60, a STEPGUARD subclass): the word past STEPGUARD it holds (func_00177D70 reads it too) */
-struct GUARD3C : STEPGUARD {
-    u8 unknown_0x1010[0x7C];
-    /* 0x108C */ LO *field_0x108C;
-};
 extern "C" {
 float GRandInRange(float, float);
 int GoalBrain_FCmdEqual(GOALCMD *, GOALCMD *);
@@ -112,7 +107,7 @@ void GoalBrain_SetCommand(GOALBRAIN *goal, GOALCMD *pcmd) {
         }
         case 15: {
             GOALANIM *anim = (GOALANIM *)func_00205438(GOAL_GUARD(goal), 0xAE);
-            anim->ptarget = ((GUARD3C *)goal->pstep)->field_0x108C;
+            anim->ptarget = ((ZONEGUARD *)goal->pstep)->ploCommand;
             anim->Activate();
             break;
         }

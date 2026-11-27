@@ -1,9 +1,9 @@
-#include "types.h"
-struct Parent { u8 unknown_0x0[0xF3C]; int value; };
-struct Obj { u8 unknown_0x0[0x10]; Parent *parent; };
-extern "C" void func_00174B28(Obj *);
-void func_001752C0(Obj *obj)
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "stepguard.h"
+#include "goal.h"
+extern "C" void func_00174B28(GOAL *);
+void func_001752C0(GOAL *obj)
 {
     func_00174B28(obj);
-    obj->parent->value = 0;
+    ((STEPGUARD *)obj->pstep)->fFlag = 0;
 }

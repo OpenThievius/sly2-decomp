@@ -1,14 +1,10 @@
-#include "types.h"
-struct Owner {
-    u8 unknown_0x0[0xE94];
-    unsigned count;
-    int items[8];
-};
-void func_0020A518(Owner *owner, int value)
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "stepguard.h"
+void func_0020A518(STEPGUARD *owner, int value)
 {
-    unsigned count = owner->count;
+    unsigned count = owner->field_0xE94;
     if (count < 8) {
-        owner->items[count] = value;
-        owner->count = count + 1;
+        owner->field_0xE98[count] = value;
+        owner->field_0xE94 = count + 1;
     }
 }

@@ -1,21 +1,16 @@
-#include "types.h"
-struct Owner_20A9C0 {
-    u8 unknown_0x0[0xEB8]; int types[8];
-    int typeCount;
-    int plos[8];
-    int ploCount;
-};
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "stepguard.h"
 extern "C" {
-int PloNew(int, Owner_20A9C0 *, int, int);
+int PloNew(int, STEPGUARD *, int, int);
 
-int func_0020A9C0(Owner_20A9C0 *self) {
+int func_0020A9C0(STEPGUARD *self) {
     int plo;
-    if (self->typeCount == 0) {
+    if (self->caoid == 0) {
         plo = PloNew(0x78, self, 0x2CC, -1);
-        self->plos[self->ploCount++] = plo;
-        self->types[self->typeCount++] = 0x2CC;
+        self->afound[self->cfound++] = plo;
+        self->aoid[self->caoid++] = 0x2CC;
     } else {
-        plo = self->plos[0];
+        plo = self->afound[0];
     }
     return plo;
 }

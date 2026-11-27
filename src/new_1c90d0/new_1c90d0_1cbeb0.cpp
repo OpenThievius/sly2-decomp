@@ -50,10 +50,7 @@ extern "C" int func_001CBEE0(STEPGUARD *self, HITFX *stim)
     return result;
 }
 
-// A guard subclass with a camera policy switch right after STEPGUARD's 0x1010 bytes (class unnamed; not a JT: a JT's posOffset is there).
-struct CMOWNER : STEPGUARD {
-    /* 0x1010 */ s32 fPolicyOn;
-};
+// the guard of class 61 (STEPGUARD61, stepguard.h): func_001CBF90 is its slot 90
 
 
 void SetCmPolicy(CM *pcm, CPP cpp, CPLCY *pcplcy, SO *pso, void *pv);
@@ -61,7 +58,7 @@ void RevokeCmPolicy(CM *pcm, int grf, CPP cpp, CPLCY *pcplcy, SO *pso, void *pv)
 
 extern "C" {
 extern SO *g_2f7900;
-void func_001CBF90(CMOWNER *owner, s32 enable) {
+void func_001CBF90(STEPGUARD61 *owner, s32 enable) {
     if (owner->fPolicyOn != enable) {
         owner->fPolicyOn = enable;
         if (enable != 0) {

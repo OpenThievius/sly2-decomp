@@ -8,25 +8,9 @@
 #include "po.h"
 #include "wkr.h"
 #include "ps2inline.h"
+#include "stepguard.h"
 
-
-// a guard's fall check (STEPGUARD::pfallcheck)
-struct FALLCHECK {
-    PO *pguard;
-    s32 state;
-    f32 tState;
-    s32 fEnabled;
-};
-
-// the object that damages a guard: the grftak and ndamage the guard's absorb work item takes from it
-struct SRC_DAMAGE : SO {
-    u8 unknown_0x150[0x184 - sizeof(SO)];
-    int ndamage;
-    int grftak;
-};
-
-// a guard's damage watch
-struct GUARDDAMAGE { PO *pguard; int state; float tState; SRC_DAMAGE *psrc; int fActive; };
+// FALLCHECK and GUARDDAMAGE (guard.h), SRC_DAMAGE (stepguard.h)
 
 extern "C" void PaloAbsorbWkr(WKR *);
 
@@ -62,7 +46,7 @@ extern "C" void EnableFallCheck(FALLCHECK *pfallcheck) {
     pfallcheck->fEnabled = 1;
 }
 
-void func_0020D1B0(GUARDDAMAGE *pdamage, PO *pguard)
+void func_0020D1B0(GUARDDAMAGE *pdamage, STEPGUARD *pguard)
 {
     pdamage->pguard = pguard;
     pdamage->state = -1;

@@ -11,14 +11,14 @@
 #include "goals.h"
 
 struct POSTPAIR {
-    u8 unknown_0x0[0x4];
-    /* 0x04 */ struct LO *ploA;     /* PloPostSide (func_00155A68) returns it when the target is in volume A */
-    u8 unknown_0x8[0x4];
-    /* 0x0C */ struct LO *pvolumeA; /* PloPostSide: the zone it tests the target against */
-    u8 unknown_0x10[0x4];
-    /* 0x14 */ struct LO *ploB;     /* PloPostSide returns it otherwise */
-    u8 unknown_0x18[0x4];
-    /* 0x1C */ struct LO *pvolumeB; /* PloPostSide */
+    /* 0x00 */ s32 oidA;            /* AddGuardPost stores it, PostLoadGuardPosts looks it up into ploA (two readers agree) */
+    /* 0x04 */ struct LO *ploA;     /* PloPostSide (func_00155A68) returns it when the target is in volume A; PostLoadGuardPosts sets it */
+    /* 0x08 */ s32 oidVolumeA;      /* AddGuardPost, PostLoadGuardPosts (into pvolumeA) */
+    /* 0x0C */ struct LO *pvolumeA; /* PloPostSide: the zone it tests the target against; PostLoadGuardPosts sets it */
+    /* 0x10 */ s32 oidB;            /* AddGuardPost, PostLoadGuardPosts (into ploB) */
+    /* 0x14 */ struct LO *ploB;     /* PloPostSide returns it otherwise; PostLoadGuardPosts sets it */
+    /* 0x18 */ s32 oidVolumeB;      /* AddGuardPost, PostLoadGuardPosts (into pvolumeB) */
+    /* 0x1C */ struct LO *pvolumeB; /* PloPostSide; PostLoadGuardPosts sets it */
     /* 0x20 */ s32 used;            /* GoalPostRun_SetState sets it when the run leaves state 0 */
 };
 
@@ -52,12 +52,19 @@ struct NOTICE {
 };
 
 #ifdef __cplusplus
-/* The guard with its post table (0x1014) and the tick of the last pick (0x1018); readers: LoadGuardPosts (0x1014, 0x1018),
-   GoalPostRun_SetState (0x1018), GoalPostRun_Activate (0x1018). A local subclass past STEPGUARD's 0x1010. */
+/* The guard with a post table: class 59 of retail's class table (0x1020 bytes, factory 0x111828, derived from class 58). Its own
+   methods: LoadGuardPosts (func_001553F0, slot 14) and PostLoadGuardPosts (slot 15); GoalBrain_ChooseNextCommand tests class 59
+   and its post count. */
 struct STEPGUARDPOSTS : STEPGUARD {
-    u8 unknown_0x1010[0x4];
-    /* 0x1014 */ struct POSTPAIR *apost;
-    /* 0x1018 */ s32 tickPick;
+    /* 0x1010 */ s32 cpost;         /* AddGuardPost counts it up, PostLoadGuardPosts (15) walks it, GoalBrain_ChooseNextCommand tests it */
+    /* 0x1014 */ struct POSTPAIR *apost; /* LoadGuardPosts (14) allocates it; AddGuardPost, PostLoadGuardPosts */
+    /* 0x1018 */ s32 tickPick;      /* LoadGuardPosts (14), GoalPostRun_SetState, GoalPostRun_Activate */
+    u8 unknown_0x101C[0x4];
 };
+#if defined(__mips__)
+SLY2_SIZE_CHECK(STEPGUARDPOSTS, 0x1020);
+SLY2_OFFSET_CHECK(STEPGUARDPOSTS, cpost, 0x1010);
+SLY2_OFFSET_CHECK(STEPGUARDPOSTS, apost, 0x1014);
+#endif
 #endif
 #endif

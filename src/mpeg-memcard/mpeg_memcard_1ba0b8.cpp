@@ -11,31 +11,7 @@
 #include "vu0inline.h"
 #include "ps2inline.h"
 
-/* The guard class these functions belong to (a subclass of STEPGUARD past its 0x1010 bytes, read by func_001BA0B8, SetGuardLookMode
-   (func_001BA408), UpdateZoneScriptBeh, SetZoneScriptState and func_001BA980): its look-at animation, the object it owns at 0x1050
-   (slot 9 of its vtable: Remove), the distance curve and the script state. */
-struct ZONEGUARD : STEPGUARD {
-    u8 unknown_0x1010[0x8];
-    /* 0x1018 */ s32 modeLook;       /* func_001BA408: 0 or 1 */
-    /* 0x101C */ f32 tModeLook;      /* func_001BA408: the clock at the last change */
-    /* 0x1020 */ void *pasegLook;    /* func_001BA408 passes it to ApplyAseg */
-    /* 0x1024 */ BASIC *pasegaLook;  /* func_001BA408: ApplyAseg's out-argument; it retracts and releases it */
-    /* 0x1028 */ LO *ploLook;        /* func_001BA408 clears it and copies it to goal 0x9E's target */
-    /* 0x102C */ s32 hLook;          /* func_001BA408: the look-at act (func_0012DC18's result, released by func_0012E460) */
-    u8 unknown_0x1030[0x4];
-    /* 0x1034 */ s32 field_0x1034;   /* func_001BA408 passes it to func_0012DC18 */
-    u8 unknown_0x1038[0x18];
-    /* 0x1050 */ LO *plo;            /* func_001BA0B8 removes it */
-    u8 unknown_0x1054[0xC];
-    /* 0x1060 */ ANIMREF animrefLook; /* SetZoneScriptState points goal 0x9D's panimref at it */
-    /* 0x1070 */ f32 curve[3];       /* UpdateZoneScriptBeh: a quadratic in the distance */
-    u8 unknown_0x107C[0x4];
-    /* 0x1080 */ f32 lowLimit;       /* UpdateZoneScriptBeh: the clamp */
-    /* 0x1084 */ f32 highLimit;
-    /* 0x1088 */ f32 reach;          /* UpdateZoneScriptBeh: seconds in state 1 before state 2 */
-    /* 0x108C */ s32 field_0x108C;   /* func_001BA980 sets it */
-    /* 0x1090 */ u8 stateScript[0xC]; /* SetZoneScriptState saves/restores the script state here; func_001BA980 clears it */
-};
+/* ZONEGUARD, the guard class these functions belong to (class 60): stepguard.h */
 
 extern "C" void OnGuardAdd();
 
@@ -75,7 +51,7 @@ extern "C" GOAL *func_00205458(void *, int);
 
 extern "C" void func_0012E460(void *);
 
-extern "C" int func_0012DC18(void *, int, int, int, int, QW);
+extern "C" int func_0012DC18(void *, XF *, int, int, int, QW);
 
 void SetStepSpinRatio(STEP *, float);
 
@@ -104,7 +80,7 @@ extern "C" void func_001BA408(ZONEGUARD *guard, int mode)
         ApplyAseg(guard->pasegLook, guard, 0.0f, 1.0f, 1, &guard->pasegaLook);
         BASIC *pasega = guard->pasegaLook;
         pasega->OnAdd();
-        guard->hLook = func_0012DC18(guard, guard->field_0x1034, 5, 8, 3, g_2a2dd0);
+        guard->hLook = func_0012DC18(guard, guard->pxfLook, 5, 8, 3, g_2a2dd0);
         if (FIsGuardInSgs(guard, 2)) {
             ((GOALANIM *)func_00205458(guard, 0x9E))->ptarget = guard->ploLook;
             SetStepSpinRatio(guard, 4.0f);
@@ -270,11 +246,11 @@ extern "C" s32 func_00205458_1BA980(ZONEGUARD *, s32);
 
 extern "C" void *memset(void *, int, unsigned int);
 
-extern "C" void func_001BA980(ZONEGUARD *owner, s32 value) {
+extern "C" void func_001BA980(ZONEGUARD *owner, LO *value) {
     s8 command[0x70] __attribute__((aligned(16)));
     s32 handle;
     memset(owner->stateScript, 0, 0xC);
-    owner->field_0x108C = value;
+    owner->ploCommand = value;
     memset(command, 0, 0x70);
     *(s32 *)command = 0xF;
     handle = func_00205458_1BA980(owner, 0x9C);

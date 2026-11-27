@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
 #include "stepguard.h"
-struct GUARDSUB : STEPGUARD { int cunk; };
+#include "goalpost.h"
 #include "goal.h"
 struct GOAL_177BA0 : GOAL {
     int kindRunning;
@@ -24,7 +24,7 @@ void GoalBrain_ChooseNextCommand(GOAL_177BA0 *pgoal)
 {
     CMD cmd;
     memset(&cmd, 0, 0x70);
-    if (FIsBasicDerivedFrom(((STEPGUARD *)pgoal->pstep), 0x3B) != 0 && ((GUARDSUB *)pgoal->pstep)->cunk > 0) {
+    if (FIsBasicDerivedFrom(((STEPGUARD *)pgoal->pstep), 0x3B) != 0 && ((STEPGUARDPOSTS *)pgoal->pstep)->cpost > 0) {
         cmd.kind = 0xD;
         cmd.arg = PpoSwFocusBase(&B_003DD490);
     } else if (((STEPGUARD *)pgoal->pstep)->mode == 0x15) {
