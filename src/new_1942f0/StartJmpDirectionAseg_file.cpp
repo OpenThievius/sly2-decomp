@@ -15,6 +15,7 @@
 #include "clock.h"
 #include "joy.h"
 #include "murray.h"
+#include "sly.h"
 #include "jmp.h"
 #include "xf.h"
 
@@ -88,7 +89,8 @@ union VU_SCALE { QW q; VECTOR v; };
 
 union VU_VECTOR { QW q; VECTOR v; };
 
-/* a field of JT or its subclasses that no header declares yet (one reader each: 0x1010, 0x18F0, 0x18C4, 0xF5C, 0xF60, 0x1F18) */
+/* a field of JT or its subclasses that no header declares (0xF5C: PLAYERJT reads a CRV * there, this file stores a JMPASEGA *; 0x1F18: one
+   reader; 0x18C4: SLY::ploJtcs, which this file stores a JMPASEGA * into through a JT with no class test) */
 #define JT_FIELD(pjt, type, offset) (*(type *)((char *)(pjt) + (offset)))
 
 extern "C" float D_002BF818;
@@ -321,8 +323,7 @@ extern "C" void UpdateJmpBodyState(JMP *pjmp)
                 SetJmpBodyState(pjmp, 4, 0);
             } else {
                 JT *pjtSmooth = pjmp->pjt;
-                JT_FIELD(pjtSmooth, QW, 0x1010) =
-                    PosSmooth(JT_FIELD(pjtSmooth, QW, 0x1010), g_2a2dd0, D_002BF820, 0, g_2dded0.dt);
+                pjtSmooth->posOffset = PosSmooth(pjtSmooth->posOffset, g_2a2dd0, D_002BF820, 0, g_2dded0.dt);
                 posEdge.q = ConvertXfPos(pjmp->psoEdge->pxf, 0, pjmp->posEdge);
                 if (g_2dded0.t - pjmp->tState > 0.03f &&
                     !FCheckJtEdgeGrab__FP2JTP2SOP6VECTOR3XPKPvT2(pjmp, pjmp->psoEdge, posEdge.q, pjmp->field_0x100,
@@ -354,17 +355,17 @@ extern "C" void UpdateJmpBodyState(JMP *pjmp)
         case 21: {
             float tGoal = pjmp->pactval->tGoal;
             if (tGoal < g_2dded0.t) {
-                JT *pjtSly = 0;
+                SLY *pjtSly = 0;
                 if (FIsBasicDerivedFrom(pjmp->pjt, 0x35)) {
-                    pjtSly = pjmp->pjt;
-                    saved = JT_FIELD(pjtSly, s32, 0x18F0);
+                    pjtSly = (SLY *)pjmp->pjt;
+                    saved = pjtSly->field_0x18F0;
                 }
                 posEdge.q = pjmp->pjt->GetVelocityVec();
                 posEdge.v.x = posEdge.v.y = 0.0f;
                 pjmp->pjt->Slot35(posEdge.q);
                 SetJmpState(pjmp, 0xB, 0, 0);
                 if (pjtSly) {
-                    JT_FIELD(pjtSly, s32, 0x18F0) = saved;
+                    pjtSly->field_0x18F0 = saved;
                 }
             } else if (pjmp->landing.field_0x4 && tGoal < g_2dded0.t + 0.25f &&
                        (FIsBasicDerivedFrom(pjmp->landing.plo, 0x13) || FIsBasicDerivedFrom(pjmp->landing.plo, 0xB) ||
@@ -797,7 +798,7 @@ extern "C" void bevy_player_p14_jts8_enter(JMP *pjmp)
         return;
     case 15:
         JT_FIELD(pjmp->pjt, JMPASEGA *, 0xF5C) = pjmp->pasega;
-        JT_FIELD(pjmp->pjt, f32, 0xF60) = pjmp->field_0x14;
+        pjmp->pjt->sPipe = pjmp->field_0x14;
         pjt = pjmp->pjt;
         pjt->SetMode(8);
         return;

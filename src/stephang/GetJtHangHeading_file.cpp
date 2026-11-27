@@ -6,13 +6,12 @@
 #include "include_asm.h"
 
 
-struct JTCSINFO : LO { }; /* the object a Sly in a hang keeps at SLY::pjtcsinfo: slot 31 (LO's PmatWorld) gives its matrix */
 
 extern "C" float atan2f(float, float);
 
 extern "C" void GetJtHangHeading__FP2JTPf(SLY *sly, float *out) {
-    MATRIX4 *first = sly->pjtcsinfo->PmatWorld();
-    *out = atan2f(first->mat[0][1], sly->pjtcsinfo->PmatWorld()->mat[0][0]);
+    MATRIX4 *first = sly->ploJtcs->PmatWorld();
+    *out = atan2f(first->mat[0][1], sly->ploJtcs->PmatWorld()->mat[0][0]);
 }
 
 INCLUDE_ASM(0X190C58);

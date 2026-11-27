@@ -22,7 +22,7 @@ extern "C" void UpdateButton(BUTTON *button)
     UpdateSo();
     switch (button->btn.buttons) {
     case 2:
-        if (g_2e1e40 != 0 && g_2e1e40->jts == 3 && (s32)g_2e1e40->pjtcsinfo == button->id)
+        if (g_2e1e40 != 0 && g_2e1e40->jts == 3 && (s32)g_2e1e40->ploJtcs == button->id)
             button->btn.tButtons = g_2dded0;
         {
             float time = button->btn.dtRepush;
@@ -53,7 +53,7 @@ extern "C" void UpdateButton(BUTTON *button)
             buttons = 0;
             if (g_2e1e40 != 0) {
                 if (g_2e1e40->jts == 3)
-                    buttons = (s32)g_2e1e40->pjtcsinfo == button->id;
+                    buttons = (s32)g_2e1e40->ploJtcs == button->id;
             }
             break;
         case 0:

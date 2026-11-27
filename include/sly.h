@@ -48,7 +48,10 @@ struct SLY : JT {
     u8 unknown_0x1884[0xC];
     /* 0x1890 */ QW abounds[3]; /* UpdateJtBounds extends the bounds by each of the first cbounds; at most 3, ptarget follows */
     /* 0x18C0 */ struct TARGET *ptarget; /* the cane's target: FFaceSlyAimTarget (slot 92) faces it, ChooseJtSweepTarget sets it */
-    /* 0x18C4 */ struct JTCSINFO *pjtcsinfo; /* SetJtJtcs: its 0x130 is the leaving sound */
+    /* 0x18C4 */ struct LO *ploJtcs; /* the object of the jtcs state (was pjtcsinfo; c8 settled it from its readers): an LO, GetJtHangHeading
+                                       calls its PmatWorld (LO slot 31), func_0018A350 its PosLoWorld, HandleSlyMessage compares it with a
+                                       message's sender, AddSafePointOnMember reads its member at 0x100, UpdateJmpBodyState stores the jump's
+                                       JMPASEGA (jmp.h: an LO) here; SetJtJtcs (not landed) reads a word at its 0x130 */
     /* 0x18C8 */ s32 jts; /* the state: NSlyActionCategory (85), FAllowBinocSly (94), BindJtStepAseg (90), JT_FInvulnerable (76), func_0018A428 (50) */
     u8 unknown_0x18CC[0x4];
     /* 0x18D0 */ s32 field_0x18D0; /* bevy_player_input_from_pad_cm */
@@ -59,7 +62,9 @@ struct SLY : JT {
     /* 0x18E4 */ s32 field_0x18E4;
     /* 0x18E8 */ s32 field_0x18E8; /* reader: UpdateJtCaneInput (a Sly method) tests it in the cane's charge state */
     /* 0x18EC */ s32 field_0x18EC;
-    u8 unknown_0x18F0[0x10];
+    /* 0x18F0 */ s32 field_0x18F0; /* UpdateJmpBodyState (state 21, after testing class 0x35) saves it around SetJmpState and restores it;
+                                      StartNextSeqnodeRecord (AddJsgContext_file) sets it from a record argument after the class 0x35 test (two readers) */
+    u8 unknown_0x18F4[0xC];
     /* 0x1900 */ struct HANGBODY *phangbody; /* AddJtHangBodyReaction (slot 105) */
     u8 unknown_0x1904[0x2C];
     /* 0x1930 */ QW accelHang;               /* AddJtHangBodyReaction: AddSoAcceleration's vector */
@@ -146,5 +151,6 @@ SLY2_OFFSET_CHECK(SLY, field_0x2014, 0x2014);
 SLY2_OFFSET_CHECK(SLY, field_0x2020, 0x2020);
 SLY2_OFFSET_CHECK(SLY, field_0x202C, 0x202C);
 SLY2_OFFSET_CHECK(SLY, field_0x2038, 0x2038);
+SLY2_OFFSET_CHECK(SLY, field_0x18F0, 0x18F0);
 #endif
 #endif

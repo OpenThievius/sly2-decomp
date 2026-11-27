@@ -1,19 +1,22 @@
-#include "m2c_macros.h"
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "bentley.h"
 
-s32 PslotBentleyGadget(s32 arg0, s32 arg1) {
-    switch (arg1) {
+/* the slot of a gadget among Bentley's six (BENTLEY::aslot, 0xC bytes each) */
+extern "C" BENTLEYSLOT *PslotBentleyGadget(BENTLEY *pbentley, s32 gadget)
+{
+    switch (gadget) {
     case 5:
-        return arg0 + 0x1824;
+        return &pbentley->aslot[0];
     case 7:
-        return arg0 + 0x1830;
+        return &pbentley->aslot[1];
     case 9:
-        return arg0 + 0x183C;
+        return &pbentley->aslot[2];
     case 11:
-        return arg0 + 0x1848;
+        return &pbentley->aslot[3];
     case 13:
-        return arg0 + 0x1854;
+        return &pbentley->aslot[4];
     case 4:
-        return arg0 + 0x1860;
+        return &pbentley->aslot[5];
     default:
         return 0;
     }

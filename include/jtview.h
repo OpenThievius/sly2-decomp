@@ -45,7 +45,7 @@ struct JTVIEW {
     /* 0x10DC */ sptr field_0x10DC;         /* JT::field_0x10DC, a STEPGUARD address: func_001431D0 takes its goal stack */
     /* 0x10E0 */ s32 fFocusBusy;            /* JT::fFocusBusy: the partner attack goals' Deactivate clear bit 0 */
     u8 unknown_0x10E4[0x1C];
-    /* 0x1100 */ s32 fLookHold;             /* ReleaseJtLookHold clears it */
+    /* 0x1100 */ s32 fLookHold;             /* JT::fLookHold: ReleaseJtLookHold clears it */
     u8 unknown_0x1104[0xB0];
     /* 0x11B4 */ s32 field_0x11B4;          /* JT::field_0x11B4; func_001424C0 */
     u8 unknown_0x11B8[0x160];

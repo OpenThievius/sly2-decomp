@@ -1,8 +1,9 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
-struct Jt { u8 unknown_0x0[0x1100]; int held; };
+#include "jt.h"
 void SetJtLookTarget();
-void SetJtLookTargetHeld(Jt *self)
+void SetJtLookTargetHeld(JT *self)
 {
     SetJtLookTarget();
-    self->held = 1;
+    self->fLookHold = 1;
 }

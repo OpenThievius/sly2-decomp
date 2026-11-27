@@ -3,11 +3,6 @@
 #include "ps2inline.h"
 #include "murray.h"
 #include "xp.h"
-/* The word of the player at 0x1908 that this function sets (murray.h has it inside an unknown span). */
-struct MURRAYXPVIEW {
-    u8 unknown_0x0[0x1908];
-    s32 field_0x1908;
-};
 extern "C" {
 extern float D_002C0A38;
 extern float D_002C3C60[];
@@ -38,7 +33,7 @@ extern "C" void AdjustMurrayNewXp(MURRAY *m, XP *pxp, int iside)
                 QW cosine = GCosAngle(velocity, pxp->normal);
                 int hit = LaneX(cosine) < D_002C0A38;
                 if (hit)
-                    ((MURRAYXPVIEW *)m)->field_0x1908 = charges;
+                    m->field_0x1908 = charges;
             }
         }
         break;
