@@ -2,55 +2,40 @@
 #include "sly2.h"
 #include "alloc.h"
 #include "sw.h"
+#include "oxa.h"
+#include "geom.h"
 #include "ps2inline.h"
 #include "vu0inline.h"
-
-struct SWNODE {
-    /* 0x0 */ f32 lo[3];       /* reader: bevy_camera_follow_push_out (the node's box, compared with the swept box) */
-    u8 unknown_0xC[0x4];
-    /* 0x10 */ f32 hi[3];      /* reader: bevy_camera_follow_push_out */
-    u8 unknown_0x1C[0x4];
-    /* 0x20 */ QW posCenter;
-    /* 0x30 */ f32 sRadius;
-    /* 0x34 */ struct ALO *paloFirst;
-    u8 unknown_0x38[0x8];
-    /* 0x40 */ SWNODE *pnext;
-};
-
-struct ALO {
-    u8 unknown_0x0[0x60];
-    /* 0x60 */ ALO *paloNext;
-};
 
 extern "C" {
 void *PvAllocStackImpl__Fi(ALLOCREQ *preq);
 void UpdateSwAaox__FP2SW(SW *psw);
 void func_00133E30(SW *psw);
 
-void IntersectSwBoundingSphere(SW *psw, QW posCenter, int (*pfnFilter)(void *, ALO *), void *pvContext, int *pcalo, float sRadius, ALO ***papalo)
+void IntersectSwBoundingSphere(SW *psw, QW posCenter, int (*pfnFilter)(void *, GEOM *), void *pvContext, int *pcalo, float sRadius, GEOM ***papalo)
 {
     int calo = 0;
     ALLOCREQ req;
     req.cb = 0x400;
     req.cbAlign = 0x10;
-    ALO **apalo = (ALO **)PvAllocStackImpl__Fi(&req);
+    GEOM **apgeom = (GEOM **)PvAllocStackImpl__Fi(&req);
     func_00133E30(psw);
     UpdateSwAaox__FP2SW(psw);
-    for (SWNODE *pnode = psw->pnodeFirst; pnode != 0; pnode = pnode->pnext) {
-        float sRadiusNode = pnode->sRadius;
-        QW dpos = VectorSub(posCenter, pnode->posCenter);
+    for (OXA *poxa = (OXA *)psw->dlOxaWorld.head; poxa != 0; poxa = poxa->pnextWorld) {
+        float sRadiusNode = poxa->sRadius;
+        QW dpos = VectorSub(posCenter, poxa->posCenter);
         float sDistanceSquared = LaneX(SquaredLength(dpos));
         float sReach = sRadius + sRadiusNode;
         float sReachSquared = sReach * sReach;
         if (sReachSquared < sDistanceSquared) continue;
-        for (ALO *palo = pnode->paloFirst; palo != 0; palo = palo->paloNext) {
-            if ((pfnFilter == 0 || pfnFilter(pvContext, palo) != 0) && calo < 0x100) {
-                apalo[calo] = palo;
+        for (GEOM *pgeom = (GEOM *)poxa->dlGeom.head; pgeom != 0; pgeom = pgeom->pgeomNext) {
+            if ((pfnFilter == 0 || pfnFilter(pvContext, pgeom) != 0) && calo < 0x100) {
+                apgeom[calo] = pgeom;
                 calo++;
             }
         }
     }
-    *papalo = apalo;
+    *papalo = apgeom;
     *pcalo = calo;
 }
 }

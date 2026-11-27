@@ -7,11 +7,9 @@
 #include "sw.h"
 #include "classinfo.h"
 
-struct Entry { u8 unknown_0x0[12]; };
-
-extern "C" Entry *PdlFromSwOid(char *base, int oid)
+extern "C" SL *PdlFromSwOid(SW *psw, int oid)
 {
-    return (Entry *)(base + 0x38) + ((oid * 0x95675) & 0x1FF);
+    return &psw->aslOid[(oid * 0x95675) & 0x1FF];
 }
 
 extern "C" SL *PdlFromSwCid(SW *psw, s32 cid) {
@@ -127,7 +125,7 @@ extern "C" void CploFindSwObjects_thunk(int a, int b, int c, int d, int e, int f
     CploFindSwObjects((char *)a, b, c, (LO_15E678 *)d, 0, e, (LO_15E3E8 **)f);
 }
 
-extern "C" Entry *PdlFromSwOid(char *base, int oid);
+extern "C" SL *PdlFromSwOid(SW *psw, int oid);
 
 extern "C" SL *func_0015E3C0(SW *psw, int oid);
 
@@ -201,8 +199,8 @@ extern "C" int CploFindSwObjects(char *psw, int grffso, int oid, LO_15E678 *ploC
         fAll = grffso & 0x200;
         break;
     }
-    PdlFromSwOid(psw, oid);
-    for (plo = *(LO_15E678 **)PdlFromSwOid(psw, oid); plo; plo = plo->ploNextOid) {
+    PdlFromSwOid((SW *)psw, oid);
+    for (plo = *(LO_15E678 **)PdlFromSwOid((SW *)psw, oid); plo; plo = plo->ploNextOid) {
         if (plo->oid == oid)
             MatchSwObject(psw, (LO_15E3E8 *)plo, plo->ploMatch, grffso, (LO_15E3E8 *)ploContext, plst, cploMax,
                           &find.cploMatch, aplo, &find.ipsl);

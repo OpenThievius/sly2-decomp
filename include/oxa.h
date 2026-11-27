@@ -30,10 +30,16 @@ struct OXA {
     /* 0x00 */ f32 aMin[3];         /* the bounds' low corner: PoxaAllocSw (the world's axis lists point at each coordinate), FPoxaPairInteracts */
     u8 unknown_0xC[0x4];
     /* 0x10 */ f32 aMax[3];         /* the high corner: the same readers */
-    u8 unknown_0x1C[0x18];
+    u8 unknown_0x1C[0x4];
+    /* 0x20 */ QW posCenter;        /* the bounding sphere's centre: IntersectSwBoundingSphere (one reader; the record is certain, reached through
+                                       SW::dlOxaWorld) */
+    /* 0x30 */ f32 sRadius;         /* its radius: IntersectSwBoundingSphere */
     /* 0x34 */ struct DL dlGeom;    /* the geometry entered in the record: AddSoGeomToOxa (FFindDlEntry, AppendDlEntry), RemoveSoGeomFromOxa (FFindDlEntry,
-                                       RemoveDlEntry, FIsDlEmpty); a method of SO (poxa's owner) in both; PoxaAllocSw: InitDl(.., 0x60) */
-    u8 unknown_0x40[0x8];
+                                       RemoveDlEntry, FIsDlEmpty); a method of SO (poxa's owner) in both; PoxaAllocSw: InitDl(.., 0x60);
+                                       IntersectSwBoundingSphere and bevy_camera_follow_push_out walk it (GEOM::pgeomNext) */
+    /* 0x40 */ OXA *pnextWorld;     /* the link of SW::dlOxaWorld (Sw_Construct: ibDle 0x40): func_001F8F80, IntersectSwBoundingSphere,
+                                       bevy_camera_follow_push_out walk it (each used to call the record SWNODE) */
+    u8 unknown_0x44[0x4];
     /* 0x48 */ OXA *pnext;          /* the link of SW::dlOxa (Sw_Construct: ibDle 0x48): RecalcSwOxfFilterForObject */
     u8 unknown_0x4C[0xC];           /* 0x50: the link of SW::dlOxaRecalc (ibDle 0x50) */
     /* 0x58 */ OXA *pnextDirty;     /* the link of SW::dlOxaDirty (ibDle 0x58): RecalcSwXpAll */
@@ -50,6 +56,10 @@ struct OXA {
 
 #if defined(__mips__)
 typedef char check_OX_size[(sizeof(OX) == 0x14) ? 1 : -1];
+typedef char check_OXA_size[(sizeof(OXA) == 0x80) ? 1 : -1]; /* SW::slotheapOxa: 0x80-byte slots */
+typedef char check_OXA_posCenter[((unsigned int)&((OXA *)0)->posCenter == 0x20) ? 1 : -1];
+typedef char check_OXA_dlGeom[((unsigned int)&((OXA *)0)->dlGeom == 0x34) ? 1 : -1];
+typedef char check_OXA_pnextWorld[((unsigned int)&((OXA *)0)->pnextWorld == 0x40) ? 1 : -1];
 typedef char check_OXA_first[((unsigned int)&((OXA *)0)->first == 0x64) ? 1 : -1];
 typedef char check_OXA_grf[((unsigned int)&((OXA *)0)->grf == 0x70) ? 1 : -1];
 #endif

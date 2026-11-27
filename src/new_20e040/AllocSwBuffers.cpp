@@ -8,7 +8,7 @@ extern "C" void *PvAllocSwImpl__Fi(ALLOCREQ *);
 extern "C" void *PvAllocSwClearImpl__Fi(ALLOCREQ *);
 extern "C" void InitSl(void *, int);
 extern "C" void InitZpr__FP3ZPR3ZPKP2LO(ZPR *, int, int);
-extern "C" void func_001BE398(ZPRENTRY *, ZPR *);
+extern "C" void func_001BE398(ROGWINDOW *, ZPR *);
 extern "C" void bevy_camera_follow_activity(ACT *, int, void *);
 extern "C" ACT B_002DEB30;
 void AllocSwBuffers(SW *sw)
@@ -22,7 +22,7 @@ void AllocSwBuffers(SW *sw)
         *slot++ = (OBR *)PvAllocSwImpl__Fi(&req);
     }
     unsigned index = 0;
-    ZPRENTRY *entry = sw->azprentry;
+    ROGWINDOW *entry = sw->arogwindow;
     req.cb = 0x8000;
     req.cbAlign = 0x10;
     sw->agrfentry = (GRFENTRY *)PvAllocSwClearImpl__Fi(&req);

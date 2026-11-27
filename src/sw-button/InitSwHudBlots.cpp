@@ -21,5 +21,5 @@ void InitSwHudBlots(SW *psw)
         }
     }
     psw->cclueFound = CcluesFound();
-    psw->field_0x4768 = func_001C7D00();
+    psw->cclueMax = func_001C7D00();
 }

@@ -62,8 +62,6 @@ extern "C" void func_001F8E90(SW *psw, SO *pso, int *pcso, SO **apso)
     }
 }
 
-struct SWNODE { u8 unknown_0x0[0x40]; SWNODE *pnext; u8 unknown_0x44[0x60 - 0x44]; SO *pso; };
-
 int FXfKindStatic(int);
 
 void func_001F8E90(SW *, SO *, int *, SO **);
@@ -73,10 +71,10 @@ void func_001F9240(SW *, unsigned, int, SO **);
 void func_001F8F80(SW *psw, unsigned grf)
 {
     struct { SO *apso[769]; int cso; } l;
-    SWNODE *pnode;
+    OXA *poxa;
     SO *pso;
-    for (pnode = psw->pnodeFirst; pnode != 0; pnode = pnode->pnext) {
-        pso = pnode->pso;
+    for (poxa = (OXA *)psw->dlOxaWorld.head; poxa != 0; poxa = poxa->pnextWorld) {
+        pso = poxa->owner;
         PHYS *pphys = pso->pphys;
         if (pphys == 0) continue;
         if ((pso->grfso & 0x8000000UL) != 0) continue;
@@ -88,8 +86,8 @@ void func_001F8F80(SW *psw, unsigned grf)
         func_001F8E90(psw, pso, &l.cso, l.apso);
         func_001F9240(psw, grf, l.cso, l.apso);
     }
-    for (pnode = psw->pnodeFirst; pnode != 0; pnode = pnode->pnext) {
-        pso = pnode->pso;
+    for (poxa = (OXA *)psw->dlOxaWorld.head; poxa != 0; poxa = poxa->pnextWorld) {
+        pso = poxa->owner;
         pso->grfso &= ~0x8000000UL;
         pso->grfso &= ~0x10000000UL;
     }

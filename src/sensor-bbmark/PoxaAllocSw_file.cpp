@@ -26,7 +26,7 @@ void *PoxaAllocSw(SW *psw, SO *pso)
     poxa->owner = pso;
     AppendDlEntry(&psw->dlOxa, poxa);
     if (FFindDlEntry(&psw->dlRootNext, pso->proot))
-        AppendDlEntry(&psw->pnodeFirst, poxa);
+        AppendDlEntry(&psw->dlOxaWorld, poxa);
     for (int axis = 0; axis < 3; axis++) {
         OBR *pobr = &psw->aobr[axis][psw->cobr];
         pobr->ps = &poxa->aMin[axis];

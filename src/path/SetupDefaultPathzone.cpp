@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "sly2.h"
 #include "alloc.h"
+#include "sw.h"
 struct CGV;
 struct CGVL { CGV *pcgv; int unk; };
 struct CGV { VECTOR pos; int ccgvl; CGVL *acgvl; int pad[2]; };
@@ -10,10 +11,9 @@ struct CGFDEF { int aicgv[3]; };
 struct CGE { float g0; float g1; int unk; unsigned short s0; unsigned short s1; };
 struct CG { int ccgv; CGV *acgv; int ccgf; CGF *acgf; int ccge; CGE *acge; };
 struct PATHZONE { u8 unknown_0x0[0xE0]; CG cg; u8 unknown_0xF8[0x114 - 0xF8]; int ipathzone; };
-struct GLOBALS { u8 unknown_0x0[0x3D70]; int cpathzone; };
 extern CGVDEF D_002C0C10[];
 extern CGFDEF D_002C0C90[];
-extern GLOBALS B_003DD490;
+extern SW B_003DD490;
 extern "C" void *PvAllocSwClearImpl__Fi(ALLOCREQ *);
 extern "C" void *PvAllocSwImpl__Fi(ALLOCREQ *);
 void HookupCg(CG *);
@@ -77,5 +77,5 @@ void SetupDefaultPathzone(PATHZONE *ppathzone)
     pcge->g0 = g;
     pcge->g1 = -g;
     HookupCg(&ppathzone->cg);
-    ppathzone->ipathzone = ++B_003DD490.cpathzone;
+    ppathzone->ipathzone = ++B_003DD490.stamp;
 }
