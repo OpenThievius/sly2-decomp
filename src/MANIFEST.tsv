@@ -2870,6 +2870,7 @@ address	name	size	file	whole_file	symbol
 0X19FAF8	FindBestSafePoint	308	jp-stepzap/FindBestSafePoint.cpp		
 0X19FC30	UpdateJtSafePoints	256	jp-stepzap/AddSafePointOnMember_file.cpp	jp-stepzap/AddSafePointOnMember_file.cpp	UpdateJtSafePoints
 0X19FD30	AddSafePointOnMember	380	jp-stepzap/AddSafePointOnMember_file.cpp	jp-stepzap/AddSafePointOnMember_file.cpp	AddSafePointOnMember
+0X19FEB0	AddSafePointOnGeom	404	jp-stepzap/AddSafePointOnMember_file.cpp	jp-stepzap/AddSafePointOnMember_file.cpp	AddSafePointOnGeom
 0X1A0048	RemoveSafePoints	136	jp-stepzap/AddSafePointOnMember_file.cpp	jp-stepzap/AddSafePointOnMember_file.cpp	RemoveSafePoints
 0X1A00D0	RemoveSafePointsOfLo	212	jp-stepzap/AddSafePointOnMember_file.cpp	jp-stepzap/AddSafePointOnMember_file.cpp	RemoveSafePointsOfLo
 0X1A01A8	StaticInitSlotheaps_1a01a8	308	jp-stepzap/AddSafePointOnMember_file.cpp	jp-stepzap/AddSafePointOnMember_file.cpp	StaticInitSlotheaps_1a01a8
@@ -4859,6 +4860,7 @@ address	name	size	file	whole_file	symbol
 0X214300	SetBlotModal	152	screen-font/SetBlotModal.c		
 0X214398	LoadMovieDictionary	200	screen-font/LoadMovieDictionary.cpp		
 0X214460	LoadMovieSprites	1396	screen-font/LoadMovieSprites.cpp		
+0X2149D8	LoadMovieCharacter	3044	screen-font/LoadMovieCharacter.cpp		
 0X2155C0	func_002155C0	248	screen-font/fun_002155c0.cpp		
 0X2156B8	InitDepthSlot	120	screen-font/InitDepthSlot.cpp		
 0X215730	func_00215730	284	screen-font/fun_00215730.cpp		

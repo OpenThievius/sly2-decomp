@@ -2870,6 +2870,7 @@ us_address	name	other_address	pair	score	addresses
 0x19FAF8	FindBestSafePoint	0X19FA80	same	0	ok
 0x19FC30	UpdateJtSafePoints	0X19FBB8	same	0	ok
 0x19FD30	AddSafePointOnMember	0X19FCB8	same	0	ok
+0x19FEB0	AddSafePointOnGeom	0X19FE38	same	0	ok
 0x1A0048	RemoveSafePoints	0X19FFD0	identical	0	ok
 0x1A00D0	RemoveSafePointsOfLo	0X1A0058	same	0	ok
 0x1A01A8	StaticInitSlotheaps_1a01a8	0X1A0130	same	0	ok
@@ -4859,6 +4860,7 @@ us_address	name	other_address	pair	score	addresses
 0x214300	SetBlotModal	0X214AD0	same	0	ok
 0x214398	LoadMovieDictionary	0X214B68	same	0	ok
 0x214460	LoadMovieSprites	0X214C30	same	0	ok
+0x2149D8	LoadMovieCharacter	0X2151A8	gap	0	ok
 0x2155C0	func_002155C0	0X215D90	same	0	ok
 0x2156B8	InitDepthSlot	0X215E88	same	0	ok
 0x215730	func_00215730	0X215F00	same	0	ok

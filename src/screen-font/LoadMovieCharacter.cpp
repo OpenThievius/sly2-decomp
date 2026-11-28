@@ -2,23 +2,23 @@
 #include "bis.h"
 typedef CBinaryInputStream Bis;
 struct SLOTHEAP;
-struct BLOT { char pad[0xC4]; SLOTHEAP *heap; };
+#include "blot.h"
 struct B4 { char b[4]; };
 struct M3 { float mat[3][4]; } __attribute__((aligned(16)));
 #include "alloc.h"
 struct PRIM { int w0; int w4; int colour; unsigned char cvtx; char p0[3]; int cslot; unsigned char b14; char p1[3]; short *axy; unsigned char hasBytes; char p2[3]; unsigned char *abyte; };
 struct BATCH { int cprim; int cslot; int cvtx; PRIM *pfirst; PRIM *pend; };
-struct CHAR { int id; int kind; void *owner; int pad0; union { struct { unsigned short cprim; unsigned short cbatch; int cvtxTotal; int cqw; int pk; } shape; float f[13]; int i[13]; } u; };
+struct CHAR { int id; int kind; void *owner; u8 unknown_0xC[4]; union { struct { unsigned short cprim; unsigned short cbatch; int cvtxTotal; int cqw; int pk; } shape; float f[13]; int i[13]; } u; };
 struct SVEC { short x, y; };
 struct B8 { char b[8]; };
 struct PL { long v; } __attribute__((packed));
-struct GIFSX { char pad0[4]; char *ab; char pad1[4]; char *pb; char pad2[0x20]; };
+struct GIFSX { u8 unknown_0x0[4]; char *ab; u8 unknown_0x8[4]; char *pb; u8 unknown_0x10[0x20]; };
 class CStackFrame {
 public:
     CStackFrame();
     ~CStackFrame();
 };
-struct VIFSX { char pad[0x30]; } __attribute__((aligned(16)));
+struct VIFSX { u8 unknown_0x0[0x30]; } __attribute__((aligned(16)));
 extern "C" {
 void CBinaryInputStream_Read_thunk(Bis *, int, void *);
 void *PvAllocSlotheapClearImpl__FP8SLOTHEAP(SLOTHEAP *, int, int);
@@ -87,11 +87,11 @@ void LoadMovieCharacter(BLOT *const pblot, Bis *pbis, void *owner, int cchar, ch
         D_002C40A4 = 1;
         LoadMovieDictionary(pblot, pbis, owner, &pchar->u.i[0], &pchar->u.i[1]);
         pchar->u.i[4] = pbis->U32Read();
-        pchar->u.i[5] = (int)PvAllocSlotheapClearImpl__FP8SLOTHEAP(pblot->heap, pchar->u.i[4] << 2, 0x13);
+        pchar->u.i[5] = (int)PvAllocSlotheapClearImpl__FP8SLOTHEAP((SLOTHEAP *)pblot->palloc, pchar->u.i[4] << 2, 0x13);
         for (int icode = 0; icode < pchar->u.i[4]; icode++)
             ((unsigned *)pchar->u.i[5])[icode] = pbis->U32Read();
         pchar->u.i[2] = pbis->U32Read();
-        pchar->u.i[3] = (int)PvAllocSlotheapClearImpl__FP8SLOTHEAP(pblot->heap, pchar->u.i[2] << 2, 0x13);
+        pchar->u.i[3] = (int)PvAllocSlotheapClearImpl__FP8SLOTHEAP((SLOTHEAP *)pblot->palloc, pchar->u.i[2] << 2, 0x13);
         int i;
         for (i = 0; i < pchar->u.i[2]; i++)
             ((float *)pchar->u.i[3])[i] = pbis->F32Read();
@@ -121,7 +121,7 @@ void LoadMovieCharacter(BLOT *const pblot, Bis *pbis, void *owner, int cchar, ch
         CBinaryInputStream_ReadMatrix(pbis, (MATRIX3 *)&mat);
         Store2x3(&pchar->u.f[0], mat);
         *(unsigned short *)&pchar->u.i[8] = pbis->U16Read();
-        void *pv = PvAllocSlotheapClearImpl__FP8SLOTHEAP(pblot->heap, *(unsigned short *)&pchar->u.i[8] * 0x18, 0x14);
+        void *pv = PvAllocSlotheapClearImpl__FP8SLOTHEAP((SLOTHEAP *)pblot->palloc, *(unsigned short *)&pchar->u.i[8] * 0x18, 0x14);
         pchar->u.i[9] = (int)pv;
         CBinaryInputStream_Read_thunk(pbis, *(unsigned short *)&pchar->u.i[8] * 0x18, pv);
         break;
@@ -186,9 +186,9 @@ void LoadMovieCharacter(BLOT *const pblot, Bis *pbis, void *owner, int cchar, ch
         EndDmaCnt__4DMAS(&vifs2);
         AddDmaRet__4DMAS(&vifs2);
         if (pchar->kind == 6) {
-            DMAS_DetachCopy(&vifs2, pblot->heap, &pchar->u.i[2], 0, &pchar->u.i[3]);
+            DMAS_DetachCopy(&vifs2, (SLOTHEAP *)pblot->palloc, &pchar->u.i[2], 0, &pchar->u.i[3]);
         } else {
-            DMAS_DetachCopy(&vifs2, pblot->heap, &pchar->u.i[1], 0, &pchar->u.i[2]);
+            DMAS_DetachCopy(&vifs2, (SLOTHEAP *)pblot->palloc, &pchar->u.i[1], 0, &pchar->u.i[2]);
             QueueSwCallback(B_003DD490, pblot, ((const PL *)&RO_002A8B08)->v, pchar);
         }
         break;
@@ -281,7 +281,7 @@ void LoadMovieCharacter(BLOT *const pblot, Bis *pbis, void *owner, int cchar, ch
         }
         EndDmaCnt__4DMAS(&vifs);
         AddDmaRet__4DMAS(&vifs);
-        DMAS_DetachCopy(&vifs, pblot->heap, &pchar->u.shape.cqw, 0, &pchar->u.shape.pk);
+        DMAS_DetachCopy(&vifs, (SLOTHEAP *)pblot->palloc, &pchar->u.shape.cqw, 0, &pchar->u.shape.pk);
         break;
     }
     }

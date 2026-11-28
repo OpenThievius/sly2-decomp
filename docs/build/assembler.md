@@ -170,8 +170,9 @@ Measured (`try.py`, rule off then on; every draft is in `nonmatching/sdk/`): `sc
 6 to 0 (all three landed 2026-11-27; the first two joined `config/us/sony_gcc29.txt`: they match only with Sony's compiler and this rule),
 `func_0024C670` 12 to 8, `func_002539D0` 33 to 27, `func_0024C4B0` (94), `func_0023A420` (32), `func_00252148` (21) unchanged. Control:
 `rejudge.py` on all 5,732 matched functions before the landing: only the three known failures (0x114AE0, 0x15CAD8, 0x2019F0), so no
-matched SDK function moved. The `dsra $r,$r,32` and volatile-load cases that sly1-decomp's tool also covers are not implemented: nothing here
-needs them yet; add one only with a function that does.
+matched SDK function moved. The `dsra $r,$r,32`, volatile-load and any-single-instruction-before-a-return cases that sly1-decomp's tool also covers
+are not implemented: measured 2026-11-28 (a scratch copy of the rule with each case, scored on `0x24C670`, `0x2539D0`, `0x24C4B0`, `0x252148`
+and `0x23A420`), none of those five has such a site and no score moved; add one only with a function that does.
 
 ## Before changing the assembler
 

@@ -5,7 +5,8 @@
 #include "sly.h"
 #include "geom.h"
 #include "m2c_macros.h"
-#include "include_asm.h"
+#include "ps2inline.h"
+#include "vu0inline.h"
 
 /* what UpdateJtSafePoints reads through SLY::psoSurface (STEP 0x208; the class is a guess, so a view): an object at 0x4C, a position at 0x60 */
 struct SAFESURFACE {
@@ -135,7 +136,46 @@ void AddSafePointOnMember(float parameter, SPL *list, SAFEMEMBEROBJ *pmember)
     list->items[0].plo->grfo |= 1UL << 59;
 }
 
-INCLUDE_ASM(0X19FEB0);
+extern "C" void *memset(void *, int, unsigned int);
+
+extern "C" void AddSafePointOnGeom(void *plist, int geomword, QW pos)
+{
+    SPL *list = (SPL *)plist;
+    GEOM *pgeom = (GEOM *)geomword;
+    SP *slot;
+    SP *history;
+    int found = 1;
+    for (; found < list->count; found++) {
+        history = &list->items[found];
+        if (pgeom == history->pgeom) {
+            float distance = LaneX(SqrtX(SquaredLength(VectorSub(pos, list->items[found].second))));
+            if (distance < 50.0f) {
+                if (found != 1) {
+                    SP saved = *history;
+                    memmove(&list->items[2], &list->items[1], (found - 1) * 32);
+                    list->items[1] = saved;
+                }
+                break;
+            }
+        }
+    }
+    if (found >= list->count) {
+        unsigned count = list->count;
+        if (count < 0x20)
+            list->count = count + 1;
+        memmove(&list->items[1], &list->items[0], list->count * 32 - 32);
+    }
+    slot = &list->items[0];
+    history = slot;
+    memset(slot, 0, 0x20);
+    if (pgeom != 0) {
+        list->items[0].plo = pgeom->pso;
+        history->pgeom = pgeom;
+        pgeom->grf |= 1UL << 51;
+    }
+    list->items[0].second = pos;
+    history->tStamp = g_2dded0[0];
+}
 
 void RemoveSafePoints(SPL *list, LO *plo, GEOM *pgeom)
 {

@@ -240,7 +240,6 @@ address	name	size	file	score
 0X19DF70	PresetJtAccelPipe__FP2JT	416	steppipe/PresetJtAccelPipe__FP2JT.cpp	16
 0X19E1E0	UpdateJtActivePipe	1904	new_19e110/UpdateJtActivePipe.cpp	60
 0X19EA00	func_0019EA00	96	new_19e110/fun_0019ea00.c	20
-0X19FEB0	AddSafePointOnGeom	408	jp-stepzap/AddSafePointOnGeom.cpp	17
 0X1A0300	BuildPlainBlend	336	jp-stepzap/BuildPlainBlend.cpp	6
 0X1A0450	SolvePlainBlendWeights	720	jp-stepzap/SolvePlainBlendWeights.c	163
 0X1A0720	SetJtGoalVelocityFromStick	672	jp-stepzap/SetJtGoalVelocityFromStick.c	166
@@ -437,7 +436,6 @@ address	name	size	file	score
 0X20C2F8	SetJumperState	1024	steprun-stream/SetJumperState.cpp	69
 0X20C7E0	LoadDirAnimSet	360	steprun-stream/LoadDirAnimSet.c	71
 0X20E890	ExecuteSwLoadRequest	1840	new_20e040/ExecuteSwLoadRequest.c	327
-0X2149D8	LoadMovieCharacter	3048	screen-font/LoadMovieCharacter.cpp	5
 0X215F40	CMovieText_ClineWrap	408	font-break/CMovieText_ClineWrap.cpp	5
 0X2160D8	CMovieText_UpdateFont	240	font-break/CMovieText_UpdateFont.cpp	38
 0X216750	CMovieText_DrawGlyphs	1008	font-break/CMovieText_DrawGlyphs.cpp	2
