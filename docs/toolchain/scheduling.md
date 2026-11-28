@@ -79,3 +79,15 @@ Keep a lever only if it is a form the original plausibly wrote.
 2. Which dump files and verbose output our SN 2.95.3, Sony 991111b and 991111-01 builds write for `-dS -fsched-verbose-6`.
 3. Whether the rules hold on Sly 2's SN build and the Sony builds (Sly 1 results are SN 2.95.3).
 4. Sly 1 left unexplained: `sly1:func_00109488` (life 2194), `sly1:func_00130C58`; `sly1:func_0020BB18` only with a stand-in (3,589 of 20,644 candidates exact). Dead end: CLOBBER-first for `sly1:func_0017ECE8`.
+
+## 7. Measured here (2026-11-28)
+
+Answers open question 2. The dumps: `compile_unit.compile_assembly(language, source, out, assembler=..., extra=['-dS', '-dR', '-fsched-verbose-6'])`
+writes `<source stem>.cc.sched` (sched1) and `.cc.sched2` beside the assembly, for the game build and for Sony 991111b (991111-01 not
+tried). Each file has a dependence table per block (insn, code, priority, cost, units, dependents), `Ready list (t=N)` lines (best last),
+`Ready-->Q` lines and a visualisation per block. Reading one pair of insns that retail emits in the other order: if priority, dependents
+and unit columns are equal, the ready list order is the LUID, and no source wording that keeps the order before sched1 can change it.
+That is the case of `0x17CF10` (argument loads, three loads tied at priority 8 with three dependents each) and `0x152C58` (a store and a
+move at priority 6). `0x122CE0` is the other kind: its tie is the dependents count (4 against 3), made by later register sets and call
+clobbers. A prototype `work/scratch/c9/ideas/S1/sched_ties.py FILE.sched2` lists, per block and cycle, the best ready insn and the ones
+tied with it; it is noisy without the diff's block. Five wordings of the last call of `0x17CF10` left it byte-identical.

@@ -71,6 +71,13 @@ Rules of thumb from Sly 1: `blez` plus `li` before the loop means a hoisted cons
 - `scripts/matching/flag_sweep.py` scores every `tried` source under flag variants (`VARIANTS`: `-O1`, `-G8`, `-fno-gcse`, `-fno-strength-reduce`, ...) via `COMPILE_FLAGS`, writing `work/matching/flagsweep.tsv`; `flag_report.py` groups by module. It has no `-mvu0-use-vf0-NN` or `-fmove-all-movables` variant today, and those two are not in `VARIANTS` because they are per-function lists.
 - Loop dumps: compile by hand with `-dL`, the way `regalloc.py` passes `-dl -dg`. No script wraps `-dL` yet.
 
+The loop dump is one command: `compile_unit.py c++ SRC out.o --flags=-dL` (the equals sign is required; add `--vu0` for an address in
+`config/us/vu0_regs.txt`) writes `<source>.cc.loop` into the working directory. Read it for `not desirable` lines (`life 1, savings 1`):
+on `0x1BDA00` the two refused insns (188 and 210) are exactly the constants `-fmove-all-movables` moves to reach score 0, so it is a cheap
+test of "is this a hoist-threshold miss" before spending compiles. On `0x206900` the `%hi` that retail hoists out of a 98-insn outer
+loop is refused in the second pass and movables is not enough (26 to 28). Do not write a reverse loop as `while (i-- > 0)` or
+`for (i = count; i-- > 0;)`: 112 against 16 on `0x1A81F8` (2026-11-27).
+
 ## 6. Open questions
 
 - Does our SN 2.95.3 `cc1plus` accept `-mvu0-use-vf0-NN` (NN other than 15), and is the threshold `64 + NN` here? **Not measured here.**

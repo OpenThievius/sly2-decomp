@@ -251,3 +251,24 @@ Scores are from nonmatching/MANIFEST.tsv; kinds from config/us/inline_functions.
 - [ ] **Exceptions probe for the SDK C++ runtime**: libgcc's `_eh.o` (`__throw`, `__throw_type_match`) is in the image, so the runtime around it may be built with exceptions. Compile one never-returning-call function from the range with and without `-fexceptions` on the sony29 build and compare frames and tail calls (retail: kept frame and `jal`, no tail call). Fits an unmatched SDK function whose diff is `j` instead of `jal` or a missing frame. Measure: `compile_unit.py` per flag, `try.py`. Ruling: none; a per-file flag change is the existing rule.
 - [ ] **Vector-local stack slot for weights**: Sly 1 found that a float turned into a vector in retail is stored to a 16-byte slot nothing reads, shared between weights of one expression. Fits an inline-kind near miss whose frame is 16 bytes short or whose `sqc2` count is one low: `SetCmLookAt` (6), `UpdateEmitter__FP7EMITTERf` (2). Try a `QW x[1]`-typed local for the converted float where it is an unused-looking local (note AGENTS.md allows a typed local only where the original plausibly had one; keep it a value the code reads). Measure: `try.py` frame size and `sqc2` count in the diff. Ruling: none if the local is read; a pure slot-sizing local is not allowed.
 - [ ] **Fixed-register microprogram, evidence first**: for `RenderGlobsetTree` (`0x1D5808`, 2824 B, kind vu) count the `vcallms` sites and which `vf` registers are read before each (retail disassembly, `awk` for `vcallms`) so a ruling request has numbers: how many functions, how many fixed registers, whether the registers are set by `vmove` or `lqc2` in retail. Fits only the functions in `inline_functions.tsv` with `vcallms`. Measure: a read-only grep of the disassembly; no compile. Ruling: **needs one** before any match using register-variable inputs.
+
+## 7. Results of the round of 2026-11-27
+
+Six Sonnet workers (one per section above) and one Opus worker on the `tie` walls tested these items on about 40 functions; the Opus tie-wall
+worker held the best near misses, so sections 1 and 2 ran on 3 to 4 functions each. A strike below means "no gain on the functions tried",
+not "the idea is wrong". Reports and variants: `work/scratch/c9/ideas/S1..S6`, `work/scratch/c9/tie`.
+
+- **Hit:** `0x1C9688` 65 to 0 (inline setter in offset order, section 5 item 1); `0x214100` 4 to 0 (a prototype fault, tie-wall pass).
+- **Ticked, answered:** the sched1/sched2 dump recipe and the loop dump recipe (docs/toolchain/scheduling.md section 7, loops.md section 5);
+  the `-fmove-all-movables` sweep over 43 tie drafts (no gain; `0x1BDA00` is the known per-file flag question); the exceptions probe for
+  the SDK C++ runtime (`-fno-exceptions` equals `.c`); the run-once-loop macro audit (one user, no second); the vcallms register
+  evidence (only the 0x1C0 program uses high fixed registers; the ruling exists).
+- **Struck on the functions tried:** the `"+j"`/`"0"` ties on the VU helpers, a lui-carry check, read-the-pointer-first, use-the-member,
+  index form against running pointer, do/while shape pairs, `const` references for loop weights, flag as a value (byte-identical code),
+  named stride, member against offset for reloads, a goto back edge with a real second use (diagnostic only: score 32 to 100).
+- **Stale, close or rewrite:** the second-stage splat helper (premise gone: `VectorFromFloats3` exists), the FromFloats ruling (done
+  2026-11-15), `ReadCop0Status` (no user in game code), "46 near misses" in the classification item (38 by a fresh measure).
+- **Still open:** the tie-wall mechanism table (docs: config/matching/walls.tsv evidence columns), `flag_sweep.py` over the 44 near misses,
+  `0x1BDA00` as a per-file movables decision, the `const` pointer lever on the hi-only class (the one reached 0 only with a padded local type).
+- **Tools:** `tsearch.py` and `sitesearch.py` (docs/contributing/search-tools.md). A batch over the 27 searchable unwalled near misses
+  improved 14 (best: `0x221A18` 34 to 15, `0x217058` 45 to 27) and reached no valid 0; the tie walls did not move.
