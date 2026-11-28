@@ -3347,6 +3347,7 @@ address	name	size	file	whole_file	symbol
 0X1BD310	PobstacleFindEdgeBlocker	240	mpeg-memcard/Obstacle_Init_file.cpp	mpeg-memcard/Obstacle_Init_file.cpp	PobstacleFindEdgeBlocker
 0X1BD560	func_001BD560	436	mpeg-memcard/Obstacle_Init_file.cpp	mpeg-memcard/Obstacle_Init_file.cpp	func_001BD560
 0X1BD718	func_001BD718	396	mpeg-memcard/Obstacle_Init_file.cpp	mpeg-memcard/Obstacle_Init_file.cpp	func_001BD718
+0X1BDA00	PobstacleGroupAlloc	452	mpeg-memcard/Obstacle_Init_file.cpp	mpeg-memcard/Obstacle_Init_file.cpp	PobstacleGroupAlloc
 0X1BDBC8	func_001BDBC8	36	mpeg-memcard/Obstacle_Init_file.cpp	mpeg-memcard/Obstacle_Init_file.cpp	func_001BDBC8
 0X1BDE18	Obstacle_JoinGroup	104	mpeg-memcard/Obstacle_Init_file.cpp	mpeg-memcard/Obstacle_Init_file.cpp	Obstacle_JoinGroup
 0X1BE1E8	AssignObstaclesToPathzones	84	mpeg-memcard/Obstacle_Init_file.cpp	mpeg-memcard/Obstacle_Init_file.cpp	AssignObstaclesToPathzones

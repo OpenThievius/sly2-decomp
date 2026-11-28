@@ -27,6 +27,7 @@
 0x1D2E18  # 304 > 300
 0x1DBEF0  # 127 > 126
 0x1DF3D0  # 72 > 71
+0x1BDA00  # 31 > 0
 0x1E57A0  # 184 > 174
 0x1E9858  # 134 > 132
 0x1EFAC0  # 88 > 39
@@ -40,5 +41,6 @@
 0x213F70  # 74 > 0
 0x121938  # frame 0xC0 > 0
 0x1DEDB0  # whole file game-stepguard/game_stepguard_1dedb0.cpp: its one flag set (proved with 0X1DF3D0)
+0x1BC050  # whole file mpeg-memcard/Obstacle_Init_file.cpp: its one flag set (proved with 0X1BDA00)
 0x1B8988  # 34 > 0 (loop-exit constant kept in a register)
 0x137A30  # whole file blend/FillBlAmrsg_file.cpp: its one flag set (proved with 0X138BA0)

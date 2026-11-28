@@ -11,7 +11,7 @@ void PairHandle_Init(PairHandle *, CPair *);
 void PairHandle_Assign(PairHandle *, CPair *);
 void CRef_Destruct(CRef *);
 void SetTag__4CRef4TAGK(CRef *, int);
-void CRef_SetF32(CRef *, float);
+void SetF32__4CReff(CRef *, float);
 CRef *CRef_ConstructPair(CRef *);
 void CPairPtr_Destructor(PairHandle *, int);
 void UnlinkPairNode(CPair *);
@@ -33,7 +33,7 @@ extern "C" CRef *RefOpVectorRadianNormal(CRef *pref, int carg, CRef *aref, CFram
     QW *pvecA = aref[0].pv;
     CRef *prefAngle = &h.p->ref;
     float rad = RadBetweenVectors__FP6VECTORN20(*pvecA, *pvecB, pnormal->pv);
-    CRef_SetF32(prefAngle, rad);
+    SetF32__4CReff(prefAngle, rad);
     CRef_ConstructPair(pref);
     CPair *held = h.p;
     if (held) {

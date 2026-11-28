@@ -298,7 +298,6 @@ address	name	size	file	score
 0X1BD040	Obstacle_AddToPathzone	416	new_1bc198/Obstacle_AddToPathzone.c	84
 0X1BD400	Obstacle_UpdatePlanes	352	new_1bc198/Obstacle_UpdatePlanes.c	74
 0X1BD8A8	func_001BD8A8	344	new_1bc198/fun_001bd8a8.c	68
-0X1BDA00	PobstacleGroupAlloc	456	new_1bc198/PobstacleGroupAlloc.cpp	31
 0X1BDE80	MergeObstacles	872	new_1bc198/MergeObstacles.c	186
 0X1BE398	func_001BE398	856	rog-path/fun_001be398.cpp	59
 0X1BF1F8	PcgtPointInCgSafe	416	rog-path/PcgtPointInCgSafe.c	104

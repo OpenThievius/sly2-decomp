@@ -3347,6 +3347,7 @@ us_address	name	other_address	pair	score	addresses
 0x1BD310	PobstacleFindEdgeBlocker	0X1BD578	same	0	ok
 0x1BD560	func_001BD560	0X1BD7C8	same	0	ok
 0x1BD718	func_001BD718	0X1BD980	same	0	ok
+0x1BDA00	PobstacleGroupAlloc	0X1BDC68	same	0	ok
 0x1BDBC8	func_001BDBC8	0X1BDE30	identical	0	ok
 0x1BDE18	Obstacle_JoinGroup	0X1BE080	same	0	ok
 0x1BE1E8	AssignObstaclesToPathzones	0X1BE450	same	0	ok
