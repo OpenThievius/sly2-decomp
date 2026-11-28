@@ -28,6 +28,7 @@ import boundaries  # noqa: E402
 import compile_unit  # noqa: E402
 import delay_slots  # noqa: E402
 import original_data  # noqa: E402
+import zero_objects  # noqa: E402
 import credit_audit  # noqa: E402
 import harvest  # noqa: E402
 import export_nonmatching  # noqa: E402
@@ -2761,6 +2762,93 @@ class OriginalDataTests(unittest.TestCase):
         rows = original_data.read(os.path.join(os.path.dirname(HERE), 'config', 'us', 'original_data.tsv'))
         self.assertEqual({row['name'] for row in rows} >= {'vutext', 'irx'}, True)
         self.assertTrue(all(row['size'] > 0 and row['address'] > 0 for row in rows))
+
+
+class VerifiedTableTests(unittest.TestCase):
+    """check_source.py: a byte array over 64 elements passes with `data-ok: verified table: <rule>` (a table the original wrote as a literal and
+    a test proves against its rule: __clz_tab, _ctype_); without it, or as a plain data-ok, it stays a dump."""
+    BODY = 'extern const unsigned char D_00000000[256] = {%s};\n' % ', '.join(['0'] * 256)
+
+    def test_the_marker_lets_a_byte_table_pass(self):
+        found = check_source.data_definitions('// data-ok: verified table: tab[i] == bit_length(i)\n' + self.BODY)
+        self.assertEqual(found, [])
+
+    def test_a_plain_marker_stays_a_dump(self):
+        found = check_source.data_definitions("// data-ok: retail's bytes\n" + self.BODY)
+        self.assertEqual([entry[1] for entry in found], ['banned'])
+
+    def test_a_marker_without_a_rule_is_not_enough(self):
+        found = check_source.data_definitions('// data-ok: verified table:\n' + self.BODY)
+        self.assertEqual([entry[1] for entry in found], ['banned'])
+
+    def test_the_marker_does_not_lift_the_word_array_rule(self):
+        body = 'extern const unsigned int D_00000000[256] = {%s};\n' % ', '.join(['0'] * 256)
+        found = check_source.data_definitions('// data-ok: verified table: x\n' + body)
+        self.assertEqual([entry[1] for entry in found], ['banned'])
+
+
+class VerifiedByteTableTests(unittest.TestCase):
+    """The byte tables the repository defines with `data-ok: verified table` are proved against their rules here: libgcc's __clz_tab (entry i is the
+    bit length of i, four copies) and newlib's _ctype_ (entry 1 + c is the class flags of the character c, from include/ctypeflags.h)."""
+    ROOT = os.path.dirname(HERE)
+
+    def initializer(self, path):
+        """The text between the braces of the one initializer of a source (comments removed)."""
+        with open(os.path.join(self.ROOT, path), encoding='utf-8') as handle:
+            text = re.sub(r'//[^\n]*', '', handle.read())
+        return text[text.index('= {') + 3:text.rindex('}')]
+
+    def flags(self):
+        with open(os.path.join(self.ROOT, 'include', 'ctypeflags.h'), encoding='utf-8') as handle:
+            return {name: int(value, 16) for name, value in re.findall(r'#define (CTYPE_\w+) (0x[0-9a-fA-F]+)', handle.read())}
+
+    def test_every_clz_table_is_the_bit_length_of_its_index(self):
+        for address in ('2aae18', '2aaf18', '2ab018', '2ab118'):
+            values = [int(word) for word in self.initializer(f'src/rodata/sdk_{address}.cpp').replace('\n', ' ').split(',') if word.strip()]
+            self.assertEqual(values, [index.bit_length() for index in range(256)], address)
+
+    def test_the_ctype_table_is_the_class_flags_of_each_character(self):
+        flags = self.flags()
+        entries = []
+        for word in self.initializer('src/rodata/sdk_2aa6a0.cpp').replace('\n', ' ').split(','):
+            if word.strip():
+                entries.append(sum(flags[name] if name in flags else int(name, 0) for name in re.split(r'\s*\|\s*', word.strip())))
+
+        def classes(code):
+            character = chr(code)
+            value = 0
+            value |= flags['CTYPE_UPPER'] if 'A' <= character <= 'Z' else 0
+            value |= flags['CTYPE_LOWER'] if 'a' <= character <= 'z' else 0
+            value |= flags['CTYPE_DIGIT'] if '0' <= character <= '9' else 0
+            value |= flags['CTYPE_SPACE'] if character in '\t\n\v\f\r ' else 0
+            value |= flags['CTYPE_PUNCT'] if 33 <= code <= 47 or 58 <= code <= 64 or 91 <= code <= 96 or 123 <= code <= 126 else 0
+            value |= flags['CTYPE_CONTROL'] if code < 32 or code == 127 else 0
+            value |= flags['CTYPE_HEX'] if character in 'abcdefABCDEF' else 0
+            value |= flags['CTYPE_BLANK'] if character == ' ' else 0
+            return value
+        self.assertEqual(entries, [0] + [classes(code) for code in range(256)])
+
+
+class ZeroObjectTests(unittest.TestCase):
+    """scripts/build/zero_objects.py: a whole file's zero-initialised object that retail keeps as zeros inside .rodata counts as matched data."""
+
+    def retail(self, content):
+        return lambda address, size: content[address - 0x1000:address - 0x1000 + size]
+
+    def test_a_bss_object_over_zero_bytes_in_rodata_is_credited(self):
+        self.assertEqual(zero_objects.zero_ranges([(0x1000, 4, '.bss')], self.retail(b'\0\0\0\0'), 0x1000, 0x2000), [(0x1000, 4)])
+
+    def test_nonzero_retail_bytes_are_not_credited(self):
+        self.assertEqual(zero_objects.zero_ranges([(0x1000, 4, '.bss')], self.retail(b'\0\0\1\0'), 0x1000, 0x2000), [])
+
+    def test_an_object_outside_rodata_is_not_credited(self):
+        self.assertEqual(zero_objects.zero_ranges([(0x3000, 4, '.bss')], self.retail(b'\0\0\0\0'), 0x1000, 0x2000), [])
+
+    def test_a_data_object_is_not_credited_here(self):
+        self.assertEqual(zero_objects.zero_ranges([(0x1000, 4, '.data')], self.retail(b'\0\0\0\0'), 0x1000, 0x2000), [])
+
+    def test_an_empty_symbol_is_ignored(self):
+        self.assertEqual(zero_objects.zero_ranges([(0x1000, 0, '.bss')], self.retail(b''), 0x1000, 0x2000), [])
 
 
 if __name__ == '__main__':

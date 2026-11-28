@@ -73,6 +73,7 @@ DATA_OK = re.compile(r'data-ok:\s*\S')
 WORD_ARRAY_LIMIT = 64  # a plain integer word array longer than this needs its type from a reader: docs/contributing/exceptions.md "Game data defined in source"
 PLAIN_WORDS = {'int', 'u32', 's32'}  # `unsigned int` and `signed int` reach here as `int`
 TYPED_FROM = re.compile(r'data-ok:\s*typed from\s+\S')
+VERIFIED_TABLE = re.compile(r'data-ok:\s*verified table:\s*\S')  # a byte table the original wrote as a literal and a test proves against its rule (docs/contributing/exceptions.md)
 ZERO_BUFFER = re.compile(r'data-ok:\s*zero buffer\b')  # a zeroed buffer no reader indexes (ruled 2026-11-28): allowed only with an all-zero initializer
 ZERO_INITIALIZER = re.compile(r'^\s*(?:\{\s*(?:0[uUlL]*\s*)?\}|0[uUlL]*)\s*;?\s*$')
 
@@ -134,7 +135,8 @@ def data_definitions(text):
                     elements = (int(length) if length and length.isdigit() else initializer_count(initializer)) if length is not None else 1
                     if not marker:
                         found.append((start, 'banned', f'data definition without `// data-ok: <reason>`: {name}'))
-                    elif size == 1 and elements > BYTE_DUMP_LIMIT and not initializer.lstrip().startswith('"'):  # a string literal is typed
+                    elif size == 1 and elements > BYTE_DUMP_LIMIT and not initializer.lstrip().startswith('"') and not (
+                            VERIFIED_TABLE.search(lines[start - 1]) or (start > 1 and VERIFIED_TABLE.search(lines[start - 2]))):  # a string literal is typed
                         found.append((start, 'banned', f'byte array of {elements} elements, over the {BYTE_DUMP_LIMIT}-element limit (a dump, not typed data): {name}'))
                     elif type_name in PLAIN_WORDS and length is not None and elements > WORD_ARRAY_LIMIT and not (
                             TYPED_FROM.search(lines[start - 1]) or (start > 1 and TYPED_FROM.search(lines[start - 2]))):
