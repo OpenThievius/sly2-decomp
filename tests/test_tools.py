@@ -34,11 +34,15 @@ import list_functions  # noqa: E402
 import make_whole_files  # noqa: E402
 import export_src  # noqa: E402
 import idioms  # noqa: E402
+import meaning_rewrites  # noqa: E402
 import mutate  # noqa: E402
 import neighborhood  # noqa: E402
 import permute  # noqa: E402
 import permute_stores  # noqa: E402
 import search_guard  # noqa: E402
+import sitesearch  # noqa: E402
+import source_tree  # noqa: E402
+import tsearch  # noqa: E402
 import boundary_suspects  # noqa: E402
 import rules  # noqa: E402
 import park  # noqa: E402
@@ -2417,6 +2421,263 @@ class DelaySlotTests(unittest.TestCase):
     def test_a_store_to_a_constant_keeps_the_assemblers_lui_before_the_call(self):
         filled = delay_slots.fill('x:\n\t#.set\tvolatile\n\tsw\t$3,0x1000b000\n\t#.set\tnovolatile\n\tjal\tf\n')
         self.assertIn('\tlui\t$1,4097\n\tjal\tf\n\tsw\t$3,-20480($1)', filled)
+
+
+class SourceTreeTests(unittest.TestCase):
+    TEXT = 'struct S { int a; };\nint g(int);\nint f(struct S *s, int a)\n{\n    int x = a + 1;\n    int y;\n    y = s->a;\n    s->a = x;\n    g(y);\n    return x;\n}\n'
+
+    def statements(self):
+        source = source_tree.Source(self.TEXT)
+        return source, source.body.parts['statements']
+
+    def test_reads_the_last_function_and_its_statements(self):
+        source, statements = self.statements()
+        self.assertEqual([statement.kind for statement in statements], ['declaration', 'declaration', 'expression', 'expression', 'expression', 'return'])
+
+    def test_locals_are_tracked_by_name(self):
+        source, statements = self.statements()
+        self.assertFalse(source.effects(statements[0]).conflicts(source.effects(statements[1])))
+
+    def test_a_read_of_what_another_writes_conflicts(self):
+        source, statements = self.statements()
+        self.assertTrue(source.effects(statements[0]).conflicts(source.effects(statements[3])))
+
+    def test_a_memory_store_conflicts_with_a_memory_read(self):
+        source, statements = self.statements()
+        self.assertTrue(source.effects(statements[2]).conflicts(source.effects(statements[3])))
+
+    def test_a_call_conflicts_with_a_memory_store(self):
+        source, statements = self.statements()
+        self.assertTrue(source.effects(statements[3]).conflicts(source.effects(statements[4])))
+
+    def test_a_return_is_never_moved(self):
+        source, statements = self.statements()
+        self.assertTrue(source.effects(statements[5]).control)
+
+    def test_a_cast_to_a_pointer_parses(self):
+        source = source_tree.Source('void *f(void)\n{\n    UNKNOWN *p = (UNKNOWN *)Make(4);\n    return p;\n}\n')
+        self.assertEqual(source.body.parts['statements'][0].parts['declarators'][0].initializer.kind, 'cast')
+
+
+class MeaningRewriteTests(unittest.TestCase):
+    """Each rewrite of meaning_rewrites.py on a small source: the exact text it gives, and the cases it must refuse."""
+
+    def rewritten(self, name, text):
+        return [new for _, new in meaning_rewrites.rewrites(text, {name})]
+
+    def test_move_statement_moves_an_independent_declaration(self):
+        text = 'void f(int *p, int a, int b)\n{\n    int x = a + 1;\n    int y = b + 2;\n    p[0] = x;\n    p[1] = y;\n}\n'
+        self.assertIn('void f(int *p, int a, int b)\n{\n    int y = b + 2;\n    int x = a + 1;\n    p[0] = x;\n    p[1] = y;\n}\n', self.rewritten('move_statement', text))
+
+    def test_move_statement_never_moves_a_use_above_its_definition(self):
+        text = 'void f(int *p, int a)\n{\n    int x = a + 1;\n    p[0] = x;\n}\n'
+        self.assertEqual(self.rewritten('move_statement', text), [])
+
+    def test_move_statement_never_swaps_a_store_and_a_load(self):
+        text = 'void f(int *p, int *q, int a)\n{\n    p[0] = a;\n    a = q[0];\n    p[1] = a;\n}\n'
+        self.assertEqual(self.rewritten('move_statement', text), [])
+
+    def test_loop_forms_while_with_init_and_step_as_for(self):
+        text = 'int f(int *p, int n)\n{\n    int i;\n    int s = 0;\n    i = 0;\n    while (i < n) {\n        s += p[i];\n        i++;\n    }\n    return s;\n}\n'
+        self.assertIn('int f(int *p, int n)\n{\n    int i;\n    int s = 0;\n    for (i = 0; i < n; i++) {\n        s += p[i];\n    }\n    return s;\n}\n',
+                      self.rewritten('loop_forms', text))
+
+    def test_loop_forms_known_first_test_as_do_while(self):
+        text = 'int f(void)\n{\n    int i;\n    int s = 0;\n    for (i = 0; i < 4; i++) {\n        s += i;\n    }\n    return s;\n}\n'
+        self.assertIn('int f(void)\n{\n    int i;\n    int s = 0;\n    i = 0;\n    do {\n        s += i;\n        i++;\n    } while (i < 4);\n    return s;\n}\n',
+                      self.rewritten('loop_forms', text))
+
+    def test_loop_forms_keeps_a_loop_with_continue(self):
+        text = 'int f(int *p, int n)\n{\n    int i;\n    i = 0;\n    while (i < n) {\n        if (p[i]) continue;\n        i++;\n    }\n    return i;\n}\n'
+        self.assertFalse([new for new in self.rewritten('loop_forms', text) if 'for (i = 0;' in new])
+
+    def test_ternary_assignment_if_else_as_ternary(self):
+        text = 'int f(int a, int b)\n{\n    int x;\n    if (a < b)\n        x = a;\n    else\n        x = b;\n    return x;\n}\n'
+        self.assertIn('int f(int a, int b)\n{\n    int x;\n    x = (a < b) ? a : b;\n    return x;\n}\n', self.rewritten('ternary_assignment', text))
+
+    def test_ternary_assignment_refuses_values_of_two_kinds(self):
+        text = 'float f(int a, int b, float c)\n{\n    float x;\n    if (a < b)\n        x = a;\n    else\n        x = c;\n    return x;\n}\n'
+        self.assertEqual(self.rewritten('ternary_assignment', text), [])
+
+    def test_early_return_final_if_as_an_early_return(self):
+        text = 'void g(int);\nvoid f(int b)\n{\n    g(1);\n    if (b) {\n        g(3);\n    }\n}\n'
+        self.assertIn('void g(int);\nvoid f(int b)\n{\n    g(1);\n    if (!b)\n        return;\n    g(3);\n}\n', self.rewritten('early_return', text))
+
+    def test_compound_assignment_both_ways(self):
+        text = 'void f(int *p, int a)\n{\n    int x = a;\n    x = x << 2;\n    p[0] -= a + 1;\n    p[1] = x;\n}\n'
+        found = self.rewritten('compound_assignment', text)
+        self.assertIn('void f(int *p, int a)\n{\n    int x = a;\n    x <<= 2;\n    p[0] -= a + 1;\n    p[1] = x;\n}\n', found)
+        self.assertIn('void f(int *p, int a)\n{\n    int x = a;\n    x = x << 2;\n    p[0] = p[0] - (a + 1);\n    p[1] = x;\n}\n', found)
+
+    def test_commute_operands_keeps_the_polynomial(self):
+        """mutate.py's textual commute turned `a * b + c` into `a * c + b` (asinf, docs/IDEAS.md); the parsed one cannot."""
+        found = self.rewritten('commute_operands', 'float f(float a, float b, float c)\n{\n    return a * b + c;\n}\n')
+        self.assertEqual(sorted(new.split('return ')[1].split(';')[0] for new in found), ['b * a + c', 'c + a * b'])
+
+    def test_declaration_placement_sinks_into_the_first_assignment(self):
+        text = 'void g(int);\nvoid f(int a)\n{\n    int y;\n    g(a);\n    y = a + 1;\n    g(y);\n}\n'
+        self.assertIn('void g(int);\nvoid f(int a)\n{\n    g(a);\n    int y = a + 1;\n    g(y);\n}\n', self.rewritten('declaration_placement', text))
+
+    def test_declaration_placement_hoists_to_the_function_top(self):
+        text = 'void g(int);\nvoid f(int a)\n{\n    g(a);\n    int x = a * 2;\n    g(x);\n}\n'
+        self.assertIn('void g(int);\nvoid f(int a)\n{\n    int x;\n    g(a);\n    x = a * 2;\n    g(x);\n}\n', self.rewritten('declaration_placement', text))
+
+    def test_const_local(self):
+        text = 'void g(int);\nvoid f(int a)\n{\n    int x = a * 2;\n    g(x);\n}\n'
+        self.assertEqual(self.rewritten('const_local', text), ['void g(int);\nvoid f(int a)\n{\n    const int x = a * 2;\n    g(x);\n}\n'])
+
+    def test_const_local_refuses_an_assigned_local(self):
+        text = 'void g(int);\nvoid f(int a)\n{\n    int x = a * 2;\n    x++;\n    g(x);\n}\n'
+        self.assertEqual(self.rewritten('const_local', text), [])
+
+    def test_pointer_reference(self):
+        text = 'struct S { int a; int b; };\nvoid f(struct S *s)\n{\n    struct S *p = s;\n    p->a = 1;\n    p->b = 2;\n}\n'
+        self.assertEqual(self.rewritten('pointer_reference', text), ['struct S { int a; int b; };\nvoid f(struct S *s)\n{\n    struct S &p = *s;\n    p.a = 1;\n    p.b = 2;\n}\n'])
+
+    def test_argument_local_takes_the_callee_parameter_type(self):
+        text = 'struct S { int a; };\nvoid g(unsigned value, int count);\nvoid f(struct S *s)\n{\n    g(s->a, 2);\n}\n'
+        self.assertEqual(self.rewritten('argument_local', text),
+                         ['struct S { int a; };\nvoid g(unsigned value, int count);\nvoid f(struct S *s)\n{\n    unsigned argument = s->a;\n    g(argument, 2);\n}\n'])
+
+    def test_argument_local_refuses_a_second_call(self):
+        text = 'int h(void);\nvoid g(int value, int count);\nstruct S { int a; };\nvoid f(struct S *s)\n{\n    g(s->a, h());\n}\n'
+        self.assertEqual(self.rewritten('argument_local', text), [])
+
+    def test_switch_if_chain_switch_as_chain(self):
+        text = 'int f(int k)\n{\n    int r;\n    switch (k) {\n    case 0:\n        r = 5;\n        break;\n    case 1:\n    case 2:\n        r = 6;\n        break;\n    default:\n        r = 7;\n        break;\n    }\n    return r;\n}\n'
+        self.assertIn('int f(int k)\n{\n    int r;\n    if (k == 0) {\n        r = 5;\n    } else if (k == 1 || k == 2) {\n        r = 6;\n    } else {\n        r = 7;\n    }\n    return r;\n}\n',
+                      self.rewritten('switch_if_chain', text))
+
+    def test_switch_if_chain_refuses_a_fall_through(self):
+        text = 'int f(int k)\n{\n    int r = 0;\n    switch (k) {\n    case 0:\n        r = 5;\n    case 1:\n        r += 6;\n        break;\n    }\n    return r;\n}\n'
+        self.assertEqual(self.rewritten('switch_if_chain', text), [])
+
+    def test_switch_if_chain_chain_as_switch(self):
+        text = 'int f(int r)\n{\n    if (r == 5)\n        return 1;\n    else if (r == 6)\n        return 2;\n    return 0;\n}\n'
+        self.assertIn('int f(int r)\n{\n    switch (r) {\n    case 5:\n        return 1;\n    case 6:\n        return 2;\n    }\n    return 0;\n}\n', self.rewritten('switch_if_chain', text))
+
+    def test_pointer_walk_drops_the_counter(self):
+        text = 'int f(int *table, int n)\n{\n    int s = 0;\n    for (int i = 0; i < n; i++) {\n        s += table[i];\n    }\n    return s;\n}\n'
+        self.assertIn('int f(int *table, int n)\n{\n    int s = 0;\n    for (int *element = table; element < table + n; element++) {\n        s += (*element);\n    }\n    return s;\n}\n',
+                      self.rewritten('pointer_walk', text))
+
+    def test_element_pointer(self):
+        text = 'struct S { int a; int b; };\nextern struct S items[8];\nvoid f(int i)\n{\n    items[i].a = 1;\n    items[i].b = 2;\n}\n'
+        self.assertEqual(self.rewritten('element_pointer', text),
+                         ['struct S { int a; int b; };\nextern struct S items[8];\nvoid f(int i)\n{\n    struct S *element = &items[i];\n    element->a = 1;\n    element->b = 2;\n}\n'])
+
+    def test_reuse_variable_merges_two_lives(self):
+        text = 'int g(void);\nvoid h(int);\nvoid f(void)\n{\n    int a;\n    int b;\n    a = g();\n    h(a);\n    b = g();\n    h(b);\n}\n'
+        self.assertIn('int g(void);\nvoid h(int);\nvoid f(void)\n{\n    int a;\n    a = g();\n    h(a);\n    a = g();\n    h(a);\n}\n', self.rewritten('reuse_variable', text))
+
+    def test_reuse_variable_splits_a_life(self):
+        text = 'int g(void);\nvoid h(int);\nvoid f(void)\n{\n    int a;\n    a = g();\n    h(a);\n    a = g();\n    h(a);\n}\n'
+        self.assertIn('int g(void);\nvoid h(int);\nvoid f(void)\n{\n    int a;\n    a = g();\n    h(a);\n    int a2 = g();\n    h(a2);\n}\n', self.rewritten('reuse_variable', text))
+
+    def test_reuse_variable_refuses_lives_in_one_loop(self):
+        text = 'int g(void);\nvoid h(int);\nvoid f(int n)\n{\n    int a;\n    int b;\n    while (n--) {\n        h(a);\n        a = g();\n        b = g();\n        h(b);\n    }\n}\n'
+        self.assertFalse([new for new in self.rewritten('reuse_variable', text) if 'merged' in new or 'int b;' not in new])
+
+    def test_test_in_each_arm(self):
+        text = 'int F(void);\nint G(void);\nvoid S(void);\nvoid f(int a)\n{\n    int hit;\n    if (a) {\n        hit = F();\n    } else {\n        hit = G();\n    }\n    if (hit)\n        S();\n}\n'
+        self.assertIn('int F(void);\nint G(void);\nvoid S(void);\nvoid f(int a)\n{\n    int hit;\n    if (a) {\n        hit = F();\n        if (hit)\n            S();\n    } else {\n'
+                      '        hit = G();\n        if (hit)\n            S();\n    }\n}\n', self.rewritten('test_in_each_arm', text))
+
+    def test_case_order_sets_the_value_in_every_group(self):
+        text = 'void g(int);\nvoid f(int k, int *p)\n{\n    int n;\n    n = 0;\n    switch (k) {\n    case 0:\n        g(1);\n        break;\n    case 1:\n        g(2);\n        break;\n    }\n    *p = n;\n}\n'
+        self.assertIn('void g(int);\nvoid f(int k, int *p)\n{\n    int n;\n    switch (k) {\n    case 0:\n        n = 0;\n        g(1);\n        break;\n    case 1:\n        n = 0;\n        g(2);\n'
+                      '        break;\n    default:\n        n = 0;\n        break;\n    }\n    *p = n;\n}\n', self.rewritten('case_order', text))
+
+    def test_repeat_expression(self):
+        text = 'struct S { int a; int b; };\nvoid f(struct S *s, int *out)\n{\n    int x = s->a + 1;\n    int y = s->a + 2;\n    out[0] = x * y;\n}\n'
+        self.assertEqual(self.rewritten('repeat_expression', text),
+                         ['struct S { int a; int b; };\nvoid f(struct S *s, int *out)\n{\n    int value = s->a;\n    int x = value + 1;\n    int y = value + 2;\n    out[0] = x * y;\n}\n'])
+
+    def test_repeat_expression_never_crosses_a_call_that_may_write_it(self):
+        """The first version hoisted `sp[1]` above the call that writes it through `&sp[1]` (found on 0x1BCCE0's draft)."""
+        text = 'int g(float *);\nvoid f(float *out)\n{\n    float sp[2];\n    if (g(&sp[1])) {\n        out[0] = sp[1] * 2.0f;\n        out[1] = sp[1];\n    }\n}\n'
+        self.assertEqual(self.rewritten('repeat_expression', text), [])
+
+    def test_repeat_expression_refuses_a_store_that_may_alias(self):
+        text = 'struct S { int a; };\nvoid f(struct S *s, int *out)\n{\n    out[0] = s->a + 1;\n    out[1] = s->a + 2;\n}\n'
+        self.assertEqual(self.rewritten('repeat_expression', text), [])
+
+    def test_inline_constant_local(self):
+        text = 'void g(float);\nvoid f(void)\n{\n    float half = 1;\n    g(half);\n    g(half);\n}\n'
+        self.assertEqual(self.rewritten('inline_constant_local', text), ['void g(float);\nvoid f(void)\n{\n    g(1.0f);\n    g(1.0f);\n}\n'])
+
+    def test_no_rewrite_adds_inline_asm_or_volatile(self):
+        self.assertEqual(meaning_rewrites.forbidden('int x;', 'volatile int x;'), ['volatile'])
+
+    def test_labels_turn_the_regrouping_rewrites_off(self):
+        text = 'void g(int);\nvoid f(int b)\n{\n    if (b) {\n        goto done;\n    }\n    g(1);\ndone:\n    g(2);\n}\n'
+        self.assertEqual(self.rewritten('early_return', text), [])
+
+
+class SiteSearchTests(unittest.TestCase):
+    """Each generator of sitesearch.py on a small source: the exact candidate it writes."""
+
+    def candidates(self, name, text):
+        return [new for _, _, _, new in sitesearch.candidates(text, {name})]
+
+    def test_store_in_both_arms(self):
+        text = 'void g(int);\nvoid f(int a, int *p)\n{\n    int x;\n    x = 0;\n    if (a) {\n        g(1);\n    } else {\n        g(2);\n    }\n    *p = x;\n}\n'
+        self.assertIn('void g(int);\nvoid f(int a, int *p)\n{\n    int x;\n    if (a) {\n        x = 0;\n        g(1);\n    } else {\n        x = 0;\n        g(2);\n    }\n    *p = x;\n}\n',
+                      self.candidates('store_in_both_arms', text))
+
+    def test_store_in_both_arms_refuses_a_test_that_reads_the_store(self):
+        text = 'void g(int);\nvoid f(int a)\n{\n    int x;\n    x = a;\n    if (x) {\n        g(1);\n    }\n    g(x);\n}\n'
+        self.assertEqual(self.candidates('store_in_both_arms', text), [])
+
+    def test_read_once_local(self):
+        text = 'struct S { int a; int b; };\nvoid f(struct S *s, int *out)\n{\n    *out = s->a + s->b;\n}\n'
+        self.assertIn('struct S { int a; int b; };\nvoid f(struct S *s, int *out)\n{\n    int a2 = s->a;\n    *out = a2 + s->b;\n}\n', self.candidates('read_once_local', text))
+
+    def test_clamp_forms(self):
+        text = 'int f(int c)\n{\n    int v;\n    v = c;\n    if (v > 10)\n        v = 10;\n    return v;\n}\n'
+        found = self.candidates('clamp_forms', text)
+        self.assertIn('int f(int c)\n{\n    int v;\n    v = 10;\n    if (c <= 10)\n        v = c;\n    return v;\n}\n', found)
+        self.assertIn('int f(int c)\n{\n    int v;\n    v = (c > 10) ? 10 : c;\n    return v;\n}\n', found)
+
+    def test_flag_as_value(self):
+        text = 'int f(int a, int b)\n{\n    int flag = 0;\n    if (a < b && b < 8)\n        flag = 1;\n    return flag;\n}\n'
+        self.assertEqual(self.candidates('flag_as_value', text), ['int f(int a, int b)\n{\n    int flag = a < b && b < 8;\n    return flag;\n}\n'])
+
+    def test_countdown_loops(self):
+        text = 'void g(void);\nvoid f(int n)\n{\n    int i;\n    for (i = 0; i < n; i++) {\n        g();\n    }\n}\n'
+        headers = sorted(new.split('\n')[4].strip() for new in self.candidates('countdown_loops', text))
+        self.assertEqual(headers, ['for (i = n; --i >= 0;) {', 'for (i = n; i > 0; i--) {', 'for (i = n; i-- > 0;) {'])
+
+    def test_countdown_loops_refuses_a_counter_the_body_reads(self):
+        text = 'void g(int);\nvoid f(int n)\n{\n    int i;\n    for (i = 0; i < n; i++) {\n        g(i);\n    }\n}\n'
+        self.assertEqual(self.candidates('countdown_loops', text), [])
+
+    def test_copy_after_join(self):
+        text = 'struct N { struct N *next; int v; };\nint f(struct N *c)\n{\n    while (c->v != 0) {\n        c = c->next;\n    }\n    return c->v + 1;\n}\n'
+        self.assertEqual(self.candidates('copy_after_join', text),
+                         ['struct N { struct N *next; int v; };\nint f(struct N *c)\n{\n    while (c->v != 0) {\n        c = c->next;\n    }\n    struct N *last = c;\n    return last->v + 1;\n}\n'])
+
+    def test_empty_case(self):
+        text = 'void g(int);\nvoid f(int k)\n{\n    switch (k) {\n    case 1:\n        g(1);\n        break;\n    case 3:\n        g(3);\n        break;\n    }\n}\n'
+        self.assertIn('void g(int);\nvoid f(int k)\n{\n    switch (k) {\n    case 1:\n        g(1);\n        break;\n    case 3:\n        g(3);\n        break;\n    case 2:\n        break;\n    }\n}\n',
+                      self.candidates('empty_case', text))
+
+    def test_empty_case_refuses_a_switch_with_a_default(self):
+        text = 'void g(int);\nvoid f(int k)\n{\n    switch (k) {\n    case 1:\n        g(1);\n        break;\n    default:\n        g(0);\n        break;\n    }\n}\n'
+        self.assertEqual(self.candidates('empty_case', text), [])
+
+
+class TreeSearchTests(unittest.TestCase):
+    def candidate(self, label, score):
+        return tsearch.Candidate('x', label, tsearch.Candidate('start'), score)
+
+    def test_interleaved_tries_every_kind_first(self):
+        pool = [self.candidate('move_statement@1', None), self.candidate('move_statement@2', None), self.candidate('loop_forms@3', None)]
+        self.assertEqual([candidate.label for candidate in tsearch.interleaved(pool)], ['move_statement@1', 'loop_forms@3', 'move_statement@2'])
+
+    def test_next_beam_prefers_another_kind_at_an_equal_score(self):
+        judged = [self.candidate('move_statement@1', 4), self.candidate('move_statement@2', 4), self.candidate('loop_forms@3', 4), self.candidate('case_order@4', 9)]
+        self.assertEqual([candidate.label for candidate in tsearch.next_beam(judged, 2)], ['move_statement@1', 'loop_forms@3'])
 
 
 if __name__ == '__main__':

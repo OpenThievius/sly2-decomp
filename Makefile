@@ -2,7 +2,7 @@
 #
 # Setup: ./setup.sh --sly2 /path/to/SCUS_973.16, then `make elf`; names: docs/build/name-recovery.md.
 
- .PHONY: help elf objdiff blockers config nonmatching src report readme repo-check cleanup commits check test unit lint lint-shell compile-scripts links pal-check rules permute permute-stores fix-stack mutate adopt search land pal
+ .PHONY: help elf objdiff blockers config nonmatching src report readme repo-check cleanup commits check test unit lint lint-shell compile-scripts links pal-check rules permute permute-stores fix-stack mutate adopt search land pal tsearch sitesearch
 
 help: ## List the targets
 	@grep -hE '^[a-z-]+:.*## ' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  %-16s %s\n", $$1, $$2}'
@@ -47,6 +47,13 @@ fix-stack: ## Size the placeholder sp[0x400] buffers of the near misses (writes 
 
 mutate: ## The random rewrites of mutate.py on the near misses scoring MIN to MAX; a better source is written to data/matching/src/fn
 	.venv/bin/python scripts/matching/mutate.py --batch --min-score $(MIN) --max-score $(MAX) --budget $(BUDGET) --jobs $(JOBS) --write
+
+tsearch: ## The meaning-keeping beam search (tsearch.py, meaning_rewrites.py) on one function (ADDRESS=0x1C7C30) or on the near misses scoring MIN to MAX; results go to work/matching/tsearch, never to data/ or src/
+	.venv/bin/python scripts/matching/tsearch.py $(if $(ADDRESS),$(ADDRESS),--batch --min-score $(MIN) --max-score $(MAX)) --budget $(BUDGET) --jobs $(JOBS)
+
+sitesearch: ## Candidate statements at the sites of one near miss (sitesearch.py), ADDRESS=0x1C7C30 [BUDGET=300]; results go to work/matching/sitesearch
+	@test -n "$(ADDRESS)" || { echo "usage: make sitesearch ADDRESS=0x1C7C30"; exit 2; }
+	.venv/bin/python scripts/matching/sitesearch.py $(ADDRESS) --budget $(BUDGET) --jobs $(JOBS)
 
 adopt: ## Take the sources of work/matching/fix-stack and permute-stores that score strictly lower than the current ones into data/matching/src/fn
 	.venv/bin/python scripts/matching/adopt.py

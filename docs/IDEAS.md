@@ -9,10 +9,14 @@ polynomial's meaning).
 
 ## 0. Tools and pairing (from the first pass, 2026-11-14)
 
-- [ ] **Port `tsearch.py` and `sitesearch.py`** from `work/sly1-decomp/tools/`: first diff their rewrite library against `rules.py`, `neighborhood.py` and
+- [x] **Port `tsearch.py` and `sitesearch.py`** from `work/sly1-decomp/tools/`: first diff their rewrite library against `rules.py`, `neighborhood.py` and
   `mutate.py` (list what is new: named-constant, repeat-expression, param-order, callee-return, reuse-variable, test-in-each-arm, case-order,
   chained-assignment, struct-store), port only those; `sitesearch.py` inserts candidate statements at one site and is new to us. Measure on the 106
-  near misses of score 5-16: how many each finds that `neighborhood.py` did not.
+  near misses of score 5-16: how many each finds that `neighborhood.py` did not. **Result (2026-11-28):** `scripts/matching/tsearch.py`, `sitesearch.py`,
+  `meaning_rewrites.py` (18 rewrites) and `source_tree.py`, new code (docs/contributing/search-tools.md has the inventory, what was left out and the pilot). Only 4
+  unwalled game-range near misses score 5-16, so the pilot took all 26 unwalled ones up to 100 plus the 24 game-range tie walls of score 8 or less: at 300 candidates
+  each, tsearch/sitesearch beat neighborhood.py on 6 functions (StoreAudioModeInSave 9 to 0 by a `const` pointer local, not landed yet), neighborhood.py won more words
+  (93 against 67) but six of its 14 wins changed the meaning; no tool moved a tie wall.
 - [ ] **Pair Sly 2 with Sly 1 names, types and layouts by script, no agents.** Their `config/us/` (`classes.tsv`, `members.tsv`, `methods.tsv`,
   `dispatch.tsv`, `tables.tsv`, `installers.tsv`) and `include/*.h` (~574 headers, `names.h`) against our `config/recovered/` and `include/`: pair by
   class descriptor and method-table shape, then check every field offset against Sly 2's own code before it lands (Sly 2 regroups classes and moves
@@ -20,7 +24,8 @@ polynomial's meaning).
 - [x] **Sly 1 bodies as automated seeds.** For each Sly 2 function paired to a Sly 1 body (`exact`/`bsim`, never under ~90 bytes): compile the **Result (2026-11-14):** `sly1_seed_extract.py` and `sly1_seed_run.py`. 195 unmatched Sly 2 functions have a Sly 1 body; 172 compile and score. 9 score 0, 6 at 1-4, 9 at 5-16, 50 at 17-64; the draft beats our best on 69 (56 by 10 or more). Controls (777 matched): 223 at 0, 119 at 1-4, 161 at 5-16. Eight of the nine zeros landed (CroutDecomp, ResetGs, VBlankS_Interrupt, BlendDisplayOnBufferMismatch, the VU_FLOAT constructor, three soft-float `.c`): the work per function is to keep the Sly 1 body, give it our `types.h`, and rename its callees and globals to the addresses `try.py`'s LINK lines print. `PosSmooth` (0x11F088) is the ninth: its Sly 1 body uses a `Vu0::Vec` API (Sub, Length, MulX, MulAddX, Scalar) our headers lack, so it waits for the helper rulings (multi-instruction helpers). The other 15 seeds within 16 words: `sly1_seed_flatten.py` makes standalone sources; 5 compile in our pipeline (ChooseEmitVelocity 14, CplsgFindEdgePath 15, func_0023D338 4, sinf 10, func_0024FAD0 3) and `neighborhood.py` (800 compiles each, link check off with `SCORER_NO_LINK=1`) found nothing lower; the other 10 need their Sly 1 per-file flags in the scorer first. Next: the 24 at most 16 words, then feed the 17-64 ones to `neighborhood.py`.
   Sly 1 C as a draft, score it, feed anything within 64 words to `neighborhood.py`. Measure the hit rate on the 300 near misses of score 17-64
   before spending any agent tokens (the 2026-10-23 pilot cost 270k tokens per fix through agent review).
-- [ ] **Make the neighbourhood search keep meaning.** `neighborhood.py` and `mutate.py` rewrote an asinf polynomial (`commute`) and moved a store past its
+- [ ] **Make the neighbourhood search keep meaning.** (2026-11-28: `tsearch.py` keeps meaning by construction and prints every step as a diff; the pilot found six
+  meaning-changing neighbourhood wins of 14, listed in search-tools.md. `mutate.py`'s commute, flip_comparison, toggle_cast and swap_adjacent are still unchecked.) `neighborhood.py` and `mutate.py` rewrote an asinf polynomial (`commute`) and moved a store past its
   use in fmodf (`swap_adjacent`) and still scored better: add a cheap equivalence check (compare the dumps' RTL after cse for the same inputs, or
   refuse reorderings across a read of the same variable) or at least print each winning edit for review.
 - [ ] **Ask for rulings** (listed in [toolchain/vu0-mmi-and-builds.md](toolchain/vu0-mmi-and-builds.md) section 3): register-variable `"j"` inputs for
