@@ -2680,5 +2680,45 @@ class TreeSearchTests(unittest.TestCase):
         self.assertEqual([candidate.label for candidate in tsearch.next_beam(judged, 2)], ['move_statement@1', 'loop_forms@3'])
 
 
+class PublishedRegressionTests(unittest.TestCase):
+    """scripts/matching/export_nonmatching.py published_regressions: a published near miss that got worse or vanished is named."""
+
+    def test_a_worse_score_is_named(self):
+        self.assertEqual(export_nonmatching.published_regressions({'0X19DF70': ('PresetJtAccelPipe', 16)}, {'0X19DF70': 95}),
+                         [('0X19DF70', 'PresetJtAccelPipe', 16, 95)])
+
+    def test_a_vanished_source_is_named(self):
+        self.assertEqual(export_nonmatching.published_regressions({'0X19DF70': ('PresetJtAccelPipe', 16)}, {}),
+                         [('0X19DF70', 'PresetJtAccelPipe', 16, None)])
+
+    def test_an_equal_or_better_score_is_not_named(self):
+        self.assertEqual(export_nonmatching.published_regressions({'0X1': ('A', 5), '0X2': ('B', 5)}, {'0X1': 5, '0X2': 3}), [])
+
+    def test_the_names_come_by_address(self):
+        names = export_nonmatching.published_regressions({'0X20': ('B', 1), '0X10': ('A', 1)}, {})
+        self.assertEqual([entry[0] for entry in names], ['0X10', '0X20'])
+
+
+class LocalSharedTypeReviewTests(unittest.TestCase):
+    """scripts/matching/check_source.py review: a local copy of a shared type, and padding members, are named (never failures)."""
+
+    def test_a_local_copy_of_a_shared_type_is_named(self):
+        found = check_source.review('struct CRef {\n    int tagk;\n};\n')
+        self.assertIn('a local copy of the shared type CRef', ' '.join(message for _, _, message in found))
+
+    def test_a_type_of_its_own_is_not_named(self):
+        self.assertEqual([entry for entry in check_source.review('struct ONLY_HERE_9Z {\n    int x;\n};\n') if 'shared type' in entry[2]], [])
+
+    def test_a_padding_member_is_named(self):
+        found = check_source.review('struct ONLY_HERE_9Z {\n    int pad[2];\n};\n')
+        self.assertIn('padding member', ' '.join(message for _, _, message in found))
+
+    def test_the_tsearch_zero_of_0x1d54b8_is_named_twice(self):
+        text = 'struct CRef {\n    int tagk;\n    int n;\n    int pad[2];\n};\n'
+        kinds = [message.split(':')[0].split(' (')[0] for _, _, message in check_source.review(text)]
+        self.assertEqual(sum('CRef' in message for _, _, message in check_source.review(text)), 1)
+        self.assertIn('padding member', ' '.join(kinds))
+
+
 if __name__ == '__main__':
     unittest.main()

@@ -220,12 +220,50 @@ def literal_locals(text):
     return found
 
 
+AGGREGATE_DEFINITION = re.compile(r'\b(?:struct|class|union)\s+([A-Za-z_]\w*)\s*(?::[^{;]*)?\{')
+PADDING_MEMBER = re.compile(r'^\s*(?:char|u8|s8|int|s32|u32|short|s16|u16)\s+(?:pad|padding)\w*\s*\[')
+_shared_names = []
+
+
+def shared_type_names():
+    """The names of the aggregates defined in include/*.h (read once): a source that defines one of them again holds a local copy."""
+    if not _shared_names:
+        folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'include')
+        names = set()
+        for name in os.listdir(folder) if os.path.isdir(folder) else ():
+            if name.endswith('.h'):
+                with open(os.path.join(folder, name), encoding='utf-8', errors='ignore') as handle:
+                    names.update(AGGREGATE_DEFINITION.findall(strip_comments(handle.read())))
+        _shared_names.append(names)
+    return _shared_names[0]
+
+
+def local_shared_types(text):
+    """[(line number, type name)]: aggregates this source defines that include/ already defines (AGENTS.md "Shared types over local ones": a
+    local copy that also carries a padding member to size the frame is the banned padded type; a search that reaches 0 only with one has not
+    matched: tsearch's score 0 of 0x1D54B8 did, with a 16-byte CRef against the real 8-byte one)."""
+    shared = shared_type_names()
+    found = []
+    for number, line in enumerate(strip_comments(text).split('\n'), 1):
+        for name in AGGREGATE_DEFINITION.findall(line):
+            if name in shared:
+                found.append((number, name))
+    return found
+
+
+def padding_members(text):
+    """[(line number, line)]: members named pad* in a source's own structs (unused bytes that exist to place the next member or size a frame)."""
+    return [(number, line.strip()) for number, line in enumerate(strip_comments(text).split('\n'), 1) if PADDING_MEMBER.match(line)]
+
+
 def review(text):
     """[(line number, 'review', message)]: what the rules do not ban but a person should read before a rewrite is adopted (a literal-holding local, a
     constant-true condition). Kept apart from `problems`: record.py parks a source that has a problem, and these are warnings. A lint for a callee
     declared with an argument it does not have was tried (callee_sigs `params` against the declaration) and dropped: it fired on 19% of the matched
     sources, because a callee may ignore an argument its callers still pass. That check needs retail's call sites, not the callee's code."""
     found = [(number, 'review', f'literal local: {line}') for number, line in literal_locals(text)]
+    found += [(number, 'review', f'a local copy of the shared type {name} (include/ defines it)') for number, name in local_shared_types(text)]
+    found += [(number, 'review', f'padding member: {line[:80]}') for number, line in padding_members(text)]
     for number, line in enumerate(strip_comments(text).split('\n'), 1):
         if CONSTANT_CONDITION.search(line):
             found.append((number, 'review', f'constant condition: {line.strip()[:100]}'))

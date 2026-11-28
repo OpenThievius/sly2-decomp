@@ -35,6 +35,7 @@ import sys
 import time
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import check_source  # noqa: E402
 import meaning_rewrites  # noqa: E402
 import scorer  # noqa: E402
 import search_guard  # noqa: E402
@@ -143,6 +144,9 @@ def write_result(directory, name, candidate, address, start_score):
         handle.write(f'# {address:06X}: score {candidate.score} from {start_score}\n# {findings_text(candidate.text)}\n')
         for number, (label, step) in enumerate(candidate.steps(), 1):
             handle.write(f'\n# step {number}: {label}\n{step}')
+    risky = [message for _, kind, message in check_source.review(candidate.text) if 'shared type' in message or 'padding member' in message]
+    if risky:  # the source holds what AGENTS.md calls a padded or local copy of a shared type: its score is not a lead until a person has read it
+        print(f'{address:06X}: {name}.cpp has review findings, read before trusting its score {candidate.score}: ' + '; '.join(risky[:3]))
     return path
 
 
