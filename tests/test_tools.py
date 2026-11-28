@@ -26,6 +26,9 @@ import check_unit  # noqa: E402
 import commit_msg  # noqa: E402
 import boundaries  # noqa: E402
 import compile_unit  # noqa: E402
+import delay_slots  # noqa: E402
+import original_data  # noqa: E402
+import zero_objects  # noqa: E402
 import credit_audit  # noqa: E402
 import harvest  # noqa: E402
 import export_nonmatching  # noqa: E402
@@ -33,11 +36,15 @@ import list_functions  # noqa: E402
 import make_whole_files  # noqa: E402
 import export_src  # noqa: E402
 import idioms  # noqa: E402
+import meaning_rewrites  # noqa: E402
 import mutate  # noqa: E402
 import neighborhood  # noqa: E402
 import permute  # noqa: E402
 import permute_stores  # noqa: E402
 import search_guard  # noqa: E402
+import sitesearch  # noqa: E402
+import source_tree  # noqa: E402
+import tsearch  # noqa: E402
 import boundary_suspects  # noqa: E402
 import rules  # noqa: E402
 import park  # noqa: E402
@@ -2268,6 +2275,15 @@ class DataDefinitionTests(unittest.TestCase):
     def test_a_long_plain_word_array_without_its_reader_is_banned(self):
         self.assertIn('a dump in words', self.kinds('// data-ok: table\nconst unsigned int g_t[65] = {0};\n')[0])
 
+    def test_a_zero_buffer_with_a_zero_initializer_is_allowed(self):
+        self.assertEqual(self.kinds('// data-ok: zero buffer, ruled 2026-11-28\nunsigned int D_002C6858[1018] = {0};\n'), [])
+
+    def test_a_zero_buffer_marker_on_a_non_zero_initializer_is_banned(self):
+        self.assertIn('non-zero initializer', self.kinds('// data-ok: zero buffer\nunsigned int g_t[65] = {1};\n')[0])
+
+    def test_a_zero_buffer_marker_does_not_allow_a_long_byte_array(self):
+        self.assertIn('a dump, not typed data', self.kinds('// data-ok: zero buffer\nunsigned char g_b[4072] = {0};\n')[0])
+
     def test_a_long_string_is_not_a_dump(self):
         self.assertEqual(self.kinds('// data-ok: message\nconst char g_s[80] = "' + 'x' * 79 + '";\n'), [])
 
@@ -2387,6 +2403,452 @@ class LandingToolTests(unittest.TestCase):
                    ('float func_00153638(void *p, float g);\n', False)]
         arities, types = check_calls.learn(matched)
         self.assertEqual(check_calls.flags('float func_00153638(void *p, float g);\n', False, 'Draft', arities, types), [])
+
+
+class DelaySlotTests(unittest.TestCase):
+    """scripts/build/delay_slots.py: a volatile store directly before a reorder-mode jump moves into its slot (docs/build/assembler.md "Delay slots of the SDK range")."""
+    VOLATILE_STORE = '\t#.set\tvolatile\n\tsw\t$0,0($3)\n\t#.set\tnovolatile\n'
+
+    def test_a_volatile_store_before_a_call_moves_into_its_slot(self):
+        filled = delay_slots.fill('x:\n' + self.VOLATILE_STORE + '\tjal\tInitIpu\n')
+        self.assertIn('\t.set\tnoreorder\n\tjal\tInitIpu\n\tsw\t$0,0($3)\n\t.set\treorder', filled)
+
+    def test_a_plain_store_stays_before_its_call(self):
+        text = 'x:\n\tsw\t$0,0($3)\n\tjal\tInitIpu\n'
+        self.assertEqual(delay_slots.fill(text), text)
+
+    def test_a_volatile_store_with_an_instruction_before_the_call_stays(self):
+        text = 'x:\n' + self.VOLATILE_STORE + '\tli\t$2,1\n\tjal\tInitIpu\n'
+        self.assertEqual(delay_slots.fill(text), text)
+
+    def test_a_store_in_noreorder_mode_stays(self):
+        text = 'x:\n\t.set\tnoreorder\n' + self.VOLATILE_STORE + '\tjal\tInitIpu\n\tnop\n'
+        self.assertEqual(delay_slots.fill(text), text)
+
+    def test_a_store_of_the_return_address_stays(self):
+        text = 'x:\n' + self.VOLATILE_STORE.replace('$0,0($3)', '$31,0($3)') + '\tjal\tInitIpu\n'
+        self.assertEqual(delay_slots.fill(text), text)
+
+    def test_a_store_to_a_constant_keeps_the_assemblers_lui_before_the_call(self):
+        filled = delay_slots.fill('x:\n\t#.set\tvolatile\n\tsw\t$3,0x1000b000\n\t#.set\tnovolatile\n\tjal\tf\n')
+        self.assertIn('\tlui\t$1,4097\n\tjal\tf\n\tsw\t$3,-20480($1)', filled)
+
+
+class SourceTreeTests(unittest.TestCase):
+    TEXT = 'struct S { int a; };\nint g(int);\nint f(struct S *s, int a)\n{\n    int x = a + 1;\n    int y;\n    y = s->a;\n    s->a = x;\n    g(y);\n    return x;\n}\n'
+
+    def statements(self):
+        source = source_tree.Source(self.TEXT)
+        return source, source.body.parts['statements']
+
+    def test_reads_the_last_function_and_its_statements(self):
+        source, statements = self.statements()
+        self.assertEqual([statement.kind for statement in statements], ['declaration', 'declaration', 'expression', 'expression', 'expression', 'return'])
+
+    def test_locals_are_tracked_by_name(self):
+        source, statements = self.statements()
+        self.assertFalse(source.effects(statements[0]).conflicts(source.effects(statements[1])))
+
+    def test_a_read_of_what_another_writes_conflicts(self):
+        source, statements = self.statements()
+        self.assertTrue(source.effects(statements[0]).conflicts(source.effects(statements[3])))
+
+    def test_a_memory_store_conflicts_with_a_memory_read(self):
+        source, statements = self.statements()
+        self.assertTrue(source.effects(statements[2]).conflicts(source.effects(statements[3])))
+
+    def test_a_call_conflicts_with_a_memory_store(self):
+        source, statements = self.statements()
+        self.assertTrue(source.effects(statements[3]).conflicts(source.effects(statements[4])))
+
+    def test_a_return_is_never_moved(self):
+        source, statements = self.statements()
+        self.assertTrue(source.effects(statements[5]).control)
+
+    def test_a_cast_to_a_pointer_parses(self):
+        source = source_tree.Source('void *f(void)\n{\n    UNKNOWN *p = (UNKNOWN *)Make(4);\n    return p;\n}\n')
+        self.assertEqual(source.body.parts['statements'][0].parts['declarators'][0].initializer.kind, 'cast')
+
+
+class MeaningRewriteTests(unittest.TestCase):
+    """Each rewrite of meaning_rewrites.py on a small source: the exact text it gives, and the cases it must refuse."""
+
+    def rewritten(self, name, text):
+        return [new for _, new in meaning_rewrites.rewrites(text, {name})]
+
+    def test_move_statement_moves_an_independent_declaration(self):
+        text = 'void f(int *p, int a, int b)\n{\n    int x = a + 1;\n    int y = b + 2;\n    p[0] = x;\n    p[1] = y;\n}\n'
+        self.assertIn('void f(int *p, int a, int b)\n{\n    int y = b + 2;\n    int x = a + 1;\n    p[0] = x;\n    p[1] = y;\n}\n', self.rewritten('move_statement', text))
+
+    def test_move_statement_never_moves_a_use_above_its_definition(self):
+        text = 'void f(int *p, int a)\n{\n    int x = a + 1;\n    p[0] = x;\n}\n'
+        self.assertEqual(self.rewritten('move_statement', text), [])
+
+    def test_move_statement_never_swaps_a_store_and_a_load(self):
+        text = 'void f(int *p, int *q, int a)\n{\n    p[0] = a;\n    a = q[0];\n    p[1] = a;\n}\n'
+        self.assertEqual(self.rewritten('move_statement', text), [])
+
+    def test_loop_forms_while_with_init_and_step_as_for(self):
+        text = 'int f(int *p, int n)\n{\n    int i;\n    int s = 0;\n    i = 0;\n    while (i < n) {\n        s += p[i];\n        i++;\n    }\n    return s;\n}\n'
+        self.assertIn('int f(int *p, int n)\n{\n    int i;\n    int s = 0;\n    for (i = 0; i < n; i++) {\n        s += p[i];\n    }\n    return s;\n}\n',
+                      self.rewritten('loop_forms', text))
+
+    def test_loop_forms_known_first_test_as_do_while(self):
+        text = 'int f(void)\n{\n    int i;\n    int s = 0;\n    for (i = 0; i < 4; i++) {\n        s += i;\n    }\n    return s;\n}\n'
+        self.assertIn('int f(void)\n{\n    int i;\n    int s = 0;\n    i = 0;\n    do {\n        s += i;\n        i++;\n    } while (i < 4);\n    return s;\n}\n',
+                      self.rewritten('loop_forms', text))
+
+    def test_loop_forms_keeps_a_loop_with_continue(self):
+        text = 'int f(int *p, int n)\n{\n    int i;\n    i = 0;\n    while (i < n) {\n        if (p[i]) continue;\n        i++;\n    }\n    return i;\n}\n'
+        self.assertFalse([new for new in self.rewritten('loop_forms', text) if 'for (i = 0;' in new])
+
+    def test_ternary_assignment_if_else_as_ternary(self):
+        text = 'int f(int a, int b)\n{\n    int x;\n    if (a < b)\n        x = a;\n    else\n        x = b;\n    return x;\n}\n'
+        self.assertIn('int f(int a, int b)\n{\n    int x;\n    x = (a < b) ? a : b;\n    return x;\n}\n', self.rewritten('ternary_assignment', text))
+
+    def test_ternary_assignment_refuses_values_of_two_kinds(self):
+        text = 'float f(int a, int b, float c)\n{\n    float x;\n    if (a < b)\n        x = a;\n    else\n        x = c;\n    return x;\n}\n'
+        self.assertEqual(self.rewritten('ternary_assignment', text), [])
+
+    def test_early_return_final_if_as_an_early_return(self):
+        text = 'void g(int);\nvoid f(int b)\n{\n    g(1);\n    if (b) {\n        g(3);\n    }\n}\n'
+        self.assertIn('void g(int);\nvoid f(int b)\n{\n    g(1);\n    if (!b)\n        return;\n    g(3);\n}\n', self.rewritten('early_return', text))
+
+    def test_compound_assignment_both_ways(self):
+        text = 'void f(int *p, int a)\n{\n    int x = a;\n    x = x << 2;\n    p[0] -= a + 1;\n    p[1] = x;\n}\n'
+        found = self.rewritten('compound_assignment', text)
+        self.assertIn('void f(int *p, int a)\n{\n    int x = a;\n    x <<= 2;\n    p[0] -= a + 1;\n    p[1] = x;\n}\n', found)
+        self.assertIn('void f(int *p, int a)\n{\n    int x = a;\n    x = x << 2;\n    p[0] = p[0] - (a + 1);\n    p[1] = x;\n}\n', found)
+
+    def test_commute_operands_keeps_the_polynomial(self):
+        """mutate.py's textual commute turned `a * b + c` into `a * c + b` (asinf, docs/IDEAS.md); the parsed one cannot."""
+        found = self.rewritten('commute_operands', 'float f(float a, float b, float c)\n{\n    return a * b + c;\n}\n')
+        self.assertEqual(sorted(new.split('return ')[1].split(';')[0] for new in found), ['b * a + c', 'c + a * b'])
+
+    def test_declaration_placement_sinks_into_the_first_assignment(self):
+        text = 'void g(int);\nvoid f(int a)\n{\n    int y;\n    g(a);\n    y = a + 1;\n    g(y);\n}\n'
+        self.assertIn('void g(int);\nvoid f(int a)\n{\n    g(a);\n    int y = a + 1;\n    g(y);\n}\n', self.rewritten('declaration_placement', text))
+
+    def test_declaration_placement_hoists_to_the_function_top(self):
+        text = 'void g(int);\nvoid f(int a)\n{\n    g(a);\n    int x = a * 2;\n    g(x);\n}\n'
+        self.assertIn('void g(int);\nvoid f(int a)\n{\n    int x;\n    g(a);\n    x = a * 2;\n    g(x);\n}\n', self.rewritten('declaration_placement', text))
+
+    def test_const_local(self):
+        text = 'void g(int);\nvoid f(int a)\n{\n    int x = a * 2;\n    g(x);\n}\n'
+        self.assertEqual(self.rewritten('const_local', text), ['void g(int);\nvoid f(int a)\n{\n    const int x = a * 2;\n    g(x);\n}\n'])
+
+    def test_const_local_refuses_an_assigned_local(self):
+        text = 'void g(int);\nvoid f(int a)\n{\n    int x = a * 2;\n    x++;\n    g(x);\n}\n'
+        self.assertEqual(self.rewritten('const_local', text), [])
+
+    def test_pointer_reference(self):
+        text = 'struct S { int a; int b; };\nvoid f(struct S *s)\n{\n    struct S *p = s;\n    p->a = 1;\n    p->b = 2;\n}\n'
+        self.assertEqual(self.rewritten('pointer_reference', text), ['struct S { int a; int b; };\nvoid f(struct S *s)\n{\n    struct S &p = *s;\n    p.a = 1;\n    p.b = 2;\n}\n'])
+
+    def test_argument_local_takes_the_callee_parameter_type(self):
+        text = 'struct S { int a; };\nvoid g(unsigned value, int count);\nvoid f(struct S *s)\n{\n    g(s->a, 2);\n}\n'
+        self.assertEqual(self.rewritten('argument_local', text),
+                         ['struct S { int a; };\nvoid g(unsigned value, int count);\nvoid f(struct S *s)\n{\n    unsigned argument = s->a;\n    g(argument, 2);\n}\n'])
+
+    def test_argument_local_refuses_a_second_call(self):
+        text = 'int h(void);\nvoid g(int value, int count);\nstruct S { int a; };\nvoid f(struct S *s)\n{\n    g(s->a, h());\n}\n'
+        self.assertEqual(self.rewritten('argument_local', text), [])
+
+    def test_switch_if_chain_switch_as_chain(self):
+        text = 'int f(int k)\n{\n    int r;\n    switch (k) {\n    case 0:\n        r = 5;\n        break;\n    case 1:\n    case 2:\n        r = 6;\n        break;\n    default:\n        r = 7;\n        break;\n    }\n    return r;\n}\n'
+        self.assertIn('int f(int k)\n{\n    int r;\n    if (k == 0) {\n        r = 5;\n    } else if (k == 1 || k == 2) {\n        r = 6;\n    } else {\n        r = 7;\n    }\n    return r;\n}\n',
+                      self.rewritten('switch_if_chain', text))
+
+    def test_switch_if_chain_refuses_a_fall_through(self):
+        text = 'int f(int k)\n{\n    int r = 0;\n    switch (k) {\n    case 0:\n        r = 5;\n    case 1:\n        r += 6;\n        break;\n    }\n    return r;\n}\n'
+        self.assertEqual(self.rewritten('switch_if_chain', text), [])
+
+    def test_switch_if_chain_chain_as_switch(self):
+        text = 'int f(int r)\n{\n    if (r == 5)\n        return 1;\n    else if (r == 6)\n        return 2;\n    return 0;\n}\n'
+        self.assertIn('int f(int r)\n{\n    switch (r) {\n    case 5:\n        return 1;\n    case 6:\n        return 2;\n    }\n    return 0;\n}\n', self.rewritten('switch_if_chain', text))
+
+    def test_pointer_walk_drops_the_counter(self):
+        text = 'int f(int *table, int n)\n{\n    int s = 0;\n    for (int i = 0; i < n; i++) {\n        s += table[i];\n    }\n    return s;\n}\n'
+        self.assertIn('int f(int *table, int n)\n{\n    int s = 0;\n    for (int *element = table; element < table + n; element++) {\n        s += (*element);\n    }\n    return s;\n}\n',
+                      self.rewritten('pointer_walk', text))
+
+    def test_element_pointer(self):
+        text = 'struct S { int a; int b; };\nextern struct S items[8];\nvoid f(int i)\n{\n    items[i].a = 1;\n    items[i].b = 2;\n}\n'
+        self.assertEqual(self.rewritten('element_pointer', text),
+                         ['struct S { int a; int b; };\nextern struct S items[8];\nvoid f(int i)\n{\n    struct S *element = &items[i];\n    element->a = 1;\n    element->b = 2;\n}\n'])
+
+    def test_reuse_variable_merges_two_lives(self):
+        text = 'int g(void);\nvoid h(int);\nvoid f(void)\n{\n    int a;\n    int b;\n    a = g();\n    h(a);\n    b = g();\n    h(b);\n}\n'
+        self.assertIn('int g(void);\nvoid h(int);\nvoid f(void)\n{\n    int a;\n    a = g();\n    h(a);\n    a = g();\n    h(a);\n}\n', self.rewritten('reuse_variable', text))
+
+    def test_reuse_variable_splits_a_life(self):
+        text = 'int g(void);\nvoid h(int);\nvoid f(void)\n{\n    int a;\n    a = g();\n    h(a);\n    a = g();\n    h(a);\n}\n'
+        self.assertIn('int g(void);\nvoid h(int);\nvoid f(void)\n{\n    int a;\n    a = g();\n    h(a);\n    int a2 = g();\n    h(a2);\n}\n', self.rewritten('reuse_variable', text))
+
+    def test_reuse_variable_refuses_lives_in_one_loop(self):
+        text = 'int g(void);\nvoid h(int);\nvoid f(int n)\n{\n    int a;\n    int b;\n    while (n--) {\n        h(a);\n        a = g();\n        b = g();\n        h(b);\n    }\n}\n'
+        self.assertFalse([new for new in self.rewritten('reuse_variable', text) if 'merged' in new or 'int b;' not in new])
+
+    def test_test_in_each_arm(self):
+        text = 'int F(void);\nint G(void);\nvoid S(void);\nvoid f(int a)\n{\n    int hit;\n    if (a) {\n        hit = F();\n    } else {\n        hit = G();\n    }\n    if (hit)\n        S();\n}\n'
+        self.assertIn('int F(void);\nint G(void);\nvoid S(void);\nvoid f(int a)\n{\n    int hit;\n    if (a) {\n        hit = F();\n        if (hit)\n            S();\n    } else {\n'
+                      '        hit = G();\n        if (hit)\n            S();\n    }\n}\n', self.rewritten('test_in_each_arm', text))
+
+    def test_case_order_sets_the_value_in_every_group(self):
+        text = 'void g(int);\nvoid f(int k, int *p)\n{\n    int n;\n    n = 0;\n    switch (k) {\n    case 0:\n        g(1);\n        break;\n    case 1:\n        g(2);\n        break;\n    }\n    *p = n;\n}\n'
+        self.assertIn('void g(int);\nvoid f(int k, int *p)\n{\n    int n;\n    switch (k) {\n    case 0:\n        n = 0;\n        g(1);\n        break;\n    case 1:\n        n = 0;\n        g(2);\n'
+                      '        break;\n    default:\n        n = 0;\n        break;\n    }\n    *p = n;\n}\n', self.rewritten('case_order', text))
+
+    def test_repeat_expression(self):
+        text = 'struct S { int a; int b; };\nvoid f(struct S *s, int *out)\n{\n    int x = s->a + 1;\n    int y = s->a + 2;\n    out[0] = x * y;\n}\n'
+        self.assertEqual(self.rewritten('repeat_expression', text),
+                         ['struct S { int a; int b; };\nvoid f(struct S *s, int *out)\n{\n    int value = s->a;\n    int x = value + 1;\n    int y = value + 2;\n    out[0] = x * y;\n}\n'])
+
+    def test_repeat_expression_never_crosses_a_call_that_may_write_it(self):
+        """The first version hoisted `sp[1]` above the call that writes it through `&sp[1]` (found on 0x1BCCE0's draft)."""
+        text = 'int g(float *);\nvoid f(float *out)\n{\n    float sp[2];\n    if (g(&sp[1])) {\n        out[0] = sp[1] * 2.0f;\n        out[1] = sp[1];\n    }\n}\n'
+        self.assertEqual(self.rewritten('repeat_expression', text), [])
+
+    def test_repeat_expression_refuses_a_store_that_may_alias(self):
+        text = 'struct S { int a; };\nvoid f(struct S *s, int *out)\n{\n    out[0] = s->a + 1;\n    out[1] = s->a + 2;\n}\n'
+        self.assertEqual(self.rewritten('repeat_expression', text), [])
+
+    def test_inline_constant_local(self):
+        text = 'void g(float);\nvoid f(void)\n{\n    float half = 1;\n    g(half);\n    g(half);\n}\n'
+        self.assertEqual(self.rewritten('inline_constant_local', text), ['void g(float);\nvoid f(void)\n{\n    g(1.0f);\n    g(1.0f);\n}\n'])
+
+    def test_no_rewrite_adds_inline_asm_or_volatile(self):
+        self.assertEqual(meaning_rewrites.forbidden('int x;', 'volatile int x;'), ['volatile'])
+
+    def test_labels_turn_the_regrouping_rewrites_off(self):
+        text = 'void g(int);\nvoid f(int b)\n{\n    if (b) {\n        goto done;\n    }\n    g(1);\ndone:\n    g(2);\n}\n'
+        self.assertEqual(self.rewritten('early_return', text), [])
+
+
+class SiteSearchTests(unittest.TestCase):
+    """Each generator of sitesearch.py on a small source: the exact candidate it writes."""
+
+    def candidates(self, name, text):
+        return [new for _, _, _, new in sitesearch.candidates(text, {name})]
+
+    def test_store_in_both_arms(self):
+        text = 'void g(int);\nvoid f(int a, int *p)\n{\n    int x;\n    x = 0;\n    if (a) {\n        g(1);\n    } else {\n        g(2);\n    }\n    *p = x;\n}\n'
+        self.assertIn('void g(int);\nvoid f(int a, int *p)\n{\n    int x;\n    if (a) {\n        x = 0;\n        g(1);\n    } else {\n        x = 0;\n        g(2);\n    }\n    *p = x;\n}\n',
+                      self.candidates('store_in_both_arms', text))
+
+    def test_store_in_both_arms_refuses_a_test_that_reads_the_store(self):
+        text = 'void g(int);\nvoid f(int a)\n{\n    int x;\n    x = a;\n    if (x) {\n        g(1);\n    }\n    g(x);\n}\n'
+        self.assertEqual(self.candidates('store_in_both_arms', text), [])
+
+    def test_read_once_local(self):
+        text = 'struct S { int a; int b; };\nvoid f(struct S *s, int *out)\n{\n    *out = s->a + s->b;\n}\n'
+        self.assertIn('struct S { int a; int b; };\nvoid f(struct S *s, int *out)\n{\n    int a2 = s->a;\n    *out = a2 + s->b;\n}\n', self.candidates('read_once_local', text))
+
+    def test_clamp_forms(self):
+        text = 'int f(int c)\n{\n    int v;\n    v = c;\n    if (v > 10)\n        v = 10;\n    return v;\n}\n'
+        found = self.candidates('clamp_forms', text)
+        self.assertIn('int f(int c)\n{\n    int v;\n    v = 10;\n    if (c <= 10)\n        v = c;\n    return v;\n}\n', found)
+        self.assertIn('int f(int c)\n{\n    int v;\n    v = (c > 10) ? 10 : c;\n    return v;\n}\n', found)
+
+    def test_flag_as_value(self):
+        text = 'int f(int a, int b)\n{\n    int flag = 0;\n    if (a < b && b < 8)\n        flag = 1;\n    return flag;\n}\n'
+        self.assertEqual(self.candidates('flag_as_value', text), ['int f(int a, int b)\n{\n    int flag = a < b && b < 8;\n    return flag;\n}\n'])
+
+    def test_countdown_loops(self):
+        text = 'void g(void);\nvoid f(int n)\n{\n    int i;\n    for (i = 0; i < n; i++) {\n        g();\n    }\n}\n'
+        headers = sorted(new.split('\n')[4].strip() for new in self.candidates('countdown_loops', text))
+        self.assertEqual(headers, ['for (i = n; --i >= 0;) {', 'for (i = n; i > 0; i--) {', 'for (i = n; i-- > 0;) {'])
+
+    def test_countdown_loops_refuses_a_counter_the_body_reads(self):
+        text = 'void g(int);\nvoid f(int n)\n{\n    int i;\n    for (i = 0; i < n; i++) {\n        g(i);\n    }\n}\n'
+        self.assertEqual(self.candidates('countdown_loops', text), [])
+
+    def test_copy_after_join(self):
+        text = 'struct N { struct N *next; int v; };\nint f(struct N *c)\n{\n    while (c->v != 0) {\n        c = c->next;\n    }\n    return c->v + 1;\n}\n'
+        self.assertEqual(self.candidates('copy_after_join', text),
+                         ['struct N { struct N *next; int v; };\nint f(struct N *c)\n{\n    while (c->v != 0) {\n        c = c->next;\n    }\n    struct N *last = c;\n    return last->v + 1;\n}\n'])
+
+    def test_empty_case(self):
+        text = 'void g(int);\nvoid f(int k)\n{\n    switch (k) {\n    case 1:\n        g(1);\n        break;\n    case 3:\n        g(3);\n        break;\n    }\n}\n'
+        self.assertIn('void g(int);\nvoid f(int k)\n{\n    switch (k) {\n    case 1:\n        g(1);\n        break;\n    case 3:\n        g(3);\n        break;\n    case 2:\n        break;\n    }\n}\n',
+                      self.candidates('empty_case', text))
+
+    def test_empty_case_refuses_a_switch_with_a_default(self):
+        text = 'void g(int);\nvoid f(int k)\n{\n    switch (k) {\n    case 1:\n        g(1);\n        break;\n    default:\n        g(0);\n        break;\n    }\n}\n'
+        self.assertEqual(self.candidates('empty_case', text), [])
+
+
+class TreeSearchTests(unittest.TestCase):
+    def candidate(self, label, score):
+        return tsearch.Candidate('x', label, tsearch.Candidate('start'), score)
+
+    def test_interleaved_tries_every_kind_first(self):
+        pool = [self.candidate('move_statement@1', None), self.candidate('move_statement@2', None), self.candidate('loop_forms@3', None)]
+        self.assertEqual([candidate.label for candidate in tsearch.interleaved(pool)], ['move_statement@1', 'loop_forms@3', 'move_statement@2'])
+
+    def test_next_beam_prefers_another_kind_at_an_equal_score(self):
+        judged = [self.candidate('move_statement@1', 4), self.candidate('move_statement@2', 4), self.candidate('loop_forms@3', 4), self.candidate('case_order@4', 9)]
+        self.assertEqual([candidate.label for candidate in tsearch.next_beam(judged, 2)], ['move_statement@1', 'loop_forms@3'])
+
+
+class PublishedRegressionTests(unittest.TestCase):
+    """scripts/matching/export_nonmatching.py published_regressions: a published near miss that got worse or vanished is named."""
+
+    def test_a_worse_score_is_named(self):
+        self.assertEqual(export_nonmatching.published_regressions({'0X19DF70': ('PresetJtAccelPipe', 16)}, {'0X19DF70': 95}),
+                         [('0X19DF70', 'PresetJtAccelPipe', 16, 95)])
+
+    def test_a_vanished_source_is_named(self):
+        self.assertEqual(export_nonmatching.published_regressions({'0X19DF70': ('PresetJtAccelPipe', 16)}, {}),
+                         [('0X19DF70', 'PresetJtAccelPipe', 16, None)])
+
+    def test_an_equal_or_better_score_is_not_named(self):
+        self.assertEqual(export_nonmatching.published_regressions({'0X1': ('A', 5), '0X2': ('B', 5)}, {'0X1': 5, '0X2': 3}), [])
+
+    def test_the_names_come_by_address(self):
+        names = export_nonmatching.published_regressions({'0X20': ('B', 1), '0X10': ('A', 1)}, {})
+        self.assertEqual([entry[0] for entry in names], ['0X10', '0X20'])
+
+
+class LocalSharedTypeReviewTests(unittest.TestCase):
+    """scripts/matching/check_source.py review: a local copy of a shared type, and padding members, are named (never failures)."""
+
+    def test_a_local_copy_of_a_shared_type_is_named(self):
+        found = check_source.review('struct CRef {\n    int tagk;\n};\n')
+        self.assertIn('a local copy of the shared type CRef', ' '.join(message for _, _, message in found))
+
+    def test_a_type_of_its_own_is_not_named(self):
+        self.assertEqual([entry for entry in check_source.review('struct ONLY_HERE_9Z {\n    int x;\n};\n') if 'shared type' in entry[2]], [])
+
+    def test_a_padding_member_is_named(self):
+        found = check_source.review('struct ONLY_HERE_9Z {\n    int pad[2];\n};\n')
+        self.assertIn('padding member', ' '.join(message for _, _, message in found))
+
+    def test_the_tsearch_zero_of_0x1d54b8_is_named_twice(self):
+        text = 'struct CRef {\n    int tagk;\n    int n;\n    int pad[2];\n};\n'
+        kinds = [message.split(':')[0].split(' (')[0] for _, _, message in check_source.review(text)]
+        self.assertEqual(sum('CRef' in message for _, _, message in check_source.review(text)), 1)
+        self.assertIn('padding member', ' '.join(kinds))
+
+
+class OriginalDataTests(unittest.TestCase):
+    """scripts/build/original_data.py: the data no C global can define is left out of the data units (config/us/original_data.tsv)."""
+    ROWS = [{'name': 'irx', 'address': 0x1000, 'size': 0x100, 'kind': 'iop-modules', 'why': ''},
+            {'name': 'kernel', 'address': 0x2040, 'size': 0x20, 'kind': 'kernel-code', 'why': ''}]
+
+    def test_a_whole_section_is_recognised(self):
+        self.assertTrue(original_data.covers_section(self.ROWS, 0x1000, 0x100))
+
+    def test_a_range_inside_a_section_is_not_a_section(self):
+        self.assertFalse(original_data.covers_section(self.ROWS, 0x2000, 0x100))
+
+    def test_a_range_is_cut_out_of_the_gap_that_holds_it(self):
+        self.assertEqual(original_data.without_ranges([(0x2000, 0x100, False)], self.ROWS[1:]), [(0x2000, 0x40, False), (0x2060, 0xA0, False)])
+
+    def test_a_piece_without_a_range_is_kept_whole(self):
+        self.assertEqual(original_data.without_ranges([(0x3000, 0x100, False)], self.ROWS), [(0x3000, 0x100, False)])
+
+    def test_a_range_inside_what_c_owns_raises(self):
+        with self.assertRaises(ValueError):
+            original_data.without_ranges([(0x2000, 0x100, True)], self.ROWS[1:])
+
+    def test_a_range_that_starts_a_piece_leaves_the_rest(self):
+        self.assertEqual(original_data.without_ranges([(0x2040, 0x40, False)], self.ROWS[1:]), [(0x2060, 0x20, False)])
+
+    def test_the_summary_counts_the_bytes_left_out(self):
+        self.assertEqual(original_data.summary(self.ROWS)['bytes'], 0x120)
+
+    def test_the_table_of_the_repository_has_whole_rows(self):
+        rows = original_data.read(os.path.join(os.path.dirname(HERE), 'config', 'us', 'original_data.tsv'))
+        self.assertEqual({row['name'] for row in rows} >= {'vutext', 'irx'}, True)
+        self.assertTrue(all(row['size'] > 0 and row['address'] > 0 for row in rows))
+
+
+class VerifiedTableTests(unittest.TestCase):
+    """check_source.py: a byte array over 64 elements passes with `data-ok: verified table: <rule>` (a table the original wrote as a literal and
+    a test proves against its rule: __clz_tab, _ctype_); without it, or as a plain data-ok, it stays a dump."""
+    BODY = 'extern const unsigned char D_00000000[256] = {%s};\n' % ', '.join(['0'] * 256)
+
+    def test_the_marker_lets_a_byte_table_pass(self):
+        found = check_source.data_definitions('// data-ok: verified table: tab[i] == bit_length(i)\n' + self.BODY)
+        self.assertEqual(found, [])
+
+    def test_a_plain_marker_stays_a_dump(self):
+        found = check_source.data_definitions("// data-ok: retail's bytes\n" + self.BODY)
+        self.assertEqual([entry[1] for entry in found], ['banned'])
+
+    def test_a_marker_without_a_rule_is_not_enough(self):
+        found = check_source.data_definitions('// data-ok: verified table:\n' + self.BODY)
+        self.assertEqual([entry[1] for entry in found], ['banned'])
+
+    def test_the_marker_does_not_lift_the_word_array_rule(self):
+        body = 'extern const unsigned int D_00000000[256] = {%s};\n' % ', '.join(['0'] * 256)
+        found = check_source.data_definitions('// data-ok: verified table: x\n' + body)
+        self.assertEqual([entry[1] for entry in found], ['banned'])
+
+
+class VerifiedByteTableTests(unittest.TestCase):
+    """The byte tables the repository defines with `data-ok: verified table` are proved against their rules here: libgcc's __clz_tab (entry i is the
+    bit length of i, four copies) and newlib's _ctype_ (entry 1 + c is the class flags of the character c, from include/ctypeflags.h)."""
+    ROOT = os.path.dirname(HERE)
+
+    def initializer(self, path):
+        """The text between the braces of the one initializer of a source (comments removed)."""
+        with open(os.path.join(self.ROOT, path), encoding='utf-8') as handle:
+            text = re.sub(r'//[^\n]*', '', handle.read())
+        return text[text.index('= {') + 3:text.rindex('}')]
+
+    def flags(self):
+        with open(os.path.join(self.ROOT, 'include', 'ctypeflags.h'), encoding='utf-8') as handle:
+            return {name: int(value, 16) for name, value in re.findall(r'#define (CTYPE_\w+) (0x[0-9a-fA-F]+)', handle.read())}
+
+    def test_every_clz_table_is_the_bit_length_of_its_index(self):
+        for address in ('2aae18', '2aaf18', '2ab018', '2ab118'):
+            values = [int(word) for word in self.initializer(f'src/rodata/sdk_{address}.cpp').replace('\n', ' ').split(',') if word.strip()]
+            self.assertEqual(values, [index.bit_length() for index in range(256)], address)
+
+    def test_the_ctype_table_is_the_class_flags_of_each_character(self):
+        flags = self.flags()
+        entries = []
+        for word in self.initializer('src/rodata/sdk_2aa6a0.cpp').replace('\n', ' ').split(','):
+            if word.strip():
+                entries.append(sum(flags[name] if name in flags else int(name, 0) for name in re.split(r'\s*\|\s*', word.strip())))
+
+        def classes(code):
+            character = chr(code)
+            value = 0
+            value |= flags['CTYPE_UPPER'] if 'A' <= character <= 'Z' else 0
+            value |= flags['CTYPE_LOWER'] if 'a' <= character <= 'z' else 0
+            value |= flags['CTYPE_DIGIT'] if '0' <= character <= '9' else 0
+            value |= flags['CTYPE_SPACE'] if character in '\t\n\v\f\r ' else 0
+            value |= flags['CTYPE_PUNCT'] if 33 <= code <= 47 or 58 <= code <= 64 or 91 <= code <= 96 or 123 <= code <= 126 else 0
+            value |= flags['CTYPE_CONTROL'] if code < 32 or code == 127 else 0
+            value |= flags['CTYPE_HEX'] if character in 'abcdefABCDEF' else 0
+            value |= flags['CTYPE_BLANK'] if character == ' ' else 0
+            return value
+        self.assertEqual(entries, [0] + [classes(code) for code in range(256)])
+
+
+class ZeroObjectTests(unittest.TestCase):
+    """scripts/build/zero_objects.py: a whole file's zero-initialised object that retail keeps as zeros inside .rodata counts as matched data."""
+
+    def retail(self, content):
+        return lambda address, size: content[address - 0x1000:address - 0x1000 + size]
+
+    def test_a_bss_object_over_zero_bytes_in_rodata_is_credited(self):
+        self.assertEqual(zero_objects.zero_ranges([(0x1000, 4, '.bss')], self.retail(b'\0\0\0\0'), 0x1000, 0x2000), [(0x1000, 4)])
+
+    def test_nonzero_retail_bytes_are_not_credited(self):
+        self.assertEqual(zero_objects.zero_ranges([(0x1000, 4, '.bss')], self.retail(b'\0\0\1\0'), 0x1000, 0x2000), [])
+
+    def test_an_object_outside_rodata_is_not_credited(self):
+        self.assertEqual(zero_objects.zero_ranges([(0x3000, 4, '.bss')], self.retail(b'\0\0\0\0'), 0x1000, 0x2000), [])
+
+    def test_a_data_object_is_not_credited_here(self):
+        self.assertEqual(zero_objects.zero_ranges([(0x1000, 4, '.data')], self.retail(b'\0\0\0\0'), 0x1000, 0x2000), [])
+
+    def test_an_empty_symbol_is_ignored(self):
+        self.assertEqual(zero_objects.zero_ranges([(0x1000, 0, '.bss')], self.retail(b''), 0x1000, 0x2000), [])
 
 
 if __name__ == '__main__':

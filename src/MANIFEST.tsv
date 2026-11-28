@@ -2870,6 +2870,7 @@ address	name	size	file	whole_file	symbol
 0X19FAF8	FindBestSafePoint	308	jp-stepzap/FindBestSafePoint.cpp		
 0X19FC30	UpdateJtSafePoints	256	jp-stepzap/AddSafePointOnMember_file.cpp	jp-stepzap/AddSafePointOnMember_file.cpp	UpdateJtSafePoints
 0X19FD30	AddSafePointOnMember	380	jp-stepzap/AddSafePointOnMember_file.cpp	jp-stepzap/AddSafePointOnMember_file.cpp	AddSafePointOnMember
+0X19FEB0	AddSafePointOnGeom	404	jp-stepzap/AddSafePointOnMember_file.cpp	jp-stepzap/AddSafePointOnMember_file.cpp	AddSafePointOnGeom
 0X1A0048	RemoveSafePoints	136	jp-stepzap/AddSafePointOnMember_file.cpp	jp-stepzap/AddSafePointOnMember_file.cpp	RemoveSafePoints
 0X1A00D0	RemoveSafePointsOfLo	212	jp-stepzap/AddSafePointOnMember_file.cpp	jp-stepzap/AddSafePointOnMember_file.cpp	RemoveSafePointsOfLo
 0X1A01A8	StaticInitSlotheaps_1a01a8	308	jp-stepzap/AddSafePointOnMember_file.cpp	jp-stepzap/AddSafePointOnMember_file.cpp	StaticInitSlotheaps_1a01a8
@@ -3347,6 +3348,7 @@ address	name	size	file	whole_file	symbol
 0X1BD310	PobstacleFindEdgeBlocker	240	mpeg-memcard/Obstacle_Init_file.cpp	mpeg-memcard/Obstacle_Init_file.cpp	PobstacleFindEdgeBlocker
 0X1BD560	func_001BD560	436	mpeg-memcard/Obstacle_Init_file.cpp	mpeg-memcard/Obstacle_Init_file.cpp	func_001BD560
 0X1BD718	func_001BD718	396	mpeg-memcard/Obstacle_Init_file.cpp	mpeg-memcard/Obstacle_Init_file.cpp	func_001BD718
+0X1BDA00	PobstacleGroupAlloc	452	mpeg-memcard/Obstacle_Init_file.cpp	mpeg-memcard/Obstacle_Init_file.cpp	PobstacleGroupAlloc
 0X1BDBC8	func_001BDBC8	36	mpeg-memcard/Obstacle_Init_file.cpp	mpeg-memcard/Obstacle_Init_file.cpp	func_001BDBC8
 0X1BDE18	Obstacle_JoinGroup	104	mpeg-memcard/Obstacle_Init_file.cpp	mpeg-memcard/Obstacle_Init_file.cpp	Obstacle_JoinGroup
 0X1BE1E8	AssignObstaclesToPathzones	84	mpeg-memcard/Obstacle_Init_file.cpp	mpeg-memcard/Obstacle_Init_file.cpp	AssignObstaclesToPathzones
@@ -3527,6 +3529,7 @@ address	name	size	file	whole_file	symbol
 0X1C90D0	InitLoadingLogoThread	188	new_1c90d0/InitLoadingLogoThread.cpp		
 0X1C9190	LoadingLogoThread	588	new_1c90d0/LoadingLogoThread.cpp		
 0X1C93E0	DrawLoadingLogo	676	new_1c90d0/DrawLoadingLogo_file.cpp	new_1c90d0/DrawLoadingLogo_file.cpp	DrawLoadingLogo
+0X1C9688	StaticInitLoadingLogo	664	new_1c90d0/DrawLoadingLogo_file.cpp	new_1c90d0/DrawLoadingLogo_file.cpp	StaticInitLoadingLogo
 0X1C9920	StaticInitLoadingLogo_thunk	32	new_1c90d0/DrawLoadingLogo_file.cpp	new_1c90d0/DrawLoadingLogo_file.cpp	StaticInitLoadingLogo_thunk
 0X1C9940	MakeCloneId	16	new_1c90d0/MakeCloneId_file.cpp	new_1c90d0/MakeCloneId_file.cpp	MakeCloneId
 0X1C9950	IsetFromCloneId	8	new_1c90d0/MakeCloneId_file.cpp	new_1c90d0/MakeCloneId_file.cpp	IsetFromCloneId
@@ -4852,10 +4855,12 @@ address	name	size	file	whole_file	symbol
 0X213DB0	SwitchBlotLabel	112	screen-font/SwitchBlotLabel.cpp		
 0X213E20	FGetSpriteSlotTransform	332	screen-font/FGetSpriteSlotTransform.cpp		
 0X213F70	FStartSpriteLabelInstance	396	screen-font/FStartSpriteLabelInstance.cpp		
+0X214100	FStartSpriteDepthInstance	432	screen-font/FStartSpriteDepthInstance.cpp		
 0X2142B0	FSpriteHasLabel	80	screen-font/FSpriteHasLabel.cpp		
 0X214300	SetBlotModal	152	screen-font/SetBlotModal.c		
 0X214398	LoadMovieDictionary	200	screen-font/LoadMovieDictionary.cpp		
 0X214460	LoadMovieSprites	1396	screen-font/LoadMovieSprites.cpp		
+0X2149D8	LoadMovieCharacter	3044	screen-font/LoadMovieCharacter.cpp		
 0X2155C0	func_002155C0	248	screen-font/fun_002155c0.cpp		
 0X2156B8	InitDepthSlot	120	screen-font/InitDepthSlot.cpp		
 0X215730	func_00215730	284	screen-font/fun_00215730.cpp		
@@ -5227,6 +5232,7 @@ address	name	size	file	whole_file	symbol
 0X2345B8	func_002345B8	32	sdk/fun_002345b8.c		
 0X2352B0	func_002352B0	216	sdk/fun_002352b0.c		
 0X235388	func_00235388	236	sdk/fun_00235388.cpp		
+0X235780	func_00235780	56	sdk/fun_00235780.c		
 0X2357B8	func_002357B8	176	sdk/fun_002357b8.c		
 0X235868	func_00235868	52	sdk/fun_00235868.c		
 0X2358A0	func_002358A0	144	sdk/fun_002358a0.c		
@@ -5481,6 +5487,7 @@ address	name	size	file	whole_file	symbol
 0X24A9D8	sceMpegCreate	568	sdk/sceMpegCreate.cpp		
 0X24AC10	func_0024AC10	200	sdk/fun_0024ac10.c		
 0X24ACD8	func_0024ACD8	436	sdk/fun_0024acd8.c		
+0X24B480	sceMpegInit	176	sdk/sceMpegInit.c		
 0X24B530	func_0024B530	8	sdk/fun_0024b530.cpp		
 0X24B540	sceMpegGetPicture	72	sdk/sceMpegGetPicture.cpp		
 0X24B590	func_0024B590	124	sdk/fun_0024b590.cpp		
@@ -5531,6 +5538,7 @@ address	name	size	file	whole_file	symbol
 0X253FA8	func_00253FA8	232	sdk/fun_00253fa8.c		
 0X254090	func_00254090	12	unsorted/fun_00254090.c		
 0X2540A0	func_002540A0	12	unsorted/fun_002540a0.c		
+0X2540B0	func_002540B0	484	unsorted/fun_002540b0.cpp		
 0X254298	func_00254298	12	unsorted/fun_00254298.c		
 0X2542A8	func_002542A8	12	unsorted/fun_002542a8.c		
 0X2542B8	func_002542B8	464	sdk/fun_002542b8.c		

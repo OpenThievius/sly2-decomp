@@ -434,7 +434,80 @@ extern "C" int func_001BD718(float sNow, QW pos, void *ppathzone, void *pquery, 
 
 INCLUDE_ASM(0X1BD8A8);
 
-INCLUDE_ASM(0X1BDA00);
+void *memset(void *, int, unsigned int);
+
+struct OBSTACLEGROUP : LO {
+    u8 pad50[0x10];
+    float mat[16];
+    u8 padA0[0x40];
+    s32 field_0xE0;
+    s32 field_0xE4;
+    u8 padE8[4];
+    float *mpicv;
+    void *field_0xF0;
+    void *field_0xF4;
+    u8 padF8[0xC8];
+    s32 field_0x1C0;
+    u8 pad1C4[0x14];
+    s32 field_0x1D8;
+    u8 pad1DC[0xC];
+    s32 field_0x1E8;
+    void *field_0x1EC;
+};
+
+extern "C" OBSTACLEGROUP *PloNew(int, int, int, int);
+
+extern "C" void *PvAllocSwImpl__Fi(ALLOCREQ *);
+
+extern "C" void AppendDlEntry_1BDA00(DL *, void *);
+
+extern "C" void RemoveDlEntry_1BDA00(DL *, void *);
+
+extern "C" DL B_003E1A40_1BDA00;
+
+extern "C" OBSTACLEGROUP *PobstacleGroupAlloc()
+{
+    OBSTACLEGROUP *group = (OBSTACLEGROUP *)B_003E1A40_1BDA00.head;
+    if (group == 0) {
+        int index = 0;
+        do {
+            OBSTACLEGROUP *fresh = PloNew(0xE, 0, 0x2CD, -1);
+            float *pmat = fresh->mat;
+            fresh->field_0xE0 = 0;
+            fresh->field_0xE4 = 1;
+            fresh->field_0x1C0 = 1;
+            memset(pmat, 0, 0x40);
+            pmat[15] = 1.0f;
+            pmat[10] = 1.0f;
+            pmat[5] = 1.0f;
+            pmat[0] = 1.0f;
+            ALLOCREQ request;
+            request.cb = 0x80;
+            request.cbAlign = 0x10;
+            fresh->mpicv = (float *)PvAllocSwImpl__Fi(&request);
+            for (int icv = 0; icv < 0x20; icv++)
+                fresh->mpicv[icv] = (float)icv;
+            request.cb = 0x80;
+            request.cbAlign = 0x10;
+            fresh->field_0xF0 = PvAllocSwImpl__Fi(&request);
+            index++;
+            request.cb = 0x200;
+            request.cbAlign = 0x10;
+            fresh->field_0xF4 = PvAllocSwImpl__Fi(&request);
+            request.cb = 0x1F0;
+            request.cbAlign = 0x10;
+            fresh->field_0x1EC = PvAllocSwImpl__Fi(&request);
+            fresh->Remove();
+            AppendDlEntry_1BDA00(&B_003E1A40_1BDA00, fresh);
+        } while (index < 0x10);
+        group = (OBSTACLEGROUP *)B_003E1A40_1BDA00.head;
+    }
+    RemoveDlEntry_1BDA00(&B_003E1A40_1BDA00, group);
+    group->field_0x1E8 = -1;
+    group->Add();
+    group->field_0x1D8 = 0;
+    return group;
+}
 
 int func_001BDBC8(float *a, float *b) {
     int r = -1;

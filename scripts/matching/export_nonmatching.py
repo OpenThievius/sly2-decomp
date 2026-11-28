@@ -66,6 +66,19 @@ def evaluate(job):
     return address, best
 
 
+def published_regressions(previous, current):
+    """The published near misses that got worse or lost their source: [(address, name, old score, new score or None)], by address.
+    `previous` is {address: (name, score)} of the MANIFEST before this run, `current` is {address: score} of this run. A hand-written draft in
+    data/matching/src/fn that stops compiling (a header change that clashes with its local type) drops out of the candidates silently, and the
+    function falls back to a worse m2c draft or to none: this names it, so the draft is repaired in the registry instead of lost."""
+    regressions = []
+    for address, (name, old) in previous.items():
+        new = current.get(address)
+        if new is None or new > old:
+            regressions.append((address, name, old, new))
+    return sorted(regressions, key=lambda entry: int(entry[0], 16))
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--sweep', default=os.path.join('work', 'matching', 'sweep', 'results.json'))
@@ -115,6 +128,16 @@ def main():
         with open(path, 'rb') as handle:
             desired[relative] = handle.read()
         manifest.append((f'{address:#X}', function['name'], str(function['size']), relative, str(points)))
+    previous_manifest = {}
+    previous_path = os.path.join(OUTPUT, 'MANIFEST.tsv')
+    if os.path.exists(previous_path):
+        for line in open(previous_path, encoding='utf-8').read().split('\n')[1:]:
+            columns = line.split('\t')
+            if len(columns) > 4 and columns[4].isdigit():
+                previous_manifest[columns[0]] = (columns[1], int(columns[4]))
+    for address, name, old_score, new_score in published_regressions(previous_manifest, {entry[0]: int(entry[4]) for entry in manifest}):
+        print(f'WARNING: {address} {name} was published at {old_score} and is now {"gone" if new_score is None else new_score}: '
+              f'does data/matching/src/fn/{int(address, 16):06X} still compile (a header it clashes with)?')
     desired['MANIFEST.tsv'] = ('address\tname\tsize\tfile\tscore\n' + ''.join('\t'.join(entry) + '\n' for entry in sorted(manifest))).encode()
     if readme is not None:
         desired['README.md'] = readme.encode()

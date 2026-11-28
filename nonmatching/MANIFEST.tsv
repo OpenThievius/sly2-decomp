@@ -240,7 +240,6 @@ address	name	size	file	score
 0X19DF70	PresetJtAccelPipe__FP2JT	416	steppipe/PresetJtAccelPipe__FP2JT.cpp	16
 0X19E1E0	UpdateJtActivePipe	1904	new_19e110/UpdateJtActivePipe.cpp	60
 0X19EA00	func_0019EA00	96	new_19e110/fun_0019ea00.c	20
-0X19FEB0	AddSafePointOnGeom	408	jp-stepzap/AddSafePointOnGeom.cpp	17
 0X1A0300	BuildPlainBlend	336	jp-stepzap/BuildPlainBlend.cpp	6
 0X1A0450	SolvePlainBlendWeights	720	jp-stepzap/SolvePlainBlendWeights.c	163
 0X1A0720	SetJtGoalVelocityFromStick	672	jp-stepzap/SetJtGoalVelocityFromStick.c	166
@@ -298,7 +297,6 @@ address	name	size	file	score
 0X1BD040	Obstacle_AddToPathzone	416	new_1bc198/Obstacle_AddToPathzone.c	84
 0X1BD400	Obstacle_UpdatePlanes	352	new_1bc198/Obstacle_UpdatePlanes.c	74
 0X1BD8A8	func_001BD8A8	344	new_1bc198/fun_001bd8a8.c	68
-0X1BDA00	PobstacleGroupAlloc	456	new_1bc198/PobstacleGroupAlloc.cpp	31
 0X1BDE80	MergeObstacles	872	new_1bc198/MergeObstacles.c	186
 0X1BE398	func_001BE398	856	rog-path/fun_001be398.cpp	59
 0X1BF1F8	PcgtPointInCgSafe	416	rog-path/PcgtPointInCgSafe.c	104
@@ -320,7 +318,6 @@ address	name	size	file	score
 0X1C7C30	SetClueFound	208	new_1c76d0/SetClueFound.cpp	7
 0X1C84D8	func_001C84D8	600	new_1c76d0/fun_001c84d8.cpp	44
 0X1C9058	StartLoadingLogo	56	prog-memcard/StartLoadingLogo.cpp	3
-0X1C9688	StaticInitLoadingLogo	664	new_1c90d0/StaticInitLoadingLogo.cpp	65
 0X1C9B08	func_001C9B08	1552	new_1c90d0/fun_001c9b08.cpp	24
 0X1CA118	LO_SetCloneId	496	new_1c90d0/LO_SetCloneId.cpp	19
 0X1CAA60	ReleaseLease	896	new_1c90d0/ReleaseLease.cpp	13
@@ -439,8 +436,6 @@ address	name	size	file	score
 0X20C2F8	SetJumperState	1024	steprun-stream/SetJumperState.cpp	69
 0X20C7E0	LoadDirAnimSet	360	steprun-stream/LoadDirAnimSet.c	71
 0X20E890	ExecuteSwLoadRequest	1840	new_20e040/ExecuteSwLoadRequest.c	327
-0X214100	FStartSpriteDepthInstance	432	screen-font/FStartSpriteDepthInstance.cpp	4
-0X2149D8	LoadMovieCharacter	3048	screen-font/LoadMovieCharacter.cpp	5
 0X215F40	CMovieText_ClineWrap	408	font-break/CMovieText_ClineWrap.cpp	5
 0X2160D8	CMovieText_UpdateFont	240	font-break/CMovieText_UpdateFont.cpp	38
 0X216750	CMovieText_DrawGlyphs	1008	font-break/CMovieText_DrawGlyphs.cpp	2
@@ -497,7 +492,6 @@ address	name	size	file	score
 0X2332B8	memmove	440	sdk/memmove.cpp	61
 0X233828	func_00233828	152	sdk/fun_00233828.cpp	19
 0X2355E0	func_002355E0	376	sdk/fun_002355e0.c	71
-0X235780	func_00235780	56	sdk/fun_00235780.c	6
 0X235930	func_00235930	472	sdk/fun_00235930.cpp	99
 0X236A60	sceSifInitRpc	416	sdk/sceSifInitRpc.c	26
 0X236D60	func_00236D60	208	sdk/fun_00236d60.cpp	32
@@ -546,21 +540,19 @@ address	name	size	file	score
 0X247028	__ieee754_sqrt	776	sdk/__ieee754_sqrt.cpp	226
 0X249CE0	rint	512	sdk/rint.cpp	31
 0X24AE90	func_0024AE90	696	sdk/fun_0024ae90.cpp	33
-0X24B480	sceMpegInit	176	sdk/sceMpegInit.c	2
 0X24B628	sceMpegAddCallback	56	sdk/sceMpegAddCallback.cpp	8
 0X24B660	func_0024B660	16	sdk/fun_0024b660.cpp	3
 0X24B670	func_0024B670	120	sdk/fun_0024b670.cpp	31
 0X24B6E8	func_0024B6E8	120	sdk/fun_0024b6e8.cpp	27
 0X24BC80	func_0024BC80	704	sdk/fun_0024bc80.cpp	99
 0X24C4B0	func_0024C4B0	448	sdk/fun_0024c4b0.cpp	109
-0X24C670	func_0024C670	1240	sdk/fun_0024c670.cpp	12
+0X24C670	func_0024C670	1240	sdk/fun_0024c670.cpp	8
 0X24F970	func_0024F970	200	sdk/fun_0024f970.cpp	13
 0X250360	func_00250360	592	sdk/fun_00250360.cpp	139
 0X2515F0	func_002515F0	416	sdk/fun_002515f0.c	95
 0X251CE8	func_00251CE8	376	sdk/fun_00251ce8.cpp	46
 0X252148	func_00252148	232	sdk/fun_00252148.c	11
-0X2539D0	func_002539D0	688	sdk/fun_002539d0.c	33
-0X2540B0	func_002540B0	488	sdk/fun_002540b0.cpp	6
+0X2539D0	func_002539D0	688	sdk/fun_002539d0.c	27
 0X254CA0	InitIpu	568	sdk/InitIpu.c	30
 0X254EF0	func_00254EF0	16	sdk/fun_00254ef0.cpp	6
 0X256AF0	func_00256AF0	88	sdk/fun_00256af0.cpp	7

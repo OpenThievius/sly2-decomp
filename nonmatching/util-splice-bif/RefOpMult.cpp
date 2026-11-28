@@ -12,7 +12,7 @@ struct VU_VECTOR { QW m_q; VU_VECTOR(const VECTOR &vector); };
 VU_VECTOR operator*(VU_FLOAT vuf, VU_VECTOR vuv);
 MATRIX4 operator*(const MATRIX4 &matrixLeft, const MATRIX4 &matrixRight);
 extern "C" {
-CRef *CRef_SetF32(CRef *pref, float g);
+CRef *SetF32__4CReff(CRef *pref, float g);
 CRef *CRef_SetVector(CRef *pref, QW vector);
 CRef *CRef_SetMatrixPtr(CRef *pref);
 CRef *CRef_RefClone(CRef *pref, CRef *ref, CFrame *pframe, unsigned long ulArg);
@@ -57,7 +57,7 @@ CRef RefOpMult(int cref, CRef *aref)
     int fInteger = 0;
     switch (aref->m_tagk) {
     case TAGK_S32:
-        CRef_SetF32(&ref, (float)aref->m_tag.m_n);
+        SetF32__4CReff(&ref, (float)aref->m_tag.m_n);
         fInteger = 1;
         break;
     case TAGK_F32:

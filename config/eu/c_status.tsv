@@ -2870,6 +2870,7 @@ us_address	name	other_address	pair	score	addresses
 0x19FAF8	FindBestSafePoint	0X19FA80	same	0	ok
 0x19FC30	UpdateJtSafePoints	0X19FBB8	same	0	ok
 0x19FD30	AddSafePointOnMember	0X19FCB8	same	0	ok
+0x19FEB0	AddSafePointOnGeom	0X19FE38	same	0	ok
 0x1A0048	RemoveSafePoints	0X19FFD0	identical	0	ok
 0x1A00D0	RemoveSafePointsOfLo	0X1A0058	same	0	ok
 0x1A01A8	StaticInitSlotheaps_1a01a8	0X1A0130	same	0	ok
@@ -3347,6 +3348,7 @@ us_address	name	other_address	pair	score	addresses
 0x1BD310	PobstacleFindEdgeBlocker	0X1BD578	same	0	ok
 0x1BD560	func_001BD560	0X1BD7C8	same	0	ok
 0x1BD718	func_001BD718	0X1BD980	same	0	ok
+0x1BDA00	PobstacleGroupAlloc	0X1BDC68	same	0	ok
 0x1BDBC8	func_001BDBC8	0X1BDE30	identical	0	ok
 0x1BDE18	Obstacle_JoinGroup	0X1BE080	same	0	ok
 0x1BE1E8	AssignObstaclesToPathzones	0X1BE450	same	0	ok
@@ -3527,6 +3529,7 @@ us_address	name	other_address	pair	score	addresses
 0x1C90D0	InitLoadingLogoThread	0X1C9340	same	0	ok
 0x1C9190	LoadingLogoThread	0X1C9400	same	0	ok
 0x1C93E0	DrawLoadingLogo	0X1C9650	same	3	ok
+0x1C9688	StaticInitLoadingLogo	0X1C98F8	same	0	ok
 0x1C9920	StaticInitLoadingLogo_thunk	0X1C9B90	same	0	ok
 0x1C9940	MakeCloneId	0X1C9BB0	gap	0	ok
 0x1C9950	IsetFromCloneId	0X1C9BC0	gap	0	ok
@@ -4852,10 +4855,12 @@ us_address	name	other_address	pair	score	addresses
 0x213DB0	SwitchBlotLabel	0X214580	same	0	ok
 0x213E20	FGetSpriteSlotTransform	0X2145F0	same	0	ok
 0x213F70	FStartSpriteLabelInstance	0X214740	same	0	ok
+0x214100	FStartSpriteDepthInstance	0X2148D0	same	0	ok
 0x2142B0	FSpriteHasLabel	0X214A80	identical	0	ok
 0x214300	SetBlotModal	0X214AD0	same	0	ok
 0x214398	LoadMovieDictionary	0X214B68	same	0	ok
 0x214460	LoadMovieSprites	0X214C30	same	0	ok
+0x2149D8	LoadMovieCharacter	0X2151A8	gap	0	ok
 0x2155C0	func_002155C0	0X215D90	same	0	ok
 0x2156B8	InitDepthSlot	0X215E88	same	0	ok
 0x215730	func_00215730	0X215F00	same	0	ok
@@ -5227,6 +5232,7 @@ us_address	name	other_address	pair	score	addresses
 0x2345B8	func_002345B8	0X234E00	same	0	ok
 0x2352B0	func_002352B0	0X235AF0	same	0	ok
 0x235388	func_00235388	0X235BC8	same	0	ok
+0x235780	func_00235780	0X235FC0	identical	0	ok
 0x2357B8	func_002357B8	0X235FF8	same	0	ok
 0x235868	func_00235868	0X2360A8	same	0	ok
 0x2358A0	func_002358A0	0X2360E0	identical	0	ok
@@ -5481,6 +5487,7 @@ us_address	name	other_address	pair	score	addresses
 0x24A9D8	sceMpegCreate	0X24B420	same	0	ok
 0x24AC10	func_0024AC10	0X24B658	same	0	ok
 0x24ACD8	func_0024ACD8	0X24B720	same	0	ok
+0x24B480	sceMpegInit	0X24BEC8	same	0	ok
 0x24B530	func_0024B530	0X24BF78	gap	0	ok
 0x24B540	sceMpegGetPicture	0X24BF88	same	0	ok
 0x24B590	func_0024B590	0X24BFD8	same	0	ok
@@ -5531,6 +5538,7 @@ us_address	name	other_address	pair	score	addresses
 0x253FA8	func_00253FA8	0X2549F8	same	0	ok
 0x254090	func_00254090	0X254AE0	gap	0	ok
 0x2540A0	func_002540A0	0X254AF0	gap	0	ok
+0x2540B0	func_002540B0	0X254B00	same	0	ok
 0x254298	func_00254298	0X254CE8	gap	0	ok
 0x2542A8	func_002542A8	0X254CF8	gap	0	ok
 0x2542B8	func_002542B8	0X254D08	same	0	ok

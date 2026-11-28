@@ -37,6 +37,7 @@ RETAIL = os.path.join('work', 'elf', 'SCUS_973.16')
 TEXT_START, TEXT_END, FILE_OFFSET_OF_TEXT = 0x100000, 0x259DF0, 0x80
 RODATA_START, RODATA_END = 0x262380, 0x2AC864
 ADDRESS_NAME = re.compile(r'^([A-Z]{1,3})_([0-9A-Fa-f]{8})$')
+import zero_objects  # noqa: E402  (scripts/build)
 
 os.makedirs(RUNS, exist_ok=True)
 os.makedirs(os.path.join(BUILD, 'data'), exist_ok=True)
@@ -666,8 +667,20 @@ def build(swapped, active, raw_pieces):
             sizes[section_name] = size
     with open(os.path.join(BUILD, 'image.bin'), 'wb') as handle:
         handle.write(image_bytes)
+    zero_credited = []  # zero-initialised objects of the active whole files that retail keeps as zeros in .rodata (zero_objects.py)
+    for start in sorted(active):
+        names = {name for name in wholes[start][5] if ADDRESS_NAME.match(name)}
+        if not names:
+            continue
+        with open(wholes[start][1], 'rb') as handle:
+            elf = ELFFile(handle)
+            sections = {index: section.name for index, section in enumerate(elf.iter_sections())}
+            symbols = [(int(ADDRESS_NAME.match(symbol.name).group(2), 16), symbol['st_size'], sections.get(symbol['st_shndx'], ''))
+                       for symbol in elf.get_section_by_name('.symtab').iter_symbols() if symbol.name in names]
+        zero_credited += zero_objects.zero_ranges(symbols, lambda address, size: retail[FILE_OFFSET_OF_TEXT + address - TEXT_START:FILE_OFFSET_OF_TEXT + address - TEXT_START + size],
+                                                  RODATA_START, RODATA_END)
     with open(os.path.join(BUILD, 'proved_rodata.json'), 'w') as handle:  # item ranges of the active retargeted whole files, proved equal to retail: make_objdiff.py counts them as matched data
-        json.dump(sorted(item for start in active & retargeted_wholes for item in retarget_proved.get(start, [])), handle)
+        json.dump(sorted({tuple(item) for item in (item for start in active & retargeted_wholes for item in retarget_proved.get(start, []))} | set(zero_credited)), handle)
     with open(os.path.join(BUILD, 'sections.json'), 'w') as handle:  # the sizes of the `.ro_` and `.dd_` sections: make_objdiff.py reads their bytes from image.bin
         json.dump({name: size for name, size in sizes.items() if name.startswith(('.ro_', '.dd_'))}, handle)
     print(f'build: runs {t_runs:.1f}s, pieces {t_pieces:.1f}s, ld {t_ld:.1f}s ({len(jobs)} chunks)', flush=True)

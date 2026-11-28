@@ -52,7 +52,7 @@ retail's; read each shifted offset as "which earlier allocation was bigger".
 | Reload where ours has a pseudo | A hidden rotation step: a second spill register from a rematerialised constant (`sly1:func_0014C858`) |
 | Reload of `self->field` missing | Member access instead of `*(s32*)((u8*)self + N)`, or the reverse |
 
-Diagnose, **measured on Sly 1**: grep the `.greg` dump for `Spilling reg N.` lines. Each `Spilling for insn K.` block lists
+Diagnose, **measured on Sly 1** (correction 2026-11-27: on this toolchain the kept `.greg` dumps carry only `Spilling for insn N.` lines without register numbers, so this grep finds nothing; `regalloc.py` names the reload choices instead): grep the `.greg` dump for `Spilling reg N.` lines. Each `Spilling for insn K.` block lists
 that insn's spill registers; a register number that appears once in the whole function (`Spilling reg 4` is `a0`) points at the
 insn that created it. Then check the pseudo's costs in `.lreg` (`regclass` lines) and use regalloc.py's allocator column.
 

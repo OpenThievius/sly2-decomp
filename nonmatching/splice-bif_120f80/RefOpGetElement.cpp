@@ -4,7 +4,7 @@ struct CFrame;
 extern "C" {
 void CRef_Destruct(CRef *);
 CRef *CRef_CopyConstruct(CRef *, CRef *);
-void CRef_SetF32(CRef *, float);
+void SetF32__4CReff(CRef *, float);
 void CRef_SetVectorPtr(CRef *, void *);
 }
 extern "C" CRef *RefOpGetElement(CRef *pret, int carg, CRef *aref, CFrame *pframe)
@@ -19,7 +19,7 @@ extern "C" CRef *RefOpGetElement(CRef *pret, int carg, CRef *aref, CFrame *pfram
             CRef_SetVectorPtr(&refElement, aref->ptr + row * 4);
         } else {
             PAIR *next = pair->next;
-            CRef_SetF32(&refElement, (aref->ptr + row * 4)[next->n]);
+            SetF32__4CReff(&refElement, (aref->ptr + row * 4)[next->n]);
         }
         break;
     }
@@ -28,13 +28,13 @@ extern "C" CRef *RefOpGetElement(CRef *pret, int carg, CRef *aref, CFrame *pfram
     case 0x1D:
         {
             int index = pair->n;
-            CRef_SetF32(&refElement, aref->ptr[index]);
+            SetF32__4CReff(&refElement, aref->ptr[index]);
         }
         break;
     case 0x1E:
         {
             int index = pair->n;
-            CRef_SetF32(&refElement, aref->ptr[index]);
+            SetF32__4CReff(&refElement, aref->ptr[index]);
         }
         break;
     default:

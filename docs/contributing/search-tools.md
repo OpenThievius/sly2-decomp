@@ -13,6 +13,8 @@ and `pyelftools`); [matching.md](matching.md) explains the score and [lessons.md
 | `scripts/matching/globalalloc.py` | `--address ADDRESS FILE FUNC` or `--dumps DIR FUNC`: replays local-alloc and global-alloc from the `-dl -dg` dumps (`--check` compares with them: fmodf agrees on all 61 pseudos), `--set REG:refs=N,length=N,local=H` and `--pri REG=N` flip one ranking to find the minimal change that gives retail's register, `--trace REG` explains one pseudo's turn. Ported from sly1-decomp (AGPL). | A register swap where `regalloc.py` says only 'the dump does not show why'. |
 | `scripts/matching/sly1_seed_extract.py`, `sly1_seed_run.py`, `sly1_seed_flatten.py` | Sly 1 bodies as drafts: extract the C of each Sly 1 function (local checkout of sly1-decomp in `work/sly1-decomp`), compile each paired file with its own flags and score the paired Sly 2 function (`matches.tsv`, relocations masked, no link check). Pilot 2026-11-14: of 195 unmatched Sly 2 functions with a Sly 1 body, 172 compile; 9 score 0, 24 at most 16 words, the draft beats our best on 69 (56 by 10 or more); on the 777 matched controls 223 score 0 and 503 at most 16. | After a land, to seed near misses (`sly1_seed_flatten.py` makes the 5-16 word seeds searchable with `SCORER_NO_LINK=1`); read each zero before landing (rename, `types.h`, `source:sly1-decomp`). |
 | `scripts/matching/rules.py` | The source shapes the deep dives found (docs/contributing/matching.md, "One function per kind") as rewrites: indexed loop for m2c's pointer walk, `&a[i]` with the scaled index first, `const` on `RO_` externs, a `void` function returning its result, a dummy parameter where m2c's `argN` numbering skips a register, a virtual call without its trailing object argument, a global declared as an array, a callee's trailing argument appended, dropped or replaced (and a member re-read after a call), a float parameter moved to another position, `long long` as `long`, a by-value class return. `neighborhood.py` imports it, so every rule is judged with the other edits, chained with them and kept in the beam: a corrected argument that first scores worse can still lead to 0. | The near misses that the permuters and mutations did not move: the rules are the causes found by hand, so they fix what a reordering cannot. `python3 scripts/matching/rules.py SOURCE` prints the rewrites a source gets. `make rules` runs them (with the neighborhood search) over the near misses: `make rules MIN=1 MAX=20 BUDGET=800 JOBS=8`; a better source is written to `data/matching/src/fn`, register it afterwards with `try.py --record` (or `record_round.py`), then `make src`, `make elf`. |
+| `scripts/matching/tsearch.py` (with `meaning_rewrites.py`, `source_tree.py`) | A beam search over rewrites that keep the function's meaning: statements moved past the ones they do not depend on, `while`/`for`/do-while forms, if/else against a ternary, early returns, `x = x op y` against `op=`, operands of one commutative operator swapped (parsed, so `a * b + c` stays a polynomial), declarations hoisted or sunk, `const` locals, pointer against reference locals, an argument named by a local of the callee's parameter type, switch against an if chain, pointer walks, `T *element = &A[i]`, two locals merged or one split, a test written in each arm, case order and a value set in every case, a repeated expression named once, a constant local written as its literal (`meaning_rewrites.py --list`). `source_tree.py` reads the function and says what each statement reads and writes, so no rewrite moves a statement past one that touches the same local, or a memory access past a store or a call. Results (each step as a diff, the check_source findings) go to `work/matching/tsearch/<ADDRESS>/`, never to `data/` or `src/`; `--resume` continues a run. Ideas from sly1-decomp's `tools/tsearch.py` (AGPL), code our own. | A near miss the neighbourhood search did not move, or whose winning edit changed the meaning (below). `make tsearch ADDRESS=0x1D54B8` or `make tsearch MIN=5 MAX=16`. |
+| `scripts/matching/sitesearch.py` | Statements written in at one site, each keeping the meaning: a store in both arms, a member read once into a local, a clamp in its four forms, a flag as a value, a counted loop counting down, a copy after a join (`last = c`), an empty `case` (`--generators`). Resumable log in `work/matching/sitesearch/<ADDRESS>/`. | After `tsearch.py`, on the same function: `make sitesearch ADDRESS=0x18A4E8`. |
 | `scripts/matching/mutate.py` | Random climbing with the same rewrites (one more than before: `volatile_slot`, see lessons). | Deeper, cheaper walks when the neighbourhood is exhausted. |
 | `scripts/matching/callee_sigs.py` | Reads each function's return type from the code: a caller reads `$v0` or `$f0` after the call, or the callee writes it before `jr $ra`. `check` lists source declarations that disagree, `sweep` tries every single and paired return-type change on the near misses. | Callee declarations steer scheduling even when the result is dropped. |
 | `scripts/matching/idioms.py` | `mine` counts source shapes over the matched sources, `suggest ADDRESS` lists the shapes the nearest matched functions (by shared callees) use that this source does not. | A starting point when a source is far from retail. |
@@ -120,6 +122,8 @@ Every search tool has a target; `MIN`, `MAX` (the near-miss score range, default
 | `make adopt` | `adopt.py`: takes the sources of those two folders that score strictly lower than the current ones into `data/matching/src/fn` (a `.c` file is judged as C) |
 | `make mutate` | `mutate.py --batch`: the random rewrites |
 | `make rules` | `neighborhood.py --batch` with the rewrites of `rules.py` |
+| `make tsearch` | `tsearch.py` on `ADDRESS`, or `--batch` over the near misses scoring `MIN` to `MAX`; results in `work/matching/tsearch` |
+| `make sitesearch ADDRESS=0x18A4E8` | `sitesearch.py` on one function; results in `work/matching/sitesearch` |
 | `make search` | `boundary-suspects`, `sigs`, `fix-stack`, `permute-stores`, `adopt`, `rules` in that order |
 | `make land` | after any of them: register the matches, publish, byte gate, reports (below) |
 
@@ -171,3 +175,35 @@ to its own block so they share a slot, a dead `QW junk[N]` the frame shows, and 
 Tried and dropped: a lint for a callee declared with more integer parameters than its own code reads (`callee_sigs` `params`). It fired on 19% of the matched
 sources, because a callee may ignore an argument its callers still pass: the check needs retail's call sites (which argument registers are set before the `jal`),
 not the callee's code. The search is still not protected against an invented argument; the score is, since retail does not set the register.
+
+## Rewrites that keep meaning: tsearch.py and sitesearch.py (2026-11-28)
+
+sly1-decomp's `tools/tsearch.py` and `tools/sitesearch.py` (AGPL-3.0) were read for their ideas; the code here is new. Their rewrite library was compared with ours
+(`mutate.py`, `rules.py`, `neighborhood.py`, `permute*.py`): already ours were the zero tests, `++`/`+=`, declaration split, merge and order, swapped arms, `for` as
+`while`, the guarded do-while, single exit, callee return types, float parameter positions and chained stores. New, and ported as the 18 rewrites of `meaning_rewrites.py`:
+dependence-checked statement moves, `while` as `for` and back, the do-while of a loop whose first test is known true, ternaries, the else after an exit and the final
+early return, every compound assignment, a parsed commute, declarations hoisted and sunk, `const` locals, pointer against reference, argument locals, switch against if
+chains, pointer walks, element pointers, merged and split locals, a test in each arm, case order and a value set in every case, a repeated expression named once and a
+constant local inlined. Left out: their VU0 helper swaps and `Vu0::Q` stores (Sly 1's helpers, not ours), widths of parameters and callee return types (a prototype
+retail's code does not show is banned here), parameter order (`rules.py` has it), named constants (a local that only holds a literal is steering, exceptions.md) and
+inline helpers in place or as calls (a static inline written only to move instructions is refused, matching.md "Rulings"). sly1-decomp's sitesearch has one generator
+for one function, built around a stand-in statement that is not the original's; ours has seven general generators and every candidate keeps the meaning.
+
+Pilot (2026-11-28, 300 candidates judged per function and tool, one function at a time, game range only):
+
+| Set | Tool | Improved | Score 0 | Words gained | Judged | Compiled |
+| :--- | :--- | ---: | ---: | ---: | ---: | ---: |
+| 26 unwalled near misses (score 6 to 96; only 4 unwalled ones score 5 to 16) | `neighborhood.py` | 13 | 0 | 93 | 7,800 | 7,773 |
+| | `tsearch.py` | 7 | 1 | 54 | 6,779 | 6,234 |
+| | `sitesearch.py` | 2 | 0 | 13 | 163 | 161 |
+| 24 tie walls scoring 8 or less (`SEARCH_INCLUDE_WALLS=1`) | `neighborhood.py` | 1 | 0 | 2 | 7,018 | 6,994 |
+| | `tsearch.py` | 0 | 0 | 0 | 6,055 | 5,749 |
+| | `sitesearch.py` | 0 | 0 | 0 | 94 | 94 |
+
+The new tools beat the neighbourhood search on six functions: StoreAudioModeInSave 9 to 0 (`const_local`: `SAVE *const save = &B_003D4A60;` in case 2, the hi-only
+hoist class of matching.md; try.py says MATCH, its whole file has not been landed), SwarmGroup_LayoutBands 38 to 18 (two `reuse_variable` merges), SRandNearCrv 52 to 41
+(`reuse_variable`, `ternary_assignment`), CMovieText_UpdateFont 38 to 32 (two `move_statement`), func_00167E58 37 to 33 (`commute_operands`), GetAttachCpdefi 56 to 49
+(`empty_case`). Of the neighbourhood's 14 wins, at least six changed what the function computes and could never be a match: a commute that turned
+`bandEnd + ridersF * perBand` into `ridersF + bandEnd * perBand` (181B60), a flipped comparison that moved a subtraction across `<` (`sMax - ds < s` as `sMax - s > ds`,
+1E8008), two `int` stores as `short` (217058, 2174C8), a 32-bit load as 64-bit (176BE8) and dropped call arguments (18BCE0). Read every neighbourhood win's diff before
+adopting it; tsearch.py writes every step as a diff for that reason. The tie walls stayed where they were: wording does not move a scheduling or allocation tie.

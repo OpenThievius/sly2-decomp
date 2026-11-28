@@ -1,0 +1,6 @@
+name	address	size	kind	why
+vutext	0x259DF0	34112	vu-microcode	the .vutext section: VU microprograms, made by the VU assembler; no compiler of ours emits VU micro instructions
+irx	0x472200	474176	iop-modules	the .irx section: IOP modules (IRX files) embedded in the executable, built for the IOP's R3000 by Sony's IOP toolchain
+kernel_exec	0x2C4AC0	1960	kernel-code	R5900 code InitExecPS2 copies to kernel memory 0x80074000 with a syscall: machine code, not data a program reads
+kernel_alarm	0x2C5288	1856	kernel-code	R5900 code InitAlarm copies to kernel memory 0x80076000 with a syscall
+kernel_ee	0x2C5A68	888	kernel-code	R5900 code func_0023B290 copies to kernel memory 0x80075000 (0x330 bytes of code, then zeros)

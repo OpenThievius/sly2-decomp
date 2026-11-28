@@ -135,6 +135,29 @@ used for the first call, a second declared just before the later use) removed an
 one reused local fixed an s1/s2 swap. An explicit empty `case 1: case 2: break;` arm gave `UpdateDependentTaskState` retail's switch tree (22 to 15).
 An old draft's score is no baseline when its callee prototype was wrong: fix the prototype and re-score before comparing.
 
+## Levers from the IDEAS round and the Sly 1 pass (2026-11-27)
+
+- **A prototype fault looks like a register tie.** `FStartSpriteDepthInstance` (0x214100, wall `tie`) scored 4 because `StopSpriteInstance`
+  was declared `(SPRITE *)` and retail passes `iinst` in `$a1`: with `(SPRITE *, int iinst)`, as its matched source has it, it scores 0.
+  Before treating a wall as a tie, run `check_calls.py` and compare the callee's declaration with its matched source. The same pass found
+  three walled drafts (0x1C9058, 0x11D508, 0x122CE0) whose recorded scores rested on a wrong or steering prototype.
+- **A record filled through an inline setter in offset order.** `StaticInitLoadingLogo` (0x1C9688): `SetRgba(&part->rgba, r, g, b, a)`
+  storing the four channels in order gives retail's memset-then-stores sequence and scheduling (65 to 0); direct member stores scored 112.
+- **A lone `if (c) x |= K;` becomes `movn`; retail has a branch.** Write the store in both arms (`if (c) *slot = tag | K; else *slot = tag;`):
+  `LoadSprBuf` 45 to 34, the branch and its delay slot match. Reading a global once into a local removes a PRE-hoisted `lui %hi` before a loop
+  (45 to 35).
+- **A clamp.** `v = K; if (K < c) v = c;` gives retail's `slt; movn`; the ternary `c > K ? c : K` gives `addiu K-1; slt; movz` (`0x1BE398`).
+- **Delay slots of the SDK range** are a build rule now (`scripts/build/delay_slots.py`, docs/build/assembler.md): a volatile store before
+  a `jal` or return goes into the slot. Three matches, and the old `toolchain` walls on it were removed.
+- **Do not trust a score 0 from a search without reading the source.** `tsearch` reached 0 on `0x1D54B8` with a local `CRef` of 16 bytes
+  (`int pad[2]`); the real `CRef` is 8 bytes and the honest form scores 20. A padded local copy of a shared type is the banned form even
+  when `check_source.py` passes.
+- **Measured and struck** (do not retry without a new reason): `"+j"` and `"0"` ties on `ScaleByReciprocalX` (they break the matched
+  control `DetonateBomb`, 0 to 7), `"+j"` on `ScaleAddX` (no function has the symptom), a lui-carry symptom (zero such diffs in 5,618 stored
+  diffs), `-fexceptions` against `-fno-exceptions` in the SDK range (`.c` already decides it), `const` references and float locals for loop
+  weights, an index loop against a running pointer, `do`/`while` shape pairs, a named literal for a stride, a typed `HITFX` record for
+  reloads (28 against 9), a goto back edge with an invented second use of a global (early `lui` appears, score 32 to 100).
+
 ## Levers from the 1 to 3 KB drafts (wave L18, 2026-11-18)
 
 Seven Opus workers, one function each, 12 compiles: two reached 0 (`FlushRenderRecords` 45, `UpdateSwTargetList` 54), `DrawRhythmHud` 38 to 2,

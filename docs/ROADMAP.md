@@ -13,12 +13,12 @@ matched bytes or what counts as matched ([PRESERVATION_AND_PORT.md](PRESERVATION
 From `progress/us/report.json` and `progress/eu/report.json` on `main` (`a08128db`), `scripts/list_functions.py` and `config/`.
 Numbers move; re-measure before each step.
 
-- **Code: 79.65%** (927,380 of 1,164,348 bytes), 5,727 of 6,064 functions. The 812 permanent blockers (`config/us/blockers.tsv`: VU0,
+- **Code: 79.80%** (929,192 of 1,164,348 bytes), 5,732 of 6,064 functions. The 812 permanent blockers (`config/us/blockers.tsv`: VU0,
   MMI, COP0, hand-written, remnants) stay original assembly and are left out of the totals, so this is the share of everything C
   can express.
 - **Work queue:** 271 unmatched functions with a draft in `nonmatching/`, 14 without one (all SDK range). 244 of them are measured
   walls (`config/matching/walls.tsv`): not attempted again without an unlocking finding.
-- **Data: 33.99%** (343,849 of 1,011,732 bytes). Ceiling about 49%: the irx and vutext regions are not game C.
+- **Data: 97.76% of the data C can define** (487,569 of 498,740 bytes, 2026-11-28). The other 512,992 bytes are not data a C global can define and are left out of the totals, as the permanent blockers are (`config/us/original_data.tsv`, `progress/us/original_data.json`, shown in the README): the `.irx` IOP modules (474,176), the `.vutext` VU microprograms (34,112) and three blobs of R5900 code the SDK copies into kernel memory (4,704). Sly 1 counts such data as matched instead (its `.vutext` row); leaving it out is this project's choice, made like the blockers' (2026-11-28).
 - **PAL: 77.20%**, 5,627 functions: 100 functions do not reproduce PAL from the same C.
 - **Whole files:** 199 of 209 proved (item 2).
 
@@ -28,7 +28,7 @@ Numbers move; re-measure before each step.
 | :--- | :--- | :--- |
 | A. C-expressible code | every function outside the blockers scores 0 and `make elf` passes | 79.65% |
 | B. Whole image | `make elf` reproduces retail byte for byte | holds (a gate, not work) |
-| C. Data | data defined from C where a reader shows its type | 33.99%, ceiling about 49% |
+| C. Data | data defined from C where a reader shows its type | 97.76% of the doable data |
 | D. Source shape | one definition per type, real classes and virtuals, files as retail had them | items 1, 2, 7 |
 
 Exact C of all code (blockers counted back in) tops out near 83%. The expected ceiling of A is in the 90s, not 100%: what stays is
@@ -74,13 +74,23 @@ waves. Item numbers are stable: tools and docs cite them.
    padding and char offsets module by module.
    Waves c5 and c6 (2026-11-25, PRs #79 and the one after it): padding 3,036 -> 0 (897 sources, `u8 unknown_0xOFF[n]` gaps: honest, not yet typed members), bare `long` -> `s64`/`u64`, cast offsets 29 -> 9, char offsets 9 -> 1, vtable calls 30 -> 15, m2c 0, 3 local copies. What is left is closed by ruling or measurement: 3 cast stores and 1 char store where a typed member moved registers (`SetBtnButtons`, `GoalGoto_Init`, `GoalHit_Update`) plus address arithmetic in `fun_00217298`; 15 vtable calls on tables or classes without a header (ACT-style pointer-and-delta tables, classes 35-37, JT `SetMode`, a pointer-to-member in `ZapContinue`, a C source); 22 bare `long` lines (19 in `FillShaders`, whose own `QW` clashes with `types.h`, 3 are the word in comments and a string); the 3 local copies above. New: `include/expl.h` (EXPLSO, EXPL, EXPLO, EXPLS from retail's class table 30-33); `act.h` holds the pointer-and-delta idiom in three static inline helpers (relocated, not removed). The count that still matters is the ~2,000 `unknown_0x...` gaps: typing them as members of SO, ALO, JT, GOAL and the rest is the next wave.
    Wave c7 (2026-11-26, PR #81): that wave, on the 182 files with three or more gaps (`src/sdk` left out). 168 sources use shared classes where size, vtable and readers agree, and typed members only where a method of the class or two readers agree; 24 shared headers changed and 9 new (`bspzone`, `dzg`, `fade`, `guardspawner`, `link`, `lsg`, `ropesim`, `saa`, `vehiclegun`). `unknown_0x` gaps in `src/`: 1,917 -> 1,288 (those files: 1,066 -> 430). `laser.h` SIDE settled from the asm (`pgeom` 0, `plo` 8, `pso` 0xC). Gaps that stay have one reader or no shared class; guessed one-reader fields went to local views. Left: about 860 gaps in files with one or two gaps plus `src/sdk`; a shared `xp.h` (about ten local `XP` copies); the `lo.h` Slot20 signature, `CAMOBJ` fov (0x130 against 0x11C), `STEP` 0x208 (holds an `MQ *`), `POXA` 0x68 against `OXA::own`, `CFileLocation::Set` (stores slot before hash; local copies kept).
+   Wave c8 (2026-11-27, PR #82): five shared classes, one Opus worker each, instead of module waves. `xp.h` (one `XP` of 0xC0 bytes and its `XPD` side, 15 local copies, 22 sources), `OX` in `oxa.h` (the 0x14-byte contact node, `POXA` is `OXA`; 11 sources), STEPGUARD members (33 sources, `ZONEGUARD`, `GUARDDAMAGE`, `FALLCHECK` reconciled), JT and SLY members (15 sources, `pjtcsinfo` is an `LO *`) and SW from `Sw_Construct` (17 sources: slot heaps and lists typed, `SW::state` at 0x150 was a `WIPE` field, `SWNODE` is the `OXA` record). 98 sources, 18 mangled names changed; gates each time: clean `make elf` PASS, `rejudge` only the 3 known, `make unit`, objdiff, PAL and readme unchanged. `GoalHit_Update` showed a pointer local that only stopped a clock load from hoisting: retail has no such register, so the lever is the `CLOCK` struct (`g_2dded0.t`). Left: about 1,227 gap lines in `src/`; ACT `vec20` as a `VECTOR`, STEP 0x208, SO slot signatures, SAVEVARS (0x3A18, about ten disagreeing local copies), `HITFXDEF`, a run-blend part type, `CARRYTHROW` embedded in JT, the JMP part, about 100 sources that reach SW members through separate globals, the `OXA` link gaps as `DLE` members.
 2. **Whole files** (In Progress). Left: `po_screen_210eb0`, `SyncVBlank_file`, `StartupJmt_file`, `PloFindSpawn_file` (one callee or
    global written with several types), `QueueSwCallback_file` and `PsoHitTestLineObjects_file` (compile to another size), and four
    files with per-function flag lists. Then the 826 low-confidence cuts inside a span, checked as item 3's first stage.
 3. **Data from C** (In Progress). A global is defined in C only where its initial value reproduces retail's bytes at its address,
-   typed (`// data-ok: typed from <reader>` for a word array over 64 elements). Left: 5 word arrays no reader types, 151 jump tables of
-   unmatched functions, 6 SDK byte tables, 20 groups where Splat's labels split a word, `.bss`, and the list of defined globals
-   feeding the report per global, as sly1-decomp does. Typed with the shared headers, not new per-file structs.
+   typed (`// data-ok: typed from <reader>` for a word array over 64 elements). 2026-11-28: the 128 KB pixels of a static bitmap
+   (`D_0027A790`) are 0x2000 `QUADWORD`s from `BMP::cqw` (`include/quadword.h`: the GS upload reads pixels in quadwords), as is the 32 KB
+   table `D_0029A8D0` the generator had typed as 8,192 pointers; the gadget table is `GADGETDEF[0x2B]`; 20 rodata groups holding g++ 2.95
+   pointer-to-member constants prove as `PMF` (`include/pmf.h`); the SDK group at 0x2C8358 proves. Later on 2026-11-28: 22 generated
+   rodata files that newer matches' literals overlapped were regenerated around them, the zeroed buffer `D_002C6858` is defined `= {0}`
+   (ruled that day), the word tails after the CRC table and the message table are 22 `MOVIE` records and a font (`FONTF`, `GLYPH[163]`).
+   Data went 33.99% -> 97.76% of the
+   doable data (the denominator dropped the data no C global can define, see "Where we are"). Left: 151 jump tables of unmatched
+   functions (they follow their functions), the 128 vtables (36 files, 70 KB) typed half-way as `void *` pairs (an array of `PMF`-shaped
+   entries), `D_002BBB90` (508 pointers that are 12-byte `{fn, count, hasRest}` records), `D_002C36A0` (pairs, `SjisRange`),
+   `D_002C5EF8` (TLB entries) and `D_002C60C0` (an `.eh_frame` table: close to a dump, no reader by label), `.bss`, and the list of
+   defined globals feeding the report per global, as sly1-decomp does. Typed with the shared headers, not new per-file structs.
 4. **Port-facing metadata, no code change** (Not Started). Depends on 1. Details and reasons in [PORTING.md](PORTING.md).
    - A layer column in `src/MANIFEST.tsv` and the registry: game logic, engine, platform (SDK range, GS, VIF and DMA, IOP, memory card,
      pad, VU microcode). The Sly 1 port keeps this list by hand (`libraries.tsv`).
@@ -95,6 +105,7 @@ waves. Item numbers are stable: tools and docs cite them.
    it, `rejudge.py` the affected drafts, and run a wave only on a class where a lever just landed. Check `walls.tsv` and
    `work/matching/runs.log` before any wave. Open threads from the path-to-100 stages:
    - Near misses: `StartLoadingLogo` (9, a high-part register tie), `powf` and the libm drafts.
+   - 2026-11-27: Sly 1's compiler notes gave one lever (the delay-slot rule for the SDK range, `scripts/build/delay_slots.py`: 3 matches, the old `toolchain` walls on it removed) and one class of mistake (a wrong or steering prototype recorded as a tie: 0x214100 matched, three other recorded scores corrected). `tsearch.py` and `sitesearch.py` now search near misses with rewrites that keep the meaning; the unwalled pool is small (27 searchable) and the tie walls did not move. Next only on a measured lever.
    - Inline kind: `RenderGlobsetTree` (328, its `vcallms` and `cfc2.i` still inline asm), `func_001B8D30` (9), `func_001CC2E8` (4,
      needs a two-instruction `DotProductXy` with one user), `UpdateVehicle` (43), `UpdateGuardSensor` (26), `RefOpMult` (33).
    - Tail: `FireExplsExplso` (0x15C690) has no draft. What is left after that is a permanent wall: one line of semantics in

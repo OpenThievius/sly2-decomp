@@ -31,6 +31,9 @@ import shutil
 import subprocess
 import sys
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import delay_slots  # noqa: E402
+
 ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..'))
 COMPILER = os.path.join(ROOT, 'tools', 'compilers', 'ee-gcc2.95.3-136')
 LEGACY_COMPILER = os.path.join(ROOT, 'work', 'matching', 'compilers', 'ee-gcc2.95.3-136')
@@ -257,8 +260,20 @@ def compile_sony(language, source, output, include=None, localize=True):
     directory = SONY_COMPILER if os.path.isdir(os.path.join(SONY_COMPILER, 'bin')) else LEGACY_SONY_COMPILER
     version = os.listdir(os.path.join(directory, 'lib', 'gcc-lib', 'ee'))[0]
     temporary = output + '.tmp'
+    assembly = output + '.s'
     result = subprocess.run([WIBO, os.path.join(directory, 'bin', 'ee-gcc.exe'), '-x', language, f'-B{os.path.join(directory, "lib", "gcc-lib", "ee", version)}/',
-                             f'-I{include or os.path.join(ROOT, "include")}', *SONY_FLAGS, '-c', os.path.abspath(source), '-o', temporary], capture_output=True, text=True)
+                             f'-I{include or os.path.join(ROOT, "include")}', *SONY_FLAGS, '-S', os.path.abspath(source), '-o', assembly], capture_output=True, text=True)
+    if result.returncode or not os.path.exists(assembly):
+        return False, result.stderr or result.stdout
+    if os.environ.get('SONY_DELAY_SLOTS') != '0':  # the variable is for measuring the rule against the plain assembler
+        with open(assembly, encoding='utf-8', errors='replace') as handle:
+            text = handle.read()
+        with open(assembly, 'w', encoding='utf-8') as handle:
+            handle.write(delay_slots.fill(text))
+    # the assembler the driver runs, with the flags it gives it (docs/build/assembler.md "Delay slots of the SDK range")
+    result = subprocess.run([WIBO, os.path.join(directory, 'ee', 'bin', 'as.exe'), *[flag for flag in SONY_FLAGS if flag.startswith(('-G', '-O'))], '-mabi=eabi', '-o', temporary, assembly],
+                            capture_output=True, text=True)
+    os.remove(assembly)
     return finish_sony(result, temporary, output, localize)
 
 
