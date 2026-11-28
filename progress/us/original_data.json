@@ -1,0 +1,30 @@
+{
+ "bytes": 512992,
+ "rows": [
+  {
+   "name": "vutext",
+   "kind": "vu-microcode",
+   "bytes": 34112
+  },
+  {
+   "name": "irx",
+   "kind": "iop-modules",
+   "bytes": 474176
+  },
+  {
+   "name": "kernel_exec",
+   "kind": "kernel-code",
+   "bytes": 1960
+  },
+  {
+   "name": "kernel_alarm",
+   "kind": "kernel-code",
+   "bytes": 1856
+  },
+  {
+   "name": "kernel_ee",
+   "kind": "kernel-code",
+   "bytes": 888
+  }
+ ]
+}

@@ -27,6 +27,7 @@ import commit_msg  # noqa: E402
 import boundaries  # noqa: E402
 import compile_unit  # noqa: E402
 import delay_slots  # noqa: E402
+import original_data  # noqa: E402
 import credit_audit  # noqa: E402
 import harvest  # noqa: E402
 import export_nonmatching  # noqa: E402
@@ -2718,6 +2719,39 @@ class LocalSharedTypeReviewTests(unittest.TestCase):
         kinds = [message.split(':')[0].split(' (')[0] for _, _, message in check_source.review(text)]
         self.assertEqual(sum('CRef' in message for _, _, message in check_source.review(text)), 1)
         self.assertIn('padding member', ' '.join(kinds))
+
+
+class OriginalDataTests(unittest.TestCase):
+    """scripts/build/original_data.py: the data no C global can define is left out of the data units (config/us/original_data.tsv)."""
+    ROWS = [{'name': 'irx', 'address': 0x1000, 'size': 0x100, 'kind': 'iop-modules', 'why': ''},
+            {'name': 'kernel', 'address': 0x2040, 'size': 0x20, 'kind': 'kernel-code', 'why': ''}]
+
+    def test_a_whole_section_is_recognised(self):
+        self.assertTrue(original_data.covers_section(self.ROWS, 0x1000, 0x100))
+
+    def test_a_range_inside_a_section_is_not_a_section(self):
+        self.assertFalse(original_data.covers_section(self.ROWS, 0x2000, 0x100))
+
+    def test_a_range_is_cut_out_of_the_gap_that_holds_it(self):
+        self.assertEqual(original_data.without_ranges([(0x2000, 0x100, False)], self.ROWS[1:]), [(0x2000, 0x40, False), (0x2060, 0xA0, False)])
+
+    def test_a_piece_without_a_range_is_kept_whole(self):
+        self.assertEqual(original_data.without_ranges([(0x3000, 0x100, False)], self.ROWS), [(0x3000, 0x100, False)])
+
+    def test_a_range_inside_what_c_owns_raises(self):
+        with self.assertRaises(ValueError):
+            original_data.without_ranges([(0x2000, 0x100, True)], self.ROWS[1:])
+
+    def test_a_range_that_starts_a_piece_leaves_the_rest(self):
+        self.assertEqual(original_data.without_ranges([(0x2040, 0x40, False)], self.ROWS[1:]), [(0x2060, 0x20, False)])
+
+    def test_the_summary_counts_the_bytes_left_out(self):
+        self.assertEqual(original_data.summary(self.ROWS)['bytes'], 0x120)
+
+    def test_the_table_of_the_repository_has_whole_rows(self):
+        rows = original_data.read(os.path.join(os.path.dirname(HERE), 'config', 'us', 'original_data.tsv'))
+        self.assertEqual({row['name'] for row in rows} >= {'vutext', 'irx'}, True)
+        self.assertTrue(all(row['size'] > 0 and row['address'] > 0 for row in rows))
 
 
 if __name__ == '__main__':

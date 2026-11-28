@@ -262,6 +262,8 @@ with concurrent.futures.ThreadPoolExecutor(os.cpu_count()) as pool:
 # reach the report, never the bytes.
 DATA_SECTIONS = [('rodata', '.rodata'), ('data', '.data'), ('vutext', '.vutext'), ('irx', '.irx')]
 data_units = []
+import original_data  # noqa: E402  (scripts/build)
+ORIGINAL_DATA = original_data.read(os.path.join('config', 'us', 'original_data.tsv'))
 
 def owned_rodata(kind='rodata'):
     """[(address, bytes)] of the rodata that compiled C objects own: the `.ro_<address>` sections of the linked image (build/image/image.bin)
@@ -317,6 +319,8 @@ def build_data_units():
             section = image.get_section_by_name(section_name)
             if section is None or not section['sh_size']:
                 continue
+            if original_data.covers_section(ORIGINAL_DATA, section['sh_addr'], section['sh_size']):
+                continue  # original data (the IOP modules, the VU microprograms): left out of the totals, config/us/original_data.tsv
             blob_directory = os.path.join('build', 'objdiff', 'data', name)
             os.makedirs(blob_directory, exist_ok=True)
             retail, address = section.data(), section['sh_addr']
@@ -324,7 +328,8 @@ def build_data_units():
             header_line = f'.section {section_name}, "a", @progbits\n'
             # objdiff counts a data section as matched only when all of it matches, so the C-owned ranges are a unit of their own
             groups = {'': ([header_line], [header_line]), '-c': ([header_line], [header_line])}
-            for start, size, is_owned in data_symbols(address, section['sh_size'], owned):
+            inside = [row for row in ORIGINAL_DATA if address <= row['address'] < address + section['sh_size']]
+            for start, size, is_owned in original_data.without_ranges(data_symbols(address, section['sh_size'], owned), inside):
                 symbol = f'D_{start:08X}'
                 blob = os.path.join(blob_directory, symbol + '.bin')
                 open(blob, 'wb').write(retail[start - address:start - address + size])
@@ -349,6 +354,10 @@ def build_data_units():
                 data_units.append({'name': unit, 'target_path': expected, 'base_path': base, 'metadata': {'progress_categories': ['data'], 'complete': suffix == '-c'}})
 
 build_data_units()
+os.makedirs(os.path.join('progress', 'us'), exist_ok=True)
+with open(os.path.join('progress', 'us', 'original_data.json'), 'w') as handle:
+    json.dump(original_data.summary(ORIGINAL_DATA), handle, indent=1)
+    handle.write('\n')
 
 configuration = {
     '$schema': 'https://raw.githubusercontent.com/encounter/objdiff/main/config.schema.json',

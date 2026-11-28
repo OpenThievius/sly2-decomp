@@ -33,8 +33,12 @@ def table():
     if blockers.exists():
         blocked = json.loads(blockers.read_text(encoding='utf-8'))
     inline = inline_to_match()
-    rows = ['| Version | Code matched | Functions matched | Original assembly, outside the count | C with inline assembly to match |',
-            '| :--- | ---: | ---: | ---: | ---: |']
+    original = {'bytes': 0}
+    original_path = ROOT / 'progress' / 'us' / 'original_data.json'
+    if original_path.exists():
+        original = json.loads(original_path.read_text(encoding='utf-8'))
+    rows = ['| Version | Code matched | Functions matched | Data matched | Original assembly and data, outside the count | C with inline assembly to match |',
+            '| :--- | ---: | ---: | ---: | ---: | ---: |']
     for label, path in (('NTSC-U `SCUS_973.16`', 'progress/us/report.json'), ('PAL `SCES_525.29`', 'progress/eu/report.json')):
         report = ROOT / path
         if not report.exists():
@@ -42,13 +46,19 @@ def table():
         measures = json.loads(report.read_text(encoding='utf-8'))['measures']
         total = int(measures['total_code'])
         matched = int(measures['matched_code'])
-        rows.append('| %s | %.2f%% (%s of %s bytes) | %s of %s | %s functions, %s bytes | %s functions, %.2f%% |' % (
-            label, float(measures['matched_code_percent']), matched, total, measures['matched_functions'], measures['total_functions'],
-            blocked['functions'], blocked['bytes'], inline['functions'], 100 * inline['bytes'] / total))
+        total_data = int(measures.get('total_data', 0))
+        data = '%.2f%% (%s of %s bytes)' % (float(measures.get('matched_data_percent', 0)), measures.get('matched_data', 0), total_data) if int(measures.get('matched_data', 0)) else 'not measured'
+        rows.append('| %s | %.2f%% (%s of %s bytes) | %s of %s | %s | %s functions, %s bytes; %s bytes of data | %s functions, %.2f%% |' % (
+            label, float(measures['matched_code_percent']), matched, total, measures['matched_functions'], measures['total_functions'], data,
+            blocked['functions'], blocked['bytes'], original['bytes'], inline['functions'], 100 * inline['bytes'] / total))
     note = ('A function counts when `make elf` links its C and the image still equals retail byte for byte; for PAL, when the same C also reproduces '
             "PAL's code. Permanent blockers that are final (a VU0 or COP0 instruction, hand-written assembly, or a remnant that is not a function: "
             '`config/us/blockers.tsv`, [docs/build/vu0-mmi.md](docs/build/vu0-mmi.md)) stay original assembly for good, so they are left out of '
-            'the totals above: they are neither matched nor unmatched, and the column before the last counts them. Functions with MMI instructions '
+            'the totals above: they are neither matched nor unmatched, and the column before the last counts them. '
+            'The same goes for the data no C global can '
+            'define (`config/us/original_data.tsv`: the IOP modules, the VU microprograms and the machine code the SDK copies into kernel memory): '
+            'it is left out of the data totals and counted in that column. '
+            'Functions with MMI instructions '
             'stay in the totals as unmatched until the shared helpers rule on them, and so do the SDK functions that use `$gp` as an ordinary '
             'register (kind `gp`) until a ruling on them. Compiled C that needs a shared inline-assembly helper for an '
             'instruction GCC cannot emit (`config/us/inline_functions.tsv`, [docs/build/inline-asm-helpers.md](docs/build/inline-asm-helpers.md)) '

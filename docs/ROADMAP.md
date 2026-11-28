@@ -18,7 +18,7 @@ Numbers move; re-measure before each step.
   can express.
 - **Work queue:** 271 unmatched functions with a draft in `nonmatching/`, 14 without one (all SDK range). 244 of them are measured
   walls (`config/matching/walls.tsv`): not attempted again without an unlocking finding.
-- **Data: 33.99%** (343,849 of 1,011,732 bytes). Ceiling about 49%: the irx and vutext regions are not game C.
+- **Data: 95.91% of the data C can define** (478,321 of 498,740 bytes, 2026-11-28). The other 512,992 bytes are not data a C global can define and are left out of the totals, as the permanent blockers are (`config/us/original_data.tsv`, `progress/us/original_data.json`, shown in the README): the `.irx` IOP modules (474,176), the `.vutext` VU microprograms (34,112) and three blobs of R5900 code the SDK copies into kernel memory (4,704). Sly 1 counts such data as matched instead (its `.vutext` row); leaving it out is this project's choice, made like the blockers' (2026-11-28).
 - **PAL: 77.20%**, 5,627 functions: 100 functions do not reproduce PAL from the same C.
 - **Whole files:** 199 of 209 proved (item 2).
 
@@ -28,7 +28,7 @@ Numbers move; re-measure before each step.
 | :--- | :--- | :--- |
 | A. C-expressible code | every function outside the blockers scores 0 and `make elf` passes | 79.65% |
 | B. Whole image | `make elf` reproduces retail byte for byte | holds (a gate, not work) |
-| C. Data | data defined from C where a reader shows its type | 33.99%, ceiling about 49% |
+| C. Data | data defined from C where a reader shows its type | 95.91% of the doable data |
 | D. Source shape | one definition per type, real classes and virtuals, files as retail had them | items 1, 2, 7 |
 
 Exact C of all code (blockers counted back in) tops out near 83%. The expected ceiling of A is in the 90s, not 100%: what stays is
@@ -79,9 +79,15 @@ waves. Item numbers are stable: tools and docs cite them.
    global written with several types), `QueueSwCallback_file` and `PsoHitTestLineObjects_file` (compile to another size), and four
    files with per-function flag lists. Then the 826 low-confidence cuts inside a span, checked as item 3's first stage.
 3. **Data from C** (In Progress). A global is defined in C only where its initial value reproduces retail's bytes at its address,
-   typed (`// data-ok: typed from <reader>` for a word array over 64 elements). Left: 5 word arrays no reader types, 151 jump tables of
-   unmatched functions, 6 SDK byte tables, 20 groups where Splat's labels split a word, `.bss`, and the list of defined globals
-   feeding the report per global, as sly1-decomp does. Typed with the shared headers, not new per-file structs.
+   typed (`// data-ok: typed from <reader>` for a word array over 64 elements). 2026-11-28: the 128 KB pixels of a static bitmap
+   (`D_0027A790`) are 0x2000 `QUADWORD`s from `BMP::cqw` (`include/quadword.h`: the GS upload reads pixels in quadwords), as is the 32 KB
+   table `D_0029A8D0` the generator had typed as 8,192 pointers; the gadget table is `GADGETDEF[0x2B]`; 20 rodata groups holding g++ 2.95
+   pointer-to-member constants prove as `PMF` (`include/pmf.h`); the SDK group at 0x2C8358 proves. Data went 33.99% -> 95.91% of the
+   doable data (the denominator dropped the data no C global can define, see "Where we are"). Left: 151 jump tables of unmatched
+   functions (they follow their functions), the 128 vtables (36 files, 70 KB) typed half-way as `void *` pairs (an array of `PMF`-shaped
+   entries), `D_002BBB90` (508 pointers that are 12-byte `{fn, count, hasRest}` records), `D_002C36A0` (pairs, `SjisRange`),
+   `D_002C5EF8` (TLB entries) and `D_002C60C0` (an `.eh_frame` table: close to a dump, no reader by label), `.bss`, and the list of
+   defined globals feeding the report per global, as sly1-decomp does. Typed with the shared headers, not new per-file structs.
 4. **Port-facing metadata, no code change** (Not Started). Depends on 1. Details and reasons in [PORTING.md](PORTING.md).
    - A layer column in `src/MANIFEST.tsv` and the registry: game logic, engine, platform (SDK range, GS, VIF and DMA, IOP, memory card,
      pad, VU microcode). The Sly 1 port keeps this list by hand (`libraries.tsv`).
