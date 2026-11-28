@@ -18,7 +18,7 @@ Numbers move; re-measure before each step.
   can express.
 - **Work queue:** 271 unmatched functions with a draft in `nonmatching/`, 14 without one (all SDK range). 244 of them are measured
   walls (`config/matching/walls.tsv`): not attempted again without an unlocking finding.
-- **Data: 95.91% of the data C can define** (478,321 of 498,740 bytes, 2026-11-28). The other 512,992 bytes are not data a C global can define and are left out of the totals, as the permanent blockers are (`config/us/original_data.tsv`, `progress/us/original_data.json`, shown in the README): the `.irx` IOP modules (474,176), the `.vutext` VU microprograms (34,112) and three blobs of R5900 code the SDK copies into kernel memory (4,704). Sly 1 counts such data as matched instead (its `.vutext` row); leaving it out is this project's choice, made like the blockers' (2026-11-28).
+- **Data: 97.76% of the data C can define** (487,569 of 498,740 bytes, 2026-11-28). The other 512,992 bytes are not data a C global can define and are left out of the totals, as the permanent blockers are (`config/us/original_data.tsv`, `progress/us/original_data.json`, shown in the README): the `.irx` IOP modules (474,176), the `.vutext` VU microprograms (34,112) and three blobs of R5900 code the SDK copies into kernel memory (4,704). Sly 1 counts such data as matched instead (its `.vutext` row); leaving it out is this project's choice, made like the blockers' (2026-11-28).
 - **PAL: 77.20%**, 5,627 functions: 100 functions do not reproduce PAL from the same C.
 - **Whole files:** 199 of 209 proved (item 2).
 
@@ -28,7 +28,7 @@ Numbers move; re-measure before each step.
 | :--- | :--- | :--- |
 | A. C-expressible code | every function outside the blockers scores 0 and `make elf` passes | 79.65% |
 | B. Whole image | `make elf` reproduces retail byte for byte | holds (a gate, not work) |
-| C. Data | data defined from C where a reader shows its type | 95.91% of the doable data |
+| C. Data | data defined from C where a reader shows its type | 97.76% of the doable data |
 | D. Source shape | one definition per type, real classes and virtuals, files as retail had them | items 1, 2, 7 |
 
 Exact C of all code (blockers counted back in) tops out near 83%. The expected ceiling of A is in the 90s, not 100%: what stays is
@@ -82,7 +82,10 @@ waves. Item numbers are stable: tools and docs cite them.
    typed (`// data-ok: typed from <reader>` for a word array over 64 elements). 2026-11-28: the 128 KB pixels of a static bitmap
    (`D_0027A790`) are 0x2000 `QUADWORD`s from `BMP::cqw` (`include/quadword.h`: the GS upload reads pixels in quadwords), as is the 32 KB
    table `D_0029A8D0` the generator had typed as 8,192 pointers; the gadget table is `GADGETDEF[0x2B]`; 20 rodata groups holding g++ 2.95
-   pointer-to-member constants prove as `PMF` (`include/pmf.h`); the SDK group at 0x2C8358 proves. Data went 33.99% -> 95.91% of the
+   pointer-to-member constants prove as `PMF` (`include/pmf.h`); the SDK group at 0x2C8358 proves. Later on 2026-11-28: 22 generated
+   rodata files that newer matches' literals overlapped were regenerated around them, the zeroed buffer `D_002C6858` is defined `= {0}`
+   (ruled that day), the word tails after the CRC table and the message table are 22 `MOVIE` records and a font (`FONTF`, `GLYPH[163]`).
+   Data went 33.99% -> 97.76% of the
    doable data (the denominator dropped the data no C global can define, see "Where we are"). Left: 151 jump tables of unmatched
    functions (they follow their functions), the 128 vtables (36 files, 70 KB) typed half-way as `void *` pairs (an array of `PMF`-shaped
    entries), `D_002BBB90` (508 pointers that are 12-byte `{fn, count, hasRest}` records), `D_002C36A0` (pairs, `SjisRange`),

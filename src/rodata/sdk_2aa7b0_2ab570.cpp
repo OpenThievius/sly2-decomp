@@ -1,12 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Retail .rodata 0X2AB530-0X2AB680 (piece rodata/sdk_2aa7b0), one global per Splat label: written by scripts/build/make_data_files.py,
+// Retail .rodata 0X2AB570-0X2AB680 (piece rodata/sdk_2aa7b0), one global per Splat label: written by scripts/build/make_data_files.py,
 // listed in config/us/data_files.tsv (link_image.py links it at its address and checks the bytes).
-
-// data-ok: retail's bytes at 0X2AB530
-extern const char D_002AB530[40] = "Scmd fail sema cur_cmd:%d keep_cmd:%d\012";
-
-// data-ok: retail's bytes at 0X2AB558
-extern const char D_002AB558[24] = "Libcdvd bind err S cmd\012";
 
 // data-ok: retail's bytes at 0X2AB570
 extern const char D_002AB570[32] = "Libcdvd bind err %d CD_Init %d\012";

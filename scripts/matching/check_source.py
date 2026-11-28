@@ -73,6 +73,8 @@ DATA_OK = re.compile(r'data-ok:\s*\S')
 WORD_ARRAY_LIMIT = 64  # a plain integer word array longer than this needs its type from a reader: docs/contributing/exceptions.md "Game data defined in source"
 PLAIN_WORDS = {'int', 'u32', 's32'}  # `unsigned int` and `signed int` reach here as `int`
 TYPED_FROM = re.compile(r'data-ok:\s*typed from\s+\S')
+ZERO_BUFFER = re.compile(r'data-ok:\s*zero buffer\b')  # a zeroed buffer no reader indexes (ruled 2026-11-28): allowed only with an all-zero initializer
+ZERO_INITIALIZER = re.compile(r'^\s*(?:\{\s*(?:0[uUlL]*\s*)?\}|0[uUlL]*)\s*;?\s*$')
 
 
 def initializer_count(initializer):
@@ -102,6 +104,8 @@ def data_definitions(text):
     without the marker, or a byte-sized array (`char`, `u8`, `s8`) of more than BYTE_DUMP_LIMIT elements (a dump, not typed data), is banned:
     the source can never match as written. A plain integer word array (`int`, `unsigned int`, `u32`, `s32`) of more than WORD_ARRAY_LIMIT elements
     is banned too unless its marker names the code that shows the type (`// data-ok: typed from <reader>`): without one it is a dump in words.
+    The one other marker such an array may carry is `// data-ok: zero buffer` (ruled 2026-11-28), and only with an all-zero initializer (`{0}`, `{}`
+    or `0`): a zeroed buffer no reader indexes, defined over its whole range. A byte array over the limit stays banned whatever its marker.
     An `extern` declaration with an initializer is a definition (the form a `const` global takes to keep external linkage in C++)."""
     lines = text.split('\n')
     clean = strip_comments(text).split('\n')
@@ -134,8 +138,12 @@ def data_definitions(text):
                         found.append((start, 'banned', f'byte array of {elements} elements, over the {BYTE_DUMP_LIMIT}-element limit (a dump, not typed data): {name}'))
                     elif type_name in PLAIN_WORDS and length is not None and elements > WORD_ARRAY_LIMIT and not (
                             TYPED_FROM.search(lines[start - 1]) or (start > 1 and TYPED_FROM.search(lines[start - 2]))):
-                        found.append((start, 'banned', f'plain word array of {elements} elements, over the {WORD_ARRAY_LIMIT}-element limit, with no '
-                                                       f'`// data-ok: typed from <reader>` (a dump in words): {name}'))
+                        zero_marker = ZERO_BUFFER.search(lines[start - 1]) or (start > 1 and ZERO_BUFFER.search(lines[start - 2]))
+                        if not zero_marker:
+                            found.append((start, 'banned', f'plain word array of {elements} elements, over the {WORD_ARRAY_LIMIT}-element limit, with no '
+                                                           f'`// data-ok: typed from <reader>` (a dump in words): {name}'))
+                        elif not ZERO_INITIALIZER.match(initializer):
+                            found.append((start, 'banned', f'`// data-ok: zero buffer` on a non-zero initializer (only `{{0}}`, `{{}}` or `0` qualify): {name}'))
                 number = max(number, index)
                 line = ''
         for character in line:

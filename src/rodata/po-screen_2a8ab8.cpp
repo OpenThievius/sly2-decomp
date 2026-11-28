@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Retail .rodata 0X2A8AB8-0X2A8AF0 (piece rodata/po-screen), one global per Splat label: written by scripts/build/make_data_files.py,
+// Retail .rodata 0X2A8AB8-0X2A8AE8 (piece rodata/po-screen), one global per Splat label: written by scripts/build/make_data_files.py,
 // listed in config/us/data_files.tsv (link_image.py links it at its address and checks the bytes).
 
 // data-ok: retail's bytes at 0X2A8AB8
@@ -34,6 +34,3 @@ extern const struct {
     "YIKES",
     "&2S&."
 };
-
-// data-ok: retail's bytes at 0X2A8AE8
-extern const char D_002A8AE8[8] = "ZRB.";

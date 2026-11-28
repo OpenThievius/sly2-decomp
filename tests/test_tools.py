@@ -2274,6 +2274,15 @@ class DataDefinitionTests(unittest.TestCase):
     def test_a_long_plain_word_array_without_its_reader_is_banned(self):
         self.assertIn('a dump in words', self.kinds('// data-ok: table\nconst unsigned int g_t[65] = {0};\n')[0])
 
+    def test_a_zero_buffer_with_a_zero_initializer_is_allowed(self):
+        self.assertEqual(self.kinds('// data-ok: zero buffer, ruled 2026-11-28\nunsigned int D_002C6858[1018] = {0};\n'), [])
+
+    def test_a_zero_buffer_marker_on_a_non_zero_initializer_is_banned(self):
+        self.assertIn('non-zero initializer', self.kinds('// data-ok: zero buffer\nunsigned int g_t[65] = {1};\n')[0])
+
+    def test_a_zero_buffer_marker_does_not_allow_a_long_byte_array(self):
+        self.assertIn('a dump, not typed data', self.kinds('// data-ok: zero buffer\nunsigned char g_b[4072] = {0};\n')[0])
+
     def test_a_long_string_is_not_a_dump(self):
         self.assertEqual(self.kinds('// data-ok: message\nconst char g_s[80] = "' + 'x' * 79 + '";\n'), [])
 

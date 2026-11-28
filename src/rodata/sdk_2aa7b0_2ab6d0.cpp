@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Retail .rodata 0X2AB6D0-0X2AB8F0 (piece rodata/sdk_2aa7b0), one global per Splat label: written by scripts/build/make_data_files.py,
+// Retail .rodata 0X2AB6D0-0X2AB8C0 (piece rodata/sdk_2aa7b0), one global per Splat label: written by scripts/build/make_data_files.py,
 // listed in config/us/data_files.tsv (link_image.py links it at its address and checks the bytes).
 
 // data-ok: retail's bytes at 0X2AB6D0
@@ -90,21 +90,3 @@ extern const float D_002AB87C = 7.5497894e-08f;
 
 // data-ok: retail's bytes at 0X2AB880
 extern const float D_002AB880[16] = {0.33333334f, -0.2f, 0.14285715f, -0.111111104f, 0.09090887f, -0.07691876f, 0.06661073f, -0.058335703f, 0.04976878f, -0.03653157f, 0.01628582f, 1.0f, 1e+30f, 1.0f, 1e+30f, 0.0f};
-
-// data-ok: retail's bytes at 0X2AB8C0
-extern const char D_002AB8C0[8] = "log10";
-
-// data-ok: retail's bytes at 0X2AB8C8
-extern const unsigned int D_002AB8C8[2] = {0xe0000000, 0xc7efffff};
-
-// data-ok: retail's bytes at 0X2AB8D0
-extern const unsigned int D_002AB8D0[2] = {0x776f70, 0};
-
-// data-ok: retail's bytes at 0X2AB8D8
-extern const unsigned int D_002AB8D8[2] = {0, 0x7ff80000};
-
-// data-ok: retail's bytes at 0X2AB8E0
-extern const unsigned int D_002AB8E0[2] = {0xe0000000, 0x47efffff};
-
-// data-ok: retail's bytes at 0X2AB8E8
-extern const unsigned int D_002AB8E8[2] = {0xe0000000, 0xc7efffff};
